@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 
 const reverseGeocodeMock = vi.fn();
 const journeyPlannerMock = vi.fn();
@@ -77,6 +78,10 @@ vi.mock("mapbox-gl", () => ({
 }));
 
 import { useCampusMapModel } from "../../../pages/CampusMap/hooks/useCampusMapModel";
+
+function RouterWrapper({ children }) {
+  return <MemoryRouter>{children}</MemoryRouter>;
+}
 
 function createMutableState(overrides = {}) {
   const state = {
@@ -176,7 +181,7 @@ describe("useCampusMapModel", () => {
   });
 
   it("initialises map setup and exposes stable model fields", () => {
-    const { result, unmount } = renderHook(() => useCampusMapModel());
+    const { result, unmount } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     expect(responsiveMock).toHaveBeenCalledWith(mockState.setUi, mockState.ui.isMobile);
     expect(mapInstance.addControl).toHaveBeenCalled();
@@ -204,7 +209,7 @@ describe("useCampusMapModel", () => {
 
   it("updates selection, form, and panel state through returned handlers", () => {
     const campus = { name: "Strand Campus", coords: [-0.116, 51.5114] };
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     act(() => {
       result.current.handleSelectCampus(campus);
@@ -234,7 +239,7 @@ describe("useCampusMapModel", () => {
       form: { manualDestination: "Old", manualStart: "Start" },
     });
 
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     act(() => {
       result.current.handleClearStart();
@@ -260,7 +265,7 @@ describe("useCampusMapModel", () => {
       .mockResolvedValueOnce("Student Union")
       .mockRejectedValueOnce(new Error("no reverse geocode"));
 
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     act(() => {
       result.current.handleGeolocateStart();
@@ -304,7 +309,7 @@ describe("useCampusMapModel", () => {
       },
     });
 
-    renderHook(() => useCampusMapModel());
+    renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     await waitFor(() => expect(fetchWalkingRouteMock).toHaveBeenCalled());
     expect(displayRouteMock).toHaveBeenCalledWith(mockRefs.map.current, { id: "walk-1" });
@@ -324,7 +329,7 @@ describe("useCampusMapModel", () => {
     fetchWalkingRouteMock.mockResolvedValueOnce(null);
     journeyPlannerMock.mockRejectedValueOnce(new Error("TfL down"));
 
-    renderHook(() => useCampusMapModel());
+    renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     await waitFor(() => expect(clearRouteSourceMock).toHaveBeenCalled());
     expect(mockState.routes.routeError).toMatch(/No walking route found/i);
@@ -345,7 +350,7 @@ describe("useCampusMapModel", () => {
     });
     mockRefs.routeLayerAdded.current = false;
 
-    renderHook(() => useCampusMapModel());
+    renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     await waitFor(() => expect(clearRouteSourceMock).toHaveBeenCalled());
     expect(mockState.routes.routeInfo).toBeNull();
@@ -366,7 +371,7 @@ describe("useCampusMapModel", () => {
       },
     });
 
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     await waitFor(() => expect(fetchWalkingRouteMock).toHaveBeenCalled());
     expect(mockState.routes.routeError).toMatch(/Could not calculate the route/i);
@@ -396,7 +401,7 @@ describe("useCampusMapModel", () => {
       },
     });
 
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     act(() => {
       result.current.handleUserJourneyCalculate(
@@ -416,7 +421,7 @@ describe("useCampusMapModel", () => {
   });
 
   it("skips toggling the popup when the clicked marker's popup is already open", () => {
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     const handleCampusSelect = handleMapLoadMock.mock.calls[0][1];
     // clickedMarker's popup isOpen() = true → if (!true) = false → no togglePopup from the if branch
@@ -442,7 +447,7 @@ describe("useCampusMapModel", () => {
     });
     reverseGeocodeMock.mockRejectedValueOnce(new Error("no geocode"));
 
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     act(() => { result.current.handleGeolocateStart(); });
     await act(async () => {
@@ -459,7 +464,7 @@ describe("useCampusMapModel", () => {
     mockRefs.map.current = mapInstance;
     const mapCallsBefore = handleMapLoadMock.mock.calls.length;
 
-    renderHook(() => useCampusMapModel());
+    renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     // handleMapLoad should NOT be called since map.current is already set
     expect(handleMapLoadMock).toHaveBeenCalledTimes(mapCallsBefore);
@@ -483,7 +488,7 @@ describe("useCampusMapModel", () => {
       new Promise((resolve) => { resolveJourney = resolve; })
     );
 
-    const { unmount } = renderHook(() => useCampusMapModel());
+    const { unmount } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     await waitFor(() => expect(fetchWalkingRouteMock).toHaveBeenCalled());
 
@@ -510,7 +515,7 @@ describe("useCampusMapModel", () => {
     fetchWalkingRouteMock.mockResolvedValueOnce({ id: "walk-1" });
     journeyPlannerMock.mockResolvedValueOnce(null); // null journey → "No TfL journey found"
 
-    renderHook(() => useCampusMapModel());
+    renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     await waitFor(() => expect(journeyPlannerMock).toHaveBeenCalled());
     await waitFor(() => expect(mockState.routes.tflRouteError).toMatch(/No TfL journey found/i));
@@ -531,7 +536,7 @@ describe("useCampusMapModel", () => {
       new Promise((_, reject) => { rejectJourney = reject; })
     );
 
-    const { unmount } = renderHook(() => useCampusMapModel());
+    const { unmount } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     await waitFor(() => expect(journeyPlannerMock).toHaveBeenCalled());
 
@@ -551,7 +556,7 @@ describe("useCampusMapModel", () => {
       value: undefined,
     });
 
-    const { result } = renderHook(() => useCampusMapModel());
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: RouterWrapper });
 
     act(() => {
       result.current.handleGeolocate();

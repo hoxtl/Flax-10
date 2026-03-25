@@ -84,12 +84,18 @@ describe("CreateTaskBar", () => {
   });
 
   it("normalizes empty module and list values on change", () => {
-    const s = state({ setModuleId: vi.fn(), setTaskListId: vi.fn(), moduleOptions: [{ value: "", label: "A" }], listOptions: [{ value: "", label: "B" }] });
+    const s = state({
+      setModuleId: vi.fn(),
+      setTaskListId: vi.fn(),
+      sortedLists: [{ id: 1, name: "Inbox" }],
+      moduleOptions: [{ value: "", label: "A" }],
+      listOptions: [{ value: "", label: "B" }],
+    });
     hookMock.mockReturnValue(s);
     render(<CreateTaskBar inputRef={{ current: null }} />);
     fireEvent.change(screen.getByLabelText("Module"), { target: { value: "" } });
     fireEvent.change(screen.getByLabelText("Select list"), { target: { value: "" } });
     expect(s.setModuleId).toHaveBeenCalledWith(null);
-    expect(s.setTaskListId).toHaveBeenCalledWith("");
+    expect(s.setTaskListId).toHaveBeenCalledWith(1);
   });
 });

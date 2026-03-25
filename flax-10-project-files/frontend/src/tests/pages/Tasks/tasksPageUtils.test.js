@@ -129,12 +129,9 @@ describe("tasksPageUtils", () => {
       expect(out.some((t) => t.id === 2)).toBe(true);
       vi.useRealTimers();
     });
-<<<<<<< HEAD
-=======
-
-    it("wires modal save and close handlers, including create-list-from-task", async () => {
-      const state = {
-        activeListId: 4,
+  it("wires modal save and close handlers, including create-list-from-task", async () => {
+    const state = {
+      activeListId: 4,
         activeFilter: "today",
         setActiveListId: vi.fn(),
         setActiveFilter: vi.fn(),
@@ -251,6 +248,5 @@ describe("tasksPageUtils", () => {
       await result.taskModalProps.onSave({ title: "Ghost task" });
       expect(state.setToastUndo).toHaveBeenCalledWith(null);
     });
->>>>>>> main
   });
 });

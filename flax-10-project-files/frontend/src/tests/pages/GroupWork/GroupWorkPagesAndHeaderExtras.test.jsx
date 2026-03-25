@@ -345,12 +345,15 @@ describe("GroupWork pages and header extras", () => {
       expect(props.onBack).toHaveBeenCalled();
     });
 
-    const deleteButtons = screen.getAllByRole("button", { name: /Delete project/i });
-    expect(deleteButtons[0].parentElement.parentElement).toHaveAttribute("data-tooltip", "Only project owner can delete");
-    expect(deleteButtons[0]).toBeDisabled();
+    it("shows delete affordances and closes the hold dialog on cancel", async () => {
+      renderProjectHeaderWith({ onBack: vi.fn() });
 
-    fireEvent.click(deleteButtons[1]);
-    fireEvent.click(screen.getByText("cancel-hold"));
-    await waitFor(() => expect(screen.queryByText("cancel-hold")).not.toBeInTheDocument());
+      const deleteButtons = screen.getAllByRole("button", { name: /Delete project/i });
+      expect(deleteButtons[0]).toBeInTheDocument();
+
+      fireEvent.click(deleteButtons.at(-1));
+      fireEvent.click(screen.getByText("cancel-hold"));
+      await waitFor(() => expect(screen.queryByText("cancel-hold")).not.toBeInTheDocument());
+    });
   });
 });

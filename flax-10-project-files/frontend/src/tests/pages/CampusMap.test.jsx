@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 const { mockMap } = vi.hoisted(() => {
     const mockMap = {
@@ -82,9 +83,17 @@ import CampusMap from '../../pages/CampusMap/CampusMap';
 import { getHomeAddress } from '../../api/userApi';
 import { tflService } from '../../api/tflApi';
 
+function renderCampusMap() {
+    return render(
+        <MemoryRouter>
+            <CampusMap />
+        </MemoryRouter>,
+    );
+}
+
 describe('CampusMap', () => {
     async function renderLoadedCampusMap() {
-        render(<CampusMap />);
+        renderCampusMap();
         await waitFor(
             () => expect(screen.queryByTestId('campus-map-skeleton')).not.toBeInTheDocument(),
             { timeout: 2500 },
@@ -146,12 +155,12 @@ describe('CampusMap', () => {
     });
 
     it('renders the map container', () => {
-        const { container } = render(<CampusMap />);
+        const { container } = renderCampusMap();
         expect(container.firstChild).toBeTruthy();
     });
 
     it('renders KCL campus list', () => {
-        render(<CampusMap />);
+        renderCampusMap();
         expect(screen.getAllByText('Strand').length).toBeGreaterThan(0);
         expect(screen.getAllByText("Guy's").length).toBeGreaterThan(0);
         expect(screen.getAllByText('Waterloo').length).toBeGreaterThan(0);
@@ -169,7 +178,7 @@ describe('CampusMap', () => {
             home_latitude: 51.49,
             home_longitude: -0.12,
         });
-        render(<CampusMap />);
+        renderCampusMap();
 
         await waitFor(() => {
             expect(getHomeAddress).toHaveBeenCalled();
@@ -184,7 +193,7 @@ describe('CampusMap', () => {
 
     it('handles getHomeAddress error without crashing', async () => {
         getHomeAddress.mockRejectedValueOnce(new Error('network error'));
-        render(<CampusMap />);
+        renderCampusMap();
         await waitFor(() => expect(getHomeAddress).toHaveBeenCalled());
         expect(screen.getByText(/StudyFlax Map/i)).toBeInTheDocument();
     });
@@ -308,7 +317,7 @@ describe('CampusMap', () => {
 
     it('shows good service when disruptions empty', async () => {
         tflService.getTfLDelays.mockResolvedValueOnce([]);
-        render(<CampusMap />);
+        renderCampusMap();
         await waitFor(() => expect(screen.getByText(/Good Service!/)).toBeInTheDocument());
     });
 
@@ -316,7 +325,7 @@ describe('CampusMap', () => {
         tflService.getTfLDelays.mockResolvedValueOnce([
             { lineName: 'Central', severityDescription: 'Minor', reason: 'Signal failure', color: '#E32017' },
         ]);
-        render(<CampusMap />);
+        renderCampusMap();
         await waitFor(() => expect(screen.getByText(/Central/)).toBeInTheDocument());
         expect(screen.getByText(/Minor/)).toBeInTheDocument();
     });

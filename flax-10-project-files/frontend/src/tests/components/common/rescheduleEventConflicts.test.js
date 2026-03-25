@@ -3,6 +3,7 @@ import {
   applyConflictResolutionPlan,
   buildConflictResolutionPlan,
   buildConflictResolutionToastMessage,
+  undoConflictResolutionPlan,
 } from "../../../components/common/RescheduleEvents/rescheduleEventConflicts";
 
 function iso(dateString) {
@@ -65,7 +66,7 @@ describe("rescheduleEventConflicts", () => {
   });
 
   it("returns default messages for no overlaps and for unresolved-only plans", () => {
-    expect(buildConflictResolutionToastMessage({ operations: [], unresolved: [] })).toBe("No overlaps to clear.");
+    expect(buildConflictResolutionToastMessage({ operations: [], unresolved: [] })).toBe("No overlap events.");
     expect(buildConflictResolutionToastMessage({ operations: [], unresolved: [{ reason: "fixed" }] })).toBe(
       "These overlaps are fixed lectures, societies, or deadline items, so they stay in place.",
     );

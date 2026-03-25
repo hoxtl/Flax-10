@@ -142,25 +142,10 @@ describe("MiniTimeline interactions", () => {
     expect(setEventCtxMenu).toHaveBeenCalledWith({ eventItem: { id: "evt-1", title: "Seminar" }, x: 12, y: 34 });
   });
 
-<<<<<<< HEAD
   it("renders the portal menu when state carries an event", () => {
     mockTimelineState({
       eventCtxMenu: { eventItem: { id: 3, title: "Event" }, x: 22, y: 44 },
       setEventCtxMenu: vi.fn(),
-=======
-  it("covers quick-start, gap skipping, and read-only context-menu suppression", () => {
-    const onQuickStart = vi.fn();
-    useMiniTimelineState.mockReturnValue({
-      eventCtxMenu: { eventItem: { id: 5, title: "Read only", readOnly: true }, x: 10, y: 20 },
-      setEventCtxMenu: vi.fn(),
-      attachNowRow: vi.fn(),
-    });
-    useMiniTimelineData.mockReturnValue({
-      currentBlock: null,
-      rows: [{ id: "gap-1", type: "free", title: "Gap" }],
-      gapDeadlineFallbacks: {},
-      assignedGapTasks: { map: {}, nextMap: {} },
->>>>>>> main
     });
     mockTimelineData({ rows: [{ id: "evt-2", type: "event", title: "Workshop" }] });
     renderTimeline({ onEdit: vi.fn(), onDelete: vi.fn() });

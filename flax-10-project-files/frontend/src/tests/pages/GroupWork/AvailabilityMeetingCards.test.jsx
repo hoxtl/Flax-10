@@ -31,7 +31,10 @@ vi.mock("framer-motion", () => ({
 vi.mock("lucide-react", () => ({
   Check: () => <span>check-icon</span>,
   X: () => <span>x-icon</span>,
+  Clock3: () => <span>clock-icon</span>,
   Plus: () => <span>plus-icon</span>,
+  Search: () => <span>search-icon</span>,
+  Star: () => <span>star-icon</span>,
   Trash2: () => <span>trash-icon</span>,
 }));
 

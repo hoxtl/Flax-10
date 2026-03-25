@@ -81,11 +81,6 @@ describe("useSchedulingState", () => {
     expect(result.current.studyTimeProps.hasUnsaved).toBe(false);
   });
 
-<<<<<<< HEAD
-  it("updates and saves week preferences", async () => {
-    const onWeekSave = vi.fn().mockResolvedValue(null);
-    const { result } = renderHook(() => useSchedulingState({ onStudyTimeSave: vi.fn(), onWeekPreferenceSave: onWeekSave, onWorktimePreferenceSave: vi.fn() }));
-=======
   it("preserves study input when the save response is empty and falls back to the default value for invalid input", async () => {
     const onStudyTimeSave = vi.fn().mockResolvedValue(null);
     const { result } = renderHook(() => useSchedulingState({
@@ -109,16 +104,9 @@ describe("useSchedulingState", () => {
     expect(result.current.studyTimeProps.hasUnsaved).toBe(true);
   });
 
-  it("saves week and worktime preferences and keeps current values when APIs return nullish settings", async () => {
-    const onWeekPreferenceSave = vi.fn().mockResolvedValue(null);
-    const onWorktimePreferenceSave = vi.fn().mockResolvedValue({ worktime_preference: "" });
-    const { result } = renderHook(() => useSchedulingState({
-      onStudyTimeSave: vi.fn(),
-      onWeekPreferenceSave,
-      onWorktimePreferenceSave,
-    }));
-
->>>>>>> main
+  it("updates and saves week preferences", async () => {
+    const onWeekSave = vi.fn().mockResolvedValue(null);
+    const { result } = renderHook(() => useSchedulingState({ onStudyTimeSave: vi.fn(), onWeekPreferenceSave: onWeekSave, onWorktimePreferenceSave: vi.fn() }));
     await waitFor(() => expect(result.current.loading).toBe(false));
     act(() => { result.current.weekPreferenceProps.onWeekPreferenceChange("weekends"); });
     await act(async () => { await result.current.weekPreferenceProps.onSubmit({ preventDefault: vi.fn() }); });

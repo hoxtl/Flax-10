@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { EventsSummaryModal } from '../../../components/Calendar/EventsSummaryModal/EventsSummaryModal';
 
 const events = [
@@ -11,14 +12,16 @@ const baseDate = new Date('2024-03-08');
 
 function renderModal(props = {}) {
     return render(
-        <EventsSummaryModal
-            isOpen={true}
-            onClose={vi.fn()}
-            allEvents={events}
-            baseDate={baseDate}
-            isMutualOrSelf={true}
-            {...props}
-        />
+        <MemoryRouter>
+            <EventsSummaryModal
+                isOpen={true}
+                onClose={vi.fn()}
+                allEvents={events}
+                baseDate={baseDate}
+                isMutualOrSelf={true}
+                {...props}
+            />
+        </MemoryRouter>
     );
 }
 
@@ -79,22 +82,26 @@ describe('EventsSummaryModal', () => {
     it('resets range to today when reopened', () => {
         const { rerender } = renderModal({ isOpen: false });
         rerender(
-            <EventsSummaryModal
-                isOpen={false}
-                onClose={vi.fn()}
-                allEvents={events}
-                baseDate={baseDate}
-                isMutualOrSelf={true}
-            />
+            <MemoryRouter>
+                <EventsSummaryModal
+                    isOpen={false}
+                    onClose={vi.fn()}
+                    allEvents={events}
+                    baseDate={baseDate}
+                    isMutualOrSelf={true}
+                />
+            </MemoryRouter>
         );
         rerender(
-            <EventsSummaryModal
-                isOpen={true}
-                onClose={vi.fn()}
-                allEvents={events}
-                baseDate={baseDate}
-                isMutualOrSelf={true}
-            />
+            <MemoryRouter>
+                <EventsSummaryModal
+                    isOpen={true}
+                    onClose={vi.fn()}
+                    allEvents={events}
+                    baseDate={baseDate}
+                    isMutualOrSelf={true}
+                />
+            </MemoryRouter>
         );
         // range should be reset to 'today'
         expect(screen.getByText(/Events - Today/)).toBeTruthy();

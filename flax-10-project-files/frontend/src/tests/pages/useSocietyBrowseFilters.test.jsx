@@ -15,7 +15,7 @@ describe("useSocietyBrowseFilters", () => {
     const { result } = renderHook(() => useSocietyBrowseFilters());
     const cat = { id: "s", label: "S" };
     act(() => { result.current.setCategory([cat]); result.current.toggleFilter("r", "r"); });
-    expect(result.current.filters).toEqual({ r: "r", category: [cat] });
+    expect(result.current.filters).toEqual({ ratified: "all", category: [cat], r: "r" });
     act(() => { result.current.clearFilters(); });
     expect(result.current.filters).toEqual({ ratified: "all", category: [] });
   });

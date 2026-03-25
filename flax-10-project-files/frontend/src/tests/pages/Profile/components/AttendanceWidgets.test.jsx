@@ -89,7 +89,7 @@ describe("Profile attendance widgets", () => {
     const onClose = vi.fn();
     render(
       <>
-        <AttendanceCharts overallData={[{ label: "A" }]} onSegmentClick={onSegmentClick} />
+        <AttendanceCharts overall={{ attended: 0, missed: 0 }} overallData={[{ label: "A" }]} byTypeData={[]} onSegmentClick={onSegmentClick} />
         <CompactAttHeader onNavigate={onNavigate} />
         <SegmentDetailPanelWrapper
           selectedSegment={{ chart: "overall", label: "Attended" }}

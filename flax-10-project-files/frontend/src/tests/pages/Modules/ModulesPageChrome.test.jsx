@@ -67,6 +67,7 @@ function buildState(overrides = {}) {
       handleModuleUpdated: vi.fn(),
       handleEnrollment: vi.fn(),
       handleDisenrol: vi.fn(),
+      enrollments: [],
       ...overrides.hook,
     },
     editingModule: null,
@@ -129,6 +130,7 @@ describe("ModulesPageChrome", () => {
 
   it("renders and closes modals", () => {
     const state = buildState({
+      viewingModule: null,
       deadlineModule: { module_code: "CS101" },
       readingModule: { module_code: "MA202" },
     });

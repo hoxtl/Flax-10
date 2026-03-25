@@ -148,26 +148,6 @@ describe("settings leaf extras", () => {
     localStorage.clear();
   });
 
-<<<<<<< HEAD
-  describe("settings UI atoms", () => {
-    it("renders banners and form helpers", () => {
-      renderSettingsUiShowcase();
-      expect(screen.getByText("success:Saved!")).toBeInTheDocument();
-      expect(screen.getByText("error:Oops")).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Account" })).toBeInTheDocument();
-      expect(screen.getByText("(5 characters remaining)")).toBeInTheDocument();
-      expect(screen.getByText("Profile")).toBeInTheDocument();
-    });
-
-    it("routes select and sidebar interactions", () => {
-      const { onChange } = renderSettingsUiShowcase();
-      fireEvent.click(screen.getByText("Select"));
-      expect(onChange).toHaveBeenCalledWith({ target: { name: "theme", value: "dark" } });
-      expect(screen.getByRole("button", { name: "✓ Saved!" })).toBeInTheDocument();
-      fireEvent.click(screen.getByText("Appearance"));
-      expect(onChange).toHaveBeenCalledWith("preferences_themes");
-    });
-=======
   it("covers small settings UI components and sidebar states", () => {
     const onChange = vi.fn();
     render(
@@ -196,7 +176,6 @@ describe("settings leaf extras", () => {
     expect(onChange).toHaveBeenCalledWith("flax");
     fireEvent.click(screen.getByText("Appearance"));
     expect(onChange).toHaveBeenCalledWith("preferences_themes");
->>>>>>> main
   });
 
   it("hides profile completion when user details are complete", () => {

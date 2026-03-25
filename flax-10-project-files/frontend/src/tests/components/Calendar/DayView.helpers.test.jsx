@@ -5,6 +5,7 @@ const mockUseTimeSlotDrop = vi.fn();
 const mockUseResizeHighlight = vi.fn();
 const mockIsSameDay = vi.fn();
 const mockCalculateEventColumns = vi.fn();
+const mockGetEventKey = vi.fn((event) => `${event.id}-${new Date(event.start_time).getTime()}-${new Date(event.end_time).getTime()}`);
 
 vi.mock("../../../components/Calendar/hooks/useTimeSlotDrop", () => ({
   useTimeSlotDrop: (...args) => mockUseTimeSlotDrop(...args),
@@ -20,6 +21,7 @@ vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
 
 vi.mock("../../../components/Calendar/utils/overlapUtils", () => ({
   calculateEventColumns: (...args) => mockCalculateEventColumns(...args),
+  getEventKey: (...args) => mockGetEventKey(...args),
 }));
 
 import { TimeSlot } from "../../../components/Calendar/DayView/TimeSlot";
@@ -47,7 +49,7 @@ describe("DayView helpers", () => {
     };
     const currentDate = new Date("2026-03-24T12:00:00.000Z");
     mockCalculateEventColumns.mockReturnValue(new Map([
-      ["event-1", { totalColumns: 2, column: 1 }],
+      [mockGetEventKey(event), { totalColumns: 2, column: 1 }],
     ]));
 
     const style = calculateEventStyle(event, 60, [event, { id: "event-2" }], currentDate);
@@ -67,7 +69,7 @@ describe("DayView helpers", () => {
     };
 
     mockCalculateEventColumns.mockReturnValue(new Map([
-      ["event-1", { totalColumns: 1, column: 0 }],
+      [mockGetEventKey(event), { totalColumns: 1, column: 0 }],
     ]));
 
     const withSingleColumn = calculateEventStyle(event, 60, [event, { id: "event-2" }]);

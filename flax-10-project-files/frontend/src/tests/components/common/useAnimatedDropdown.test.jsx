@@ -141,7 +141,11 @@ describe("useAnimatedDropdownState", () => {
       it("manages scroll listeners while the menu is open", () => {
         const add = vi.spyOn(window, "addEventListener");
         const remove = vi.spyOn(window, "removeEventListener");
-        const { rerender, props } = renderGroupedDropdown();
+        const { result, rerender, props } = renderGroupedDropdown();
+        const box = { top: 120, bottom: 160, left: 40, width: 150 };
+        act(() => {
+          result.current.containerRef.current = { getBoundingClientRect: () => box };
+        });
         rerender({ ...props, isOpen: true });
         expect(add).toHaveBeenCalledWith("scroll", expect.any(Function), true);
         rerender({ ...props, isOpen: false });

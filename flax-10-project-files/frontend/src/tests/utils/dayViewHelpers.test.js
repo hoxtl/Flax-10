@@ -7,10 +7,11 @@ import {
 } from "../../components/Calendar/DayView/dayViewHelpers";
 
 vi.mock("../../components/Calendar/utils/overlapUtils", () => ({
+  getEventKey: vi.fn((event) => `${event.id}-${new Date(event.start_time).getTime()}-${new Date(event.end_time).getTime()}`),
   calculateEventColumns: vi.fn((events) => {
     const map = new Map();
     events.forEach((e, i) =>
-      map.set(e.id, { column: i, totalColumns: events.length }),
+      map.set(`${e.id}-${new Date(e.start_time).getTime()}-${new Date(e.end_time).getTime()}`, { column: i, totalColumns: events.length }),
     );
     return map;
   }),

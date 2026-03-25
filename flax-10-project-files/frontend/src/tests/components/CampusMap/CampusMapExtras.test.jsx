@@ -404,7 +404,7 @@ describe("DestinationSection", () => {
     render(<DestinationSection {...baseProps} selectedCampus={campus} customDestination={custom} />);
     expect(screen.getByText("Current location")).toBeTruthy();
     // Strand Campus chip should not be shown since custom overrides
-    expect(screen.queryByText("Strand Campus")).toBeTruthy(); // it's still a campus button, but not in chip
+    expect(screen.queryByText("Strand Campus")).not.toBeInTheDocument();
   });
 
   it("calls onSelectCampus when campus button clicked", () => {

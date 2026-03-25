@@ -138,7 +138,7 @@ describe("TaskWidgetSlot", () => {
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
     });
-    expect(screen.getByRole("button", { name: /\+ 1 more/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /\+ 4 more/i })).toBeTruthy();
   });
 
   it("expands hidden tasks when Show more is clicked", () => {
@@ -153,7 +153,7 @@ describe("TaskWidgetSlot", () => {
       taskWidgetList: tasks,
     });
     expect(screen.queryByText("Task 7")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /\+ 1 more/i }));
+    fireEvent.click(screen.getByRole("button", { name: /\+ 4 more/i }));
     expect(screen.getByText("Task 7")).toBeTruthy();
     expect(screen.getByRole("button", { name: /show less/i })).toBeTruthy();
   });

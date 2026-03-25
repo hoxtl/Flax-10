@@ -104,9 +104,6 @@ describe("SearchBar", () => {
     unregisterTarget(high);
   });
 
-<<<<<<< HEAD
-  it("ignores hidden and disabled targets", () => {
-=======
   it("breaks ties by the left-most visible target when items share the same top position", () => {
     const left = makeVisibleInput(10, 20);
     const right = makeVisibleInput(10, 90);
@@ -125,7 +122,6 @@ describe("SearchBar", () => {
   });
 
   it("ignores hidden, disconnected, disabled, and readOnly targets and cleans up on unmount", () => {
->>>>>>> main
     const hidden = makeVisibleInput();
     Object.defineProperty(hidden, "offsetParent", { configurable: true, get: () => null });
     hidden.focus = vi.fn();

@@ -56,7 +56,8 @@ describe('taskTimelineUtils – placeTasksIntoWeeks', () => {
     const weeks = buildWeeks(anchor);
     const taskDate = new Date(anchor.getTime() + DAY_MS);
     const layout = placeTasksIntoWeeks([{ id: 1, due_date: taskDate.toISOString() }], weeks);
-    expect(layout[0]).toHaveLength(1);
-    expect(layout[0][0].id).toBe(1);
+    expect(layout[0]).toHaveLength(6);
+    expect(layout[0][1]).toHaveLength(1);
+    expect(layout[0][1][0].id).toBe(1);
   });
 });

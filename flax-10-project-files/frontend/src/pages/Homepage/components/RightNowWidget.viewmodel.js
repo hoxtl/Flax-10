@@ -91,7 +91,7 @@ function buildCommuteProps(props) {
   };
 }
 
-export function buildRightNowViewProps({ liveClock, now, sortedEvents, taskWidgetItemsOnly, tomorrowFirstEvent }) {
+export function buildRightNowViewProps({ liveClock, now, sortedEvents, taskWidgetItemsOnly = [], tomorrowFirstEvent }) {
   return {
     liveClock,
     sortedEvents,

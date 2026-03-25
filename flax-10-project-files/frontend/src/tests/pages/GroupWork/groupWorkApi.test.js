@@ -62,7 +62,9 @@ describe("groupWorkApi", () => {
   });
 
   it("sends create project and member management requests", async () => {
-    fetch.mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue({ id: 2 }) }).mockResolvedValueOnce({ ok: true });
+    fetch
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue({ id: 2 }) })
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue({ id: 99 }) });
     await createGroupProject({ title: "N" });
     await addProjectMember(1, 22);
     expect(fetch).toHaveBeenCalledWith("/api/group-work/projects/", expect.objectContaining({ method: "POST" }));

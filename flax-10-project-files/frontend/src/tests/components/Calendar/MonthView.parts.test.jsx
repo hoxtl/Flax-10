@@ -75,13 +75,13 @@ describe("MonthView parts", () => {
     expect(screen.queryByText("+")).not.toBeInTheDocument();
   });
 
-<<<<<<< HEAD
   it("handles date selection in DayCell", () => {
     const onDateSelect = vi.fn();
     render(<DayCell day={new Date("2026-03-24T00:00:00.000Z")} events={[]} isCur onDateSelect={onDateSelect} />);
     fireEvent.click(screen.getByText("24"));
     expect(onDateSelect).toHaveBeenCalled();
-=======
+  });
+
   it("renders a fresh readonly day cell and forwards the more-events click", () => {
     const onDateSelect = vi.fn();
     const onMoreClick = vi.fn();
@@ -125,7 +125,6 @@ describe("MonthView parts", () => {
     rerender(<EventDot e={{ id: 3, title: "Popup only", source: "personal" }} readOnly />);
     fireEvent.click(screen.getByText("Popup only"));
     expect(openPopup).toHaveBeenCalled();
->>>>>>> main
   });
 
   it("delays next month navigation for swipe animation", () => {
@@ -139,9 +138,6 @@ describe("MonthView parts", () => {
     vi.useRealTimers();
   });
 
-<<<<<<< HEAD
-  it("delays prev month navigation for swipe animation", () => {
-=======
   it("sorts all-day events ahead of timed events within a week row", () => {
     const day = new Date("2026-03-24T00:00:00.000Z");
     render(
@@ -159,8 +155,7 @@ describe("MonthView parts", () => {
     expect(buttonTexts.indexOf("All day")).toBeLessThan(buttonTexts.indexOf("Timed"));
   });
 
-  it("delays month navigation until the swipe animation timeout completes", () => {
->>>>>>> main
+  it("delays prev month navigation for swipe animation", () => {
     vi.useFakeTimers();
     render(<SwipeMonthView />);
     const { onPrev } = useSwipeNavigation.mock.calls.at(-1)[0];

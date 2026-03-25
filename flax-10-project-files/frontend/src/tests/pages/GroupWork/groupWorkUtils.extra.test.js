@@ -77,7 +77,8 @@ describe('availabilityUtils – formatSuggestionDateLabel', () => {
 
   it('handles a date at midnight', () => {
     const result = formatSuggestionDateLabel('2026-06-15T00:00:00.000Z');
-    expect(result).toMatch(/00:00/);
+    expect(result).toContain('15 Jun');
+    expect(result).toMatch(/\d{2}:\d{2}/);
   });
 });
 

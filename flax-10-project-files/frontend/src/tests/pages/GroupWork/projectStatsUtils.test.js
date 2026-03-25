@@ -123,8 +123,15 @@ describe('priorityUtils – getUserColor', () => {
 describe('taskStatsUtils', () => {
   it('calculates completion segments correctly', () => {
     const tasks = [{ completed: true }, { completed: false }, { completed: true }];
-    const segments = calcCompletionSegments(tasks);
-    expect(segments).toHaveLength(2);
-    expect(segments.find(s => s.label === 'Done').value).toBe(2);
+    const result = calcCompletionSegments(tasks, []);
+    expect(result.completed).toBe(2);
+    expect(result.total).toBe(3);
+    expect(result.percent).toBe(67);
+    expect(result.segments).toEqual([
+      expect.objectContaining({
+        id: "unassigned",
+        percentage: expect.closeTo((2 / 3) * 100, 5),
+      }),
+    ]);
   });
 });

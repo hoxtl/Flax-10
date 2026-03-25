@@ -149,7 +149,12 @@ describe("account component extras", () => {
 
   it("renders pending request details and allows cancellation", () => {
     const onCancelRequest = vi.fn();
-    renderCourseDisplay({ course: "Physics", pendingRequest: { requested_course: "Chemistry" }, successMessage: "✓ Request sent.", onCancelRequest });
+    const { rerender, onRequestClick } = renderCourseDisplay({
+      course: "Physics",
+      pendingRequest: { requested_course: "Chemistry" },
+      successMessage: "✓ Request sent.",
+      onCancelRequest,
+    });
     expect(screen.getByText(/An admin will review your request shortly/)).toBeInTheDocument();
     expect(screen.getByText("✓ Request sent.")).toBeInTheDocument();
     fireEvent.click(screen.getByText("cancel-request"));
@@ -193,7 +198,7 @@ describe("account component extras", () => {
 
   it("surfaces server errors and lets the user close the modal", async () => {
     requestCourseChange.mockRejectedValueOnce(new Error("network failed"));
-    const { container, onClose } = renderCourseChangeModal();
+    const { container, onClose, onSuccess, unmount } = renderCourseChangeModal();
     fillReason("Another reason");
     selectPhysicsCourse();
     submitCourseChangeForm(container);
@@ -201,7 +206,7 @@ describe("account component extras", () => {
     fireEvent.click(screen.getByText("close-standard-modal"));
     expect(onClose).toHaveBeenCalled();
 
-    secondModal.unmount();
+    unmount();
     requestCourseChange.mockRejectedValueOnce({});
     const thirdModal = render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
     fireEvent.change(screen.getByPlaceholderText(/Tell us a bit/), { target: { value: "Fallback reason" } });

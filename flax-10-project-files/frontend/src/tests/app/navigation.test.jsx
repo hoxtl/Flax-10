@@ -85,16 +85,6 @@ describe("useNavHandler", () => {
     navigate.mockReset();
   });
 
-<<<<<<< HEAD
-  describe("navigation shapes", () => {
-    it("handles entity-based navigation with tabs (societies)", () => {
-      const setActiveNav = vi.fn();
-      const { result } = renderHook(() => useNavHandler(setActiveNav));
-      act(() => result.current("societies_17_events"));
-      expect(setActiveNav).toHaveBeenLastCalledWith("societies");
-      expect(navigate).toHaveBeenLastCalledWith("/societies?id=17&tab=events");
-    });
-=======
   it("handles every supported navigation shape", () => {
     const setActiveNav = vi.fn();
     const { result } = renderHook(() => useNavHandler(setActiveNav));
@@ -123,32 +113,31 @@ describe("useNavHandler", () => {
     act(() => result.current("settings"));
     expect(setActiveNav).toHaveBeenLastCalledWith("settings");
     expect(navigate).toHaveBeenLastCalledWith("/settings");
->>>>>>> main
+  });
 
-    it("handles entity-based navigation with tabs (group-work)", () => {
-      const setActiveNav = vi.fn();
-      const { result } = renderHook(() => useNavHandler(setActiveNav));
-      act(() => result.current("group-work_31_board"));
-      expect(navigate).toHaveBeenLastCalledWith("/group-work?project=31&tab=board");
-    });
+  it("handles entity-based navigation with tabs (group-work)", () => {
+    const setActiveNav = vi.fn();
+    const { result } = renderHook(() => useNavHandler(setActiveNav));
+    act(() => result.current("group-work_31_board"));
+    expect(navigate).toHaveBeenLastCalledWith("/group-work?project=31&tab=board");
+  });
 
-    it("handles simple profile and settings navigation", () => {
-      const setActiveNav = vi.fn();
-      const { result } = renderHook(() => useNavHandler(setActiveNav));
-      act(() => result.current("profile"));
-      expect(navigate).toHaveBeenLastCalledWith("/profile");
-      act(() => result.current("settings"));
-      expect(navigate).toHaveBeenLastCalledWith("/settings");
-    });
+  it("handles simple profile and settings navigation", () => {
+    const setActiveNav = vi.fn();
+    const { result } = renderHook(() => useNavHandler(setActiveNav));
+    act(() => result.current("profile"));
+    expect(navigate).toHaveBeenLastCalledWith("/profile");
+    act(() => result.current("settings"));
+    expect(navigate).toHaveBeenLastCalledWith("/settings");
+  });
 
-    it("handles direct paths and query strings", () => {
-      const setActiveNav = vi.fn();
-      const { result } = renderHook(() => useNavHandler(setActiveNav));
-      act(() => result.current("/calendar?view=month"));
-      expect(navigate).toHaveBeenLastCalledWith("/calendar?view=month");
-      act(() => result.current("modules?filter=active"));
-      expect(setActiveNav).toHaveBeenLastCalledWith("modules");
-    });
+  it("handles direct paths and query strings", () => {
+    const setActiveNav = vi.fn();
+    const { result } = renderHook(() => useNavHandler(setActiveNav));
+    act(() => result.current("/calendar?view=month"));
+    expect(navigate).toHaveBeenLastCalledWith("/calendar?view=month");
+    act(() => result.current("modules?filter=active"));
+    expect(setActiveNav).toHaveBeenLastCalledWith("modules");
   });
 
   it("subscribes to window navigate events and cleans up on unmount", () => {

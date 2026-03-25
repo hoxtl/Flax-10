@@ -315,55 +315,59 @@ describe("SocietyDetailPage", () => {
       expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith({ id: 7 });
     });
 
-    renderPage(<SocietyDetailPage societyId={1} onBack={onBack} onDelete={onDelete} />);
+    it("handles report, announcement, settings, and delete flows", async () => {
+      const onBack = vi.fn();
+      const onDelete = vi.fn();
+      const data = renderDetailPageWithData(interactiveOverrides, { onBack, onDelete });
 
-    fireEvent.click(screen.getByText("rename-society"));
-    fireEvent.click(screen.getByText("open-gallery"));
-    fireEvent.click(screen.getByText("edit-images"));
-    fireEvent.click(screen.getByText("view-members"));
-    fireEvent.click(screen.getByText("edit-announcement"));
+      fireEvent.click(screen.getByText("rename-society"));
+      fireEvent.click(screen.getByText("open-gallery"));
+      fireEvent.click(screen.getByText("edit-images"));
+      fireEvent.click(screen.getByText("view-members"));
+      fireEvent.click(screen.getByText("edit-announcement"));
 
-    expect(data.updateSociety).toHaveBeenCalledWith({ name: "Renamed Society" });
-    expect(data.modals.setGalleryOpen).toHaveBeenCalledWith({ index: 1 });
-    expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(true);
-    expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(true);
-    expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith({ id: 7 });
+      expect(data.updateSociety).toHaveBeenCalledWith({ name: "Renamed Society" });
+      expect(data.modals.setGalleryOpen).toHaveBeenCalledWith({ index: 1 });
+      expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(true);
+      expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(true);
+      expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith({ id: 7 });
 
-    fireEvent.click(screen.getByText("report-success"));
-    expect(data.updateLocalSociety).toHaveBeenCalledWith({ has_reported: true });
+      fireEvent.click(screen.getByText("report-success"));
+      expect(data.updateLocalSociety).toHaveBeenCalledWith({ has_reported: true });
 
-    fireEvent.click(screen.getByText("close-report"));
-    fireEvent.click(screen.getByText("close-gallery"));
-    fireEvent.click(screen.getByText("close-cover"));
-    fireEvent.click(screen.getByText("close-members"));
-    fireEvent.click(screen.getByText("close-announcement"));
-    expect(data.modals.setShowReportModal).toHaveBeenCalledWith(false);
-    expect(data.modals.setGalleryOpen).toHaveBeenCalledWith(null);
-    expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(false);
-    expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(false);
-    expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith(null);
+      fireEvent.click(screen.getByText("close-report"));
+      fireEvent.click(screen.getByText("close-gallery"));
+      fireEvent.click(screen.getByText("close-cover"));
+      fireEvent.click(screen.getByText("close-members"));
+      fireEvent.click(screen.getByText("close-announcement"));
+      expect(data.modals.setShowReportModal).toHaveBeenCalledWith(false);
+      expect(data.modals.setGalleryOpen).toHaveBeenCalledWith(null);
+      expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(false);
+      expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(false);
+      expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith(null);
 
-    fireEvent.click(screen.getByText("save-cover"));
-    expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1", "img-2"], image: "img-1" });
-    fireEvent.click(screen.getByText("save-empty-cover"));
-    expect(data.updateSociety).toHaveBeenCalledWith({ images: [], image: null });
+      fireEvent.click(screen.getByText("save-cover"));
+      expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1", "img-2"], image: "img-1" });
+      fireEvent.click(screen.getByText("save-empty-cover"));
+      expect(data.updateSociety).toHaveBeenCalledWith({ images: [], image: null });
 
-    fireEvent.click(screen.getByText("submit-announcement"));
-    fireEvent.click(screen.getByText("submit-new-announcement"));
-    fireEvent.click(screen.getByText("submit-conflict"));
-    fireEvent.click(screen.getByText("delete-announcement"));
-    expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Updated announcement" }, false);
-    expect(data.addAnnouncement).toHaveBeenCalledWith({ title: "Fresh announcement" }, false);
-    expect(data.updateAnnouncement).toHaveBeenCalledWith(4, { id: 4, pinned: false, title: "Existing pinned" }, false);
-    expect(data.deleteAnnouncement).toHaveBeenCalledWith(7, false);
+      fireEvent.click(screen.getByText("submit-announcement"));
+      fireEvent.click(screen.getByText("submit-new-announcement"));
+      fireEvent.click(screen.getByText("submit-conflict"));
+      fireEvent.click(screen.getByText("delete-announcement"));
+      expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Updated announcement" }, false);
+      expect(data.addAnnouncement).toHaveBeenCalledWith({ title: "Fresh announcement" }, false);
+      expect(data.updateAnnouncement).toHaveBeenCalledWith(4, { id: 4, pinned: false, title: "Existing pinned" }, false);
+      expect(data.deleteAnnouncement).toHaveBeenCalledWith(7, false);
 
-    fireEvent.click(screen.getByText("close-settings"));
-    expect(data.modals.setShowSettings).toHaveBeenCalledWith(false);
+      fireEvent.click(screen.getByText("close-settings"));
+      expect(data.modals.setShowSettings).toHaveBeenCalledWith(false);
 
-    fireEvent.click(screen.getByText("delete-society"));
-    await waitFor(() => expect(data.deleteSociety).toHaveBeenCalledTimes(1));
-    expect(onDelete).toHaveBeenCalledTimes(1);
-    expect(onBack).toHaveBeenCalledTimes(1);
+      fireEvent.click(screen.getByText("delete-society"));
+      await waitFor(() => expect(data.deleteSociety).toHaveBeenCalledTimes(1));
+      expect(onDelete).toHaveBeenCalledTimes(1);
+      expect(onBack).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("publishes tracked changes before leaving edit mode", async () => {

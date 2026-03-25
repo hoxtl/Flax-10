@@ -83,9 +83,6 @@ describe("useLocationAutocomplete", () => {
     expect(screen.getByTestId("suggestion-count")).toHaveTextContent("0");
   });
 
-<<<<<<< HEAD
-  it("prevents immediate reopen after selection", async () => {
-=======
   it("falls back to an empty suggestion array when the API response has no features list", async () => {
     fetch.mockResolvedValue({
       json: async () => ({}),
@@ -101,8 +98,7 @@ describe("useLocationAutocomplete", () => {
     expect(screen.getByTestId("suggestion-count")).toHaveTextContent("0");
   });
 
-  it("prevents immediate reopen after selection, then reopens and closes outside", async () => {
->>>>>>> main
+  it("prevents immediate reopen after selection", async () => {
     const onChangeSpy = vi.fn();
     render(<LocationAutocompleteHarness onChangeSpy={onChangeSpy} />);
     fireEvent.click(screen.getByText("select-location"));
@@ -112,11 +108,23 @@ describe("useLocationAutocomplete", () => {
   });
 
   it("reopens suggestions after selection cooldown and closes on outside click", async () => {
+    fetch.mockResolvedValue({
+      json: async () => ({
+        features: [{ id: "1", place_name: "Strand Campus, London", text: "Strand Campus" }],
+      }),
+    });
+
     render(<LocationAutocompleteHarness onChangeSpy={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText("location-input"), { target: { value: "Strand" } });
+    await delay(320);
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByTestId("suggestion-count")).toHaveTextContent("1"));
+
     fireEvent.click(screen.getByText("select-location"));
     await delay(220);
     fireEvent.focus(screen.getByLabelText("location-input"));
-    expect(screen.getByTestId("show-state")).toHaveTextContent("true");
+    await waitFor(() => expect(screen.getByTestId("show-state")).toHaveTextContent("true"));
     fireEvent.mouseDown(document.body);
     await waitFor(() => expect(screen.getByTestId("show-state")).toHaveTextContent("false"));
   });

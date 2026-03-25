@@ -30,18 +30,13 @@ describe("timer effect extra coverage", () => {
     expect(document.title).toBe("StudyFlax");
   });
 
-<<<<<<< HEAD
-  it("ignores keyboard shortcuts when typing in text inputs", () => {
-=======
   it("shows the work-mode timer title", () => {
     renderHook(() => useTimerDocumentTitle({ isActive: true, isPaused: false, timeLeft: 125, mode: "work" }));
     expect(document.title).toContain("02:05");
     expect(document.title).toContain("🔥");
   });
 
-  it("ignores text inputs and toggles timer state from keyboard shortcuts", () => {
-    const togglePause = vi.fn();
->>>>>>> main
+  it("ignores keyboard shortcuts when typing in text inputs", () => {
     const setIsActive = vi.fn();
     renderHook(() => useTimerShortcuts({
       t: { isActive: false, setIsActive, togglePause: vi.fn(), resetTimer: vi.fn() },
@@ -59,10 +54,11 @@ describe("timer effect extra coverage", () => {
     const setIsActive = vi.fn();
     const setShowShortcuts = vi.fn((updater) => updater(false));
     const setFocusMode = vi.fn();
+    const openFocusMode = vi.fn();
 
     renderHook(() => useTimerShortcuts({
       t: { isActive: false, setIsActive, togglePause: vi.fn(), resetTimer: vi.fn() },
-      setShowShortcuts, setFocusMode, openFocusMode: vi.fn(), closeOverlays: vi.fn(),
+      setShowShortcuts, setFocusMode, openFocusMode, closeOverlays: vi.fn(),
     }));
 
     fireEvent.keyDown(window, { key: " " });
@@ -70,7 +66,8 @@ describe("timer effect extra coverage", () => {
     fireEvent.keyDown(window, { key: "?" });
 
     expect(setIsActive).toHaveBeenCalledWith(true);
-    expect(setFocusMode).toHaveBeenCalledWith(false);
+    expect(setFocusMode).not.toHaveBeenCalled();
+    expect(openFocusMode).toHaveBeenCalled();
     expect(setShowShortcuts).toHaveBeenCalled();
   });
 
@@ -95,8 +92,6 @@ describe("timer effect extra coverage", () => {
     Object.defineProperty(document, "fullscreenElement", { configurable: true, value: document.body });
     renderHook(() => useFocusFullscreen({ focusMode: false, focusFullscreenPending: true, setFocusFullscreenPending: vi.fn() }));
     expect(exitFullscreen).toHaveBeenCalled();
-<<<<<<< HEAD
-=======
   });
 
   it("swallows fullscreen request and exit failures", async () => {
@@ -216,6 +211,5 @@ describe("timer effect extra coverage", () => {
       focusFullscreenPending: false,
       setFocusFullscreenPending: vi.fn(),
     }));
->>>>>>> main
   });
 });

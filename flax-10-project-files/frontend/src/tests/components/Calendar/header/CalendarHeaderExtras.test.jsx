@@ -23,6 +23,7 @@ vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
 }));
 
 vi.mock("lucide-react", () => ({
+  Clock: () => <span>clock-icon</span>,
   Search: () => <span>search-icon</span>,
   X: () => <span>x-icon</span>,
   LayoutList: () => <span>layout-icon</span>,
@@ -83,6 +84,7 @@ vi.mock("../../../../context/ToastContext", () => ({
 
 vi.mock("../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent: mockEditEvent }),
+  useCalendarEvents: () => ({ loadEvents: vi.fn() }),
 }));
 
 vi.mock("../../../../components/Common/RescheduleEvents/rescheduleEventConflicts", () => ({

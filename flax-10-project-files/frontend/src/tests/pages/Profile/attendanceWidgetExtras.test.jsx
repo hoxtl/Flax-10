@@ -171,18 +171,25 @@ describe("attendance widget extras", () => {
 
   it("passes data and handlers to by-type attendance chart", () => {
     const onSegmentClick = vi.fn();
-    render(<AttendanceCharts byTypeData={[{ label: "L", value: 5 }]} onSegmentClick={onSegmentClick} />);
-    expect(byTypeChartProps.at(-1)).toEqual(expect.objectContaining({ data: [{ label: "L", value: 5 }], onSegmentClick }));
+    render(
+      <AttendanceCharts
+        overall={{ attended: 0, missed: 0 }}
+        overallData={[]}
+        byTypeData={[{ label: "Lecture", value: 5 }]}
+        onSegmentClick={onSegmentClick}
+      />,
+    );
+    expect(byTypeChartProps.at(-1)).toEqual(expect.objectContaining({ data: [{ label: "Lecture", value: 5 }], onSegmentClick }));
   });
 
   it("composes overall and by-type attendance data", async () => {
-    useAttendanceStats.mockReturnValue({ stats: { overall: { attended: 3, missed: 1 }, by_type: { L: { attended: 2, missed: 0 } } }, loading: false });
-    useAttendanceRecords.mockReturnValue({ records: [{ id: 1, title: "L", event_type: "Lecture" }] });
+    useAttendanceStats.mockReturnValue({ stats: { overall: { attended: 3, missed: 1 }, by_type: { Lecture: { attended: 2, missed: 0 } } }, loading: false });
+    useAttendanceRecords.mockReturnValue({ records: [{ id: 1, title: "Lecture", event_type: "Lecture" }] });
     
     const { result } = renderHook(() => useAttendanceWidgetData({ chart: "overall", label: "Attended" }));
     await waitFor(() => expect(result.current.attendancePct).toBe(75));
     expect(result.current.overall.attended).toBe(3);
-    expect(result.current.byTypeData[0].label).toBe("L");
+    expect(result.current.byTypeData[0].label).toBe("Lecture");
   });
 
   it("handles event status toggling and refetches", async () => {

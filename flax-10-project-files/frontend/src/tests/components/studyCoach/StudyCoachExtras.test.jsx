@@ -147,9 +147,6 @@ describe("StudyCoach extras", () => {
     await waitFor(() => expect(screen.getByText("Failed")).toBeInTheDocument());
   });
 
-<<<<<<< HEAD
-  it("renders study coach message suggestions", () => {
-=======
   it("hides the footer for empty imports and shows the done state after the last import", async () => {
     const dispatch = vi.fn();
     useCalendarDispatch.mockReturnValue(dispatch);
@@ -178,7 +175,6 @@ describe("StudyCoach extras", () => {
   });
 
   it("renders study coach messages states and suggestion actions", () => {
->>>>>>> main
     const onSend = vi.fn();
     render(<StudyCoachMessages messages={[]} onSend={onSend} />);
     fireEvent.click(screen.getByText("Help me plan"));

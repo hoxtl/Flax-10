@@ -32,36 +32,10 @@ import { ConflictActions, ConflictCard } from "../../../../pages/Homepage/compon
 import { PlanFreeRowContent } from "../../../../pages/Homepage/components/MiniTimeline/parts/PlanFreeRowContent";
 import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "../../../../pages/Homepage/components/MiniTimeline/parts/TimelineRowLayout";
 
-<<<<<<< HEAD
 const conflictActionItems = [
   { id: "a", item: { title: "🔥 Lecture", tag: "x" }, isReadOnly: false },
   { id: "b", item: { title: "Read only", tag: null }, isReadOnly: true },
 ];
-=======
-describe("mini timeline parts extras", () => {
-  it("covers tag slot list pill, overlap controls, and duration helper", () => {
-    const onToggleConflictPopover = vi.fn();
-    const outerClick = vi.fn();
-    const { rerender } = render(
-      <div onClick={outerClick}>
-        <EventTagSlot
-          styles={styles}
-          isOverlap
-          isReadOnly={false}
-          rowId="row-1"
-          moduleCode=""
-          matchTask={{ task_list: 2 }}
-          taskLists={[{ id: 2, name: "Urgent" }]}
-          accentColor="#00aa00"
-          onToggleConflictPopover={onToggleConflictPopover}
-        />
-      </div>,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Reschedule to next free window" }));
-    expect(onToggleConflictPopover).toHaveBeenCalledWith("row-1");
-    expect(screen.getByText("Urgent").closest("a")).toHaveAttribute("href", "/tasks?list=2");
->>>>>>> main
 
 function renderTagSlot(overrides = {}) {
   const props = {
@@ -79,7 +53,6 @@ function renderTagSlot(overrides = {}) {
   return render(<EventTagSlot {...props} />);
 }
 
-<<<<<<< HEAD
 function renderConflictPopover(overrides = {}) {
   const props = {
     styles,
@@ -91,31 +64,6 @@ function renderConflictPopover(overrides = {}) {
   };
   return render(<ConflictPopover {...props} />);
 }
-=======
-    rerender(
-      <div onClick={outerClick}>
-        <EventTagSlot
-          styles={styles}
-          isOverlap={false}
-          isReadOnly={false}
-          rowId="row-3"
-          moduleCode=""
-          matchTask={{ task_list: 999 }}
-          taskLists={null}
-          accentColor="#663399"
-          onToggleConflictPopover={onToggleConflictPopover}
-        />
-      </div>,
-    );
-    fireEvent.click(screen.getByText("List"));
-    expect(outerClick).not.toHaveBeenCalled();
-
-    const { rerender: rerenderDuration, container } = render(<EventDuration styles={styles} durationMins={0} />);
-    expect(container.firstChild).toBeNull();
-    rerenderDuration(<EventDuration styles={styles} durationMins={45} />);
-    expect(screen.getByText("45m")).toBeInTheDocument();
-  });
->>>>>>> main
 
 function renderConflictActions(overrides = {}) {
   const props = {
@@ -195,7 +143,6 @@ describe("mini timeline parts extras", () => {
     });
   });
 
-<<<<<<< HEAD
   describe("conflict popover and actions", () => {
     it("disables next gap button when no free row is available", () => {
       const onMoveTomorrow = vi.fn();
@@ -204,54 +151,6 @@ describe("mini timeline parts extras", () => {
       fireEvent.click(screen.getByText("→ Move to tomorrow"));
       expect(onMoveTomorrow).toHaveBeenCalled();
     });
-=======
-  it("covers blank conflict-card times and edit actions without a handler", () => {
-    render(
-      <>
-        <ConflictCard
-          itemRow={{ item: { title: "🔥 Untimed clash", start_time: "", end_time: "" } }}
-          styles={styles}
-          accent="#ff0000"
-          isSleepTime={false}
-          onContextMenu={vi.fn()}
-          onActivate={vi.fn()}
-          onMoveTomorrow={vi.fn()}
-          canMoveTomorrow={false}
-        />
-        <ConflictActions
-          styles={styles}
-          items={[{ id: "a", item: { title: "🔥 Untimed clash", tag: null }, isReadOnly: false }]}
-          freeRow={{ id: "gap-1" }}
-          movable={{ item: { title: "Untimed clash" } }}
-          onAutoMove={vi.fn()}
-        />
-      </>,
-    );
-
-    expect(screen.getAllByText("Untimed clash")).toHaveLength(2);
-    fireEvent.click(screen.getByTitle("Edit Untimed clash"));
-  });
-
-  it("covers free-row content variants and layout helpers", () => {
-    const onSkipTask = vi.fn();
-    const onStartTask = vi.fn();
-    const outerClick = vi.fn();
-    const { rerender } = render(
-      <div onClick={outerClick}>
-        <PlanFreeRowContent
-          styles={styles}
-          gapContext={{ type: "study" }}
-          durationLabel="45m"
-          assignedTask={null}
-          candidateTask={null}
-          isBestGap={false}
-          onSkipTask={onSkipTask}
-          onStartTask={onStartTask}
-        />
-      </div>,
-    );
-    expect(screen.getByText("Short breather")).toBeInTheDocument();
->>>>>>> main
 
     it("fires auto-move and edit handlers when a gap exists", () => {
       const onAutoReschedule = vi.fn();

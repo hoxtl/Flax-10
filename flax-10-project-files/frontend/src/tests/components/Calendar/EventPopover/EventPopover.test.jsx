@@ -2,8 +2,9 @@
  * Tests for EventPopover - event detail popover component.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { EventPopover } from '../../../../components/Calendar/EventPopover/EventPopover';
 import { createMockEvent, createMockTag } from '../mocks/calendarMocks';
 
@@ -23,6 +24,8 @@ class MockResizeObserver {
 
 beforeEach(() => { global.ResizeObserver = MockResizeObserver; });
 afterEach(() => { delete global.ResizeObserver; });
+
+const render = (ui) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe('EventPopover', () => {
     const anchor = { top: 100, left: 100, right: 150, bottom: 150, width: 50, height: 50 };

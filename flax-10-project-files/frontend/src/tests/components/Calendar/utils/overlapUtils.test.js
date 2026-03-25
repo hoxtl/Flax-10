@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { eventsOverlap, findOverlappingEvents, checkOverlapWithConfirm, calculateEventColumns } from '../../../../components/Calendar/utils/overlapUtils';
+import { eventsOverlap, findOverlappingEvents, checkOverlapWithConfirm, calculateEventColumns, getEventKey } from '../../../../components/Calendar/utils/overlapUtils';
 
 const makeEvent = (id, start, end) => ({ id, start_time: start, end_time: end, title: `Event ${id}` });
 
@@ -92,7 +92,7 @@ describe('calculateEventColumns', () => {
     it('assigns single event to column 0 with totalColumns 1', () => {
         const events = [makeEvent(1, '2026-03-15T10:00:00Z', '2026-03-15T11:00:00Z')];
         const result = calculateEventColumns(events);
-        expect(result.get(1)).toEqual({ column: 0, totalColumns: 1 });
+        expect(result.get(getEventKey(events[0]))).toEqual({ column: 0, totalColumns: 1 });
     });
 
     it('assigns overlapping events to separate columns', () => {
@@ -101,10 +101,10 @@ describe('calculateEventColumns', () => {
             makeEvent(2, '2026-03-15T10:30:00Z', '2026-03-15T11:30:00Z'),
         ];
         const result = calculateEventColumns(events);
-        expect(result.get(1).column).toBe(0);
-        expect(result.get(2).column).toBe(1);
-        expect(result.get(1).totalColumns).toBe(2);
-        expect(result.get(2).totalColumns).toBe(2);
+        expect(result.get(getEventKey(events[0])).column).toBe(0);
+        expect(result.get(getEventKey(events[1])).column).toBe(1);
+        expect(result.get(getEventKey(events[0])).totalColumns).toBe(2);
+        expect(result.get(getEventKey(events[1])).totalColumns).toBe(2);
     });
 
     it('assigns non-overlapping events to separate groups', () => {
@@ -113,8 +113,8 @@ describe('calculateEventColumns', () => {
             makeEvent(2, '2026-03-15T12:00:00Z', '2026-03-15T13:00:00Z'),
         ];
         const result = calculateEventColumns(events);
-        expect(result.get(1)).toEqual({ column: 0, totalColumns: 1 });
-        expect(result.get(2)).toEqual({ column: 0, totalColumns: 1 });
+        expect(result.get(getEventKey(events[0]))).toEqual({ column: 0, totalColumns: 1 });
+        expect(result.get(getEventKey(events[1]))).toEqual({ column: 0, totalColumns: 1 });
     });
 
     it('handles three overlapping events', () => {
@@ -124,10 +124,10 @@ describe('calculateEventColumns', () => {
             makeEvent(3, '2026-03-15T10:00:00Z', '2026-03-15T13:00:00Z'),
         ];
         const result = calculateEventColumns(events);
-        const cols = [result.get(1).column, result.get(2).column, result.get(3).column];
+        const cols = [result.get(getEventKey(events[0])).column, result.get(getEventKey(events[1])).column, result.get(getEventKey(events[2])).column];
         cols.sort();
         expect(cols).toEqual([0, 1, 2]);
-        expect(result.get(1).totalColumns).toBe(3);
+        expect(result.get(getEventKey(events[0])).totalColumns).toBe(3);
     });
 
     it('reuses columns when earlier event in same group ends before next starts', () => {
@@ -138,6 +138,6 @@ describe('calculateEventColumns', () => {
         ];
         const result = calculateEventColumns(events);
         // event 3 starts when event 1 ends, so it can reuse column 0
-        expect(result.get(3).column).toBe(0);
+        expect(result.get(getEventKey(events[2])).column).toBe(0);
     });
 });

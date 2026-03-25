@@ -22,6 +22,7 @@ vi.mock("../../../../../context/ToastContext", () => ({
 
 vi.mock("../../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent }),
+  useCalendarEvents: () => ({ loadEvents: vi.fn() }),
 }));
 
 vi.mock("../../../../../components/Common/Tooltip/Tooltip", () => ({

@@ -8,7 +8,7 @@ import { buildQuickAddPayload, runQuickAdd } from "../../../pages/Tasks/utils/cr
 describe("createTaskBarUtils", () => {
   describe("buildQuickAddPayload", () => {
     it("builds payload with taskListId when set", () => {
-      const state = { sortedLists: [{ id: 1 }], taskListId: "5", estimatedBlocks: 2, moduleId: null, defaultDueDate: "2026-03-15" };
+      const state = { sortedLists: [{ id: 1 }], taskListId: "5", estimatedMinutes: 50, moduleId: null, defaultDueDate: "2026-03-15" };
       const out = buildQuickAddPayload(state, "Read ch 3");
       expect(out.title).toBe("Read ch 3");
       expect(out.task_list).toBe(5);

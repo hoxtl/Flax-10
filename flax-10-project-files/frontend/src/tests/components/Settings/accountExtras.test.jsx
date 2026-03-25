@@ -137,7 +137,9 @@ describe("account extras", () => {
       setCachedPendingRequest("Chemistry");
       const { result } = await renderAccountState({ requestError: "offline" });
       expect(result.current.currentCourse).toBe("Physics");
-      expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "Chemistry" });
+      await waitFor(() =>
+        expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "Chemistry" }),
+      );
       act(() => result.current.handleChange({ target: { name: "firstName", value: "Ava" } }));
       expect(result.current.formData.firstName).toBe("Ava");
     });
@@ -165,36 +167,6 @@ describe("account extras", () => {
       expect(context.setInitialFormData).toHaveBeenCalledWith(context.formData);
     });
 
-<<<<<<< HEAD
-    it("cancels pending requests and shows success copy", async () => {
-      const context = buildRequestContext();
-      cancelCourseChangeRequest.mockResolvedValueOnce({});
-      getMyCourseChangeRequest.mockResolvedValueOnce({ status: "rejected" });
-      const cancel = createCancelCourseRequestHandler(context);
-      await cancel();
-      expect(context.setPendingRequest).toHaveBeenCalledWith(null);
-      expect(context.setCourseRequestNotice).toHaveBeenCalledWith("Request cancelled.");
-    });
-
-    it("handles cancel errors and server failures", async () => {
-      const context = buildRequestContext();
-      cancelCourseChangeRequest.mockRejectedValueOnce(new Error("No pending request to cancel"));
-      const cancel = createCancelCourseRequestHandler(context);
-      await cancel();
-      expect(context.setPendingRequest).toHaveBeenCalledWith(null);
-      cancelCourseChangeRequest.mockRejectedValueOnce(new Error("Server exploded"));
-      await cancel();
-      expect(context.setCourseRequestError).toHaveBeenCalledWith("Server exploded");
-    });
-
-    it("marks pending requests after successful submissions", () => {
-      const context = buildRequestContext();
-      const success = createCourseRequestSuccessHandler(context);
-      success({ requestedCourse: "History" }, "History");
-      expect(context.setPendingRequest).toHaveBeenCalledWith({ requestedCourse: "History", status: "pending", requested_course: "History" });
-      expect(context.setShowModal).toHaveBeenCalledWith(false);
-    });
-=======
   it("keeps empty profile state while auth is loading and caches pending API requests", async () => {
     useAuth.mockReturnValue({
       profile: null,
@@ -302,6 +274,7 @@ describe("account extras", () => {
     success(null, "");
     expect(context.setPendingRequest).toHaveBeenCalledWith({ status: "pending", requested_course: "" });
     expect(localStorage.getItem("course_change_pending_request")).toBeNull();
->>>>>>> main
+  });
+
   });
 });

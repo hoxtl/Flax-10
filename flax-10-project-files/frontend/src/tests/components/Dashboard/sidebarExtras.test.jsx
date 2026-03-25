@@ -73,9 +73,6 @@ describe("Dashboard sidebar extras", () => {
     expect(result.current).toBe(false);
   });
 
-<<<<<<< HEAD
-  it("renders desktop sidebar navigation and hover styling", () => {
-=======
   it("treats non-array deadline payloads as no pressure", async () => {
     getUpcomingDeadlines.mockResolvedValueOnce({ results: [] });
 
@@ -88,8 +85,7 @@ describe("Dashboard sidebar extras", () => {
     expect(result.current).toBe(false);
   });
 
-  it("renders desktop interactions including hover, user menu actions, and pressure styling", () => {
->>>>>>> main
+  it("renders desktop sidebar navigation and hover styling", () => {
     const onChange = vi.fn();
     const { container } = render(
       <SidebarDesktop
@@ -101,49 +97,16 @@ describe("Dashboard sidebar extras", () => {
     fireEvent.mouseEnter(container.firstChild);
     fireEvent.click(screen.getByText("Tasks"));
     expect(onChange).toHaveBeenCalledWith("tasks");
-<<<<<<< HEAD
-=======
-
-    fireEvent.click(screen.getByText("Alice"));
-    expect(screen.getByText("Profile")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Log out"));
-    fireEvent.click(screen.getByText("Profile"));
-    expect(onSettingsClick).toHaveBeenCalled();
-    expect(onLogoutClick).toHaveBeenCalled();
-    expect(onProfileClick).toHaveBeenCalled();
-
-    fireEvent.click(document.querySelector('[class*="menuBackdrop"]'));
-
->>>>>>> main
     fireEvent.mouseLeave(container.firstChild);
     expect(container.textContent).not.toContain("alice@example.com");
   });
 
-<<<<<<< HEAD
   it("handles desktop sidebar user menu actions", () => {
-=======
-  it("falls back to a default avatar label when the user has no name", () => {
-    render(
-      <SidebarDesktop
-        active="home"
-        onChange={vi.fn()}
-        user={{}}
-      />,
-    );
-
-    expect(screen.getByText("U")).toBeInTheDocument();
-  });
-
-  it("renders mobile drawer actions, active states, and closes even when a footer action is missing", () => {
-    const onToggle = vi.fn();
-    const onChange = vi.fn();
->>>>>>> main
     const onSettingsClick = vi.fn();
     const onLogoutClick = vi.fn();
     const onProfileClick = vi.fn();
 
-    render(
+    const { container } = render(
       <SidebarDesktop
         active="home"
         onChange={vi.fn()}
@@ -154,6 +117,7 @@ describe("Dashboard sidebar extras", () => {
       />,
     );
 
+    fireEvent.mouseEnter(container.firstChild);
     fireEvent.click(screen.getByText("Alice"));
     expect(screen.getByText("Profile")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Settings"));
@@ -162,6 +126,18 @@ describe("Dashboard sidebar extras", () => {
     expect(onSettingsClick).toHaveBeenCalled();
     expect(onLogoutClick).toHaveBeenCalled();
     expect(onProfileClick).toHaveBeenCalled();
+  });
+
+  it("falls back to a default avatar label when the user has no name", () => {
+    render(
+      <SidebarDesktop
+        active="home"
+        onChange={vi.fn()}
+        user={{}}
+      />,
+    );
+
+    expect(screen.getByText("U")).toBeInTheDocument();
   });
 
   it("handles mobile drawer navigation and toggling", () => {

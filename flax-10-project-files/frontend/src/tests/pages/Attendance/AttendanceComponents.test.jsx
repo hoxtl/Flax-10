@@ -92,6 +92,16 @@ describe("Attendance components", () => {
   const segmentEvent = { id: 2, title: "Lab", start_time: "2026-03-01T10:00:00Z", attended: true, event_type: "Lab" };
   const selectedSegment = { chart: "overall", label: "Attended" };
 
+  const generateEvents = (startId, count, overrides = {}) =>
+    Array.from({ length: count }, (_, index) => ({
+      id: startId + index,
+      title: `Lecture ${startId + index}`,
+      start_time: `2026-03-${String((index % 20) + 1).padStart(2, "0")}T09:00:00Z`,
+      event_type: "Lecture",
+      attended: index % 2 === 0,
+      ...overrides,
+    }));
+
   it("renders the record tab and switches to marked tab", () => {
     const showMarkedTab = vi.fn();
     render(

@@ -11,7 +11,7 @@ describe('ScheduleAutoForm', () => {
     const payload = buildScheduleAutoForm({ deadlines });
 
     expect(payload).toEqual(expect.objectContaining({
-      clear_existing: false,
+      clear_existing: true,
       deadline_preferences: [
         expect.objectContaining({ deadline_id: 1, ideal_minutes_per_day: 75 }),
         expect.objectContaining({ deadline_id: 3, ideal_minutes_per_day: 45 }),

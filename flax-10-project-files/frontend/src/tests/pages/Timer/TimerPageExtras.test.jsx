@@ -235,38 +235,42 @@ describe("Timer page extras", () => {
       expect(onClose).toHaveBeenCalled();
     });
 
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-03-24T18:30:00.000Z"));
-    const { rerender } = render(<TimerPageContent state={state} />);
-    expect(screen.getByText("Focus Timer")).toBeInTheDocument();
-    expect(screen.getByText("focus,lock in,you've got this")).toBeInTheDocument();
-    expect(screen.getByText("focus-skeleton")).toBeInTheDocument();
-    expect(screen.getByText(/Study today to keep your 4-day streak/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByText("open-history"));
-    expect(state.setShowHistory).toHaveBeenCalledWith(true);
-    fireEvent.click(screen.getByText("open-focus"));
-    expect(state.openFocusMode).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("✕"));
-    expect(state.setDismissedWarning).toHaveBeenCalledWith(true);
-    fireEvent.click(screen.getByText("shortcuts"));
-    expect(state.setShowShortcuts).toHaveBeenCalledWith(false);
-    fireEvent.click(screen.getByText("close-history"));
-    expect(state.setShowHistory).toHaveBeenCalledWith(false);
-    fireEvent.click(screen.getByText("exit-focus"));
-    expect(state.setFocusMode).toHaveBeenCalledWith(false);
-    expect(useNavigate).toHaveBeenCalledWith("/timer");
+    it("renders focus and non-focus page controls", () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-03-24T18:30:00.000Z"));
 
-    const nonFocusState = {
-      ...state,
-      focusMode: false,
-      showShortcuts: false,
-      showPageSkeleton: false,
-      showFocusTransition: false,
-    };
-    rerender(<TimerPageContent state={nonFocusState} />);
-    fireEvent.click(screen.getByText("Back"));
-    expect(useNavigate).toHaveBeenCalledWith(-1);
-    vi.useRealTimers();
+      const state = buildTimerState();
+      const { rerender } = render(<TimerPageContent state={state} />);
+      expect(screen.getByText("Focus Timer")).toBeInTheDocument();
+      expect(screen.getByText("focus,lock in,you've got this")).toBeInTheDocument();
+      expect(screen.getByText("focus-skeleton")).toBeInTheDocument();
+      expect(screen.getByText(/Study today to keep your 4-day streak/i)).toBeInTheDocument();
+      fireEvent.click(screen.getByText("open-history"));
+      expect(state.setShowHistory).toHaveBeenCalledWith(true);
+      fireEvent.click(screen.getByText("open-focus"));
+      expect(state.openFocusMode).toHaveBeenCalled();
+      fireEvent.click(screen.getByText("✕"));
+      expect(state.setDismissedWarning).toHaveBeenCalledWith(true);
+      fireEvent.click(screen.getByText("shortcuts"));
+      expect(state.setShowShortcuts).toHaveBeenCalledWith(false);
+      fireEvent.click(screen.getByText("close-history"));
+      expect(state.setShowHistory).toHaveBeenCalledWith(false);
+      fireEvent.click(screen.getByText("exit-focus"));
+      expect(state.setFocusMode).toHaveBeenCalledWith(false);
+      expect(useNavigate).toHaveBeenCalledWith("/timer");
+
+      const nonFocusState = {
+        ...state,
+        focusMode: false,
+        showShortcuts: false,
+        showPageSkeleton: false,
+        showFocusTransition: false,
+      };
+      rerender(<TimerPageContent state={nonFocusState} />);
+      fireEvent.click(screen.getByText("Back"));
+      expect(useNavigate).toHaveBeenCalledWith(-1);
+      vi.useRealTimers();
+    });
   });
 
   it("hides the streak warning when the user already studied today", () => {

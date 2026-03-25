@@ -88,7 +88,7 @@ describe("Homepage widget extras", () => {
     useSemesterData.mockReturnValue({
       loading: false,
       deadlines: [{ due_date: "2026-03-16T12:00:00.000Z" }, { due_date: "2026-03-18T12:00:00.000Z" }],
-      events: [{ start_time: "2026-03-17T09:00:00.000Z", title: "L1" }, { start_time: "2026-03-19T09:00:00.000Z", title: "Assessment" }],
+      events: [{ start_time: "2026-03-17T09:00:00.000Z", title: "Lecture 1" }, { start_time: "2026-03-19T09:00:00.000Z", title: "Exam" }],
     });
 
     render(<SemesterOverviewWidget semesterStart="2026-03-02" numWeeks={3} readingWeekIndices={[1]} />);

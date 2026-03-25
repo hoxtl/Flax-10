@@ -167,10 +167,16 @@ describe("useTaskFeedData", () => {
   });
 
   it("filters task feed by selected module codes", async () => {
-    const tasks = [{ id: 1, m: "CS1" }, { id: 2, m: "MA2" }];
+    vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation((_filterListIds, _onFilterByList, setFilterModuleCodes) => ({
+      toggleListFilter: vi.fn(),
+      toggleModuleFilter: (code) => setFilterModuleCodes([code]),
+      clearAllFilters: vi.fn(),
+    }));
+
+    const tasks = [{ id: 1, module_code: "CS1" }, { id: 2, module_code: "MA2" }];
     const { result } = renderHook(() => useTaskFeedData({ tasks, allTasks: tasks, lists: [], activeFilter: "all", filterListIds: [] }));
-    act(() => { result.current.setFilterModuleCodes(["CS1"]); });
-    await waitFor(() => expect(result.current.pending).toEqual([{ id: 1, m: "CS1" }]));
+    act(() => { result.current.toggleModuleFilter("CS1"); });
+    await waitFor(() => expect(result.current.pending).toEqual([{ id: 1, module_code: "CS1" }]));
   });
 
   it("clears all filters when clearAllFilters is called", async () => {

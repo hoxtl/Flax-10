@@ -18,7 +18,7 @@ describe("TaskCardMeta", () => {
   it("renders society, people, and project pills", () => {
     renderMeta(<TaskCardMeta task={{ society_name: "Chess", society_id: 9, assignees_count: 2, group_project_name: "TP" }} />);
     expect(screen.getByRole("link", { name: /Chess/ })).toHaveAttribute("href", "/societies?id=9");
-    expect(screen.getByText("2 people")).toBeInTheDocument();
+    expect(screen.getByTitle("Open users")).toHaveTextContent("2 people");
     expect(screen.getByText("TP")).toBeInTheDocument();
   });
 
@@ -29,18 +29,7 @@ describe("TaskCardMeta", () => {
         <TaskCardMeta task={{ module_code: "CS101" }} />
       </div>
     );
-<<<<<<< HEAD
     fireEvent.click(screen.getByRole("link"));
-=======
-
-    expect(screen.getByText("Inbox")).toBeInTheDocument();
-    expect(screen.getByTitle("Open CS101 module")).toHaveAttribute("href", "/modules?moduleId=7");
-    expect(screen.getByTitle("Open Chess Club")).toHaveAttribute("href", "/societies?id=9");
-    expect(screen.getByTitle("Open users")).toHaveTextContent("3 people");
-    expect(screen.getByText("Final Presentation")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByTitle("Open CS101 module"));
->>>>>>> main
     expect(onParentClick).not.toHaveBeenCalled();
   });
 

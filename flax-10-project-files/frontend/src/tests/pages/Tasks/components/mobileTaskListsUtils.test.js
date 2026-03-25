@@ -22,7 +22,7 @@ describe("mobileTaskListsUtils", () => {
 
   it("returns reading list section props", () => {
     const onSelectList = vi.fn();
-    const lists = [{ id: "r1", name: "CS101" }];
+    const lists = [{ id: "r1", name: "CS101 - Algorithms" }];
     const counts = { "r1": 3 };
     const { readingProps } = getMobileListSectionProps(lists, counts, "r1", onSelectList);
     expect(readingProps).toEqual({

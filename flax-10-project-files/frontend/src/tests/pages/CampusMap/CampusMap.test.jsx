@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import CampusMap from "../../../pages/CampusMap/CampusMap";
 import { reverseGeocode } from "../../../api/geocodeApi";
 import { tflService } from "../../../api/tflApi";
@@ -42,7 +43,11 @@ function stripMotionProps(props) {
 }
 
 async function renderLoadedCampusMap() {
-  render(<CampusMap />);
+  render(
+    <MemoryRouter>
+      <CampusMap />
+    </MemoryRouter>,
+  );
   await waitFor(
     () => expect(screen.queryByTestId("campus-map-skeleton")).not.toBeInTheDocument(),
     { timeout: 2000 },
@@ -129,7 +134,11 @@ describe("CampusMap", () => {
     mockMapInstance.on.mockImplementation(function () {
       return mockMapInstance;
     });
-    render(<CampusMap />);
+    render(
+      <MemoryRouter>
+        <CampusMap />
+      </MemoryRouter>,
+    );
     await waitFor(() => expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument());
   });
 

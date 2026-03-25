@@ -5,7 +5,9 @@
 /** Formats a meeting slot start time as a human-readable GB date/time string. */
 
 export function formatSuggestionDateLabel(value) {
+    if (!value) return "--";
     const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "--";
     const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
     const day = date.toLocaleDateString("en-GB", { day: "numeric" });
     const month = date.toLocaleDateString("en-GB", { month: "short" });

@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 const useReadingModal = vi.fn();
 const useClickOutside = vi.fn();
+const toggleExpanded = vi.fn();
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -83,7 +84,7 @@ vi.mock("../../../components/Modules/Modules/useModuleCourseFilterState", () => 
     filterQuery: "",
     setFilterQuery: vi.fn(),
     expanded: {},
-    toggleExpanded: vi.fn(),
+    toggleExpanded,
     ref: { current: null },
   }),
 }));
@@ -102,14 +103,18 @@ import ModuleCourseFilter from "../../../components/Modules/Modules/ModuleCourse
 describe("module reading and filter extras", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    toggleExpanded.mockReset();
   });
 
   it("validates reading form required fields and numeric constraints", () => {
     const onSubmit = vi.fn();
     render(<ReadingForm onSubmit={onSubmit} onCancel={vi.fn()} />);
     fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Notes" } });
+    fireEvent.change(screen.getByLabelText("Start Page"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("End Page"), { target: { value: "2" } });
     fireEvent.click(screen.getByText("Add Reading"));
     expect(screen.getByText("Due date cannot be empty.")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Pick due date & time"), { target: { value: "2026-03-30T09:30" } });
     fireEvent.change(screen.getByLabelText("Chapter (optional)"), { target: { value: "-1" } });
     fireEvent.click(screen.getByText("Add Reading"));
     expect(screen.getByText("Chapter cannot be negative.")).toBeInTheDocument();
@@ -119,10 +124,18 @@ describe("module reading and filter extras", () => {
     const onSubmit = vi.fn();
     render(<ReadingForm onSubmit={onSubmit} onCancel={vi.fn()} />);
     fireEvent.change(screen.getByLabelText("Title"), { target: { value: "N" } });
+    fireEvent.change(screen.getByLabelText("Start Page"), { target: { value: "4" } });
+    fireEvent.change(screen.getByLabelText("End Page"), { target: { value: "9" } });
     fireEvent.change(screen.getByLabelText("Pick due date & time"), { target: { value: "2026-03-30T09:30" } });
     fireEvent.change(screen.getByLabelText("Estimated Minutes (optional) - leave blank to auto-calculate"), { target: { value: "10" } });
     fireEvent.click(screen.getByText("Add Reading"));
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ title: "N", estimated_minutes: 10 }));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+      title: "N",
+      start_page: 4,
+      end_page: 9,
+      estimated_minutes: 10,
+      deadline: new Date("2026-03-30T09:30").toISOString(),
+    }));
   });
 
   it("renders reading list and handles modal close", () => {
@@ -148,6 +161,6 @@ describe("module reading and filter extras", () => {
     fireEvent.click(screen.getByText("Computer Science"));
     expect(onToggleCourse).toHaveBeenCalledWith("Computer Science");
     fireEvent.click(screen.getByRole("button", { name: /\+ 1 more/i }));
-    expect(screen.getByText("History")).toBeInTheDocument();
+    expect(toggleExpanded).toHaveBeenCalledWith("dept_Computing");
   });
 });

@@ -11,14 +11,15 @@ import {
 } from '../../../components/Calendar/DayView/dayViewHelpers';
 
 vi.mock('../../../components/Calendar/utils/overlapUtils', () => ({
+    getEventKey: vi.fn((event) => `${event.id}-${new Date(event.start_time).getTime()}-${new Date(event.end_time).getTime()}`),
     calculateEventColumns: vi.fn((events) => {
         const map = new Map();
-        events.forEach((e, i) => map.set(e.id, { column: i, totalColumns: events.length }));
+        events.forEach((e, i) => map.set(`${e.id}-${new Date(e.start_time).getTime()}-${new Date(e.end_time).getTime()}`, { column: i, totalColumns: events.length }));
         return map;
     }),
 }));
 
-const { calculateEventColumns } = await import('../../../components/Calendar/utils/overlapUtils');
+const { calculateEventColumns, getEventKey } = await import('../../../components/Calendar/utils/overlapUtils');
 
 describe('getHoursOfDay', () => {
     it('returns array of 24 hours', () => {
@@ -134,7 +135,7 @@ describe('calculateEventStyle', () => {
     it('does not apply layout adjustment when totalColumns is 1', () => {
         const event = { id: 1, start_time: '2026-03-15T10:00:00', end_time: '2026-03-15T11:00:00' };
         const otherEvent = { id: 2, start_time: '2026-03-15T12:00:00', end_time: '2026-03-15T13:00:00' };
-        calculateEventColumns.mockReturnValueOnce(new Map([[1, { column: 0, totalColumns: 1 }]]));
+        calculateEventColumns.mockReturnValueOnce(new Map([[getEventKey(event), { column: 0, totalColumns: 1 }]]));
         const style = calculateEventStyle(event, slotHeight, [event, otherEvent]);
         expect(style.width).toBe('100%');
     });

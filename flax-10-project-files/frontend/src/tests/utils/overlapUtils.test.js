@@ -4,6 +4,7 @@ import {
     findOverlappingEvents,
     checkOverlapWithConfirm,
     calculateEventColumns,
+    getEventKey,
 } from '../../components/Calendar/utils/overlapUtils';
 
 const makeEvent = (id, start, end) => ({ id, start_time: start, end_time: end, title: `Event ${id}` });
@@ -86,7 +87,7 @@ describe('calculateEventColumns', () => {
     it('assigns column 0 to single event', () => {
         const events = [makeEvent(1, '2026-01-01T10:00:00', '2026-01-01T11:00:00')];
         const cols = calculateEventColumns(events);
-        expect(cols.get(1)).toEqual({ column: 0, totalColumns: 1 });
+        expect(cols.get(getEventKey(events[0]))).toEqual({ column: 0, totalColumns: 1 });
     });
 
     it('assigns different columns to overlapping events', () => {
@@ -95,9 +96,9 @@ describe('calculateEventColumns', () => {
             makeEvent(2, '2026-01-01T10:30:00', '2026-01-01T11:30:00'),
         ];
         const cols = calculateEventColumns(events);
-        expect(cols.get(1).column).toBe(0);
-        expect(cols.get(2).column).toBe(1);
-        expect(cols.get(1).totalColumns).toBe(2);
+        expect(cols.get(getEventKey(events[0])).column).toBe(0);
+        expect(cols.get(getEventKey(events[1])).column).toBe(1);
+        expect(cols.get(getEventKey(events[0])).totalColumns).toBe(2);
     });
 
     it('reuses columns for non-overlapping events', () => {
@@ -107,7 +108,7 @@ describe('calculateEventColumns', () => {
         ];
         const cols = calculateEventColumns(events);
         // Non-overlapping, each gets column 0 but in separate groups
-        expect(cols.get(1).column).toBe(0);
-        expect(cols.get(2).column).toBe(0);
+        expect(cols.get(getEventKey(events[0])).column).toBe(0);
+        expect(cols.get(getEventKey(events[1])).column).toBe(0);
     });
 });

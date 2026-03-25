@@ -118,7 +118,8 @@ describe('useAsyncList', () => {
   });
 
   it("exposes setError for manual error updates", async () => {
-    const { result } = renderHook(() => useAsyncList(vi.fn(() => Promise.resolve([])), ''));
+    const fetcher = vi.fn(() => Promise.resolve([]));
+    const { result } = renderHook(() => useAsyncList(fetcher, ''));
     await act(async () => {});
     act(() => { result.current.setError('Manual'); });
     expect(result.current.error).toBe('Manual');
@@ -126,12 +127,12 @@ describe('useAsyncList', () => {
 
   it("clears old errors when a later fetch succeeds", async () => {
     let fail = true;
-    const fetcher = vi.fn(() => (fail ? Promise.reject(new Error('B')) : Promise.resolve([{ id: 7 }])));
-    const { result, rerender } = renderHook(({ f }) => useAsyncList(f, 'E'), { initialProps: { f: fetcher } });
+    const makeFetcher = () => vi.fn(() => (fail ? Promise.reject(new Error('B')) : Promise.resolve([{ id: 7 }])));
+    const { result, rerender } = renderHook(({ f }) => useAsyncList(f, 'E'), { initialProps: { f: makeFetcher() } });
     await act(async () => {});
     expect(result.current.error).toBe('B');
     fail = false;
-    rerender({ f: fetcher });
+    rerender({ f: makeFetcher() });
     await act(async () => {});
     expect(result.current.error).toBe('');
     expect(result.current.items).toEqual([{ id: 7 }]);

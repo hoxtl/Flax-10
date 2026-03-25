@@ -101,7 +101,7 @@ describe("AvailabilityTab", () => {
     expect(screen.getByText(/Propose meeting timings/)).toBeInTheDocument();
     expect(screen.getAllByText(/Propose/).length).toBeGreaterThan(0);
     // star-icon for best slot (free_count === total_count)
-    expect(screen.getByText("star-icon")).toBeInTheDocument();
+    expect(screen.getAllByText("star-icon").length).toBeGreaterThan(0);
     // footer
     expect(screen.getByText(/Green rings mean free/)).toBeInTheDocument();
   });

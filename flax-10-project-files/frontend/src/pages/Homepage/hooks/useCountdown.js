@@ -31,10 +31,11 @@ export function useCountdown(targetTime) {
 }
 
 function useCountdownTicker(targetTime, setNow) {
+  const targetMs = targetTime instanceof Date ? targetTime.getTime() : null;
   useEffect(() => {
     if (!isValidTargetTime(targetTime)) return undefined;
     return startCountdownTicker(targetTime, setNow);
-  }, [targetTime?.getTime(), setNow]);
+  }, [targetMs, targetTime, setNow]);
 }
 
 function startCountdownTicker(targetTime, setNow) {

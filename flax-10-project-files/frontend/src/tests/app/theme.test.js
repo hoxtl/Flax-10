@@ -21,8 +21,8 @@ describe("loadTheme", () => {
     await loadTheme(false, setInitialTheme, setInitialMode, setIsLoadingTheme);
 
     expect(getUserSettings).not.toHaveBeenCalled();
-    expect(setInitialTheme).not.toHaveBeenCalled();
-    expect(setInitialMode).not.toHaveBeenCalled();
+    expect(setInitialTheme).toHaveBeenCalledWith("flax");
+    expect(setInitialMode).toHaveBeenCalledWith("light");
     expect(setIsLoadingTheme).toHaveBeenCalledWith(false);
   });
 

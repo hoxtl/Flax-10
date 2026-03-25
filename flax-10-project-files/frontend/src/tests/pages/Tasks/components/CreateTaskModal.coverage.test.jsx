@@ -97,7 +97,7 @@ describe("CreateTaskModal coverage", () => {
     fireEvent.change(screen.getByLabelText(/Task name/i), { target: { value: "Updated title" } });
     fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: "Updated description" } });
     fireEvent.click(screen.getByRole("button", { name: "Set due" }));
-    fireEvent.click(screen.getByRole("button", { name: "50m" }));
+    fireEvent.click(screen.getByRole("button", { name: "50 minutes (2 Pomodoro blocks)" }));
     fireEvent.click(screen.getByRole("button", { name: "Inbox" }));
     fireEvent.click(screen.getByRole("button", { name: "KCL1 – Alpha" }));
     fireEvent.click(screen.getByRole("button", { name: "Medium" }));

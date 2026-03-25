@@ -109,7 +109,7 @@ describe("SocietyBrowseResults", () => {
   it("handles pagination via the Pagination component", () => {
     const setPage = vi.fn();
     paginationMock.mockReturnValue({ currentItems: [], totalPages: 3, currentPage: 1, setPage });
-    render(<SocietyBrowseResults items={[]} onSelect={vi.fn()} search="" setSearch={vi.fn()} />);
+    render(<SocietyBrowseResults items={[{ id: 1, name: "Chess Club" }]} onSelect={vi.fn()} search="" setSearch={vi.fn()} />);
     fireEvent.click(screen.getAllByText("Go to page 2")[0]);
     expect(setPage).toHaveBeenCalledWith(2);
   });

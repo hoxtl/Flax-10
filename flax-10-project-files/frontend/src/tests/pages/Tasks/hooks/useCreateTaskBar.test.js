@@ -10,7 +10,10 @@ vi.mock("../../../../components/Modules/utils/moduleUtils", () => ({ isEnrolledI
 vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: checkSleepAndRunMock }),
 }));
-vi.mock("../../../../pages/Tasks/utils/createTaskBarUtils", () => ({ runQuickAdd: vi.fn() }));
+vi.mock("../../../../pages/Tasks/utils/createTaskBarUtils", async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, runQuickAdd: vi.fn() };
+});
 
 import useCreateTaskBar from "../../../../pages/Tasks/hooks/useCreateTaskBar";
 import { getModules, getEnrollments } from "../../../../api/moduleApi";
