@@ -136,27 +136,20 @@ describe("ReadingsPanel coverage", () => {
 
   it("sorts, expands, and opens the modal with computed page counts", async () => {
     const onReadingAdded = vi.fn();
-
     render(<ReadingsPanel readings={readings} onReadingAdded={onReadingAdded} />);
-
     expect(screen.getByText("Chapter 2")).toBeInTheDocument();
     expect(screen.queryByText("Optional Reading")).not.toBeInTheDocument();
-
     fireEvent.click(screen.getByRole("button", { name: "Show more (1)" }));
     expect(screen.getByText("Optional Reading")).toBeInTheDocument();
-
     fireEvent.click(screen.getByText("Chapter 2"));
     expect(await screen.findByTestId("task-info-modal")).toBeInTheDocument();
     expect(screen.getByText("Chapter 2")).toBeInTheDocument();
     expect(screen.getByTestId("task-page-count")).toHaveTextContent("20");
-
     fireEvent.click(screen.getByRole("button", { name: "close-modal" }));
     await waitFor(() => expect(screen.queryByTestId("task-info-modal")).not.toBeInTheDocument());
-
     fireEvent.click(screen.getByText("Seminar Notes"));
     expect(await screen.findByTestId("task-info-modal")).toBeInTheDocument();
     expect(screen.getByTestId("task-page-count")).toHaveTextContent("null");
-
     fireEvent.click(screen.getAllByRole("button", { name: "add reading" })[3]);
     expect(onReadingAdded).toHaveBeenCalledWith(3);
   });
