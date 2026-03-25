@@ -41,4 +41,5 @@ node_modules/
 # Django media uploads
 backend/media/
 
-flax-10-project-files/frontend/coverage*/
+
+frontend/coverage*/
