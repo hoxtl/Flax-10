@@ -15,6 +15,23 @@ vi.mock('../../../../../components/Calendar/EventModal/components/LocationAutoCo
   ),
 }));
 
+const mockLocationLinkClick = vi.fn();
+vi.mock('../../../../../components/common/LocationLink/LocationLink', () => ({
+  default: ({ location, onClick }) => (
+    <button
+      type="button"
+      data-testid="location-link"
+      onClick={() => {
+        const event = { stopPropagation: vi.fn() };
+        mockLocationLinkClick(event);
+        onClick(event);
+      }}
+    >
+      {location}
+    </button>
+  ),
+}));
+
 describe('LocationEditCell', () => {
   function renderCell(ui) {
     return render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -44,5 +61,14 @@ describe('LocationEditCell', () => {
 
     expect(onChange).toHaveBeenCalledWith('Campus library');
     expect(onSave).toHaveBeenCalled();
+  });
+
+  it('renders a populated location link and stops propagation on click', () => {
+    renderCell(<LocationEditCell value="Lecture Hall" isEditing={false} onChange={vi.fn()} onSave={vi.fn()} />);
+
+    fireEvent.click(screen.getByTestId('location-link'));
+
+    expect(mockLocationLinkClick).toHaveBeenCalled();
+    expect(mockLocationLinkClick.mock.calls[0][0].stopPropagation).toHaveBeenCalled();
   });
 });

@@ -62,6 +62,8 @@ describe("navigation and analytics extras", () => {
     expect(navigate).toHaveBeenLastCalledWith("/societies?id=17");
     act(() => result.current("group-work_31"));
     expect(navigate).toHaveBeenLastCalledWith("/group-work?project=31");
+    act(() => result.current("mystery-destination"));
+    expect(setActiveNav).toHaveBeenLastCalledWith("mystery-destination");
   });
 
   it("covers analytics animation visible config", () => {

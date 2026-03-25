@@ -256,7 +256,7 @@ describe('CompatibilityScore', () => {
     expect(screen.getByText(/1 module in common/)).toBeInTheDocument();
   });
 
-  it('handles missing personas, all-day personas, neutral personas, and opposite rhythms', () => {
+  it('handles missing personas and all-day personas', () => {
     const { rerender } = render(
       <CompatibilityScore
         viewedSummary={{ persona: {} }}
@@ -276,8 +276,10 @@ describe('CompatibilityScore', () => {
       />
     );
     expect(screen.getByText(/really well/i)).toBeInTheDocument();
+  });
 
-    rerender(
+  it('handles sprint personas and opposite rhythms', () => {
+    const { rerender } = render(
       <CompatibilityScore
         viewedSummary={{ persona: { id: 'sprint' } }}
         currentUserSummary={{ persona: { id: 'night_owl' } }}
@@ -298,7 +300,7 @@ describe('CompatibilityScore', () => {
     expect(screen.getByText(/very different study rhythms/i)).toBeInTheDocument();
   });
 
-  it('covers intermediate compatibility messaging thresholds', () => {
+  it('covers threshold for similar hours and overlapping windows', () => {
     const { rerender } = render(
       <CompatibilityScore
         viewedSummary={{ persona: { id: 'night_owl' } }}
@@ -318,8 +320,10 @@ describe('CompatibilityScore', () => {
       />
     );
     expect(screen.getByText(/a few overlapping study windows/i)).toBeInTheDocument();
+  });
 
-    rerender(
+  it('covers threshold for different rhythms and partial overlap', () => {
+    const { rerender } = render(
       <CompatibilityScore
         viewedSummary={{ persona: { id: 'early_bird' } }}
         currentUserSummary={{ persona: { id: 'afternoon_peak' } }}
