@@ -241,9 +241,8 @@ function StudentAction({ enrolled, isCore, onToggle }) {
     if (isCore) {
         return (
             <Tooltip content="Cannot leave a core course module" position="top">
-                <span style={{ display: 'inline-flex', cursor: 'not-allowed' }}>
-                    <button className={styles.unenrollButton} disabled aria-disabled="true"
-                        style={{ opacity: 0.55, cursor: 'not-allowed', pointerEvents: 'none' }}>
+                <span className={styles.disabledWrapper}>
+                    <button className={`${styles.unenrollButton} ${styles.disabledBtn}`.trim()} disabled aria-disabled="true">
                         × Leave Module
                     </button>
                 </span>

@@ -1,0 +1,234 @@
+════════════════════════════════════════════════════════════════════════════════════════
+[1m                              STUDYFLAX CODE QUALITY AUDIT                              [0m
+════════════════════════════════════════════════════════════════════════════════════════
+  [2mBackend: deep AST analysis  |  Frontend: heuristic analysis[0m
+  [2mChecks:  DRY · SRP · Abstraction · Dead Code · Styles · Comments[0m
+
+  [2mScanning frontend …[0m
+
+[1m[96m──── 4. FRONTEND — FUNCTION LENGTH & NESTING ─────────────────────────────────[0m
+  [2m>20 lines or >1 control-flow depth[0m
+
+  [91m✗[0m  [91m130 errors[0m
+
+  [[91mERROR[0m]  [1msrc/components/Analytics/ConsistencyScore.jsx:14[0m
+           `getExplanation` nesting depth 3 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/EventModal/components/ReminderField.jsx:41[0m
+           `formatMinutes` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/EventPopover/popoverUtils.js:12[0m
+           `resolveHorizontalPlacement` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/EventPopups.jsx:69[0m
+           `getPopupActions` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/ListView/EventRow.jsx:18[0m
+           `getTagBadges` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/TableView/TableRow.jsx:22[0m
+           `getSourceBadge` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/TableView/cells/EditableCell.jsx:36[0m
+           `EditableCell` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/TableView/cells/TagEditCell.jsx:49[0m
+           `TagEditCell` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/header/ScheduleManager/ScheduleManagerDialog.jsx:64[0m
+           `ScheduleDialogBody` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useCalendarEvents.js:11[0m
+           `getDateKey` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useEventResize.js:71[0m
+           `saveResizedEvent` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useKeyboardNav.js:10[0m
+           `createMoveNext` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useKeyboardNav.js:19[0m
+           `createMovePrev` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useKeyboardNav.js:28[0m
+           `createKeyDownHandler` nesting depth 3 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useMonthDayDrop.js:24[0m
+           `moveEventToDate` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useTimeSlotDrop.js:38[0m
+           `dispatchDrop` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/hooks/useTimeSlotDrop.js:99[0m
+           `moveEventToTime` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/utils/eventStyleUtils.js:10[0m
+           `getEventTheme` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/utils/formUtils.js:98[0m
+           `saveEvent` nesting depth 3 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Calendar/utils/formUtils.js:108[0m
+           `handleRecurringEdit` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Modules/Deadlines/UpcomingDeadlinesWidget.jsx:88[0m
+           `buildInteractiveProps` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Modules/Modules/ModuleCourseFilter.jsx:64[0m
+           `CoursesList` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Modules/Modules/ModulesCard.jsx:26[0m
+           `getCardClass` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Modules/Modules/ModulesCard.jsx:239[0m
+           `StudentAction` nesting depth 2 (max 1)
+  [[91mERROR[0m]  [1msrc/components/Modules/hooks/useModules.js:80[0m
+           `handleDisenrolError` nesting depth 2 (max 1)
+
+  [2m... and 105 more[0m
+
+
+[1m[96m──── 5. FRONTEND — SRP & ABSTRACTION ─────────────────────────────────────────[0m
+  [2mfetch + state + render in same unit[0m
+
+  [91m✗[0m  [33m1 warning[0m
+
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/TaskWidgetSlot.jsx:1[0m
+           Mixes 4 computation chains with rendering
+
+
+[1m[96m──── 6. FRONTEND — INLINE & HARDCODED STYLES ─────────────────────────────────[0m
+  [2mstyle={{}} or hardcoded hex/rgb values[0m
+
+  [91m✗[0m  [33m6 warnings[0m
+
+  [[33mWARN [0m]  [1msrc/components/Modules/Modules/ModuleDetails.jsx:302[0m
+           Multi-prop inline style: style={{ display: 'inline-flex', cursor: 'not-allowed' 
+  [[33mWARN [0m]  [1msrc/components/Modules/Modules/ModulesCard.jsx:244[0m
+           Multi-prop inline style: style={{ display: 'inline-flex', cursor: 'not-allowed' 
+  [[33mWARN [0m]  [1msrc/components/Modules/Modules/ModulesCard.jsx:246[0m
+           Multi-prop inline style: style={{ opacity: 0.55, cursor: 'not-allowed', pointerE
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/IntelligenceWidgets.jsx:138[0m
+           Hardcoded colour value: rgba(
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/IntelligenceWidgets.jsx:139[0m
+           Hardcoded colour value: rgba(
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/IntelligenceWidgets.jsx:140[0m
+           Hardcoded colour value: rgba(
+
+
+[1m[96m──── 7. FRONTEND — DRY ───────────────────────────────────────────────────────[0m
+  [2mduplicate normalised blocks across source files[0m
+
+  [92m✓[0m  No issues found
+
+
+[1m[96m──── 8. DEAD CODE ────────────────────────────────────────────────────────────[0m
+  [2mconsole.log, commented-out blocks, unused imports[0m
+
+  [92m✓[0m  No issues found
+
+
+[1m[96m──── 9. UNUSED FILES ─────────────────────────────────────────────────────────[0m
+  [2mfiles never imported and not a convention entry point[0m
+
+  [91m✗[0m  [33m1 warning[0m
+
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/RightNowWidget.viewmodel.js:1[0m
+           JS/JSX file never imported and not a convention entry point
+
+
+[1m[96m──── 10. DOCSTRING SPACING ───────────────────────────────────────────────────[0m
+  [2mexactly one blank line required after every docstring[0m
+
+  [91m✗[0m  [33m17 warnings[0m
+
+  [[33mWARN [0m]  [1msrc/components/Calendar/EventModal/components/ReminderFieldParts.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/components/Calendar/EventModal/components/useLocationAutocomplete.js:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/components/Calendar/ListView/EventRow.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/components/Calendar/MonthView/EventDot.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/components/Calendar/MonthView/WeekRow.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/components/Calendar/header/ScheduleManager/useScheduleManagerState.js:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/components/Calendar/header/useFilterDropdownState.js:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/components/Onboarding/OnboardingModal.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Admin/hooks/useUsersTabState.js:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/HomepageOverlays.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/HomepageTimelineSection.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/IntelligenceWidgets.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/RightNowUtils.js:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Homepage/components/TinyTimelineWidget.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Homepage/utils/homepageViewModel.js:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Tasks/components/listSidebarParts.jsx:3[0m
+           No blank line after /** */ block
+  [[33mWARN [0m]  [1msrc/pages/Tasks/components/useListSidebarState.js:3[0m
+           No blank line after /** */ block
+
+
+[1m[96m──── 11. FRONTEND — COMMENT QUALITY ──────────────────────────────────────────[0m
+  [2mbanners, American spelling, emojis, arrow text[0m
+
+  [91m✗[0m  [33m215 warnings[0m
+
+  [[33mWARN [0m]  [1msrc/tests/components/Attendance/AttendancePrompt.test.jsx:174[0m
+           Arrow notation in comment: null event → if (event) is false → no setSessionDismiss
+  [[33mWARN [0m]  [1msrc/tests/components/Attendance/AttendancePrompt.test.jsx:185[0m
+           Arrow notation in comment: Don't provide closeDelayMs in options (undefined) → def
+  [[33mWARN [0m]  [1msrc/tests/components/Attendance/AttendancePrompt.test.jsx:186[0m
+           Arrow notation in comment: closeDelayMs > 0 → wait(closeDelayMs) is called
+  [[33mWARN [0m]  [1msrc/tests/components/Attendance/AttendancePrompt.test.jsx:203[0m
+           Arrow notation in comment: Second click should hit the guard (answeredWith !== nul
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:121[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:123[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:173[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:175[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:188[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:190[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:204[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:206[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:218[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:220[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:235[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:237[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:251[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:253[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:272[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:274[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:292[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:294[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:305[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderInteractions.test.jsx:307[0m
+           Decorative separator: // ----------------------------------------------------
+  [[33mWARN [0m]  [1msrc/tests/components/Calendar/CalendarHeaderMobile.test.jsx:89[0m
+           Decorative separator: // ----------------------------------------------------
+
+  [2m... and 190 more[0m
+
+════════════════════════════════════════════════════════════════════════════════════════
+[1m  SUMMARY[0m
+────────────────────────────────────────────────────────────────────────────────────────
+  [92m✓[0m  Backend DRY                                         [92m0[0m
+  [92m✓[0m  Backend Single Responsibility                       [92m0[0m
+  [92m✓[0m  Backend Single Level of Abstraction                 [92m0[0m
+  [91m✗[0m  Function Length & Nesting                           [91m130[0m
+  [91m✗[0m  SRP & Abstraction                                   [33m1[0m
+  [91m✗[0m  Inline & Hardcoded Styles                           [33m6[0m
+  [92m✓[0m  DRY                                                 [92m0[0m
+  [92m✓[0m  Dead Code                                           [92m0[0m
+  [91m✗[0m  Unused Files                                        [33m1[0m
+  [91m✗[0m  Docstring Spacing                                   [91m17[0m
+  [91m✗[0m  Comment Quality                                     [91m215[0m
+
+════════════════════════════════════════════════════════════════════════════════════════
+  [33m⚠  370 total finding(s)[0m  ·  [91m130 error(s)[0m
+════════════════════════════════════════════════════════════════════════════════════════
+

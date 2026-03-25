@@ -298,8 +298,8 @@ function RecurringBadge() {
 }
 
 function LeaveModuleButton({ is_core, onUnenroll }) {
-    const btn = <PrimaryButton variant="danger" pill onClick={is_core ? undefined : onUnenroll} disabled={is_core} aria-disabled={is_core} style={is_core ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}>Leave module</PrimaryButton>;
-    if (is_core) return <Tooltip content="Cannot leave a core course module" position="bottom"><span style={{ display: 'inline-flex', cursor: 'not-allowed' }}>{btn}</span></Tooltip>;
+    const btn = <PrimaryButton variant="danger" pill onClick={is_core ? undefined : onUnenroll} disabled={is_core} aria-disabled={is_core} className={is_core ? styles.disabledBtn : undefined}>Leave module</PrimaryButton>;
+    if (is_core) return <Tooltip content="Cannot leave a core course module" position="bottom"><span className={styles.disabledWrapper}>{btn}</span></Tooltip>;
     return btn;
 }
 
