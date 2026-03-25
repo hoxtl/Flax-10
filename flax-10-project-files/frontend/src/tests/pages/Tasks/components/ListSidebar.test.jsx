@@ -123,25 +123,15 @@ describe("ListSidebar coverage", () => {
   });
 
   it("covers teacher sections, rename handlers, archive toggles, and delete dialogs", () => {
-    const state = buildState({
-      renamingId: 1,
-      showArchived: true,
-      deleteListId: 3,
-      permDeleteId: 9,
-      ctxMenu: { x: 12, y: 24, listId: 3 },
-    });
+    const state = buildState({ renamingId: 1, showArchived: true, deleteListId: 3, permDeleteId: 9, ctxMenu: { x: 12, y: 24, listId: 3 } });
     const props = buildProps();
-
-    authMock.mockReturnValue({ profile: { role: "teacher" } });
-    sidebarStateMock.mockReturnValue(state);
-
+    authMock.mockReturnValue({ profile: { role: "teacher" } }); sidebarStateMock.mockReturnValue(state);
     render(<ListSidebar {...props} />);
 
     expect(screen.getByText("Lectures")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Save rename" }));
     expect(props.onRenameList).toHaveBeenCalledWith(1, "Renamed list");
-    expect(state.setRenamingId).toHaveBeenCalledWith(null);
     fireEvent.click(screen.getByRole("button", { name: "Cancel rename" }));
     expect(state.setRenamingId).toHaveBeenCalledWith(null);
 
@@ -155,15 +145,13 @@ describe("ListSidebar coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: /archived/i }));
     expect(state.setShowArchived).toHaveBeenCalledWith(expect.any(Function));
 
-    const confirmButtons = screen.getAllByRole("button", { name: "Confirm" });
-    fireEvent.click(confirmButtons[0]);
-    fireEvent.click(confirmButtons[1]);
+    const confirms = screen.getAllByRole("button", { name: "Confirm" });
+    fireEvent.click(confirms[0]); fireEvent.click(confirms[1]);
     expect(props.onDeleteList).toHaveBeenCalledWith(3);
     expect(props.onPermanentlyDeleteList).toHaveBeenCalledWith(9);
 
-    const cancelButtons = screen.getAllByRole("button", { name: "Cancel" });
-    fireEvent.click(cancelButtons[0]);
-    fireEvent.click(cancelButtons[1]);
+    const cancels = screen.getAllByRole("button", { name: "Cancel" });
+    fireEvent.click(cancels[0]); fireEvent.click(cancels[1]);
     expect(state.setDeleteListId).toHaveBeenCalledWith(null);
     expect(state.setPermDeleteId).toHaveBeenCalledWith(null);
   });

@@ -106,39 +106,12 @@ describe("Filters and sections coverage", () => {
   });
 
   it("shows reading-list empty subtitles and disables editing for reading tasks", () => {
-    const onEditTask = vi.fn();
-
+    const onEdit = vi.fn(); const onToggle = vi.fn(); const onDelete = vi.fn();
     render(
       <>
-        <TaskSection
-          title="Later"
-          emoji="⏳"
-          tasks={[]}
-          completedCount={1}
-          sortBy="priority"
-          listMap={{}}
-          lists={[]}
-          sectionType="later"
-          emptyMessage="No tasks"
-          emptySub="Nothing waiting"
-          onToggleComplete={vi.fn()}
-          onDeleteTask={vi.fn()}
-          onEditTask={onEditTask}
-        />
-        <TaskSection
-          title="Readings"
-          emoji="📚"
-          tasks={[{ id: 2, title: "Chapter 1", task_list: 10, completed: false }]}
-          completedCount={0}
-          sortBy="priority"
-          listMap={{ "10": { name: "CS101 - Systems", idx: 0 } }}
-          lists={[{ id: 10, name: "CS101 - Systems" }]}
-          sectionType="all"
-          onToggleComplete={vi.fn()}
-          onDeleteTask={vi.fn()}
-          onEditTask={onEditTask}
-        />
-      </>,
+        <TaskSection title="Later" emoji="⏳" tasks={[]} completedCount={1} sortBy="priority" listMap={{}} lists={[]} sectionType="later" emptyMessage="No tasks" emptySub="Nothing waiting" onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />
+        <TaskSection title="Readings" emoji="📚" tasks={[{ id: 2, title: "Chapter 1", task_list: 10, completed: false }]} completedCount={0} sortBy="priority" listMap={{ "10": { name: "CS101 - Systems", idx: 0 } }} lists={[{ id: 10, name: "CS101 - Systems" }]} sectionType="all" onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />
+      </>
     );
 
     expect(screen.getByText("Nothing waiting")).toBeInTheDocument();

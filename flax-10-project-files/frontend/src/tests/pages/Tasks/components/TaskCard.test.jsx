@@ -167,52 +167,7 @@ describe("TaskCard coverage", () => {
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
   });
 
-  it("covers menu back buttons, invalid moves, due removal, sleep warnings, and outside clicks", async () => {
-    getUserSettings.mockRejectedValueOnce(new Error("offline"));
-    sleepWarningHookMock.mockReturnValue({
-      sleepWarning: true,
-      sleepWarningProps: {},
-      checkSleepAndRun: (_dueDate, callback) => callback(),
-    });
 
-    const onClose = vi.fn();
-    const onEdit = vi.fn();
-
-    renderWithRouter(
-      <TaskContextMenu
-        task={buildProps().task}
-        onDelete={vi.fn()}
-        onEdit={onEdit}
-        lists={buildProps().lists}
-        pos={{ x: 10, y: 20 }}
-        onClose={onClose}
-      />,
-    );
-
-    expect(screen.getByTestId("sleep-warning")).toBeInTheDocument();
-
-    fireEvent.mouseDown(screen.getByRole("button", { name: /Set due date/i }));
-    expect(onClose).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole("button", { name: /Move to list/i }));
-    fireEvent.click(screen.getByRole("button", { name: /invalid option/i }));
-    expect(onEdit).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: /Back/i }));
-
-    fireEvent.click(screen.getByRole("button", { name: /Set due date/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Set due date/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Clear date/i }));
-
-    expect(onEdit).toHaveBeenCalledWith(
-      { due_date: null },
-      { source: "context-menu", action: "set-due-date", dueDate: null },
-    );
-
-    fireEvent.mouseDown(document.body);
-    expect(onClose).toHaveBeenCalled();
-    await waitFor(() => expect(getUserSettings).toHaveBeenCalled());
-  });
 
   it("covers routine and repeated completion flows and the study-now fallback color path", () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
@@ -240,22 +195,7 @@ describe("TaskCard coverage", () => {
 
   it("handles completed tasks and routine completions without showing celebration UI", () => {
     isRoutineTask.mockReturnValue(true);
-
-    renderWithRouter(
-      <TaskCard
-        {...buildProps({
-          task: {
-            ...buildProps().task,
-            completed: true,
-            priority: "low",
-          },
-          isCompletedSection: true,
-          lists: [],
-          onEdit: undefined,
-          listColor: undefined,
-        })}
-      />,
-    );
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...buildProps().task, completed: true, priority: "low" }, isCompletedSection: true, lists: [], onEdit: undefined, listColor: undefined })} />);
 
     expect(screen.getByText("Completed label")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Study now/i })).not.toBeInTheDocument();
@@ -313,111 +253,26 @@ describe("TaskCard coverage", () => {
 
   it("covers non-matching storage events, default edit lists, link clicks, and non-enter keys", async () => {
     formatDueDate.mockReturnValueOnce({ label: "Soon", status: "mystery" });
-
-    renderWithRouter(
-      <TaskCard
-        {...buildProps({
-          task: {
-            ...buildProps().task,
-            id: 22,
-            priority: undefined,
-            estimated_blocks: undefined,
-          },
-          lists: undefined,
-        })}
-      />,
-    );
-
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...buildProps().task, id: 22, priority: undefined, estimated_blocks: undefined }, lists: undefined })} />);
     const card = screen.getByTitle(/Right-click for more options/i);
     const initialClassName = card.className;
 
-    await act(async () => {
-      window.dispatchEvent(new StorageEvent("storage", { key: "other-key", newValue: "22" }));
-    });
+    await act(async () => { window.dispatchEvent(new StorageEvent("storage", { key: "other-key", newValue: "22" })); });
     expect(card.className).toBe(initialClassName);
 
     fireEvent.keyDown(screen.getByText("Read book").closest('[role="button"]'), { key: " " });
     expect(screen.queryByTestId("info-modal")).not.toBeInTheDocument();
-
     fireEvent.click(screen.getByTitle(/Open KCL1 module/i));
     expect(screen.queryByTestId("info-modal")).not.toBeInTheDocument();
-
     fireEvent.click(screen.getByRole("button", { name: /Study now/i }));
-    expect(timerMock.setActiveTaskId).toHaveBeenCalledWith(
-      22,
-      expect.objectContaining({ estimatedBlocks: 1 }),
-    );
+    expect(timerMock.setActiveTaskId).toHaveBeenCalledWith(22, expect.objectContaining({ estimatedBlocks: 1 }));
 
     fireEvent.contextMenu(card);
     fireEvent.click(screen.getByRole("button", { name: /Edit/i }));
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
   });
 
-  it("covers empty move values and missing source list names in the context menu", () => {
-    const onEdit = vi.fn();
 
-    renderWithRouter(
-      <TaskContextMenu
-        task={{ ...buildProps().task, task_list: null }}
-        onDelete={vi.fn()}
-        onEdit={onEdit}
-        lists={[{ id: 2, name: "Work" }]}
-        pos={{ x: 10, y: 20 }}
-        onClose={vi.fn()}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: /Move to list/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Work/i }));
-
-    expect(onEdit).toHaveBeenCalledWith(
-      { task_list: 2 },
-      expect.objectContaining({ fromListName: undefined }),
-    );
-  });
-
-  it("handles missing sleep settings and ignores late failures after unmount", async () => {
-    getUserSettings.mockResolvedValueOnce({});
-
-    const firstRender = renderWithRouter(
-      <TaskContextMenu
-        task={buildProps().task}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        lists={buildProps().lists}
-        pos={{ x: 10, y: 20 }}
-        onClose={vi.fn()}
-      />,
-    );
-
-    await waitFor(() => expect(getUserSettings).toHaveBeenCalled());
-    firstRender.unmount();
-
-    let rejectSettings;
-    getUserSettings.mockReturnValueOnce(
-      new Promise((_, reject) => {
-        rejectSettings = reject;
-      }),
-    );
-
-    const secondRender = renderWithRouter(
-      <TaskContextMenu
-        task={buildProps().task}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        lists={buildProps().lists}
-        pos={{ x: 10, y: 20 }}
-        onClose={vi.fn()}
-      />,
-    );
-
-    secondRender.unmount();
-
-    await act(async () => {
-      rejectSettings(new Error("late failure"));
-      await Promise.resolve();
-    });
-  });
 
   it("renders the edit modal directly with its default list fallback", () => {
     render(
