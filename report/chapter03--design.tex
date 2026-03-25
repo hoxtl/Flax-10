@@ -74,36 +74,37 @@ Registration creates a \texttt{User} record and returns a DRF auth token in the 
 
 The backend exposes a set of admin-only API endpoints under \texttt{/api/admin/}, restricted to users with the \texttt{staff} role. These allow administrators to manage user accounts, oversee registered societies, and access platform-wide analytics without going through Django's built-in \texttt{/admin/} panel. Django's default \texttt{/admin/} interface is also available for direct database-level inspection and management during development. Role-based access is enforced at the view level using a custom permission check against the \texttt{is\_staff} flag on the \texttt{User} model.
 
-\section{Data Model / Entity Relationships}
+\section{UML Component Diagrams}
 
-The data model is divided across three figures below, grouped by functional domain for legibility. Each colour represents a distinct cluster: blue (Auth \& User), yellow (Notifications), red (Socials), green (Calendar), purple (Module), pink (Tasks), magenta (Timer), orange (Groupwork), and cyan (Society).
-
-\FloatBarrier
-
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=\textwidth, height=0.9\textheight, keepaspectratio]{figures/er_diagram_1.png}
-    \caption{ER Diagram (Part 1) --- Authentication, User, Notification \& Social Models}
-    \label{fig:er_diagram_1}
-\end{figure}
+The system architecture is illustrated across two component diagrams below. Figure~\ref{fig:component_frontend} shows the frontend architecture, including the browser routing layer, state management contexts, page components, and API service layer. Figure~\ref{fig:component_backend} shows the backend architecture, including the Django REST Framework views, signal handlers, serialisers, ORM layer, PostgreSQL database, and external service integrations.
 
 \FloatBarrier
 
+\begin{landscape}
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\textwidth, height=0.9\textheight, keepaspectratio]{figures/er_diagram_2.png}
-    \caption{ER Diagram (Part 2) --- Calendar, Module, Task \& Timer Models}
-    \label{fig:er_diagram_2}
+    \adjustbox{max width=\linewidth, max totalheight=\textheight-2cm}{%
+        \includegraphics{figures/component_diagram_frontend.png}%
+    }
+    \vspace{-0.5cm}
+    \caption{Component Diagram --- Frontend Architecture}
+    \label{fig:component_frontend}
 \end{figure}
+\end{landscape}
 
 \FloatBarrier
 
+\begin{landscape}
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\textwidth, height=0.9\textheight, keepaspectratio]{figures/er_diagram_3.png}
-    \caption{ER Diagram (Part 3) --- Groupwork \& Society Models}
-    \label{fig:er_diagram_3}
+    \adjustbox{max width=\linewidth, max totalheight=\textheight-2cm}{%
+        \includegraphics{figures/component_diagram_backend.png}%
+    }
+    \vspace{-0.5cm}
+    \caption{Component Diagram --- Backend \& Infrastructure Architecture}
+    \label{fig:component_backend}
 \end{figure}
+\end{landscape}
 
 \FloatBarrier
 
