@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Clock, Sparkles, Sun } from "lucide-react";
-import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
+import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
 import LocationLink from "../../../components/common/LocationLink/LocationLink";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useRightNowData } from "../hooks/useRightNowData";

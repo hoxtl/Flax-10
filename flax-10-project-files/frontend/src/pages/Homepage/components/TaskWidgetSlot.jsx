@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import WidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
+import WidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
 import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 import rowStyles from "../../Modules/DashboardRows.module.css";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
@@ -173,4 +173,3 @@ function getTaskGroups(taskWidgetList, _row) {
     visibleCompleted: completedTasks,
   };
 }
-

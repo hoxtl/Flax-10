@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DeadlinesWidget } from '../../../pages/Homepage/components/DeadlinesWidget';
+import { UpcomingDeadlinesWidget } from '../../../components/Modules/Deadlines/UpcomingDeadlinesWidget';
 
 const navigateMock = vi.fn();
 
@@ -58,5 +59,47 @@ describe('DeadlinesWidget (Homepage)', () => {
     fireEvent.click(screen.getByText('CS101'));
     fireEvent.click(screen.getByText('EXAM'));
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('filters invalid deadlines and supports keyboard selection in the shared widget', () => {
+    const onSelectDeadline = vi.fn();
+    render(
+      <MemoryRouter>
+        <UpcomingDeadlinesWidget
+          interactiveRows
+          onSelectDeadline={onSelectDeadline}
+          deadlines={[
+            { id: 1, title: 'Essay', module_code: 'CS101', start_due_date: '2026-04-01T12:00:00Z', deadline_type: 'coursework' },
+            { id: 2, title: 'Skip me' },
+          ]}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Essay')).toBeInTheDocument();
+    expect(screen.queryByText('Skip me')).not.toBeInTheDocument();
+
+    const row = screen.getByRole('button', { name: /essay/i });
+    fireEvent.keyDown(row, { key: ' ' });
+    expect(onSelectDeadline).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+  });
+
+  it('returns null for non-array deadline input and hides the header when custom empty content is rendered', () => {
+    const { rerender, container } = render(
+      <MemoryRouter>
+        <UpcomingDeadlinesWidget deadlines={null} />
+      </MemoryRouter>,
+    );
+
+    expect(container).toBeEmptyDOMElement();
+
+    rerender(
+      <MemoryRouter>
+        <UpcomingDeadlinesWidget deadlines={[]} renderEmpty={() => <div>Custom empty</div>} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Custom empty')).toBeInTheDocument();
+    expect(screen.queryByText('Upcoming Deadlines')).not.toBeInTheDocument();
   });
 });

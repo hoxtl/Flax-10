@@ -11,7 +11,7 @@ import { getInitials } from '../../Authentication/utils/userUtils.js';
 import { useAuth } from '../../../context/AuthContext.jsx';
 import Badge from '../../common/Badge/Badge.jsx';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
-import { getUrgencyTier } from '../../Common/DeadlineCountdown/deadlineCountdownUtils.js';
+import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton.jsx';
 import Tooltip from '../../common/Tooltip/Tooltip.jsx';

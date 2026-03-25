@@ -117,4 +117,32 @@ describe('DeadlineForm', () => {
         fireEvent.change(screen.getByRole('combobox'), { target: { value: 'presentation' } });
         expect(screen.getByText('Location')).toBeInTheDocument();
     });
+
+    it('validates missing start date and exam end date requirements', () => {
+        const onSubmit = vi.fn();
+        render(<DeadlineForm onSubmit={onSubmit} onCancel={vi.fn()} />);
+
+        fireEvent.change(screen.getAllByRole('textbox')[0], { target: { value: 'Exam title' } });
+        fireEvent.click(screen.getByText('Add Deadline'));
+        expect(screen.getByText('Due date cannot be empty.')).toBeInTheDocument();
+        expect(onSubmit).not.toHaveBeenCalled();
+
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'exam' } });
+        fireEvent.change(screen.getAllByPlaceholderText('Pick date & time')[0], { target: { value: '2026-06-01T10:00' } });
+        fireEvent.click(screen.getByText('Add Deadline'));
+
+        expect(screen.getByText('End time cannot be empty.')).toBeInTheDocument();
+    });
+
+    it('validates end time ordering for exams', () => {
+        render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+
+        fireEvent.change(screen.getAllByRole('textbox')[0], { target: { value: 'Exam title' } });
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'exam' } });
+        fireEvent.change(screen.getAllByPlaceholderText('Pick date & time')[0], { target: { value: '2026-06-01T10:00' } });
+        fireEvent.change(screen.getAllByPlaceholderText('Pick date & time')[1], { target: { value: '2026-06-01T09:30' } });
+        fireEvent.click(screen.getByText('Add Deadline'));
+
+        expect(screen.getByText('End time must be after start time.')).toBeInTheDocument();
+    });
 });
