@@ -14,7 +14,7 @@ function clearToastTimer(timeoutRef) {
   timeoutRef.current = null;
 }
 
-function buildToastState(message, options = {}) {
+function buildToastState(message, options) {
   return {
     message,
     actionLabel: options.actionLabel || null,

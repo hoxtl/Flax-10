@@ -20,8 +20,13 @@ vi.mock('../../components/Calendar/utils/dateValidation', () => ({
     validateDateRange: vi.fn().mockReturnValue(null),
 }));
 
+vi.mock('../../api/geocodeApi', () => ({
+    geocodeAddress: vi.fn(),
+}));
+
 import { checkOverlapWithConfirm } from '../../components/Calendar/utils/overlapUtils';
 import { extractBaseEventId, hasRecurrence } from '../../components/Calendar/utils/eventUtils';
+import { geocodeAddress } from '../../api/geocodeApi';
 
 describe('getInitialForm', () => {
     it('returns default form when no event', () => {
@@ -123,6 +128,35 @@ describe('getInitialForm', () => {
         const form = getInitialForm(event);
         expect(form.reminder).toEqual([]);
     });
+
+    it('reads all-day aliases and recurrence defaults from sparse events', () => {
+        const form = getInitialForm({
+            title: 'Alias all day',
+            start_time: '2026-03-07T00:00:00',
+            end_time: '2026-03-07T00:00:00',
+            is_all_day: true,
+            recurrence: '',
+        });
+
+        expect(form.all_day).toBe(true);
+        expect(form.recurrence).toEqual({ frequency: 'none', interval: 1, end_date: null });
+    });
+
+    it('falls back to empty text fields and recurrence detail defaults', () => {
+        const form = getInitialForm({
+            title: '',
+            description: '',
+            location: '',
+            start_time: '2026-03-07T09:00:00',
+            end_time: '2026-03-07T10:00:00',
+            recurrence_details: { frequency: '', interval: 0, end_date: '' },
+        });
+
+        expect(form.title).toBe('');
+        expect(form.description).toBe('');
+        expect(form.location).toBe('');
+        expect(form.recurrence).toEqual({ frequency: 'none', interval: 1, end_date: null });
+    });
 });
 
 describe('isRecurringEvent', () => {
@@ -172,6 +206,7 @@ describe('validateAndSubmit', () => {
         checkOverlapWithConfirm.mockResolvedValue(true);
         hasRecurrence.mockReturnValue(false);
         extractBaseEventId.mockImplementation((id) => id);
+        geocodeAddress.mockReset();
     });
 
     it('calls setError when title is empty', async () => {
@@ -208,6 +243,27 @@ describe('validateAndSubmit', () => {
         await validateAndSubmit(null, form, null, actions, onClose, setError, confirmFn, []);
         expect(actions.addEvent).toHaveBeenCalled();
         expect(onClose).toHaveBeenCalled();
+    });
+
+    it('applies recurring-rule interval and end-date fallbacks when submitting', async () => {
+        const form = {
+            title: 'Recurring Event',
+            description: '',
+            start_time: '2026-03-07T09:00',
+            end_time: '2026-03-07T10:00',
+            recurrence: { frequency: 'weekly', interval: '', end_date: '' },
+            reminder: [],
+            tag: null,
+            location: '',
+            all_day: false,
+            is_private: false,
+        };
+
+        await validateAndSubmit(null, form, null, actions, onClose, setError, confirmFn, []);
+
+        expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({
+            recurrence_rule: { frequency: 'weekly', interval: 1, end_date: null },
+        }));
     });
 
     it('calls editEvent for existing non-recurring event', async () => {
@@ -249,6 +305,35 @@ describe('validateAndSubmit', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
+    it('filters the current event out of overlap checks and handles blank recurrence/location fallbacks', async () => {
+        const event = { id: 10 };
+        const form = {
+            title: 'Updated Event',
+            description: '',
+            start_time: '2026-03-07T09:00',
+            end_time: '2026-03-07T10:00',
+            recurrence: null,
+            reminder: [],
+            tag: '',
+            location: '   ',
+            all_day: false,
+            is_private: undefined,
+        };
+
+        await validateAndSubmit(null, form, event, actions, onClose, setError, confirmFn, [{ id: 10 }, { id: 11 }]);
+
+        expect(checkOverlapWithConfirm).toHaveBeenCalledWith(
+            expect.objectContaining({
+                id: 10,
+                recurrence_rule: null,
+                is_private: false,
+                tag: null,
+            }),
+            [{ id: 11 }],
+            confirmFn,
+        );
+    });
+
     it('includes recurrence_rule in data when frequency is not none', async () => {
         const form = {
             title: 'Weekly Event',
@@ -285,6 +370,38 @@ describe('validateAndSubmit', () => {
         expect(actions.addEvent).toHaveBeenCalledWith(
             expect.objectContaining({ recurrence_rule: null })
         );
+    });
+
+    it('geocodes locations and keeps invalid lookups marked as unvalidated', async () => {
+        geocodeAddress
+            .mockResolvedValueOnce({ latitude: 1.2, longitude: 3.4 })
+            .mockResolvedValueOnce(null);
+
+        const geocodedForm = {
+            title: 'Mapped Event',
+            description: '',
+            start_time: '2026-03-07T09:00',
+            end_time: '2026-03-07T10:00',
+            recurrence: { frequency: 'daily', interval: '2', end_date: '' },
+            reminder: [],
+            tag: null,
+            location: 'Library',
+            all_day: false,
+            is_private: false,
+        };
+
+        await validateAndSubmit(null, geocodedForm, null, actions, onClose, setError, confirmFn, []);
+        expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({
+            location_latitude: 1.2,
+            location_longitude: 3.4,
+            location_validated: true,
+            recurrence_rule: { frequency: 'daily', interval: 2, end_date: null },
+        }));
+
+        await validateAndSubmit(null, { ...geocodedForm, location: 'Unknown room' }, null, actions, onClose, setError, confirmFn, []);
+        expect(actions.addEvent).toHaveBeenLastCalledWith(expect.objectContaining({
+            location_validated: false,
+        }));
     });
 
     it('calls setError when addEvent throws', async () => {

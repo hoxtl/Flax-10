@@ -42,6 +42,12 @@ describe('resizeUtils', () => {
             const calledWith = editEvent.mock.calls[0][0];
             expect(calledWith.duration).toBeGreaterThanOrEqual(15); // SNAP_INTERVAL
         });
+
+        it('uses the default 60 minute duration when the event duration is missing', () => {
+            const editEvent = vi.fn();
+            commitResize({ id: 2 }, 10, editEvent);
+            expect(editEvent).toHaveBeenCalledWith(expect.objectContaining({ duration: 70 }));
+        });
     });
 
     describe('createResizeSession', () => {

@@ -54,6 +54,10 @@ describe('TimeRowHelpers', () => {
             expect(getDisplayValue('2025-01-01T10:00', false, 'start_time')).toBe('2025-01-01T10:00');
         });
 
+        it('should return empty values unchanged in all-day mode', () => {
+            expect(getDisplayValue('', true, 'start_time')).toBe('');
+        });
+
         it('should strip time for start_time all day', () => {
             expect(getDisplayValue('2025-01-01T10:00', true, 'start_time')).toBe('2025-01-01');
         });
@@ -97,6 +101,18 @@ describe('TimeRowHelpers', () => {
             // Times are preserved as is when toggling off
             expect(result.start_time).toBe('2025-01-01T00:00');
             expect(result.end_time).toBe('2025-01-02T00:00');
+        });
+
+        it('preserves empty start/end values when toggling all_day on', () => {
+            const setForm = vi.fn();
+            const handler = handleToggle(setForm, {});
+
+            handler({ target: { checked: true } });
+
+            const updateFn = setForm.mock.calls[0][0];
+            const result = updateFn({ all_day: false, start_time: '', end_time: '' });
+
+            expect(result).toEqual({ all_day: true, start_time: '', end_time: '' });
         });
     });
 });

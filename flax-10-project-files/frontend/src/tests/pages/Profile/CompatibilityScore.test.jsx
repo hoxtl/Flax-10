@@ -189,6 +189,24 @@ describe('CompatibilityScore', () => {
     expect(screen.queryByText('Study momentum')).toBeNull();
   });
 
+  it('renders sparkline dots even when dates are missing and levels need clamping', () => {
+    const sparkline = Array.from({ length: 7 }, (_, index) => ({
+      level: index % 2 === 0 ? 99 : -3,
+    }));
+
+    render(
+      <CompatibilityScore
+        viewedSummary={viewedSummary}
+        currentUserSummary={currentUserSummary}
+        sharedModuleCount={2}
+        totalModuleCount={4}
+        activitySparkline={sparkline}
+      />
+    );
+
+    expect(screen.getByText('Study momentum')).toBeInTheDocument();
+  });
+
   it('handles different personas for mismatch compatibility text', () => {
     const { container } = render(
       <CompatibilityScore
@@ -236,5 +254,89 @@ describe('CompatibilityScore', () => {
       />
     );
     expect(screen.getByText(/1 module in common/)).toBeInTheDocument();
+  });
+
+  it('handles missing personas, all-day personas, neutral personas, and opposite rhythms', () => {
+    const { rerender } = render(
+      <CompatibilityScore
+        viewedSummary={{ persona: {} }}
+        currentUserSummary={currentUserSummary}
+        sharedModuleCount={0}
+        totalModuleCount={4}
+      />
+    );
+    expect(screen.getByText(/very different study rhythms/i)).toBeInTheDocument();
+
+    rerender(
+      <CompatibilityScore
+        viewedSummary={{ persona: { id: 'consistent' } }}
+        currentUserSummary={{ persona: { id: 'consistent' } }}
+        sharedModuleCount={2}
+        totalModuleCount={2}
+      />
+    );
+    expect(screen.getByText(/really well/i)).toBeInTheDocument();
+
+    rerender(
+      <CompatibilityScore
+        viewedSummary={{ persona: { id: 'sprint' } }}
+        currentUserSummary={{ persona: { id: 'night_owl' } }}
+        sharedModuleCount={1}
+        totalModuleCount={3}
+      />
+    );
+    expect(screen.getByText(/different study rhythms/i)).toBeInTheDocument();
+
+    rerender(
+      <CompatibilityScore
+        viewedSummary={{ persona: { id: 'early_bird' } }}
+        currentUserSummary={{ persona: { id: 'night_owl' } }}
+        sharedModuleCount={0}
+        totalModuleCount={3}
+      />
+    );
+    expect(screen.getByText(/very different study rhythms/i)).toBeInTheDocument();
+  });
+
+  it('covers intermediate compatibility messaging thresholds', () => {
+    const { rerender } = render(
+      <CompatibilityScore
+        viewedSummary={{ persona: { id: 'night_owl' } }}
+        currentUserSummary={{ persona: { id: 'night_owl' } }}
+        sharedModuleCount={0}
+        totalModuleCount={10}
+      />
+    );
+    expect(screen.getByText(/similar hours/i)).toBeInTheDocument();
+
+    rerender(
+      <CompatibilityScore
+        viewedSummary={{ persona: { id: 'sprint' } }}
+        currentUserSummary={{ persona: { id: 'marathon' } }}
+        sharedModuleCount={0}
+        totalModuleCount={3}
+      />
+    );
+    expect(screen.getByText(/a few overlapping study windows/i)).toBeInTheDocument();
+
+    rerender(
+      <CompatibilityScore
+        viewedSummary={{ persona: { id: 'early_bird' } }}
+        currentUserSummary={{ persona: { id: 'afternoon_peak' } }}
+        sharedModuleCount={1}
+        totalModuleCount={4}
+      />
+    );
+    expect(screen.getByText(/very different study rhythms/i)).toBeInTheDocument();
+
+    rerender(
+      <CompatibilityScore
+        viewedSummary={{ persona: { id: 'early_bird' } }}
+        currentUserSummary={{ persona: { id: 'consistent' } }}
+        sharedModuleCount={2}
+        totalModuleCount={2}
+      />
+    );
+    expect(screen.getByText(/still have some overlap/i)).toBeInTheDocument();
   });
 });

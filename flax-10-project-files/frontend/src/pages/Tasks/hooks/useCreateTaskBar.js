@@ -12,7 +12,7 @@ import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";
 
 function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   const sortedLists = useMemo(
-    () => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
+    () => [...lists].sort((a, b) => (a.name || "").localeCompare(b.name || "")),
     [lists]
   );
   const [title, setTitle] = useState("");

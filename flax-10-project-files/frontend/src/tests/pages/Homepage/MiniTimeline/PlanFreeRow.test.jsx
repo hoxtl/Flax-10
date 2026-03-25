@@ -130,6 +130,13 @@ describe('PlanFreeRow', () => {
         expect(screen.getByText(/Revision: CW1/)).toBeTruthy();
     });
 
+    it('falls back to the deadline title when assessment_title is missing', () => {
+        renderRow({
+            deadlineSuggestions: [{ title: 'Essay', start_due_date: '2024-03-15' }],
+        });
+        expect(screen.getByText(/Revision: Essay/)).toBeTruthy();
+    });
+
     it('shows urgency emoji for overdue task', () => {
         const pastDue = new Date();
         pastDue.setDate(pastDue.getDate() - 1);
@@ -165,5 +172,17 @@ describe('PlanFreeRow', () => {
             },
         });
         expect(screen.getByText(/travel/)).toBeTruthy();
+    });
+
+    it('uses default gap context and deadlineSuggestions when omitted', () => {
+        render(
+            <PlanFreeRow
+                row={{ ...baseRow, gapContext: undefined }}
+                onQuickStart={vi.fn()}
+                selectedDate={baseDate}
+                styles={mockStyles}
+            />
+        );
+        expect(screen.getByText(hasExactText('1h free'))).toBeTruthy();
     });
 });

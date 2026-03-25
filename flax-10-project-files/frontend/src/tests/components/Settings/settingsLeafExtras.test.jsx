@@ -148,6 +148,7 @@ describe("settings leaf extras", () => {
     localStorage.clear();
   });
 
+<<<<<<< HEAD
   describe("settings UI atoms", () => {
     it("renders banners and form helpers", () => {
       renderSettingsUiShowcase();
@@ -166,6 +167,36 @@ describe("settings leaf extras", () => {
       fireEvent.click(screen.getByText("Appearance"));
       expect(onChange).toHaveBeenCalledWith("preferences_themes");
     });
+=======
+  it("covers small settings UI components and sidebar states", () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <SuccessBanner message="Saved!" />
+        <ErrorMessage message="Oops" />
+        <SectionHeader title="Account" />
+        <FormInput id="bio" label="Bio" value="hello" onChange={vi.fn()} maxLength={10} />
+        <FormSelect id="theme" label="Theme" value="light" onChange={onChange} options={[{ value: "light", label: "Light" }]} grouped />
+        <SubmitButton isSaving={false} label="Save" savingLabel="Saving..." hasUnsaved saveSignal={1} />
+        <TabButton id="x" label="Go" isActive onClick={onChange} />
+        <ThemeGridSelector value="flax" onChange={onChange} />
+        <SettingsSidebar activeTab="account" onChange={onChange} user={{ first_name: "Ava" }} />
+      </>,
+    );
+
+    expect(screen.getByText("success:Saved!")).toBeInTheDocument();
+    expect(screen.getByText("error:Oops")).toBeInTheDocument();
+    expect(screen.queryByText("Profile")).toBeInTheDocument();
+    expect(screen.getByText("(5 characters remaining)")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Select"));
+    expect(onChange).toHaveBeenCalledWith({ target: { name: "theme", value: "dark" } });
+    expect(screen.getByRole("button", { name: "✓ Saved!" })).toBeInTheDocument();
+    expect(screen.getByText("Classic")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Flax"));
+    expect(onChange).toHaveBeenCalledWith("flax");
+    fireEvent.click(screen.getByText("Appearance"));
+    expect(onChange).toHaveBeenCalledWith("preferences_themes");
+>>>>>>> main
   });
 
   it("hides profile completion when user details are complete", () => {
@@ -296,6 +327,7 @@ describe("settings leaf extras", () => {
     vi.useRealTimers();
 
     expect(getSleepMinutes("23:30", "06:15")).toBe(405);
+    expect(getSleepMinutes("22:00", "23:30")).toBe(90);
     expect(getSleepDuration("23:30", "06:15")).toEqual(expect.objectContaining({ label: "6h 45m", totalMinutes: 405 }));
     expect(getSleepQuality(600).label).toBe("Too much");
     expect(getSleepQuality(480).label).toBe("Great");

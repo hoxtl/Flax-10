@@ -128,5 +128,25 @@ describe("taskFeedDataUtils", () => {
       expect(setFilterModuleCodes).toHaveBeenCalledWith([]);
       expect(setFilterQuery).toHaveBeenCalledWith("");
     });
+
+    it("toggles module filters through the updater and handles missing list filters", () => {
+      const onFilterByList = vi.fn();
+      const setFilterQuery = vi.fn();
+      let moduleCodes = [];
+      const setFilterModuleCodes = vi.fn((updater) => {
+        moduleCodes = updater(moduleCodes);
+      });
+
+      const handlers = getFilterHandlers(undefined, onFilterByList, setFilterModuleCodes, setFilterQuery);
+
+      handlers.toggleListFilter("2");
+      expect(onFilterByList).toHaveBeenCalledWith(["2"]);
+
+      handlers.toggleModuleFilter("CS101");
+      expect(moduleCodes).toEqual(["CS101"]);
+
+      handlers.toggleModuleFilter("CS101");
+      expect(moduleCodes).toEqual([]);
+    });
   });
 });

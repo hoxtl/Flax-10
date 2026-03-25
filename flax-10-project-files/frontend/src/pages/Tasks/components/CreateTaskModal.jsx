@@ -165,15 +165,6 @@ function CreateTaskModalPriority({ form, set }) {
   );
 }
 
-function CreateTaskModalCategoryPriority({ form, set, categoryOptions, selectedListColor, handleCategoryChange }) {
-  return (
-    <div className={styles.settingsStack}>
-      <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
-      <CreateTaskModalPriority form={form} set={set} />
-    </div>
-  );
-}
-
 function CreateTaskModalModuleRow({ form, set, sortedModules }) {
   if (sortedModules.length === 0) return null;
   const options = [{ value: "", label: "No module" }, ...sortedModules.map((m) => ({ value: String(m.id), label: `${m.module_code} – ${m.module_name || m.title || ""}` }))];

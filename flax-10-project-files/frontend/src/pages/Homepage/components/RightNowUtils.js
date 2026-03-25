@@ -43,7 +43,7 @@ export function formatTimeLeft(endTime, nowMs) {
 export function getJourneySummary(journey) {
   if (!journey) return null;
   const legs = journey.legs || [];
-  const lines = legs.flatMap((leg) => leg.routeOptions?.map((o) => o.name).filter(Boolean) || []);
+  const lines = legs.flatMap((leg) => leg.routeOptions?.map((option) => option?.name).filter(Boolean) || []);
   const uniqueLines = [...new Set(lines)];
   return {
     duration: Number.isFinite(journey.duration) ? `${journey.duration} min` : null,

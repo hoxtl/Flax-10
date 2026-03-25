@@ -48,7 +48,7 @@ describe("FocusHeatmap widgets", () => {
       }),
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /View full analytics/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: /View full analytics/i })[1]);
     expect(onNavigate).toHaveBeenCalledWith("analytics");
 
     fireEvent.keyDown(screen.getByTestId("card"), { key: "Enter", preventDefault: vi.fn() });
@@ -75,5 +75,54 @@ describe("FocusHeatmap widgets", () => {
 
     fireEvent.click(screen.getByTestId("card"));
     expect(onNavigate).toHaveBeenCalledWith("analytics");
+  });
+
+  it("renders non-interactive focus headers and contribution fallback colours", () => {
+    const { container, rerender } = render(
+      <FocusHeatmapWidget
+        heatmap={{ data: [[10], [20]], days: ["Only one"], hours: [] }}
+      />,
+    );
+
+    expect(screen.getByText("View full analytics")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /View full analytics/i })).not.toBeInTheDocument();
+
+    rerender(
+      <ContributionHeatmap
+        heatmap={{ data: [[null], [0], [30], [60], [120]] }}
+      />,
+    );
+
+    const cells = container.querySelectorAll('[title]');
+    expect(Array.from(cells).some((cell) => cell.getAttribute('title') === '')).toBe(true);
+    expect(Array.from(cells).some((cell) => cell.getAttribute('title') === '0h')).toBe(true);
+  });
+
+  it("keeps provided heatmap hours and treats malformed contribution rows as zero totals", () => {
+    const { rerender } = render(
+      <FocusHeatmapWidget
+        heatmap={{ data: [[10], [20]], days: ["Mon", "Tue"], hours: [8, 9] }}
+      />,
+    );
+
+    expect(studyHeatmapMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        heatmapData: expect.objectContaining({
+          hours: [8, 9],
+        }),
+      }),
+    );
+
+    rerender(
+      <ContributionHeatmap
+        heatmap={{ data: [[30], null, [15]] }}
+      />,
+    );
+    expect(screen.getByTitle("0h")).toBeInTheDocument();
+  });
+
+  it("returns null for empty contribution heatmaps", () => {
+    const { container } = render(<ContributionHeatmap heatmap={{ data: [] }} />);
+    expect(container).toBeEmptyDOMElement();
   });
 });

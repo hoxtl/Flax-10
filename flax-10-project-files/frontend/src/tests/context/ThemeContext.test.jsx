@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { ThemeProvider, useTheme } from '../../context/ThemeContext';
+import { fetchApi } from '../../api/client';
 
 vi.mock('../../api/client', () => ({
     fetchApi: vi.fn().mockResolvedValue({}),
@@ -17,6 +18,7 @@ describe('ThemeContext', () => {
 
     afterEach(() => {
         localStorage.clear();
+        vi.useRealTimers();
     });
 
     it('throws when used outside provider', () => {
@@ -104,5 +106,28 @@ describe('ThemeContext', () => {
         expect(removeSpy).toHaveBeenCalledWith('beforeunload', expect.any(Function));
         addSpy.mockRestore();
         removeSpy.mockRestore();
+    });
+
+    it('logs a theme session on unload after at least one minute and ignores invalid theme changes', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2026-03-25T09:00:00.000Z'));
+
+        const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
+        const { result } = renderHook(() => useTheme(), { wrapper });
+
+        act(() => {
+            result.current.setTheme('not-a-theme');
+        });
+        expect(result.current.theme).toBe('flax');
+
+        act(() => {
+            vi.setSystemTime(new Date('2026-03-25T09:02:00.000Z'));
+            window.dispatchEvent(new Event('beforeunload'));
+        });
+
+        expect(fetchApi).toHaveBeenCalledWith(
+            '/analytics/theme-session/',
+            expect.objectContaining({ method: 'POST' }),
+        );
     });
 });

@@ -31,6 +31,14 @@ describe('moduleHelpers', () => {
         expect(errors.end_time).toBeDefined();
     });
 
+    it('validateForm returns required errors for empty department, course, and times', () => {
+        const errors = validateForm({ ...getFormData(), module_code: 'CS101', module_name: 'Test' });
+        expect(errors.department).toBe('Department is required');
+        expect(errors.course).toBe('Course is required');
+        expect(errors.start_time).toBe('Start time is required');
+        expect(errors.end_time).toBe('End time is required');
+    });
+
     it('validateForm returns no errors for valid form', () => {
         const form = {
             module_code: 'CS101',

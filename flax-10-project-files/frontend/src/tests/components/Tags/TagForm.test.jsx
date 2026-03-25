@@ -90,4 +90,25 @@ describe('TagForm', () => {
     render(<TagForm initialData={defaultInitialData} onCancel={vi.fn()} onSave={vi.fn()} />);
     expect(screen.getByText('#ff0000')).toBeInTheDocument();
   });
+
+  it('keeps the validation error when a field change does not actually change the value', () => {
+    render(<TagForm initialData={{ label: '', color: '#000000' }} onCancel={vi.fn()} onSave={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(screen.getByText('Name is required.')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: '' } });
+    expect(screen.getByText('Name is required.')).toBeInTheDocument();
+  });
+
+  it('keeps the validation error when the new non-empty value matches the existing field value', () => {
+    render(<TagForm initialData={{ label: 'Work', color: '#000000' }} onCancel={vi.fn()} onSave={vi.fn()} />);
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(screen.getByText('Name is required.')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByDisplayValue('#000000'), { target: { value: '#000000' } });
+    expect(screen.getByText('Name is required.')).toBeInTheDocument();
+  });
 });

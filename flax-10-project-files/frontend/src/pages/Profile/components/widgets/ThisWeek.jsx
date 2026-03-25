@@ -21,11 +21,10 @@ function buildSliderPct(value) {
 }
 
 function buildDisplayedWeekly(weekly, goalHoursOverride) {
-  if (!weekly) return null;
-  if (!goalHoursOverride) return weekly;
   const hoursStudied = Number(weekly.hours_studied || 0);
-  const nextPercentage = goalHoursOverride > 0 ? Math.round((hoursStudied / goalHoursOverride) * 100) : weekly.percentage;
-  return { ...weekly, goal_hours: goalHoursOverride, percentage: nextPercentage };
+  const goalHours = Number(goalHoursOverride);
+  const safeGoal = Math.max(goalHours, 1);
+  return { ...weekly, goal_hours: goalHours, percentage: Math.round((hoursStudied / safeGoal) * 100) };
 }
 
 function GoalRingSvg({ percentage, radius }) {

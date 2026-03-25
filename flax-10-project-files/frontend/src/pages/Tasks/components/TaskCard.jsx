@@ -27,7 +27,7 @@ const styles = { ...cardStyles, ...ctxMenuStyles };
 
 function useActiveTimerTaskId() {
   const [id, setId] = useState(() => {
-    try { return typeof window !== "undefined" ? sessionStorage.getItem("timerTaskId") : null; } catch { return null; }
+    try { return sessionStorage.getItem("timerTaskId"); } catch { return null; }
   });
   useEffect(() => {
     const onStorage = (e) => { if (e.key === "timerTaskId") setId(e.newValue); };
@@ -64,7 +64,7 @@ function useTaskContextMenuState(task) {
 
 function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
   useEffect(() => {
-    const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) onClose(); };
+    const handler = () => { onClose(); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [menuRef, onClose]);
@@ -90,11 +90,10 @@ function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) 
 }
 
 function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
-  const safeList = lists || [];
-  const fromListName = safeList.find((x) => String(x.id) === String(task.task_list))?.name || null;
-  const options = safeList.map(l => ({ value: String(l.id), label: l.name }));
+  const fromListName = lists.find((x) => String(x.id) === String(task.task_list))?.name;
+  const options = lists.map(l => ({ value: String(l.id), label: l.name }));
   const handleMove = (listId) => {
-    const l = safeList.find(x => String(x.id) === listId);
+    const l = lists.find(x => String(x.id) === listId);
     if (!l) return;
     onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName });
     onClose();
@@ -104,7 +103,7 @@ function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
       <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
       <div className={styles.ctxDivider} />
       <div className={styles.ctxMoveDropdownWrap}>
-        <AnimatedDropdown value={String(task.task_list || "")} onChange={handleMove} options={options} menuMaxHeight={200} usePortal allowFlipUpward />
+        <AnimatedDropdown value={String(task.task_list ?? "")} onChange={handleMove} options={options} menuMaxHeight={200} usePortal allowFlipUpward />
       </div>
     </>
   );
@@ -126,7 +125,7 @@ function ContextMenuDueView({ dueValue, setDueValue, onEdit, onClose, checkSleep
   );
 }
 
-export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos, onClose }) {
+export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists = [], pos, onClose }) {
   const menuRef = useRef(null);
   const state = useTaskContextMenuState(task);
   useTaskContextMenuEffects(menuRef, onClose, state.setSleepSettings);
@@ -183,7 +182,7 @@ function getTaskCardAccentClass(task) {
 
 function getTaskCardDerived(task) {
   const due = formatDueDate(task.due_date);
-  const priorityKey = (task.priority || "").toLowerCase();
+  const priorityKey = String(task.priority ?? "").toLowerCase();
   const showPriorityText = ["medium", "high", "urgent"].includes(priorityKey) && !task.completed;
   return { due, priorityKey, showPriorityText };
 }
@@ -224,7 +223,7 @@ function CardTitleRow({ task, searchQuery, showPriorityText, priorityKey, hideDu
     <div className={styles.titleRow}>
       <span className={`${styles.title} ${styles.titleClickable} ${task.completed ? styles.titleDone : ""}`}><HighlightText text={task.title} query={searchQuery} /></span>
       <span className={styles.titleMetaRight}>
-        {showPriorityText && <span className={`${styles.priorityText} ${styles[`priorityText_${priorityKey}`]}`}><span className={styles.priorityMarks}>{PRIORITY_MARKS[priorityKey] || ""}</span><span className={styles.priorityLabel}>{PRIORITY_LABELS[priorityKey] || "Priority"}</span></span>}
+        {showPriorityText && <span className={`${styles.priorityText} ${styles[`priorityText_${priorityKey}`]}`}><span className={styles.priorityMarks}>{PRIORITY_MARKS[priorityKey]}</span><span className={styles.priorityLabel}>{PRIORITY_LABELS[priorityKey]}</span></span>}
         {due && !hideDueBadge && <span className={dueCls}>{(due.status === "tomorrow" || due.status === "today" || due.status === "overdue") && !(task.completed && isCompletedSection) && <Clock size={11} className={styles.duePillIcon} />}{dueLabel}</span>}
       </span>
     </div>
@@ -232,7 +231,7 @@ function CardTitleRow({ task, searchQuery, showPriorityText, priorityKey, hideDu
 }
 
 function CardContentArea({ card, task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, due, priorityKey, showPriorityText }) {
-  const openInfo = (e) => { if (!e.target.closest?.("button") && !e.target.closest?.("a")) card.setShowInfo(true); };
+  const openInfo = () => { card.setShowInfo(true); };
   return (
     <div className={styles.content} role="button" tabIndex={0} onClick={openInfo} onKeyDown={(e) => { if (e.key === "Enter") card.setShowInfo(true); }}>
       <CardTitleRow task={task} searchQuery={searchQuery} showPriorityText={showPriorityText} priorityKey={priorityKey} hideDueBadge={hideDueBadge} due={due} isCompletedSection={isCompletedSection} />
@@ -244,7 +243,7 @@ function CardContentArea({ card, task, listName, listColor, hideDueBadge, hideLi
 function CardPlayButton({ task, listColor, setActiveTaskId, nav }) {
   const onPlay = () => {
     const split = splitEstimatedBlocks(task.estimated_blocks);
-    setActiveTaskId(task.id, { title: task.title, categoryColor: listColor || undefined, estimatedBlocks: Number(task.estimated_blocks || 1), estimatedSessionCount: split.sessionCount, estimatedWorkMinutes: split.workMinutes });
+    setActiveTaskId(task.id, { title: task.title, categoryColor: listColor ?? undefined, estimatedBlocks: Number(task.estimated_blocks ?? 1), estimatedSessionCount: split.sessionCount, estimatedWorkMinutes: split.workMinutes });
     nav("/timer", { state: { fromTaskPlay: true } });
   };
   return (

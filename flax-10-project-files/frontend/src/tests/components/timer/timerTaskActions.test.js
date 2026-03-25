@@ -84,6 +84,26 @@ describe('startManualTask', () => {
     );
   });
 
+  it('falls back to default session count and work minutes for zero-like values', () => {
+    const t = {
+      task: 'Quick note',
+      setIsActive: vi.fn(),
+      setActiveTaskId: vi.fn(),
+      activeTaskMeta: { listName: '', estimatedBlocks: 0 },
+      targetSessions: 0,
+      workTime: 0,
+    };
+    startManualTask(t);
+    expect(t.setActiveTaskId).toHaveBeenCalledWith(
+      null,
+      expect.objectContaining({
+        estimatedSessionCount: 1,
+        estimatedWorkMinutes: 25,
+        listName: 'Quick task',
+      }),
+    );
+  });
+
   it('does not call setActiveTaskId when it is not provided', () => {
     const t = { task: 'My Task', setIsActive: vi.fn() };
     expect(() => startManualTask(t)).not.toThrow();

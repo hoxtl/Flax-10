@@ -50,6 +50,20 @@ describe('StandardModal', () => {
         render(<StandardModal onClose={vi.fn()}><p>Content only</p></StandardModal>);
         expect(screen.queryByRole('button')).toBeNull();
     });
+
+    it('renders safely with an unknown size', () => {
+        render(<StandardModal title="Odd modal" size="giant" onClose={vi.fn()} />);
+        expect(screen.getByText('Odd modal')).toBeInTheDocument();
+    });
+
+    it('supports a custom backdrop class and can ignore backdrop dismissal', () => {
+        const onClose = vi.fn();
+        render(<StandardModal title="Modal" onClose={onClose} backdropClassName="dim" dismissOnBackdrop={false} />);
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+        expect(backdrop.className).toContain('dim');
+        fireEvent.mouseDown(backdrop);
+        expect(onClose).not.toHaveBeenCalled();
+    });
 });
 
 describe('ModalHeader', () => {

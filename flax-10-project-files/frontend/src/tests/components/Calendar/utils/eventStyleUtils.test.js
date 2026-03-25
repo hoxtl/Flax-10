@@ -89,4 +89,11 @@ describe('getEventTheme', () => {
         const result = getEventTheme(event, tags);
         expect(result.color).toBe('var(--color-caramel)');
     });
+
+    it('falls back when array tags have no matching label or name values', () => {
+        const event = { _tagName: 'work' };
+        const tags = { tags: [{}] };
+        const result = getEventTheme(event, tags);
+        expect(result).toEqual({ color: 'var(--color-caramel)', icon: '🏷️' });
+    });
 });

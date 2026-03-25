@@ -195,4 +195,19 @@ describe('CommonGroundSection', () => {
     fireEvent.click(screen.getByText('Music Society'));
     expect(onNavigate).toHaveBeenCalledWith('/societies?id=s2');
   });
+
+  it('treats missing current-user collections as empty lists', () => {
+    render(
+      <CommonGroundSection
+        viewedModules={['CS101']}
+        viewedSocieties={[{ id: 's4', name: 'Debate Society' }]}
+        currentUserModules={undefined}
+        currentUserSocieties={undefined}
+        onNavigate={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('CS101')).toBeInTheDocument();
+    expect(screen.getByText('Debate Society')).toBeInTheDocument();
+  });
 });

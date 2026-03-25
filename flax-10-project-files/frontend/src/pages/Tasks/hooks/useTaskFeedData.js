@@ -25,7 +25,7 @@ import {
 
 function buildModuleItems(tasks, moduleNameMap) {
   const byCode = new Map();
-  (tasks || []).forEach((task) => {
+  tasks.forEach((task) => {
     const code = normalizeModuleCode(task.module_code);
     if (!code) return;
     const name = String(task.module_name || moduleNameMap[code] || "").trim();
@@ -61,7 +61,7 @@ function useTaskFeedFilterOptions(tasks, lists, filterQuery, moduleNameMap) {
 }
 
 function useTaskFeedListMap(lists) {
-  return useMemo(() => { const map = {}; (lists || []).forEach((l, idx) => { map[String(l.id)] = { ...l, idx }; }); return map; }, [lists]);
+  return useMemo(() => { const map = {}; lists.forEach((l, idx) => { map[String(l.id)] = { ...l, idx }; }); return map; }, [lists]);
 }
 
 function useTaskFeedBuckets(filtered, filteredCompleted, search) {
@@ -138,7 +138,7 @@ function useTaskFeedCollections(searchSourceTasks, filterModuleCodes) {
 }
 
 function useActiveTaskList(activeListId, lists) {
-  return useMemo(() => (activeListId && lists?.length ? lists.find((list) => String(list.id) === String(activeListId)) || null : null), [activeListId, lists]);
+  return useMemo(() => (activeListId ? lists.find((list) => String(list.id) === String(activeListId)) || null : null), [activeListId, lists]);
 }
 
 function buildTodayEmptyCardProps(clearMessage, completedTodayCount, navigate, onPlanTomorrow) {
@@ -184,7 +184,7 @@ function useTaskFeedPresentation({ activeFilter, activeListId, activeModuleCode,
 
 /* Derive task feed state and section data from tasks, lists, and filter options. */
 export default function useTaskFeedData(opts) {
-  const { tasks, allTasks = tasks, lists, activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
+  const { tasks = [], allTasks = tasks, lists = [], activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
   const filterState = useTaskFeedFilterState(filterListIds, onFilterByList);
   const hasSearchQuery = filterState.search.trim().length > 0;
   const moduleNameMap = useTaskFeedModuleNameMap();

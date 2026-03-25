@@ -48,6 +48,7 @@ vi.mock("../../components/Society/SocietyDetail/imageHandlers/CoverImageModal", 
     <div data-testid="cover-modal">
       <button type="button" onClick={onClose}>close-cover</button>
       <button type="button" onClick={() => onUpdate(["img-1", "img-2"])}>save-cover</button>
+      <button type="button" onClick={() => onUpdate([])}>save-empty-cover</button>
     </div>
   ),
 }));
@@ -110,6 +111,14 @@ vi.mock("../../pages/Societies/SocietySkeletons", () => ({
 import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
 function buildPageData(overrides = {}) {
+  const {
+    society: societyOverrides = {},
+    page: pageOverrides = {},
+    modals: modalOverrides = {},
+    subscription: subscriptionOverrides = {},
+    tracker: trackerOverrides = {},
+    ...rest
+  } = overrides;
   return {
     loading: false,
     society: {
@@ -123,13 +132,13 @@ function buildPageData(overrides = {}) {
       tags: [],
       ratification_status: "approved",
       is_ratified: true,
-      ...overrides.society,
+      ...societyOverrides,
     },
     page: {
       activeTab: "calendar",
       handleTabChange: vi.fn(),
       focusAnnouncementId: null,
-      ...overrides.page,
+      ...pageOverrides,
     },
     modals: {
       showSettings: false,
@@ -146,18 +155,18 @@ function buildPageData(overrides = {}) {
       setEditingAnnouncement: vi.fn(),
       editMode: false,
       setEditMode: vi.fn(),
-      ...overrides.modals,
+      ...modalOverrides,
     },
     subscription: {
       isSubscribed: false,
       toggleSubscription: vi.fn(),
-      ...overrides.subscription,
+      ...subscriptionOverrides,
     },
     tracker: {
       hasChanges: vi.fn(() => false),
       getChangeSummary: vi.fn(() => []),
       resetChanges: vi.fn(),
-      ...overrides.tracker,
+      ...trackerOverrides,
     },
     members: [],
     updateSociety: vi.fn(),
@@ -182,7 +191,7 @@ function buildPageData(overrides = {}) {
     joinSociety: vi.fn(),
     leaveSociety: vi.fn(),
     handleUnreport: vi.fn(),
-    ...overrides,
+    ...rest,
   };
 }
 
@@ -252,16 +261,15 @@ describe("SocietyDetailPage", () => {
 
   it("renders loading and not-found states", () => {
     useSocietyPageDataMock.mockReturnValueOnce(buildPageData({ loading: true }));
-    const { rerender } = renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+    const { unmount } = renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
 
     const onBack = vi.fn();
-    useSocietyPageDataMock.mockReturnValueOnce(buildPageData({ society: null }));
-    rerender(
-      <MemoryRouter>
-        <SocietyDetailPage societyId={1} onBack={onBack} />
-      </MemoryRouter>,
-    );
+    unmount();
+    const notFoundData = buildPageData();
+    notFoundData.society = null;
+    useSocietyPageDataMock.mockReturnValue(notFoundData);
+    renderPage(<SocietyDetailPage societyId={1} onBack={onBack} />);
 
     expect(screen.getByText("Society not found.")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Back to Societies"));
@@ -307,60 +315,55 @@ describe("SocietyDetailPage", () => {
       expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith({ id: 7 });
     });
 
-    it("updates report state and closes the modal", () => {
-      const data = renderDetailPageWithData(interactiveOverrides);
-      clickByText("report-success");
-      clickByText("close-report");
+    renderPage(<SocietyDetailPage societyId={1} onBack={onBack} onDelete={onDelete} />);
 
-      expect(data.updateLocalSociety).toHaveBeenCalledWith({ has_reported: true });
-      expect(data.modals.setShowReportModal).toHaveBeenCalledWith(false);
-    });
+    fireEvent.click(screen.getByText("rename-society"));
+    fireEvent.click(screen.getByText("open-gallery"));
+    fireEvent.click(screen.getByText("edit-images"));
+    fireEvent.click(screen.getByText("view-members"));
+    fireEvent.click(screen.getByText("edit-announcement"));
 
-    it("closes gallery, cover, member, and announcement modals", () => {
-      const data = renderDetailPageWithData(interactiveOverrides);
-      clickByText("close-gallery");
-      clickByText("close-cover");
-      clickByText("close-members");
-      clickByText("close-announcement");
+    expect(data.updateSociety).toHaveBeenCalledWith({ name: "Renamed Society" });
+    expect(data.modals.setGalleryOpen).toHaveBeenCalledWith({ index: 1 });
+    expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(true);
+    expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(true);
+    expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith({ id: 7 });
 
-      expect(data.modals.setGalleryOpen).toHaveBeenCalledWith(null);
-      expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(false);
-      expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(false);
-      expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith(null);
-    });
+    fireEvent.click(screen.getByText("report-success"));
+    expect(data.updateLocalSociety).toHaveBeenCalledWith({ has_reported: true });
 
-    it("saves cover changes", () => {
-      const data = renderDetailPageWithData(interactiveOverrides);
-      clickByText("save-cover");
+    fireEvent.click(screen.getByText("close-report"));
+    fireEvent.click(screen.getByText("close-gallery"));
+    fireEvent.click(screen.getByText("close-cover"));
+    fireEvent.click(screen.getByText("close-members"));
+    fireEvent.click(screen.getByText("close-announcement"));
+    expect(data.modals.setShowReportModal).toHaveBeenCalledWith(false);
+    expect(data.modals.setGalleryOpen).toHaveBeenCalledWith(null);
+    expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(false);
+    expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(false);
+    expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith(null);
 
-      expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1", "img-2"], image: "img-1" });
-    });
+    fireEvent.click(screen.getByText("save-cover"));
+    expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1", "img-2"], image: "img-1" });
+    fireEvent.click(screen.getByText("save-empty-cover"));
+    expect(data.updateSociety).toHaveBeenCalledWith({ images: [], image: null });
 
-    it("handles announcement submissions", () => {
-      const data = renderDetailPageWithData(interactiveOverrides);
-      clickByText("submit-announcement");
-      clickByText("submit-new-announcement");
-      clickByText("submit-conflict");
-      clickByText("delete-announcement");
+    fireEvent.click(screen.getByText("submit-announcement"));
+    fireEvent.click(screen.getByText("submit-new-announcement"));
+    fireEvent.click(screen.getByText("submit-conflict"));
+    fireEvent.click(screen.getByText("delete-announcement"));
+    expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Updated announcement" }, false);
+    expect(data.addAnnouncement).toHaveBeenCalledWith({ title: "Fresh announcement" }, false);
+    expect(data.updateAnnouncement).toHaveBeenCalledWith(4, { id: 4, pinned: false, title: "Existing pinned" }, false);
+    expect(data.deleteAnnouncement).toHaveBeenCalledWith(7, false);
 
-      expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Updated announcement" }, false);
-      expect(data.addAnnouncement).toHaveBeenCalledWith({ title: "Fresh announcement" }, false);
-      expect(data.updateAnnouncement).toHaveBeenCalledWith(4, { id: 4, pinned: false, title: "Existing pinned" }, false);
-      expect(data.deleteAnnouncement).toHaveBeenCalledWith(7, false);
-    });
+    fireEvent.click(screen.getByText("close-settings"));
+    expect(data.modals.setShowSettings).toHaveBeenCalledWith(false);
 
-    it("handles settings closure and deletion", async () => {
-      const onBack = vi.fn();
-      const onDelete = vi.fn();
-      const data = renderDetailPageWithData(interactiveOverrides, { onBack, onDelete });
-      clickByText("close-settings");
-      clickByText("delete-society");
-
-      expect(data.modals.setShowSettings).toHaveBeenCalledWith(false);
-      await waitFor(() => expect(data.deleteSociety).toHaveBeenCalledTimes(1));
-      expect(onDelete).toHaveBeenCalledTimes(1);
-      expect(onBack).toHaveBeenCalledTimes(1);
-    });
+    fireEvent.click(screen.getByText("delete-society"));
+    await waitFor(() => expect(data.deleteSociety).toHaveBeenCalledTimes(1));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 
   it("publishes tracked changes before leaving edit mode", async () => {
@@ -385,5 +388,27 @@ describe("SocietyDetailPage", () => {
     await waitFor(() => expect(data.publishChanges).toHaveBeenCalledWith(["updated-announcement"]));
     expect(data.tracker.resetChanges).toHaveBeenCalledTimes(1);
     expect(data.modals.setEditMode).toHaveBeenCalledWith(false);
+  });
+
+  it("toggles edit mode without publishing when it is not already editing", () => {
+    const data = buildPageData({
+      modals: {
+        editMode: false,
+        setEditMode: vi.fn(),
+      },
+      tracker: {
+        hasChanges: vi.fn(() => true),
+        getChangeSummary: vi.fn(() => ["updated-announcement"]),
+        resetChanges: vi.fn(),
+      },
+      publishChanges: vi.fn(),
+    });
+    useSocietyPageDataMock.mockReturnValue(data);
+
+    renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("toggle-edit-mode"));
+
+    expect(data.publishChanges).not.toHaveBeenCalled();
+    expect(data.modals.setEditMode).toHaveBeenCalledWith(true);
   });
 });

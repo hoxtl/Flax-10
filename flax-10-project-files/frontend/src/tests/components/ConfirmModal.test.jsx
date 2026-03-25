@@ -82,4 +82,28 @@ describe('ConfirmModal', () => {
         const confirmBtn = screen.getByText('OK');
         expect(confirmBtn.className).toContain('primary');
     });
+
+    it('renders centered buttons plus the correct danger and info hints', () => {
+        const { rerender } = render(
+            <ConfirmModal
+                {...defaultProps}
+                isDanger
+                centerText
+                dangerHint="This action cannot be undone."
+            />
+        );
+
+        expect(screen.getByText('This action cannot be undone.')).toBeInTheDocument();
+        expect(screen.queryByText('Helpful hint')).toBeNull();
+
+        rerender(
+            <ConfirmModal
+                {...defaultProps}
+                infoHint="Helpful hint"
+            />
+        );
+
+        expect(screen.getByText('Helpful hint')).toBeInTheDocument();
+        expect(screen.queryByText('This action cannot be undone.')).toBeNull();
+    });
 });

@@ -62,6 +62,14 @@ describe("pillFilterOptions", () => {
     expect(getActiveFilterLabel("missing", options)).toBe("Filter");
   });
 
+  it("uses zero counts and empty tags by default", () => {
+    expect(getUniqueTags()).toEqual([]);
+    expect(createPillFilterOptions([{ id: 1, label: "Workshop" }], {})).toEqual([
+      { value: "all", label: "All (0)" },
+      { value: "workshop", label: "Workshop (0)" },
+    ]);
+  });
+
   it("renders the pill filter controls", () => {
     const onClick = vi.fn();
     render(

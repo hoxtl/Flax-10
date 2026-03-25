@@ -16,6 +16,8 @@ describe("readingListUtils", () => {
     expect(isTeachingList(list)).toBe(true);
     expect(getTeachingListDisplayName(list)).toBe("Pharmacology");
     expect(isTeachingList({ name: "Reading List - Pharmacology" })).toBe(false);
+    expect(isTeachingList({})).toBe(false);
+    expect(getTeachingListDisplayName({})).toBe("");
   });
 
   it("detects modern and legacy reading-list names", () => {

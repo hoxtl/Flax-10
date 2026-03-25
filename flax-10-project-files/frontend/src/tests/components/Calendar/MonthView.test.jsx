@@ -263,4 +263,17 @@ describe('MonthView', () => {
         );
         expect(screen.getByText('Prop event')).toBeInTheDocument();
     });
+
+    it('falls back to an empty event list when neither props nor context provide events', () => {
+        const propDate = new Date(2026, 3, 10);
+        vi.mocked(CalendarContextModule.useCalendar).mockReturnValue({ selectedDate: new Date(2020, 0, 1), events: null, readOnly: false });
+        vi.mocked(CalendarContextModule.useCalendarData).mockReturnValue({ selectedDate: new Date(2020, 0, 1), events: null });
+        render(
+            <TagProvider>
+                <MonthView selectedDate={propDate} events={null} />
+            </TagProvider>
+        );
+        expect(screen.getByText('10')).toBeInTheDocument();
+        expect(screen.queryByText('Prop event')).not.toBeInTheDocument();
+    });
 });

@@ -227,4 +227,24 @@ describe('common DateTimePicker', () => {
       expect(onChange).toHaveBeenCalledWith(expect.stringMatching(/^2026-03-20T\d{2}:\d{2}$/));
     }
   });
+
+  it('uses a custom trigger and toggles the portal open state', () => {
+    render(
+      <DateTimePicker
+        value=""
+        onChange={vi.fn()}
+        customTrigger={<span>Open custom picker</span>}
+        wrapperClassName="outer-wrap"
+      />,
+    );
+
+    expect(document.querySelector('.outer-wrap')).toBeInTheDocument();
+    expect(document.querySelector('.dropdown')).toBeNull();
+
+    fireEvent.click(screen.getByText('Open custom picker'));
+    expect(document.querySelector('.dropdown')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Open custom picker'));
+    expect(document.querySelector('.dropdown')).toBeNull();
+  });
 });

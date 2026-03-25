@@ -154,6 +154,19 @@ describe("account component extras", () => {
     expect(screen.getByText("✓ Request sent.")).toBeInTheDocument();
     fireEvent.click(screen.getByText("cancel-request"));
     expect(onCancelRequest).toHaveBeenCalled();
+
+    rerender(
+      <CourseDisplay
+        course="Physics"
+        pendingRequest={{}}
+        onRequestClick={onRequestClick}
+        onCancelRequest={onCancelRequest}
+        cancellingRequest={false}
+        successMessage=""
+      />,
+    );
+    expect(screen.getByText(/An admin will review your request shortly/)).toBeInTheDocument();
+    expect(screen.queryByText("Chemistry")).toBeNull();
   });
 
   it("requires a reason and course before submitting a change request", async () => {
@@ -187,6 +200,14 @@ describe("account component extras", () => {
     await waitFor(() => expect(screen.getByText("network failed")).toBeInTheDocument());
     fireEvent.click(screen.getByText("close-standard-modal"));
     expect(onClose).toHaveBeenCalled();
+
+    secondModal.unmount();
+    requestCourseChange.mockRejectedValueOnce({});
+    const thirdModal = render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
+    fireEvent.change(screen.getByPlaceholderText(/Tell us a bit/), { target: { value: "Fallback reason" } });
+    fireEvent.click(screen.getByText("Search for a course..."));
+    fireEvent.submit(thirdModal.container.querySelector("form"));
+    await waitFor(() => expect(screen.getByText("Failed to submit. Please try again.")).toBeInTheDocument());
   });
 
   it("fetches pending requests for external users when auth is unavailable", async () => {

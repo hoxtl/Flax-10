@@ -49,6 +49,7 @@ describe("Dashboard sidebar extras", () => {
     expect(Number.isNaN(getDeadlineTime({}))).toBe(true);
     expect(hasDeadlineWithin48Hours(null)).toBe(false);
     expect(hasDeadlineWithin48Hours([])).toBe(false);
+    expect(hasDeadlineWithin48Hours({})).toBe(false);
     expect(hasDeadlineWithin48Hours([{ start_due_date: "2026-03-24T12:00:00Z" }])).toBe(true);
     expect(hasDeadlineWithin48Hours([{ start_due_date: "2026-03-28T12:00:00Z" }])).toBe(false);
     expect(hasDeadlineWithin48Hours([{ start_due_date: "nope" }])).toBe(false);
@@ -72,7 +73,23 @@ describe("Dashboard sidebar extras", () => {
     expect(result.current).toBe(false);
   });
 
+<<<<<<< HEAD
   it("renders desktop sidebar navigation and hover styling", () => {
+=======
+  it("treats non-array deadline payloads as no pressure", async () => {
+    getUpcomingDeadlines.mockResolvedValueOnce({ results: [] });
+
+    const { result } = renderHook(() => useDeadlinePressure());
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(result.current).toBe(false);
+  });
+
+  it("renders desktop interactions including hover, user menu actions, and pressure styling", () => {
+>>>>>>> main
     const onChange = vi.fn();
     const { container } = render(
       <SidebarDesktop
@@ -84,11 +101,44 @@ describe("Dashboard sidebar extras", () => {
     fireEvent.mouseEnter(container.firstChild);
     fireEvent.click(screen.getByText("Tasks"));
     expect(onChange).toHaveBeenCalledWith("tasks");
+<<<<<<< HEAD
+=======
+
+    fireEvent.click(screen.getByText("Alice"));
+    expect(screen.getByText("Profile")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Settings"));
+    fireEvent.click(screen.getByText("Log out"));
+    fireEvent.click(screen.getByText("Profile"));
+    expect(onSettingsClick).toHaveBeenCalled();
+    expect(onLogoutClick).toHaveBeenCalled();
+    expect(onProfileClick).toHaveBeenCalled();
+
+    fireEvent.click(document.querySelector('[class*="menuBackdrop"]'));
+
+>>>>>>> main
     fireEvent.mouseLeave(container.firstChild);
     expect(container.textContent).not.toContain("alice@example.com");
   });
 
+<<<<<<< HEAD
   it("handles desktop sidebar user menu actions", () => {
+=======
+  it("falls back to a default avatar label when the user has no name", () => {
+    render(
+      <SidebarDesktop
+        active="home"
+        onChange={vi.fn()}
+        user={{}}
+      />,
+    );
+
+    expect(screen.getByText("U")).toBeInTheDocument();
+  });
+
+  it("renders mobile drawer actions, active states, and closes even when a footer action is missing", () => {
+    const onToggle = vi.fn();
+    const onChange = vi.fn();
+>>>>>>> main
     const onSettingsClick = vi.fn();
     const onLogoutClick = vi.fn();
     const onProfileClick = vi.fn();
@@ -133,5 +183,23 @@ describe("Dashboard sidebar extras", () => {
     expect(onToggle).toHaveBeenCalled();
     fireEvent.click(screen.getByText("Profile"));
     expect(onToggle).toHaveBeenCalledTimes(2);
+  });
+
+  it("fires bottom-bar navigation clicks when the drawer is closed", () => {
+    const onToggle = vi.fn();
+    const onChange = vi.fn();
+
+    render(
+      <SidebarMobile
+        isOpen={false}
+        onToggle={onToggle}
+        user={{ isAdmin: false }}
+        active="home"
+        onChange={onChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Tasks"));
+    expect(onChange).toHaveBeenCalledWith("tasks");
   });
 });

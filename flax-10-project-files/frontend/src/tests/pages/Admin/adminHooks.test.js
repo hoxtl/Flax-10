@@ -2,11 +2,25 @@
  * Tests for admin React hooks: useAsyncAction, useAsyncList, usePaginatedItems.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+
+const { fetchAdminUsers } = vi.hoisted(() => ({
+  fetchAdminUsers: vi.fn(),
+}));
+
+vi.mock('../../../api/adminApi', () => ({
+  fetchAdminUsers,
+}));
+
 import { useAsyncAction } from '../../../pages/Admin/hooks/useAsyncAction';
 import { useAsyncList } from '../../../pages/Admin/hooks/useAsyncList';
 import { usePaginatedItems } from '../../../pages/Admin/hooks/usePaginatedItems';
+import { useUsersTabState } from '../../../pages/Admin/hooks/useUsersTabState';
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe('useAsyncAction', () => {
   it('starts with busy as null', () => {
@@ -167,5 +181,31 @@ describe('usePaginatedItems', () => {
     const { result } = renderHook(() => usePaginatedItems(null, 10));
     expect(result.current.pageItems).toEqual([]);
     expect(result.current.totalPages).toBe(1);
+  });
+});
+
+describe('useUsersTabState', () => {
+  it('loads users and exposes update controls', async () => {
+    fetchAdminUsers.mockResolvedValueOnce([{ id: 1, username: 'alice' }]);
+
+    const { result } = renderHook(() => useUsersTabState());
+
+    await act(async () => {});
+
+    expect(result.current.users).toEqual([{ id: 1, username: 'alice' }]);
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBe('');
+    expect(result.current.filters).toEqual({ roles: [], status: [] });
+  });
+
+  it('falls back to the default error message when loading users fails without a message', async () => {
+    fetchAdminUsers.mockRejectedValueOnce({});
+
+    const { result } = renderHook(() => useUsersTabState());
+
+    await act(async () => {});
+
+    expect(result.current.error).toBe('Failed to load users.');
+    expect(result.current.loading).toBe(false);
   });
 });

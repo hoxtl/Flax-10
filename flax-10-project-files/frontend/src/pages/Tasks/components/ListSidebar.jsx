@@ -34,9 +34,9 @@ function ListLabel({ list }) {
   }
 
   const parsed = parseReadingListName(list.name);
-  const displayLabel = parsed.moduleName && parsed.moduleCode
+  const displayLabel = parsed.moduleCode
     ? `${parsed.moduleName} (${parsed.moduleCode})`
-    : parsed.moduleName || parsed.moduleCode || list.name;
+    : parsed.moduleName;
 
   return <span className={styles.readingListLabel}>{displayLabel}</span>;
 }

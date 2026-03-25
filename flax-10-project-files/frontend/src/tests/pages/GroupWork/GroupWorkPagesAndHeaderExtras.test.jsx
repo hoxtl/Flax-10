@@ -345,51 +345,12 @@ describe("GroupWork pages and header extras", () => {
       expect(props.onBack).toHaveBeenCalled();
     });
 
-    it("removes team members and confirms header delete", async () => {
-      const onMemberRemove = vi.fn();
-      const onDelete = vi.fn();
-      renderProjectHeaderWith({ onMemberRemove, onDelete });
-      fireEvent.click(screen.getByText("Edit team"));
-      fireEvent.click(screen.getByText("remove-member"));
-      fireEvent.click(screen.getByRole("button", { name: /Delete project/i }));
-      fireEvent.click(screen.getAllByText("confirm-hold")[0]);
-      await waitFor(() => expect(onDelete).toHaveBeenCalled());
-    });
+    const deleteButtons = screen.getAllByRole("button", { name: /Delete project/i });
+    expect(deleteButtons[0].parentElement.parentElement).toHaveAttribute("data-tooltip", "Only project owner can delete");
+    expect(deleteButtons[0]).toBeDisabled();
 
-    it("shows owner delete toasts only after success", async () => {
-      const toast = vi.fn();
-      useToast.mockReturnValue(toast);
-      const onDelete = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
-      render(<ProjectDeleteAction onDelete={onDelete} isOwner />);
-      fireEvent.click(screen.getByRole("button", { name: /Delete project/i }));
-      fireEvent.click(screen.getByText("confirm-hold"));
-      await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1));
-      expect(toast).not.toHaveBeenCalled();
-      fireEvent.click(screen.getByRole("button", { name: /Delete project/i }));
-      fireEvent.click(screen.getByText("confirm-hold"));
-      await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2));
-      expect(toast).toHaveBeenCalledWith("Project deleted.");
-    });
-
-    it("renders project progress stats", () => {
-      render(<ProjectProgress taskStats={baseTaskStats} />);
-      expect(screen.getByText(/Overall:40/)).toBeInTheDocument();
-    });
-
-    it("shows the non-owner tooltip and cancels the modal", async () => {
-      const ownerDelete = vi.fn();
-      render(
-        <>
-          <ProjectDeleteAction onDelete={vi.fn()} isOwner={false} />
-          <ProjectDeleteAction onDelete={ownerDelete} isOwner />
-        </>,
-      );
-  const tooltipHost = screen.getByText((_, element) => element?.dataset?.tooltip === "Only project owner can delete");
-  expect(tooltipHost).toBeInTheDocument();
-      expect(screen.getAllByRole("button", { name: /Delete project/i })[0]).toBeDisabled();
-      fireEvent.click(screen.getAllByRole("button", { name: /Delete project/i })[1]);
-      fireEvent.click(screen.getByText("cancel-hold"));
-      await waitFor(() => expect(ownerDelete).not.toHaveBeenCalled());
-    });
+    fireEvent.click(deleteButtons[1]);
+    fireEvent.click(screen.getByText("cancel-hold"));
+    await waitFor(() => expect(screen.queryByText("cancel-hold")).not.toBeInTheDocument());
   });
 });

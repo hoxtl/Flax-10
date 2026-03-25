@@ -46,6 +46,7 @@ describe("TaskFeedToolbar", () => {
     render(<TaskFeedToolbar {...props({ search: "abc", onSearchChange })} />);
     fireEvent.change(screen.getByPlaceholderText(/Search/i), { target: { value: "x" } });
     fireEvent.click(screen.getByRole("button", { name: /Clear search/i }));
+    fireEvent.keyDown(screen.getByPlaceholderText(/Search/i), { key: "Escape" });
     expect(onSearchChange).toHaveBeenCalledWith("x");
     expect(onSearchChange).toHaveBeenCalledWith("");
   });
@@ -60,5 +61,10 @@ describe("TaskFeedToolbar", () => {
     expect(onFilterOpenChange).toHaveBeenCalled();
     expect(onSortChange).toHaveBeenCalledWith("due");
     expect(screen.getByTestId("task-filter-panel")).toBeInTheDocument();
+  });
+
+  it("hides the view lists button when no handler is provided", () => {
+    render(<TaskFeedToolbar {...props({ onOpenLists: null })} />);
+    expect(screen.queryByRole("button", { name: /View lists/i })).not.toBeInTheDocument();
   });
 });

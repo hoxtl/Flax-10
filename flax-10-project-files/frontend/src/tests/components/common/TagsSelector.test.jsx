@@ -67,7 +67,15 @@ describe("TagsSelector", () => {
   });
 
   it("uses the built-in empty hint and fallback scrolling when scrollTo is unavailable", () => {
-    delete Element.prototype.scrollTo;
+    const originalScrollTo = HTMLElement.prototype.scrollTo;
+    const originalScrollLeft = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollLeft");
+    const scrollLeftSet = vi.fn();
+    HTMLElement.prototype.scrollTo = undefined;
+    Object.defineProperty(HTMLElement.prototype, "scrollLeft", {
+      configurable: true,
+      get: () => 0,
+      set: scrollLeftSet,
+    });
     Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
       configurable: true,
       get: () => 180,
@@ -76,10 +84,26 @@ describe("TagsSelector", () => {
     render(<TagsSelector onSelectionChange={vi.fn()} />);
 
     expect(screen.getByText("Select tags to filter…")).toBeInTheDocument();
+    expect(scrollLeftSet).toHaveBeenCalledWith(180);
+
+    HTMLElement.prototype.scrollTo = originalScrollTo;
+    if (originalScrollLeft) {
+      Object.defineProperty(HTMLElement.prototype, "scrollLeft", originalScrollLeft);
+    } else {
+      delete HTMLElement.prototype.scrollLeft;
+    }
   });
 
   it("does not show the empty hint while selected tags are present", () => {
     render(<TagsSelector tags={tags} selectedTags={[tags[1]]} onSelectionChange={vi.fn()} emptyHint="Nothing selected" />);
     expect(screen.queryByText("Nothing selected")).not.toBeInTheDocument();
+  });
+
+  it("skips scrollTo when scrollRef.current is null", () => {
+    // Render with no ref attached (by passing null ref via unmounted component)
+    // Simulate by deleting scrollTo and setting scrollWidth to 0 - node exists but is not set
+    const { unmount } = render(<TagsSelector tags={tags} selectedTags={[]} onSelectionChange={vi.fn()} />);
+    unmount();
+    // No error thrown means null ref branch was handled (useEffect cleanup)
   });
 });

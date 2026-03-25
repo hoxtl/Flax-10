@@ -8,6 +8,7 @@ import * as SleepWarningModule from '../../../../components/Settings/hooks/useSl
 const mockEvents = [];
 const mockActions = { addEvent: vi.fn(), editEvent: vi.fn(), removeEvent: vi.fn(), addException: vi.fn() };
 const mockUseCalendar = vi.fn(() => ({ events: mockEvents }));
+const toastMock = vi.fn();
 const mockInitialForm = {
     title: 'Form', description: '', tag: '', start_time: '', end_time: '',
     reminder: [], recurrence: { frequency: 'none' }, location: '', all_day: false
@@ -35,6 +36,10 @@ vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: () => vi.fn(),
 }));
 
+vi.mock('../../../../context/ToastContext', () => ({
+    useToast: () => toastMock,
+}));
+
 vi.mock('../../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
@@ -46,6 +51,7 @@ vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
 describe('useEventForm', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        toastMock.mockReset();
     });
 
     it('should initialise form with values', () => {
@@ -215,6 +221,25 @@ describe('useEventForm', () => {
         expect(onClose).toHaveBeenCalled();
     });
 
+    it('customSubmit handler also succeeds when called without an event object', async () => {
+        const onClose = vi.fn();
+        const customSubmit = vi.fn().mockResolvedValue(undefined);
+        const formWithTitle = { ...mockInitialForm, title: 'No event arg' };
+        FormUtilsModule.getInitialForm.mockReturnValue(formWithTitle);
+
+        const { result } = renderHook(() =>
+            useEventForm(null, onClose, { customSubmit })
+        );
+
+        await act(async () => { });
+        await act(async () => {
+            await result.current.handleSubmit();
+        });
+
+        expect(customSubmit).toHaveBeenCalledWith(result.current.form);
+        expect(onClose).toHaveBeenCalled();
+    });
+
     it('uses default sleep/wake when getUserSettings returns empty or missing times', async () => {
         UserServiceModule.getUserSettings.mockResolvedValueOnce({});
         const { result } = renderHook(() => useEventForm(null, vi.fn()));
@@ -243,6 +268,30 @@ describe('useEventForm', () => {
             mockEvents,
             false
         );
+    });
+
+    it('shows a success toast when editing saves successfully', async () => {
+        FormUtilsModule.validateAndSubmit.mockResolvedValueOnce(true);
+
+        const { result } = renderHook(() => useEventForm({ id: 1 }, vi.fn()));
+        await act(async () => { });
+        await act(async () => {
+            await result.current.handleSubmit({ preventDefault: vi.fn() });
+        });
+
+        expect(toastMock).toHaveBeenCalledWith('Event updated', { variant: 'success' });
+    });
+
+    it('shows a success toast when creating saves successfully', async () => {
+        FormUtilsModule.validateAndSubmit.mockResolvedValueOnce(true);
+
+        const { result } = renderHook(() => useEventForm(null, vi.fn()));
+        await act(async () => { });
+        await act(async () => {
+            await result.current.handleSubmit({ preventDefault: vi.fn() });
+        });
+
+        expect(toastMock).toHaveBeenCalledWith('Event saved', { variant: 'success' });
     });
 
     it('handleConfirmSleep when no pending submit is a no-op', () => {

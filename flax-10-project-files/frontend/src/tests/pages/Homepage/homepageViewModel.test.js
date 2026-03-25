@@ -368,4 +368,359 @@ describe("homepageViewModel helpers", () => {
       });
     });
   });
+
+  it("covers homepage view-model fallback branches and recommendation edges", () => {
+    const now = new Date("2026-03-24T09:00:00.000Z");
+
+    expect(getEnrolledModules(null, [1], () => true)).toEqual([]);
+    expect(getTomorrowFirstEvent(null, new Date("2026-03-24T09:00:00.000Z"))).toBeNull();
+
+    overlapsDayMock.mockReturnValue(false);
+    expect(
+      getTomorrowFirstEvent(
+        [{ id: 1, start_time: "2026-03-25T09:00:00.000Z" }],
+        new Date("2026-03-24T09:00:00.000Z"),
+      ),
+    ).toBeNull();
+    overlapsDayMock.mockReturnValue(true);
+
+    expect(
+      getTaskCategoryPillMeta(
+        { list_name: "none", task_list: 4, module: 5 },
+        [{ id: 4, name: "none" }],
+        [{ id: 5, module_name: "History" }],
+      ),
+    ).toEqual({ label: "History", listId: null });
+    expect(
+      getTaskCategoryPillMeta(
+        { moduleId: 6 },
+        [],
+        [{ id: 6 }],
+      ),
+    ).toEqual({ label: "M6", listId: null });
+    expect(getTaskCategoryPillMeta({ tag: 7 }, null, null)).toBeNull();
+    expect(getTaskCategoryColor({ module_code: "CS101" }, () => null)).toBe("sage");
+    expect(
+      getHomepageRecommendation(
+        [{ id: 6, title: "Module-code match", module_code: "BIO", completed: false }],
+        [{ module_code: "BIO", title: "Biology notes", start_due_date: "2026-03-25T20:00:00.000Z" }],
+      ),
+    ).toEqual({
+      meta: "BIO · due tomorrow",
+      taskTitle: "Module-code match",
+      text: "Focus on Module-code match for Biology notes.",
+    });
+
+    expect(getSortedEvents(null)).toEqual([]);
+    expect(getSortedEvents([{ id: 10, start_time: "2026-03-24T09:00:00.000Z" }])).toEqual([
+      { id: 10, start_time: "2026-03-24T09:00:00.000Z" },
+    ]);
+    expect(getSortedEvents([{ id: 9, title: "Lunch" }])).toEqual([{ id: 9, title: "Lunch" }]);
+    isNowMock.mockReturnValue(true);
+    expect(
+      getPastItems(
+        [{ id: 1, start_time: "2026-03-24T08:00:00.000Z", end_time: "2026-03-24T09:00:00.000Z" }],
+        new Date("2026-03-24T10:00:00.000Z"),
+      ),
+    ).toEqual([]);
+    isNowMock.mockReturnValue(false);
+    expect(getPastItems(null, new Date("2026-03-24T10:00:00.000Z"))).toEqual([]);
+    expect(Array.from(getPastIdsShownInTimeline(null, null))).toEqual([]);
+    expect(getUpcomingItems(null, [])).toEqual([]);
+    expect(getUpcomingItems([{ id: 30, title: "Later" }], null)).toEqual([{ id: 30, title: "Later" }]);
+    expect(
+      Array.from(
+        getPastIdsShownInTimeline(
+          [{ id: 10, start_time: "2026-03-24T08:00:00.000Z" }],
+          [{ id: 11, start_time: "2026-03-24T08:30:00.000Z" }],
+        ),
+      ),
+    ).toEqual([]);
+    expect(
+      Array.from(
+        getPastIdsShownInTimeline(
+          [{ id: 14, start_time: "2026-03-24T08:00:00.000Z", end_time: "2026-03-24T09:00:00.000Z" }],
+          [{ id: 15, start_time: "2026-03-24T08:30:00.000Z" }],
+        ),
+      ),
+    ).toEqual([14]);
+    expect(
+      Array.from(
+        getPastIdsShownInTimeline(
+          [{ id: 12, start_time: "2026-03-24T08:00:00.000Z", end_time: "2026-03-24T09:00:00.000Z" }],
+          null,
+        ),
+      ),
+    ).toEqual([]);
+    expect(getMissedItems(now, null, new Set())).toEqual([]);
+    expect(getSuggestableTasks(null, [{ title: "Essay" }])).toEqual([]);
+    expect(getSuggestableTasks([{ id: 6, title: "Essay" }], null)).toEqual([{ id: 6, title: "Essay" }]);
+    expect(getSuggestableTasks([{ id: 4, title: "Essay" }], [{ id: 5 }])).toEqual([{ id: 4, title: "Essay" }]);
+    expect(getTasksDueToday(null, now)).toEqual([]);
+    expect(getTasksDueToday([{ id: 7, completed: false }], now)).toEqual([]);
+
+    expect(
+      getDeadlineSuggestions(
+        now,
+        [{ id: 4, title: "Soon", start_due_date: "2026-03-25T12:00:00.000Z" }],
+        [{}],
+        now.getTime(),
+      ),
+    ).toEqual([{ id: 4, title: "Soon", start_due_date: "2026-03-25T12:00:00.000Z" }]);
+    expect(
+      getDeadlineSuggestions(
+        now,
+        [
+          { id: 1, module_code: "BIO", start_due_date: "2026-03-25T12:00:00.000Z" },
+          { id: 2, title: "No due date" },
+          { id: 3, module_code: "CHEM", start_due_date: "2026-04-20T12:00:00.000Z" },
+        ],
+        [{ id: 44, title: "BIO quiz prep" }],
+        now.getTime(),
+      ),
+    ).toEqual([]);
+    expect(
+      getDeadlineSuggestions(
+        now,
+        [
+          { id: 6, title: "Second", start_due_date: "2026-03-27T12:00:00.000Z" },
+          { id: 7, title: "First", start_due_date: "2026-03-25T12:00:00.000Z" },
+        ],
+        null,
+        now.getTime(),
+      ).map((deadline) => deadline.id),
+    ).toEqual([7, 6]);
+    isTodayMock.mockReturnValue(false);
+    expect(getDeadlineSuggestions(now, [{ id: 8, start_due_date: "2026-03-25T12:00:00.000Z" }], [], now.getTime())).toEqual([]);
+    isTodayMock.mockReturnValue(true);
+    expect(getDeadlineSuggestions(now, null, [], now.getTime())).toEqual([]);
+    expect(
+      getDeadlineSuggestions(
+        now,
+        [{ id: 5, assessment_title: "Essay plan", start_due_date: "2026-03-25T12:00:00.000Z" }],
+        [{ id: 77, title: "essay pl review" }],
+        now.getTime(),
+      ),
+    ).toEqual([]);
+    expect(getOverdueTasksForNow(null, () => null, now)).toEqual([]);
+    isRoutineOrEventTaskMock.mockImplementation((task) => task.title === "Routine");
+    expect(
+      getOverdueTasksForNow(
+        [
+          { id: 20, title: "Routine", completed: false, due_date: "2026-03-23T08:00:00.000Z" },
+          { id: 21, title: "Essay", completed: false, due_date: "2026-03-23T07:00:00.000Z" },
+          { id: 22, title: "Essay 2", completed: false, due_date: "2026-03-23T06:00:00.000Z" },
+        ],
+        () => null,
+        now,
+      ).map((task) => task.id),
+    ).toEqual([22, 21]);
+    isRoutineOrEventTaskMock.mockReturnValue(false);
+
+    expect(getTaskWidgetList(null, now)).toEqual([]);
+    expect(getTaskWidgetList([{ id: 2, title: "No due date", completed: false }], now)).toEqual([]);
+    expect(
+      getTaskWidgetList(
+        [{ id: 1, title: "Done", completed: true, due_date: "2026-03-24T11:00:00.000Z", priority: "low" }],
+        now,
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        id: 1,
+        taskWidgetStatus: "completed",
+      }),
+    ]);
+
+    const fiveShownItems = Array.from({ length: 5 }, (_, index) => ({
+      id: index + 1,
+      title: `Task ${index + 1}`,
+      completed: false,
+      due_date: "2026-03-24T10:00:00.000Z",
+      sortTime: new Date("2026-03-24T10:00:00.000Z"),
+      taskWidgetStatus: "upcoming",
+      priority: "medium",
+    }));
+    expect(getTaskWidgetDisplayList([], now, fiveShownItems)).toEqual(fiveShownItems);
+    expect(getTaskWidgetDisplayList([], now)).toEqual([]);
+    expect(
+      getTaskWidgetDisplayList(
+        null,
+        now,
+        [
+          { id: "overdue", title: "Overdue", completed: false, due_date: "2026-03-24T08:00:00.000Z", sortTime: "2026-03-24T08:00:00.000Z", taskWidgetStatus: "overdue", priority: "medium" },
+          { id: "upcoming", title: "Upcoming", completed: false, due_date: "2026-03-24T12:00:00.000Z", sortTime: "2026-03-24T12:00:00.000Z", taskWidgetStatus: "upcoming", priority: "medium" },
+        ],
+      ).map((task) => task.id),
+    ).toEqual(["overdue", "upcoming"]);
+    expect(
+      getTaskWidgetDisplayList(
+        [],
+        now,
+        [
+          { id: "upcoming-first", title: "Upcoming", completed: false, due_date: "2026-03-24T12:00:00.000Z", sortTime: "2026-03-24T12:00:00.000Z", taskWidgetStatus: "upcoming", priority: "medium" },
+          { id: "overdue-second", title: "Overdue", completed: false, due_date: "2026-03-24T08:00:00.000Z", sortTime: "2026-03-24T08:00:00.000Z", taskWidgetStatus: "overdue", priority: "medium" },
+        ],
+      ).map((task) => task.id),
+    ).toEqual(["overdue-second", "upcoming-first"]);
+    expect(
+      getTaskWidgetDisplayList(
+        [],
+        now,
+        [
+          { id: "upcoming-a", title: "Upcoming A", completed: false, due_date: "2026-03-24T12:00:00.000Z", sortTime: "2026-03-24T12:00:00.000Z", taskWidgetStatus: "upcoming", priority: "medium" },
+          { id: "overdue-a", title: "Overdue A", completed: false, due_date: "2026-03-24T08:00:00.000Z", sortTime: "2026-03-24T08:00:00.000Z", taskWidgetStatus: "overdue", priority: "medium" },
+          { id: "upcoming-b", title: "Upcoming B", completed: false, due_date: "2026-03-24T13:00:00.000Z", sortTime: "2026-03-24T13:00:00.000Z", taskWidgetStatus: "upcoming", priority: "medium" },
+        ],
+      ).slice(0, 2).map((task) => task.id),
+    ).toEqual(["overdue-a", "upcoming-a"]);
+    expect(getTaskWidgetDisplayList([], now, null)).toEqual([]);
+
+    const sortedDisplay = getTaskWidgetDisplayList(
+      [
+        { id: 90, title: "Future filler", completed: false, due_date: "2026-03-30T09:00:00.000Z", priority: "urgent" },
+        { id: 91, title: "Invalid filler", completed: false, due_date: "invalid-date", priority: "low" },
+      ],
+      now,
+      [
+        { id: "a", title: "Zed overdue", completed: false, due_date: "2026-03-24T08:00:00.000Z", sortTime: "bad-time", taskWidgetStatus: "overdue", priority: "mystery" },
+        { id: "b", title: "Alpha overdue", completed: false, due_date: "2026-03-24T08:00:00.000Z", sortTime: "bad-time", taskWidgetStatus: "overdue", priority: "mystery" },
+      ],
+    );
+    expect(sortedDisplay[0].title).toBe("Alpha overdue");
+    expect(sortedDisplay[1].title).toBe("Zed overdue");
+    expect(
+      getTaskWidgetDisplayList(
+        [],
+        now,
+        [
+          {
+            id: "o2",
+            title: "Later overdue",
+            completed: false,
+            due_date: "2026-03-24T09:00:00.000Z",
+            sortTime: "2026-03-24T09:00:00.000Z",
+            taskWidgetStatus: "overdue",
+            priority: "medium",
+          },
+          {
+            id: "o1",
+            title: "Earlier overdue",
+            completed: false,
+            due_date: "2026-03-24T07:00:00.000Z",
+            sortTime: "2026-03-24T07:00:00.000Z",
+            taskWidgetStatus: "overdue",
+            priority: "medium",
+          },
+        ],
+      ).map((task) => task.id),
+    ).toEqual(["o1", "o2"]);
+    expect(
+      getTaskWidgetDisplayList(
+        [],
+        now,
+        [
+          { id: "u2", title: "Later upcoming", completed: false, due_date: "2026-03-24T12:00:00.000Z", sortTime: "2026-03-24T12:00:00.000Z", taskWidgetStatus: "upcoming" },
+          { id: "u1", title: "Sooner upcoming", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: "2026-03-24T10:00:00.000Z", taskWidgetStatus: "upcoming" },
+          { id: "u3", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: "2026-03-24T10:00:00.000Z", taskWidgetStatus: "upcoming" },
+        ],
+      ).map((task) => task.id),
+    ).toEqual(["u3", "u1", "u2"]);
+    expect(
+      getTaskWidgetDisplayList(
+        [],
+        now,
+        [
+          { id: "named", title: "Named", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: "2026-03-24T10:00:00.000Z", taskWidgetStatus: "upcoming" },
+          { id: "untitled", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: "2026-03-24T10:00:00.000Z", taskWidgetStatus: "upcoming" },
+        ],
+      ).map((task) => task.id),
+    ).toEqual(["untitled", "named"]);
+    expect(
+      getTaskWidgetDisplayList(
+        [],
+        now,
+        [
+          { id: "empty-1", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: "2026-03-24T10:00:00.000Z", taskWidgetStatus: "upcoming" },
+          { id: "empty-2", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: "2026-03-24T10:00:00.000Z", taskWidgetStatus: "upcoming" },
+        ],
+      ).map((task) => task.id),
+    ).toEqual(["empty-1", "empty-2"]);
+    expect(
+      getTaskWidgetDisplayList(
+        [
+          { id: 40, completed: false, due_date: "2026-03-26T09:00:00.000Z" },
+          { id: 41, completed: false, due_date: "2026-03-26T09:00:00.000Z" },
+        ],
+        now,
+        [],
+      ).map((task) => task.id),
+    ).toEqual([40, 41]);
+
+    expect(getTaskWidgetDueTodayCount(null, now)).toBe(0);
+    expect(getTaskWidgetDueTodayCount([{ completed: false }], now)).toBe(0);
+    expect(getTaskWidgetCompletedCount(null)).toBe(0);
+    expect(getTaskWidgetSpineCompletedPct([], 0)).toBe(0);
+
+    isTodayMock.mockReturnValue(false);
+    expect(getTodayFreeWindows(now, [{ id: 1 }])).toEqual([]);
+    isTodayMock.mockReturnValue(true);
+    getAllFreeWindowsTodayMock.mockReturnValue([{ start: 10, end: 11, minutes: 10 }]);
+    expect(getTodayFreeWindows(now, [{ id: 1 }])).toEqual([]);
+
+    expect(getHomepageRecommendation(null, null, null)).toBeNull();
+    expect(
+      getHomepageRecommendation(
+        [{ id: 10, title: "Empty key task", completed: false }],
+        [{ id: 11, title: "Deadline only", start_due_date: "2026-03-28T20:00:00.000Z" }],
+        null,
+      ),
+    ).toEqual({
+      meta: "Module · due in 4d",
+      taskTitle: "Empty key task",
+      text: "Focus on Empty key task for Deadline only.",
+    });
+    expect(
+      getHomepageRecommendation(
+        [{ id: 11, title: "Sort deadlines", completed: false }],
+        [
+          { id: 12, title: "Later deadline", start_due_date: "2026-03-29T20:00:00.000Z" },
+          { id: 13, title: "Sooner deadline", start_due_date: "2026-03-25T20:00:00.000Z" },
+        ],
+        null,
+      ),
+    ).toEqual({
+      meta: "Module · due tomorrow",
+      taskTitle: "Sort deadlines",
+      text: "Focus on Sort deadlines for Sooner deadline.",
+    });
+    expect(getHomepageRecommendation([{ id: 9, title: "No window yet", completed: false }], null, "20m")).toEqual({
+      meta: "Best task to move next",
+      taskTitle: "No window yet",
+      text: "Use the 20m window to move No window yet forward.",
+    });
+    expect(
+      getHomepageRecommendation(
+        [{ id: 7, title: "Plan module work", module: 8, completed: false }],
+        [{ module: 8, start_due_date: "2026-03-24T20:00:00.000Z" }],
+      ),
+    ).toEqual({
+      meta: "Module · due today",
+      taskTitle: "Plan module work",
+      text: "Focus on Plan module work for upcoming deadline.",
+    });
+    expect(
+      getHomepageRecommendation(
+        [{ id: 8, title: "No window yet", completed: false }],
+        [],
+        null,
+      ),
+    ).toBeNull();
+    expect(
+      getHomepageRecommendation(
+        [{ id: 12, title: "Unmatched", module_code: "ZZZ", completed: false }],
+        [{ module_code: "BIO", start_due_date: "2026-03-25T20:00:00.000Z" }],
+        null,
+      ),
+    ).toBeNull();
+  });
 });

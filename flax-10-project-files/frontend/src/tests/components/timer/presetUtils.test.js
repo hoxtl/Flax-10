@@ -86,4 +86,40 @@ describe("presetUtils", () => {
     expect(timer.setTimeLeft).toHaveBeenCalledWith(25 * 60);
     expect(sessionStorage.getItem("timerTaskId")).toBe("9");
   });
+
+  it("covers empty metadata fallbacks for icons, task titles, and estimated blocks", () => {
+    expect(inferTaskType(null)).toBe("general");
+    expect(inferTaskType()).toBe("general");
+    expect(getPresetIcon()).toBe("⚙️");
+
+    const timer = {
+      setTask: vi.fn(),
+      updateTime: vi.fn(),
+      setTimeLeft: vi.fn(),
+      setActiveTaskId: vi.fn(),
+    };
+
+    applyTaskToTimer(
+      {
+        id: 12,
+        title: "General admin",
+        estimated_blocks: 0,
+        list_color: "#000",
+        module_code: "",
+        due_date: "",
+        list_name: "",
+      },
+      timer,
+    );
+
+    expect(timer.setActiveTaskId).toHaveBeenCalledWith(
+      12,
+      expect.objectContaining({
+        moduleCode: null,
+        dueDate: null,
+        listName: null,
+        estimatedBlocks: 1,
+      }),
+    );
+  });
 });

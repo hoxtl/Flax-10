@@ -65,8 +65,8 @@ function ImportButton({ event, status, onImport }) {
 }
 
 function ImportFooter({ statuses, onImportAll }) {
+  if (!statuses.length) return null;
   if (statuses.every((status) => status === "done")) return <ImportDoneState />;
-  if (!statuses.some((status) => status !== "done")) return null;
   return (
     <button className={styles.importAllBtn} onClick={onImportAll}>
       <CalendarPlus size={14} />

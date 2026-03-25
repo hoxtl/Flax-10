@@ -127,4 +127,14 @@ describe('ImageManagerComponents', () => {
     fireEvent.change(fileInput, { target: { files: [] } });
     expect(onAdd).not.toHaveBeenCalled();
   });
+
+  it('clicks the hidden file input when the add card is pressed', () => {
+    render(<ImageGrid images={[]} onDelete={vi.fn()} onPin={vi.fn()} onAdd={vi.fn()} />);
+    const fileInput = document.querySelector('input[type="file"]');
+    const clickSpy = vi.spyOn(fileInput, 'click');
+
+    fireEvent.click(screen.getByRole('button', { name: '+' }));
+
+    expect(clickSpy).toHaveBeenCalled();
+  });
 });

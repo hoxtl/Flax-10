@@ -16,6 +16,7 @@ import {
   filterUsers,
 } from '../../../pages/Admin/utils/userFilters';
 import { banUserState, unbanUserState } from '../../../pages/Admin/utils/userState';
+import { isProtectedFixtureUser } from '../../../pages/Admin/utils/protectedUsers';
 
 describe('adminMotion', () => {
   it('fadeUp has correct initial, animate, exit, and transition values', () => {
@@ -216,5 +217,12 @@ describe('userState', () => {
   it('does not mutate the original users array', () => {
     banUserState(users, 1, 'Test');
     expect(users[0].is_active).toBe(true);
+  });
+});
+
+describe('protectedUsers', () => {
+  it('matches protected fixture usernames case-insensitively and handles missing users', () => {
+    expect(isProtectedFixtureUser({ username: ' JaneDoe ' })).toBe(true);
+    expect(isProtectedFixtureUser()).toBe(false);
   });
 });

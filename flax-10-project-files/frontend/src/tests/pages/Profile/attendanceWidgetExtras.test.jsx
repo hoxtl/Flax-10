@@ -84,6 +84,8 @@ describe("attendance widget extras", () => {
     fireEvent.click(screen.getByTestId("pie-chart"));
     expect(onSegmentClick).toHaveBeenCalledWith({ chart: "overall", label: "Clicked" });
     expect(pieChartProps.at(-1).series[0].innerRadius).toBe(38);
+    pieChartProps.at(-1).onItemClick({}, { dataIndex: 0 }, {});
+    expect(onSegmentClick).toHaveBeenLastCalledWith({ chart: "overall", label: "Attended" });
   });
 
   it("renders by-type donut only when data exists and stops wrapper clicks", () => {
@@ -106,6 +108,12 @@ describe("attendance widget extras", () => {
     expect(outerClick).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("pie-chart"));
     expect(onSegmentClick).toHaveBeenCalledWith({ chart: "byType", label: "Clicked" });
+  });
+
+  it("omits pie-chart selection handling when no segment callback is supplied", () => {
+    render(<CompactOverallDonut overallData={[{ label: "Attended", value: 1, color: "#0f0" }]} />);
+    expect(pieChartProps.at(-1).onItemClick).toBeUndefined();
+    fireEvent.click(screen.getByTestId("pie-chart"));
   });
 
   it("handles attendance header navigation via callback and window event", () => {

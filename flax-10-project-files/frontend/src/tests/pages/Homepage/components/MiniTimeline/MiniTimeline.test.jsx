@@ -57,10 +57,11 @@ vi.mock('../../../../../pages/Homepage/components/MiniTimeline/NowRow', () => ({
 }));
 
 vi.mock('../../../../../pages/Homepage/components/MiniTimeline/PlanFreeRow', () => ({
-  PlanFreeRow: ({ row, isBestGap, assignedTask, setSlotPopoverRowId, slotPopoverRowId, slotPopoverRef }) => (
+  PlanFreeRow: ({ row, isBestGap, assignedTask, setSlotPopoverRowId, slotPopoverRowId, slotPopoverRef, onQuickStart }) => (
     <div>
       <div>FREE:{row.id}{isBestGap ? ':BEST' : ''}{assignedTask ? `:${assignedTask.title}` : ''}</div>
       <button type="button" onClick={() => setSlotPopoverRowId(row.id)}>open-slot</button>
+      <button type="button" onClick={() => onQuickStart?.(new Date('2026-03-25T10:00:00Z'), 25, { estimated_blocks: 1 }, null)}>quick-start-fallback</button>
       {slotPopoverRowId === row.id && (
         <div ref={slotPopoverRef} data-testid="slot-popover">SLOT_POPOVER</div>
       )}
@@ -206,6 +207,19 @@ describe('MiniTimeline', () => {
     expect(screen.getByTestId('slot-popover')).toBeTruthy();
     fireEvent.mouseDown(document.body);
     expect(screen.queryByTestId('slot-popover')).toBeNull();
+  });
+
+  it('handles quick starts even when suggested tasks have no id or title', () => {
+    const onQuickStart = vi.fn();
+    mockRows = [{ id: 'free', type: 'free', minutes: 30 }];
+    renderTL({ onQuickStart });
+    fireEvent.click(screen.getByText('quick-start-fallback'));
+    expect(onQuickStart).toHaveBeenCalledWith(
+      new Date('2026-03-25T10:00:00.000Z'),
+      25,
+      { estimated_blocks: 1 },
+      null,
+    );
   });
 
   it('opens event context menu and calls onDelete', async () => {

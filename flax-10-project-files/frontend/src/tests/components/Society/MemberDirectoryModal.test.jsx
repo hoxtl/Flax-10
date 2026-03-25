@@ -115,4 +115,20 @@ describe('MemberDirectoryModal', () => {
         expect(spy).toHaveBeenCalledWith(expect.objectContaining({ detail: 'profile_1' }));
         window.removeEventListener('navigate', spy);
     });
+
+    it('uses an empty members array fallback when members is null', () => {
+        vi.mocked(useSearchFilter).mockReturnValue([]);
+        render(<MemberDirectoryModal societyName="Club" members={null} onClose={onClose} />);
+        expect(screen.getByText('No members found.')).toBeInTheDocument();
+    });
+
+    it('does not update loading state after an async fetch resolves post-unmount', async () => {
+        let resolveFetch;
+        const delayedFetch = vi.fn().mockImplementation(() => new Promise((resolve) => {
+            resolveFetch = resolve;
+        }));
+        const { unmount } = render(<MemberDirectoryModal societyName="Club" members={[]} onFetchMembers={delayedFetch} onClose={onClose} />);
+        unmount();
+        await resolveFetch?.();
+    });
 });

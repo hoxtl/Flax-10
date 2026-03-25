@@ -137,4 +137,22 @@ describe("app components", () => {
     rerender(<ScreenRouter screen="dashboard" state={{ ...state, isBanned: false }} />);
     expect(screen.getByText("Layout:home:Ava")).toBeInTheDocument();
   });
+
+  it("ScreenRouter falls back to an empty banned reason when none is stored", () => {
+    localStorage.removeItem("ban_reason");
+    render(
+      <ScreenRouter
+        screen="auth"
+        state={{
+          activeNav: "home",
+          isBanned: true,
+          setActiveNav: vi.fn(),
+          setShowWelcome: vi.fn(),
+          user: { name: "Ava" },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Banned:")).toBeInTheDocument();
+  });
 });

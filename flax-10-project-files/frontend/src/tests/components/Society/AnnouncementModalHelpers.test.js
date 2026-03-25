@@ -5,6 +5,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   getInitialForm,
+  getImageList,
   validateForm,
   handleFileSelect,
   MAX_IMAGES,
@@ -95,6 +96,12 @@ describe('AnnouncementModalHelpers', () => {
       expect(getInitialForm({}).images).toEqual([]);
       expect(getInitialForm({ images: null }).images).toEqual([]);
     });
+
+    it('falls back to a single image field and filters unusable image objects', () => {
+      expect(getInitialForm({ image: 'cover.jpg' }).images).toEqual(['cover.jpg']);
+      expect(getInitialForm({ image: { url: 'cover-2.jpg' } }).images).toEqual(['cover-2.jpg']);
+      expect(getImageList({ images: [{ id: 1 }, null, { url: 'usable.jpg' }] })).toEqual(['usable.jpg']);
+    });
   });
 
   describe('validateForm', () => {
@@ -127,26 +134,36 @@ describe('AnnouncementModalHelpers', () => {
       expect(onAdd).not.toHaveBeenCalled();
     });
 
-    it('reads file and calls onAdd with data URL and clears input', (done) => {
-      const onAdd = vi.fn(() => {
-        expect(onAdd).toHaveBeenCalledWith('data:image/png;base64,eA==');
-        expect(fileRef.current.value).toBe('');
-        done();
+    it('reads file and calls onAdd with data URL and clears input', () => {
+      vi.stubGlobal('FileReader', class {
+        readAsDataURL() {
+          this.onload?.({ target: { result: 'data:image/png;base64,eA==' } });
+        }
       });
+
+      const onAdd = vi.fn();
       const fileRef = { current: { value: 'x' } };
       const file = new File([new Uint8Array([120])], 'f.png', {
         type: 'image/png',
       });
+
       handleFileSelect(file, onAdd, fileRef);
+      expect(onAdd).toHaveBeenCalledWith('data:image/png;base64,eA==');
+      expect(fileRef.current.value).toBe('');
     });
 
-    it('does not clear input when fileRef.current is null', (done) => {
-      const onAdd = vi.fn(() => {
-        done();
+    it('does not clear input when fileRef.current is null', () => {
+      vi.stubGlobal('FileReader', class {
+        readAsDataURL() {
+          this.onload?.({ target: { result: 'data:image/png;base64,eA==' } });
+        }
       });
+
+      const onAdd = vi.fn();
       const fileRef = { current: null };
       const file = new File(['x'], 'f.png', { type: 'image/png' });
       handleFileSelect(file, onAdd, fileRef);
+      expect(onAdd).toHaveBeenCalledWith('data:image/png;base64,eA==');
     });
   });
 });

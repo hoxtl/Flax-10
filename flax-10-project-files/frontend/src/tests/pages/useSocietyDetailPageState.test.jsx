@@ -198,4 +198,25 @@ describe("useSocietyDetailPageState", () => {
 
     replaceStateSpy.mockRestore();
   });
+
+  it("falls back to the default tab and clears announcement focus when tab changes without an id", async () => {
+    const wrapper = createWrapper({
+      pathname: "/societies/5",
+      search: "?announcementId=44",
+    });
+
+    const { result } = renderHook(() => useSocietyPageData(5, null, vi.fn()), { wrapper });
+
+    expect(result.current.page.activeTab).toBe("calendar");
+    expect(result.current.page.focusAnnouncementId).toBe("44");
+
+    act(() => {
+      result.current.page.handleTabChange("about");
+    });
+
+    await waitFor(() => {
+      expect(result.current.page.activeTab).toBe("about");
+      expect(result.current.page.focusAnnouncementId).toBeUndefined();
+    });
+  });
 });

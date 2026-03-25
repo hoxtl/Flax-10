@@ -22,10 +22,20 @@ function Consumer() {
     document.body.setAttribute('data-result-custom', String(value));
   };
 
+  const openAlternateDefault = async () => {
+    const value = await confirm({
+      title: 'Alternate default?',
+      message: 'Alternate path',
+      alternateText: 'Alternate',
+    });
+    document.body.setAttribute('data-result-alt-default', String(value));
+  };
+
   return (
     <>
       <button onClick={openDefault}>open-default</button>
       <button onClick={openCustom}>open-custom</button>
+      <button onClick={openAlternateDefault}>open-alt-default</button>
     </>
   );
 }
@@ -70,5 +80,17 @@ describe('ConfirmContext', () => {
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
     await waitFor(() => expect(document.body.getAttribute('data-result-custom')).toBe('NO'));
     expect(document.body.getAttribute('data-result-custom')).toBe('NO');
+  });
+
+  it('uses the default alternate value when none is provided', async () => {
+    render(
+      <ConfirmProvider>
+        <Consumer />
+      </ConfirmProvider>
+    );
+
+    fireEvent.click(screen.getByText('open-alt-default'));
+    fireEvent.click(screen.getByRole('button', { name: /alternate/i }));
+    await waitFor(() => expect(document.body.getAttribute('data-result-alt-default')).toBe('ALTERNATE'));
   });
 });

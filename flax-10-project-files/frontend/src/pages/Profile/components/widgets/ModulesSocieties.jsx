@@ -110,7 +110,7 @@ function TabsAction({ tab, setTab, isTeacher, hasSocieties }) {
         className={`${styles.widgetTab} ${tab === "modules" ? styles.widgetTabActive : ""}`}
         onClick={() => setTab("modules")}
       >
-        {isTeacher ? "Teaching" : "Modules"}
+        Modules
       </button>
       <button
         className={`${styles.widgetTab} ${tab === "societies" ? styles.widgetTabActive : ""}`}
@@ -131,7 +131,7 @@ export function ModulesSocietiesWidget({ modules, societies, onNavigate, role, c
   if (isTeacher) return <TeacherModulesSection modules={modules} nameMap={nameMap} onNavigate={onNavigate} />;
   if (!modules?.length && !isTeacher) return null;
 
-  const title = tab === "modules" ? (isTeacher ? "MODULES I TEACH" : "MODULES") : "SOCIETIES JOINED";
+  const title = tab === "modules" ? "MODULES" : "SOCIETIES JOINED";
   const tabsAction = <TabsAction tab={tab} setTab={setTab} isTeacher={isTeacher} hasSocieties={hasSocieties} />;
 
   return (
@@ -148,7 +148,7 @@ export function ModulesSection({ modules, onNavigate, role }) {
   if (isTeacher) return <TeacherModulesSection modules={modules} nameMap={nameMap} onNavigate={onNavigate} />;
   if (!modules?.length) return null;
   return (
-    <ProfileWidget title={isTeacher ? "MODULES I TEACH" : "MODULES"} className={styles.modulesWidget}>
+    <ProfileWidget title="MODULES" className={styles.modulesWidget}>
       {modules?.length > 0 && <ModuleList modules={modules} nameMap={nameMap} onNavigate={onNavigate} />}
     </ProfileWidget>
   );

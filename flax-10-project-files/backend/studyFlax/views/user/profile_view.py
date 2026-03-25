@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from studyFlax.models import User
 
-from .profile_helpers import apply_profile_patch, build_profile_response
+from .profile_helpers import apply_profile_patch, build_profile_response, update_username
 from .study_session_suggestions import create_study_suggestion, get_target_user, validate_target_user
 
 

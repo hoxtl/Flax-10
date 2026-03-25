@@ -48,4 +48,22 @@ describe("TabBar", () => {
     expect(screen.getByText("Panel body")).toBeInTheDocument();
     expect(screen.getByText("Panel body").parentElement).toHaveStyle({ minHeight: "180px" });
   });
+
+  it("uses the default variant and min height when optional props are omitted", () => {
+    render(
+      <>
+        <TabBar
+          tabs={[{ id: "one", label: "One" }, { id: "two", label: "Two" }]}
+          activeTab="two"
+          onTabChange={vi.fn()}
+        />
+        <TabContent activeTab="summary">
+          <div>Default panel</div>
+        </TabContent>
+      </>
+    );
+
+    expect(screen.getByRole("button", { name: "One" })).toBeInTheDocument();
+    expect(screen.getByText("Default panel").parentElement).toHaveStyle({ minHeight: "320px" });
+  });
 });

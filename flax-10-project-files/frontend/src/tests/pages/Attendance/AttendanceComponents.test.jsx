@@ -11,6 +11,7 @@ import AttendanceEventList from "../../../pages/Attendance/components/Attendance
 import AttendanceEventInfo from "../../../pages/Attendance/components/AttendanceEventInfo";
 import AttendanceRecordActions from "../../../pages/Attendance/components/AttendanceRecordActions";
 import AttendanceMarkedActions from "../../../pages/Attendance/components/AttendanceMarkedActions";
+import AttendanceSuccessOverlay from "../../../pages/Attendance/components/AttendanceSuccessOverlay";
 import SegmentDetailPanel from "../../../pages/Attendance/components/SegmentDetailPanel";
 import SegmentDetailHeader from "../../../pages/Attendance/components/SegmentDetailHeader";
 import SegmentDetailList from "../../../pages/Attendance/components/SegmentDetailList";
@@ -55,6 +56,7 @@ vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
 
 describe("Attendance components", () => {
   beforeEach(() => {
+    vi.useRealTimers();
     recordAttendanceMock.mockReset();
     recordAttendanceMock.mockResolvedValue({});
   });
@@ -132,15 +134,44 @@ describe("Attendance components", () => {
     expect(clearSegment).toHaveBeenCalled();
   });
 
-  const generateEvents = (startId, count) => Array.from({ length: count }, (_, i) => ({
-    id: startId + i,
-    title: `Lecture ${i + 1}`,
-    start_time: "2026-03-01T09:00:00Z",
-    attended: i % 2 === 0,
-    event_type: "Lecture",
-  }));
+  it("covers events-loading, record-tab switching, and empty marked-state branches", () => {
+    const { rerender, container } = render(
+      <AttendanceListColumn
+        model={{
+          eventsLoading: true,
+          selectedSegment: null,
+          listTab: "record",
+          unmarkedEvents: [],
+          markedEvents: [],
+          refetchAll: vi.fn(),
+          showRecordTab: vi.fn(),
+          showMarkedTab: vi.fn(),
+        }}
+      />,
+    );
+    expect(container).toBeEmptyDOMElement();
 
-  it("renders populated record list and records attendance changes", async () => {
+    const showRecordTab = vi.fn();
+    rerender(
+      <AttendanceListColumn
+        model={{
+          eventsLoading: false,
+          selectedSegment: null,
+          listTab: "marked",
+          unmarkedEvents: [{ id: 1, title: "Lecture 1", start_time: "2026-03-01T09:00:00Z" }],
+          markedEvents: [],
+          refetchAll: vi.fn(),
+          showRecordTab,
+          showMarkedTab: vi.fn(),
+        }}
+      />
+    );
+    expect(screen.getByText("No marked events yet.")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("record"));
+    expect(showRecordTab).toHaveBeenCalled();
+  });
+
+  it("renders empty and populated record and marked lists and records changes", async () => {
     const onRecorded = vi.fn();
     const manyEvents = generateEvents(1, 21);
     
@@ -159,7 +190,38 @@ describe("Attendance components", () => {
     expect(screen.getByText(/Showing 30 most recent/)).toBeInTheDocument();
   });
 
-  it("renders event info and record actions", async () => {
+  it("covers coursework filtering, submit failures, overlay variants, and empty marked lists", async () => {
+    const onRecorded = vi.fn();
+    const courseworkOnly = [{ id: 90, title: "Lecture 90", start_time: "2026-03-01T09:00:00Z", event_type: "Coursework" }];
+    const { rerender, container } = render(<RecordAttendanceList events={courseworkOnly} onRecorded={onRecorded} />);
+    expect(container).toBeEmptyDOMElement();
+
+    recordAttendanceMock.mockRejectedValueOnce(new Error("save failed"));
+    rerender(
+      <RecordAttendanceList
+        events={[{ id: 91, title: "Lecture 91", start_time: "2026-03-01T09:00:00Z", event_type: "Lecture" }]}
+        onRecorded={onRecorded}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Attended" }));
+    await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(91, true));
+    expect(onRecorded).not.toHaveBeenCalled();
+
+    recordAttendanceMock.mockResolvedValueOnce({});
+    fireEvent.click(screen.getByRole("button", { name: "Missed" }));
+    await waitFor(() => expect(screen.getByText("Missed session noted.")).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("Missed session noted.")).toBeNull(), { timeout: 2000 });
+
+    rerender(<MarkedAttendanceList markedEvents={[]} />);
+    expect(screen.queryByText("Your recorded attendance. Once marked, attendance cannot be changed.")).not.toBeInTheDocument();
+  }, 10000);
+
+  it("renders the unattended success overlay variant", () => {
+    render(<AttendanceSuccessOverlay attended={false} />);
+    expect(screen.getByText("Missed session noted.")).toBeInTheDocument();
+  });
+
+  it("renders event info, record actions, marked actions, and segment detail rows", async () => {
     const onRecord = vi.fn();
     render(
       <>

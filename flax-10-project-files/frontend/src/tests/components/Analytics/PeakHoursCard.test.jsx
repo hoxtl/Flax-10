@@ -60,4 +60,19 @@ describe("PeakHoursCard", () => {
       "Hours when you study most. Schedule demanding tasks here.",
     );
   });
+
+  it("formats noon-style peak hours with the 12 fallback", () => {
+    render(
+      <PeakHoursCard
+        data={{
+          heatmap: {
+            data: [[0, 40]],
+            hours: ["00", "12"],
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("12pm")).toBeTruthy();
+  });
 });

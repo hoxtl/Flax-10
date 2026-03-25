@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ConflictPairRow } from '../../../../../pages/Homepage/components/MiniTimeline/ConflictPairRow';
+import {
+  ConflictPairRow,
+  getConflictPriorityRank,
+  getConflictResolutionPlan,
+  getMoveTomorrowWindow,
+} from '../../../../../pages/Homepage/components/MiniTimeline/ConflictPairRow';
 import * as useSleepWarning from '../../../../../components/Settings/hooks/useSleepWarning';
 
 vi.mock('../../../../../components/Settings/hooks/useSleepWarning', () => ({
@@ -187,6 +192,14 @@ describe('ConflictPairRow', () => {
     expect(onCardClick).toHaveBeenCalled();
   });
 
+  it('keeps read-only lecture cards inert when no card click handler is provided', () => {
+    const onEdit = vi.fn();
+    renderConflictPairRow({ onCardClick: undefined, onEdit });
+    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    fireEvent.click(card);
+    expect(onEdit).not.toHaveBeenCalled();
+  });
+
   it('shows sleep badge when isDuringSleepWindow returns true', () => {
     vi.mocked(useSleepWarning.doesEventOverlapSleepWindow).mockReturnValueOnce(true);
     renderConflictPairRow();
@@ -242,5 +255,112 @@ describe('ConflictPairRow', () => {
     const card = screen.getAllByText('Study session')[0].closest('[role="button"]');
     fireEvent.keyDown(card, { key: ' ' });
     expect(onEdit).toHaveBeenCalled();
+  });
+
+  it('does not open the editable context menu for read-only conflict cards', () => {
+    const onEventContextMenu = vi.fn();
+    renderConflictPairRow({ onEventContextMenu });
+    const lectureCard = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    fireEvent.contextMenu(lectureCard);
+    expect(onEventContextMenu).not.toHaveBeenCalled();
+  });
+
+  it('builds auto-arrange, tomorrow, and null conflict plans from exported helpers', () => {
+    const autoPlan = getConflictResolutionPlan({
+      row,
+      rows: rowsWithFreeGap,
+      selectedDate,
+    });
+    expect(autoPlan.type).toBe('auto-arrange');
+
+    const tomorrowPlan = getConflictResolutionPlan({
+      row,
+      rows: rowsNoFree,
+      selectedDate,
+    });
+    expect(tomorrowPlan.event.id).toBe(2);
+
+    const nullPlan = getConflictResolutionPlan({
+      row: {
+        ...row,
+        items: [
+          row.items[0],
+          {
+            ...row.items[1],
+            item: { ...row.items[1].item, tag_name: 'lecture' },
+          },
+        ],
+      },
+      rows: rowsNoFree,
+      selectedDate,
+    });
+    expect(nullPlan).toBeNull();
+  });
+
+  it('computes tomorrow windows using the default minimum duration', () => {
+    const { start, end } = getMoveTomorrowWindow({
+      start_time: '2024-03-08T10:00:00Z',
+      end_time: null,
+    });
+
+    expect(end.getTime() - start.getTime()).toBe(25 * 60000);
+  });
+
+  it('uses fallback defaults when sleep window and tag metadata are missing', () => {
+    const customRow = {
+      ...row,
+      items: [
+        {
+          ...row.items[1],
+          item: {
+            ...row.items[1].item,
+            tag_name: undefined,
+            tag: undefined,
+          },
+        },
+      ],
+    };
+
+    render(
+      <ConflictPairRow
+        row={customRow}
+        rows={rowsNoFree}
+        styles={mockStyles}
+        selectedDate={selectedDate}
+        getTag={undefined}
+      />
+    );
+
+    expect(screen.getAllByText('Study session').length).toBeGreaterThan(0);
+  });
+
+  it('covers priority and duration fallbacks for exported helpers', () => {
+    expect(getConflictPriorityRank()).toBe(0);
+    expect(getConflictPriorityRank({ priority: 'unknown' })).toBe(0);
+
+    const { start, end } = getMoveTomorrowWindow({
+      start_time: '2024-03-08T10:00:00Z',
+      end_time: '2024-03-08T10:00:00Z',
+    });
+    expect(end.getTime() - start.getTime()).toBe(25 * 60000);
+  });
+
+  it('returns null when no row items are available or tomorrow relocation is blocked', () => {
+    expect(
+      getConflictResolutionPlan({
+        row: { items: null, endMins: 600 },
+        rows: rowsNoFree,
+        selectedDate,
+      }),
+    ).toBeNull();
+
+    expect(
+      getConflictResolutionPlan({
+        row,
+        rows: rowsNoFree,
+        selectedDate,
+        canRelocateEvent: () => false,
+      }),
+    ).toBeNull();
   });
 });

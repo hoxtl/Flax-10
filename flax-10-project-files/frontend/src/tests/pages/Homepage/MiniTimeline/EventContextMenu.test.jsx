@@ -64,13 +64,26 @@ describe('EventContextMenu', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
-    it('renders at the given position', () => {
-        renderMenu({ pos: { x: 50, y: 75 } });
-        // EventContextMenu uses createPortal — menu is appended to document.body
-        const menu = document.body.querySelector('.contextMenu');
-        expect(menu.style.getPropertyValue('--ctx-top')).toBe('75px');
-        expect(menu.style.getPropertyValue('--ctx-left')).toBe('50px');
-    });
+  it('renders at the given position', () => {
+    renderMenu({ pos: { x: 50, y: 75 } });
+    // EventContextMenu uses createPortal — menu is appended to document.body
+    const menu = document.body.querySelector('.contextMenu');
+    expect(menu.style.getPropertyValue('--ctx-top')).toBe('75px');
+    expect(menu.style.getPropertyValue('--ctx-left')).toBe('50px');
+  });
+
+  it('handles wrapper mouse and context-menu events', () => {
+    renderMenu();
+    const menu = document.body.querySelector('.contextMenu');
+    const mouseDown = new MouseEvent('mousedown', { bubbles: true });
+    const stopPropagation = vi.spyOn(mouseDown, 'stopPropagation');
+    menu.dispatchEvent(mouseDown);
+    expect(stopPropagation).toHaveBeenCalled();
+
+    const contextMenu = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    menu.dispatchEvent(contextMenu);
+    expect(contextMenu.defaultPrevented).toBe(true);
+  });
 
     it('does not throw when onEdit is undefined', () => {
         renderMenu({ onEdit: undefined });

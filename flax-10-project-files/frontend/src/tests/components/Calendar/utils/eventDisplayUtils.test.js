@@ -160,6 +160,17 @@ describe('getAllDayVisualRange', () => {
         expect(range).not.toBeNull();
     });
 
+    it('keeps a timed event that starts at midnight on the same visual day', () => {
+        const event = makeEvent({
+            start_time: '2026-03-15T00:00:00',
+            end_time: '2026-03-16T10:00:00',
+        });
+        const range = getAllDayVisualRange(event);
+        expect(range).not.toBeNull();
+        expect(range.start.getDate()).toBe(15);
+        expect(range.end.getDate()).toBe(15);
+    });
+
     it('handles timed event starting before midnight - no range if vStart > vEnd', () => {
         // Event from 10pm to 11pm - timed range: vStart rounds up to next day, vEnd rounds down to today
         // vStart (next day) > vEnd (today) so should return null

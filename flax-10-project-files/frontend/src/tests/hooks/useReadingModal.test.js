@@ -8,6 +8,16 @@ const createReadingMock = vi.fn();
 const updateReadingMock = vi.fn();
 const deleteReadingMock = vi.fn();
 
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
 vi.mock("../../api/readingApi", () => ({
   getReadings: (...args) => getReadingsMock(...args),
   createReading: (...args) => createReadingMock(...args),
@@ -73,5 +83,33 @@ describe("useReadingModal", () => {
     act(() => result.current.openCreate());
     expect(result.current.editing).toBeNull();
     expect(result.current.showForm).toBe(true);
+  });
+
+  it("normalizes empty reload responses after deletes", async () => {
+    getReadingsMock
+      .mockResolvedValueOnce([{ id: 1, title: "Week 1" }])
+      .mockResolvedValueOnce(null);
+
+    const { result } = renderHook(() => useReadingModal(12));
+    await waitFor(() => expect(result.current.readings).toEqual([{ id: 1, title: "Week 1" }]));
+
+    await act(async () => {
+      await result.current.handleDelete(1);
+    });
+
+    expect(result.current.readings).toEqual([]);
+  });
+
+  it("ignores late initial loads after unmount", async () => {
+    const pending = deferred();
+    getReadingsMock.mockReturnValueOnce(pending.promise);
+
+    const { unmount } = renderHook(() => useReadingModal(13));
+    unmount();
+
+    await act(async () => {
+      pending.resolve([{ id: 7, title: "Late reading" }]);
+      await pending.promise;
+    });
   });
 });

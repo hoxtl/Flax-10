@@ -12,6 +12,7 @@ describe("tutorPhotoFallback", () => {
   });
 
   it("returns null for unknown users when generic fallbacks are disabled", () => {
+    expect(getTutorPhotoFallback()).toBeNull();
     expect(getTutorPhotoFallback({ fullName: "Mystery Person", username: "mystery" })).toBeNull();
   });
 
@@ -52,5 +53,39 @@ describe("tutorPhotoFallback", () => {
     ).toContain("robohash.org/riley.wood");
 
     expect(getResolvedUserPhoto(null)).toBeNull();
+  });
+
+  it("covers username, id, and name fallbacks when resolving generic avatars", () => {
+    expect(
+      getTutorPhotoFallback({ role: "teacher", allowGeneric: true, seed: "", username: "", fullName: "" }),
+    ).toContain("i.pravatar.cc/96?img=");
+
+    expect(
+      getResolvedUserPhoto({ role: "teacher", user_name: "fallback-user" }, { allowGeneric: true }),
+    ).toContain("i.pravatar.cc/96?img=");
+
+    expect(
+      getResolvedUserPhoto({ id: 42, role: "teacher" }, { allowGeneric: true }),
+    ).toContain("i.pravatar.cc/96?img=");
+
+    expect(
+      getResolvedUserPhoto({ first_name: "Mystery", last_name: "Person", role: "teacher" }, { allowGeneric: true }),
+    ).toContain("i.pravatar.cc/96?img=");
+  });
+
+  it("uses the internal user seed when no generic fallback seed is provided", () => {
+    expect(
+      getTutorPhotoFallback({ role: "teacher", allowGeneric: true, seed: null, username: "", fullName: "" }),
+    ).toContain("i.pravatar.cc/96?img=");
+  });
+
+  it("normalises null and titled values before resolving generic teacher avatars", () => {
+    expect(
+      getTutorPhotoFallback({ fullName: "Dr. Sarah Example", role: "teacher", seed: "teacher-dr", allowGeneric: true }),
+    ).toContain("randomuser.me/api/portraits/women/");
+
+    expect(
+      getTutorPhotoFallback({ fullName: null, username: null, role: "teacher", seed: "teacher-null", allowGeneric: true }),
+    ).toContain("i.pravatar.cc/96?img=");
   });
 });

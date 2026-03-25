@@ -22,7 +22,18 @@ function getViewRange(viewDate) {
 function expandEvent(event, viewStart, viewEnd) {
     const recurrence = event.recurrence || 'none';
     if (recurrence === 'none') return [event];
+    if (!isSupportedRecurrence(recurrence)) {
+        const start = new Date(event.start_time);
+        const end = new Date(event.end_time);
+        return overlapsRange(start, end, viewStart, viewEnd)
+            ? [createOccurrence(event, start, end, 0)]
+            : [];
+    }
     return generateOccurrences(event, recurrence, viewStart, viewEnd);
+}
+
+function isSupportedRecurrence(recurrence) {
+    return ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'].includes(recurrence);
 }
 
 function shouldIncludeOccurrence(start, endDate, exceptions) {
@@ -80,12 +91,14 @@ function getEndDate(event) {
 }
 
 function calcNextOccurrence(baseDate, recurrence, index) {
-    if (recurrence === 'daily') return addDays(baseDate, index);
-    if (recurrence === 'weekly') return addWeeks(baseDate, index);
-    if (recurrence === 'biweekly') return addWeeks(baseDate, index * 2);
-    if (recurrence === 'monthly') return addMonths(baseDate, index);
-    if (recurrence === 'yearly') return addYears(baseDate, index);
-    return baseDate;
+    const calculators = {
+        daily: () => addDays(baseDate, index),
+        weekly: () => addWeeks(baseDate, index),
+        biweekly: () => addWeeks(baseDate, index * 2),
+        monthly: () => addMonths(baseDate, index),
+        yearly: () => addYears(baseDate, index),
+    };
+    return calculators[recurrence]();
 }
 
 function addYears(date, years) {

@@ -32,7 +32,6 @@ function normaliseYearForStorage(year) {
 }
 
 function mergeAccountSettingsToUser(storedUser, settingsPayload) {
-  if (!settingsPayload) return storedUser;
   if (!storedUser) return settingsPayload;
   const updates = buildUserUpdates(settingsPayload);
   if (!Object.keys(updates).length) return storedUser;
@@ -50,7 +49,6 @@ function buildUserUpdates(settingsPayload) {
 }
 
 function saveAuthUser(user) {
-  if (!user) return;
   saveUserToStorage(user);
   window.dispatchEvent(new Event("auth-changed"));
 }

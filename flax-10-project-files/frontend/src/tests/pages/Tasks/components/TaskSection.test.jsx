@@ -4,7 +4,16 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import TaskSection from "../../../../pages/Tasks/components/TaskSection";
 
 vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
-  default: ({ task }) => <div data-testid="task-card">{task.title}</div>,
+  default: ({ task, onEdit }) => (
+    <div data-testid="task-card">
+      <span>{task.title}</span>
+      {onEdit && (
+        <button type="button" onClick={() => onEdit({ title: "Updated" }, { source: "test" })}>
+          Edit row
+        </button>
+      )}
+    </div>
+  ),
 }));
 vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
   default: ({ message }) => <div data-testid="all-complete">{message}</div>,
@@ -40,5 +49,27 @@ describe("TaskSection", () => {
     expect(screen.getByTestId("task-card")).toBeInTheDocument();
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("calls row edit handlers for non-reading lists and renders muted completed counts when collapsed", () => {
+    render(
+      <TaskSection
+        title="Today"
+        emoji="📅"
+        tasks={[{ id: 1, title: "Edit me", task_list: 1 }]}
+        completedCount={2}
+        sortBy="priority"
+        listMap={{ 1: { id: 1, name: "Inbox", idx: 0 } }}
+        lists={[{ id: 1, name: "Inbox" }]}
+        sectionType="today"
+        {...handlers}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit row" }));
+    expect(handlers.onEditTask).toHaveBeenCalledWith(1, { title: "Updated" }, { source: "test" });
+
+    fireEvent.click(screen.getByRole("button", { name: /Today/i }));
+    expect(screen.getByText(/2 done/i)).toBeInTheDocument();
   });
 });

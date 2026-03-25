@@ -42,8 +42,8 @@ function buildAppearanceProps(mode, setMode, theme, setTheme, onSave, isSaving, 
 
 function AppearanceForm({ mode, setMode, theme, setTheme, onSave, isSaving, hasUnsaved, saveSignal, onSaved }) {
   const handleChange = (next) => {
-    if (next.mode) setMode(next.mode);
-    if (next.theme) setTheme(next.theme);
+    setMode(next.mode);
+    setTheme(next.theme);
   };
   return (
     <form onSubmit={(event) => handleAppearanceSubmit(event, { mode, theme }, onSave, hasUnsaved, onSaved)}>

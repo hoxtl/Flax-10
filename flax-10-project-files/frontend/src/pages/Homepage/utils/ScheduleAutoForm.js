@@ -48,9 +48,9 @@ function compareByDueDate(left, right) {
 }
 
 function buildDeadlinePreference(deadline) {
-  const tier = getUrgencyTier(deadline.start_due_date) || 'upcoming';
+  const tier = getUrgencyTier(deadline.start_due_date);
   return {
     deadline_id: Number(deadline.id),
-    ideal_minutes_per_day: MINUTES_BY_URGENCY[tier] || 45,
+    ideal_minutes_per_day: MINUTES_BY_URGENCY[tier],
   };
 }

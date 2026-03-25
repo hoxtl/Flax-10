@@ -105,4 +105,19 @@ describe("SuggestedReadingsSection", () => {
     expect(await screen.findByText("R1")).toBeInTheDocument();
     expect(screen.getByText("R2")).toBeInTheDocument();
   });
+
+  it("uses default task arrays and normalises null suggestions", async () => {
+    getSuggestedReadings.mockResolvedValueOnce(null);
+    getReadingSpeed.mockResolvedValueOnce({ is_personalised: false, avg_min_per_page: 2 });
+
+    render(
+      <SuggestedReadingsSection
+        activeList={{ id: 12, name: "Reading List - History" }}
+        taskCount={0}
+      />,
+    );
+
+    expect(await screen.findByText("No suggested readings right now.")).toBeInTheDocument();
+    expect(screen.getByText("Average speed estimate")).toBeInTheDocument();
+  });
 });

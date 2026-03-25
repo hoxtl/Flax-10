@@ -33,5 +33,5 @@ function findAccentKey(context) {
 export function getEventAccentColor(title, tagName) {
   const context = getEventContext(title, tagName);
   const accentKey = findAccentKey(context);
-  return EVENT_ACCENTS[accentKey] || EVENT_ACCENTS.default;
+  return EVENT_ACCENTS[accentKey];
 }

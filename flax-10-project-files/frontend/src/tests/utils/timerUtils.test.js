@@ -126,6 +126,15 @@ describe('timerUtils: useCompletionCheck', () => {
         expect(setIsActive).toHaveBeenCalledWith(false);
         expect(startNext).toHaveBeenCalled();
     });
+
+    it('calls onWorkComplete when a work session ends with break time remaining', () => {
+        const onWorkComplete = vi.fn();
+        const timer = { mode: 'work', timeLeft: 0, isActive: true, breakTime: 5, setIsActive: vi.fn() };
+
+        renderHook(() => useCompletionCheck(timer, vi.fn(), vi.fn(), onWorkComplete));
+
+        expect(onWorkComplete).toHaveBeenCalledWith(timer);
+    });
 });
 
 describe('timerUtils: useNotificationPermission', () => {
@@ -185,6 +194,23 @@ describe('timerUtils: useNotificationPermission', () => {
         const { result } = renderHook(() => useNotificationPermission());
         await act(async () => { await result.current.request(); });
         expect(requestPermission).toHaveBeenCalled();
+        vi.unstubAllGlobals();
+    });
+
+    it('keeps the same permission value when polling sees no external change', async () => {
+        const requestPermission = vi.fn().mockResolvedValue('granted');
+        vi.stubGlobal('Notification', Object.assign(vi.fn(), {
+            permission: 'granted',
+            requestPermission,
+        }));
+        vi.useFakeTimers();
+
+        const { result } = renderHook(() => useNotificationPermission());
+        await act(async () => { vi.advanceTimersByTime(1100); });
+
+        expect(result.current.permission).toBe('granted');
+
+        vi.useRealTimers();
         vi.unstubAllGlobals();
     });
 });

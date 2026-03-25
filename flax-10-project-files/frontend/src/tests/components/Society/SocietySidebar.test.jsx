@@ -99,6 +99,24 @@ describe('SocietySidebar', () => {
     await waitFor(() => expect(screen.queryByText('submit-event')).toBeNull());
   });
 
+  it('closes the event modal even when no add-event handler is provided', async () => {
+    render(<SocietySidebar society={baseSociety()} editMode tags={[]} />);
+
+    fireEvent.click(screen.getByText('+ Add Event'));
+    fireEvent.click(await screen.findByText('submit-event'));
+
+    await waitFor(() => expect(screen.queryByText('submit-event')).toBeNull());
+  });
+
+  it('closes the event modal without submitting a new event', async () => {
+    render(<SocietySidebar society={baseSociety()} editMode tags={[]} />);
+
+    fireEvent.click(screen.getByText('+ Add Event'));
+    fireEvent.click(await screen.findByText('close-event'));
+
+    await waitFor(() => expect(screen.queryByText('submit-event')).toBeNull());
+  });
+
   it('announcement submit without conflicting pinned does not call onUpdateAnnouncement', async () => {
     const onAddAnnouncement = vi.fn();
     const onUpdateAnnouncement = vi.fn();

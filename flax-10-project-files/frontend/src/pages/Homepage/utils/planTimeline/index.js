@@ -22,7 +22,7 @@ function buildEntries(inWindow, now, dayTasks, tasksDueToday) {
 }
 
 function sortRows(rows) {
-  return [...rows].sort((a, b) => (a.startMins ?? 0) - (b.startMins ?? 0));
+  return [...rows].sort((a, b) => a.startMins - b.startMins);
 }
 
 export { CAMPUS_DISPLAY } from "./constants";
