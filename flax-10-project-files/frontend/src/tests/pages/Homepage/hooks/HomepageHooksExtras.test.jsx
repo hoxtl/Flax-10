@@ -26,7 +26,7 @@ const conflictMocks = vi.hoisted(() => ({
   buildConflictResolutionToastMessage: vi.fn(),
 }));
 
-vi.mock("../../../../components/Common/RescheduleEvents/rescheduleEventConflicts", () => conflictMocks);
+vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => conflictMocks);
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Mocks for useCountdown

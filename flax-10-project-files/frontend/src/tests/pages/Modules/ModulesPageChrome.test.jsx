@@ -53,11 +53,13 @@ vi.mock("../../../components/Modules/Readings/ReadingModal.jsx", () => ({
 }));
 
 import {
+  AnimatedContent,
   DetailsView,
   FormView,
   getViewKey,
   ModulesPageModals,
   ModulesSkeleton,
+  TestModeContent,
 } from "../../../pages/Modules/ModulesPageChrome";
 
 function buildState(overrides = {}) {
@@ -139,5 +141,41 @@ describe("ModulesPageChrome", () => {
     fireEvent.click(screen.getByText("Close reading"));
     expect(state.setDeadlineModule).toHaveBeenCalledWith(null);
     expect(state.setReadingModule).toHaveBeenCalledWith(null);
+  });
+
+  it("returns null for page modals when form or details are active", () => {
+    const { rerender, container } = render(<ModulesPageModals state={buildState({ showForm: true })} />);
+    expect(container).toBeEmptyDOMElement();
+
+    rerender(<ModulesPageModals state={buildState({ viewingModule: { id: 1, module_code: "CS101" } })} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("covers test-mode and animated content branches", () => {
+    const MainView = ({ state }) => <div>{`Main ${state.viewingModule ? "details" : "list"}`}</div>;
+
+    const createState = buildState({ showForm: true, viewingModule: null, editingModule: null });
+    const { rerender } = render(<TestModeContent state={createState} MainView={MainView} />);
+    expect(screen.getByText("New module")).toBeInTheDocument();
+
+    const detailsState = buildState({ showForm: false, viewingModule: { id: 2, module_code: "CS202", module_name: "Algorithms" } });
+    rerender(<TestModeContent state={detailsState} MainView={MainView} />);
+    expect(screen.getByText("CS202")).toBeInTheDocument();
+
+    const listState = buildState({ showForm: false, viewingModule: null, deadlineModule: { module_code: "CS303" } });
+    rerender(<TestModeContent state={listState} MainView={MainView} />);
+    expect(screen.getByText("Main list")).toBeInTheDocument();
+    expect(screen.getByText("Deadline CS303")).toBeInTheDocument();
+
+    const editState = buildState({ showForm: true, viewingModule: null, editingModule: { id: 3, module_code: "CS303" } });
+    rerender(<AnimatedContent state={editState} viewKey="edit" MainView={MainView} />);
+    fireEvent.click(screen.getByText("Save module"));
+    expect(editState.hook.handleModuleUpdated).toHaveBeenCalledWith({ id: 9, module_code: "CS9" });
+    expect(editState.setEditingModule).toHaveBeenCalledWith(null);
+
+    const freshState = buildState({ showForm: true, viewingModule: null, editingModule: null });
+    rerender(<AnimatedContent state={freshState} viewKey="create" MainView={MainView} />);
+    fireEvent.click(screen.getByText("Cancel module form"));
+    expect(freshState.setShowForm).toHaveBeenCalledWith(false);
   });
 });
