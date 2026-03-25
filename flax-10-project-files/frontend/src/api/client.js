@@ -13,7 +13,9 @@ export async function fetchApi(endpoint, options = {}) {
 
 function buildRequestConfig(options) {
   const token = localStorage.getItem('token');
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  const isFormData = options.body instanceof FormData;
+  const headers = { ...options.headers };
+  if (!isFormData && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
   if (token) headers['Authorization'] = `Token ${token}`;
   return { ...options, headers };
 }
