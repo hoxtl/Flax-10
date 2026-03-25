@@ -1,4 +1,4 @@
-/**
+/*
  * Modal to create a new task list (name + colour). Subcomponents keep main fn under 20 lines.
  */
 
@@ -6,6 +6,7 @@ import { useState } from "react";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import styles from "./CreateListModal.module.css";
 import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
 
 function CreateListModalBody({ name, setName, color, setColor, onEnter }) {
   return (

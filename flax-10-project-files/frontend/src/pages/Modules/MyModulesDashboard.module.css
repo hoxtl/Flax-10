@@ -1,0 +1,21 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  min-width: 0;
+}
+
+.widgetRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .widgetRow {
+    grid-template-columns: 1fr;
+  }
+}

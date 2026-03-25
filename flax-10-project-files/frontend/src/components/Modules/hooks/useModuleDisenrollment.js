@@ -1,15 +1,20 @@
+/*
+ * Hook for handling module disenrolment with notifications.
+ */
+
 import { useNotifications } from '../../../context/NotificationContext';
 import { disenrolByModuleId } from '../../../api/moduleApi';
 import { createNotify } from '../utils/notifyHelper';
 
-async function disenrollFromModule(moduleId, onSuccess, notify) {
-    try {
-        await disenrolByModuleId(moduleId);
-        notify('Successfully left the module!', 'success');
-        if (onSuccess) onSuccess();
-    } catch (err) {
-        notify(err.message, 'error');
-    }
+function handleSuccess(onSuccess, notify) {
+    notify('Successfully left the module!', 'success');
+    if (onSuccess) onSuccess();
+}
+
+function disenrollFromModule(moduleId, onSuccess, notify) {
+    return disenrolByModuleId(moduleId)
+        .then(() => handleSuccess(onSuccess, notify))
+        .catch(err => notify(err.message, 'error'));
 }
 
 export function useModuleDisenrollment() {

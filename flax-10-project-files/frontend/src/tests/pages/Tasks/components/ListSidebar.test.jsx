@@ -1,9 +1,9 @@
-/**
+/*
  * Tests for ListSidebar.
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "../../../../utils/test-utils";
 import ListSidebar from "../../../../pages/Tasks/components/ListSidebar";
 
 describe("ListSidebar", () => {

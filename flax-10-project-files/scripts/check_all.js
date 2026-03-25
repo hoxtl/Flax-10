@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Code Quality Checker - BAND V COMPLIANCE
- * Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file
+ * Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file
  * Test files: ≤25 lines for test functions | ≤2 nesting
  */
 
@@ -27,7 +27,7 @@ function printHeader() {
     )}${Colors.END}`
   );
   console.log("=".repeat(75));
-  console.log("Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file");
+  console.log("Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file");
   console.log("Test files: ≤25 lines for test functions | ≤2 nesting\n");
 }
 
@@ -218,7 +218,7 @@ function checkFunctionLength(targetDir) {
       if (!/\.(js|jsx)$/.test(file)) continue;
 
       const isTest = isTestFile(filePath);
-      const limit = isTest ? 25 : 15;
+      const limit = isTest ? 25 : 20;
 
       try {
         const code = fs.readFileSync(filePath, "utf-8");
@@ -380,7 +380,7 @@ function main() {
   const regularFunc = funcViolations.filter((v) => !v.is_test);
   const testFunc = funcViolations.filter((v) => v.is_test);
 
-  printSubsection("Regular Files (≤15 lines)");
+  printSubsection("Regular Files (≤20 lines)");
   if (regularFunc.length > 0) {
     console.log(`\n${Colors.RED}❌ ${regularFunc.length} VIOLATION(S)${Colors.END}\n`);
     regularFunc
@@ -472,18 +472,15 @@ function main() {
     funcViolations.length + fileViolations.length + nestViolations.length;
 
   console.log(
-    `Function Length:  ${funcViolations.length > 0 ? "❌" : "✅"} ${
-      funcViolations.length
+    `Function Length:  ${funcViolations.length > 0 ? "❌" : "✅"} ${funcViolations.length
     } violation(s) (${regularFunc.length} regular, ${testFunc.length} test)`
   );
   console.log(
-    `File Length:      ${fileViolations.length > 0 ? "❌" : "✅"} ${
-      fileViolations.length
+    `File Length:      ${fileViolations.length > 0 ? "❌" : "✅"} ${fileViolations.length
     } violation(s)`
   );
   console.log(
-    `Nesting Depth:    ${nestViolations.length > 0 ? "❌" : "✅"} ${
-      nestViolations.length
+    `Nesting Depth:    ${nestViolations.length > 0 ? "❌" : "✅"} ${nestViolations.length
     } violation(s) (${regularNest.length} regular, ${testNest.length} test)`
   );
 

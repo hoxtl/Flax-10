@@ -33,7 +33,7 @@ describe('RecurrenceField', () => {
 
     it('should show interval input when frequency is not none', () => {
         render(<RecurrenceField value={{ frequency: 'daily' }} onChange={mockOnChange} />);
-        expect(screen.getByText('Every')).toBeInTheDocument();
+        expect(screen.getAllByText('Every').length).toBeGreaterThan(0);
     });
 
     it('should call onChange when frequency changes', () => {
@@ -46,8 +46,8 @@ describe('RecurrenceField', () => {
 
     it('should call onChange when interval changes', () => {
         render(<RecurrenceField value={{ frequency: 'daily', interval: 1 }} onChange={mockOnChange} />);
-        const input = screen.getByRole('spinbutton');
-        fireEvent.change(input, { target: { value: '2' } });
+        const inputs = screen.getAllByRole('spinbutton');
+        fireEvent.change(inputs[0], { target: { value: '2' } });
         expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ interval: '2' }));
     });
 

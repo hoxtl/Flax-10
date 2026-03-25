@@ -1,4 +1,9 @@
+/*
+ * Card shown when a section has no tasks or all are complete.
+ */
+
 import styles from "./AllTasksCompleteCard.module.css";
+import CelebrationEmoji from "../../../components/common/motion/CelebrationEmoji";
 
 function CtaBlock({ ctaLabel, onCtaClick, children }) {
   const hasButton = ctaLabel != null && typeof onCtaClick === "function";
@@ -12,9 +17,6 @@ function CtaBlock({ ctaLabel, onCtaClick, children }) {
   );
 }
 
-/**
- * Card shown when a section has no tasks or all complete. Supports emoji, message, optional CTA.
- */
 export default function AllTasksCompleteCard({
   emoji = "🎉",
   message,
@@ -25,7 +27,7 @@ export default function AllTasksCompleteCard({
 }) {
   return (
     <div className={styles.card}>
-      <span className={styles.emoji} aria-hidden>{emoji}</span>
+      <CelebrationEmoji emoji={emoji} className={styles.emoji} />
       <p className={styles.message}>{message}</p>
       {sub && <p className={styles.sub}>{sub}</p>}
       <CtaBlock ctaLabel={ctaLabel} onCtaClick={onCtaClick}>{children}</CtaBlock>

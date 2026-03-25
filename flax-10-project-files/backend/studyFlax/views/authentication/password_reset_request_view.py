@@ -24,6 +24,7 @@ EMAIL_SEND_ERRORS = (
 
 def _send_reset_email(user_email):
     """Invalidate existing tokens and dispatch a new password reset email."""
+
     user = User.objects.get(email__iexact=user_email)
     ResetPasswordToken.objects.filter(user=user, token_used=False).update(token_used=True)
     new_token = ResetPasswordToken.create_user_token(user)
@@ -45,21 +46,34 @@ def _email_error_response(exc):
     logger.debug("Error details", exc_info=exc)
     return Response({'error': "Error when sending reset password email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(['POST'])
-def reset_password_view(request):
-    """Send a password reset email if an account with the given address exists."""
-    serialiser, error_response = _validated_reset_serialiser(request)
-    if error_response:
-        return error_response
+
+def _dispatch_reset_email(serialiser):
+    _send_reset_email(serialiser.validated_data['email'])
+    logger.info("Password reset link sent successfully")
+
+
+def _handle_missing_user():
+    logger.warning("No user with such email found")
+
+
+def _reset_password_result(serialiser):
     try:
-        _send_reset_email(serialiser.validated_data['email'])
-        logger.info("Password reset link sent successfully")
+        _dispatch_reset_email(serialiser)
     except ValidationError as exc:
         return _validation_error_response(exc)
     except User.DoesNotExist:
-        logger.warning("No user with such email found")
+        _handle_missing_user()
     except EMAIL_SEND_ERRORS as exc:
         return _email_error_response(exc)
     except Exception as exc:
         return _email_error_response(exc)
     return Response({'message': "Reset password email sent."}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def reset_password_view(request):
+    """Send a password reset email if an account with the given address exists."""
+
+    serialiser, error_response = _validated_reset_serialiser(request)
+    if error_response:
+        return error_response
+    return _reset_password_result(serialiser)

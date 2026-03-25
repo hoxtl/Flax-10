@@ -8,10 +8,11 @@ from studyFlax.models import Enrollment
 class EnrollmentSerialiser(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.first_name', read_only=True)
     module_name = serializers.CharField(source='module.module_name', read_only=True)
+    module_code = serializers.CharField(source='module.module_code', read_only=True)
 
     class Meta:
         model = Enrollment
-        fields = ['id', 'student', 'student_name', 'module', 'module_name', 'enrolled_at']
+        fields = ['id', 'student', 'student_name', 'module', 'module_name', 'module_code', 'enrolled_at']
         read_only_fields = ['student']
 
     def validate(self, validated_data):

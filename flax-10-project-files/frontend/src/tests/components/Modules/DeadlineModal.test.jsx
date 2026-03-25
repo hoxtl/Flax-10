@@ -1,6 +1,10 @@
+/*
+ * Tests for DeadlineModal component.
+ */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DeadlineModal from '../../../components/Modules/DeadlineModal';
+import DeadlineModal from '../../../components/Modules/Deadlines/DeadlineModal';
 
 // Const values for the test Modal
 const mockModal = {
@@ -18,7 +22,7 @@ vi.mock('../../../components/Modules/hooks/useDeadlineModal', () => ({
     useDeadlineModal: () => mockModal,
 }));
 
-vi.mock('../../../components/Modules/DeadlineForm', () => ({
+vi.mock('../../../components/Modules/Deadlines/DeadlineForm', () => ({
     default: ({ onCancel, onSubmit }) => (
         <div>
             <button onClick={onCancel}>Cancel</button>
@@ -27,7 +31,7 @@ vi.mock('../../../components/Modules/DeadlineForm', () => ({
     ),
 }));
 
-vi.mock('../DeadlineCard', () => ({
+vi.mock('../../../components/Modules/Deadlines/DeadlineCard', () => ({
     default: ({ deadline, onEdit, onDelete }) => (
         <div>
             <span>{deadline.title}</span>
@@ -37,7 +41,7 @@ vi.mock('../DeadlineCard', () => ({
     ),
 }));
 
-vi.mock('../DeadlineModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/Deadlines/DeadlineModal.module.css', () => ({ default: {} }));
 
 const module = { id: 1, module_code: '5CCS2SEG' };
 
@@ -56,7 +60,7 @@ describe('DeadlineModal', () => {
     it('should call onClose when close button is clicked', () => {
         const onClose = vi.fn();
         render(<DeadlineModal module={module} onClose={onClose} />);
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalled();
     });
 
@@ -92,8 +96,9 @@ describe('DeadlineModal', () => {
 
     it('calls onClose when backdrop is clicked', () => {
         const onClose = vi.fn();
-        const { container } = render(<DeadlineModal module={module} onClose={onClose} />);
-        const backdrop = container.querySelector('[class*="backdrop"]');
+        render(<DeadlineModal module={module} onClose={onClose} />);
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]') || document.body.querySelector('[class*="backdrop"]');
+        expect(backdrop).toBeTruthy();
         fireEvent.mouseDown(backdrop);
         expect(onClose).toHaveBeenCalled();
     });

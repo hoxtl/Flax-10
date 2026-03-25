@@ -1,120 +1,169 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy({}, {
-        get: (_, tag) => ({ children, ...props }) => {
-            const Tag = typeof tag === 'string' ? tag : 'div';
-            return <Tag {...props}>{children}</Tag>;
-        },
-    }),
-    AnimatePresence: ({ children }) => <>{children}</>,
+const state = vi.hoisted(() => ({
+  dashboard: {
+    edit: false,
+    layout: ["hero", "rightNow"],
+    handleRandomize: vi.fn(),
+    handleReset: vi.fn(),
+    setEdit: vi.fn(),
+    setLayout: vi.fn(),
+    setShowAdd: vi.fn(),
+    setWidgetSize: vi.fn(),
+    showAdd: true,
+    widgetSizes: { hero: { row: 2 } },
+    showResetConfirm: false,
+    setShowResetConfirm: vi.fn(),
+  },
+  renderIntelligenceWidget: vi.fn(() => <div data-testid="rendered-widget">widget</div>),
 }));
 
-vi.mock('../../../api/tflService', () => ({
-    tflService: { getTfLDelays: vi.fn().mockResolvedValue([]) },
+vi.mock("../../../context/AuthContext", () => ({
+  useAuth: () => ({
+    profile: { id: 7, role: "student" },
+    user: { id: 7, role: "student" },
+  }),
 }));
 
-vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
-    useProfileSummary: vi.fn(() => ({
-        summary: {
-            weekly: { percentage: 72 },
-            streaks: { current: 3 },
-        },
-        loading: false,
-    })),
+vi.mock("../../../components/common", () => ({
+  ConfirmModal: ({ title, message, onConfirm, onCancel }) => (
+    <div data-testid="confirm-modal">
+      <h2>{title}</h2>
+      <p>{message}</p>
+      <button type="button" onClick={onConfirm}>confirm reset</button>
+      <button type="button" onClick={onCancel}>cancel reset</button>
+    </div>
+  ),
 }));
 
-vi.mock('../../../pages/Homepage/components/SocialDiscoverWidget', () => ({
-    SocialDiscoverWidget: () => <div data-testid="social-discover-widget" />,
+vi.mock("../../../pages/Homepage/components/IntelligenceGrid", () => ({
+  default: (props) => (
+    <div data-testid="intelligence-grid">
+      <div data-testid="grid-props">{JSON.stringify({
+        catalogue: props.catalogue,
+        edit: props.edit,
+        layout: props.layout,
+        showAdd: props.showAdd,
+      })}</div>
+      <button type="button" onClick={() => props.widgetRenderer("hero", { row: 4 })}>render hero</button>
+      <button type="button" onClick={() => props.widgetRenderer("todayTasks", { row: 1 })}>render today tasks</button>
+      <button type="button" onClick={() => props.widgetRenderer("deadlines", { row: 1 })}>render deadlines</button>
+    </div>
+  ),
 }));
 
-vi.mock('../../../components/ui/bento-grid', () => ({
-    BentoGrid: ({ children }) => <div data-testid="bento-grid">{children}</div>,
-    BentoCard: ({ children, className }) => <div data-testid="bento-card" className={className}>{children}</div>,
+vi.mock("../../../pages/Homepage/components/IntelligenceWidgetRenderer", () => ({
+  renderIntelligenceWidget: (...args) => state.renderIntelligenceWidget(...args),
 }));
 
-import IntelligenceRow from '../../../pages/Homepage/components/IntelligenceRow';
+vi.mock("../../../pages/Homepage/hooks/useIntelligenceDashboard", () => ({
+  CATALOGUE: ["hero", "rightNow", "todayTasks"],
+  DEFAULT_LAYOUT: ["hero", "deadlines", "todayTasks", "bigTimeline"],
+  getSemesterProgress: vi.fn(),
+  useIntelligenceDashboard: () => state.dashboard,
+}));
 
-function renderRow(props = {}) {
-    return render(
-        <MemoryRouter>
-            <IntelligenceRow {...props} />
-        </MemoryRouter>
+import IntelligenceRow from "../../../pages/Homepage/components/IntelligenceRow";
+
+describe("IntelligenceRow", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.dashboard = {
+      edit: false,
+      layout: ["hero", "rightNow"],
+      handleRandomize: vi.fn(),
+      handleReset: vi.fn(),
+      setEdit: vi.fn(),
+      setLayout: vi.fn(),
+      setShowAdd: vi.fn(),
+      setWidgetSize: vi.fn(),
+      showAdd: true,
+      widgetSizes: { hero: { row: 2 } },
+      showResetConfirm: false,
+      setShowResetConfirm: vi.fn(),
+    };
+  });
+
+  it("renders the intelligence grid shell", () => {
+    render(<IntelligenceRow />);
+    expect(screen.getByTestId("intelligence-grid")).toBeInTheDocument();
+  });
+
+  it("passes dashboard grid props through", () => {
+    render(<IntelligenceRow />);
+    expect(screen.getByTestId("grid-props").textContent).toContain('"catalogue":["hero","rightNow","todayTasks"]');
+    expect(screen.getByTestId("grid-props").textContent).toContain('"layout":["hero","rightNow"]');
+    expect(screen.getByTestId("grid-props").textContent).toContain('"showAdd":true');
+  });
+
+  it("delegates slot1TodayTasks through widget rendering", () => {
+    render(<IntelligenceRow slot1TodayTasks={<div data-testid="today-tasks">Tasks</div>} />);
+    fireEvent.click(screen.getByText("render today tasks"));
+    expect(state.renderIntelligenceWidget).toHaveBeenCalledWith(
+      "todayTasks",
+      expect.objectContaining({ slot1TodayTasks: expect.any(Object) }),
+      { row: 1 },
     );
-}
+  });
 
-describe('IntelligenceRow', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+  it("delegates slot3Urgent through widget rendering", () => {
+    render(<IntelligenceRow slot3Urgent={<div data-testid="urgent">Urgent</div>} />);
+    fireEvent.click(screen.getByText("render deadlines"));
+    expect(state.renderIntelligenceWidget).toHaveBeenCalledWith(
+      "deadlines",
+      expect.objectContaining({ slot3Urgent: expect.any(Object) }),
+      { row: 1 },
+    );
+  });
 
-    it('renders the bento grid', () => {
-        renderRow();
-        expect(screen.getByTestId('bento-grid')).toBeTruthy();
-    });
+  it("passes displayName into widget rendering when provided", () => {
+    render(<IntelligenceRow displayName="Alice" />);
+    fireEvent.click(screen.getByText("render hero"));
+    expect(state.renderIntelligenceWidget).toHaveBeenCalledWith(
+      "hero",
+      expect.objectContaining({ displayName: "Alice" }),
+      { row: 4 },
+    );
+  });
 
-    it('renders live context summary in the banner', () => {
-        renderRow();
-        expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy();
-    });
+  it("passes undefined displayName through without crashing", () => {
+    render(<IntelligenceRow displayName={undefined} />);
+    fireEvent.click(screen.getByText("render hero"));
+    expect(state.renderIntelligenceWidget).toHaveBeenCalledWith(
+      "hero",
+      expect.objectContaining({ displayName: undefined }),
+      { row: 4 },
+    );
+  });
 
-    it('renders analytics summary in the banner', () => {
-        renderRow();
-        expect(screen.getByText(/weekly goal/i)).toBeTruthy();
-        expect(screen.getByText(/streak/i)).toBeTruthy();
-    });
+  it("passes the auth profile into widget rendering", () => {
+    render(<IntelligenceRow />);
+    fireEvent.click(screen.getByText("render hero"));
+    expect(state.renderIntelligenceWidget).toHaveBeenCalledWith(
+      "hero",
+      expect.objectContaining({ profile: expect.objectContaining({ role: "student" }) }),
+      { row: 4 },
+    );
+  });
 
-    it('renders slot1TodayTasks content', () => {
-        renderRow({ slot1TodayTasks: <div data-testid="today-tasks">Tasks</div> });
-        expect(screen.getByTestId('today-tasks')).toBeTruthy();
-    });
+  it("does not render the reset modal when confirmation is hidden", () => {
+    render(<IntelligenceRow />);
+    expect(screen.queryByTestId("confirm-modal")).not.toBeInTheDocument();
+  });
 
-    it('renders slot3Urgent content', () => {
-        renderRow({ slot3Urgent: <div data-testid="urgent">Urgent</div> });
-        expect(screen.getByTestId('urgent')).toBeTruthy();
-    });
+  it("confirms reset by restoring the default layout", () => {
+    state.dashboard.showResetConfirm = true;
+    render(<IntelligenceRow />);
+    fireEvent.click(screen.getByText("confirm reset"));
+    expect(state.dashboard.setLayout).toHaveBeenCalledWith(["hero", "deadlines", "todayTasks", "bigTimeline"]);
+    expect(state.dashboard.setShowResetConfirm).toHaveBeenCalledWith(false);
+  });
 
-    it('renders greeting with displayName', () => {
-        renderRow({ displayName: 'Alice' });
-        expect(screen.getByText(/Alice/)).toBeTruthy();
-    });
-
-    it('renders greeting without displayName', () => {
-        renderRow({ displayName: undefined });
-        // greeting should contain "Good" but no name
-        const text = screen.getByText(/^Good (Morning|Afternoon|Evening)\.$/);
-        expect(text).toBeTruthy();
-    });
-
-    it('handles TfL getTfLDelays rejection', async () => {
-        const { tflService } = await import('../../../api/tflService');
-        tflService.getTfLDelays.mockRejectedValueOnce(new Error('Network error'));
-        renderRow();
-        await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
-    });
-
-    it('handles TfL getTfLDelays returning non-array', async () => {
-        const { tflService } = await import('../../../api/tflService');
-        tflService.getTfLDelays.mockResolvedValueOnce({ data: [] });
-        renderRow();
-        await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
-    });
-
-    it('shows event-specific TfL warning for the next KCL event', async () => {
-        const { tflService } = await import('../../../api/tflService');
-        tflService.getTfLDelays.mockResolvedValueOnce([
-            { lineName: 'Northern', severityDescription: 'Minor delays' },
-        ]);
-        const start = new Date(Date.now() + 60 * 60 * 1000);
-        const end = new Date(Date.now() + 2 * 60 * 60 * 1000);
-        const kclEvent = { id: 1, title: 'Algorithms Lecture', location: 'Strand Campus',
-            start_time: start.toISOString(), end_time: end.toISOString() };
-        renderRow({ slot5Data: { now: new Date(), sortedEvents: [kclEvent] } });
-        await waitFor(() => {
-            expect(screen.getByText(/you may be late for your/i)).toBeTruthy();
-            expect(screen.getByText(/Algorithms Lecture/)).toBeTruthy();
-        });
-    });
+  it("cancels reset by hiding the confirmation modal", () => {
+    state.dashboard.showResetConfirm = true;
+    render(<IntelligenceRow />);
+    fireEvent.click(screen.getByText("cancel reset"));
+    expect(state.dashboard.setShowResetConfirm).toHaveBeenCalledWith(false);
+  });
 });

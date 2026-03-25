@@ -14,3 +14,33 @@ from .society.society_serialisers import (
     SocietyTagSerialiser, SocietyAnnouncementSerialiser, SocietyEventSerialiser,
     SocietyEventCalendarSerialiser, get_society_color
 )
+from .schedule_serialiser import (
+    ScheduleSerialiser,
+    AutoScheduleRequestSerialiser,
+    ScheduleEventAllocationSerialiser,
+)
+
+_ = (
+    CalendarEventSerialiser,
+    CalendarEventCreateSerialiser,
+    TagSerialiser,
+    CategorySerialiser,
+    DeadlineSerialiser,
+    ModuleSerialiser,
+    EnrollmentSerialiser,
+    RegistrationUserSerialiser,
+    UserSerialiser,
+    LoggedUserSerialiser,
+    NotificationSerialiser,
+    SocietyListSerialiser,
+    SocietyDetailSerialiser,
+    SocietyMembershipSerialiser,
+    SocietyTagSerialiser,
+    SocietyAnnouncementSerialiser,
+    SocietyEventSerialiser,
+    SocietyEventCalendarSerialiser,
+    get_society_color,
+    ScheduleSerialiser,
+    AutoScheduleRequestSerialiser,
+    ScheduleEventAllocationSerialiser,
+)

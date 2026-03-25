@@ -52,11 +52,31 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
     SearchButton: ({ value, onChange }) => (
         <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
     ),
+    FilterDropdownButton: ({ active, onChange }) => (
+        <button type="button" onClick={() => onChange('work')}>Filter {Array.isArray(active) ? active.join(',') : active}</button>
+    ),
+    ScheduleManagerButton: () => <button type="button">Reschedule my events</button>,
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
+
+vi.mock('../../../components/TimetableImportModal', () => {
+    const React = require('react');
+    function MockTimetableImportModal({ onClose, onImport }) {
+        const [url, setUrl] = React.useState('');
+        return (
+            <div>
+                <h2>Import Timetable</h2>
+                <input placeholder="https://example.com/timetable.ics" value={url} onChange={e => setUrl(e.target.value)} />
+                <button type="button" onClick={onClose}>Close</button>
+                <button type="button" onClick={() => onImport(url)}>Import</button>
+            </div>
+        );
+    }
+    return { default: MockTimetableImportModal };
+});
 
 const mockDispatch = vi.fn();
 const mockOpenModal = vi.fn();
@@ -120,6 +140,18 @@ describe('CalendarHeader', () => {
             type: 'SET_VIEW_MODE',
             payload: 'week',
         });
+    });
+
+    it('renders reschedule control', () => {
+        setup();
+        expect(screen.getByText('Reschedule my events')).toBeInTheDocument();
+    });
+
+    it('hides add and schedule actions when viewing a shared calendar', () => {
+        setup({ ...defaultState, sharedCalendarUserId: '44', sharedCalendarName: 'Jane Doe' });
+        expect(screen.queryByText('Reschedule my events')).not.toBeInTheDocument();
+        expect(screen.queryByText('+')).not.toBeInTheDocument();
+        expect(screen.queryByText('Import timetable')).not.toBeInTheDocument();
     });
 
     it('should open modal on adding event', () => {
@@ -198,7 +230,7 @@ describe('CalendarHeader', () => {
         setup();
         fireEvent.click(screen.getByText('Import timetable'));
         await screen.findByText('Import Timetable');
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
 
@@ -207,20 +239,6 @@ describe('CalendarHeader', () => {
         const addBtn = screen.getByText('+');
         fireEvent.click(addBtn);
         expect(mockOpenModal).toHaveBeenCalledWith(null, null, defaultState.selectedDate);
-    });
-
-    it('should navigate correctly in year view', () => {
-        setup({ ...defaultState, viewMode: 'year' });
-        const nextBtn = screen.getByText('>');
-        fireEvent.click(nextBtn);
-
-        expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'SET_SELECTED_DATE',
-            payload: expect.any(Date)
-        });
-        const callArgs = mockDispatch.mock.calls[0][0];
-        // 2026 + 1 = 2027
-        expect(callArgs.payload.getFullYear()).toBe(2027);
     });
 
     it('should navigate correctly in week view', () => {
@@ -248,18 +266,21 @@ describe('CalendarHeader', () => {
         expect(callArgs.payload.getDate()).toBe(14);
     });
 
-    it('should dispatch SET_SELECTED_DATE and SET_VIEW_MODE when clicking a date card in day view', () => {
+    it('should dispatch SET_SELECTED_DATE and SET_VIEW_MODE when clicking a date card in day view on mobile', () => {
+        const originalInnerWidth = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 500 });
         setup({ ...defaultState, viewMode: 'day' });
         const dateCards = document.querySelectorAll('.date-card');
         expect(dateCards.length).toBeGreaterThan(0);
         fireEvent.click(dateCards[0]);
         expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'SET_SELECTED_DATE' }));
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
+        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: originalInnerWidth });
     });
 
-    it('hides Today button when in month view and selected month is current month', () => {
+    it('hides Today button when the selected date is today', () => {
         const now = new Date();
-        setup({ selectedDate: new Date(now.getFullYear(), now.getMonth(), 15), viewMode: 'month' });
+        setup({ selectedDate: new Date(now.getFullYear(), now.getMonth(), now.getDate()), viewMode: 'month' });
         expect(screen.queryByText('Today')).not.toBeInTheDocument();
     });
 
@@ -273,11 +294,4 @@ describe('CalendarHeader', () => {
         Object.defineProperty(window, 'innerWidth', { value: originalInnerWidth, configurable: true });
     });
 
-    it('navigate prev in year view decrements year', () => {
-        setup({ ...defaultState, viewMode: 'year' });
-        const prevBtn = screen.getByText('<');
-        fireEvent.click(prevBtn);
-        const callArgs = mockDispatch.mock.calls[0][0];
-        expect(callArgs.payload.getFullYear()).toBe(2025);
-    });
 });

@@ -1,51 +1,72 @@
+/*
+ * Styles for the tag manager modal.
+ */
+
 .modalBackdrop {
     background: color-mix(in srgb, #000 52%, transparent);
     backdrop-filter: blur(3px);
 }
 
 .modalShell {
-    width: 90%;
-    max-width: 400px;
+    --modal-padding: 18px;
+    width: 88%;
+    max-width: 372px;
     display: flex;
     flex-direction: column;
+    height: 500px;
     max-height: 80vh;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .modalContent {
-    overflow: visible;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .content {
-    overflow: visible;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 16px;
 }
 
 .list {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
+    overflow-y: auto;
+    padding-bottom: 4px;
 }
 
 .item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 11px;
+    padding: 6px 10px;
     background: color-mix(in srgb, var(--surface-card) 90%, var(--surface-raised) 10%);
-    border-radius: 10px;
+    border-radius: 9px;
     border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
 }
 
 .preview {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 9px;
     font-weight: 600;
+    font-size: 0.9rem;
     color: var(--text);
 }
 
-.preview span:first-child {
-    font-size: 1.2rem;
+.colorDot {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .preview span:last-child {
@@ -54,18 +75,23 @@
 
 .actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .actions button {
     background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
-    padding: 6px 10px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.86rem;
+    font-size: 0.8rem;
     color: var(--text);
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
 }
 
 .actions button:hover {
@@ -84,36 +110,33 @@
     border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
 }
 
-.addBtn {
-    width: 100%;
-    margin-top: 16px;
-    padding: 12px;
-    background: color-mix(in srgb, var(--primary) 86%, var(--surface-raised));
-    color: color-mix(in srgb, var(--text) 96%, transparent);
-    border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+.actions .deleteDisabled,
+.actions .deleteDisabled:hover {
+    opacity: 0.45;
+    cursor: not-allowed;
+    color: var(--text-secondary);
+    border-color: color-mix(in srgb, var(--border) 78%, transparent);
+    background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
 }
 
-.addBtn:hover {
-    background: color-mix(in srgb, var(--primary) 100%, var(--surface-raised));
-    border-color: color-mix(in srgb, var(--primary) 75%, var(--border));
+.addTagButton {
+    margin-top: 0;
+    flex-shrink: 0;
 }
 
 /* Form Styles */
 .form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    overflow-y: auto;
 }
 
 .form label {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
+    gap: 6px;
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -157,73 +180,16 @@
 
 .formActions {
     display: flex;
-    gap: 12px;
-    margin-top: 8px;
+    gap: 10px;
+    margin-top: 4px;
 }
 
-.formActions button {
+.formActionBtn {
     flex: 1;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-}
-
-.cancelBtn {
-    background: color-mix(in srgb, var(--surface-card) 78%, var(--surface-raised));
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-}
-
-.saveBtn {
-    background: color-mix(in srgb, var(--primary) 90%, var(--surface-raised));
-    color: var(--text);
-    border: 1px solid color-mix(in srgb, var(--primary) 58%, var(--border));
-}
-
-.saveBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Emoji Input */
-.emojiInputWrapper {
-    position: relative;
-}
-
-.emojiInputRow {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.emojiPreviewBtn {
-    width: 50px;
-    height: 50px;
-    font-size: 28px;
-    border: var(--input-border);
-    border-radius: var(--input-radius);
-    background: var(--surface-card);
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.emojiPreviewBtn:hover {
-    border-color: var(--primary);
-    background: var(--hover);
+    min-height: 44px;
 }
 
 :global(:root[data-theme="dark"]) .modalShell {
     background: color-mix(in srgb, var(--surface-card) 90%, #000 10%);
     border-color: color-mix(in srgb, var(--border) 90%, transparent);
-}
-
-.emojiHint {
-    font-size: 0.85rem;
-    color: var(--muted, #64748b);
-    font-weight: 400;
 }

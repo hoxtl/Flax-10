@@ -7,6 +7,7 @@ import { SLOT_HEIGHT, SNAP_INTERVAL, pixelsToMinutes } from "../calendarConstant
 /**
  * Calculates the new height of the event based on the mouse position.
  */
+
 export const calculateNewHeight = (originalHeight, currentY, startY) => {
     const diff = currentY - startY;
     const rawHeight = originalHeight + diff;
@@ -18,6 +19,7 @@ export const calculateNewHeight = (originalHeight, currentY, startY) => {
 /**
  * Commits the resize operation by updating the event duration.
  */
+
 export const commitResize = (event, pixelDiff, editEvent) => {
     // Reuse your pixelsToMinutes helper for consistency
     const minutesChange = pixelsToMinutes(pixelDiff);
@@ -32,6 +34,7 @@ export const commitResize = (event, pixelDiff, editEvent) => {
 /**
  * Creates a resize session that listens for mouse move and mouse up events.
  */
+
 export const createResizeSession = (startY, originalHeight, { onMove, onEnd }) => {
     const onMouseMove = (e) => onMove(Math.max(30, originalHeight + (e.clientY - startY)));
     const onMouseUp = (e) => {

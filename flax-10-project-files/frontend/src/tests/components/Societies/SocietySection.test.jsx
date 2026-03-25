@@ -100,6 +100,6 @@ describe('SocietySection', () => {
                 pagination={{ currentPage: 1, totalPages: 2, onPageChange: vi.fn() }}
             />
         );
-        expect(screen.getAllByRole('button', { name: /Next/ }).length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('button', { name: /→/ }).length).toBeGreaterThan(0);
     });
 });

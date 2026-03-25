@@ -1,282 +1,372 @@
 .modalBackdrop {
-    background: rgba(0,0,0,0.32);
-    backdrop-filter: blur(4px);
-    animation: fadeIn 0.12s ease;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.12s ease;
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .infoModal {
-    position: relative;
-    max-height: 85vh;
-    background: var(--card-bg, #FFFCFA);
-    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 18%, transparent);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 24px 48px rgba(74, 52, 33, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04);
-    animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: flex;
-    flex-direction: column;
+  position: relative;
+  max-height: 85vh;
+  max-width: 100%;
+  background: var(--card-bg, #fffcfa);
+  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 18%, transparent);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 48px rgba(74, 52, 33, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 .infoModalContent {
-    display: flex;
-    flex-direction: column;
-    padding: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 .infoModalAccent {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--info-accent, var(--primary, #7B6751));
-    border-radius: 16px 0 0 16px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--info-accent, var(--primary, #7b6751));
+  border-radius: 16px 0 0 16px;
 }
 
 .infoModalHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 18px 20px 16px;
-    background: var(--card-bg, #FFFCFA);
-    border-bottom: 1px solid color-mix(in srgb, var(--primary, #7B6751) 12%, transparent);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px 16px;
+  background: var(--card-bg, #fffcfa);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--primary, #7b6751) 12%, transparent);
 }
 
 .infoModalIcon {
-    flex-shrink: 0;
-    color: var(--info-accent, var(--primary, #7B6751));
+  flex-shrink: 0;
+  color: var(--info-accent, var(--primary, #7b6751));
 }
 
 .infoModalHeaderText {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .infoModalTitle {
-    margin: 0;
-    font-family: var(--font-body);
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--text, var(--text));
-    letter-spacing: -0.02em;
-    line-height: 1.25;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text, var(--text));
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
 .infoModalSub {
-    margin: 2px 0 0;
-    font-family: var(--font-body);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    letter-spacing: 0.01em;
+  margin: 2px 0 0;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
 }
 
 .infoModalClose {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: transparent;
-    border: none;
-    color: var(--muted, var(--color-primary));
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transition: background 0.2s, color 0.2s;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  color: var(--muted, var(--color-primary));
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 .infoModalClose:hover {
-    background: color-mix(in srgb, var(--primary, #7B6751) 10%, transparent);
-    color: var(--text, var(--text));
+  background: color-mix(in srgb, var(--primary, #7b6751) 10%, transparent);
+  color: var(--text, var(--text));
 }
 
 .infoModalBody {
-    padding: 18px 20px 20px;
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-    background: var(--card-bg, #FFFCFA);
+  padding: 18px 20px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  background: var(--card-bg, #fffcfa);
 }
 
 .infoHero {
-    margin-bottom: 18px;
-    padding: 16px 18px;
-    background: color-mix(in srgb, var(--primary, #7B6751) 4%, transparent);
-    border-radius: 12px;
-    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 14%, transparent);
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--primary, #7b6751) 4%, transparent);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 14%, transparent);
 }
 
 .infoHeroTitle {
-    margin: 0;
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text, var(--text));
-    line-height: 1.4;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text, var(--text));
+  line-height: 1.4;
 }
 
 .infoHeroDesc {
-    margin: 8px 0 0;
-    font-size: 0.875rem;
-    color: var(--text);
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.readingPillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+}
+
+.readingDetailPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary, #7b6751) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 14%, transparent);
+}
+
+.readingDetailLabel {
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.readingDetailValue {
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--text);
+  white-space: nowrap;
 }
 
 .infoGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
 }
 
 .infoRow,
 .infoRowFull {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px;
-    background: color-mix(in srgb, var(--primary, #7B6751) 3%, transparent);
-    border-radius: 10px;
-    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--primary, #7b6751) 3%, transparent);
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 10%, transparent);
 }
 
 .infoRowFull {
-    grid-column: 1 / -1;
-    flex-direction: row;
+  grid-column: 1 / -1;
+  flex-direction: row;
 }
 
 .infoLabel {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--font-body);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
 }
 .infoLabel svg {
-    flex-shrink: 0;
-    opacity: 0.9;
-    color: var(--info-accent, var(--primary, #7B6751));
+  flex-shrink: 0;
+  opacity: 0.9;
+  color: var(--info-accent, var(--primary, #7b6751));
 }
 
 .infoVal {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text, var(--text));
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, var(--text));
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .infoRowFull .infoVal {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .infoValPill {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    background: color-mix(in srgb, var(--primary, #7B6751) 8%, transparent);
-    color: var(--text);
-    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 20%, transparent);
-    white-space: nowrap;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--primary, #7b6751) 8%, transparent);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 20%, transparent);
+  white-space: nowrap;
 }
 
 .infoListDot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    margin-right: 6px;
-    vertical-align: middle;
-    background: var(--primary, #7B6751);
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+  background: var(--primary, #7b6751);
 }
 
 .infoModalFooter {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 14px 20px 18px;
-    border-top: 1px solid color-mix(in srgb, var(--primary, #7B6751) 12%, transparent);
-    background: color-mix(in srgb, var(--primary, #7B6751) 3%, transparent);
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--primary, #7b6751) 12%, transparent);
+  background: color-mix(in srgb, var(--primary, #7b6751) 3%, transparent);
+  flex-shrink: 0;
 }
 
 .infoHint {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: var(--font-body);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 .infoHint svg {
-    opacity: 0.8;
-    flex-shrink: 0;
-}
-
-.infoCloseBtn {
-    padding: 10px 20px;
-    border-radius: 10px;
-    background: var(--primary, #7B6751);
-    border: none;
-    color: var(--color-card);
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-}
-.infoCloseBtn:hover {
-    background: var(--primary-strong, #5D4037);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(123, 103, 81, 0.25);
+  opacity: 0.8;
+  flex-shrink: 0;
 }
 
 :root[data-mode="dark"] .infoModal {
-    background: var(--card-bg);
-    border-color: var(--border-color);
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
 }
 :root[data-mode="dark"] .infoModalHeader {
-    background: var(--card-bg);
-    border-bottom-color: var(--border-color);
+  background: var(--card-bg);
+  border-bottom-color: var(--border-color);
 }
 :root[data-mode="dark"] .infoModalBody {
-    background: var(--card-bg);
+  background: var(--card-bg);
 }
 :root[data-mode="dark"] .infoHero {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-color);
 }
 :root[data-mode="dark"] .infoRow,
 :root[data-mode="dark"] .infoRowFull {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-color);
 }
 :root[data-mode="dark"] .infoValPill {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--border-color);
-    color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 :root[data-mode="dark"] .infoModalFooter {
-    background: rgba(255, 255, 255, 0.03);
-    border-top-color: var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+  border-top-color: var(--border-color);
 }
-:root[data-mode="dark"] .infoCloseBtn {
-    background: var(--primary);
-    color: var(--card-bg);
-}
-:root[data-mode="dark"] .infoCloseBtn:hover {
-    background: var(--primary);
-    filter: brightness(1.1);
+
+@media (max-width: 768px) {
+  .infoModal {
+    max-height: 90vh;
+  }
+
+  .infoModalHeader {
+    gap: 10px;
+    padding: 14px 14px 12px;
+  }
+
+  .infoModalBody {
+    padding: 12px 14px 14px;
+  }
+
+  .infoModalFooter {
+    padding: 10px 14px 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .infoHint {
+    font-size: 0.66rem;
+    line-height: 1.35;
+  }
+
+  .readingPillRow {
+    gap: 0.45rem;
+  }
+
+  .readingDetailPill {
+    max-width: 100%;
+    min-width: 0;
+    padding: 0.4rem 0.62rem;
+  }
+
+  .readingDetailValue {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .infoRow,
+  .infoRowFull {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 9px 10px;
+  }
+
+  .infoValPill {
+    white-space: normal;
+  }
 }

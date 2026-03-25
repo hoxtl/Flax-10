@@ -14,16 +14,35 @@ vi.mock('../../../../../components/Calendar/EventModal/components/TagField', () 
     TagField: () => <div data-testid="tag-field">TagField</div>,
 }));
 vi.mock('../../../../../components/Calendar/EventModal/components/RecurrenceField', () => ({
-    RecurrenceField: () => <div data-testid="recurrence-field">RecurrenceField</div>,
+    RecurrenceField: ({ onChange }) => (
+        <button type="button" data-testid="recurrence-field" onClick={() => onChange({ frequency: 'monthly' })}>
+            RecurrenceField
+        </button>
+    ),
 }));
 vi.mock('../../../../../components/Calendar/EventModal/components/TimeRow', () => ({
-    TimeRow: () => <div data-testid="time-row">TimeRow</div>,
+    TimeRow: ({ onRecurrenceChange }) => (
+        <button type="button" data-testid="time-row" onClick={() => onRecurrenceChange({ frequency: 'weekly' })}>
+            TimeRow
+        </button>
+    ),
 }));
 vi.mock('../../../../../components/Calendar/EventModal/components/ActionButtons', () => ({
     ActionButtons: () => <div data-testid="action-buttons">ActionButtons</div>,
 }));
 vi.mock('../../../../../components/Calendar/EventModal/components/ReminderField', () => ({
-    ReminderField: () => <div data-testid="reminder-field">ReminderField</div>,
+    ReminderField: ({ onChange }) => (
+        <button type="button" data-testid="reminder-field" onClick={() => onChange(30)}>
+            ReminderField
+        </button>
+    ),
+}));
+vi.mock('../../../../../components/Calendar/EventModal/components/LocationAutoComplete', () => ({
+    LocationAutocomplete: ({ onChange }) => (
+        <button type="button" data-testid="location-field" onClick={() => onChange('Strand Campus')}>
+            LocationAutocomplete
+        </button>
+    ),
 }));
 
 describe('EventFormBody', () => {
@@ -90,5 +109,20 @@ describe('EventFormBody', () => {
         const form = screen.getByText('🌐 Public').closest('form');
         fireEvent.submit(form);
         expect(onSubmit).toHaveBeenCalled();
+    });
+
+    it('updates location, recurrence, and reminder fields through setForm', () => {
+        const setForm = vi.fn();
+        render(<EventFormBody form={defaultForm} setForm={setForm} isEditing={false} onSubmit={() => {}} />);
+
+        fireEvent.click(screen.getByTestId('location-field'));
+        fireEvent.click(screen.getByTestId('time-row'));
+        fireEvent.click(screen.getByTestId('recurrence-field'));
+        fireEvent.click(screen.getByTestId('reminder-field'));
+
+        expect(setForm.mock.calls[0][0]({ location: '' }).location).toBe('Strand Campus');
+        expect(setForm.mock.calls[1][0]({ recurrence: null }).recurrence).toEqual({ frequency: 'weekly' });
+        expect(setForm.mock.calls[2][0]({ recurrence: null }).recurrence).toEqual({ frequency: 'monthly' });
+        expect(setForm.mock.calls[3][0]({ reminder: null }).reminder).toBe(30);
     });
 });

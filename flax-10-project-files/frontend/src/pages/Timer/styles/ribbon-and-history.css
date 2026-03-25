@@ -1,0 +1,300 @@
+/*
+ * Timer page styles chunk.
+ */
+
+.todayRibbonFillAnimate .todayRibbonFillShimmer {
+    animation: todayBarShimmer 820ms ease forwards;
+}
+
+.todayRibbonFillShimmer {
+    position: absolute;
+    inset: -40% -60%;
+    background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.48) 50%, transparent 65%);
+    transform: translateX(-55%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes todayBarShimmer {
+    0% {
+        opacity: 0;
+        transform: translateX(-55%);
+    }
+    15% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(55%);
+    }
+}
+
+.todayRibbonFillLive {
+    animation: todayBarLivePulse 2.8s ease-in-out infinite;
+}
+
+@keyframes todayBarLivePulse {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.todayRibbonTickLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.todayRibbonTick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.45);
+    transform: translateX(-0.5px);
+}
+
+.todayRibbonActivePulse {
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--focus-accent) 80%, #fff);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--focus-accent) 38%, transparent);
+    animation: activeSegmentPulse 1.8s ease-out infinite;
+}
+
+@keyframes activeSegmentPulse {
+    0% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--focus-accent) 36%, transparent);
+    }
+    100% {
+        box-shadow: 0 0 0 10px color-mix(in srgb, var(--focus-accent) 0%, transparent);
+    }
+}
+
+.todayRibbonScale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.57rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--muted) 82%, transparent);
+}
+
+.todayRibbonProgressMeta {
+    display: none;
+}
+
+.todayRibbonMeta {
+    font-size: 0.62rem;
+    color: color-mix(in srgb, var(--muted) 88%, transparent);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.18rem;
+}
+
+.todayRibbonMilestoneHint {
+    display: none;
+}
+
+.todayRibbonFocusValue {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+
+.todayRibbonFocusSub {
+    font-size: 0.62rem;
+    color: color-mix(in srgb, var(--muted) 88%, transparent);
+    font-weight: 700;
+}
+
+.todayRibbonStreakWrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.34rem;
+    cursor: default;
+}
+
+.todayRibbonStreakWrap[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 8px);
+    background: #2b1e14;
+    color: #fff;
+    font-size: 0.64rem;
+    font-weight: 600;
+    padding: 0.26rem 0.44rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    z-index: 12;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.todayRibbonStreakIcon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #c8102e;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    line-height: 1;
+}
+
+.todayRibbonStreakValue {
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+
+@media (max-width: 900px) {
+    .todayRibbon {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+
+    .todayRibbonZone {
+        align-items: flex-start;
+        border-left: none !important;
+        padding: 0.12rem 0.2rem;
+    }
+
+    .todayRibbonHeroRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.24rem;
+    }
+}
+
+.rightHistoryPanel {
+    font-family: Inter, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.rightHistoryWeeklySummary {
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--surface-card) 98%, var(--hover));
+    padding: 0.58rem 0.62rem 0.5rem;
+}
+
+.rightHistoryWeeklyHeader {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text) 92%, #000);
+    margin-bottom: 0.45rem;
+}
+
+.rightHistoryWeeklyChart {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    align-items: end;
+    gap: 0.36rem;
+}
+
+.rightHistoryWeeklyBarCol {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.18rem;
+}
+
+.rightHistoryWeeklyBarTrack {
+    width: 100%;
+    max-width: 18px;
+    height: 42px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--border) 78%, transparent);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.rightHistoryWeeklyBarFill {
+    width: 100%;
+    border-radius: inherit;
+    background: linear-gradient(180deg, #9b876f 0%, #7a6650 100%);
+    box-shadow: 0 6px 16px color-mix(in srgb, #7a6650 24%, transparent);
+    transform-origin: bottom center;
+}
+
+.rightHistoryWeeklyBarLabel {
+    font-size: 0.58rem;
+    color: var(--muted);
+    font-weight: 700;
+    line-height: 1;
+}
+
+.rightHistoryWeeklyValue {
+    font-size: 0.52rem;
+    color: color-mix(in srgb, var(--muted) 86%, transparent);
+    font-weight: 600;
+    line-height: 1;
+}
+
+.rightHistoryWeeklyBarLabelToday {
+    color: color-mix(in srgb, var(--text) 98%, #000);
+    font-weight: 800;
+}
+
+.rightHistoryWeeklyValueToday {
+    color: color-mix(in srgb, var(--text) 90%, var(--primary-strong));
+}
+
+.rightHistorySections {
+    display: flex;
+    flex-direction: column;
+    gap: 0.62rem;
+    max-height: 440px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.rightHistorySections::-webkit-scrollbar {
+    width: 5px;
+}
+
+.rightHistorySections::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.rightHistorySections::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--border) 60%, transparent);
+    border-radius: 10px;
+}
+
+.rightHistorySections::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--border) 90%, transparent);
+}
+
+
+.rightHistorySection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.38rem;
+}
+
+.rightHistorySectionTitle {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}

@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 export function useTimerHandlers(t, modal, setModal, startNext, resetBlockId, endEarly) {
     return {
         break: () => {

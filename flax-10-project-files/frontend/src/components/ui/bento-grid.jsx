@@ -1,6 +1,13 @@
-import { useRef, useState } from "react";
+/**
+ * Bento grid layout components.
+ */
+
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import styles from "./bento-grid.module.css";
+import { useGlowPosition } from "./bento-grid/useGlowPosition";
+
+const MotionDiv = motion.div;
 
 const containerVariants = {
   hidden: {},
@@ -22,48 +29,32 @@ const cardVariants = {
 
 export function BentoGrid({ children, className }) {
   return (
-    <motion.div
+    <MotionDiv
       className={[styles.grid, className].filter(Boolean).join(" ")}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {children}
-    </motion.div>
+    </MotionDiv>
   );
 }
 
 export function BentoCard({ children, className }) {
   const cardRef = useRef(null);
-  const [glowPos, setGlowPos] = useState({ x: "50%", y: "50%" });
-
-  const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setGlowPos({ x: `${x}%`, y: `${y}%` });
-  };
+  const { glowPos, handleMouseMove, resetGlow } = useGlowPosition(cardRef);
 
   return (
-    <motion.div
-      className={[styles.cardWrapper, className].filter(Boolean).join(" ")}
-      variants={cardVariants}
-    >
-      <div
-        ref={cardRef}
-        className={styles.card}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => setGlowPos({ x: "50%", y: "50%" })}
-      >
+    <MotionDiv className={[styles.cardWrapper, className].filter(Boolean).join(" ")} variants={cardVariants}>
+      <div ref={cardRef} className={styles.card} onMouseMove={handleMouseMove} onMouseLeave={resetGlow}>
         <div
           className={styles.glow}
-          style={{ "--glow-x": glowPos.x, "--glow-y": glowPos.y }}
+          style={glowPos}
           aria-hidden
         />
         <div className={styles.hoverOverlay} aria-hidden />
         <div className={styles.content}>{children}</div>
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 }

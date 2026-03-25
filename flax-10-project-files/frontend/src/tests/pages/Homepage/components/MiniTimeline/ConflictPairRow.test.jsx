@@ -4,7 +4,7 @@ import { ConflictPairRow } from '../../../../../pages/Homepage/components/MiniTi
 import * as useSleepWarning from '../../../../../components/Settings/hooks/useSleepWarning';
 
 vi.mock('../../../../../components/Settings/hooks/useSleepWarning', () => ({
-  isDuringSleepWindow: vi.fn(() => false),
+  doesEventOverlapSleepWindow: vi.fn(() => false),
 }));
 
 const mockStyles = {
@@ -179,8 +179,16 @@ describe('ConflictPairRow', () => {
     expect(onCardClick).toHaveBeenCalled();
   });
 
+  it('allows read-only lecture cards to open with onCardClick', () => {
+    const onCardClick = vi.fn();
+    renderConflictPairRow({ onCardClick });
+    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    fireEvent.click(card);
+    expect(onCardClick).toHaveBeenCalled();
+  });
+
   it('shows sleep badge when isDuringSleepWindow returns true', () => {
-    vi.mocked(useSleepWarning.isDuringSleepWindow).mockReturnValueOnce(true);
+    vi.mocked(useSleepWarning.doesEventOverlapSleepWindow).mockReturnValueOnce(true);
     renderConflictPairRow();
     expect(screen.getByLabelText('Scheduled during sleep hours')).toBeInTheDocument();
   });

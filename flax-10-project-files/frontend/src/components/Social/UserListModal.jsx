@@ -1,7 +1,14 @@
+/*
+ * Modal for showing and interacting with a list of users.
+ */
+
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import ShareButton from './ShareButton';
 import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
+import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
 import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 
 function getCurrentUser() {
     return JSON.parse(localStorage.getItem('user')) || {};
@@ -12,15 +19,14 @@ function isCurrentUser(user, currentUser) {
 }
 
 function sortUsers(users, currentUser) {
-    return [...users].sort((a, b) => {
-        if (isCurrentUser(a, currentUser)) return -1;
-        if (isCurrentUser(b, currentUser)) return 1;
-        if (a.is_sharing && !b.is_sharing) return -1;
-        if (!a.is_sharing && b.is_sharing) return 1;
+    return [...users].sort((left, right) => {
+        if (isCurrentUser(left, currentUser)) return -1;
+        if (isCurrentUser(right, currentUser)) return 1;
+        if (left.is_sharing && !right.is_sharing) return -1;
+        if (!left.is_sharing && right.is_sharing) return 1;
         return 0;
     });
 }
-
 
 function formatName(user) {
     const fn = user.first_name || '';
@@ -28,31 +34,52 @@ function formatName(user) {
     return (fn || ln) ? `${fn} ${ln}`.trim() : user.username;
 }
 
-export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {
+function buildRenderItem(currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction) {
+    return (user, index) => (
+        <UserListItem
+            key={user.id || user.username || index}
+            user={user}
+            currentUser={currentUser}
+            onUserClick={onUserClick}
+            onUserUpdate={onUserUpdate}
+            onUserCalendarClick={onUserCalendarClick}
+            showCalendarAction={showCalendarAction}
+        />
+    );
+}
+
+function UserListItem({ user, currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction }) {
+    const isSelf = isCurrentUser(user, currentUser);
+    const rightAction = isSelf ? null : buildRightAction(user, onUserUpdate, onUserCalendarClick, showCalendarAction);
+    const avatarUser = { ...user, profile_photo_url: getResolvedUserPhoto(user, { allowGeneric: true }) };
+    return <SummaryItem avatar={<UserAvatar user={avatarUser} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
+}
+
+function CalendarActionButton({ user, onUserCalendarClick }) {
+    return (
+        <PrimaryButton pill size="small" variant="primary" onClick={(e) => { e.stopPropagation(); onUserCalendarClick?.(user); }}>
+            View calendar
+        </PrimaryButton>
+    );
+}
+
+function buildRightAction(user, onUserUpdate, onUserCalendarClick, showCalendarAction) {
+    if (showCalendarAction) return <CalendarActionButton user={user} onUserCalendarClick={onUserCalendarClick} />;
+    return <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} shareVariant="secondary" sharedVariant="primary" sharedLabel="Shared calendar" />;
+}
+
+function UserListEmpty({ emptyHint }) {
+    return <SearchEmptyState itemLabel="users" title="No users found" hint={emptyHint} />;
+}
+
+export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction = false, emptyHint = "No one is sharing with you yet." }) {
     if (!users) return null;
     const currentUser = getCurrentUser();
-    const sortedUsers = sortUsers(users, currentUser);
-
+    const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction);
     return (
-        <GenericSummaryModal
-            isOpen={true}
-            onClose={onClose}
-            title={title}
-            emptyMessage="No users found."
-            items={sortedUsers}
-            renderItem={(u, i) => {
-                const isSelf = isCurrentUser(u, currentUser);
-                return (
-                    <SummaryItem
-                        key={u.id || u.username || i}
-                        avatar={<UserAvatar user={u} avatarOnly />}
-                        title={formatName(u)}
-                        subtitle={`@${u.username}`}
-                        onClick={() => onUserClick?.(u)}
-                        rightAction={!isSelf ? <ShareButton userId={u.id} initialIsSharing={u.is_sharing} onToggle={onUserUpdate} /> : null}
-                    />
-                );
-            }}
+        <GenericSummaryModal isOpen={true} onClose={onClose} title={title}
+            emptyContent={<UserListEmpty emptyHint={emptyHint} />}
+            items={sortUsers(users, currentUser)} renderItem={renderItem}
         />
     );
 }

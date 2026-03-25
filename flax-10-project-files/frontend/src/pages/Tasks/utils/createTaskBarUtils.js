@@ -1,5 +1,5 @@
-/**
- * Helpers for CreateTaskBar quick-add payload and save.
+/*
+ * Create-task-bar quick-add helpers.
  */
 
 export function getEstimateBlocks(pageCount) {
@@ -7,7 +7,7 @@ export function getEstimateBlocks(pageCount) {
 }
 
 export function buildQuickAddPayload(state, taskTitle) {
-  const { sortedLists, taskListId, estimatedBlocks, moduleId, defaultDueDate , pageCount} = state;
+  const { sortedLists, taskListId, estimatedBlocks, moduleId, defaultDueDate, pageCount } = state;
   return {
     title: taskTitle,
     description: "",
@@ -20,15 +20,23 @@ export function buildQuickAddPayload(state, taskTitle) {
   };
 }
 
+function resetQuickAddForm(state) {
+  state.setTitle("");
+  state.setModuleId(null);
+  if (typeof state.setPageCount === "function") state.setPageCount(null);
+}
+
+function setQuickAddSaving(state, value) {
+  if (typeof state.setSaving === "function") state.setSaving(value);
+}
+
 export async function runQuickAdd(state, onAddTask, taskTitle) {
   if (state.saving || !onAddTask) return;
-  if (typeof state.setSaving === 'function') state.setSaving(true);
+  setQuickAddSaving(state, true);
   try {
     await onAddTask(buildQuickAddPayload(state, taskTitle));
-    state.setTitle("");
-    state.setModuleId(null);
-    state.setPageCount(null);
+    resetQuickAddForm(state);
   } finally {
-    if (typeof state.setSaving === 'function') state.setSaving(false);
+    setQuickAddSaving(state, false);
   }
 }

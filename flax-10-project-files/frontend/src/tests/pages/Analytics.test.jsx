@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '../../utils/test-utils';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
@@ -13,7 +13,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../api/analyticsService', () => ({
+vi.mock('../../api/analyticsApi', () => ({
     default: {
         getSummary: vi.fn().mockResolvedValue({
             summary: {
@@ -51,6 +51,10 @@ vi.mock('../../components/Analytics/StudyHeatmap', () => ({
     default: () => <div data-testid="study-heatmap" />,
 }));
 
+vi.mock('../../components/Analytics/AttendanceChart', () => ({
+    default: () => <div data-testid="attendance-chart" />,
+}));
+
 vi.mock('../../components/Analytics/PlannedVsActualChart', () => ({
     default: () => <div data-testid="planned-vs-actual-chart" />,
 }));
@@ -69,7 +73,7 @@ vi.mock('../../components/Analytics/InsightCards', () => ({
 }));
 
 import AnalyticsPage from '../../pages/Analytics/AnalyticsPage';
-import analyticsService from '../../api/analyticsService';
+import analyticsService from '../../api/analyticsApi';
 
 describe('AnalyticsPage', () => {
     beforeEach(() => {

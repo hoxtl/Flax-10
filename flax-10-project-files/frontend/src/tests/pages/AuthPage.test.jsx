@@ -31,7 +31,7 @@ vi.mock('../../components/Authentication/AuthBranding', () => ({
 const { mockAuthService } = vi.hoisted(() => ({
     mockAuthService: { register: vi.fn(), login: vi.fn() },
 }));
-vi.mock('../../api/authService', () => ({ authService: mockAuthService }));
+vi.mock('../../api/authApi', () => ({ authService: mockAuthService }));
 vi.mock('../../components/Authentication/utils/authHelpers', () => ({
   validatePasswords: vi.fn(() => null),
   getErrorMessage: vi.fn(() => 'error'),

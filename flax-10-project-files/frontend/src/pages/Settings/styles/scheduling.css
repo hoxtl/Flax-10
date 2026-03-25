@@ -1,0 +1,94 @@
+/*
+ * Settings scheduling section layout and compact tile styles.
+ */
+.schedulingLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 12px;
+  align-items: start;
+}
+
+.schedulingPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.schedulingSplitRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.schedulingAside {
+  min-width: 0;
+}
+
+.schedulingInfoCard {
+  position: sticky;
+  top: 12px;
+}
+
+.schedulingCompactTile {
+  margin-bottom: 0;
+  padding: 10px 10px 8px;
+}
+
+.schedulingCompactTile form {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.schedulingDropdown {
+  width: 100%;
+  --control-height: 40px;
+  --control-padding-y: 8px;
+  --control-padding-x: 10px;
+  --text-base: 13px;
+  --dropdown-radius: var(--radius-md);
+}
+
+.schedulingHint {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--text) 64%, var(--muted) 36%);
+}
+
+.schedulingCompactTile .formSection {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.schedulingCompactTile .sectionTitle {
+  margin-bottom: 3px;
+}
+
+.schedulingCompactTile .formDescription {
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+.schedulingCompactTile .formGroup {
+  margin-bottom: 5px;
+}
+
+.schedulingCompactTile .formGroup label {
+  margin-bottom: 4px;
+}
+
+.schedulingCompactTile .formGroup input {
+  padding: 7px 9px;
+  font-size: 12.5px;
+}
+
+.schedulingCompactTile .formActions {
+  padding-top: 4px;
+}
+
+.schedulingCompactTile .btnPrimary {
+  padding: 7px 15px;
+  font-size: 11.5px;
+}

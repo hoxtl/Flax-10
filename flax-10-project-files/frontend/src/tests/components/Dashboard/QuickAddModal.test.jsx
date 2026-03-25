@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
+vi.mock('../../../context/ToastContext', () => ({
+    useToast: vi.fn(() => vi.fn()),
+}));
+
 vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({
         tags: [
@@ -154,5 +158,11 @@ describe('QuickAddModal', () => {
         renderModal({ onClose });
         fireEvent.click(screen.getByText('Close'));
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('redirects legacy manual schedule view back to the main quick-add chooser', () => {
+        renderModal({ initialView: 'schedule_manual' });
+        expect(screen.getByText('Quick Add')).toBeTruthy();
+        expect(screen.getByText(/What would you like to add/i)).toBeTruthy();
     });
 });

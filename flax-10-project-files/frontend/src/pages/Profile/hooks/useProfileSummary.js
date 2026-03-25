@@ -1,25 +1,35 @@
-import { useState, useEffect, useCallback } from 'react';
-import { fetchApi } from '../../../api/client';
+/**
+ * Profile summary loading hook.
+ */
 
-async function fetchProfileSummary(userId) {
-  const url = userId ? `/profile/summary/?user_id=${userId}` : '/profile/summary/';
-  return fetchApi(url);
+import { useEffect, useRef, useState } from "react";
+import { fetchApi } from "../../../api/client";
+
+function buildSummaryUrl(userId) {
+  return userId ? `/profile/summary/?user_id=${userId}` : "/profile/summary/";
 }
 
-export function useProfileSummary(userId) {
+function useSummaryState() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  return { error, loading, setError, setLoading, setSummary, summary };
+}
 
-  const load = useCallback(() => {
-    setLoading(true);
-    fetchProfileSummary(userId)
-      .then(setSummary)
-      .catch(e => setError(e))
-      .finally(() => setLoading(false));
-  }, [userId]);
+function loadProfileSummary(userId, summaryRef, state, showLoading) {
+  const shouldShowLoading = showLoading || summaryRef.current === null;
+  if (shouldShowLoading) state.setLoading(true);
+  return fetchApi(buildSummaryUrl(userId))
+    .then((nextSummary) => { state.setSummary(nextSummary); state.setError(null); })
+    .catch((nextError) => state.setError(nextError))
+    .finally(() => shouldShowLoading && state.setLoading(false));
+}
 
-  useEffect(() => { load(); }, [load]);
-
-  return { summary, loading, error, refetch: load };
+export function useProfileSummary(userId) {
+  const state = useSummaryState();
+  const summaryRef = useRef(null);
+  useEffect(() => { summaryRef.current = state.summary; }, [state.summary]);
+  useEffect(() => { loadProfileSummary(userId, summaryRef, state, true); }, [userId]);
+  const refetch = () => loadProfileSummary(userId, summaryRef, state, false);
+  return { summary: state.summary, loading: state.loading, error: state.error, refetch };
 }

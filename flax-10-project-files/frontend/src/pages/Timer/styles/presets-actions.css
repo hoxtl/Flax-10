@@ -1,0 +1,80 @@
+/*
+ * Timer page styles chunk.
+ */
+
+.breakSuggestion {
+    font-size: 0.88rem;
+    color: var(--text);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+    border-radius: var(--radius-lg);
+    padding: 0.6rem 1rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+}
+
+.activeBreakGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    margin: 0.6rem 0 1rem;
+}
+
+.activeBreakBtn {
+    text-align: left;
+    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+    border-radius: 10px;
+    padding: 0.45rem 0.6rem;
+    background: var(--surface-card);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.activeBreakBtn:hover {
+    background: var(--hover);
+}
+
+.activeBreakBtnSelected {
+    border-color: color-mix(in srgb, var(--focus-accent) 38%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 9%, var(--surface-card));
+}
+
+.activeBreakLabel {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.activeBreakHint {
+    font-size: 0.68rem;
+    color: var(--muted);
+}
+
+.goalButton {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.notificationBtn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.notificationBtn:hover {
+    opacity: 0.92;
+}
+
+.soundPaneStreams {
+    min-width: 0;
+}
+
+.soundPaneStreams {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+}

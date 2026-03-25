@@ -1,0 +1,266 @@
+/* Split from styles/HomepageSlots.module.css (2/7) */
+.intRowDeadlineName {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intRowDeadlineDays {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #7b6751;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.intRowDeadlineDaysUrgent {
+  color: #c0714e;
+}
+.intRowDeadlineDaysMed {
+  color: #b8860b;
+}
+
+/* Legacy ring (kept for compat) */
+.intRowHealthRing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.intRowRingSvg {
+  width: 52px;
+  height: 52px;
+  transform: rotate(-90deg);
+  flex-shrink: 0;
+}
+.intRowRingBg {
+  fill: none;
+  stroke: rgba(123, 103, 81, 0.12);
+  stroke-width: 3;
+}
+.intRowRingFill {
+  fill: none;
+  stroke: #4a3421;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.6s ease;
+}
+.intRowRingPct {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+}
+
+/* Legacy urgency dots */
+.intRowUrgencyDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+  background: #9a8778;
+}
+.urgencyHigh .intRowUrgencyDot,
+.intRowUrgencyDot.urgencyHigh {
+  background: #c0714e;
+}
+.urgencyMedium .intRowUrgencyDot,
+.intRowUrgencyDot.urgencyMedium {
+  background: #b8860b;
+}
+.urgencyLow .intRowUrgencyDot,
+.intRowUrgencyDot.urgencyLow {
+  background: #84a98c;
+}
+
+/* Legacy energy bar */
+.intRowEnergyBar {
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(123, 103, 81, 0.12);
+  overflow: hidden;
+}
+.intRowEnergyFill {
+  height: 100%;
+  border-radius: 99px;
+  background: #4a3421;
+}
+
+/* Legacy deadline row */
+.intRowDeadlineRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  padding: 4px 0;
+}
+.intRowDeadlineTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intRowDeadlineTime {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  color: #7b6751;
+}
+
+/* ── Right Now slot — active timer view ── */
+.intRowNowTimerTrack {
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(123, 103, 81, 0.12);
+  overflow: hidden;
+  margin-top: 12px;
+}
+.intRowNowTimerFill {
+  height: 100%;
+  border-radius: 99px;
+  background: #84a98c;
+  transition: width 1s linear;
+}
+.intRowNowTimerBtn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 7px 0;
+  background: none;
+  border: 1px solid rgba(123, 103, 81, 0.18);
+  border-radius: 8px;
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #7b6751;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.intRowNowTimerBtn:hover {
+  background: rgba(123, 103, 81, 0.05);
+  border-color: rgba(123, 103, 81, 0.32);
+  color: #4a3421;
+}
+
+/* Up Next mini-list inside Right Now card */
+.intRowNowUpNext {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid rgba(123, 103, 81, 0.1);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.intRowNowUpNextRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.intRowNowUpNextTime {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #9a8778;
+  flex-shrink: 0;
+}
+
+.intRowNowUpNextTitle {
+  font-family: var(--font-body, "Lexend", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(45, 53, 45, 0.65);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intRowNowScheduleLink {
+  display: block;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(123, 103, 81, 0.7);
+  text-decoration: none;
+  margin-top: 6px;
+  transition: color 0.15s;
+}
+
+.intRowNowScheduleLink:hover {
+  color: #4a3421;
+}
+
+/* Conflict warning strip — full-width banner at top of Right Now card */
+.intRowNowConflictChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(192, 113, 78, 0.08);
+  border: 1px solid rgba(192, 113, 78, 0.25);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #9b3a2a;
+  box-sizing: border-box;
+}
+
+/* TFL chip — styled transit alert inside Right Now card */
+.intRowNowTflChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(192, 75, 55, 0.06);
+  border: 1px solid rgba(192, 75, 55, 0.18);
+}
+.intRowNowTflChipIcon {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.intRowNowTflChipBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.intRowNowTflChipLeave {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #9b3a2a;
+  letter-spacing: 0.02em;
+}
+.intRowNowTflChipFor {
+  font-family: var(--font-sans, "Lexend", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(155, 58, 42, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

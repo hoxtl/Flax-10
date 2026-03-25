@@ -1,4 +1,6 @@
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
+import FilterCheckbox from "../common/FilterCheckbox/FilterCheckbox";
+import styles from "./OnboardingModal.module.css";
 
 const boxStyle = {
   marginTop: '1rem',
@@ -12,13 +14,13 @@ const boxStyle = {
 function WarningText({ major }) {
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.4rem' }}>
+      <div className={styles.warningRow}>
         <span style={{ fontSize: '0.95rem' }}>⚠️</span>
-        <span style={{ fontWeight: 600, color: 'var(--warning-text)', fontSize: '0.83rem' }}>
+        <span className={styles.warningTitle}>
           Just so you know
         </span>
       </div>
-      <p style={{ margin: '0 0 0.75rem', lineHeight: 1.6, color: 'var(--text)', opacity: 0.75 }}>
+      <p className={styles.warningBody}>
         <strong style={{ fontWeight: 600 }}>{major}</strong> can&rsquo;t be changed after this. Your modules will be set up automatically based on your course.
       </p>
     </>
@@ -27,8 +29,8 @@ function WarningText({ major }) {
 
 function ConfirmCheckbox({ confirmed, onConfirm }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text)', opacity: 0.8, fontWeight: 500 }}>
-      <input type="checkbox" checked={confirmed} onChange={e => onConfirm(e.target.checked)} />
+    <label className={styles.confirmLabel}>
+      <FilterCheckbox checked={confirmed} onChange={e => onConfirm(e.target.checked)} />
       Yes, this is my course
     </label>
   );
@@ -36,7 +38,7 @@ function ConfirmCheckbox({ confirmed, onConfirm }) {
 
 export default function WarningBox({ major, confirmed, onConfirm }) {
   return (
-    <motion.div
+    <Motion.div
       style={boxStyle}
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
@@ -44,6 +46,6 @@ export default function WarningBox({ major, confirmed, onConfirm }) {
     >
       <WarningText major={major} />
       <ConfirmCheckbox confirmed={confirmed} onConfirm={onConfirm} />
-    </motion.div>
+    </Motion.div>
   );
 }

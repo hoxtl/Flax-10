@@ -1,0 +1,342 @@
+/* Split from components/IntelligenceRow.module.css (2/4) */
+.intRowAlertText {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: var(--widget-text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intRowAlertDismiss {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #b8933a;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: color 0.12s;
+}
+.intRowAlertDismiss:hover {
+  color: #7a5520;
+}
+
+.intRowAlertOverflow {
+  font-size: 0.69rem;
+  color: #b8933a;
+  padding-left: 12px;
+}
+
+/* Status strip — dynamic schedule state below greeting */
+.statusStrip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--widget-border);
+  background: var(--widget-icon-bg);
+  max-width: fit-content;
+}
+
+.statusStripDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #7b6751;
+}
+
+.statusStripText {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--widget-text-secondary);
+}
+
+/* Conflict variant — terracotta with glow pulse */
+.statusStripConflict {
+  border-color: rgba(220, 38, 38, 0.25);
+  background: rgba(254, 226, 226, 0.6);
+}
+.statusStripConflict .statusStripDot {
+  background: #dc2626;
+  animation: stripConflictGlow 1.6s ease-in-out infinite;
+}
+.statusStripConflict .statusStripText {
+  color: #dc2626;
+}
+
+@keyframes stripConflictGlow {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 0 5px rgba(220, 38, 38, 0);
+  }
+}
+
+/* ── TFL card (replaces old pill) ─────────────────────────────────────────── */
+
+.tflCard {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 8px 10px 8px 0;
+  border-radius: 10px;
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
+  overflow: hidden;
+}
+
+.tflCardSevere {
+  background: rgba(123, 103, 81, 0.09);
+  border-color: rgba(123, 103, 81, 0.22);
+}
+
+/* Left colour accent strip — colour set via inline style */
+.tflCardAccent {
+  width: 4px;
+  flex-shrink: 0;
+  border-radius: 0;
+  align-self: stretch;
+}
+
+.tflCardBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tflCardTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tflCardLine {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--widget-text-primary);
+}
+
+.tflCardStatus {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #8a7060;
+}
+
+.tflCardLeave {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--widget-text-tertiary);
+}
+
+.tflCardDismiss {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: rgba(122, 85, 32, 0.4);
+  transition: color 0.15s;
+  margin-top: 1px;
+}
+.tflCardDismiss:hover {
+  color: var(--widget-accent);
+}
+
+/* "+N more lines affected" overflow label */
+.tflOverflow {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: rgba(155, 58, 42, 0.65);
+  padding: 2px 0 2px 4px;
+}
+
+/* Dismiss button inside a pill */
+.statusStripPillDismiss {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 2px;
+  cursor: pointer;
+  color: rgba(122, 85, 32, 0.4);
+  transition: color 0.15s;
+  line-height: 1;
+}
+.statusStripPillDismiss:hover {
+  color: var(--widget-accent);
+}
+
+/* Gap variant — sage green */
+.statusStripGap {
+  border-color: rgba(22, 163, 74, 0.25);
+  background: rgba(220, 252, 231, 0.6);
+}
+.statusStripGap .statusStripDot {
+  background: #16a34a;
+}
+.statusStripGap .statusStripText {
+  color: #16a34a;
+}
+
+/* Active task variant — warm brown */
+.statusStripTask {
+  border-color: rgba(120, 113, 108, 0.2);
+  background: rgba(250, 250, 249, 0.8);
+}
+.statusStripTask .statusStripDot {
+  background: #78716c;
+  animation: stripPulse 2s ease-in-out infinite;
+}
+.statusStripTask .statusStripText {
+  color: #44403c;
+}
+
+@keyframes stripPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes intRowPulseTerracotta {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.headerSubtitle {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: rgba(74, 52, 33, 0.76);
+  margin: 0;
+  max-width: 39ch;
+}
+
+.headerPlannerPanel {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 22px;
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  backdrop-filter: blur(8px);
+}
+
+.semesterWidget {
+  display: grid;
+  gap: 6px;
+  padding: 11px 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  background: color-mix(in srgb, var(--panel) 82%, var(--surface-page));
+}
+
+.semesterWidgetHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.semesterWidgetLabel {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--primary) 72%, var(--muted));
+}
+
+.semesterWidgetValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.semesterWidgetTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.semesterWidgetFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 65%, var(--accent))
+  );
+  transition: width 0.3s ease;
+}
+
+.semesterWidgetMeta {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 66%, var(--muted));
+}
+
+.metricRail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metricChip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  min-width: 98px;
+  border-radius: 18px;
+  background: var(--widget-metric-bg);
+  border: 1px solid var(--widget-border);
+}
+
+@media (max-width: 767px) {
+  .metricRail {
+    grid-template-columns: 1fr;
+  }
+}

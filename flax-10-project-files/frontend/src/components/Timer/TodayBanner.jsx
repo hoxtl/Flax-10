@@ -1,155 +1,41 @@
-import { useState, useEffect, useCallback } from 'react';
+/*
+ * Today banner for timer progress.
+ */
+
 import styles from '../../pages/Timer/TimerPage.module.css';
-import analyticsService from '../../api/analyticsService';
-import { getNearestMilestone } from './utils/milestoneUtils';
+import StatStrip from '../common/StatStrip/StatStrip';
+import { useCountUp } from '../../hooks/useCountUp';
+import { useTodayBannerData } from './todayBanner/useTodayBannerData';
 
-function fmtHours(h) {
-    if (!h || h <= 0) return '0m';
-    const hrs = Math.floor(h);
-    const mins = Math.round((h - hrs) * 60);
-    if (hrs > 0 && mins > 0) return `${hrs}h ${mins}m`;
-    if (hrs > 0) return `${hrs}h`;
-    return `${mins}m`;
+function buildStreakItem(state, streakRef) {
+  return { key: 'streak', label: 'Current streak', value: state.streak, valueRef: streakRef, suffix: 'd', tone: state.streak > 0 ? 'success' : undefined };
 }
 
-function commitGoal(val, setGoalHours, setEditingGoal) {
-    const n = parseFloat(val);
-    if (!isNaN(n) && n > 0) {
-        setGoalHours(n);
-        try { localStorage.setItem('timerDailyGoalHours', String(n)); } catch {}
-    }
-    setEditingGoal(false);
+function buildSessionsItem(state, sessionsRef) {
+  return { key: 'sessions', label: 'Sessions logged', value: state.sessions, valueRef: sessionsRef, tooltip: 'Last 30 days', tone: state.sessions > 0 ? 'accent' : undefined };
 }
 
-function GoalEditor({ goalHours, editingGoal, goalInput, setGoalInput, setEditingGoal, setGoalHours }) {
-    if (editingGoal) {
-        return (
-            <input
-                className={styles.todayGoalInput}
-                type="number" min={0.5} max={24} step={0.5}
-                value={goalInput} autoFocus
-                onChange={e => setGoalInput(e.target.value)}
-                onBlur={() => commitGoal(goalInput, setGoalHours, setEditingGoal)}
-                onKeyDown={e => {
-                    if (e.key === 'Enter') commitGoal(goalInput, setGoalHours, setEditingGoal);
-                    if (e.key === 'Escape') setEditingGoal(false);
-                }}
-            />
-        );
-    }
-    return (
-        <button className={styles.todayGoalEditBtn} onClick={() => { setGoalInput(String(goalHours)); setEditingGoal(true); }}>
-            {goalHours}h
-        </button>
-    );
+function buildWeeklyGoalItem(state, weeklyGoalRef) {
+  return { key: 'weekly-goal', label: 'Weekly goal', value: state.weeklyGoalDays, valueRef: weeklyGoalRef, suffix: ' / 7', tooltip: 'Active days this week', tone: 'accent' };
 }
 
-function ProgressBar({ sessions, goalSessions, sessionPct, fillAnimating, isStudying, activePulseLeft, tickCount }) {
-    return (
-        <div className={styles.todayRibbonBar}>
-            <div
-                className={`${styles.todayRibbonFill} ${fillAnimating ? styles.todayRibbonFillAnimate : ''} ${isStudying ? styles.todayRibbonFillLive : ''}`}
-                style={{ width: `${sessionPct}%` }}
-            >
-                <span className={styles.todayRibbonFillShimmer} />
-            </div>
-            <div className={styles.todayRibbonTickLayer}>
-                {Array.from({ length: tickCount + 1 }).map((_, idx) => (
-                    <span key={`tick-${idx}`} className={styles.todayRibbonTick} style={{ left: `${(idx / tickCount) * 100}%` }} />
-                ))}
-            </div>
-            {isStudying && sessions < goalSessions && (
-                <span className={styles.todayRibbonActivePulse} style={{ left: `${activePulseLeft}%` }} />
-            )}
-        </div>
-    );
+function buildFocusTimeItem(state, focusHoursRef) {
+  return { key: 'focus-time', label: 'Focus time', value: state.focusHours, valueRef: focusHoursRef, suffix: 'h', tooltip: 'Last 30 days', tone: state.focusHours > 0 ? 'accent' : undefined };
 }
 
-export default function TodayBanner({ onStreakData, isStudying = false }) {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [monthSummary, setMonthSummary] = useState(null);
-    const [goalHours, setGoalHours] = useState(() => parseFloat(localStorage.getItem('timerDailyGoalHours') || '4'));
-    const [editingGoal, setEditingGoal] = useState(false);
-    const [goalInput, setGoalInput] = useState('');
-    const [lastSessionCount, setLastSessionCount] = useState(null);
-    const [fillAnimating, setFillAnimating] = useState(false);
-    const [counterAnimating, setCounterAnimating] = useState(false);
+function useTodayBannerItems(state) {
+  const streakRef = useCountUp(state.streak, 1200);
+  const sessionsRef = useCountUp(state.sessions, 1200);
+  const weeklyGoalRef = useCountUp(state.weeklyGoalDays, 1200);
+  const focusHoursRef = useCountUp(state.focusHours, 1200);
+  return [buildStreakItem(state, streakRef), buildSessionsItem(state, sessionsRef), buildWeeklyGoalItem(state, weeklyGoalRef), buildFocusTimeItem(state, focusHoursRef)];
+}
 
-    const refresh = useCallback(() => {
-        analyticsService.getSummary(1)
-            .then(res => { setData(res?.summary ?? null); if (onStreakData) onStreakData(res?.summary ?? null); })
-            .catch(() => {})
-            .finally(() => setLoading(false));
-        analyticsService.getSummary(30)
-            .then(res => setMonthSummary(res?.summary ?? null))
-            .catch(() => setMonthSummary(null));
-    }, [onStreakData]);
+export default function TodayBanner({ onStreakData }) {
+  const state = useTodayBannerData(onStreakData);
+  const items = useTodayBannerItems(state);
 
-    useEffect(() => {
-        refresh();
-        window.addEventListener('timerHistoryUpdated', refresh);
-        window.addEventListener('historyCleared', refresh);
-        return () => {
-            window.removeEventListener('timerHistoryUpdated', refresh);
-            window.removeEventListener('historyCleared', refresh);
-        };
-    }, [refresh]);
+  if (state.loading) return null;
 
-    const sessions = data?.total_sessions ?? 0;
-    const hours = data?.total_study_hours ?? 0;
-    const streak = data?.current_streak_days ?? 0;
-    const goalSessions = Math.max(1, Math.ceil((goalHours * 60) / 25));
-    const sessionPct = Math.min(100, Math.round((sessions / goalSessions) * 100));
-    const milestone = monthSummary
-        ? getNearestMilestone(Number(monthSummary.total_sessions ?? 0), Number(monthSummary.current_streak_days ?? 0), Number(monthSummary.total_study_hours ?? 0))
-        : null;
-    const weeklyProgressDays = Math.max(0, Math.min(7, streak > 0 && streak % 7 === 0 ? 7 : streak % 7));
-    const weeklyGoalText = `🔥 ${weeklyProgressDays}/7 days towards your weekly goal`;
-    const streakTooltip = milestone ? `${milestone.remaining} away from ${milestone.label}` : weeklyGoalText;
-    const tickCount = Math.max(2, Math.min(goalSessions, 16));
-    const activePulseLeft = Math.min(98, Math.max(2, ((Math.min(sessions, goalSessions - 1) + 0.5) / goalSessions) * 100));
-
-    useEffect(() => {
-        if (lastSessionCount == null) { setLastSessionCount(sessions); return; }
-        if (sessions === lastSessionCount) return;
-        setFillAnimating(true);
-        setCounterAnimating(true);
-        const fillTimer = setTimeout(() => setFillAnimating(false), 900);
-        const counterTimer = setTimeout(() => setCounterAnimating(false), 480);
-        setLastSessionCount(sessions);
-        return () => { clearTimeout(fillTimer); clearTimeout(counterTimer); };
-    }, [sessions, lastSessionCount]);
-
-    if (loading) return null;
-    return (
-        <div className={styles.todayRibbon}>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneLeft}`}>
-                <span className={styles.todayRibbonStreakWrap} data-tooltip={streakTooltip}>
-                    <span className={styles.todayRibbonStreakIcon}>🔥</span>
-                    <span className={styles.todayRibbonStreakValue}>{streak}d</span>
-                </span>
-            </div>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneCenter}`}>
-                <div className={styles.todayRibbonHeroRow}>
-                    <span className={styles.todayRibbonSessionsText}>
-                        <span className={styles.todayRibbonSessionDigitWrap}>
-                            <span key={sessions} className={`${styles.todayRibbonSessionDigit} ${counterAnimating ? styles.todayRibbonSessionDigitAnimate : ''}`}>{Math.min(sessions, goalSessions)}</span>
-                        </span>
-                        /{goalSessions} sessions today{sessions > goalSessions ? ` (+${sessions - goalSessions} extra)` : ''}
-                    </span>
-                    <span className={styles.todayRibbonMilestoneActive}>{weeklyGoalText}</span>
-                </div>
-                <div className={styles.todayRibbonScale}><span>0</span><span>{goalSessions}</span></div>
-                <ProgressBar sessions={sessions} goalSessions={goalSessions} sessionPct={sessionPct} fillAnimating={fillAnimating} isStudying={isStudying} activePulseLeft={activePulseLeft} tickCount={tickCount} />
-            </div>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneRight}`}>
-                <span className={styles.todayRibbonFocusValue}>🕒 {fmtHours(hours)}</span>
-                <span className={styles.todayRibbonMeta}>
-                    Goal:{' '}
-                    <GoalEditor goalHours={goalHours} editingGoal={editingGoal} goalInput={goalInput} setGoalInput={setGoalInput} setEditingGoal={setEditingGoal} setGoalHours={setGoalHours} />
-                </span>
-            </div>
-        </div>
-    );
+  return <StatStrip items={items} className={styles.todayMetricBanner} />;
 }

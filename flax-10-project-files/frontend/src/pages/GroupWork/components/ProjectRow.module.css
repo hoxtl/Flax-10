@@ -1,0 +1,410 @@
+.projectRowContainer {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: 0 8px 22px color-mix(in srgb, black 6%, transparent);
+}
+
+.projectRowContainer:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+.projectRowContainerUrgent {
+    border-color: color-mix(in srgb, var(--danger) 38%, var(--border));
+    box-shadow:
+        0 0 0 1.5px color-mix(in srgb, var(--danger) 20%, transparent),
+        0 0 10px color-mix(in srgb, var(--danger) 16%, transparent);
+}
+
+.projectRowContainerOverdue {
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+    background: color-mix(in srgb, var(--danger) 4%, var(--surface-panel));
+    box-shadow:
+        0 0 0 1.5px color-mix(in srgb, var(--danger) 24%, transparent),
+        0 0 12px color-mix(in srgb, var(--danger) 18%, transparent);
+}
+
+.projectRowContainerUrgent::before,
+.projectRowContainerOverdue::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--home-urgency-danger);
+    z-index: 1;
+}
+
+.projectRowContainerUrgent .projectRow,
+.projectRowContainerOverdue .projectRow {
+    background: transparent;
+}
+
+.projectRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 16px 10px;
+}
+
+.projectInfoArea {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.projectText {
+    min-width: 0;
+    flex: 1;
+}
+
+.projectTitleRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    margin-bottom: 2px;
+}
+
+.projectTitleAction {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.detailsButton {
+    min-height: 34px;
+    padding-inline: 14px;
+    box-shadow:
+        0 10px 20px color-mix(in srgb, black 8%, transparent),
+        inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+}
+
+.teacherAvatarTooltipWrap {
+    flex-shrink: 0;
+}
+
+.teacherAvatarShell {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--groupwork-teacher-badge-bg);
+    border: 2px solid var(--groupwork-teacher-badge-border);
+    box-shadow: var(--groupwork-teacher-badge-shadow);
+    overflow: hidden;
+}
+
+.teacherAvatarButton {
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.teacherAvatarButton:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 30%, var(--surface-card) 70%);
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--modules-accent-ink) 16%, transparent);
+}
+
+.teacherAvatarButton:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 72%, white 28%);
+    outline-offset: 3px;
+}
+
+.teacherAvatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+
+.teacherAvatarFallback {
+    font-size: 1.28rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--modules-accent-ink);
+}
+
+.projectName {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.projectNameButton {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.projectNameButton:hover {
+    color: var(--primary);
+}
+
+.projectNameButton:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+.projectCaption {
+    margin: 0.18rem 0 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    max-width: 64ch;
+}
+
+
+.projectSubRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.55rem;
+    margin-top: 0.62rem;
+}
+
+.projectModuleLink {
+    display: inline-flex;
+    text-decoration: none;
+}
+
+.projectModuleLink:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 999px;
+}
+
+.projectModuleBadge {
+    background: rgba(123, 103, 81, 0.08);
+    color: var(--primary);
+    border-color: rgba(123, 103, 81, 0.16);
+}
+
+:global([data-mode="dark"]) .projectRowContainer {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%) 0%,
+        color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%) 100%
+    );
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 14%, var(--border));
+    box-shadow:
+        0 16px 32px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global([data-mode="dark"]) .projectRowContainer:hover {
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 24%, var(--border));
+    box-shadow:
+        0 22px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-mode="dark"]) .projectModuleBadge {
+    background: var(--modules-chip-bg);
+    color: var(--modules-chip-fg);
+    border-color: var(--modules-chip-border);
+}
+
+:global([data-mode="dark"]) .detailsButton {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-raised, var(--surface-card)) 94%, var(--surface-inner) 6%),
+        color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 22%, var(--border) 78%) !important;
+    color: color-mix(in srgb, var(--text) 92%, white 8%) !important;
+    box-shadow:
+        0 14px 28px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+:global([data-mode="dark"]) .detailsButton:hover {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-raised, var(--surface-card)) 90%, var(--surface-inner) 10%),
+        color-mix(in srgb, var(--surface-card) 76%, var(--color-bg) 24%)
+    ) !important;
+}
+
+:global([data-mode="dark"]) .avatarWrapper {
+    background: var(--surface-inner);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 18%, var(--border));
+}
+
+:global([data-mode="dark"]) .avatarCountLabel {
+    color: color-mix(in srgb, white 78%, var(--text-secondary) 22%);
+}
+
+.projectModuleCode {
+    font-weight: 700;
+}
+
+.avatarStack {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.34rem;
+    margin-top: 0.5rem;
+    padding-left: 0;
+}
+
+.avatarTooltipWrap {
+    display: inline-flex;
+}
+
+.avatarWrapper {
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--surface-panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-panel);
+}
+
+.avatarWrapper:hover {
+    z-index: 20 !important;
+    box-shadow: var(--shadow-md);
+}
+
+.avatarWrapper:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.avatarCountLabel {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-left: 0.12rem;
+}
+
+.projectMetaArea {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+    min-width: fit-content;
+    flex-shrink: 0;
+}
+
+.deadlineInfo {
+    display: flex;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.deadlineCountdown {
+    margin-top: 0;
+}
+
+.ownerPill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.24);
+    flex-shrink: 0;
+}
+
+.projectAccordion {
+    padding: 0 16px 10px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.accordionSummary {
+    display: block;
+}
+
+.progressTooltipWrap {
+    flex: 1;
+    min-width: 0;
+}
+
+.progressTrack {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--groupwork-progress-track);
+    overflow: hidden;
+    cursor: default;
+}
+
+.progressFill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+        90deg,
+        var(--groupwork-progress-fill-start),
+        var(--groupwork-progress-fill-end)
+    );
+}
+
+@media (max-width: 768px) {
+    .projectRow {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 14px 12px;
+    }
+
+    .projectTitleAction {
+        width: 100%;
+    }
+
+    .projectCaption {
+        max-width: none;
+    }
+
+    .projectMetaArea {
+        min-width: 0;
+        justify-content: flex-start;
+    }
+
+    .deadlineInfo {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .projectAccordion {
+        padding: 0 14px 12px;
+    }
+
+    .accordionSummary {
+        display: block;
+    }
+}

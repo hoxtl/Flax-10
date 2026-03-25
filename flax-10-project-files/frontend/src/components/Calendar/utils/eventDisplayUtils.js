@@ -1,4 +1,11 @@
+/**
+ * eventDisplayUtils - Event display logic for all-day and timed events.
+ * Determines how events should appear in time grids vs all-day rows.
+ */
+
 import { overlapsDay, startOfDay } from './dateUtils';
+
+/** Returns true if the event should display as an all-day event. */
 
 export function isAllDayEvent(event) {
     if (event.all_day || event.is_all_day || event.allDay) return true;
@@ -11,6 +18,8 @@ function isMidnightAligned(event) {
     return s.getHours() === 0 && s.getMinutes() === 0 &&
         e.getHours() === 0 && e.getMinutes() === 0;
 }
+
+/** Returns true if the event should appear in the hourly time grid. */
 
 export function shouldShowInTimeGrid(event, day) {
     if (isAllDayEvent(event)) return false;
@@ -32,6 +41,8 @@ export function isFullDay(event, day) {
 
     return eventStart <= dayStart && eventEnd >= dayEnd;
 }
+
+/** Calculates the visual date range for an all-day event display. */
 
 export function getAllDayVisualRange(event) {
     const start = new Date(event.start_time);

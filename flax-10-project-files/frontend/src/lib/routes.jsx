@@ -1,3 +1,7 @@
+/*
+ * Defines all app routes and their page components for the dashboard.
+ */
+
 import Homepage from "../pages/Homepage/Homepage";
 import CalendarPage from "../pages/Calendar/CalendarPage";
 import SocietiesPage from "../pages/Societies/SocietiesPage";
@@ -22,31 +26,33 @@ export const APP_ROUTES = [
   },
   {
     id: "attendance",
-    label: "Attendance",
+    label: "My Venio Details",
     icon: "✔️",
     path: "/attendance",
     element: <AttendancePage />,
+    studentOnly: true,
   },
   {
     id: "timer",
-    label: "Timer",
+    label: "Focus Timer",
     icon: "⏲️",
     path: "/timer",
     element: <TimerPage />,
   },
   {
     id: "tasks",
-    label: "Tasks",
+    label: "To-do Tasks",
     icon: "✅",
     path: "/tasks",
     element: <TasksPage />,
   },
   {
     id: "group-work",
-    label: "Group Work",
+    label: "Group Projects",
     icon: "🤝",
     path: "/group-work",
     element: <GroupWorkIndexPage />,
+    studentOnly: true,
   },
   {
     id: "users",
@@ -61,10 +67,12 @@ export const APP_ROUTES = [
     icon: "👥",
     path: "/societies",
     element: <SocietiesPage />,
+    studentOnly: true,
   },
   {
     id: "modules",
     label: "Modules",
+    teacherLabel: "Manage My Modules",
     icon: "📚",
     path: "/modules",
     element: <ModulesPage />,

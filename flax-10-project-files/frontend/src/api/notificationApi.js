@@ -1,3 +1,7 @@
+/*
+ * Fetches, creates, marks read, and clears user notifications.
+ */
+
 import { fetchApi } from './client';
 
 export async function fetchNotifications() {

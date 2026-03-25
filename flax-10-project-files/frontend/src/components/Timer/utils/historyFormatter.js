@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 export const formatTimeRange = (start, end) => {
     if (!start || !end) return '';
     const s = new Date(start);
@@ -22,45 +26,41 @@ export const formatDuration = (seconds) => {
     return parts.join(':');
 };
 
-const normalizeSession = (s) => {
-    let {
-        start_time, startTime,
-        end_time, endTime,
-        date, duration: durInSeconds,
-        break_duration, breakDuration,
-        pause_duration, pauseDuration,
-        study_block_id, studyBlockId
-    } = s;
-
-    const now = new Date().toISOString();
-
-    const normalizedStartTime = startTime || start_time;
-    const normalizedEndTime = endTime || end_time || date || now;
-    const normalizedBreakDuration = breakDuration !== undefined ? breakDuration : (break_duration || 0);
-    const normalizedPauseDuration = pauseDuration !== undefined ? pauseDuration : (pause_duration || 0);
-    const normalizedBlockId = studyBlockId || study_block_id;
-
-    let finalStartTime;
-    if (!normalizedStartTime) {
-        const endTs = new Date(normalizedEndTime).getTime();
-        finalStartTime = !isNaN(endTs) ? new Date(endTs - (durInSeconds || 0) * 1000).toISOString() : now;
-    } else {
-        finalStartTime = normalizedStartTime;
-    }
-
+function getSessionFields(session) {
     return {
-        ...s,
-        startTime: finalStartTime,
-        endTime: normalizedEndTime,
-        date: date || normalizedEndTime,
-        duration: durInSeconds || 0,
-        breakDuration: normalizedBreakDuration,
-        pauseDuration: normalizedPauseDuration,
-        studyBlockId: normalizedBlockId
+        startTime: session.startTime || session.start_time || null,
+        endTime: session.endTime || session.end_time || session.date || new Date().toISOString(),
+        breakDuration: session.breakDuration ?? session.break_duration ?? 0,
+        pauseDuration: session.pauseDuration ?? session.pause_duration ?? 0,
+        studyBlockId: session.studyBlockId || session.study_block_id,
+        duration: session.duration || 0,
+        date: session.date || null,
+    };
+}
+
+function resolveStartTime(fields) {
+    if (fields.startTime) return fields.startTime;
+    const endTs = new Date(fields.endTime).getTime();
+    if (isNaN(endTs)) return new Date().toISOString();
+    return new Date(endTs - fields.duration * 1000).toISOString();
+}
+
+const normalizeSession = (session) => {
+    const fields = getSessionFields(session);
+    return {
+        ...session,
+        startTime: resolveStartTime(fields),
+        endTime: fields.endTime,
+        date: fields.date || fields.endTime,
+        duration: fields.duration,
+        breakDuration: fields.breakDuration,
+        pauseDuration: fields.pauseDuration,
+        studyBlockId: fields.studyBlockId
     };
 };
 
 /** Initialize a new study block from a session */
+
 const createBlock = (id, s) => ({
     id, sessions: [s], totalDuration: s.duration,
     totalBreak: s.breakDuration || 0,
@@ -70,6 +70,7 @@ const createBlock = (id, s) => ({
 });
 
 /** Aggregate session data into an existing block */
+
 const updateBlock = (b, s) => {
     b.sessions.push(s);
     b.totalDuration += s.duration;
@@ -82,6 +83,7 @@ const updateBlock = (b, s) => {
 };
 
 /** Group sessions by ID and sort by date (newest first) */
+
 export const groupHistoryByBlock = (history) => {
     const blocks = {};
     history.forEach(rawSession => {

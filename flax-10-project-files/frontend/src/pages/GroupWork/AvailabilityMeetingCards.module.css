@@ -1,0 +1,262 @@
+.meetingCards,
+.meetingCardsEmpty {
+  padding: 16px 24px;
+  background: color-mix(in srgb, var(--soft-paper) 72%, var(--surface-card));
+  border-bottom: 1px solid var(--border);
+}
+
+.meetingCards {
+  display: grid;
+  gap: 12px;
+}
+
+.meetingCardsEmpty {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.meetingCardsEmptyState {
+  margin: 0;
+  box-shadow: none;
+  background: transparent;
+  border: none;
+}
+
+.suggestionCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--border) 88%, var(--surface-card));
+  background: color-mix(in srgb, var(--panel) 90%, var(--surface-card));
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.confirmedCard {
+  border-color: color-mix(in srgb, var(--sage) 26%, var(--border) 74%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--success-bg) 52%, var(--surface-card) 48%), color-mix(in srgb, var(--surface-card) 94%, var(--success-bg) 6%));
+}
+
+.suggestionMain {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 8px;
+}
+
+.suggestionTopRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.suggestionTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.suggestionMeta {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.suggestionSubtext {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.countRow {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.countPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.acceptedCount {
+  background: color-mix(in srgb, var(--sage) 16%, transparent);
+  color: color-mix(in srgb, var(--sage) 72%, var(--text) 28%);
+}
+
+.rejectedCount {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: color-mix(in srgb, var(--danger) 78%, var(--text) 22%);
+}
+
+.pendingCount {
+  background: color-mix(in srgb, var(--color-highlight) 16%, transparent);
+  color: color-mix(in srgb, var(--color-highlight) 76%, var(--text) 24%);
+}
+
+.responseStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.responseAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+}
+
+.responseAccepted {
+  border-color: var(--sage);
+}
+
+.responseRejected {
+  border-color: var(--danger);
+  opacity: 0.78;
+}
+
+.responsePending {
+  border-color: color-mix(in srgb, var(--color-highlight) 74%, var(--border) 26%);
+}
+
+.responseBadge {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--bg);
+  background: var(--surface-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.confirmedTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.confirmedLabel {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: color-mix(in srgb, var(--sage) 14%, transparent);
+  color: color-mix(in srgb, var(--sage) 72%, var(--text) 28%);
+}
+
+.confirmedPill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: color-mix(in srgb, var(--sage) 14%, transparent);
+  color: color-mix(in srgb, var(--sage) 76%, var(--text) 24%);
+}
+
+.suggestionActions {
+  display: inline-flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.acceptBtn,
+.rejectBtn,
+.deleteBtn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+  background: color-mix(in srgb, var(--surface-card) 92%, var(--surface-raised, var(--surface-card)) 8%);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+}
+
+.meetingActionActive {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.acceptBtn {
+  color: color-mix(in srgb, var(--sage) 82%, white 18%);
+  background: color-mix(in srgb, var(--sage) 14%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--sage) 34%, var(--border) 66%);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--sage) 12%, transparent);
+}
+
+.rejectBtn {
+  color: color-mix(in srgb, var(--danger) 82%, white 18%);
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--danger) 32%, var(--border) 68%);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.deleteBtn {
+  color: color-mix(in srgb, var(--danger) 88%, black 12%);
+}
+
+.acceptBtn:hover,
+.rejectBtn:hover,
+.deleteBtn:hover {
+  transform: translateY(-1px);
+}
+
+.acceptBtn:hover {
+  background: color-mix(in srgb, var(--sage) 22%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--sage) 46%, var(--border) 54%);
+}
+
+.rejectBtn:hover {
+  background: color-mix(in srgb, var(--danger) 18%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--border) 58%);
+}
+
+.deleteBtn:hover {
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--danger) 34%, var(--border) 66%);
+}
+
+@media (max-width: 820px) {
+  .meetingCards,
+  .meetingCardsEmpty {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .suggestionCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .suggestionActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

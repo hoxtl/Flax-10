@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { useProfileVisibility, getVisibilityFlags } from '../../pages/Profile/hooks/useProfileVisibility';
+import { useProfileVisibility } from '../../pages/Profile/hooks/useProfileVisibility';
 
 describe('useProfileVisibility', () => {
     it('returns isSelf and all canView* true when profile is self', () => {
@@ -43,13 +43,3 @@ describe('useProfileVisibility', () => {
     });
 });
 
-describe('getVisibilityFlags', () => {
-    it('returns same result as useProfileVisibility', () => {
-        const profileData = { username: 'bob', is_shared_with_me: true };
-        const currentUser = { username: 'alice' };
-        const flags = getVisibilityFlags(profileData, currentUser);
-        expect(flags).toEqual(useProfileVisibility(profileData, currentUser));
-        expect(flags.isSelf).toBe(false);
-        expect(flags.canViewCalendar).toBe(true);
-    });
-});

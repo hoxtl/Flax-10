@@ -22,14 +22,16 @@ export const TopbarMock = ({ onLogoutClick, onAddClick, onSettingsClick, onProfi
   </div>
 );
 
-export const QuickAddMock = ({ onClose, onSelectType }) => (
+export const QuickAddMock = ({ onClose, onSelectType, initialView }) => (
   <div data-testid="quick-add-modal">
+    <span data-testid="quick-add-initial-view">{initialView}</span>
     <button onClick={onClose}>Close Quick Add</button>
     <button onClick={() => onSelectType("event", null)}>Add Event</button>
     <button onClick={() => onSelectType("society", null)}>Add Society</button>
     <button onClick={() => onSelectType("task", null)}>Add Task</button>
     <button onClick={() => onSelectType("create_module", null)}>Add Module</button>
     <button onClick={() => onSelectType("add_deadline", { id: 1, module_code: "CS101" })}>Add Deadline</button>
+    <button onClick={() => onSelectType("add_reading", { id: 2, module_code: "CS102" })}>Add Reading</button>
   </div>
 );
 
@@ -48,10 +50,17 @@ export const DeadlineModalMock = ({ onClose }) => (
   <div data-testid="deadline-modal"><button onClick={onClose}>Close Deadline Modal</button></div>
 );
 
-export const LeaveTimerMock = ({ onCancel, onPause, onExit }) => (
+export const ReadingModalMock = ({ onClose }) => (
+  <div data-testid="reading-modal"><button onClick={onClose}>Close Reading Modal</button></div>
+);
+
+export const LeaveTimerMock = ({ onCancel, onPause, onExit, onTakeBreak, timeLeftSeconds, sessionTotalSeconds }) => (
   <div data-testid="leave-timer-modal">
+    <span data-testid="leave-timer-time-left">{timeLeftSeconds}</span>
+    <span data-testid="leave-timer-session-total">{sessionTotalSeconds}</span>
     <button onClick={onCancel}>Stay</button>
     <button onClick={onPause}>Pause and Leave</button>
+    <button onClick={onTakeBreak}>Take a 5m Break instead</button>
     <button onClick={onExit}>Exit Timer</button>
   </div>
 );

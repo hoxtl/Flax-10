@@ -5,9 +5,9 @@ import { BreakModal } from '../../../components/Timer/TimerPopups';
 const testRender = () => {
     const onAction = vi.fn();
     render(<BreakModal onAction={onAction} />);
-    expect(screen.getByText('Focus Session Complete!')).toBeInTheDocument();
-    expect(screen.getByText('Start Break')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('Start Break'));
+    expect(screen.getByText('Focus session complete')).toBeInTheDocument();
+    expect(screen.getByText('Start 5m Stretch')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Start 5m Stretch'));
     expect(onAction).toHaveBeenCalled();
 };
 

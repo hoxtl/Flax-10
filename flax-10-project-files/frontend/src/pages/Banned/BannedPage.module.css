@@ -60,3 +60,5 @@
 .backBtn:active {
   transform: scale(0.97);
 }
+
+.backBtnWrapper { display: flex; justify-content: center; }

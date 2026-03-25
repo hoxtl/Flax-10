@@ -1,20 +1,24 @@
+/*
+ * Month view event dot component.
+ */
 import { useDrag } from '../hooks/useDragDrop';
 import { useEventPopup } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 import { getEventType } from '../utils/eventUtils';
 import { getEventTheme } from '../utils/eventStyleUtils';
+import dotStyles from './EventDot.module.css';
 
-export function EventDot({ e, onEventClick, customTags }) {
+export function EventDot({ e, onEventClick, customTags, readOnly }) {
     const eventType = getEventType(e);
-    const isReadOnly = eventType !== 'personal';
-    const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType);
+    const isReadOnly = readOnly || eventType !== 'personal';
+    const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType, readOnly);
 
     return (
-        <div className={className} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
-            style={{ backgroundColor: color, color: 'white', borderLeft: 'none' }}
+        <button type="button" className={`${className} ${dotStyles.eventDotColored}`} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
+            style={{ '--dot-bg': color }}
             {...(isReadOnly ? {} : dragProps)}>
             {e.title}
-        </div>
+        </button>
     );
 }
 
@@ -23,25 +27,18 @@ function getTitle(event) {
     return event.title;
 }
 
-function useEventDotLogic(event, onEventClick, customTags, eventType) {
+function createDotClickHandler(event, onEventClick, openPopup, popupReadOnly) {
+    return (ev) => { ev.stopPropagation(); const rect = ev.currentTarget.getBoundingClientRect(); if (onEventClick) onEventClick(event, rect); else openPopup(event, rect, popupReadOnly); };
+}
+
+function useEventDotLogic(event, onEventClick, customTags, eventType, readOnly) {
     const { openPopup } = useEventPopup();
     const globalTags = useTags();
     const theme = getEventTheme(event, globalTags);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
-
-    const handleClick = (ev) => {
-        ev.stopPropagation();
-        const rect = ev.currentTarget.getBoundingClientRect();
-        if (onEventClick) onEventClick(event, rect);
-        else openPopup(event, rect);
-    };
-
-    return {
-        color: theme.color,
-        className: getEventClassName(eventType, isDragging),
-        onClick: handleClick,
-        dragProps
-    };
+    const popupReadOnly = readOnly || eventType !== 'personal';
+    const handleClick = createDotClickHandler(event, onEventClick, openPopup, popupReadOnly);
+    return { color: theme.color, className: getEventClassName(eventType, isDragging), onClick: handleClick, dragProps };
 }
 
 function getEventClassName(eventType, isDragging) {
@@ -54,16 +51,16 @@ function getEventClassName(eventType, isDragging) {
 
 export function MoreEvents({ count, onClick }) {
     return (
-        <span
+        <button
+            type="button"
             className="more-events"
             onClick={(e) => {
                 e.stopPropagation();
                 onClick?.();
             }}
-            role="button"
             style={{ cursor: 'pointer' }}
         >
             +{count} more
-        </span>
+        </button>
     );
 }

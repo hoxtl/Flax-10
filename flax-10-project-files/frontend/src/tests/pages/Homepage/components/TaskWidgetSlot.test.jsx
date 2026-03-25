@@ -1,17 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { TaskWidgetSlot } from '../../../../pages/Homepage/components/TaskWidgetSlot';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { TaskWidgetSlot } from "../../../../pages/Homepage/components/TaskWidgetSlot";
 
-vi.mock('framer-motion', () => ({
+vi.mock("framer-motion", () => ({
   motion: new Proxy(
     {},
     {
       get: (_, tag) => {
-        const Tag = typeof tag === 'string' ? tag : 'div';
+        const Tag = typeof tag === "string" ? tag : "div";
         return ({ children, ...props }) => {
-          const { initial, animate, exit, transition, variants, layout, ...rest } = props;
-          return <Tag {...rest}>{children}</Tag>;
+          delete props.initial;
+          delete props.animate;
+          delete props.exit;
+          delete props.transition;
+          delete props.variants;
+          delete props.layout;
+          delete props.whileHover;
+          delete props.whileTap;
+          return <Tag {...props}>{children}</Tag>;
         };
       },
     }
@@ -19,66 +26,32 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../../pages/Tasks/components/TaskCard', () => ({
+vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
   TaskContextMenu: ({ task, onClose, onEditOpen, onDelete, onEdit }) => (
     <div data-testid="task-context-menu">
       <span>{task?.title}</span>
       <button onClick={onClose}>Close</button>
       <button onClick={onEditOpen}>Edit</button>
       <button onClick={onDelete}>Delete</button>
-      {onEdit && <button onClick={() => onEdit({ title: 'Updated title' })}>Inline Edit</button>}
+      {onEdit ? <button onClick={() => onEdit({ title: "Updated title" })}>Inline Edit</button> : null}
     </div>
   ),
 }));
 
 const mockStyles = {
-  taskWidgetSlotAllDoneWrap: 'allDone',
-  taskWidgetSlotRoot: 'root',
-  taskWidgetSlotHeader: 'header',
-  taskWidgetSlotIconWrap: 'iconWrap',
-  taskWidgetSlotIcon: 'icon',
-  taskWidgetSlotTitleBlock: 'titleBlock',
-  taskWidgetSlotTitle: 'title',
-  taskWidgetSlotSubtitle: 'subtitle',
-  taskWidgetSlotHeaderLeft: 'left',
-  taskWidgetFocusBtn: 'focusBtn',
-  taskWidgetSummaryRow: 'summaryRow',
-  taskWidgetDueTodayPill: 'pill',
-  taskWidgetSummaryPill: 'summaryPill',
-  taskWidgetTaskList: 'list',
-  taskWidgetTaskRow: 'row',
-  taskWidgetTaskRowOverdue: 'overdue',
-  taskWidgetTaskRowNext: 'next',
-  taskWidgetCheckbox: 'checkbox',
-  taskWidgetTaskBody: 'body',
-  taskWidgetTaskTopRow: 'topRow',
-  taskWidgetTaskTitle: 'taskTitle',
-  taskWidgetUrgencyPill: 'urgency',
-  taskWidgetUrgencyPillUrgent: 'urgent',
-  taskWidgetUrgencyPillHigh: 'high',
-  taskWidgetUrgencyPillNow: 'now',
-  taskWidgetMoreText: 'more',
-  taskWidgetLink: 'link',
-  taskWidgetPlanTomorrowPill: 'planTomorrow',
+  taskWidgetSlotAllDoneWrap: "allDone",
+  taskWidgetSlotRoot: "root",
+  taskWidgetPlanTomorrowPill: "planTomorrow",
+  taskWidgetLink: "link",
 };
 
 const defaultProps = {
   styles: mockStyles,
-  displayName: 'Tasks',
-  isToday: true,
-  taskWidgetOverdueCount: 0,
-  taskWidgetDueTodayCount: 2,
-  taskWidgetSpineCompletedPct: 0,
+  taskWidgetDueTodayCount: 0,
   taskWidgetItemsOnly: [],
   taskWidgetList: [],
-  showAllTaskWidgetTasks: false,
-  setShowAllTaskWidgetTasks: vi.fn(),
-  getTaskCategoryPill: vi.fn(),
-  getTaskCategoryColor: vi.fn(),
   handleTaskWidgetComplete: vi.fn(),
   taskWidgetRef: { current: null },
-  hasTimerSession: false,
-  onStartFocus: vi.fn(),
   taskLists: [],
   onEditTask: vi.fn(),
   onDeleteTask: vi.fn(),
@@ -93,227 +66,219 @@ function renderTaskWidgetSlot(props = {}) {
   );
 }
 
-describe('TaskWidgetSlot', () => {
+function hoursFromNow(hours) {
+  return new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+}
+
+function getTaskRow(title) {
+  return screen.getByLabelText(`Complete ${title}`).closest("div");
+}
+
+describe("TaskWidgetSlot", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders empty state when no tasks', () => {
+  it("renders empty state when no tasks", () => {
     renderTaskWidgetSlot();
-    expect(screen.getByText('No tasks need attention.')).toBeTruthy();
-    expect(screen.getByText('Add a task →')).toBeTruthy();
+    expect(screen.getByText("No tasks need attention.")).toBeTruthy();
+    expect(screen.getByText(/Add a task/i)).toBeTruthy();
   });
 
-  it('renders all tasks complete card when all done', () => {
+  it("renders all tasks complete card when all done", () => {
+    const completedTasks = [
+      { id: 1, title: "Task 1", completed: true },
+      { id: 2, title: "Task 2", completed: true },
+    ];
+
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [
-        { id: 1, title: 'Task 1', completed: true },
-        { id: 2, title: 'Task 2', completed: true },
-      ],
-      taskWidgetList: [],
+      taskWidgetItemsOnly: completedTasks,
+      taskWidgetList: completedTasks,
     });
-    expect(screen.getByText(/completed today/)).toBeTruthy();
-    expect(screen.getByText('Plan tomorrow →')).toBeTruthy();
+
+    expect(screen.getByText(/2 tasks completed today/i)).toBeTruthy();
+    expect(screen.getByText(/Plan tomorrow/i)).toBeTruthy();
   });
 
-  it('renders task list with incomplete tasks', () => {
+  it("renders task list with incomplete tasks", () => {
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [
-        { id: 1, title: 'Study math', completed: false },
-      ],
-      taskWidgetList: [
-        { id: 1, title: 'Study math', completed: false },
-      ],
+      taskWidgetDueTodayCount: 1,
+      taskWidgetItemsOnly: [{ id: 1, title: "Study math", completed: false, due_date: hoursFromNow(1) }],
+      taskWidgetList: [{ id: 1, title: "Study math", completed: false, due_date: hoursFromNow(1) }],
     });
+
     expect(screen.getByText("Today's Tasks")).toBeTruthy();
-    expect(screen.getByText('Study math')).toBeTruthy();
-    expect(screen.getByText('2 due today')).toBeTruthy();
-    expect(screen.getByText(/1 in queue/i)).toBeTruthy();
-    expect(screen.getByText('Focus now')).toBeTruthy();
+    expect(screen.getByText("Study math")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Go to all tasks" })).toBeTruthy();
+    expect(screen.getByText("Today")).toBeTruthy();
+    expect(screen.getByText("1")).toBeTruthy();
   });
 
-  it('calls handleTaskWidgetComplete when checkbox clicked', () => {
+  it("calls handleTaskWidgetComplete when checkbox clicked", () => {
     const handleTaskWidgetComplete = vi.fn();
+
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [
-        { id: 1, title: 'Task A', completed: false },
-      ],
-      taskWidgetList: [
-        { id: 1, title: 'Task A', completed: false },
-      ],
+      taskWidgetItemsOnly: [{ id: 1, title: "Task A", completed: false }],
+      taskWidgetList: [{ id: 1, title: "Task A", completed: false }],
       handleTaskWidgetComplete,
     });
-    fireEvent.click(screen.getByLabelText('Complete Task A'));
+
+    fireEvent.click(screen.getByLabelText("Complete Task A"));
     expect(handleTaskWidgetComplete).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 
-  it('shows Show more when more than 3 incomplete tasks', () => {
-    const tasks = Array.from({ length: 7 }, (_, i) => ({
-      id: i + 1,
-      title: `Task ${i + 1}`,
+  it("shows Show more when more than 6 incomplete tasks", () => {
+    const tasks = Array.from({ length: 7 }, (_, index) => ({
+      id: index + 1,
+      title: `Task ${index + 1}`,
       completed: false,
     }));
+
     renderTaskWidgetSlot({
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
     });
-    expect(screen.getByText(/\+ 4 more/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /\+ 1 more/i })).toBeTruthy();
   });
 
-  it('toggles showAll when Show more clicked', () => {
-    const setShowAllTaskWidgetTasks = vi.fn();
-    const tasks = Array.from({ length: 7 }, (_, i) => ({
-      id: i + 1,
-      title: `Task ${i + 1}`,
+  it("expands hidden tasks when Show more is clicked", () => {
+    const tasks = Array.from({ length: 7 }, (_, index) => ({
+      id: index + 1,
+      title: `Task ${index + 1}`,
       completed: false,
     }));
+
     renderTaskWidgetSlot({
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
-      setShowAllTaskWidgetTasks,
     });
-    fireEvent.click(screen.getByText(/\+ 4 more/));
-    // It should navigate instead of calling the old prop
-    // Note: useNavigate is mocked in this file at the top-level
-    // We need to check if it navigates to /tasks?filter=today
+    expect(screen.queryByText("Task 7")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /\+ 1 more/i }));
+    expect(screen.getByText("Task 7")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /show less/i })).toBeTruthy();
   });
 
-  it('shows urgency pill for overdue task', () => {
+  it("shows an overdue countdown for overdue tasks", () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: "Overdue task", completed: false, due_date: hoursFromNow(-1), taskWidgetStatus: "overdue" }],
+      taskWidgetList: [{ id: 1, title: "Overdue task", completed: false, due_date: hoursFromNow(-1), taskWidgetStatus: "overdue" }],
+    });
+
+    expect(screen.getByText("1d overdue")).toBeTruthy();
+  });
+
+  it("shows context menu on right click", () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: "Task", completed: false }],
+      taskWidgetList: [{ id: 1, title: "Task", completed: false }],
+    });
+
+    fireEvent.contextMenu(getTaskRow("Task"));
+    expect(screen.getByTestId("task-context-menu")).toBeTruthy();
+  });
+
+  it("shows High urgency pill for high priority task", () => {
+    renderTaskWidgetSlot({
+      taskWidgetItemsOnly: [{ id: 1, title: "High task", completed: false, due_date: hoursFromNow(1), priority: "high" }],
+      taskWidgetList: [{ id: 1, title: "High task", completed: false, due_date: hoursFromNow(1), priority: "high" }],
+    });
+
+    expect(screen.getByText("High")).toBeTruthy();
+  });
+
+  it("renders a compact completed section below active tasks", () => {
     renderTaskWidgetSlot({
       taskWidgetItemsOnly: [
-        { id: 1, title: 'Overdue task', completed: false, taskWidgetStatus: 'overdue' },
+        { id: 1, title: "Active task", completed: false },
+        { id: 2, title: "Completed task", completed: true },
       ],
       taskWidgetList: [
-        { id: 1, title: 'Overdue task', completed: false, taskWidgetStatus: 'overdue' },
+        { id: 1, title: "Active task", completed: false },
+        { id: 2, title: "Completed task", completed: true },
       ],
     });
-    expect(screen.getByText('Urgent')).toBeTruthy();
+
+    expect(screen.getByRole("button", { name: /\+ 1 completed/i })).toBeTruthy();
+    expect(screen.queryByText("Completed task")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /\+ 1 completed/i }));
+    expect(screen.getByText("Completed task")).toBeTruthy();
   });
 
-  it('shows context menu on right click', () => {
-    renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [
-        { id: 1, title: 'Task', completed: false },
-      ],
-      taskWidgetList: [
-        { id: 1, title: 'Task', completed: false },
-      ],
-    });
-    const row = screen.getByText('Task').closest('li');
-    fireEvent.contextMenu(row);
-    expect(screen.getByTestId('task-context-menu')).toBeTruthy();
-  });
-
-  // This behavior was removed in favor of a redirect
-  it.skip('shows Show less when showAllTaskWidgetTasks is true', () => {
-    const tasks = Array.from({ length: 7 }, (_, i) => ({
-      id: i + 1,
-      title: `Task ${i + 1}`,
-      completed: false,
-    }));
-    renderTaskWidgetSlot({
-      taskWidgetItemsOnly: tasks,
-      taskWidgetList: tasks,
-      showAllTaskWidgetTasks: true,
-    });
-    expect(screen.getByText('Show less')).toBeTruthy();
-  });
-
-  it('shows High urgency pill for high priority task', () => {
-    renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'High task', completed: false, priority: 'high' }],
-      taskWidgetList: [{ id: 1, title: 'High task', completed: false, priority: 'high' }],
-    });
-    expect(screen.getByText('High')).toBeTruthy();
-  });
-
-  it('renders a compact completed section below active tasks', () => {
-    renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [
-        { id: 1, title: 'Active task', completed: false },
-        { id: 2, title: 'Completed task', completed: true },
-      ],
-      taskWidgetList: [
-        { id: 1, title: 'Active task', completed: false },
-        { id: 2, title: 'Completed task', completed: true },
-      ],
-    });
-    expect(screen.getByText('Completed')).toBeTruthy();
-    expect(screen.getByText('1 done')).toBeTruthy();
-    expect(screen.queryByText('Completed task')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: /completed/i }));
-    expect(screen.getByText('Completed task')).toBeTruthy();
-  });
-
-  it('shows Now urgency pill for taskWidgetStatus now', () => {
-    renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'Now task', completed: false, taskWidgetStatus: 'now' }],
-      taskWidgetList: [{ id: 1, title: 'Now task', completed: false, taskWidgetStatus: 'now' }],
-    });
-    expect(screen.getByText('Now')).toBeTruthy();
-  });
-
-  it('calls onEditTask when context menu Edit is clicked', () => {
+  it("calls onEditTask when context menu Edit is clicked", () => {
     const onEditTask = vi.fn();
+
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'Ctx Task', completed: false }],
-      taskWidgetList: [{ id: 1, title: 'Ctx Task', completed: false }],
+      taskWidgetItemsOnly: [{ id: 1, title: "Ctx Task", completed: false }],
+      taskWidgetList: [{ id: 1, title: "Ctx Task", completed: false }],
       onEditTask,
     });
-    fireEvent.contextMenu(screen.getByText('Ctx Task').closest('li'));
-    fireEvent.click(screen.getByText('Edit'));
-    expect(onEditTask).toHaveBeenCalledWith(expect.objectContaining({ id: 1, title: 'Ctx Task' }));
+
+    fireEvent.contextMenu(getTaskRow("Ctx Task"));
+    fireEvent.click(screen.getByText("Edit"));
+    expect(onEditTask).toHaveBeenCalledWith(expect.objectContaining({ id: 1, title: "Ctx Task" }));
   });
 
-  it('calls onDeleteTask when context menu Delete is clicked', async () => {
+  it("calls onDeleteTask when context menu Delete is clicked", async () => {
     const onDeleteTask = vi.fn().mockResolvedValue(undefined);
+
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'Del Task', completed: false }],
-      taskWidgetList: [{ id: 1, title: 'Del Task', completed: false }],
+      taskWidgetItemsOnly: [{ id: 1, title: "Del Task", completed: false }],
+      taskWidgetList: [{ id: 1, title: "Del Task", completed: false }],
       onDeleteTask,
     });
-    fireEvent.contextMenu(screen.getByText('Del Task').closest('li'));
-    fireEvent.click(screen.getByText('Delete'));
+
+    fireEvent.contextMenu(getTaskRow("Del Task"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("Delete"));
+    });
     await vi.waitFor(() => expect(onDeleteTask).toHaveBeenCalledWith(expect.objectContaining({ id: 1 })));
+    await vi.waitFor(() => expect(screen.queryByTestId("task-context-menu")).toBeNull());
   });
 
-  it('closes context menu when Close is clicked', () => {
+  it("closes context menu when Close is clicked", () => {
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'T', completed: false }],
-      taskWidgetList: [{ id: 1, title: 'T', completed: false }],
+      taskWidgetItemsOnly: [{ id: 1, title: "T", completed: false }],
+      taskWidgetList: [{ id: 1, title: "T", completed: false }],
     });
-    fireEvent.contextMenu(screen.getByText('T').closest('li'));
-    fireEvent.click(screen.getByText('Close'));
-    expect(screen.queryByTestId('task-context-menu')).toBeNull();
+
+    fireEvent.contextMenu(getTaskRow("T"));
+    fireEvent.click(screen.getByText("Close"));
+    expect(screen.queryByTestId("task-context-menu")).toBeNull();
   });
 
-  it('all done card shows singular task when one task completed', () => {
+  it("all done card shows singular task when one task completed", () => {
+    const completedTask = [{ id: 1, title: "Only", completed: true }];
+
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'Only', completed: true }],
-      taskWidgetList: [],
+      taskWidgetItemsOnly: completedTask,
+      taskWidgetList: completedTask,
     });
-    expect(screen.getByText(/1 task.*completed today/)).toBeTruthy();
+
+    expect(screen.getByText(/1 task completed today/i)).toBeTruthy();
   });
 
-  it('calls onInlineTaskEdit when context menu Inline Edit is clicked', async () => {
+  it("calls onInlineTaskEdit when context menu Inline Edit is clicked", async () => {
     const onInlineTaskEdit = vi.fn().mockResolvedValue(undefined);
+
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'Edit Me', completed: false }],
-      taskWidgetList: [{ id: 1, title: 'Edit Me', completed: false }],
+      taskWidgetItemsOnly: [{ id: 1, title: "Edit Me", completed: false }],
+      taskWidgetList: [{ id: 1, title: "Edit Me", completed: false }],
       onInlineTaskEdit,
     });
-    fireEvent.contextMenu(screen.getByText('Edit Me').closest('li'));
-    fireEvent.click(screen.getByText('Inline Edit'));
+
+    fireEvent.contextMenu(getTaskRow("Edit Me"));
+    fireEvent.click(screen.getByText("Inline Edit"));
     await vi.waitFor(() =>
-      expect(onInlineTaskEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }), { title: 'Updated title' })
+      expect(onInlineTaskEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }), { title: "Updated title" })
     );
   });
 
-  it('shows Urgent pill for priority urgent', () => {
+  it("shows Urgent pill for priority urgent", () => {
     renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: 'Urgent task', completed: false, priority: 'urgent' }],
-      taskWidgetList: [{ id: 1, title: 'Urgent task', completed: false, priority: 'urgent' }],
+      taskWidgetItemsOnly: [{ id: 1, title: "Urgent task", completed: false, due_date: hoursFromNow(1), priority: "urgent" }],
+      taskWidgetList: [{ id: 1, title: "Urgent task", completed: false, due_date: hoursFromNow(1), priority: "urgent" }],
     });
-    expect(screen.getByText('Urgent')).toBeTruthy();
+
+    expect(screen.getByText("Urgent")).toBeTruthy();
   });
 });

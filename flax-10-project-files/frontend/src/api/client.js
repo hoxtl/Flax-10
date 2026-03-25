@@ -1,3 +1,7 @@
+/*
+ * Shared fetch wrapper that injects auth tokens and normalises errors.
+ */
+
 const API_BASE_URL = "/api";
 
 export async function fetchApi(endpoint, options = {}) {
@@ -11,7 +15,7 @@ function buildRequestConfig(options) {
   const token = localStorage.getItem('token');
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (token) headers['Authorization'] = `Token ${token}`;
-  return { headers, ...options };
+  return { ...options, headers };
 }
 
 async function handleResponse(response) {

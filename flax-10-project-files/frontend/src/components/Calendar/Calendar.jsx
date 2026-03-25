@@ -1,3 +1,8 @@
+/*
+ * Calendar.jsx
+ * Main calendar component with animated view switching.
+ */
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useCalendar } from "../../context/CalendarContext";
 import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
@@ -10,15 +15,15 @@ import { TableView } from "./TableView/TableView";
 import { viewSwapMotion } from "../common";
 import "./Calendar.css";
 
-export function Calendar() {
-  return (
-    <ResizeHighlightProvider>
-      <CalendarContent />
-    </ResizeHighlightProvider>
-  );
-}
+const MOTION_STYLE = { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 };
+const GRID_VIEWS = { day: DayView, week: WeekView, month: SwipeMonthView };
+const DISPLAY_VIEWS = { grid: null, list: ListView, table: TableView };
 
-const motionWrapperStyle = { display: "flex", flexDirection: "column", height: "100%" };
+function CalendarView({ viewMode, displayMode }) {
+  const View = DISPLAY_VIEWS[displayMode] || GRID_VIEWS[viewMode];
+  const { readOnly } = useCalendar();
+  return View ? <View readOnly={readOnly} /> : null;
+}
 
 function CalendarContent() {
   const { viewMode, displayMode } = useCalendar();
@@ -29,7 +34,7 @@ function CalendarContent() {
     <div className="calendar-container">
       <div className="calendar-view-relative-wrapper">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={viewKey} style={motionWrapperStyle} {...viewSwapMotion}>
+          <motion.div key={viewKey} style={MOTION_STYLE} {...viewSwapMotion}>
             <CalendarView viewMode={viewMode} displayMode={displayMode} />
           </motion.div>
         </AnimatePresence>
@@ -38,9 +43,12 @@ function CalendarContent() {
   );
 }
 
-function CalendarView({ viewMode, displayMode }) {
-  const gridViews = { day: DayView, week: WeekView, month: SwipeMonthView };
-  const displayViews = { grid: gridViews[viewMode], list: ListView, table: TableView };
-  const View = displayViews[displayMode] || gridViews[viewMode];
-  return View ? <View /> : null;
+/** Main calendar wrapper with resize highlight provider. */
+
+export function Calendar() {
+  return (
+    <ResizeHighlightProvider>
+      <CalendarContent />
+    </ResizeHighlightProvider>
+  );
 }

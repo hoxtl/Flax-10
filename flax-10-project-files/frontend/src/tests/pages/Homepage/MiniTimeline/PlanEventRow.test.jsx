@@ -12,6 +12,7 @@ vi.mock('lucide-react', () => ({
 }));
 
 vi.mock('../../../../pages/Homepage/utils/dateFormatUtils', () => ({
+    formatTime: vi.fn((t) => (t ? '9:00 am' : '')),
     formatTime12h: vi.fn((t) => (t ? '9:00 am' : '')),
     fmtDurationShort: vi.fn(() => '1h'),
 }));
@@ -25,7 +26,7 @@ vi.mock('../../../../pages/Homepage/utils/timelineUtils', () => ({
 }));
 
 vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
-    isDuringSleepWindow: vi.fn(() => false),
+    doesEventOverlapSleepWindow: vi.fn(() => false),
 }));
 
 import { PlanEventRow } from '../../../../pages/Homepage/components/MiniTimeline/PlanEventRow';
@@ -235,7 +236,7 @@ describe('PlanEventRow', () => {
     });
 
     it('shows sleep badge when isDuringSleepWindow returns true', () => {
-        vi.mocked(useSleepWarning.isDuringSleepWindow).mockReturnValueOnce(true);
+        vi.mocked(useSleepWarning.doesEventOverlapSleepWindow).mockReturnValueOnce(true);
         renderRow();
         expect(screen.getByLabelText('Scheduled during sleep hours')).toBeInTheDocument();
     });
@@ -253,49 +254,49 @@ describe('PlanEventRow', () => {
     it('renders lecture accent for lecture tag', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: 'lecture', title: 'CS Lecture' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#7B9BAD');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-lecture)');
     });
 
     it('renders routine accent for lunch title', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Lunch' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#B8956A');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-routine)');
     });
 
     it('renders wellness accent for gym title', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Gym session' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#7BB38E');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-wellness)');
     });
 
     it('renders society accent for KCLSU in title', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'KCLSU event' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#C4906A');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-society)');
     });
 
     it('renders social accent for coffee in title', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Coffee with friends' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#C0714E');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-social)');
     });
 
     it('renders study accent for library in title', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Library study' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#9A8CB0');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-study)');
     });
 
     it('renders meeting accent for seminar in title', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Seminar' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#A08B72');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-meeting)');
     });
 
     it('renders admin accent for laundry in title', () => {
         renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Laundry' } } });
         const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('#C4A46D');
+        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-admin)');
     });
 
     it('renders task list link when matchTask has task_list and no moduleCode', () => {
@@ -307,10 +308,10 @@ describe('PlanEventRow', () => {
         expect(link).toHaveAttribute('href', '/tasks?list=5');
     });
 
-    it('renders module link with matchTask when both moduleCode and matchTask present', () => {
+    it('renders the module pill instead of a task list link when both moduleCode and matchTask are present', () => {
         renderRow({ row: { ...baseRow, moduleCode: 'CS101', matchTask: { task_list: 5 } } });
-        const link = screen.getByRole('link', { name: 'CS101' });
-        expect(link).toHaveAttribute('href', '/tasks?list=5&module=CS101');
+        expect(screen.getByText('CS101')).toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'CS101' })).toBeNull();
     });
 
     it('does not call onPushTomorrow when disabled', () => {
@@ -348,8 +349,8 @@ describe('PlanEventRow', () => {
     });
 
     it('renders end time when different from start', async () => {
-        const { formatTime12h } = await import('../../../../pages/Homepage/utils/dateFormatUtils');
-        formatTime12h.mockReturnValueOnce('9:00 am').mockReturnValueOnce('10:00 am');
+        const { formatTime } = await import('../../../../pages/Homepage/utils/dateFormatUtils');
+        formatTime.mockReturnValueOnce('9:00 am').mockReturnValueOnce('10:00 am');
         renderRow();
         expect(screen.getByText(/10:00 am/)).toBeTruthy();
     });

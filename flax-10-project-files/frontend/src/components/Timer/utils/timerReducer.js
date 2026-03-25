@@ -1,9 +1,15 @@
+/*
+ * Timer feature file.
+ */
+
 export const initialState = (work = 25, breakTime = 5, sessions = 4) => ({
     workTime: work, breakTime, targetSessions: sessions, completedSessions: 0,
     timeLeft: work * 60, totalWork: 0, totalBreak: 0, totalPaused: 0,
     blockTotalWork: 0, blockTotalBreak: 0,
     isActive: false, isPaused: false, mode: 'work'
 });
+
+
 
 const tickState = (state) => {
     if (state.isPaused) return { ...state, totalPaused: state.totalPaused + 1 };

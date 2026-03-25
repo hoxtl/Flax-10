@@ -63,14 +63,14 @@ describe("TabButton", () => {
 });
 
 describe("SettingsTabs", () => {
-  it("renders all 6 tabs", () => {
+  it("renders preference tabs with updated labels", () => {
     render(<SettingsTabs activeTab="account" onChange={vi.fn()} />);
     expect(screen.getByText("Account")).toBeTruthy();
     expect(screen.getByText("Security")).toBeTruthy();
-    expect(screen.getByText("Preferences")).toBeTruthy();
-    expect(screen.getByText("Home Address")).toBeTruthy();
-    expect(screen.getByText("Sleep")).toBeTruthy();
-    expect(screen.getByText("Course Change")).toBeTruthy();
+    expect(screen.getByText("Appearance")).toBeTruthy();
+    expect(screen.getByText("Sleep Schedule")).toBeTruthy();
+    expect(screen.getByText("Scheduling")).toBeTruthy();
+    expect(screen.getByText("Location")).toBeTruthy();
   });
 
   it("calls onChange when a tab is clicked", () => {
@@ -90,7 +90,7 @@ describe("SuccessBanner", () => {
   it("renders message when provided", () => {
     render(<SuccessBanner message="Saved!" />);
     expect(screen.getByText("Saved!")).toBeTruthy();
-    expect(screen.getByText("✅")).toBeTruthy();
+    expect(screen.getByText("✓")).toBeTruthy();
   });
 });
 
@@ -103,7 +103,7 @@ describe("ErrorMessage", () => {
   it("renders error message when provided", () => {
     render(<ErrorMessage message="Something went wrong" />);
     expect(screen.getByText("Something went wrong")).toBeTruthy();
-    expect(screen.getByText("⚠️")).toBeTruthy();
+    expect(screen.getByText("✕")).toBeTruthy();
   });
 });
 
@@ -199,7 +199,9 @@ describe("FormSelect", () => {
         options={options}
       />,
     );
-    expect(screen.getByLabelText("Choose")).toBeTruthy();
+    // AnimatedDropdown is mocked in this test suite and doesn't wire the label via htmlFor.
+    expect(screen.getByText("Choose")).toBeTruthy();
+    expect(screen.getByRole("combobox")).toBeTruthy();
   });
 
   it("renders flat options", () => {

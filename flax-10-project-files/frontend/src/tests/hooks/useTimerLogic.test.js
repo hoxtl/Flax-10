@@ -141,7 +141,7 @@ describe('useTimerLogic Hook', () => {
             expect.any(Number), // blockId
             'My Important Task', // Task
             expect.any(Number), // pause
-            expect.any(String)  // status
+            expect.any(String), // status
         );
     });
 

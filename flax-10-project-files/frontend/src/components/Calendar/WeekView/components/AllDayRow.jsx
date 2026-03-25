@@ -1,3 +1,8 @@
+/**
+ * AllDayRow - Displays all-day events spanning multiple days in week view.
+ * Renders events as horizontal bars positioned across day columns.
+ */
+
 import { useMemo } from 'react';
 import { getAllDayVisualRange } from '../../utils/eventDisplayUtils';
 import { useEventPopup } from '../../../../context/CalendarContext';
@@ -5,6 +10,8 @@ import { useTags } from '../../../../context/TagContext';
 import { calculateEventLayout } from './allDayRowHelpers';
 import { getEventTheme } from '../../utils/eventStyleUtils';
 import './AllDayRow.css';
+
+/** Row component displaying all-day events as spanning bars. */
 
 export function AllDayRow({ days, events, readOnly }) {
     const layoutItems = useMemo(() => calculateEventLayout(events, days), [events, days]);
@@ -22,27 +29,23 @@ export function AllDayRow({ days, events, readOnly }) {
     );
 }
 
-function AllDayEventBar({ item, readOnly }) {
-    const { event, startCol, endCol, row } = item;
+function buildBarStyle(startCol, endCol, row, color) {
+    return { gridColumnStart: startCol, gridColumnEnd: endCol, gridRow: row, backgroundColor: color };
+}
+
+function useAllDayBarState(event) {
     const { openPopup } = useEventPopup();
     const tags = useTags();
     const theme = getEventTheme(event, tags);
+    const handleClick = (ev) => { ev.stopPropagation(); openPopup(event, ev.currentTarget.getBoundingClientRect()); };
+    return { theme, handleClick };
+}
 
-    const style = {
-        gridColumnStart: startCol,
-        gridColumnEnd: endCol,
-        gridRow: row,
-        backgroundColor: theme.color
-    };
-
-    const handleClick = (ev) => {
-        ev.stopPropagation();
-        const rect = ev.currentTarget.getBoundingClientRect();
-        openPopup(event, rect);
-    };
-
+function AllDayEventBar({ item, readOnly }) {
+    const { event, startCol, endCol, row } = item;
+    const { theme, handleClick } = useAllDayBarState(event);
     return (
-        <div className="all-day-event-bar" style={style} onClick={handleClick} data-event-id={event.id}>
+        <div className="all-day-event-bar" style={buildBarStyle(startCol, endCol, row, theme.color)} onClick={handleClick} data-event-id={event.id}>
             {event.title}
         </div>
     );

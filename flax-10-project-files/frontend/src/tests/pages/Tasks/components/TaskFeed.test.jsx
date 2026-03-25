@@ -1,5 +1,6 @@
+/* Tests for TaskFeed component rendering and user interactions */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "../../../../utils/test-utils";
 import TaskFeed from "../../../../pages/Tasks/components/TaskFeed";
 
 const useTaskFeedDataMock = vi.hoisted(() => vi.fn());
@@ -19,6 +20,9 @@ vi.mock("../../../../pages/Tasks/components/CompletedTasksSection", () => ({
 }));
 vi.mock("../../../../pages/Tasks/components/TaskSection", () => ({
   default: ({ title }) => <div data-testid="task-section">{title}</div>,
+}));
+vi.mock("../../../../pages/Tasks/components/SuggestedReadingsSection", () => ({
+  default: () => <div data-testid="suggested-readings-section" />,
 }));
 vi.mock("../../../../components/ui/EstTimeHelpBanner", () => ({
   default: () => <div data-testid="est-time-help" />,
@@ -102,5 +106,36 @@ describe("TaskFeed", () => {
     useTaskFeedDataMock.mockReturnValue(data({ filteredCompleted: [{ id: 99 }] }));
     render(<TaskFeed activeFilter="all" lists={[]} onToggleComplete={vi.fn()} onDeleteTask={vi.fn()} onEditTask={vi.fn()} />);
     expect(screen.getByTestId("completed-block")).toHaveTextContent("1");
+  });
+
+  it("renders suggested reading list section for module reading lists", () => {
+    useTaskFeedDataMock.mockReturnValue(data());
+    render(
+      <TaskFeed
+        activeFilter="all"
+        activeListId="7"
+        lists={[{ id: 7, name: "MA4101 - Calculus I" }]}
+        onToggleComplete={vi.fn()}
+        onDeleteTask={vi.fn()}
+        onEditTask={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId("suggested-readings-section")).toBeInTheDocument();
+  });
+
+  it("uses module-focused subtitle copy for reading lists", () => {
+    useTaskFeedDataMock.mockReturnValue(data({ headerTitle: "AI4404 - Reinforcement Learning" }));
+    render(
+      <TaskFeed
+        activeFilter="all"
+        activeListId="7"
+        lists={[{ id: 7, name: "AI4404 - Reinforcement Learning" }]}
+        onToggleComplete={vi.fn()}
+        onDeleteTask={vi.fn()}
+        onEditTask={vi.fn()}
+      />
+    );
+    expect(screen.getByText(/Keep your/i)).toBeInTheDocument();
+    expect(screen.getByText(/Reinforcement Learning \(AI4404\)/i)).toBeInTheDocument();
   });
 });

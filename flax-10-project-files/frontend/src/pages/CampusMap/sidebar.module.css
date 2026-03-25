@@ -1,0 +1,183 @@
+/**
+ * Campus map sidebar-specific styles.
+ */
+.locationChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface-inner);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.locationChipDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--border);
+}
+
+.locationChipText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.locationCoords {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.locationHint {
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.clearBtn:hover {
+  color: rgba(var(--brown-text), 0.8);
+  background: rgba(var(--c-cocoa), 0.08);
+}
+
+.geoBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.geoBtn:hover:not(:disabled) {
+  background: var(--panel);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--shadow-sm);
+}
+
+.geoBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.campusList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.campusBtn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 11px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+  transition: all 130ms ease;
+}
+
+.campusBtn:hover {
+  background: rgba(var(--c-cocoa), 0.06);
+  border-color: rgba(var(--c-cocoa), 0.1);
+}
+
+.campusBtnActive {
+  background: var(--surface-inner);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.campusDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.campusQuickNav {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  box-shadow: var(--shadow-lg);
+  z-index: 4;
+  max-width: calc(100% - 40px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.quickNavBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 130ms;
+  white-space: nowrap;
+}
+
+.quickNavBtn:hover {
+  background: var(--surface-inner);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.quickNavDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

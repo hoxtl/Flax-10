@@ -48,23 +48,40 @@ def _pick_time(event, data, field):
 
 def _overlap_limit_response():
     return Response(
-        {'error': 'Cannot have more than 3 overlapping events.'},
+        {'error': 'Cannot have more than 2 overlapping events.'},
         status=status.HTTP_400_BAD_REQUEST,
     )
 
-def update_event(event, data):
+def _event_update_error(event, data):
     if _is_locked_event(event):
         return _locked_event_response()
+    if _exceeds_overlap_limit(event, data):
+        return _overlap_limit_response()
+    return None
+
+
+def _exceeds_overlap_limit(event, data):
     start_time = _pick_time(event, data, 'start_time')
     end_time = _pick_time(event, data, 'end_time')
-    if exceeds_overlap_limit(event.user, start_time, end_time, exclude_id=event.id):
-        return _overlap_limit_response()
+    return exceeds_overlap_limit(event.user, start_time, end_time, exclude_id=event.id)
+
+
+def _event_update_result(event, data):
+    error_response = _event_update_error(event, data)
+    if error_response:
+        return None, error_response
     serialiser = CalendarEventCreateSerialiser(event, data=data, partial=True)
     if not serialiser.is_valid():
-        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        return None, Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
-    return Response(CalendarEventSerialiser(event).data)
+    return CalendarEventSerialiser(event).data, None
+
+
+def update_event(event, data):
+    payload, error_response = _event_update_result(event, data)
+    if error_response:
+        return error_response
+    return Response(payload)
 
 def delete_event(event):
     if _is_locked_event(event):
@@ -72,18 +89,38 @@ def delete_event(event):
     event.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def add_exception_date(request, pk):
-    event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
-    date = request.data.get('date')
+
+def _exception_date_error(event, date):
     if not date:
         return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
     if not event.recurrence_rule:
         return Response({'error': 'Event has no recurrence rule'}, status=status.HTTP_400_BAD_REQUEST)
+    return None
+
+
+def _append_exception_date(event, date):
     exception_dates = event.recurrence_rule.exception_dates or []
-    if date not in exception_dates:
-        exception_dates.append(date)
-        event.recurrence_rule.exception_dates = exception_dates
-        event.recurrence_rule.save()
-    return Response(CalendarEventSerialiser(event).data)
+    if date in exception_dates:
+        return
+    exception_dates.append(date)
+    event.recurrence_rule.exception_dates = exception_dates
+    event.recurrence_rule.save()
+
+
+def _exception_date_payload(event):
+    return CalendarEventSerialiser(event).data
+
+
+def _exception_date_response(request, pk):
+    event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)
+    date = request.data.get('date')
+    error_response = _exception_date_error(event, date)
+    if error_response:
+        return error_response
+    _append_exception_date(event, date)
+    return Response(_exception_date_payload(event))
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_exception_date(request, pk):
+    return _exception_date_response(request, pk)

@@ -12,11 +12,12 @@
   border-radius: var(--dropdown-radius);
   font: inherit;
   font-size: var(--text-base);
-  background: var(--surface-search);
+  background: var(--surface-inner, var(--surface-card, #ffffff));
   color: var(--text);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   box-sizing: border-box;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
 }
 
 .input::placeholder {

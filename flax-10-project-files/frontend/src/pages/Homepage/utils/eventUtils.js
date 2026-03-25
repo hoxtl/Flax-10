@@ -1,8 +1,7 @@
-/**
+/*
  * Homepage event helpers. Pure functions only.
  */
 
-/** Remove emoji and other symbols from a string for clean timeline titles. */
 export function stripEmojiFromTitle(str) {
   if (typeof str !== "string") return str ?? "";
   return str

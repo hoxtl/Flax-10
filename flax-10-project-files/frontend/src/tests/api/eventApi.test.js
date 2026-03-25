@@ -26,6 +26,11 @@ describe('eventApi', () => {
         expect(fetchApi).toHaveBeenCalledWith('/events/?start=2026-01-01');
     });
 
+    it('getEvents filters out all falsy values and preserves truthy numeric values', async () => {
+        await api.getEvents({ start: null, end: undefined, page: 2, q: 0, search: false });
+        expect(fetchApi).toHaveBeenCalledWith('/events/?page=2');
+    });
+
     it('createEvent sends POST with JSON body', async () => {
         const data = { title: 'Test Event' };
         await api.createEvent(data);

@@ -2,9 +2,10 @@
  * AnnouncementModal provides a comprehensive form for creating and editing society announcements,
  * with optional synchronization to the society's event calendar.
  */
-import { useState, useRef, useEffect } from "react";
+
+import { useState, useRef } from "react";
 import styles from "./AnnouncementModal.module.css";
-import { getInitialForm, validateForm, handleFileSelect, MAX_IMAGES } from "./AnnouncementModalHelpers";
+import { handleFileSelect, MAX_IMAGES } from "./AnnouncementModalHelpers";
 import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
 import { RecurrenceField } from "../../../../Calendar/EventModal/components/RecurrenceField";
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
@@ -13,37 +14,10 @@ import ConfirmModal from "../../../../common/ConfirmModal/ConfirmModal";
 import StandardModal from "../../../../common/StandardModal/StandardModal";
 import PrimaryButton from "../../../../common/PrimaryButton/PrimaryButton";
 import "../../../../Calendar/EventModal/EventModal.css";
-import { fetchSocietyEvent } from "../../../../../api/societyApi";
-import { useConfirm } from "../../../../../context/ConfirmContext";
-
-const findPinConflict = (announcements, formId) =>
-    announcements.find(a => a.pinned && a.id !== formId);
-
-const handlePinnedSubmit = async (form, announcements, confirmFn, onSubmit) => {
-    const other = findPinConflict(announcements, form.id);
-    if (other) return await handlePinConflict(form, other, confirmFn, onSubmit);
-    onSubmit(form);
-};
-
-const makeSubmit = (form, announcements, confirmFn, onSubmit, setError) =>
-    async () => {
-        const err = validateForm(form);
-        if (err) return setError(err);
-        if (form.pinned) return handlePinnedSubmit(form, announcements, confirmFn, onSubmit);
-        onSubmit(form);
-    };
-
-const useAnnounceForm = (announcement, societyId, onSubmit, announcements) => {
-    const [form, setForm] = useState(getInitialForm(announcement));
-    const [error, setError] = useState("");
-    const confirmFn = useConfirm();
-    useEffect(() => { loadLinkedEvent(announcement, societyId, setForm); }, [announcement, societyId]);
-    const submit = makeSubmit(form, announcements, confirmFn, onSubmit, setError);
-    return { form, setForm, error, setError, submit };
-};
+import { useAnnouncementForm } from "./useAnnouncementForm";
 
 export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = [], announcement = null, societyId, announcements = [] }) {
-    const { form, setForm, error, setError, submit } = useAnnounceForm(announcement, societyId, onSubmit, announcements);
+    const { form, setForm, error, submit } = useAnnouncementForm(announcement, societyId, onSubmit, announcements);
     const [showDelete, setShowDelete] = useState(false);
     const fileRef = useRef(null);
     const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
@@ -61,37 +35,11 @@ export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = 
     );
 }
 
-function loadLinkedEvent(announcement, societyId, setForm) {
-    if (!announcement?.event_id || !societyId) return;
-    fetchSocietyEvent(societyId, announcement.event_id)
-        .then(event => setForm(prev => mergeEventData(prev, event)))
-        .catch(e => console.error("Failed to load linked event", e));
-}
-
-function mergeEventData(prev, event) {
-    return {
-        ...prev, addAsEvent: true,
-        start_time: event.start_time?.slice(0, 16),
-        end_time: event.end_time?.slice(0, 16),
-        recurrence: event.recurrence, all_day: event.all_day
-    };
-}
-
 function DeleteConfirmModal({ hasEvent, onConfirm, onCancel }) {
     const message = hasEvent
         ? "This will delete the announcement and its linked event. This cannot be undone."
         : "Are you sure you want to delete this announcement? This cannot be undone.";
     return <ConfirmModal title="Delete Announcement" message={message} onConfirm={onConfirm} onCancel={onCancel} />;
-}
-
-
-async function handlePinConflict(form, other, confirmFn, onSubmit) {
-    const ok = await confirmFn({
-        title: "Replace Pinned",
-        message: `"${other.title}" is already pinned. Replace it?`,
-        confirmText: "Replace", cancelText: "Cancel"
-    });
-    if (ok) onSubmit(form, other);
 }
 
 function ModalContent({ form, update, setForm, fileRef, tags, error, onClose, onSubmit, isEdit, onDeleteClick }) {

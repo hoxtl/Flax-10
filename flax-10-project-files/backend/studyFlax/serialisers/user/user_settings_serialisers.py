@@ -15,10 +15,25 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
 
     def validate_major(self, value):
         """Prevent changing the major once it has been set."""
+
         if self.instance and self.instance.major and value != self.instance.major:
             raise serializers.ValidationError("major cannot be changed once set")
         return value
 
     class Meta:
         model = UserSettings
-        fields = ['theme', 'mode', 'timezone', 'year', 'major', 'major_locked', 'sleep_time', 'wake_time', 'homepage_widgets']
+        fields = [
+            'theme',
+            'mode',
+            'timezone',
+            'year',
+            'major',
+            'major_locked',
+            'sleep_time',
+            'wake_time',
+            'homepage_widgets',
+            'homepage_widget_sizes',
+            'preferred_study_minutes_per_day',
+            'week_preference',
+            'worktime_preference',
+        ]

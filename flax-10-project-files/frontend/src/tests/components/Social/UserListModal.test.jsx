@@ -28,7 +28,8 @@ describe('UserListModal', () => {
 
   it('renders empty state when users array is empty', () => {
     render(<UserListModal title="People" users={[]} onClose={vi.fn()} />);
-    expect(screen.getByText('No users found.')).toBeInTheDocument();
+    expect(screen.getByText('No users found')).toBeInTheDocument();
+    expect(screen.getByText('No one is sharing with you yet.')).toBeInTheDocument();
   });
 
   it('sorts current user first, then sharing users', () => {
@@ -64,26 +65,45 @@ describe('UserListModal', () => {
     expect(onUserUpdate).toHaveBeenCalledWith(2, true);
   });
 
+  it('renders a View calendar action when requested and calls onUserCalendarClick', () => {
+    const onUserCalendarClick = vi.fn();
+    render(
+      <UserListModal
+        title="People"
+        users={users}
+        onClose={vi.fn()}
+        showCalendarAction
+        onUserCalendarClick={onUserCalendarClick}
+      />
+    );
+
+    fireEvent.click(screen.getAllByText(/view calendar/i)[0]);
+
+    expect(screen.queryByTestId('share-2')).not.toBeInTheDocument();
+    expect(onUserCalendarClick).toHaveBeenCalledWith(expect.objectContaining({ id: 3, username: 'cara' }));
+  });
+
   it('closes on overlay and close button clicks, but not modal content click', () => {
     const onClose = vi.fn();
     const { container } = render(<UserListModal title="People" users={users} onClose={onClose} />);
 
-    const backdrop = container.querySelector('[class*="backdrop"]');
-    if (backdrop) fireEvent.mouseDown(backdrop);
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]') || document.body.querySelector('[class*="backdrop"]');
+    expect(backdrop).toBeTruthy();
+    fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalledTimes(1);
 
-    const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+    const closeBtn = screen.getByRole('button', { name: /close/i });
     fireEvent.click(closeBtn);
     expect(onClose).toHaveBeenCalledTimes(2);
 
-    const modalContent = container.querySelector('[class*="modal"]');
+    const modalContent = document.body.querySelector('div[class*="_modal"]') || container.querySelector('[class*="modal"]');
     if (modalContent) fireEvent.click(modalContent);
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it('renders avatar fallback from username when first_name is empty', () => {
+  it('renders the user row when first_name is empty', () => {
     render(<UserListModal title="People" users={users} onClose={vi.fn()} />);
-    expect(screen.getByText('c')).toBeInTheDocument();
+    expect(screen.getByText('Clark')).toBeInTheDocument();
   });
 
   it('treats matching username as current user even when id differs', () => {
@@ -140,5 +160,13 @@ describe('UserListModal', () => {
     ];
     render(<UserListModal title="People" users={usersNoId} onClose={vi.fn()} />);
     expect(screen.getByText('No Id')).toBeInTheDocument();
+  });
+
+  it('renders a profile photo when a shared user has one resolved', () => {
+    const photoUsers = [
+      { id: 99, username: 'ricky.curtis', first_name: 'Ricky', last_name: 'Curtis', is_sharing: true, profile_photo_url: 'https://example.com/avatar.jpg' },
+    ];
+    render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
+    expect(document.body.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
   });
 });

@@ -1,37 +1,11 @@
-import { useEffect, useState } from 'react';
 import styles from './EditProfileModal.module.css';
-import { updateUserProfile } from '../../api/userService';
 import { getInitials } from '../Authentication/utils/userUtils';
-import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 import FormField from '../common/FormField/FormField';
 import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../common/StandardModal/StandardModal';
 import TextInput from '../common/TextInput/TextInput';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-
-function resolveProfilePhoto(user) {
-  return getResolvedUserPhoto(user, {
-    allowGeneric: false,
-    seed: user?.username || user?.id || user?.name,
-  });
-}
-
-function useProfileForm(user) {
-  const [username, setUsername] = useState(user?.username || '');
-  const [bio, setBio] = useState(user?.bio || '');
-  const [profilePhoto, setProfilePhoto] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(resolveProfilePhoto(user));
-  const [removePhoto, setRemovePhoto] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  useEffect(() => {
-    setPreviewUrl(resolveProfilePhoto(user));
-    setRemovePhoto(false);
-  }, [user]);
-  return { username, setUsername, bio, setBio, profilePhoto, setProfilePhoto, previewUrl, setPreviewUrl, removePhoto, setRemovePhoto, loading, setLoading, error, setError, success, setSuccess };
-}
+import { useTransientSavedState } from '../common/hooks/useTransientSavedState';
+import { buildEditProfileSubmitHandler, useEditProfileForm } from './useEditProfileForm';
 
 function handlePhotoChange(e, setProfilePhoto, setPreviewUrl, setRemovePhoto) {
   const file = e.target.files[0];
@@ -45,61 +19,6 @@ function handleRemovePhoto(setProfilePhoto, setPreviewUrl, setRemovePhoto) {
   setProfilePhoto(null);
   setPreviewUrl(null);
   setRemovePhoto(true);
-}
-
-async function fetchUsernameAvailable(username, token) {
-  const res = await fetch(`${API_BASE_URL}/check-username/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
-    body: JSON.stringify({ username }),
-  });
-  const data = await res.json();
-  return data.available;
-}
-
-async function checkUsernameAvailable(username, currentUsername) {
-  if (username === currentUsername) return true;
-  try {
-    return await fetchUsernameAvailable(username, localStorage.getItem('token'));
-  } catch (err) {
-    console.error('Error checking username:', err);
-    return false;
-  }
-}
-
-function buildFormData(username, bio, profilePhoto, removePhoto) {
-  const formData = new FormData();
-  formData.append('username', username);
-  formData.append('bio', bio);
-  if (profilePhoto) formData.append('profile_photo', profilePhoto);
-  else if (removePhoto) formData.append('remove_photo', 'true');
-  return formData;
-}
-
-async function submitProfileUpdate(formData, onSave, setError, setSuccess, onClose) {
-  try {
-    await updateUserProfile(formData);
-    await onSave();
-    setSuccess('Profile saved successfully!');
-    setTimeout(onClose, 1500);
-  } catch (err) {
-    console.error('Failed to update profile:', err);
-    setError(err.response?.data?.error || 'Failed to update profile');
-  }
-}
-
-function buildSubmitHandler(form, user, onSave, onClose) {
-  const { username, bio, profilePhoto, removePhoto, setLoading, setError, setSuccess } = form;
-  return async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    if (username.length < 3) { setError('Username must be at least 3 characters long'); setLoading(false); return; }
-    const isAvailable = await checkUsernameAvailable(username, user?.username);
-    if (!isAvailable) { setError('Username is already taken'); setLoading(false); return; }
-    await submitProfileUpdate(buildFormData(username, bio, profilePhoto, removePhoto), onSave, setError, setSuccess, onClose);
-    setLoading(false);
-  };
 }
 
 function PhotoPreview({ previewUrl, initials }) {
@@ -148,35 +67,36 @@ function BioField({ bio, setBio }) {
   );
 }
 
-function FormActions({ loading, onClose }) {
+function FormActions({ loading, onClose, saveSignal }) {
+  const showSaved = useTransientSavedState(saveSignal);
+  const buttonLabel = loading ? 'Saving...' : showSaved ? '✓ Saved!' : 'Save Changes';
   return (
     <div className={styles.actions}>
       <PrimaryButton type="button" onClick={onClose} className={styles.cancelBtn} variant="ghost" pill>Cancel</PrimaryButton>
-      <PrimaryButton type="submit" disabled={loading} className={styles.saveBtn} pill>{loading ? 'Saving...' : 'Save Changes'}</PrimaryButton>
+      <PrimaryButton type="submit" disabled={loading} className={`${styles.saveBtn} ${showSaved ? styles.saveBtnSaved : ''}`} pill>{buttonLabel}</PrimaryButton>
     </div>
   );
 }
 
 function ModalForm({ form, user, onClose, onSubmit }) {
-  const { username, setUsername, bio, setBio, previewUrl, setProfilePhoto, setPreviewUrl, setRemovePhoto, loading, error, success } = form;
+  const { username, setUsername, bio, setBio, previewUrl, setProfilePhoto, setPreviewUrl, setRemovePhoto, loading, error, saveSignal } = form;
   const initials = user?.name ? getInitials(user.name) : username.substring(0, 2).toUpperCase();
   const onPhotoChange = (e) => handlePhotoChange(e, setProfilePhoto, setPreviewUrl, setRemovePhoto);
   const onRemovePhoto = () => handleRemovePhoto(setProfilePhoto, setPreviewUrl, setRemovePhoto);
   const canRemovePhoto = Boolean(previewUrl);
   return (
     <form onSubmit={onSubmit} className={styles.form}>
-      {success && <div className={styles.success}>{success}</div>}
       {error && <div className={styles.error}>{error}</div>}
       <PhotoSection previewUrl={previewUrl} initials={initials} canRemovePhoto={canRemovePhoto} onPhotoChange={onPhotoChange} onRemovePhoto={onRemovePhoto} />
       <UsernameField username={username} setUsername={setUsername} />
       <BioField bio={bio} setBio={setBio} />
-      <FormActions loading={loading} onClose={onClose} />
+      <FormActions loading={loading} onClose={onClose} saveSignal={saveSignal} />
     </form>);}
 
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
-  const form = useProfileForm(user);
+  const form = useEditProfileForm(user);
   if (!isOpen) return null;
-  const handleSubmit = buildSubmitHandler(form, user, onSave, onClose);
+  const handleSubmit = buildEditProfileSubmitHandler(form, user, onSave);
   return (
     <StandardModal
       title="Edit Profile"

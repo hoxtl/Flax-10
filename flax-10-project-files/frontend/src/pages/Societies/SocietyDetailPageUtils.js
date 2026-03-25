@@ -13,14 +13,16 @@ function extractUrl(item) {
 }
 
 export function getAvailablePhotos(society) {
-    if (!society) return [];
-    const announcementImages = extractAnnouncementImages(society.announcements || []);
-    const currentCovers = new Set(getImageUrls(society.images));
-    return announcementImages.filter(img => !currentCovers.has(img));
-}
-
-function extractAnnouncementImages(announcements) {
-    return announcements.flatMap(a => (a?.images || []).map(extractUrl)).filter(Boolean);
+    const coverUrls = new Set(getImageUrls(society?.images));
+    const available = [];
+    (society?.announcements || []).forEach(ann => {
+        getImageUrls(ann?.images).forEach(url => {
+            if (!coverUrls.has(url) && !available.includes(url)) {
+                available.push(url);
+            }
+        });
+    });
+    return available;
 }
 
 export function scrollContentToTop() {

@@ -10,12 +10,13 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory
 
 from ..base import BaseTestCase
-from studyFlax.models import Module, User
+from studyFlax.models import Enrollment, Module, Notification, User
 from studyFlax.serialisers import ModuleSerialiser
 
 class ModuleViewTests(BaseTestCase):
 
     """Tests for module view."""
+
     def setUp(self):
         super().setUp()
         self.user.role = 'teacher'
@@ -63,6 +64,45 @@ class ModuleViewTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Module.objects.filter(id=self.module.id).exists())
 
+    def test_teacher_delete_unenrols_students_and_notifies_them(self):
+        student = User.objects.create_user(
+            username='module_student',
+            email='module_student@example.com',
+            password='pass',
+        )
+        student.role = 'student'
+        student.save()
+        Enrollment.objects.create(student=student, module=self.module)
+
+        response = self.client.delete(f'/api/modules/{self.module.id}/')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Enrollment.objects.filter(student=student, module=self.module).exists())
+        notification = Notification.objects.get(user=student, notification_type='module_deleted')
+        self.assertIn('unenrolled', notification.message.lower())
+        self.assertEqual(notification.action_url, '/modules')
+
+    def test_teacher_update_notifies_enrolled_students_about_changes(self):
+        student = User.objects.create_user(
+            username='updated_student',
+            email='updated_student@example.com',
+            password='pass',
+        )
+        student.role = 'student'
+        student.save()
+        Enrollment.objects.create(student=student, module=self.module)
+
+        response = self.client.put(
+            f'/api/modules/{self.module.id}/',
+            {'module_name': 'Updated module title'},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        notification = Notification.objects.get(user=student, notification_type='module_updated')
+        self.assertIn('module name', notification.message.lower())
+        self.assertEqual(notification.action_url, f'/modules?code={self.module.module_code}')
+
     def test_teacher_cannot_update_module_with_duplicate_code(self):
         Module.objects.create(
             module_code='TAKEN001', module_name='Taken',
@@ -86,6 +126,7 @@ class ModuleViewTests(BaseTestCase):
 
 class ModuleSerialiserTests(TestCase):
     """Tests for module serialiser."""
+
     def setUp(self):
         self.factory = APIRequestFactory()
         self.teacher = User.objects.create_user(
@@ -207,3 +248,36 @@ class ModuleViewCoverageTest(TestCase):
         self.client.force_authenticate(user=other_teacher)
         response = self.client.delete(f'/api/modules/{self.module.id}/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ModuleNotificationsTest(TestCase):
+    """Tests for module notification helper branches."""
+
+    def test_notify_module_updated_does_nothing_for_empty_fields(self):
+        from studyFlax.views.modules.module_notifications import notify_module_updated
+        from unittest.mock import MagicMock
+        module = MagicMock()
+        notify_module_updated(module, [])
+
+    def test_format_updated_fields_empty_returns_details(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields([]), 'details')
+
+    def test_format_updated_fields_one_label(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields(['module_code']), 'module code')
+
+    def test_format_updated_fields_two_labels(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields(['module_code', 'module_name']), 'module code and module name')
+
+    def test_format_updated_fields_three_labels(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(
+            _format_updated_fields(['module_code', 'module_name', 'description']),
+            'module code, module name, and description',
+        )
+
+    def test_format_updated_fields_four_or_more_returns_details(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields(['module_code', 'module_name', 'description', 'semester']), 'details')

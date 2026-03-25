@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks taskCardUtils: getModuleColor, formatDueDate, getCompletedDueLabel,
  * splitEstimatedBlocks, formatFocusBlocks, PRIORITY_LABELS, PRIORITY_MARKS.
  */

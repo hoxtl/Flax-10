@@ -58,8 +58,6 @@ vi.mock('lucide-react', () => ({
 }));
 
 describe('common DateTimePicker', () => {
-  const originalInnerHeight = window.innerHeight;
-
   function openDropdown() {
     const trigger = document.querySelector('.trigger');
     if (!trigger) throw new Error('Trigger button not found');
@@ -213,7 +211,7 @@ describe('common DateTimePicker', () => {
     const { rerender } = render(<DateTimePicker value="invalid" onChange={onChange} placeholder="Pick" />);
     expect(document.querySelector('.trigger')).toBeInTheDocument();
     rerender(<DateTimePicker value="2026-03-15T10:30" onChange={onChange} placeholder="Pick" />);
-    expect(screen.getByText(/15 Mar 2026/)).toBeInTheDocument();
+    expect(screen.getByText(/15 \/ 03 \/ 2026/)).toBeInTheDocument();
   });
 
   it('full dateTime mode emits ISO string when selecting day', () => {
@@ -230,4 +228,3 @@ describe('common DateTimePicker', () => {
     }
   });
 });
-

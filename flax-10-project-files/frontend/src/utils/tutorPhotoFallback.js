@@ -1,3 +1,7 @@
+/*
+ * Deterministic avatar fallbacks for tutors and students.
+ */
+
 function normalise(value = "") {
   return `${value}`.trim().toLowerCase().replace(/^dr\.\s*/i, "");
 }
@@ -25,58 +29,40 @@ const KNOWN_FEMALE_NAMES = new Set([
 ]);
 
 function getFirstName(fullName = "") {
-  const clean = `${fullName}`.trim().toLowerCase().replace(/^dr\.\s*/i, "");
-  return clean.split(/\s+/)[0] || "";
+  return normalise(fullName).split(/\s+/)[0] || "";
 }
 
-function inferGender({ fullName = "", username = "" } = {}) {
-  const uname = normalise(username);
-  const first = getFirstName(fullName);
+const MALE_USERNAME_PATTERN = /^johndoe|charlie|omar|liamk|srahwan|echen|jmurphy|rkapoor|dnguyen|tbrown|fnunes|cellis|bkwame|jpark$/;
+const FEMALE_USERNAME_PATTERN = /^janedoe|riley|nina|sofia|amiller|hpatel|swan|lturner|ofarrell|ayamada|hlewis|asmith$/;
 
-  if (KNOWN_MALE_NAMES.has(first) || /^johndoe|charlie|omar|liamk|srahwan|echen|jmurphy|rkapoor|dnguyen|tbrown|fnunes|cellis|bkwame|jpark$/.test(uname)) {
-    return "male";
-  }
-  if (KNOWN_FEMALE_NAMES.has(first) || /^janedoe|riley|nina|sofia|amiller|hpatel|swan|lturner|ofarrell|ayamada|hlewis|asmith$/.test(uname)) {
-    return "female";
-  }
+function inferGender({ fullName = "", username = "" } = {}) {
+  const first = getFirstName(fullName);
+  const uname = normalise(username);
+  if (KNOWN_MALE_NAMES.has(first) || MALE_USERNAME_PATTERN.test(uname)) return "male";
+  if (KNOWN_FEMALE_NAMES.has(first) || FEMALE_USERNAME_PATTERN.test(uname)) return "female";
   return "unknown";
 }
 
 function buildGenderAvatar(seedKey = "", gender = "unknown") {
   const hash = getHash(seedKey);
-  if (gender === "male") {
-    const idx = MALE_AVATAR_INDICES[hash % MALE_AVATAR_INDICES.length];
-    return `https://randomuser.me/api/portraits/men/${idx}.jpg`;
-  }
-  if (gender === "female") {
-    const idx = FEMALE_AVATAR_INDICES[hash % FEMALE_AVATAR_INDICES.length];
-    return `https://randomuser.me/api/portraits/women/${idx}.jpg`;
-  }
-  const idx = (hash % 50) + 1;
-  return `https://i.pravatar.cc/96?img=${idx}`;
+  if (gender === "male") return `https://randomuser.me/api/portraits/men/${MALE_AVATAR_INDICES[hash % MALE_AVATAR_INDICES.length]}.jpg`;
+  if (gender === "female") return `https://randomuser.me/api/portraits/women/${FEMALE_AVATAR_INDICES[hash % FEMALE_AVATAR_INDICES.length]}.jpg`;
+  return `https://i.pravatar.cc/96?img=${(hash % 50) + 1}`;
 }
 
 function buildNonHumanAvatar(seedKey = "") {
   const hash = getHash(seedKey);
-  if (hash % 2 === 0) {
-    return `https://robohash.org/${encodeURIComponent(seedKey)}?set=set4&size=96x96`;
-  }
+  if (hash % 2 === 0) return `https://robohash.org/${encodeURIComponent(seedKey)}?set=set4&size=96x96`;
   return `https://picsum.photos/seed/${encodeURIComponent(seedKey)}/96/96`;
 }
 
 function buildStudentFallback(seedKey = "") {
   const hash = getHash(seedKey);
-  if (hash % 10 === 0) {
-    return null;
-  }
-  if (hash % 4 === 0) {
-    return buildNonHumanAvatar(seedKey);
-  }
+  if (hash % 4 === 0) return buildNonHumanAvatar(seedKey);
   return buildGenderAvatar(seedKey, "unknown");
 }
 
 const FIXED_PROFILE_PHOTOS = {
-  // Core fixed accounts
   johndoe: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=96&h=96&q=80",
   janedoe: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=96&h=96&q=80",
   charlie: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&h=96&q=80",
@@ -85,8 +71,6 @@ const FIXED_PROFILE_PHOTOS = {
   omar: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=96&h=96&q=80",
   sofia: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=96&h=96&q=80",
   liamk: "https://picsum.photos/seed/liam.kelly/96/96",
-
-  // Fixed teachers (all unique)
   amiller: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&h=96&q=80",
   srahwan: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&h=96&q=80",
   hpatel: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=96&h=96&q=80",
@@ -127,37 +111,38 @@ const FIXED_NAME_PHOTOS = {
 export function getTutorPhotoFallback({ fullName = "", username = "", role = "", seed = "", allowGeneric = false } = {}) {
   const byUsername = FIXED_PROFILE_PHOTOS[normalise(username)];
   if (byUsername) return byUsername;
-
   const byName = FIXED_NAME_PHOTOS[normalise(fullName)];
   if (byName) return byName;
-
   if (!allowGeneric) return null;
-
-  const normalisedRole = normalise(role);
   const seedKey = seed || username || fullName;
-  if (normalisedRole === "teacher") return buildGenderAvatar(seedKey, inferGender({ fullName, username }));
+  if (normalise(role) === "teacher") return buildGenderAvatar(seedKey, inferGender({ fullName, username }));
   return buildStudentFallback(seedKey);
 }
 
+function extractDirectPhoto(user) {
+  return user.profile_photo_url || user.profile_photo || user.avatar || null;
+}
+
+function extractFullName(user) {
+  return user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
+}
+
+function extractUsername(user) {
+  return user.username || user.user_name || "";
+}
+
+/** Resolves a user's display photo, falling back to a deterministic avatar. */
+
 export function getResolvedUserPhoto(user, options = {}) {
   if (!user) return null;
-
-  const direct =
-    user.profile_photo_url ||
-    user.profile_photo ||
-    user.avatar ||
-    null;
+  const direct = extractDirectPhoto(user);
   if (direct) return direct;
-
-  const fullName =
-    user.name ||
-    `${user.first_name || ""} ${user.last_name || ""}`.trim();
-
+  const username = extractUsername(user);
   return getTutorPhotoFallback({
-    fullName,
-    username: user.username,
+    fullName: extractFullName(user),
+    username,
     role: user.role,
-    seed: options.seed,
+    seed: options.seed || username || user.id || extractFullName(user),
     allowGeneric: Boolean(options.allowGeneric),
   });
 }

@@ -49,10 +49,13 @@
 
 .form-field label {
     display: block;
-    margin-bottom: 0.25rem;
-    font-weight: 500;
-    color: var(--text);
-    font-size: 0.875rem;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-body);
 }
 
 .form-field input,
@@ -91,6 +94,38 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
+}
+
+.form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.tag-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+}
+
+.tag-field-header label {
+    margin-bottom: 0;
+}
+
+.tag-manage-btn {
+    background: none;
+    border: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0;
+    font-family: var(--font-body);
+}
+
+.tag-manage-btn:hover {
+    text-decoration: underline;
 }
 
 .submit-btn {

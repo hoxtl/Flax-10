@@ -1,6 +1,7 @@
 """
 Model for user notifications with type, action URL, and read status.
 """
+
 from django.db import models
 from studyFlax.models.auth.user_model import User
 
@@ -13,6 +14,8 @@ NOTIFICATION_TYPES = [
     ('ratification_approved', 'Ratification Approved'),
     ('ratification_rejected', 'Ratification Rejected'),
     ('meeting_suggestion', 'Meeting Suggestion'),
+    ('module_deleted', 'Module Deleted'),
+    ('module_updated', 'Module Updated'),
 ]
 
 class Notification(models.Model):

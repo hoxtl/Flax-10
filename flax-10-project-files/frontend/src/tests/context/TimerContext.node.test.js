@@ -1,6 +1,7 @@
 /**
  * Unit tests for TimerContext provider and persistence helpers.
  */
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const useTimerLogicMock = vi.fn();

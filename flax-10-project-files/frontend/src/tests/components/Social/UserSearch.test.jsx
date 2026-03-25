@@ -15,7 +15,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     searchUsers: vi.fn(() => Promise.resolve([])),
 }));
 
@@ -44,7 +44,7 @@ vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
 
 import UserSearch, { useSearchInit, FilterSection } from '../../../components/Social/UserSearch';
 
-import { searchUsers } from '../../../api/userService';
+import { searchUsers } from '../../../api/userApi';
 import { fetchSocieties } from '../../../api/societyApi';
 
 describe('UserSearch', () => {
@@ -187,14 +187,11 @@ describe('UserSearch', () => {
     });
 
     it('handles society init errors without crashing', async () => {
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
         fetchSocieties.mockRejectedValueOnce(new Error('societies down'));
         render(<UserSearch onUserSelect={vi.fn()} />);
 
         await act(async () => { });
         expect(screen.getByTestId('search-bar')).toBeTruthy();
-        expect(errSpy).toHaveBeenCalled();
-        errSpy.mockRestore();
     });
 
     it('shows societies tab and filters societies', async () => {
@@ -219,6 +216,20 @@ describe('UserSearch', () => {
         fireEvent.change(screen.getByTestId('search-bar'), { target: { value: 'nonexistent' } });
         await waitFor(() => expect(searchUsers).toHaveBeenCalled());
         await waitFor(() => expect(screen.getByText('No users found')).toBeTruthy());
+    });
+
+    it('renders custom empty state when provided', async () => {
+        searchUsers.mockResolvedValueOnce([]);
+        render(
+            <UserSearch
+                onUserSelect={vi.fn()}
+                renderEmptyState={() => <div>Custom collaborator empty state</div>}
+            />
+        );
+        fireEvent.focus(screen.getByTestId('search-bar'));
+        fireEvent.change(screen.getByTestId('search-bar'), { target: { value: 'nobody' } });
+        await waitFor(() => expect(searchUsers).toHaveBeenCalled());
+        await waitFor(() => expect(screen.getByText('Custom collaborator empty state')).toBeTruthy());
     });
 
     it('handles searchUsers rejection', async () => {

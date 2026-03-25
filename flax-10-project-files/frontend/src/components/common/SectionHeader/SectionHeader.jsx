@@ -1,10 +1,14 @@
+/*
+ * Section-level header with eyebrow, title, subtitle, and action slot.
+ */
+
 import styles from "./SectionHeader.module.css";
 
-export default function SectionHeader({ eyebrow, title, subtitle, action, className = "" }) {
-  const classes = className ? `${styles.header} ${className}` : styles.header;
+/** Section header with an optional eyebrow label and right-aligned action. */
 
+export default function SectionHeader({ eyebrow, title, subtitle, action, className = "" }) {
   return (
-    <div className={classes}>
+    <div className={className ? `${styles.header} ${className}` : styles.header}>
       <div className={styles.copy}>
         {eyebrow && <div className={styles.eyebrow}>{eyebrow}</div>}
         <h2 className={styles.title}>{title}</h2>

@@ -1,68 +1,26 @@
+/*
+ * Filter dropdown and tag manager entrypoint.
+ */
+
 import { useState } from "react";
 import styles from "./PillFilters.module.css";
-import { countByType } from "./utils/pillUtils";
-import { useTags } from "../../context/TagContext";
+import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import TagManagerModal from "./TagManagerModal";
-import BasePill from "./BasePill";
+import { usePillFilterOptions } from "./pillFilters/usePillFilterOptions";
+import { FilterTriggerButton } from "./pillFilters/PillFilterControls";
+import { ManageTagsButton } from "./pillFilters/PillFilterControls";
 
-export default function PillFilters({ active, onChange, items }) {
-  const { tags } = useTags();
+export default function PillFilters({ active, items, onChange }) {
   const [showManager, setShowManager] = useState(false);
-  const counts = countByType(items);
-  const pills = getAllPills(tags);
+  const { activeLabel, options } = usePillFilterOptions({ active, items });
+
   return (
     <>
       <div className={styles.row}>
-        {pills.map((p) => (
-          <PillItem
-            key={p.id} pill={p} active={active}
-            counts={counts} onChange={onChange}
-          />
-        ))}
-        <ManagerButton onClick={() => setShowManager(true)} />
+        <AnimatedDropdown align="left" className={styles.filterDropdown} customTrigger={<FilterTriggerButton label={activeLabel} />} onChange={onChange} options={options} value={active} />
+        <ManageTagsButton onClick={() => setShowManager(true)} />
       </div>
       {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
     </>
   );
-}
-
-/**
- * Combines the static 'All' option with dynamic tags from context.
- */
-function getAllPills(tags) {
-  const uniqueTags = Array.from(
-    new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
-  );
-  return [
-    { id: "all", key: "all", label: "All" },
-    ...uniqueTags.map(t => ({ id: t.id, key: t.label.toLowerCase(), label: t.label, color: t.color })),
-  ];
-}
-
-/**
- * Renders an individual pill button.
- */
-function PillItem({ pill, active, counts, onChange }) {
-  return (
-    <BasePill
-      label={pill.label}
-      count={counts[pill.key] || 0}
-      isActive={checkActive(active, pill.key)}
-      onClick={() => onChange(pill.key)}
-      color={pill.color}
-    />
-  );
-}
-
-/**
- * Checks if a specific key is currently active in the filter state.
- * Handles both string (single) and array (multi) active states.
- */
-function checkActive(active, key) {
-  if (Array.isArray(active)) return active.includes(key);
-  return active === key;
-}
-
-function ManagerButton({ onClick }) {
-  return <button className={`${styles.pill} ${styles.inactive}`} onClick={onClick} aria-label="Manage Tags">✎</button>;
 }

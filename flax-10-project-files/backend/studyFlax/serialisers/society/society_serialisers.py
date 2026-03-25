@@ -109,6 +109,7 @@ class SocietyEventSerialiser(SilentNotificationMixin, serializers.ModelSerialize
 
 class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
     """Serializer for society events displayed in personal calendar."""
+
     society_name = serializers.CharField(source='society.name', read_only=True)
     society_color = serializers.SerializerMethodField()
     source = serializers.SerializerMethodField()
@@ -127,8 +128,16 @@ class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
         return 'society'
 
 SOCIETY_COLORS = [
-    '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3',
-    '#00BCD4', '#009688', '#4CAF50', '#FF9800', '#FF5722',
+    '#F4A7B9',  # dusty rose
+    '#B8C8F4',  # periwinkle
+    '#A8D8B0',  # mint
+    '#F9C89A',  # peach
+    '#C5B4E3',  # lavender
+    '#96CEFF',  # sky blue
+    '#F7D090',  # butter
+    '#B0D9A8',  # sage
+    '#F2C6D0',  # blush
+    '#9FD3D3',  # seafoam
 ]
 
 def get_society_color(society_id):

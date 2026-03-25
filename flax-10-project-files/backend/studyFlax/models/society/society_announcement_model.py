@@ -1,6 +1,7 @@
 """
 Models for society announcements and their associated images.
 """
+
 from django.db import models
 
 from .society_model import Society

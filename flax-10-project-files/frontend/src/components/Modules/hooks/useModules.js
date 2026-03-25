@@ -1,70 +1,70 @@
-import { useState, useEffect } from 'react';
+/*
+ * Hook for managing modules state, enrolments, and CRUD operations.
+ */
+
+import { useState, useEffect, useMemo } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
-import { fetchTasks } from '../../../api/taskService.js';
-import { isEnrolledIn, getEnrollmentId } from '../utils/moduleUtils.js';
+import { fetchTasks } from '../../../api/taskApi.js';
+import { isEnrolledIn, getEnrollmentId, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { createNotify } from '../utils/notifyHelper.js';
 import { useConfirm } from '../../../context/ConfirmContext.jsx';
 
-function useModuleActions(
-  modules,
-  enrollments,
-  loading,
-  setModules,
-  setEnrollments,
-  notify,
-  confirmFn,
-  taskCountsByModule,
-) {
+function buildEnrollmentHandlers(enrollments, setEnrollments, notify) {
   return {
-    modules, enrollments, loading,
-    taskCountsByModule,
     handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify),
     handleDisenrol: (m) => handleDisenrol(m, enrollments, setEnrollments, notify),
     toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments)
       ? handleDisenrol(m, enrollments, setEnrollments, notify)
       : handleEnrollment(m, setEnrollments, notify),
+  };
+}
+
+function buildModuleHandlers(setModules, notify, confirmFn) {
+  return {
     handleDeleteModule: (m, cb) => handleDeleteModule(m, setModules, notify, confirmFn, cb),
+    handleDirectDeleteModule: (m, cb) => confirmDelete(m, setModules, notify, cb),
     handleModuleCreated: (m) => { setModules(prev => [...prev, m]); notify('Module created successfully', 'success'); },
     handleModuleUpdated: (m) => { setModules(prev => prev.map(x => x.id === m.id ? m : x)); notify('Module updated successfully', 'success'); },
   };
 }
 
-function normalizeModuleCode(code) {
-  return String(code || "").toUpperCase().replace(/\s+/g, "");
+function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn, taskCountsByModule) {
+  const enrollmentHandlers = buildEnrollmentHandlers(enrollments, setEnrollments, notify);
+  const moduleHandlers = buildModuleHandlers(setModules, notify, confirmFn);
+  return { modules, enrollments, loading, taskCountsByModule, ...enrollmentHandlers, ...moduleHandlers };
 }
 
 function buildTaskCounts(tasks = []) {
   return tasks.reduce((acc, task) => {
     if (task?.completed) return acc;
-    const code = normalizeModuleCode(task?.module_code);
+    const code = normaliseModuleCode(task?.module_code);
     if (!code) return acc;
     acc[code] = (acc[code] || 0) + 1;
     return acc;
   }, {});
 }
 
-async function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify) {
-  try {
-    setLoading(true);
-    const [modulesRes, enrollmentsRes, tasksRes] = await Promise.allSettled([
-      getModules(),
-      getEnrollments(),
-      fetchTasks(),
-    ]);
-    if (modulesRes.status !== "fulfilled") throw modulesRes.reason;
-    if (enrollmentsRes.status !== "fulfilled") throw enrollmentsRes.reason;
+function extractResults(results) {
+  const [modulesRes, enrollmentsRes, tasksRes] = results;
+  if (modulesRes.status !== "fulfilled") throw modulesRes.reason;
+  if (enrollmentsRes.status !== "fulfilled") throw enrollmentsRes.reason;
+  const taskCounts = tasksRes.status === "fulfilled" ? buildTaskCounts(tasksRes.value) : {};
+  return { modules: modulesRes.value || [], enrollments: enrollmentsRes.value || [], taskCounts };
+}
 
-    setModules(modulesRes.value || []);
-    setEnrollments(enrollmentsRes.value || []);
-    setTaskCountsByModule(
-      tasksRes.status === "fulfilled" ? buildTaskCounts(tasksRes.value) : {},
-    );
-  } catch (err) {
-    notify(err.message, 'error');
-  } finally {
-    setLoading(false);
-  }
+function applyLoadedData(data, setModules, setEnrollments, setTaskCountsByModule) {
+  setModules(data.modules);
+  setEnrollments(data.enrollments);
+  setTaskCountsByModule(data.taskCounts);
+}
+
+function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify) {
+  setLoading(true);
+  Promise.allSettled([getModules(), getEnrollments(), fetchTasks()])
+    .then(results => applyLoadedData(extractResults(results), setModules, setEnrollments, setTaskCountsByModule))
+    .catch(err => notify(err.message, 'error'))
+    .finally(() => setLoading(false));
 }
 
 async function handleEnrollment(module, setEnrollments, notify) {
@@ -77,6 +77,14 @@ async function handleEnrollment(module, setEnrollments, notify) {
   }
 }
 
+function handleDisenrolError(err, module, setEnrollments, notify) {
+  if (/core course|core module/i.test(err.message)) {
+    setEnrollments(prev => prev.map(e => e.module === module.id ? { ...e, is_core: true } : e));
+  } else {
+    notify(err.message, 'error');
+  }
+}
+
 async function handleDisenrol(module, enrollments, setEnrollments, notify) {
   try {
     const enrollment_id = getEnrollmentId(module.id, enrollments);
@@ -84,7 +92,7 @@ async function handleDisenrol(module, enrollments, setEnrollments, notify) {
     setEnrollments(prev => prev.filter(e => e.id !== enrollment_id));
     notify(`Unenrolled from ${module.module_name}!`, 'success');
   } catch (err) {
-    notify(err.message, 'error');
+    handleDisenrolError(err, module, setEnrollments, notify);
   }
 }
 
@@ -121,10 +129,9 @@ export default function useModules() {
   const [enrollments, setEnrollments] = useState([]);
   const [taskCountsByModule, setTaskCountsByModule] = useState({});
   const { addNotification } = useNotifications();
-  const notify = createNotify(addNotification);
+  const notify = useMemo(() => createNotify(addNotification), [addNotification]);
   const confirmFn = useConfirm();
-
-  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, []);
+  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, [notify]);
   return useModuleActions(
     modules,
     enrollments,

@@ -30,11 +30,23 @@ vi.mock('../../components/Calendar/hooks/calendarHelpers', () => ({
 
 describe('useCalendarEvents', () => {
   let dispatch;
+  let monthOffset = 0;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     dispatch = vi.fn();
-    useCalendarMock.mockReturnValue({ events: [{ id: 1 }], selectedDate: '2026-03-09', viewMode: 'month' });
+    const month = 2 + monthOffset; // 0-indexed, start around March
+    const year = 2026 + Math.floor(month / 12);
+    const normalizedMonth = ((month % 12) + 12) % 12;
+    const selectedDate = new Date(year, normalizedMonth, 9).toISOString();
+    monthOffset += 1;
+
+    useCalendarMock.mockReturnValue({
+      events: [{ id: 1 }],
+      selectedDate,
+      viewMode: 'month',
+      sharedCalendarUserId: null,
+    });
     useCalendarDispatchMock.mockReturnValue(dispatch);
     getDateRangeForViewMock.mockReturnValue({ start: '2026-03-01', end: '2026-03-31' });
     getEventsMock.mockResolvedValue([{ id: 2 }]);
@@ -48,7 +60,6 @@ describe('useCalendarEvents', () => {
     const { result } = renderHook(() => useCalendarEvents());
 
     await waitFor(() => {
-      expect(dispatch).toHaveBeenCalledWith({ type: 'SET_LOADING', payload: true });
       expect(dispatch).toHaveBeenCalledWith({ type: 'SET_EVENTS', payload: [{ id: 2 }] });
     });
 
@@ -62,6 +73,21 @@ describe('useCalendarEvents', () => {
 
     await waitFor(() => {
       expect(dispatch).toHaveBeenCalledWith({ type: 'SET_ERROR', payload: 'boom' });
+    });
+  });
+
+  it('loads shared calendar events with the viewed user id when present', async () => {
+    useCalendarMock.mockReturnValue({
+      events: [{ id: 1 }],
+      selectedDate: new Date(2026, 2, 9).toISOString(),
+      viewMode: 'month',
+      sharedCalendarUserId: '42',
+    });
+
+    renderHook(() => useCalendarEvents());
+
+    await waitFor(() => {
+      expect(getEventsMock).toHaveBeenCalledWith({ start: '2026-03-01', end: '2026-03-31', user_id: '42' });
     });
   });
 

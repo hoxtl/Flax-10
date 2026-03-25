@@ -1,14 +1,13 @@
-/**
- * Modal for creating and editing tasks. Uses useCreateTaskModal for state.
+/*
+ * Modal for creating and editing tasks.
  */
 
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import FormField from "../../../components/common/FormField/FormField";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import TextInput from "../../../components/common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
@@ -45,7 +44,10 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
     <div className={styles.footer}>
       {saveError && <p className={styles.saveError} role="alert">{saveError}</p>}
       {isEditMode && onDeleteTask && (
-        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" onClick={handleDelete} disabled={saving} pill>Delete task</PrimaryButton>
+        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" size="small" onClick={handleDelete} disabled={saving} pill>
+          <Trash2 size={15} strokeWidth={2.1} aria-hidden />
+          Delete task
+        </PrimaryButton>
       )}
       <PrimaryButton type="button" className={styles.cancelBtn} variant="ghost" onClick={onClose} pill>Cancel</PrimaryButton>
       <PrimaryButton type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.due_date} pill>
@@ -58,12 +60,14 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
 function CreateTaskModalTitleDesc({ form, set }) {
   return (
     <div className={styles.canvas}>
-      <FormField htmlFor="create-task-title" label={<>Task name <span className={styles.labelRequired}>*</span></>} className={styles.fieldGroup}>
+      <div className={styles.fieldGroup}>
+        <label className={styles.gridLabel} htmlFor="create-task-title">Task name <span className={styles.labelRequired}>*</span></label>
         <TextInput id="create-task-title" className={styles.titleInput} placeholder="What do you need to do?" value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus />
-      </FormField>
-      <FormField htmlFor="create-task-desc" label="Description" className={styles.fieldGroup}>
-        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Optional" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
-      </FormField>
+      </div>
+      <div className={styles.fieldGroup}>
+        <label className={styles.gridLabel} htmlFor="create-task-desc">Description <span className={styles.labelOptional}>(optional)</span></label>
+        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Add a description…" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
+      </div>
     </div>
   );
 }
@@ -103,29 +107,6 @@ function CreateTaskModalDuration({ form, setForm, isReadingList }) {
   );
 }
 
-function getBlockLabel(estimatedReadingMinutes) {
-    const blocks = estimatedReadingMinutes ? Math.max(1, Math.round(estimatedReadingMinutes / 25)) : null;
-    return blocks ? `~${estimatedReadingMinutes} min · ${blocks * 25}m block${blocks > 1 ? "s" : ""}` : null;
-}
-
-function CreateTaskModalPageCount({ form, set, isReadingList, estimatedReadingMinutes }) {
-    if (!isReadingList) return null;
-    const blockLabel = getBlockLabel(estimatedReadingMinutes);
-    return (
-        <div className={styles.durationRow}>
-            <div className={styles.rowBlock}>
-                <span className={styles.focusBlocksLabel}>
-                    Page count <span style={{ opacity: 0.5, fontSize: "0.8em" }}>(optional)</span>
-                </span>
-                <input className={`${styles.titleInput} ${styles.pageCountModalInput}`} type="number" min="1"
-                    placeholder="e.g. 38" value={form.page_count ?? ""}
-                    onChange={(e) => set("page_count", e.target.value ? Number(e.target.value) : null)}
-                />
-                {blockLabel && <p className={styles.pageCountHint}>📖 Est. reading time: {blockLabel}</p>}
-            </div>
-        </div>
-    );
-}
 
 function CreateTaskModalCategory({ form, categoryOptions, selectedListColor, handleCategoryChange }) {
   return (
@@ -193,15 +174,14 @@ function CreateTaskModalScheduleRow({ isEditMode, showAddToScheduleToggle, addTo
 }
 
 function CreateTaskModalBody({ state, addToScheduleLabel }) {
-  const { form, set, setForm, categoryOptions, selectedListColor, askFlaxInitialMessage, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
+  const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList } = state;
   return (
     <div className={styles.body}>
       <CreateTaskModalTitleDesc form={form} set={set} />
       <CreateTaskModalDateTime form={form} set={set} />
       <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
-      <CreateTaskModalPageCount form={form} set={set} isReadingList={isReadingList} estimatedReadingMinutes={estimatedReadingMinutes} />
-      <CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
+<CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
       <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>

@@ -1,3 +1,7 @@
+/**
+ * Landing page styles.
+ */
+
 .wrapper {
   position: relative;
   width: 100%;
@@ -172,17 +176,9 @@
   transform: scale(0.78);
 }
 
-@media (min-width: 640px) {
-  .globeInner {
-    transform: scale(0.94);
-  }
-}
+@media (min-width: 640px) { .globeInner { transform: scale(0.94); } }
 
-@media (min-width: 1024px) {
-  .globeInner {
-    transform: scale(1.04);
-  }
-}
+@media (min-width: 1024px) { .globeInner { transform: scale(1.04); } }
 
 .section {
   position: relative;
@@ -214,23 +210,13 @@
 }
 
 .sectionActive,
-.sectionInactive {
-  transition: filter 0.7s ease, opacity 0.7s ease;
-}
+.sectionInactive { transition: filter 0.7s ease, opacity 0.7s ease; }
 
-.sectionActive {
-  filter: saturate(1);
-  opacity: 1;
-}
+.sectionActive { filter: saturate(1); opacity: 1; }
 
-.sectionInactive {
-  filter: saturate(0.9);
-  opacity: 0.94;
-}
+.sectionInactive { filter: saturate(0.9); opacity: 0.94; }
 
-.sectionCenter {
-  align-items: center;
-}
+.sectionCenter { align-items: center; }
 
 .sectionRight {
   align-items: center;
@@ -259,9 +245,7 @@
   filter: blur(0);
 }
 
-.title {
-  margin: 0 0 12px;
-}
+.title { margin: 0 0 12px; }
 
 .title::after {
   content: "";
@@ -274,11 +258,7 @@
   opacity: 0.85;
 }
 
-.titleGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.titleGroup { display: flex; flex-direction: column; gap: 6px; }
 
 .titleMain {
   display: inline-block;
@@ -305,11 +285,7 @@
   font-size: 1.06rem;
 }
 
-.featureGrid {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+.featureGrid { display: grid; gap: 10px; margin-bottom: 20px; }
 
 .featureCard {
   display: flex;
@@ -342,13 +318,9 @@
   line-height: 1.4;
 }
 
-.sectionLast .sectionInner {
-  padding-right: 16px;
-}
+.sectionLast .sectionInner { padding-right: 16px; }
 
-.sectionContent {
-  margin-top: 14px;
-}
+.sectionContent { margin-top: 14px; }
 
 .actionRow {
   margin-top: 14px;
@@ -368,14 +340,8 @@
 }
 
 @keyframes ping {
-  0%, 80%, 100% {
-    opacity: 0.35;
-    transform: scale(1);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.35);
-  }
+  0%, 80%, 100% { opacity: 0.35; transform: scale(1); }
+  40% { opacity: 1; transform: scale(1.35); }
 }
 
 @media (max-width: 768px) {
@@ -392,17 +358,11 @@
     letter-spacing: 0.03em;
   }
 
-  .sectionNav {
-    display: none;
-  }
+  .sectionNav { display: none; }
 
-  .section {
-    padding: 28px 16px;
-  }
+  .section { padding: 28px 16px; }
 
-  .titleMain {
-    font-size: clamp(1.05rem, 7vw, 1.7rem);
-  }
+  .titleMain { font-size: clamp(1.05rem, 7vw, 1.7rem); }
 
   .actionButton {
     min-width: 0;

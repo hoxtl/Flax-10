@@ -2,11 +2,13 @@
  * ModalContent renders the main body of the event modal.
  * Switches between the event form, overlap warning, and sleep warning views.
  */
+
 import { ModalHeader } from './ModalHeader';
 import { EventFormBody } from './EventFormBody';
 import ConfirmModal from '../../../common/ConfirmModal/ConfirmModal';
 
 /** Top-level modal content that selects the appropriate view and stops click propagation. */
+
 export function ModalContent(props) {
     if (props.sleepWarning) {
         return <SleepWarningView settings={props.sleepSettings} onCancel={props.handleCancelSleep} onConfirm={props.handleConfirmSleep} />;
@@ -52,15 +54,6 @@ function formatTime(t) {
     if (!t) return t;
     const [h, m] = t.split(':').map(Number);
     return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
-}
-
-function SleepWarningBody({ settings }) {
-    return (
-        <div className="modal-body">
-            <p>Your sleep schedule is <strong>{formatTime(settings?.sleepTime)}</strong> to <strong>{formatTime(settings?.wakeTime)}</strong>. This event falls during your rest time.</p>
-            <p>Are you sure you want to schedule something at this hour?</p>
-        </div>
-    );
 }
 
 function SleepWarningView({ settings, onCancel, onConfirm }) {

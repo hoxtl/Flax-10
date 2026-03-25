@@ -1,185 +1,79 @@
-import React, { useState } from "react";
+/**
+ * Intelligence dashboard grid.
+ */
+
+import { useState } from "react";
 import styles from "./IntelligenceGrid.module.css";
-import { BentoCard } from "../../../components/ui/bento-grid";
+import { GridActions } from "./IntelligenceGridControls";
+import { AddSheet } from "./IntelligenceGridSheets";
+import { AddWidgetSlot, GridWidgetList, HeroWidget } from "./IntelligenceGridWidgets";
 
-// Helper for drag animations/logic
-const DelBtn = ({ onClick }) => (
-  <button
-    className={styles.delBtn}
-    onClick={(e) => {
-      e.stopPropagation();
-      onClick();
-    }}
-  >
-    −
-  </button>
-);
-
-const Grip = () => (
-  <div className={styles.grip}>
-    {[0, 1, 2, 3, 4, 5].map((i) => (
-      <div key={i} className={styles.gripDot} />
-    ))}
-  </div>
-);
-
-const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
-  const available = catalogue.filter((w) => !active.includes(w.id));
-  if (!visible) return null;
-  return (
-    <div className={styles.addSheetBackdrop}>
-      <div className={styles.addSheetOverlay} onClick={onClose} />
-      <div className={styles.addSheet}>
-        <div className={styles.addSheetHandle} />
-        <h3 className={styles.addSheetTitle}>Add Widgets</h3>
-        <p className={styles.addSheetSubtitle}>Tap a widget to add it to your dashboard</p>
-        
-        {available.length === 0 ? (
-          <div style={{ textAlign: "center", color: "var(--text-muted-sage)", padding: "32px 0" }}>
-            All widgets are already on your dashboard!
-          </div>
-        ) : (
-          <div className={styles.addOptionsGrid}>
-            {available.map((w) => (
-              <div
-                key={w.id}
-                className={styles.addOptionCard}
-                onClick={() => {
-                  onAdd(w.id);
-                  onClose();
-                }}
-              >
-                <span className={styles.addOptionIcon}>{w.icon}</span>
-                <div className={styles.addOptionInfo}>
-                  <div className={styles.addOptionLabel}>{w.label}</div>
-                  <div className={styles.addOptionMeta}>{w.col}×{w.row} tile</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default function IntelligenceGrid({
-  layout,
-  setLayout,
-  edit,
-  catalogue,
-  widgetRenderer,
-  showAdd,
-  setShowAdd,
-}) {
-  const [dragging, setDragging] = useState(null);
-  const [dragOver, setDragOver] = useState(null);
-
-  const onDragStart = (e, id) => {
-    setDragging(id);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const onDragEnd = () => {
-    setDragging(null);
-    setDragOver(null);
-  };
-
-  const onDragOver = (e, id) => {
-    e.preventDefault();
-    if (id !== dragging) setDragOver(id);
-  };
-
-  const onDrop = (e, targetId) => {
-    e.preventDefault();
-    if (!dragging || dragging === targetId) return;
-    setLayout((prev) => {
-      const next = [...prev];
-      const fi = next.indexOf(dragging);
-      const ti = next.indexOf(targetId);
-      next.splice(fi, 1);
-      next.splice(ti, 0, dragging);
-      return next;
-    });
-    onDragEnd();
-  };
-
+export default function IntelligenceGrid(props) {
+  const drag = useGridDrag(props.setLayout);
   return (
     <div className={styles.gridContainer}>
-
+      <GridActions edit={props.edit} onRandomize={props.onRandomize} onReset={props.onReset} onToggleEdit={() => toggleEdit(props)} />
       <div className={styles.bentoGrid} data-testid="bento-grid">
-        {/* Pinned Hero Section inside the grid container */}
-        {layout.includes("hero") && (
-          <div 
-            className={`${styles.widgetWrapper} ${styles["widget-hero"]}`}
-            style={{ gridColumn: "1 / -1" }}
-          >
-            <div className={styles.widgetClip}>
-              <div className={styles.widgetContent}>
-                {widgetRenderer("hero")}
-              </div>
-            </div>
-          </div>
-        )}
-        {layout.filter(id => id !== "hero").map((id) => {
-          const w = catalogue.find((item) => item.id === id);
-          if (!w) return null;
-          
-          const isDragSrc = dragging === id;
-          const isDragTgt = dragOver === id;
-
-          const wrapperClass = `
-            ${styles.widgetWrapper} 
-            ${edit ? styles.editMode : ""} 
-            ${isDragSrc ? styles.dragging : ""} 
-            ${isDragTgt ? styles.dragOver : ""} 
-            ${styles["widget-" + id] || ""}
-          `;
-
-          return (
-            <div
-              key={id}
-              draggable={edit}
-              onDragStart={edit ? (e) => onDragStart(e, id) : undefined}
-              onDragEnd={edit ? onDragEnd : undefined}
-              onDragOver={edit ? (e) => onDragOver(e, id) : undefined}
-              onDrop={edit ? (e) => onDrop(e, id) : undefined}
-              className={wrapperClass}
-              data-widget-id={id}
-              style={{
-                gridColumn: `span ${w.col}`,
-                gridRow: `span ${w.row}`,
-              }}
-            >
-              {edit && <DelBtn onClick={() => setLayout((prev) => prev.filter((x) => x !== id))} />}
-              {edit && <Grip />}
-              <div className={styles.widgetClip}>
-                <div className={styles.widgetContent}>
-                  <BentoCard>{widgetRenderer(id)}</BentoCard>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {edit && (
-          <div
-            onClick={() => setShowAdd(true)}
-            className={styles.addWidgetSlot}
-          >
-            <span className={styles.addIcon}>＋</span>
-            <span className={styles.addLabel}>Add Widget</span>
-          </div>
-        )}
+        <HeroWidget {...props} />
+        <MobileActionsBar edit={props.edit} onRandomize={props.onRandomize} onReset={props.onReset} onToggleEdit={() => toggleEdit(props)} />
+        <GridWidgetList {...props} {...drag} />
+        <AddWidgetSlot edit={props.edit} onClick={() => props.setShowAdd(true)} />
       </div>
+      <AddSheet visible={props.showAdd} active={props.layout} catalogue={props.catalogue} onAdd={(id) => addWidget(id, props.setLayout)} onClose={() => props.setShowAdd(false)} />
+    </div>
+  );
+}
 
-      <AddSheet
-        visible={showAdd}
-        active={layout}
-        catalogue={catalogue}
-        onAdd={(id) => setLayout((prev) => [...prev, id])}
-        onClose={() => setShowAdd(false)}
-      />
+function toggleEdit(props) {
+  props.setEdit(!props.edit);
+  if (props.edit) props.setShowAdd(false);
+}
+
+function addWidget(id, setLayout) {
+  setLayout((prev) => (prev.includes(id) ? prev : [...prev, id]));
+}
+
+function useGridDrag(setLayout) {
+  const [dragging, setDragging] = useState(null);
+  const [dragOver, setDragOver] = useState(null);
+  return { dragOver, dragging, onDragEnd: () => endDrag(setDragging, setDragOver), onDragOver: (event, id) => markDragTarget(event, dragging, id, setDragOver), onDragStart: (event, id) => beginDrag(event, id, setDragging), onDrop: (event, id) => dropWidget(event, dragging, id, setLayout, setDragging, setDragOver) };
+}
+
+function beginDrag(event, id, setDragging) {
+  setDragging(id);
+  event.dataTransfer.effectAllowed = "move";
+}
+
+function endDrag(setDragging, setDragOver) {
+  setDragging(null);
+  setDragOver(null);
+}
+
+function markDragTarget(event, dragging, id, setDragOver) {
+  event.preventDefault();
+  if (id !== dragging) setDragOver(id);
+}
+
+function dropWidget(event, dragging, targetId, setLayout, setDragging, setDragOver) {
+  event.preventDefault();
+  if (!dragging || dragging === targetId) return;
+  setLayout((prev) => reorderLayout(prev, dragging, targetId));
+  endDrag(setDragging, setDragOver);
+}
+
+function reorderLayout(layout, dragging, targetId) {
+  const next = [...layout];
+  const fromIndex = next.indexOf(dragging);
+  const targetIndex = next.indexOf(targetId);
+  next.splice(fromIndex, 1);
+  next.splice(targetIndex, 0, dragging);
+  return next;
+}
+
+function MobileActionsBar({ edit, onRandomize, onReset, onToggleEdit }) {
+  return (
+    <div className={styles.afterHeroBar} style={{ gridColumn: "1 / -1" }}>
+      <div className={styles.mobileActionsBar}><GridActions edit={edit} onRandomize={onRandomize} onReset={onReset} onToggleEdit={onToggleEdit} /></div>
     </div>
   );
 }

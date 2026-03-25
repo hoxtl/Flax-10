@@ -1,6 +1,7 @@
 """
 Utility functions for sending application emails.
 """
+
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string

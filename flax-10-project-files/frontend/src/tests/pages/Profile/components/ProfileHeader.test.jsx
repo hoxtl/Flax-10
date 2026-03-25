@@ -1,6 +1,7 @@
 /**
  * Tests for ProfileHeader and its subcomponents.
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ProfileHeader from '../../../../pages/Profile/components/ProfileHeader';
@@ -38,6 +39,7 @@ const defaultHandlers = {
   onTasksClick: vi.fn(),
   onEventsClick: vi.fn(),
   onSharedWithClick: vi.fn(),
+  onSharedByClick: vi.fn(),
   reload: vi.fn(),
   setOptimisticShare: vi.fn(),
 };
@@ -153,25 +155,21 @@ describe('ProfileHeader', () => {
     render(
       <ProfileHeader
         user={{ username: 'alice' }}
-        profileData={{ module_count: 2, task_count: 5, shared_with_count: 1 }}
+        profileData={{ module_count: 2, task_count: 5, shared_with_count: 1, shared_by_count: 4 }}
         upcomingEventCount={3}
         handlers={defaultHandlers}
         visibility={defaultVisibility}
       />
     );
     expect(screen.getByText('modules')).toBeTruthy();
-    expect(screen.getByText('tasks')).toBeTruthy();
-    expect(screen.getByText('events')).toBeTruthy();
-    expect(screen.getByText('shared')).toBeTruthy();
+    expect(screen.queryByText('tasks')).toBeNull();
+    expect(screen.queryByText('events')).toBeNull();
     const modulesBtn = screen.getByRole('button', { name: /2\s+modules/ });
+    const sharedByBtn = screen.getByRole('button', { name: /4\s+sharing with me/i });
     fireEvent.click(modulesBtn);
+    fireEvent.click(sharedByBtn);
     expect(defaultHandlers.onModulesClick).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: /5\s+tasks/ }));
-    expect(defaultHandlers.onTasksClick).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: /3\s+events/ }));
-    expect(defaultHandlers.onEventsClick).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: /1\s+shared/ }));
-    expect(defaultHandlers.onSharedWithClick).toHaveBeenCalled();
+    expect(defaultHandlers.onSharedByClick).toHaveBeenCalled();
   });
 
   it('renders bio when profileData.bio is set', () => {
@@ -215,6 +213,34 @@ describe('ProfileHeader', () => {
     expect(screen.getAllByText('Professor').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Department: Spanish').length).toBeGreaterThan(0);
     expect(screen.queryByText(/Year 2/)).toBeNull();
+  });
+
+  it('shows contact email for students too', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{ email: 'alice@kcl.ac.uk', year: 'Year 2', major: 'Physics' }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    // Email is shown in the rendered header (may be inside a link or text)
+    expect(screen.getAllByText(/alice/).length).toBeGreaterThan(0);
+  });
+
+  it('shows the shared planning tip when viewing another user profile', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{ email: 'alice@kcl.ac.uk', year: 'Year 2', major: 'Physics' }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={{ ...defaultVisibility, canEditProfile: false }}
+      />
+    );
+    expect(screen.getAllByText('Tip').length).toBeGreaterThan(0);
+    expect(screen.getByText(/Compare free slots to find times that work for both of you/i)).toBeInTheDocument();
   });
 
   it('hides stats when visibility flags are false', () => {
@@ -263,6 +289,65 @@ describe('ProfileHeader', () => {
       />
     );
     expect(screen.getAllByText('0').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('2').length).toBeGreaterThan(0);
+  });
+
+  it('does not render "Active just now" text for recent sessions', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{ last_session_end: new Date().toISOString() }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    expect(screen.queryByText('Active just now')).toBeNull();
+  });
+
+  it('does not render old active-status text for older sessions either', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{ last_session_end: '2026-03-18T12:00:00.000Z' }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    expect(screen.queryByText(/Active .* ago/)).toBeNull();
+  });
+
+  it('does not render completion nudge text', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{ profile_completion: { percentage: 60, next_action: 'add a bio to stand out' } }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    expect(screen.queryByText('Profile 60% complete - add a bio to stand out')).toBeNull();
+  });
+
+  it('pins badge when badge button is clicked', () => {
+    const onPinBadge = vi.fn();
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{}}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+        badges={[
+          { id: 'goal_getter', label: 'Goal Getter', emoji: '🎯', description: 'desc' },
+          { id: 'sessions_10', label: 'Regular', emoji: '🎖️', description: 'desc' },
+        ]}
+        pinnedBadgeId=""
+        onPinBadge={onPinBadge}
+      />
+    );
+    fireEvent.click(screen.getByText('🎯').closest('button'));
+    expect(onPinBadge).toHaveBeenCalledWith('goal_getter');
   });
 });

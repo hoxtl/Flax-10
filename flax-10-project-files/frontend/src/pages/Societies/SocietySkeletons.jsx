@@ -2,17 +2,22 @@
  * Centralized skeleton components for showing loading states across
  * the society discovery and detail views.
  */
+
 import styles from "./SocietiesPage.module.css";
+import extraStyles from "./SocietiesPageExtras.module.css";
 import detailStyles from "./SocietyDetailPage.module.css";
 
+const pageStyles = { ...styles, ...extraStyles };
+
 /** Skeleton for the main societies directory page. */
+
 export function SocietiesSkeleton() {
     return (
-        <div className={styles.container}>
-            <div className={`${styles.skel} ${styles.skelPageTitle}`} />
-            <div className={styles.skelGrid}>
+        <div className={pageStyles.container}>
+            <div className={`${pageStyles.skel} ${pageStyles.skelPageTitle}`} />
+            <div className={pageStyles.skelGrid}>
                 {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className={`${styles.skel} ${styles.skelSocCard}`}
+                    <div key={i} className={`${pageStyles.skel} ${pageStyles.skelSocCard}`}
                         style={{ animationDelay: `${i * 0.07}s` }} />
                 ))}
             </div>
@@ -21,6 +26,7 @@ export function SocietiesSkeleton() {
 }
 
 /** Skeleton for the society detail view. */
+
 export function SocietyDetailSkeleton() {
     return (
         <div className={detailStyles.page}>

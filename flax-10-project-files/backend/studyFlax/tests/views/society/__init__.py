@@ -1,0 +1,1 @@
+"""Society view tests package."""

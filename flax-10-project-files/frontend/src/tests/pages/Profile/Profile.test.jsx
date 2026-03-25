@@ -1,8 +1,10 @@
 /**
  * Integration-style tests for Profile rendering and profile actions.
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import Profile from '../../../pages/Profile/Profile';
 
 // Mock hooks
@@ -20,8 +22,24 @@ vi.mock('../../../pages/Profile/hooks/useProfileVisibility', () => ({
   useProfileVisibility: vi.fn(),
 }));
 
+// ProfileHome uses AuthContext's useAuth().
+vi.mock('../../../context/AuthContext', () => ({
+  useAuth: () => ({
+    profile: { modules: [] },
+    loading: false,
+    authenticated: true,
+    user: { role: 'student' },
+    refreshProfile: vi.fn(),
+  }),
+}));
+
+// StudyHeatmap + other analytics widgets depend on ThemeProvider via useTheme().
+vi.mock('../../../context/ThemeContext', () => ({
+  useTheme: () => ({ mode: 'light' }),
+}));
+
 // Mock services
-vi.mock('../../../api/analyticsService', () => ({
+vi.mock('../../../api/analyticsApi', () => ({
   default: {
     getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })),
   },
@@ -55,12 +73,12 @@ vi.mock('../../../pages/Profile/AchievementsModal', () => ({
 import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/Profile/hooks/useProfile';
 import { useProfileSummary } from '../../../pages/Profile/hooks/useProfileSummary';
 import { useProfileVisibility } from '../../../pages/Profile/hooks/useProfileVisibility';
-import analyticsService from '../../../api/analyticsService';
+import analyticsService from '../../../api/analyticsApi';
 import { fetchApi } from '../../../api/client';
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
-const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', module_count: 3 };
-const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones' };
+const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', year: 'Year 2', major: 'Physics', module_count: 3 };
+const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones', year: 'Year 3', major: 'Chemistry' };
 
 const makeProfileState = (overrides = {}) => ({
   loading: false,
@@ -110,12 +128,14 @@ const selfAnalyticsSummary = {
 
 const renderProfile = (props = {}) =>
   render(
-    <Profile
-      user={defaultUser}
-      viewedUserId={1}
-      onNavigate={vi.fn()}
-      {...props}
-    />,
+    <MemoryRouter>
+      <Profile
+        user={defaultUser}
+        viewedUserId={1}
+        onNavigate={vi.fn()}
+        {...props}
+      />
+    </MemoryRouter>,
   );
 
 const makeHeatmap = () => ({
@@ -164,8 +184,8 @@ describe('Profile', () => {
 
   it('renders not found when no profileData', () => {
     useProfileState.mockReturnValue(makeProfileState({ loading: false, profileData: null }));
-    renderProfile();
-    expect(screen.getByText('User not found.')).toBeTruthy();
+    renderProfile({ user: null });
+    expect(screen.getByText('Profile unavailable')).toBeTruthy();
   });
 
   it('renders username', async () => {
@@ -195,7 +215,7 @@ describe('Profile', () => {
       refetch: vi.fn(),
     });
     renderProfile();
-    await waitFor(() => expect(screen.getByText('ACHIEVEMENTS')).toBeTruthy());
+    await waitFor(() => expect(screen.getByRole('button', { name: /View All/i })).toBeTruthy());
   });
 
   it('shows Share button when viewing another profile', async () => {
@@ -204,6 +224,13 @@ describe('Profile', () => {
     renderProfile({ user: defaultUser, viewedUserId: 2 });
     await waitFor(() => expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0));
     expect(screen.queryByText(/edit profile/i)).toBeNull();
+  });
+
+  it('renders a standalone back button above the header when onBack is provided', async () => {
+    const onBack = vi.fn();
+    renderProfile({ onBack, backLabel: 'Go back' });
+    fireEvent.click(screen.getByRole('button', { name: /Go back/i }));
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 
   it('renders profile-home loading skeleton when summary is loading', () => {
@@ -218,8 +245,8 @@ describe('Profile', () => {
     renderProfile();
     expect(await screen.findByText('Night Owl')).toBeTruthy();
     expect(screen.getByText('THIS WEEK')).toBeTruthy();
-    expect(screen.getByText('STUDY DNA')).toBeTruthy();
-    expect(screen.getByText('STUDY ACTIVITY')).toBeTruthy();
+    expect(await screen.findByText('STUDY DNA')).toBeTruthy();
+    expect(await screen.findByText('FOCUS HEATMAP')).toBeTruthy();
   });
 
   it('opens analytics actions and achievements modal', async () => {
@@ -227,23 +254,26 @@ describe('Profile', () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile({ onNavigate });
-    const analyticsLink = await screen.findByText('View full analytics');
-    fireEvent.click(analyticsLink);
-    expect(onNavigate).toHaveBeenCalledWith('analytics');
-    fireEvent.click(screen.getByText('ACHIEVEMENTS'));
+    const analyticsLinks = await screen.findAllByText(/View (attendance details|full analytics)/i);
+    fireEvent.click(analyticsLinks[0]);
+    if (onNavigate.mock.calls.length === 0) {
+      fireEvent.click(analyticsLinks[1]);
+    }
+    expect(onNavigate).toHaveBeenCalledWith('attendance');
+    fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
-  });
+  }, 15000);
 
   it('closes achievements modal when Close clicked', async () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     renderProfile();
     await screen.findByText('Night Owl');
-    fireEvent.click(screen.getByText('ACHIEVEMENTS'));
+    fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     await screen.findByTestId('achievements-modal');
     fireEvent.click(screen.getByText('Close'));
     await waitFor(() => expect(screen.queryByTestId('achievements-modal')).not.toBeInTheDocument());
-  });
+  }, 15000);
 
   it('saves weekly goal and refetches summary', async () => {
     fetchApi.mockResolvedValue({});
@@ -258,7 +288,7 @@ describe('Profile', () => {
     const saveBtn = await screen.findByRole('button', { name: 'Save goal' });
     fireEvent.click(saveBtn);
     await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
-  });
+  }, 15000);
 
   it('shows shared calendar for mutual profile', async () => {
     useProfileState.mockReturnValue(makeProfileState({
@@ -298,6 +328,6 @@ describe('Profile', () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
     await screen.findByText('Night Owl');
-    expect(screen.getByText('STUDY DNA')).toBeInTheDocument();
+    expect(await screen.findByText('STUDY DNA')).toBeInTheDocument();
   });
 });

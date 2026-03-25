@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { getTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tagApi';
 
 const TagContext = createContext(null);
-const NONE_TAG = { id: 'none', label: 'None', icon: '🏷️', color: '#94A3B8' };
+const NONE_TAG = { id: 'none', label: 'None', icon: '🏷️', color: 'var(--color-tag-none)' };
 
 export function TagProvider({ children }) {
     const { tags, setTags, loading, refreshTags } = useTagLoader();
@@ -26,9 +26,7 @@ function useTagLoader() {
         try {
             const data = await getTags();
             setTags(data.map(mapBackendTag));
-        } catch (err) {
-            console.error('Failed to fetch tags:', err);
-        }
+        } catch {}
     };
 
     useEffect(() => {
@@ -42,8 +40,7 @@ async function loadInitialTags(setTags, setLoading) {
     try {
         const data = await getTags();
         setTags(data.map(mapBackendTag));
-    } catch (err) {
-        console.error('Failed to fetch tags:', err);
+    } catch {
     } finally {
         setLoading(false);
     }
@@ -68,17 +65,16 @@ async function createTagAction(tag, setTags) {
         const data = { name: tag.label, color: tag.color, icon: tag.icon || '🏷️' };
         const created = await apiCreateTag(data);
         setTags((prev) => [...prev, mapBackendTag(created)]);
-    } catch (err) {
-        console.error('Failed to create tag:', err);
-    }
+    } catch {}
 }
 
 async function deleteTagAction(id, setTags) {
     try {
         await apiDeleteTag(id);
         setTags((prev) => prev.filter((t) => t.id !== id));
-    } catch (err) {
-        console.error('Failed to delete tag:', err);
+        return true;
+    } catch {
+        return false;
     }
 }
 
@@ -87,9 +83,7 @@ async function updateTagAction(id, updates, setTags) {
         const backendData = { name: updates.label, color: updates.color, icon: updates.icon };
         const updated = await apiUpdateTag(id, backendData);
         setTags((prev) => prev.map((t) => (t.id === id ? mapBackendTag(updated) : t)));
-    } catch (err) {
-        console.error('Failed to update tag:', err);
-    }
+    } catch {}
 }
 
 function findTag(id, tags) {

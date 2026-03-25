@@ -3,10 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Homepage from '../../../pages/Homepage/Homepage';
 
-const { mockDispatch, mockOpenModal, mockRemoveEvent, mockAddEvent, mockEditEvent, mockLoadEvents,
+const { mockDispatch, mockOpenModal, mockOpenPopup, mockRemoveEvent, mockAddEvent, mockEditEvent, mockLoadEvents,
   mockRefetchTasks, mockUseCalendarEvents, mockNavigate, mockGetTag } = vi.hoisted(() => ({
   mockDispatch: vi.fn(), mockOpenModal: vi.fn(), mockRemoveEvent: vi.fn(), mockAddEvent: vi.fn(),
-  mockEditEvent: vi.fn(), mockLoadEvents: vi.fn(), mockRefetchTasks: vi.fn(),
+  mockEditEvent: vi.fn(), mockLoadEvents: vi.fn(), mockOpenPopup: vi.fn(), mockRefetchTasks: vi.fn(),
   mockUseCalendarEvents: vi.fn(), mockNavigate: vi.fn(), mockGetTag: vi.fn(() => ({ label: 'Academic' })),
 }));
 
@@ -30,7 +30,7 @@ vi.mock('../../../pages/Homepage/utils/index', () => ({
 vi.mock('../../../context/CalendarContext', () => ({
   useCalendar: () => ({ selectedDate: mockSelectedDate, events: mockEvents, filter: mockFilter }),
   useCalendarDispatch: () => mockDispatch, useEventModal: () => ({ openModal: mockOpenModal }),
-  useEventPopup: () => ({ openPopup: vi.fn() }),
+  useEventPopup: () => ({ openPopup: mockOpenPopup }),
 }));
 vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
@@ -42,6 +42,9 @@ vi.mock('../../../pages/Homepage/hooks/useHomeData', () => ({
     removePendingTask: vi.fn(), refetchTasks: mockRefetchTasks, loading: false }),
 }));
 vi.mock('../../../context/TagContext', () => ({ useTags: () => ({ getTag: mockGetTag, tags: [{ id: 1, label: 'Routine' }] }) }));
+vi.mock('../../../context/AuthContext', () => ({
+  useAuth: () => ({ profile: { id: 1, role: 'student', settings: {} }, loading: false, authenticated: true, user: { role: 'student' }, refreshProfile: vi.fn() }),
+}));
 vi.mock('../../../context/TimerContext', () => ({
   useTimerContext: () => ({ setActiveTaskId: vi.fn(), isActive: mockTimerActive, timeLeft: mockTimeLeft,
     task: mockTimerActive ? 'My Task' : null, progress: 0, setIsActive: vi.fn(),
@@ -67,7 +70,7 @@ vi.mock('../../../pages/Homepage/components/DeadlinesWidget', async () => {
 });
 vi.mock('../../../pages/Homepage/components/SleepBanner', () => ({ __esModule: true, default: () => <div data-testid="sleep-banner">sleep</div> }));
 vi.mock('../../../components/Calendar/EventPopups', () => ({ EventPopups: () => <div data-testid="event-popups" /> }));
-vi.mock('../../../components/Pagination/Pagination', () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock('../../../components/Common/BackToTop/BackToTop', () => ({ __esModule: true, default: () => <div data-testid="back-to-top" /> }));
 vi.mock('../../../components/Tags/PillFilters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
 vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   const actual = await vi.importActual('../../../pages/Tasks/components/TaskCard');
@@ -75,10 +78,10 @@ vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });
 vi.mock('../../../pages/Homepage/components', async () => {
-  const { MiniTimelineMock } = await import('./homepageMocks');
-  return { MiniTimeline: MiniTimelineMock };
+  const { MiniTimelineMock, HomepageTimelineSectionMock } = await import('./homepageMocks');
+  return { MiniTimeline: MiniTimelineMock, HomepageTimelineSection: HomepageTimelineSectionMock };
 });
-vi.mock('../../../api/taskService', () => ({
+vi.mock('../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
   createTaskList: vi.fn(), deleteTask: vi.fn().mockResolvedValue(undefined),
@@ -109,12 +112,13 @@ beforeEach(() => {
   mockTimeLeft = 0; mockTimerActive = false; mockTimerMode = 'work';
   mockDayEvents = []; mockDayTasks = []; mockAllTasks = [];
   vi.clearAllMocks();
+  window.localStorage.clear();
   mockGetTag.mockReturnValue({ label: 'Academic' });
   mockUseCalendarEvents.mockReturnValue({ loadEvents: mockLoadEvents });
   mockAddEvent.mockResolvedValue(undefined); mockEditEvent.mockResolvedValue(undefined);
   mockRemoveEvent.mockResolvedValue(undefined); mockLoadEvents.mockResolvedValue(undefined);
   mockRefetchTasks.mockResolvedValue(undefined);
-  global.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
+  globalThis.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
 });
 
 describe('Homepage – render & basic', () => {
@@ -159,7 +163,7 @@ describe('Homepage – render & basic', () => {
   });
 
   it('completes a task via TaskWidgetSlot and shows completion toast path', async () => {
-    const { updateTask } = await import('../../../api/taskService');
+    const { updateTask } = await import('../../../api/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('complete-task'));
     await waitFor(() => expect(updateTask).toHaveBeenCalled());
@@ -167,14 +171,14 @@ describe('Homepage – render & basic', () => {
   });
 
   it('shows an error toast when task update fails', async () => {
-    const svc = await import('../../../api/taskService');
+    const svc = await import('../../../api/taskApi');
     svc.updateTask.mockRejectedValueOnce(new Error('fail'));
     mockRefetchTasks.mockResolvedValueOnce([{ id: 1, completed: false }]);
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('complete-task'));
     await waitFor(() => expect(screen.getByText("Couldn't update task.")).toBeTruthy());
-    fireEvent.click(screen.getByText('✕'));
-    expect(screen.queryByText("Couldn't update task.")).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /dismiss toast/i }));
+    await waitFor(() => expect(screen.queryByText("Couldn't update task.")).toBeNull());
   });
 
   it('dedupes meal events (e.g., lunch) by day', () => {

@@ -1,6 +1,7 @@
 /**
- * Unit tests for onboarding form behavior.
+ * Unit tests for onboarding form behaviour.
  */
+
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import OnboardingForm from '../../../components/Onboarding/OnboardingForm';
@@ -11,10 +12,15 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('../../../components/common/AnimatedDropdown', () => ({
-  default: ({ placeholder, onChange }) => (
-    <button onClick={() => onChange('changed')}>
-      {placeholder}
-    </button>
+  default: ({ placeholder, onChange, onOpenChange }) => (
+    <div>
+      <button onClick={() => onChange('changed')}>
+        {placeholder}
+      </button>
+      <button onClick={() => onOpenChange?.(true)}>
+        {`${placeholder}-open`}
+      </button>
+    </div>
   ),
 }));
 
@@ -65,5 +71,12 @@ describe('OnboardingForm', () => {
     expect(screen.getByRole('button', { name: /Set up my modules/i })).not.toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: /Set up my modules/i }));
     expect(handleSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports when a dropdown opens', () => {
+    const onDropdownOpenChange = vi.fn();
+    renderForm({ onDropdownOpenChange });
+    fireEvent.click(screen.getByText('Select your year-open'));
+    expect(onDropdownOpenChange).toHaveBeenCalledWith('year', true);
   });
 });

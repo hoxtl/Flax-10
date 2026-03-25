@@ -15,6 +15,7 @@ from studyFlax.models.auth.user_settings_model import UserSettings
 
 class EnrollmentViewTests(BaseTestCase):
     """Tests for enrollment views."""
+
     def setUp(self):
         super().setUp()
         self.user.role = 'teacher'

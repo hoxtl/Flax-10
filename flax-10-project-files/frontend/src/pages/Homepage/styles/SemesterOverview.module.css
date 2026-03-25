@@ -168,8 +168,17 @@
   align-items: center;
   justify-content: flex-end;
   gap: 3px;
-  min-height: 54px;
+  min-height: 52px;
   width: 100%;
+  transition: min-height 0.3s ease;
+}
+
+.h2 .bars {
+  min-height: 110px;
+}
+
+.h2 .grid {
+  gap: 8px;
 }
 
 .bar {

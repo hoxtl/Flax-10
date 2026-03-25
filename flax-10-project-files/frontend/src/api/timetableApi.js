@@ -1,3 +1,7 @@
+/*
+ * Imports a timetable from an external source URL.
+ */
+
 import { fetchApi } from "./client";
 
 export async function importTimetable(source_url) {

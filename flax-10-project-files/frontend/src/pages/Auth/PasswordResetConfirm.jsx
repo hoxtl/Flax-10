@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
-import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric';
-import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
-import { PageTransition } from '../../components/common';
+import PasswordResetPageLayout from './PasswordResetPageLayout';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -102,30 +100,16 @@ function ResetCard({ formData, loading, error, success, passwordError, onSubmit,
   );
 }
 
-function ConfirmPageLayout({ children }) {
-  return (
-    <PageTransition>
-      <div className={styles.heroPage}>
-        <AuthHeroGeometric />
-        <div aria-hidden="true" className={styles.heroOverlay} />
-        <AuthBrand />
-        <AuthFooter absolute />
-        <div className={styles.centerContent}>{children}</div>
-      </div>
-    </PageTransition>
-  );
-}
-
 export default function PasswordResetConfirm() {
   const { token } = useParams();
   const navigate = useNavigate();
   const form = useConfirmForm();
   const handleSubmit = buildSubmitHandler({ ...form, token, navigate });
   return (
-    <ConfirmPageLayout>
+    <PasswordResetPageLayout>
       <div className={styles.container}>
         <ResetCard {...form} onSubmit={handleSubmit} onChange={form.handleChange} />
       </div>
-    </ConfirmPageLayout>
+    </PasswordResetPageLayout>
   );
 }

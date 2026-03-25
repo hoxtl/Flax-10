@@ -1,3 +1,8 @@
+/**
+ * useSwipeNavigation - Touch and scroll gesture detection for navigation.
+ * Enables swipe and wheel-based navigation between calendar views.
+ */
+
 import { useRef, useEffect, useCallback } from 'react';
 
 const WHEEL_THRESHOLD = 80;
@@ -5,60 +10,61 @@ const TOUCH_DISTANCE = 60;
 const TOUCH_VELOCITY = 0.25;
 const COOLDOWN_MS = 400;
 
-export function useSwipeNavigation({ containerRef, onPrev, onNext, enabled = true }) {
-    const lastTriggerRef = useRef(0);
-    const touchStartRef = useRef(null);
-
-    const canTrigger = useCallback(() => {
+function createCanTrigger(lastTriggerRef) {
+    return () => {
         const now = Date.now();
         if (now - lastTriggerRef.current < COOLDOWN_MS) return false;
         lastTriggerRef.current = now;
         return true;
-    }, []);
+    };
+}
 
-    const isAtScrollBoundary = useCallback((direction) => {
+function createScrollBoundaryChecker(containerRef) {
+    return (direction) => {
         const el = containerRef.current;
         if (!el) return false;
         if (direction === 'up') return el.scrollTop <= 0;
         return el.scrollTop + el.clientHeight >= el.scrollHeight - 5;
-    }, [containerRef]);
+    };
+}
 
-    const handleWheel = useCallback((e) => {
+function createWheelHandler(enabled, canTrigger, isAtScrollBoundary, onPrev, onNext) {
+    return (e) => {
         if (!enabled) return;
         const direction = e.deltaY > 0 ? 'down' : 'up';
-        if (!isAtScrollBoundary(direction)) return;
-        if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
-        if (!canTrigger()) return;
+        if (!isAtScrollBoundary(direction) || Math.abs(e.deltaY) < WHEEL_THRESHOLD || !canTrigger()) return;
         e.preventDefault();
-        if (direction === 'down') onNext();
-        else onPrev();
-    }, [enabled, canTrigger, isAtScrollBoundary, onPrev, onNext]);
+        if (direction === 'down') onNext(); else onPrev();
+    };
+}
 
-    const handleTouchStart = useCallback((e) => {
+function createTouchStartHandler(enabled, touchStartRef) {
+    return (e) => {
         if (!enabled) return;
         touchStartRef.current = { y: e.touches[0].clientY, time: Date.now() };
-    }, [enabled]);
+    };
+}
 
-    const handleTouchEnd = useCallback((e) => {
+function processTouchEnd(touchStartRef, e) {
+    const startY = touchStartRef.current.y;
+    const startTime = touchStartRef.current.time;
+    const endY = e.changedTouches[0].clientY;
+    const distance = startY - endY;
+    const velocity = Math.abs(distance) / (Date.now() - startTime);
+    touchStartRef.current = null;
+    return { distance, velocity, direction: distance > 0 ? 'down' : 'up' };
+}
+
+function createTouchEndHandler(enabled, touchStartRef, canTrigger, isAtScrollBoundary, onPrev, onNext) {
+    return (e) => {
         if (!enabled || !touchStartRef.current) return;
-        const startY = touchStartRef.current.y;
-        const startTime = touchStartRef.current.time;
-        const endY = e.changedTouches[0].clientY;
-        const endTime = Date.now();
-        touchStartRef.current = null;
+        const { distance, velocity, direction } = processTouchEnd(touchStartRef, e);
+        if (!isAtScrollBoundary(direction) || Math.abs(distance) < TOUCH_DISTANCE || velocity < TOUCH_VELOCITY || !canTrigger()) return;
+        if (direction === 'down') onNext(); else onPrev();
+    };
+}
 
-        const distance = startY - endY;
-        const duration = endTime - startTime;
-        const velocity = Math.abs(distance) / duration;
-        const direction = distance > 0 ? 'down' : 'up';
-
-        if (!isAtScrollBoundary(direction)) return;
-        if (Math.abs(distance) < TOUCH_DISTANCE || velocity < TOUCH_VELOCITY) return;
-        if (!canTrigger()) return;
-        if (direction === 'down') onNext();
-        else onPrev();
-    }, [enabled, canTrigger, isAtScrollBoundary, onPrev, onNext]);
-
+function useSwipeEventListeners(containerRef, handleWheel, handleTouchStart, handleTouchEnd) {
     useEffect(() => {
         const el = containerRef.current;
         if (!el) return;
@@ -71,4 +77,17 @@ export function useSwipeNavigation({ containerRef, onPrev, onNext, enabled = tru
             el.removeEventListener('touchend', handleTouchEnd);
         };
     }, [containerRef, handleWheel, handleTouchStart, handleTouchEnd]);
+}
+
+/** Hook for detecting swipe/scroll gestures and triggering navigation callbacks. */
+
+export function useSwipeNavigation({ containerRef, onPrev, onNext, enabled = true }) {
+    const lastTriggerRef = useRef(0);
+    const touchStartRef = useRef(null);
+    const canTrigger = useCallback(createCanTrigger(lastTriggerRef), []);
+    const isAtScrollBoundary = useCallback(createScrollBoundaryChecker(containerRef), [containerRef]);
+    const handleWheel = useCallback(createWheelHandler(enabled, canTrigger, isAtScrollBoundary, onPrev, onNext), [enabled, canTrigger, isAtScrollBoundary, onPrev, onNext]);
+    const handleTouchStart = useCallback(createTouchStartHandler(enabled, touchStartRef), [enabled]);
+    const handleTouchEnd = useCallback(createTouchEndHandler(enabled, touchStartRef, canTrigger, isAtScrollBoundary, onPrev, onNext), [enabled, canTrigger, isAtScrollBoundary, onPrev, onNext]);
+    useSwipeEventListeners(containerRef, handleWheel, handleTouchStart, handleTouchEnd);
 }

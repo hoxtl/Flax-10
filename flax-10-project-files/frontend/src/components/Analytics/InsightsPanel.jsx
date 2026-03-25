@@ -1,20 +1,17 @@
+/*
+ * AI insights panel.
+ */
+
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { buildMarkdownComponents } from '../common/markdown/buildMarkdownComponents.jsx';
 import styles from './AIInsightsTab.module.css';
 
 const FADE = { initial: { opacity: 0 }, animate: { opacity: 1 } };
+const MotionDiv = motion.div;
 
-const MARKDOWN_COMPONENTS = {
-  h1: ({ children }) => <h1 className={styles.mdH1}>{children}</h1>,
-  h2: ({ children }) => <h2 className={styles.mdH2}>{children}</h2>,
-  h3: ({ children }) => <h3 className={styles.mdH3}>{children}</h3>,
-  p: ({ children }) => <p className={styles.mdP}>{children}</p>,
-  li: ({ children }) => <li className={styles.mdLi}>{children}</li>,
-  ul: ({ children }) => <ul className={styles.mdUl}>{children}</ul>,
-  ol: ({ children }) => <ol className={styles.mdOl}>{children}</ol>,
-  strong: ({ children }) => <strong className={styles.mdStrong}>{children}</strong>,
-};
+const MARKDOWN_COMPONENTS = buildMarkdownComponents(styles);
 
 const EMPTY_TEXT = {
   full: {
@@ -43,33 +40,33 @@ function PanelHeader({ period, loading, onGenerate }) {
 
 function LoadingState() {
   return (
-    <motion.div key="loading" className={styles.centeredState} {...FADE} exit={{ opacity: 0 }}>
+    <MotionDiv key="loading" className={styles.centeredState} {...FADE} exit={{ opacity: 0 }}>
       <div className={styles.pulseRing} />
       <p>Analysing your study patterns…</p>
-    </motion.div>
+    </MotionDiv>
   );
 }
 
 function InsightsContent({ insights }) {
   return (
-    <motion.div key="insights" className={styles.insightsScrollBody} {...FADE} transition={{ duration: 0.3 }}>
+    <MotionDiv key="insights" className={styles.insightsScrollBody} {...FADE} transition={{ duration: 0.3 }}>
       <div className={styles.markdownBody}>
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
           {insights}
         </ReactMarkdown>
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 }
 
 function EmptyState({ compact }) {
   const { title, text } = compact ? EMPTY_TEXT.compact : EMPTY_TEXT.full;
   return (
-    <motion.div key={compact ? 'empty-compact' : 'empty'} className={styles.centeredState} {...FADE}>
+    <MotionDiv key={compact ? 'empty-compact' : 'empty'} className={styles.centeredState} {...FADE}>
       <div className={styles.emptyIcon}>🤖</div>
       <p className={styles.emptyTitle}>{title}</p>
       <p className={styles.emptyText}>{text}</p>
-    </motion.div>
+    </MotionDiv>
   );
 }
 

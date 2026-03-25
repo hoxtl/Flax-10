@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ConfirmModal from '../../components/common/ConfirmModal';
+import ConfirmModal from '../../components/common/ConfirmModal/ConfirmModal';
 
 const defaultProps = {
     title: 'Delete item',
@@ -44,8 +44,9 @@ describe('ConfirmModal', () => {
 
     it('calls onCancel when backdrop is clicked', () => {
         const onCancel = vi.fn();
-        const { container } = render(<ConfirmModal {...defaultProps} onCancel={onCancel} />);
-        const backdrop = container.firstChild;
+        render(<ConfirmModal {...defaultProps} onCancel={onCancel} />);
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+        expect(backdrop).toBeTruthy();
         fireEvent.mouseDown(backdrop);
         expect(onCancel).toHaveBeenCalledTimes(1);
     });
@@ -70,15 +71,15 @@ describe('ConfirmModal', () => {
         expect(screen.queryByRole('button', { name: /maybe/i })).toBeNull();
     });
 
-    it('applies danger style when isDanger is true', () => {
-        const { container } = render(<ConfirmModal {...defaultProps} isDanger={true} confirmText="Delete" />);
+    it('applies danger variant when isDanger is true', () => {
+        render(<ConfirmModal {...defaultProps} isDanger={true} confirmText="Delete" />);
         const confirmBtn = screen.getByText('Delete');
-        expect(confirmBtn.className).toContain('dangerBtn');
+        expect(confirmBtn.className).toContain('danger');
     });
 
-    it('applies primary style when isDanger is false', () => {
+    it('applies primary variant when isDanger is false', () => {
         render(<ConfirmModal {...defaultProps} isDanger={false} confirmText="OK" />);
         const confirmBtn = screen.getByText('OK');
-        expect(confirmBtn.className).toContain('primaryBtn');
+        expect(confirmBtn.className).toContain('primary');
     });
 });

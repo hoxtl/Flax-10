@@ -1,3 +1,7 @@
+/*
+ * Utility functions for deadline formatting and urgency.
+ */
+
 export const DEADLINE_LABELS = {
     exam: 'Exam' ,
     coursework: 'Coursework',
@@ -32,6 +36,7 @@ export function getDeadlineCountdown(dateStr) {
 }
 
 /** Time remaining as "14h 20m left" or "2d 5h left" for triage display. */
+
 export function getTimeRemainingCountdown(dateStr) {
     const diff = new Date(dateStr) - new Date();
     if (diff < 0) return 'Overdue';
@@ -50,6 +55,7 @@ export function getTimeRemainingCountdown(dateStr) {
 }
 
 /** "Due in 4 hours" style for high-contrast triage display. */
+
 export function getDueInPhrase(dateStr) {
     const diff = new Date(dateStr) - new Date();
     if (diff < 0) return 'Overdue';
@@ -75,6 +81,7 @@ export function getDeadlineUrgency(dateStr) {
 }
 
 /** For traffic-light dot: 'safe' (7+ days), 'caution' (3–7 days), 'critical' (< 3 days). */
+
 export function getDeadlineDotUrgency(dateStr) {
     const days = Math.floor((new Date(dateStr) - new Date()) / 86_400_000);
     if (days < 0) return 'critical';
@@ -84,6 +91,7 @@ export function getDeadlineDotUrgency(dateStr) {
 }
 
 /** Monospace countdown "07d : 00h : 22m" or "14h : 22m : 05s" (consistent spacing). */
+
 export function getTimeRemainingMonospace(dateStr) {
     const diff = new Date(dateStr) - new Date();
     if (diff < 0) return 'Overdue';
@@ -101,6 +109,7 @@ export function getTimeRemainingMonospace(dateStr) {
 }
 
 /** Cleaner countdown for triage: "7d 12h" or "14h 22m" (no colons, compact). */
+
 export function getTimeRemainingClean(dateStr) {
     const diff = new Date(dateStr) - new Date();
     if (diff < 0) return 'Overdue';
@@ -119,6 +128,7 @@ export function getTimeRemainingClean(dateStr) {
 }
 
 /** Human-readable stamped countdown: { number, unit } for "8 Days left" (number in Mono, unit in Lexend). */
+
 export function getTimeRemainingStamped(dateStr) {
     const diff = new Date(dateStr) - new Date();
     if (diff < 0) return { number: null, unit: 'Overdue' };
@@ -134,6 +144,7 @@ export function getTimeRemainingStamped(dateStr) {
 }
 
 /** True if deadline is within 24 hours (for soft coral countdown styling). */
+
 export function isDeadlineUnder24h(dateStr) {
     const diff = new Date(dateStr) - new Date();
     return diff >= 0 && diff < 24 * 60 * 60 * 1000;

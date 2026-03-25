@@ -1,3 +1,7 @@
+/*
+ * KCL campus coordinates, name aliases, and accent colours for the map.
+ */
+
 export const KCL_CAMPUSES = [
   {
     id: "strand",
@@ -5,7 +9,7 @@ export const KCL_CAMPUSES = [
     shortName: "Strand",
     coords: [-0.116, 51.5114],
     address: "Strand, London WC2R 2LS",
-    color: "#9E7E5D",
+    color: "var(--campus-strand)",
     aliases: [
       "strand",
       "strand campus",
@@ -23,7 +27,7 @@ export const KCL_CAMPUSES = [
     shortName: "Guy's",
     coords: [-0.0877, 51.5034],
     address: "Great Maze Pond, London SE1 9RT",
-    color: "#7A6048",
+    color: "var(--campus-guys)",
     aliases: [
       "guy's",
       "guys",
@@ -39,7 +43,7 @@ export const KCL_CAMPUSES = [
     shortName: "Waterloo",
     coords: [-0.1155, 51.506],
     address: "150 Stamford St, London SE1 9NH",
-    color: "#B8956A",
+    color: "var(--campus-waterloo)",
     aliases: ["waterloo", "waterloo campus", "kcl waterloo", "stamford st"],
   },
   {
@@ -48,7 +52,7 @@ export const KCL_CAMPUSES = [
     shortName: "St Thomas",
     coords: [-0.1176, 51.4986],
     address: "Westminster Bridge Rd, London SE1 7EH",
-    color: "#6B7F6B",
+    color: "var(--campus-st-thomas)",
     aliases: ["st thomas", "st thomas campus", "westminster bridge"],
   },
   {
@@ -57,7 +61,7 @@ export const KCL_CAMPUSES = [
     shortName: "Denmark Hill",
     coords: [-0.0934, 51.4686],
     address: "Denmark Hill, London SE5 9RS",
-    color: "#7B6E9E",
+    color: "var(--campus-denmark-hill)",
     aliases: ["denmark hill", "denmark hill campus", "camberwell"],
   },
 ];

@@ -12,6 +12,8 @@ from rest_framework.test import APIClient
 from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.notifications.notification_model import Notification
 
 User = get_user_model()
 
@@ -43,6 +45,32 @@ class ProfileViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('event_count', response.data)
 
+    def test_get_profile_includes_last_session_end(self):
+        StudySession.objects.create(
+            user=self.user,
+            start_time=timezone.now() - timezone.timedelta(hours=2),
+            end_time=timezone.now() - timezone.timedelta(hours=1),
+            duration=60,
+            break_duration=0,
+            pause_duration=0,
+            status='Completed',
+            study_block_id=12345,
+            session_count=1,
+        )
+        response = self.client.get('/api/profile/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('last_session_end', response.data)
+        self.assertIsNotNone(response.data['last_session_end'])
+
+    def test_get_profile_includes_completion_metadata(self):
+        response = self.client.get('/api/profile/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('profile_completion', response.data)
+        completion = response.data['profile_completion']
+        self.assertEqual(completion['total'], 5)
+        self.assertIn('next_action', completion)
+        self.assertEqual(len(completion['checkpoints']), 5)
+
     def test_patch_profile_username(self):
         response = self.client.patch('/api/profile/', {'username': 'newusername'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -63,6 +91,12 @@ class ProfileViewTest(TestCase):
     def test_patch_profile_weekly_goal(self):
         response = self.client.patch('/api/profile/', {'weekly_goal_hours': '10'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_patch_profile_pinned_badge_id(self):
+        response = self.client.patch('/api/profile/', {'pinned_badge_id': 'goal_getter'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.pinned_badge_id, 'goal_getter')
 
     def test_patch_profile_remove_photo(self):
         response = self.client.patch('/api/profile/', {'remove_photo': 'true'})
@@ -86,6 +120,20 @@ class ProfileViewTest(TestCase):
     def test_get_another_user_profile_not_found(self):
         response = self.client.get('/api/users/99999/profile/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_suggest_study_session_creates_notification(self):
+        target = User.objects.create_user(
+            username='study_pal', email='study_pal@example.com', password='pass'
+        )
+        response = self.client.post('/api/profile/study-together/', {'target_user_id': target.id}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        notification = Notification.objects.get(user=target)
+        self.assertEqual(notification.notification_type, 'meeting_suggestion')
+        self.assertIn(self.user.username, notification.title)
+
+    def test_suggest_study_session_rejects_self_target(self):
+        response = self.client.post('/api/profile/study-together/', {'target_user_id': self.user.id}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_teacher_profile_returns_only_taught_modules(self):
         teacher = self._make_teacher('teacher1', 'teacher1@example.com', 'Teach', 'Er')
@@ -159,3 +207,50 @@ class ProfileViewCoverageTest(TestCase):
     def test_patch_remove_photo(self):
         response = self.client.patch('/api/profile/', data={'remove_photo': 'true'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class SuggestStudySessionViewTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.sender = User.objects.create_user(
+            username='sender', email='sender@test.com', password='pass'
+        )
+        self.receiver = User.objects.create_user(
+            username='receiver', email='receiver@test.com', password='pass'
+        )
+        self.client.force_authenticate(user=self.sender)
+
+    def test_missing_target_user_id_returns_400(self):
+        response = self.client.post('/api/profile/study-together/', {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('target_user_id', response.data['error'])
+
+    def test_nonexistent_target_user_returns_404(self):
+        response = self.client.post('/api/profile/study-together/', {'target_user_id': 99999})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_success_with_custom_message(self):
+        response = self.client.post('/api/profile/study-together/', {
+            'target_user_id': self.receiver.id,
+            'message': 'Let us study together!',
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Notification.objects.filter(user=self.receiver).exists())
+        notification = Notification.objects.get(user=self.receiver)
+        self.assertEqual(notification.message, 'Let us study together!')
+
+    def test_success_with_slot_times(self):
+        response = self.client.post('/api/profile/study-together/', {
+            'target_user_id': self.receiver.id,
+            'slot_start': '2026-03-24 10:00',
+            'slot_end': '2026-03-24 12:00',
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        notification = Notification.objects.get(user=self.receiver)
+        self.assertIn('suggested a study session from', notification.message)
+
+    def test_invalid_target_user_id_type_returns_404(self):
+        from studyFlax.views.user.study_session_suggestions import get_target_user
+        result = get_target_user('not-a-number')
+        self.assertIsNone(result)

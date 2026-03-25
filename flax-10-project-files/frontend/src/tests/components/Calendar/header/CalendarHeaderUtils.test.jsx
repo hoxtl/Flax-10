@@ -1,12 +1,20 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu } from '../../../../components/Calendar/header/CalendarHeaderUtils';
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/Calendar/header/CalendarHeaderUtils';
+
+vi.mock('framer-motion', () => ({
+    AnimatePresence: ({ children }) => <>{children}</>,
+    motion: {
+        div: ({ children, ...props }) => <div {...props}>{children}</div>,
+    },
+}));
 
 vi.mock('lucide-react', () => ({
     ChevronLeft: () => <span data-testid="chevron-left" />,
     ChevronRight: () => <span data-testid="chevron-right" />,
     Settings2: () => <span data-testid="settings-icon" />,
     Plus: () => <span data-testid="plus-icon" />,
+    Tag: () => <span data-testid="tag-icon" />,
 }));
 
 vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
@@ -15,7 +23,7 @@ vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
     ),
 }));
 
-vi.mock('../../../../components/ui/SegmentedControl', () => ({
+vi.mock('../../../../components/common/SegmentedControl/SegmentedControl', () => ({
     SegmentedControl: ({ options, value, onChange }) => (
         <div data-testid="segmented-control">
             {options.map((o) => (
@@ -36,6 +44,27 @@ vi.mock('../../../../components/common/AnimatedDropdown', () => ({
             {value != null && <span data-value={value} />}
         </div>
     ),
+}));
+
+vi.mock('../../../../context/TagContext', () => ({
+    useTags: () => ({
+        tags: [
+            { id: 1, label: 'Lecture' },
+            { id: 2, label: 'Other' },
+        ],
+    }),
+}));
+
+vi.mock('../../../../components/common/TagsSelector/TagsSelector', () => ({
+    TagsSelector: ({ tags }) => (
+        <div data-testid="tags-selector">
+            {tags.map((tag) => <span key={tag.id}>{tag.label}</span>)}
+        </div>
+    ),
+}));
+
+vi.mock('../../../../components/Tags/TagManagerModal', () => ({
+    default: () => <div data-testid="tag-manager-modal" />,
 }));
 
 describe('CalendarHeaderUtils', () => {
@@ -150,6 +179,21 @@ describe('CalendarHeaderUtils', () => {
             expect(screen.getByTitle('Display Mode')).toBeInTheDocument();
             fireEvent.click(screen.getByText('List View'));
             expect(onViewChange).toHaveBeenCalledWith('list');
+        });
+    });
+
+    describe('FilterDropdownButton', () => {
+        it('opens the tag popup on hover', () => {
+            render(<FilterDropdownButton active="all" onChange={vi.fn()} />);
+            fireEvent.mouseEnter(screen.getByLabelText('Filter events'));
+            expect(screen.getByText('Filter by tag')).toBeInTheDocument();
+            expect(screen.getByTestId('tags-selector')).toBeInTheDocument();
+        });
+
+        it('hides the manage tags action when tag management is disabled', () => {
+            render(<FilterDropdownButton active="all" onChange={vi.fn()} allowManageTags={false} />);
+            fireEvent.mouseEnter(screen.getByLabelText('Filter events'));
+            expect(screen.queryByText(/Manage tags/i)).not.toBeInTheDocument();
         });
     });
 });

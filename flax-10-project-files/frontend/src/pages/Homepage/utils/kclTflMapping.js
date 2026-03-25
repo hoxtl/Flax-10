@@ -1,9 +1,12 @@
 /**
- * KCL campus / location → TFL lines likely needed for commute.
+ * KCL campus or location names mapped to the TFL lines likely needed for a commute.
  * Used to cross-reference next event location with TFL disruptions for smart travel alerts.
  */
 
-/** Location string (normalized) → TFL line names (as returned by TFL API, e.g. "Northern", "Jubilee") */
+import tflLineColors from '../../../api/tflLineColors.json';
+
+/** Normalised location string mapped to TFL line names, as returned by the TFL API. */
+
 const LOCATION_TO_LINES = {
   strand: ["Northern", "District", "Circle", "Central", "Bakerloo"],
   "kcl strand": ["Northern", "District", "Circle", "Central", "Bakerloo"],
@@ -30,7 +33,8 @@ const LOCATION_TO_LINES = {
   "canary wharf": ["Jubilee", "Elizabeth"],
 };
 
-/** Normalize location for lookup: lowercase, trim, collapse spaces */
+/** Normalise a location for lookup by lowercasing, trimming, and collapsing spaces. */
+
 function normalizeLocation(loc) {
   if (!loc || typeof loc !== "string") return "";
   return loc
@@ -45,17 +49,22 @@ function normalizeLocation(loc) {
  * @param {string} location - Event location string (e.g. "Strand Campus", "Guy's")
  * @returns {string[]} Line names that might be used for this commute
  */
+
 export function getTflLinesForLocation(location) {
   const norm = normalizeLocation(location);
   if (!norm) return [];
+  return Object.entries(LOCATION_TO_LINES).reduce(addMatchingLines(norm), []);
+}
 
-  const lines = new Set();
-  for (const [key, lineList] of Object.entries(LOCATION_TO_LINES)) {
-    if (norm.includes(key) || key.includes(norm)) {
-      lineList.forEach((l) => lines.add(l));
-    }
-  }
-  return [...lines];
+function addMatchingLines(norm) {
+  return (lines, [key, lineList]) => {
+    if (isMatchingLocation(norm, key)) return [...new Set([...lines, ...lineList])];
+    return lines;
+  };
+}
+
+function isMatchingLocation(norm, key) {
+  return norm.includes(key) || key.includes(norm);
 }
 
 /**
@@ -64,6 +73,7 @@ export function getTflLinesForLocation(location) {
  * @param {Array} delays - From tflService.getTfLDelays() { lineName, severityDescription, severity, ... }
  * @returns {Array} Delays that affect lines needed for this event
  */
+
 export function getRelevantDelays(nextEvent, delays) {
   if (!delays?.length || !nextEvent) return [];
   const locationLines = getTflLinesForLocation(nextEvent.location || "");
@@ -74,25 +84,11 @@ export function getRelevantDelays(nextEvent, delays) {
 }
 
 /** TfL line brand colours for line pills (slug-style keys). */
-export const TFL_LINE_COLOURS = {
-  bakerloo: "#B36305",
-  central: "#E32017",
-  circle: "#FFD300",
-  district: "#00782A",
-  "hammersmith-city": "#F3A9BB",
-  jubilee: "#A0A5A9",
-  metropolitan: "#9B0056",
-  northern: "#000000",
-  piccadilly: "#003688",
-  victoria: "#0098D4",
-  "waterloo-city": "#95CDBA",
-  elizabeth: "#6950A1",
-  dlr: "#00A4A7",
-  overground: "#EE7C0E",
-  tram: "#84B817",
-};
 
-/** Normalize API display name to TFL_LINE_COLOURS key (e.g. "Waterloo & City" → "waterloo-city"). */
+export const TFL_LINE_COLOURS = tflLineColors.lineColours;
+
+/** Normalise an API display name to a TFL_LINE_COLOURS key, for example "Waterloo & City" to "waterloo-city". */
+
 function normalizeLineKey(lineName) {
   if (!lineName || typeof lineName !== "string") return "";
   const s = lineName
@@ -105,35 +101,21 @@ function normalizeLineKey(lineName) {
 
 export function getTflLineColor(lineName) {
   const key = normalizeLineKey(lineName);
-  return TFL_LINE_COLOURS[key] || TFL_LINE_COLOURS[lineName] || "#78716c";
+  return TFL_LINE_COLOURS[key] || TFL_LINE_COLOURS[lineName] || tflLineColors.fallbackPillColour.bg;
 }
 
 /** TfL line pill: bg + text (white or dark for light-coloured lines). */
-export const TFL_LINE_PILL_COLOURS = {
-  bakerloo: { bg: "#B36305", text: "#FFFFFF" },
-  central: { bg: "#E32017", text: "#FFFFFF" },
-  circle: { bg: "#FFD300", text: "#1A1A1A" },
-  district: { bg: "#00782A", text: "#FFFFFF" },
-  "hammersmith-city": { bg: "#F3A9BB", text: "#1A1A1A" },
-  jubilee: { bg: "#A0A5A9", text: "#FFFFFF" },
-  metropolitan: { bg: "#9B0056", text: "#FFFFFF" },
-  northern: { bg: "#000000", text: "#FFFFFF" },
-  piccadilly: { bg: "#003688", text: "#FFFFFF" },
-  victoria: { bg: "#0098D4", text: "#FFFFFF" },
-  "waterloo-city": { bg: "#95CDBA", text: "#1A1A1A" },
-  elizabeth: { bg: "#6950A1", text: "#FFFFFF" },
-  dlr: { bg: "#00A4A7", text: "#FFFFFF" },
-  overground: { bg: "#EE7C0E", text: "#FFFFFF" },
-  tram: { bg: "#84B817", text: "#FFFFFF" },
-};
+
+export const TFL_LINE_PILL_COLOURS = tflLineColors.linePillColours;
 
 export function getTflLinePillStyle(lineName) {
   const key = normalizeLineKey(lineName);
   const entry = TFL_LINE_PILL_COLOURS[key] || TFL_LINE_PILL_COLOURS[lineName];
-  return entry || { bg: "#78716c", text: "#FFFFFF" };
+  return entry || tflLineColors.fallbackPillColour;
 }
 
 /** Severity: 1–4 = severe (suspension, part closure etc), 5–9 = minor delays */
+
 export function isSevereDisruption(severityDescription) {
   if (!severityDescription) return false;
   const s = severityDescription.toLowerCase();

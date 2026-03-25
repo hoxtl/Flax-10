@@ -37,6 +37,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  min-width: 0;
 }
 
 .backButton {
@@ -67,11 +68,35 @@
 
 .subtitle {
   font-size: var(--type-body);
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--text) 74%, var(--text-secondary) 26%);
   margin: 0;
   font-weight: var(--font-weight-caption);
   max-width: 58ch;
   line-height: 1.6;
+}
+
+@media (min-width: 900px) {
+  .subtitle {
+    max-width: none;
+    white-space: nowrap;
+  }
+}
+
+.subtitle em {
+  color: color-mix(in srgb, var(--color-primary, var(--primary)) 88%, var(--text) 12%);
+  font-style: italic;
+  font-weight: 600;
+}
+
+[data-mode="dark"] .subtitle em {
+  color: color-mix(in srgb, var(--color-primary, var(--primary)) 72%, white 28%);
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .action {
@@ -94,5 +119,9 @@
 
   .action {
     padding-top: 0;
+  }
+
+  .subtitle {
+    white-space: normal;
   }
 }

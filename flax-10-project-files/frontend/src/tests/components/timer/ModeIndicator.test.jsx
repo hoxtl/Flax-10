@@ -4,11 +4,11 @@ import { ModeIndicator } from '../../../components/Timer/TimerComponents';
 
 const testModes = () => {
     const { rerender } = render(<ModeIndicator mode="work" isOvertime={false} />);
-    expect(screen.getByText(/Focus Time/)).toBeInTheDocument();
+    expect(screen.getByText('Focus')).toBeInTheDocument();
     rerender(<ModeIndicator mode="break" isOvertime={false} />);
-    expect(screen.getByText('☕ Break Time')).toBeInTheDocument();
+    expect(screen.getByText('Break')).toBeInTheDocument();
     rerender(<ModeIndicator mode="break" isOvertime={false} isBreakOvertime={true} />);
-    expect(screen.getByText('⏳ Break Overtime')).toBeInTheDocument();
+    expect(screen.getByText('Break Overtime')).toBeInTheDocument();
 };
 
 describe('ModeIndicator', () => {
@@ -16,6 +16,6 @@ describe('ModeIndicator', () => {
 
     it('shows Overtime for work mode when isOvertime is true', () => {
         render(<ModeIndicator mode="work" isOvertime={true} />);
-        expect(screen.getByText('🚀 Overtime')).toBeInTheDocument();
+        expect(screen.getByText('Overtime')).toBeInTheDocument();
     });
 });

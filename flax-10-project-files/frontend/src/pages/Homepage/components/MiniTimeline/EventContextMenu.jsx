@@ -1,48 +1,28 @@
+/*
+ * Context menu for mini timeline event actions.
+ */
+
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Pencil, Trash2 } from "lucide-react";
 
-export function EventContextMenu({ eventItem, pos, onEdit, onDelete, onClose, styles }) {
-  const menuRef = useRef(null);
-
+function useMenuDismiss(menuRef, onClose) {
   useEffect(() => {
-    const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) onClose?.();
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [onClose]);
-
-  const menu = (
-    <div
-      ref={menuRef}
-      className={styles.contextMenu}
-      style={{ top: pos.y, left: pos.x }}
-      onMouseDown={(e) => e.stopPropagation()}
-      onContextMenu={(e) => e.preventDefault()}
-    >
-      <button
-        className={styles.contextItem}
-        onClick={() => {
-          onEdit?.(eventItem);
-          onClose?.();
-        }}
-      >
-        <Pencil size={14} strokeWidth={2} className={styles.contextIcon} /> Edit
-      </button>
-      <div className={styles.contextDivider} />
-      <button
-        className={`${styles.contextItem} ${styles.contextDelete}`}
-        onClick={async () => {
-          await onDelete?.(eventItem);
-          onClose?.();
-        }}
-      >
-        <Trash2 size={14} strokeWidth={2} className={styles.contextIcon} /> Delete
-      </button>
-    </div>
-  );
-
-  return createPortal(menu, document.body);
+    const handleMouseDown = (event) => !menuRef.current?.contains(event.target) && onClose?.();
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [menuRef, onClose]);
 }
 
+function ContextButton({ styles, className = "", icon, label, onClick }) {
+  return <button className={`${styles.contextItem} ${className}`.trim()} onClick={onClick}>{icon} {label}</button>;
+}
+
+export function EventContextMenu({ eventItem, pos, onEdit, onDelete, onClose, styles }) {
+  const menuRef = useRef(null);
+  useMenuDismiss(menuRef, onClose);
+  const handleEdit = () => (onEdit?.(eventItem), onClose?.());
+  const handleDelete = async () => (await onDelete?.(eventItem), onClose?.());
+  const menuPos = { "--ctx-top": `${pos.y}px`, "--ctx-left": `${pos.x}px` };
+  return createPortal(<div ref={menuRef} className={styles.contextMenu} style={menuPos} onMouseDown={(event) => event.stopPropagation()} onContextMenu={(event) => event.preventDefault()}><ContextButton styles={styles} icon={<Pencil size={14} strokeWidth={2} className={styles.contextIcon} />} label="Edit" onClick={handleEdit} /><div className={styles.contextDivider} /><ContextButton styles={styles} className={styles.contextDelete} icon={<Trash2 size={14} strokeWidth={2} className={styles.contextIcon} />} label="Delete" onClick={handleDelete} /></div>, document.body);
+}

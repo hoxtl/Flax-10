@@ -1,48 +1,56 @@
-/* TableView Container */
+/* TableView — Soft Flax Card Style */
 .container {
     flex: 1;
     min-height: 0;
-    height: calc(100vh - 280px);
+    max-height: calc(100vh - 280px);
     overflow-y: auto;
+    overflow-x: auto;
     background: var(--bg);
+    padding: 0 16px 16px 16px;
 }
 
-/* Table */
 .table {
     width: 100%;
-    border-spacing: 0;
+    border-spacing: 0 0;
     background: var(--bg);
-    border-radius: 12px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
+    box-shadow: 0 2px 12px rgba(93, 64, 55, 0.08);
+    margin-top: 16px;
 }
 
-/* Header */
 .header {
-    background: var(--panel);
+    background: transparent;
 }
 
 .headerCell {
     position: sticky;
     top: 0;
     z-index: 10;
-    padding: 12px 16px;
+    padding: 16px 20px;
     text-align: left;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.68rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    background: var(--panel);
-    border-bottom: 2px solid var(--border);
+    letter-spacing: 0.08em;
+    color: var(--text);
+    background: #FAF9F6;
+    border-bottom: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
 }
 
-/* Row */
 .row {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
+    border-bottom: 0.5px solid rgba(51, 51, 51, 0.06);
+    transition: background 0.2s ease;
+    height: 56px;
+    background: color-mix(in srgb, var(--accent, transparent) 6%, transparent);
+}
+
+.row:last-child {
+    border-bottom: none;
 }
 
 .row:hover {
-    background: var(--hover);
+    background: color-mix(in srgb, var(--accent, transparent) 12%, transparent);
 }
 
 .row.readOnly {
@@ -54,25 +62,21 @@
 }
 
 .todayRow {
-    background: linear-gradient(
-        to right,
-        rgba(184, 155, 126, 0.14),
-        rgba(184, 155, 126, 0.04)
-    );
+    background: var(--hover, rgba(74, 52, 33, 0.04));
+    border-left: 3px solid var(--primary, var(--text));
 }
 
-/* Cells */
 .nameCell,
 .tagCell,
 .dateCell,
 .locationCell,
 .descCell {
-    padding: 12px 16px;
-    vertical-align: top;
+    padding: 14px 20px;
+    vertical-align: middle;
 }
 
 .nameCell {
-    font-weight: 500;
+    font-weight: 700;
     color: var(--text);
     min-width: 150px;
     cursor: pointer;
@@ -89,13 +93,13 @@
     background: var(--danger-light, #fee2e2);
     color: var(--danger, #dc2626);
     border: none;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
     cursor: pointer;
     opacity: 0;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
     white-space: nowrap;
 }
 
@@ -106,37 +110,7 @@
 .quickActionBtn:hover {
     background: var(--danger, #dc2626);
     color: white;
-}
-
-.actionCell {
-    padding: 12px 16px;
-    vertical-align: middle;
-    width: 48px;
-    text-align: right;
-}
-
-.trashBtn {
-    background: transparent;
-    color: var(--muted);
-    border: none;
-    padding: 6px;
-    border-radius: 6px;
-    cursor: pointer;
-    opacity: 0;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.row:hover .trashBtn {
-    opacity: 0.6;
-}
-
-.trashBtn:hover {
-    color: var(--danger, #dc2626);
-    background: var(--danger-light, #fee2e2);
-    opacity: 1 !important;
+    transform: scale(1.02);
 }
 
 .tagCell {
@@ -145,86 +119,10 @@
 
 .dateCell {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--muted);
-    min-width: 160px;
-}
-
-.dateCellContent {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.dateCellContent .editIcon {
-    opacity: 0;
-}
-
-.row:hover .dateCellContent .editIcon {
-    opacity: 0.6;
-}
-
-.dateEditContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 4px 0;
-}
-
-.dateEditRow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dateEditLabel {
-    font-size: 0.75rem;
-    color: var(--muted);
-    min-width: 36px;
-}
-
-.dateEditError {
-    font-size: 0.75rem;
-    color: var(--danger, #dc2626);
-}
-
-.dateEditActions {
-    display: flex;
-    gap: 6px;
-    margin-top: 4px;
-}
-
-.dateEditBtn {
-    padding: 4px 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 6px;
-    background: var(--primary);
-    color: var(--c-white);
-    cursor: pointer;
-    transition: opacity 0.15s;
-}
-
-.dateEditBtn:hover {
-    opacity: 0.9;
-}
-
-.dateEditBtnCancel {
-    padding: 4px 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-}
-
-.dateEditBtnCancel:hover {
-    background: var(--hover);
+    font-size: 0.78rem;
+    color: var(--text);
+    min-width: 200px;
+    white-space: nowrap;
 }
 
 .locationCell {
@@ -244,18 +142,13 @@
     max-width: none;
 }
 
-.descCell.descExpanded .cellText {
+.descExpanded .cellText {
     display: block;
     -webkit-line-clamp: unset;
     line-clamp: unset;
     white-space: pre-wrap;
 }
 
-.row.expanded {
-    background: var(--hover);
-}
-
-/* Cell Text */
 .cellText {
     display: block;
     overflow: hidden;
@@ -270,21 +163,22 @@
     white-space: normal;
 }
 
-/* Cell Input */
 .cellInput {
     width: 100%;
-    padding: 6px 8px;
-    border: 1px solid var(--primary);
-    border-radius: 4px;
+    padding: 8px 12px;
+    border: 0.5px solid rgba(51, 51, 51, 0.2);
+    border-radius: 12px;
     font-family: inherit;
     font-size: inherit;
     background: var(--bg);
     color: var(--text);
     outline: none;
+    transition: all 0.2s ease;
 }
 
 .cellInput:focus {
-    box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.2);
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
 }
 
 textarea.cellInput {
@@ -292,117 +186,91 @@ textarea.cellInput {
     min-height: 60px;
 }
 
-/* Tag Cell Content */
-.tagCellContent {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.emptyTagCell {
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    cursor: pointer;
-}
-
-.emptyTagCell .editIcon {
-    opacity: 0;
-}
-
-.row:hover .emptyTagCell .editIcon {
-    opacity: 0.6;
-}
-
-/* Tag Badges */
-.tagBadge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    border-radius: 12px;
-    background: var(--pill-bg);
-    color: var(--text-primary);
-    transition: opacity 0.15s;
-}
-
-.tagCellContent:hover .tagBadge {
-    opacity: 0.85;
-}
-
 .sourceBadge {
-    display: inline-block;
-    padding: 2px 8px;
-    margin-right: 4px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    border-radius: 12px;
-    background: var(--primary);
-    color: var(--c-white);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: var(--text);
+    color: var(--bg, #FAF9F6);
+    margin-left: 6px;
 }
 
-/* Cell Wrapper for edit icon */
 .cellWrapper {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-/* Edit Icon */
 .editIcon {
     opacity: 0;
     color: var(--muted);
     flex-shrink: 0;
-    transition: opacity 0.15s;
+    transition: opacity 0.2s ease;
 }
 
-.row:hover .editIcon {
-    opacity: 0.6;
+.editIconVisible {
+    opacity: 0.5;
 }
 
-.row:hover .editIcon:hover {
-    opacity: 1;
-    color: var(--primary);
+.editIcon:hover {
+    opacity: 1 !important;
+    color: var(--text) !important;
 }
 
-/* Tag Edit Icon */
-.tagEditIcon {
-    opacity: 0;
-    color: var(--muted);
-    flex-shrink: 0;
-    transition: opacity 0.15s;
-}
-
-.row:hover .tagCellContent .tagEditIcon {
-    opacity: 0.6;
-}
-
-.tagCellContent:hover .tagEditIcon {
-    opacity: 1;
-    color: var(--primary);
-}
-
-/* Tag Select */
-.tagSelect {
-    padding: 4px 8px;
-    border: 1px solid var(--primary);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.8rem;
-    outline: none;
-    cursor: pointer;
-}
-
-.tagSelect:focus {
-    box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.2);
-}
-
-/* Empty State */
 .emptyState {
-    padding: 48px;
-    text-align: center;
+    padding: 48px; text-align: center; color: var(--muted); font-style: italic;
+}
+
+.actionCell {
+    padding: 14px 16px;
+    vertical-align: middle;
+    width: 48px;
+    text-align: right;
+}
+
+.trashBtn {
+    background: transparent;
     color: var(--muted);
+    border: none;
+    padding: 6px;
+    border-radius: 999px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.row:hover .trashBtn {
+    opacity: 0.5;
+}
+
+.trashBtn:hover {
+    color: var(--danger, #dc2626);
+    background: var(--danger-light, #fee2e2);
+    opacity: 1 !important;
+}
+
+.row.expanded {
+    background: var(--hover, rgba(74, 52, 33, 0.04));
+}
+
+.autocompleteCell {
+  width: 100%;
+  min-width: 200px;
+}
+
+.autocompleteCell input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: var(--input-bg);
+  color: var(--text);
 }

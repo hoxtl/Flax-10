@@ -55,4 +55,25 @@ describe('useProfileSummary', () => {
         await act(async () => {});
         expect(result.current.summary).toEqual({ total_sessions: 20, total_hours: 40 });
     });
+
+    it('refetch keeps loading false when summary already exists', async () => {
+        const { result } = renderHook(() => useProfileSummary());
+        await act(async () => {});
+
+        fetchApi.mockImplementationOnce(
+            () => new Promise((resolve) => setTimeout(() => resolve({ total_sessions: 20, total_hours: 40 }), 0))
+        );
+
+        await act(async () => {
+            result.current.refetch();
+        });
+
+        expect(result.current.loading).toBe(false);
+
+        await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        expect(result.current.summary).toEqual({ total_sessions: 20, total_hours: 40 });
+    });
 });

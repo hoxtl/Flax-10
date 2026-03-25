@@ -5,6 +5,11 @@ omit =
     studyFlax/views/notifications.py
     studyFlax/tests/*
     studyFlax/migrations/*
+    */__init__.py
+    manage.py
+    **/settings*.py
+    **/admin.py
+    **/apps.py
 
 [report]
 omit =
@@ -12,6 +17,11 @@ omit =
     studyFlax/views/notifications.py
     studyFlax/tests/*
     studyFlax/migrations/*
+    */__init__.py
+    manage.py
+    **/settings*.py
+    **/admin.py
+    **/apps.py
 exclude_lines =
     pragma: no cover
     def __repr__

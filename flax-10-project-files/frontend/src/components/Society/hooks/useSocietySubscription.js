@@ -1,4 +1,7 @@
-import { useState, useCallback } from "react";
+/*
+ * useSocietySubscription toggles notification subscriptions for a society.
+ */
+
 import { toggleSubscription as apiToggle } from "../../../api/societyApi";
 import { useConfirm } from "../../../context/ConfirmContext";
 
@@ -14,7 +17,9 @@ const makeSubscribe = (societyId, updateLocalSociety) =>
         try {
             await apiToggle(societyId, true);
             updateLocalSociety({ is_subscribed: true });
-        } catch (err) { console.error('Subscription failed:', err); }
+        } catch (err) {
+            console.error('Subscription failed:', err);
+        }
     };
 
 const doUnsubscribe = async (societyId, updateLocalSociety, confirm, name) => {

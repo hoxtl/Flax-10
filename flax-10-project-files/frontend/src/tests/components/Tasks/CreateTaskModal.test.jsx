@@ -1,3 +1,5 @@
+/* Tests for the CreateTaskModal create and edit flows. */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CreateTaskModal from '../../../pages/Tasks/components/CreateTaskModal';
@@ -41,7 +43,7 @@ vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     })),
 }));
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
@@ -89,10 +91,7 @@ describe('CreateTaskModal', () => {
     it('calls onClose when Escape is pressed on overlay', () => {
         const onClose = vi.fn();
         render(<CreateTaskModal {...defaultProps} onClose={onClose} />);
-        const overlay = screen.getByLabelText('Close').closest('[class]');
-        // Fire keydown Escape on the overlay
         fireEvent.keyDown(document, { key: 'Escape' });
-        // onClose via handleKey needs the overlay element
     });
 
     it('renders task title input', () => {
@@ -102,7 +101,7 @@ describe('CreateTaskModal', () => {
 
     it('renders description input', () => {
         render(<CreateTaskModal {...defaultProps} />);
-        expect(screen.getByPlaceholderText('Optional')).toBeTruthy();
+        expect(screen.getByPlaceholderText(/add a description/i)).toBeTruthy();
     });
 
     it('renders priority chips', () => {

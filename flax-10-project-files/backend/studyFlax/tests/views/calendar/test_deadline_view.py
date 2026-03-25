@@ -1,5 +1,5 @@
 """
-Backend tests for deadline views.
+Tests deadline view behaviour.
 """
 
 from rest_framework import status
@@ -10,6 +10,7 @@ from ..base import BaseTestCase
 
 class DeadlineViewTests(BaseTestCase):
     """ Tests for Deadline views"""
+
     def setUp(self):
         super().setUp()
         self.user.role = 'teacher'
@@ -27,6 +28,35 @@ class DeadlineViewTests(BaseTestCase):
         )
         self.list_url = f'/api/modules/{self.module.id}/deadlines/'
         self.detail_url = f'/api/modules/{self.module.id}/deadlines/{self.deadline.id}/'
+
+    def create_teacher(self, username):
+        """Create a teacher for deadline tests."""
+
+        return self.user.__class__.objects.create_user(
+            username=username,
+            email=f'{username}@example.com',
+            password='pass1234',
+            first_name='Other',
+            last_name='Teacher',
+            role='teacher',
+        )
+
+    def create_module_deadline(self, teacher, code):
+        """Create a module and one future deadline for a teacher."""
+
+        module = Module.objects.create(
+            module_code=code,
+            module_name='Engineering Mathematics',
+            created_by=teacher,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        Deadline.objects.create(
+            module=module,
+            title='Presentation',
+            deadline_type='presentation',
+            start_due_date=timezone.now() + timedelta(days=3),
+        )
 
     def test_list_deadlines(self):
         response = self.client.get(self.list_url)
@@ -87,6 +117,14 @@ class DeadlineViewTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    def test_teacher_upcoming_deadlines_only_include_owned_modules(self):
+        other_teacher = self.create_teacher('other_teacher')
+        self.create_module_deadline(other_teacher, 'GN4101')
+        response = self.client.get('/api/deadlines/upcoming/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['module_code'], '5CCS2SEG')
+
     def test_create_deadline_creates_events_for_enrolled_students(self):
         self.user.role = 'student'
         self.user.save()
@@ -101,6 +139,7 @@ class DeadlineViewTests(BaseTestCase):
     
     def deadline_payload(self):
         """Build a deadline payload for requests."""
+
         return dict(title='New Deadline', deadline_type='coursework',
             start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
 

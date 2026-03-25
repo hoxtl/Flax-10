@@ -1,0 +1,88 @@
+/*
+ * Settings responsive adjustments and motion polish.
+ */
+@media (max-width: 680px) {
+  .container {
+    padding: 14px 12px;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .contentMain {
+    gap: 8px;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .sidebarNav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .sidebarSectionLabel {
+    display: none;
+  }
+
+  .navItem {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    justify-content: center;
+    font-size: 11.5px;
+    padding: 8px 8px;
+  }
+
+  .panelBody {
+    padding: 18px 16px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .formActions {
+    justify-content: stretch;
+  }
+
+  .btnPrimary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .themeSelector {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .twoColLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .schedulingLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .schedulingSplitRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.preferencesContent {
+  animation: tab-fade-in 0.3s ease-out;
+}
+
+@keyframes tab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

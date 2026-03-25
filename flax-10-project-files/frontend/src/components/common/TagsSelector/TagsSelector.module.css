@@ -1,0 +1,99 @@
+.wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.selectedRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 4px 8px;
+    background: var(--tag-selector-row-bg);
+    border: 1.5px solid var(--tag-selector-row-border);
+    border-radius: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+}
+
+.selectedRow::-webkit-scrollbar {
+    display: none;
+}
+
+.emptyHint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+    font-style: italic;
+}
+
+.selectedTag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px 3px 10px;
+    background: var(--tag-selector-pill-bg);
+    border: 1px solid var(--tag-selector-pill-border);
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: var(--tag-selector-pill-shadow);
+}
+
+.tagLabel {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text);
+    font-family: var(--font-body);
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    padding: 1px;
+    cursor: pointer;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.12s, background 0.12s;
+    flex-shrink: 0;
+}
+
+.removeBtn:hover {
+    color: var(--text);
+    background: var(--hover);
+}
+
+.pillsWrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px 2px;
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    padding: 5px 12px;
+    background: var(--tag-selector-option-bg);
+    border: 1.5px solid var(--tag-selector-option-border);
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: background 0.13s, border-color 0.13s, transform 0.1s;
+}
+
+.pill:hover {
+    background: var(--tag-selector-option-hover-bg);
+    border-color: var(--tag-selector-option-hover-border);
+    transform: translateY(-1px);
+}
+
+.pill:active {
+    transform: translateY(0);
+}

@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
-import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric';
-import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
-import { PageTransition } from '../../components/common';
+import PasswordResetPageLayout from './PasswordResetPageLayout';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -90,26 +88,12 @@ function ResetCard({ email, setEmail, loading, message, error, onSubmit }) {
   );
 }
 
-function ResetPageLayout({ children }) {
-  return (
-    <PageTransition>
-      <div className={styles.heroPage}>
-        <AuthHeroGeometric />
-        <div aria-hidden="true" className={styles.heroOverlay} />
-        <AuthBrand />
-        <AuthFooter absolute />
-        <div className={styles.centerContent}>{children}</div>
-      </div>
-    </PageTransition>
-  );
-}
-
 export default function PasswordResetRequest() {
   const form = useResetForm();
   const handleSubmit = buildSubmitHandler(form);
   return (
-    <ResetPageLayout>
+    <PasswordResetPageLayout>
       <div className={styles.container}><ResetCard {...form} onSubmit={handleSubmit} /></div>
-    </ResetPageLayout>
+    </PasswordResetPageLayout>
   );
 }

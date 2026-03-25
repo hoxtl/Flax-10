@@ -1,9 +1,9 @@
-/**
+/*
  * Tests for TaskFilterPanel: tabs, search, lists tab, modules tab, clear.
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "../../../../utils/test-utils";
 import TaskFilterPanel from "../../../../pages/Tasks/components/TaskFilterPanel";
 
 describe("TaskFilterPanel", () => {

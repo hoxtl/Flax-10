@@ -1,8 +1,8 @@
-/**
- * SocietyInfo displays key metadata for a society, including bio, category, 
- * member stats, and subscription status.
+/*
+ * SocietyInfo renders editable metadata and membership actions for a society.
  */
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { Bell, BellOff } from "lucide-react";
 import Badge from "../../common/Badge/Badge";
 import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
@@ -10,6 +10,7 @@ import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
 /** Primary metadata and action row for the society detail page. */
+
 export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, onViewMembers, isSubscribed, onToggleSubscription }) {
     const categories = society.categories || (society.category ? [society.category] : []);
     return (
@@ -25,12 +26,10 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
 }
 
 /** Displays or edits the society biography. */
+
 function BioSection({ text, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
-    const [value, setValue] = useState(text || "");
-    useEffect(() => setValue(text || ""), [text]);
-
-    if (editing) return <BioEditor value={value} setValue={setValue} onSave={() => { onSave(value); setEditing(false); }} />;
+    if (editing) return <BioEditor initialValue={text || ""} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;
     return <BioDisplay text={text} editMode={editMode} onEdit={() => setEditing(true)} />;
 }
 
@@ -50,12 +49,13 @@ function BioDisplay({ text, editMode, onEdit }) {
     );
 }
 
-function BioEditor({ value, setValue, onSave }) {
+function BioEditor({ initialValue, onSave }) {
+    const [value, setValue] = useState(initialValue);
     return (
         <div className={styles.bioEditor}>
             <textarea className={styles.bioInput} value={value} onChange={(e) => setValue(e.target.value)}
                 placeholder="Describe your society..." rows={2} autoFocus />
-            <PrimaryButton className={styles.saveBtn} pill onClick={onSave}>Save</PrimaryButton>
+            <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
         </div>
     );
 }
@@ -64,20 +64,23 @@ const ensureArray = (val) => val || [];
 
 function CategorySection({ categories, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
-    const [value, setValue] = useState(() => ensureArray(categories));
-    useEffect(() => setValue(ensureArray(categories)), [categories]);
-
-    if (editing) return <CategoryEditor value={value} setValue={setValue} onSave={() => { onSave(value); setEditing(false); }} />;
+    if (editing) return <CategoryEditor initialValue={ensureArray(categories)} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;
     return <CategoryDisplay category={categories} editMode={editMode} onEdit={() => setEditing(true)} />;
 }
 
-function CategoryEditor({ value, setValue, onSave }) {
+function CategoryEditor({ initialValue, onSave }) {
+    const [value, setValue] = useState(initialValue);
     return (
         <div className={styles.categoryEditor}>
             <CategorySelector value={value} onChange={setValue} label="" multiple />
-            <PrimaryButton className={styles.saveBtn} pill onClick={onSave}>Save</PrimaryButton>
+            <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
         </div>
     );
+}
+
+function saveAndClose(value, onSave, setEditing) {
+    onSave(value);
+    setEditing(false);
 }
 
 function EditIcon({ onClick }) {

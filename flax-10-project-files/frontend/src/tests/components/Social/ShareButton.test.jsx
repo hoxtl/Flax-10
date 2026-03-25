@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-vi.mock('../../../api/socialService', () => ({
+vi.mock('../../../api/socialApi', () => ({
     shareCalendar: vi.fn().mockResolvedValue({}),
     unshareCalendar: vi.fn().mockResolvedValue({}),
 }));
 
 import ShareButton from '../../../components/Social/ShareButton';
-import { shareCalendar, unshareCalendar } from '../../../api/socialService';
+import { shareCalendar, unshareCalendar } from '../../../api/socialApi';
 
 describe('ShareButton', () => {
     beforeEach(() => {
@@ -75,12 +75,11 @@ describe('ShareButton', () => {
     });
 
     it('handles API error without throwing', async () => {
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         shareCalendar.mockRejectedValueOnce(new Error('network error'));
         render(<ShareButton userId={1} initialIsSharing={false} />);
         fireEvent.click(screen.getByRole('button'));
-        await waitFor(() => expect(errSpy).toHaveBeenCalledWith('Error toggling share status', expect.any(Error)));
-        errSpy.mockRestore();
+        await waitFor(() => expect(screen.getByText('Share Calendar')).toBeTruthy());
+        expect(screen.queryByText('Shared')).toBeNull();
     });
 
     it('does not call toggleShare when already loading', async () => {

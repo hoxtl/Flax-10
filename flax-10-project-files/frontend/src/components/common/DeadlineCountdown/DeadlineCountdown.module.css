@@ -1,0 +1,70 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.alignStart {
+  justify-content: flex-start;
+}
+
+.alignEnd {
+  justify-content: flex-end;
+}
+
+.daysLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--modules-due-future);
+}
+
+.priorityPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent);
+  font-size: 0.62rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.priorityPillOverdue {
+  background: var(--modules-priority-overdue-bg);
+  color: var(--modules-priority-overdue-fg);
+}
+
+.priorityPillCritical {
+  background: var(--modules-priority-critical-bg);
+  color: var(--modules-priority-critical-fg);
+}
+
+.dueOverdue {
+  color: var(--modules-priority-overdue-fg);
+}
+
+.dueToday {
+  color: var(--modules-priority-overdue-fg);
+}
+
+.dueTomorrow {
+  color: var(--modules-priority-critical-fg);
+}
+
+.dueFuture {
+  color: var(--modules-due-future);
+}
+
+.icon {
+  flex-shrink: 0;
+}

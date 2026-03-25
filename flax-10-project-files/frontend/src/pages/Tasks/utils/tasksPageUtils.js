@@ -1,6 +1,8 @@
-/**
+/*
  * Helpers for TasksPage: date helpers, filtered tasks, and handler builders.
  */
+
+import { buildDateBounds } from "./taskFeedDataUtils";
 
 export function getTodayEndISO() {
   const d = new Date();
@@ -20,30 +22,18 @@ function showInfoToast(state, message, duration = 3000) {
   setTimeout(() => state.setToastInfo(null), duration);
 }
 
-function getDateBounds() {
-  const dayStart = new Date();
-  dayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
-  const weekEnd = new Date(todayEnd);
-  weekEnd.setDate(weekEnd.getDate() + 7);
-  return { dayStart, todayEnd, weekEnd };
+function filterByListOrId(tasks, activeListId, filterListIds) {
+  if (filterListIds?.length > 0) {
+    const set = new Set(filterListIds.map(String));
+    return tasks.filter((t) => set.has(String(t.task_list)));
+  }
+  if (activeListId) return tasks.filter((t) => String(t.task_list) === String(activeListId));
+  return tasks;
 }
 
 export function filterTasksByListAndFilter(tasks, activeListId, activeFilter, filterListIds) {
-  const { dayStart, todayEnd, weekEnd } = getDateBounds();
-  let filtered = tasks;
-  if (filterListIds?.length > 0) {
-    const set = new Set(filterListIds.map(String));
-    filtered = tasks.filter((t) => set.has(String(t.task_list)));
-  } else if (activeListId) {
-    filtered = tasks.filter((t) => String(t.task_list) === String(activeListId));
-  } else if (activeFilter !== "all" && activeFilter !== "today" && activeFilter !== "this_week" && activeFilter !== "later" && activeFilter !== "overdue") {
-    // If we're on a specific list or filter that implies a task_list, we might keep filtering.
-    // But for "All tasks", "Today", "This Week", etc., we should show ALL relevant tasks (including group ones).
-    // The current logic already handles this because 'filtered' starts as 'tasks'.
-  }
-
+  const { dayStart, todayEnd, weekEnd } = buildDateBounds();
+  const filtered = filterByListOrId(tasks, activeListId, filterListIds);
   if (activeFilter === "overdue") return filtered.filter((t) => !t.completed && t.due_date && new Date(t.due_date) < new Date());
   if (activeFilter === "today") return filtered.filter((t) => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
   if (activeFilter === "this_week") return filtered.filter((t) => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= weekEnd);
@@ -71,8 +61,10 @@ async function handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta)
   return updated;
 }
 
-function handleDeleteListImpl(state, listsApi, listId) {
-  listsApi.removeList(listId);
+async function handleDeleteListImpl(state, listsApi, listId) {
+  const listName = listsApi.lists.find((list) => String(list.id) === String(listId))?.name || "List";
+  await listsApi.removeList(listId);
+  showInfoToast(state, `"${listName}" deleted.`);
   if (state.activeListId === listId) {
     state.setActiveListId(null);
     state.setActiveFilter("all");
@@ -82,12 +74,18 @@ function handleDeleteListImpl(state, listsApi, listId) {
 export function buildTasksPageHandlers(state, listsApi, tasksApi) {
   return {
     handleUndoAddTask: () => handleUndoAddTask(state, tasksApi),
-    handleDeleteTask: (taskId) => { tasksApi.removeTask(taskId); state.setToastDelete(true); setTimeout(() => state.setToastDelete(false), 3500); },
+    handleDeleteTask: async (taskId) => {
+      state.setToastDelete(true);
+      setTimeout(() => state.setToastDelete(false), 3500);
+      await tasksApi.removeTask(taskId);
+    },
     handleEditTask: (taskId, data, meta) => handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta),
     handleDeleteList: (listId) => handleDeleteListImpl(state, listsApi, listId),
     handleUnarchiveList: async (listId) => { await listsApi.restoreList(listId); tasksApi.reload(); },
     handlePermanentlyDeleteList: async (listId) => {
+      const listName = listsApi.archivedLists.find((list) => String(list.id) === String(listId))?.name || "List";
       await listsApi.permanentlyDeleteList(listId);
+      showInfoToast(state, `"${listName}" permanently deleted.`);
     },
   };
 }
@@ -95,7 +93,7 @@ export function buildTasksPageHandlers(state, listsApi, tasksApi) {
 export function buildTasksPageViewProps(state, listsApi, tasksApi, handlers, filteredTasks, defaultDueDateForNewTask, activeModuleCode) {
   const loading = listsApi.loading || tasksApi.initialLoading;
   const sidebarProps = { lists: listsApi.lists, tasks: tasksApi.tasks, activeListId: state.activeListId, activeFilter: state.activeFilter, onSelectList: (id) => { state.setActiveListId(id); state.setFilterListIds([]); }, onSelectFilter: state.setActiveFilter, onNewList: () => state.setShowListModal(true), onDeleteList: handlers.handleDeleteList, onRenameList: listsApi.renameList, onUnarchiveList: handlers.handleUnarchiveList, onPermanentlyDeleteList: handlers.handlePermanentlyDeleteList, archivedLists: listsApi.archivedLists };
-  const feedProps = { tasks: filteredTasks, lists: listsApi.lists, activeFilter: state.activeFilter, activeListId: state.activeListId, activeModuleCode, defaultDueDateForNewTask, onPlanTomorrow: () => { state.setTaskModalDueDate(getTomorrowEndISO()); state.setShowTaskModal(true); }, filterListIds: state.filterListIds, onToggleComplete: tasksApi.toggleComplete, onDeleteTask: handlers.handleDeleteTask, onEditTask: handlers.handleEditTask, onCreateTask: () => { state.setTaskModalDueDate(null); state.setShowTaskModal(true); }, onAddTask: async (data) => { const created = await tasksApi.addTask(data); if (created) { state.setToastUndo({ taskId: created.id, title: created.title }); setTimeout(() => state.setToastUndo(null), 5000); } }, onFilterByList: state.setFilterListIds, onReloadTasks: tasksApi.reload, };
+  const feedProps = { tasks: filteredTasks, allTasks: tasksApi.tasks, lists: listsApi.lists, activeFilter: state.activeFilter, activeListId: state.activeListId, activeModuleCode, defaultDueDateForNewTask, onPlanTomorrow: () => { state.setTaskModalDueDate(getTomorrowEndISO()); state.setShowTaskModal(true); }, filterListIds: state.filterListIds, onToggleComplete: tasksApi.toggleComplete, onDeleteTask: handlers.handleDeleteTask, onEditTask: handlers.handleEditTask, onCreateTask: () => { state.setTaskModalDueDate(null); state.setShowTaskModal(true); }, onAddTask: async (data) => { const created = await tasksApi.addTask(data); if (created) { state.setToastUndo({ taskId: created.id, title: created.title }); setTimeout(() => state.setToastUndo(null), 5000); } }, onFilterByList: state.setFilterListIds, onReloadTasks: tasksApi.reload, };
   const taskModalProps = { lists: listsApi.lists, defaultListId: state.activeListId, defaultDueDate: state.taskModalDueDate ?? defaultDueDateForNewTask, onOpenCreateList: () => state.setShowCreateListFromTask(true), newListIdCreated: state.lastCreatedListId, onSave: async (data) => { const created = await tasksApi.addTask(data); state.setToastUndo(created ? { taskId: created.id, title: created.title } : null); if (created) setTimeout(() => state.setToastUndo(null), 5000); }, onClose: () => { state.setShowTaskModal(false); state.setLastCreatedListId(null); state.setTaskModalDueDate(null); } };
   const listModalProps = { onSave: listsApi.addList, onClose: () => state.setShowListModal(false) };
   const createListFromTaskProps = { onSave: async (data) => { const created = await listsApi.addList(data); if (created?.id) state.setLastCreatedListId(created.id); state.setShowCreateListFromTask(false); }, onClose: () => state.setShowCreateListFromTask(false) };

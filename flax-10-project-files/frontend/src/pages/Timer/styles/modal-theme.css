@@ -1,0 +1,322 @@
+/*
+ * Timer page styles chunk.
+ */
+.presetListItem:active:not(:disabled) {
+    transform: scale(1.015);
+}
+
+.presetListItemTop {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.34rem;
+    min-width: 0;
+}
+
+.presetListIcon {
+    font-size: 0.86rem;
+    line-height: 1;
+}
+
+.presetListItemName {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.presetDurationTag {
+    border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+    border-radius: 999px;
+    padding: 0.1rem 0.44rem;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--surface-card) 74%, var(--surface-page));
+}
+
+.presetListItemMeta {
+    margin-left: 1.22rem;
+    font-size: 0.64rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.presetListItemActive {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--color-on-primary, #fff);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--primary) 34%, transparent);
+    animation: presetSelectPop 220ms ease;
+}
+
+.presetListItemActive .presetListItemName,
+.presetListItemActive .presetListItemMeta,
+.presetListItemActive .presetListIcon {
+    color: var(--color-on-primary, #fff);
+}
+
+.presetListItemActive .presetDurationTag {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.42);
+    color: var(--color-on-primary, #fff);
+}
+
+.presetListItemDisabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+@keyframes presetSelectPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ── Clear History Modal ─────────────────────────── */
+
+.clearHistoryModal {
+    border: 2px solid var(--text) !important;
+}
+
+.clearHistoryBody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.clearHistoryWarning {
+    font-style: italic;
+    color: var(--primary);
+    font-size: var(--text-base);
+    line-height: 1.55;
+    margin: 0;
+}
+
+.clearHistoryButtons {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    padding-top: var(--space-3);
+    border-top: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.clearHistoryDeleteBtn {
+    position: relative;
+    overflow: hidden;
+    padding: var(--btn-padding);
+    border-radius: 999px;
+    border: 1.5px solid var(--text);
+    background: var(--surface-card);
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    font-size: var(--btn-font-size);
+    cursor: pointer;
+    min-width: 120px;
+    user-select: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.clearHistoryDeleteBtn:hover {
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--text) 14%, transparent);
+}
+
+.clearHistoryDeleteBtnBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: color-mix(in srgb, var(--text) 16%, transparent);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.clearHistoryDeleteBtnLabel {
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Select Task Modal: Full Flax / No Purple ───────── */
+
+/* Modal background uses theme variables */
+.taskPickDropdown {
+    background: var(--surface-card) !important;
+}
+
+.taskPickContent {
+    background: var(--surface-card) !important;
+}
+
+.taskPickHeader {
+    background: var(--surface-card) !important;
+    border-bottom-color: var(--border) !important;
+    padding: 0.9rem 1.2rem 0.6rem !important;
+}
+
+.taskPickHeaderTitle {
+    font-size: 1.4rem !important;
+}
+
+.taskPickCloseBtn {
+    width: 2rem !important;
+    height: 2rem !important;
+    font-size: 1.3rem !important;
+}
+
+.taskPickFiltersBar {
+    background: var(--surface-card) !important;
+    padding: 0.6rem 1.2rem 0.5rem !important;
+    border-bottom-color: var(--border) !important;
+    gap: 0.4rem !important;
+}
+
+.taskPickList {
+    padding: 0.5rem 1.2rem 0.8rem !important;
+    gap: 4px !important;
+}
+
+/* Compact cards — no purple selected state */
+.taskPickItem {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border) !important;
+    border-left-width: 1px !important;
+    border-radius: 10px !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    transition: background 0.12s ease, border-color 0.12s ease !important;
+}
+
+.taskPickItem + .taskPickItem {
+    margin-top: 4px !important;
+}
+
+.taskPickItem:hover {
+    background: var(--hover) !important;
+    border-color: color-mix(in srgb, var(--primary) 32%, transparent) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.taskPickItemContent {
+    padding: 0.42rem 0.7rem !important;
+}
+
+.taskPickItemSelected {
+    background: var(--primary-strong) !important;
+    border-color: var(--primary-strong) !important;
+}
+
+.taskPickItemSelected .taskPickTitle,
+.taskPickItemSelected .taskPickPriorityIcon,
+.taskPickItemSelected .taskPickDurationInline,
+.taskPickItemSelected .taskPickMetaDivider,
+.taskPickItemSelected .taskPickMetaLine {
+    color: var(--color-on-primary) !important;
+}
+
+.taskPickItemRecommended {
+    border-color: color-mix(in srgb, var(--primary) 36%, transparent) !important;
+    box-shadow: none !important;
+    background: var(--surface-card) !important;
+}
+
+.taskPickItemSelected.taskPickItemRecommended {
+    background: var(--primary-strong) !important;
+    border-color: var(--primary-strong) !important;
+    box-shadow: none !important;
+}
+
+/* No colored left-border accent */
+.taskPickItemHot,
+.taskPickItemWarm,
+.taskPickItemCool {
+    border-left-color: var(--border) !important;
+}
+
+/* Task card text */
+.taskPickTitle {
+    color: var(--text) !important;
+    font-weight: 700 !important;
+    font-size: 0.82rem !important;
+}
+
+.taskPickMetaLine {
+    color: var(--muted) !important;
+}
+
+/* Module tag: thin pill */
+.taskPickInlineMeta {
+    flex-shrink: 0;
+}
+
+/* Filter pills: flax theme */
+.taskQuickFilterPill {
+    background: var(--surface-card) !important;
+    border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent) !important;
+    color: var(--primary-strong) !important;
+    border-radius: 999px !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    padding: 0.28rem 0.7rem !important;
+    transition: background 0.12s ease, color 0.12s ease !important;
+}
+
+.taskQuickFilterPillActive {
+    background: var(--primary-strong) !important;
+    border-color: var(--primary-strong) !important;
+    color: var(--color-on-primary) !important;
+}
+
+/* Magic Pick button: full-width below toolbar */
+.taskPickSmartBtn {
+    width: 100% !important;
+    background: var(--primary-strong) !important;
+    color: #fff !important;
+    border: 1px solid var(--primary-strong) !important;
+    border-radius: 999px !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    padding: 0.42rem 0.82rem !important;
+}
+
+.taskPickSmartBtn:hover {
+    filter: brightness(1.08) !important;
+    border-color: var(--primary-strong) !important;
+}
+
+/* Header text */
+.taskPickHeaderTitle {
+    color: var(--text) !important;
+}
+
+.taskPickHeaderSubtitle {
+    color: var(--muted) !important;
+}
+
+.taskPickPriorityHeader {
+    color: var(--text) !important;
+    font-weight: 800 !important;
+}
+
+.taskPickSortLabel {
+    color: var(--text) !important;
+}
+
+/* ── Search + Sort row ── */
+.taskPickSearchRow {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.taskPickSearchRow .taskPickSearch {
+    flex: 1;
+    min-width: 0;
+}

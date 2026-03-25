@@ -1,52 +1,55 @@
-import { createContext, useContext, useState, useCallback, useRef } from 'react';
-import AppToast from '../components/common/AppToast/AppToast';
+/*
+ * App-wide imperative toast API.
+ */
+
+import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import AppToast from "../components/common/AppToast/AppToast";
 
 const ToastContext = createContext(null);
 
+function clearToastTimer(timeoutRef) {
+  if (!timeoutRef.current) return;
+  clearTimeout(timeoutRef.current);
+  timeoutRef.current = null;
+}
+
+function buildToastState(message, options = {}) {
+  return {
+    message,
+    actionLabel: options.actionLabel || null,
+    onAction: typeof options.onAction === "function" ? options.onAction : null,
+    variant: options.variant || "success",
+    icon: options.icon || null,
+  };
+}
+
+function getToastDuration(options) {
+  return Number.isFinite(options.durationMs) ? options.durationMs : 3200;
+}
+
 function useToastState() {
-    const [toast, setToast] = useState(null);
-    const timeoutRef = useRef(null);
-
-    const closeToast = useCallback(() => {
-        if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
-        setToast(null);
-    }, []);
-
-    const showToast = useCallback((msg, opts = {}) => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setToast({
-            message: msg,
-            actionLabel: opts.actionLabel || null,
-            onAction: typeof opts.onAction === 'function' ? opts.onAction : null,
-            variant: opts.variant || 'success',
-            icon: opts.icon || null,
-        });
-        const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
-        timeoutRef.current = setTimeout(() => { setToast(null); timeoutRef.current = null; }, duration);
-    }, []);
-
-    return { toast, closeToast, showToast };
+  const [toast, setToast] = useState(null);
+  const timeoutRef = useRef(null);
+  const closeToast = useCallback(() => { clearToastTimer(timeoutRef); setToast(null); }, []);
+  const showToast = useCallback((message, options = {}) => {
+    clearToastTimer(timeoutRef);
+    setToast(buildToastState(message, options));
+    timeoutRef.current = setTimeout(() => closeToast(), getToastDuration(options));
+  }, [closeToast]);
+  return { toast, closeToast, showToast };
 }
 
 export function ToastProvider({ children }) {
-    const { toast, closeToast, showToast } = useToastState();
-    return (
-        <ToastContext.Provider value={showToast}>
-            {children}
-            {toast && (
-                <AppToast
-                    message={toast.message}
-                    actionLabel={toast.actionLabel}
-                    onAction={toast.onAction}
-                    variant={toast.variant}
-                    icon={toast.icon}
-                    onClose={closeToast}
-                />
-            )}
-        </ToastContext.Provider>
-    );
+  const { toast, closeToast, showToast } = useToastState();
+  return (
+    <ToastContext.Provider value={showToast}>
+      {children}
+      <AnimatePresence initial={false}>{toast && <AppToast message={toast.message} actionLabel={toast.actionLabel} onAction={toast.onAction} variant={toast.variant} icon={toast.icon} onClose={closeToast} />}</AnimatePresence>
+    </ToastContext.Provider>
+  );
 }
 
 export function useToast() {
-    return useContext(ToastContext);
+  return useContext(ToastContext);
 }

@@ -1,0 +1,193 @@
+.strip {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface-card);
+  border: var(--card-border);
+  border-radius: var(--card-radius-token);
+  padding: 0.875rem 1.25rem;
+  gap: 0;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  box-shadow: var(--card-shadow-rest);
+}
+
+.stripCompact {
+  padding: 0.6rem 0.85rem;
+  row-gap: 0.3rem;
+}
+
+.stripBare {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.stripNoWrap {
+  flex-wrap: nowrap;
+  row-gap: 0;
+}
+
+.stripCompact .item {
+  gap: 0.18rem;
+  padding: 0 0.7rem;
+}
+
+.stripNoWrap .item {
+  padding: 0 0.9rem;
+}
+
+.stripBare .item {
+  padding: 0 1rem;
+}
+
+.stripCompact .value {
+  font-size: 1.05rem;
+}
+
+.stripCompact .label {
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+}
+
+.stripCompact .copy {
+  gap: 0.08rem;
+}
+
+.stripCompact .meta {
+  font-size: 0.7rem;
+}
+
+.itemSlot {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.itemSlotInteractive {
+  color: inherit;
+  text-decoration: none;
+  border: 0;
+  background: transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.itemSlotInteractive:hover .item,
+.itemSlotInteractive:focus-visible .item {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.itemSlotInteractive:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 42%, transparent);
+  outline-offset: 2px;
+}
+
+.itemButton {
+  width: 100%;
+  padding: 0;
+  font: inherit;
+}
+
+.item {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0 1.25rem;
+  text-align: center;
+  border-radius: 14px;
+  transition: background 180ms ease;
+}
+
+.itemTooltipWrap {
+  cursor: default;
+}
+
+.sep {
+  width: 1px;
+  height: auto;
+  min-height: 32px;
+  background: var(--border);
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.value {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.05em;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.valueNumber,
+.valueAffix {
+  font: inherit;
+  color: inherit;
+}
+
+.label {
+  display: block;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  align-items: center;
+}
+
+.meta {
+  font-size: 0.76rem;
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: normal;
+  max-width: 20ch;
+}
+
+.valueSuccess {
+  color: var(--success-text);
+}
+
+.valueDanger {
+  color: var(--danger);
+}
+
+.valueWarning {
+  color: var(--warning-text);
+}
+
+.valueAccent {
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .stripNoWrap {
+    flex-wrap: wrap;
+    row-gap: 0.45rem;
+  }
+
+  .sep {
+    display: none;
+  }
+
+  .item {
+    padding: 0 0.75rem;
+  }
+}

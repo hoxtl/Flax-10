@@ -1,3 +1,4 @@
+/* Tests for TaskCard component rendering and user interactions */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -23,7 +24,8 @@ vi.mock("../../../../lib/completionMessages", () => ({
   getCompletionMessage: () => "Done",
   isRoutineTask: () => false,
 }));
-vi.mock("../../../../api/userService", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
+vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
+vi.mock("../../../../api/readingApi", () => ({ getReadingSpeed: vi.fn().mockResolvedValue({ avg_min_per_page: 1.6, is_personalised: true }) }));
 vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: (_d, cb) => cb() }),
 }));
@@ -34,6 +36,15 @@ vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
 vi.mock("../../../../components/TaskCelebration/CheckBurst", () => ({ CheckBurst: ({ children }) => <>{children}</> }));
 vi.mock("../../../../pages/Tasks/components/CreateTaskModal", () => ({ default: () => <div data-testid="edit-modal" /> }));
 vi.mock("../../../../pages/Tasks/components/TaskInfoModal", () => ({ TaskInfoModal: () => <div data-testid="info-modal" /> }));
+vi.mock("../../../../components/common/AnimatedDropdown/AnimatedDropdown", () => ({
+  default: ({ value, onChange, options }) => (
+    <div data-testid="animated-dropdown">
+      {(options || []).map(o => (
+        <button key={o.value} onClick={() => onChange(o.value)}>{o.label}</button>
+      ))}
+    </div>
+  ),
+}));
 vi.mock("../../../../pages/Tasks/utils/taskCardUtils", () => ({
   formatDueDate: () => ({ label: "Today", status: "today" }),
   getCompletedDueLabel: () => "Completed",

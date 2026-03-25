@@ -1,0 +1,127 @@
+/**
+ * Global campus map styles for Mapbox elements.
+ */
+.campusMarker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.campusMarkerInner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.campusMarker:hover .campusMarkerInner {
+  transform: scale(1.2);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.32);
+}
+
+.campusMarkerLabel {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--panel);
+  color: var(--text);
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  pointer-events: none;
+}
+
+.startMarker {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+.startMarkerPulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  animation: pulse 1.8s ease-out infinite;
+}
+
+.startMarkerDot {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2.5px solid white;
+  box-shadow: var(--shadow-sm);
+}
+
+.homePointer {
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: transform 150ms ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.homePointer:hover {
+  transform: scale(1.15);
+}
+
+.homePopupContent {
+  padding: 8px;
+  text-align: center;
+}
+
+.homePopupTitle {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.homePopupButton {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary);
+  color: var(--c-white);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.locPopup {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.mapboxgl-popup-content {
+  max-width: 220px !important;
+  padding: 12px 14px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--panel) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}

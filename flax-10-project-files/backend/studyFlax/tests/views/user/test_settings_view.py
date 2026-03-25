@@ -195,6 +195,7 @@ class LegacyUserSettingsViewTests(TestCase):
 
     def call_legacy_view(self, method, url, data=None, format=None):
         """Call legacy view for tests."""
+
         kwargs = {}
         if data is not None:
             kwargs['data'] = data
@@ -247,6 +248,8 @@ class UserSettingsSerializerTests(TestCase):
 
     def setUp(self):
         self.user = make_user()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
 
     def test_major_change_blocked_when_already_set(self):
         settings = UserSettings.objects.create(
@@ -281,3 +284,45 @@ class UserSettingsSerializerTests(TestCase):
         )
         locked_serializer = UserSettingsSerialiser(instance=locked_settings)
         self.assertTrue(locked_serializer.data['major_locked'])
+
+    def test_preferred_study_minutes_can_be_updated(self):
+        settings = UserSettings.objects.create(
+            user=self.user,
+            theme='light',
+            timezone='Europe/London'
+        )
+        serializer = UserSettingsSerialiser(
+            instance=settings,
+            data={'preferred_study_minutes_per_day': 180},
+            partial=True
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        updated = serializer.save()
+        self.assertEqual(updated.preferred_study_minutes_per_day, 180)
+        
+    def test_patch_updates_preferred_study_minutes(self):
+        response = self.client.patch(
+            '/api/settings/',
+            {'preferred_study_minutes_per_day': 180},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['settings']['preferred_study_minutes_per_day'], 180)
+
+    def test_patch_updates_week_preference(self):
+        response = self.client.patch(
+            '/api/settings/',
+            {'week_preference': 'weekdays'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['settings']['week_preference'], 'weekdays')
+
+    def test_patch_updates_worktime_preference(self):
+        response = self.client.patch(
+            '/api/settings/',
+            {'worktime_preference': 'night'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['settings']['worktime_preference'], 'night')

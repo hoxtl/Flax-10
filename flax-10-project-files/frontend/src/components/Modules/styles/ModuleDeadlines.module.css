@@ -1,0 +1,127 @@
+/* Styles for module deadlines and reading list items. */
+.deadlinesList {
+    display: flex;
+    flex-direction: column;
+}
+
+.deadlineItem {
+    display: flex;
+    align-items: center;
+    gap: 0.72rem;
+    padding: 0.66rem 0.1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.deadlineItem:last-child {
+    border-bottom: none;
+}
+
+.deadlineIndex {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    width: 1.1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.deadlineBody {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.deadlineTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.deadlineMeta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.48rem;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.deadlinesType {
+    --chip-padding: 0.1rem 0.46rem;
+    --chip-font-size: 0.66rem;
+    --chip-font-weight: 700;
+    white-space: nowrap;
+    text-transform: none;
+    letter-spacing: 0.02em;
+}
+
+.deadlineTitle {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 0;
+}
+
+.urgencyTag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.46rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.overdue {
+    color: var(--danger);
+    background: color-mix(in srgb, var(--danger-bg) 88%, #fff 12%);
+    border-color: color-mix(in srgb, var(--danger) 26%, transparent);
+}
+
+.due-soon {
+    color: var(--danger);
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+}
+
+.this-week {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--panel));
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.later {
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+    background: color-mix(in srgb, var(--panel) 88%, var(--surface-card) 12%);
+    border-color: color-mix(in srgb, var(--border) 78%, transparent);
+}
+
+.deadlineDate {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .deadlineBody {
+        align-items: flex-start;
+        gap: 0.42rem;
+    }
+
+    .deadlineMeta {
+        gap: 0.36rem;
+        flex-wrap: wrap;
+    }
+}
+
+.emptyText,
+.descriptionText {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+}

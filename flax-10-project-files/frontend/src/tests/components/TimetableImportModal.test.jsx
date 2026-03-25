@@ -23,19 +23,22 @@ describe('TimetableImportModal', () => {
 
     it('closes when close button clicked', () => {
         render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(defaultProps.onClose).toHaveBeenCalled();
     });
 
     it('closes when overlay background clicked', () => {
         const { container } = render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.mouseDown(container.firstChild);
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+        expect(backdrop).toBeTruthy();
+        fireEvent.mouseDown(backdrop);
         expect(defaultProps.onClose).toHaveBeenCalled();
     });
 
     it('does not close when modal content clicked', () => {
         const { container } = render(<TimetableImportModal {...defaultProps} />);
-        fireEvent.mouseDown(container.firstChild.firstChild);
+        const urlInput = screen.getByPlaceholderText(/timetable\.ics/i);
+        fireEvent.mouseDown(urlInput);
         expect(defaultProps.onClose).not.toHaveBeenCalled();
     });
 

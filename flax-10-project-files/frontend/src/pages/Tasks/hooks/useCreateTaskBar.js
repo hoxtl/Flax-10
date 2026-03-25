@@ -1,13 +1,14 @@
-/**
- * Hook for CreateTaskBar: state, effects, and submit handler.
+/*
+ * State and handlers for the create-task quick-add bar.
  */
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
-import { getUserSettings } from "../../../api/userService";
+import { getUserSettings } from "../../../api/userApi";
 import { runQuickAdd } from "../utils/createTaskBarUtils";
+import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";
 
 function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   const sortedLists = useMemo(
@@ -85,37 +86,31 @@ function useClickOutsideEffect(inputFocused, cardRef, inputRef, externalInputRef
 }
 
 function useCreateTaskBarHandlers(state, onAddTask) {
-  const doAdd = useCallback(
-    (taskTitle) => runQuickAdd(state, onAddTask, taskTitle),
-    [state.saving, state.setSaving, state.setTitle, state.setModuleId, onAddTask, state]
-  );
-  const handleSubmit = useCallback(
-    async (e) => {
-      e?.preventDefault();
-      const t = state.title.trim();
-      if (!t || state.saving || !onAddTask) return;
-      if (state.defaultDueDate) state.checkSleepAndRun(state.defaultDueDate, () => doAdd(t));
-      else await doAdd(t);
-    },
-    [state.title, state.saving, state.defaultDueDate, state.checkSleepAndRun, onAddTask, doAdd]
-  );
+  const doAdd = (taskTitle) => runQuickAdd(state, onAddTask, taskTitle);
+  const handleSubmit = async (event) => {
+    event?.preventDefault();
+    const title = state.title.trim();
+    if (!title || state.saving || !onAddTask) return;
+    if (state.defaultDueDate) state.checkSleepAndRun(state.defaultDueDate, () => doAdd(title));
+    else await doAdd(title);
+  };
   return { handleSubmit };
 }
 
 function useCreateTaskBarInputHandlers(state) {
-  const handleInputBlur = useCallback(() => {
+  const handleInputBlur = () => {
     setTimeout(() => {
       const activeEl = document.activeElement;
       if (!activeEl?.closest?.("[data-create-task-bar-card]")) state.setInputFocused(false);
     }, 0);
-  }, [state.setInputFocused]);
-  const handleInputKeyDown = useCallback((e) => {
-    if (e.key === "Escape") {
-      e.preventDefault();
+  };
+  const handleInputKeyDown = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
       state.setInputFocused(false);
-      e.currentTarget.blur();
+      event.currentTarget.blur();
     }
-  }, [state.setInputFocused]);
+  };
   return { handleInputBlur, handleInputKeyDown };
 }
 
@@ -137,8 +132,6 @@ function useCreateTaskBarOptions(state) {
   return { moduleOptions, listOptions };
 }
 
-export const isReadingList = (list) => list?.name?.toLowerCase().includes('reading') ?? false;
-
 export default function useCreateTaskBar(props) {
   const { lists = [], defaultListId, defaultDueDate, onAddTask, inputRef: externalInputRef } = props;
   const state = useCreateTaskBarFormState(lists, defaultListId, defaultDueDate);
@@ -150,5 +143,5 @@ export default function useCreateTaskBar(props) {
   const { handleInputBlur, handleInputKeyDown } = useCreateTaskBarInputHandlers(state);
   const { moduleOptions, listOptions } = useCreateTaskBarOptions(state);
   const selectedList = state.sortedLists.find(l => String(l.id) === (state.taskListId));  
-  return { ...state, handleSubmit, handleInputBlur, handleInputKeyDown, showOptions: state.inputFocused, moduleOptions, listOptions, isReadingList: isReadingList(selectedList) };
+  return { ...state, handleSubmit, handleInputBlur, handleInputKeyDown, showOptions: state.inputFocused, moduleOptions, listOptions, isReadingList: isReadingTaskList(selectedList) };
 }

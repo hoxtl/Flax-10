@@ -14,7 +14,7 @@ const mockHeatmapData = {
         [3, 0, 1, 2, 1, 0, 1],
     ],
     days: ['Mon', 'Tue'],
-    // i%3===0 → indices 0,3,6 → hours 0,12,18 → '12am','12pm','6pm'
+    // When i % 3 === 0, indices 0, 3, and 6 map to hours 0, 12, and 18.
     hours: [0, 4, 8, 12, 16, 20, 18],
 };
 

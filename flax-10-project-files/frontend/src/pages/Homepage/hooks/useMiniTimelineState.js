@@ -1,34 +1,42 @@
-import { useState, useEffect, useRef } from "react";
-import { getUserSettings } from "../../../api/userService";
+/* UI state for the homepage mini timeline. */
+
+import { useCallback, useRef, useState } from "react";
+import { usePopoverDismiss } from "./miniTimeline/usePopoverDismiss";
+import { useSleepWindow } from "./miniTimeline/useSleepWindow";
+
+function useConflictPopover() {
+  const [rowId, setRowId] = useState(null);
+  const ref = useRef(null);
+  const close = useCallback(() => setRowId(null), []);
+  usePopoverDismiss(rowId, ref, close);
+  return { rowId, setRowId, ref };
+}
+
+function useSlotPopover() {
+  const [rowId, setRowId] = useState(null);
+  const ref = useRef(null);
+  const close = useCallback(() => setRowId(null), []);
+  usePopoverDismiss(rowId, ref, close);
+  return { rowId, setRowId, ref };
+}
 
 export function useMiniTimelineState() {
-  const [conflictPopoverRowId, setConflictPopoverRowId] = useState(null);
-  const [slotPopoverRowId, setSlotPopoverRowId] = useState(null);
+  const conflict = useConflictPopover();
+  const slot = useSlotPopover();
   const [eventCtxMenu, setEventCtxMenu] = useState(null);
-  const [sleepWindow, setSleepWindow] = useState({ sleepTime: "23:00", wakeTime: "07:00" });
-  
-  const conflictPopoverRef = useRef(null);
-  const slotPopoverRef = useRef(null);
-
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (conflictPopoverRef.current && !conflictPopoverRef.current.contains(e.target)) setConflictPopoverRowId(null);
-      if (slotPopoverRef.current && !slotPopoverRef.current.contains(e.target)) setSlotPopoverRowId(null);
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  useEffect(() => {
-    getUserSettings().then(data => setSleepWindow({
-      sleepTime: data?.sleep_time?.slice(0, 5) || "23:00",
-      wakeTime: data?.wake_time?.slice(0, 5) || "07:00",
-    })).catch(() => {});
-  }, []);
+  const nowRowElementRef = useRef(null);
+  const attachNowRow = useCallback((el) => { nowRowElementRef.current = el; }, []);
 
   return {
-    conflictPopoverRowId, setConflictPopoverRowId, conflictPopoverRef,
-    slotPopoverRowId, setSlotPopoverRowId, slotPopoverRef,
-    eventCtxMenu, setEventCtxMenu, sleepWindow
+    conflictPopoverRowId: conflict.rowId,
+    setConflictPopoverRowId: conflict.setRowId,
+    conflictPopoverRef: conflict.ref,
+    slotPopoverRowId: slot.rowId,
+    setSlotPopoverRowId: slot.setRowId,
+    slotPopoverRef: slot.ref,
+    eventCtxMenu,
+    setEventCtxMenu,
+    attachNowRow,
+    sleepWindow: useSleepWindow(),
   };
 }

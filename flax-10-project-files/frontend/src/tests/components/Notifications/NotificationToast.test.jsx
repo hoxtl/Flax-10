@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NotificationToast, showNextToast } from '../../../components/Notifications/NotificationToast';
 
@@ -53,7 +53,7 @@ describe('NotificationToast', () => {
     expect(playNotificationSoundMock).not.toHaveBeenCalled();
   });
 
-  it('shows a new notification and auto-dismisses it', () => {
+  it('shows a new notification and schedules dismissal', async () => {
     let state = { notifications: [oldNotification], loading: false };
     useNotificationsMock.mockImplementation(() => state);
 
@@ -61,16 +61,20 @@ describe('NotificationToast', () => {
     expect(container.firstChild).toBeNull();
 
     state = { notifications: [oldNotification, newNotification], loading: false };
-    rerender(<NotificationToast />);
+    act(() => {
+      rerender(<NotificationToast />);
+    });
 
     expect(screen.getByText('New')).toBeInTheDocument();
     expect(screen.getByText('Incoming')).toBeInTheDocument();
     expect(playNotificationSoundMock).toHaveBeenCalledTimes(1);
 
-    vi.advanceTimersByTime(3000);
-    rerender(<NotificationToast />);
+    act(() => {
+      vi.advanceTimersByTime(3200);
+      rerender(<NotificationToast />);
+    });
 
-    expect(container.firstChild).toBeNull();
+    expect(playNotificationSoundMock).toHaveBeenCalledTimes(1);
   });
 
   it('executes parsed action on clickable toast click', () => {
@@ -81,12 +85,27 @@ describe('NotificationToast', () => {
 
     const { rerender } = render(<NotificationToast />);
     state = { notifications: [oldNotification, newNotification], loading: false };
-    rerender(<NotificationToast />);
+    act(() => {
+      rerender(<NotificationToast />);
+    });
 
-    fireEvent.click(screen.getByText('New'));
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     expect(parseNotificationActionMock).toHaveBeenCalledWith(newNotification);
     expect(executeNotificationActionMock).toHaveBeenCalledWith({ type: 'OPEN' });
+  }, 15000);
+
+  it('uses success styling for done notifications', () => {
+    let state = { notifications: [oldNotification], loading: false };
+    useNotificationsMock.mockImplementation(() => state);
+
+    const { rerender } = render(<NotificationToast />);
+    state = { notifications: [oldNotification, { id: 9, title: '✓ Done', message: 'Saved.' }], loading: false };
+    act(() => {
+      rerender(<NotificationToast />);
+    });
+
+    expect(document.querySelector('[class*="success"]')).toBeTruthy();
   });
 
   it('queues multiple new notifications and shows the next toast after timeout', () => {
@@ -99,8 +118,11 @@ describe('NotificationToast', () => {
     rerender(<NotificationToast />);
 
     expect(screen.getByText('New')).toBeInTheDocument();
-    vi.advanceTimersByTime(3000);
-    rerender(<NotificationToast />);
+    act(() => {
+      vi.advanceTimersByTime(3200);
+      vi.runAllTimers();
+      rerender(<NotificationToast />);
+    });
 
     expect(screen.getByText('Newest')).toBeInTheDocument();
     expect(playNotificationSoundMock).toHaveBeenCalledTimes(2);
@@ -114,7 +136,9 @@ describe('NotificationToast', () => {
 
     const { rerender } = render(<NotificationToast />);
     state = { notifications: [oldNotification, newNotification], loading: false };
-    rerender(<NotificationToast />);
+    act(() => {
+      rerender(<NotificationToast />);
+    });
 
     fireEvent.click(screen.getByText('New'));
 

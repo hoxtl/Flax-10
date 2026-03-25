@@ -15,7 +15,7 @@ function ReadOnlyDayCell({ day, events, isCur, onDateSelect, onEventClick, onMor
     return (
         <div className={className} onClick={() => onDateSelect?.(day)}>
             <span className="day-number">{day.getDate()}</span>
-            <DayEvents events={events} onEventClick={onEventClick} onMoreClick={() => onMoreClick?.(day)} customTags={customTags} />
+            <DayEvents events={events} onEventClick={onEventClick} onMoreClick={() => onMoreClick?.(day)} customTags={customTags} readOnly={true} />
         </div>
     );
 }
@@ -29,7 +29,7 @@ function EditableDayCell({ day, events, isCur, onDateSelect, onEventClick, onMor
         <div {...props}>
             <span className="day-number">{day.getDate()}</span>
             <AddEventBtn day={day} />
-            <DayEvents events={events} onEventClick={onEventClick} onMoreClick={() => onMoreClick?.(day)} customTags={customTags} />
+            <DayEvents events={events} onEventClick={onEventClick} onMoreClick={() => onMoreClick?.(day)} customTags={customTags} readOnly={false} />
         </div>
     );
 }

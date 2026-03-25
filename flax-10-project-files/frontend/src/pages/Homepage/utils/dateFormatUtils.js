@@ -1,4 +1,4 @@
-/**
+/*
  * Homepage date/time formatting helpers. Pure functions only.
  */
 
@@ -8,12 +8,14 @@ export function formatTime(dateStr) {
 }
 
 /** Format time as HH:MM for display */
+
 export function formatTimeHHMM(dateOrStr) {
   const d = dateOrStr instanceof Date ? dateOrStr : new Date(dateOrStr);
   return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
 }
 
 /** Duration for plan timeline card: "1h 30m" or "45m". */
+
 export function fmtDurationShort(mins) {
   if (mins == null || mins < 0) return "";
   if (mins < 60) return `${mins}m`;
@@ -23,6 +25,7 @@ export function fmtDurationShort(mins) {
 }
 
 /** Format date string as 12-hour time without leading zero: "6am", "2:30pm", "12pm" */
+
 export function formatTime12h(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -34,6 +37,7 @@ export function formatTime12h(dateStr) {
 }
 
 /** Format integer hour + optional minutes as 12-hour: "6am", "2:30pm" */
+
 export function formatHour12h(hour, min = 0) {
   const period = hour < 12 ? "am" : "pm";
   const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;

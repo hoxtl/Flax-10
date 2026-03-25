@@ -8,6 +8,7 @@
  * @param {array} accept - An array of accepted types.
  * @returns {object|null} The parsed data if the type is accepted, null otherwise.
  */
+
 export const parseDropPayload = (e, accept) => {
     try {
         const parsed = JSON.parse(e.dataTransfer.getData('application/json'));
@@ -21,6 +22,7 @@ export const parseDropPayload = (e, accept) => {
  * @param {string} type - The type of the data being dragged.
  * @param {object} data - The data being dragged.
  */
+
 export const setupDragStart = (e, type, data) => {
     e.dataTransfer.setData('application/json', JSON.stringify({ type, data }));
     e.dataTransfer.effectAllowed = 'move';
@@ -30,6 +32,7 @@ export const setupDragStart = (e, type, data) => {
  * Handles the drag over event.
  * @param {object} e - The drag over event.
  */
+
 export const handleDragOverEffect = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';

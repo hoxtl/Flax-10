@@ -1,8 +1,19 @@
 /* StandardModal handles overlay and container positioning */
+.onboardingPanel {
+  width: min(640px, 95vw);
+  max-height: min(540px, 82vh);
+  transition: max-height 0.24s ease, width 0.24s ease;
+}
+
+.onboardingPanelExpanded {
+  max-height: min(720px, 90vh);
+}
+
 .modal {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow: visible;
 }
 
 .title {
@@ -23,6 +34,16 @@
   margin-bottom: 4px;
 }
 
+.submitRow {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.submitButton {
+  width: 100%;
+}
+
 .btn {
   margin-top: 1.25rem;
   padding: 0.75rem;
@@ -38,4 +59,66 @@
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.starSpan {
+  display: inline-block;
+  color: var(--primary);
+}
+
+.successWrapper {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.successEmoji {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.successBody {
+  color: var(--text);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.warningRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+}
+
+.warningTitle {
+  font-weight: 600;
+  color: var(--warning-text);
+  font-size: 0.83rem;
+}
+
+.warningBody {
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+  color: var(--text);
+  opacity: 0.75;
+}
+
+.confirmLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .onboardingPanel {
+    max-height: min(600px, 88vh);
+  }
+
+  .onboardingPanelExpanded {
+    max-height: min(720px, 92vh);
+  }
 }

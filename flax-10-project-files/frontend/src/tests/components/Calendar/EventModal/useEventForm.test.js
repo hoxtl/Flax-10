@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useEventForm } from '../../../../components/Calendar/EventModal/useEventForm';
 import * as FormUtilsModule from '../../../../components/Calendar/utils/formUtils';
-import * as UserServiceModule from '../../../../api/userService';
+import * as UserServiceModule from '../../../../api/userApi';
 import * as SleepWarningModule from '../../../../components/Settings/hooks/useSleepWarning';
 
 const mockEvents = [];
@@ -35,7 +35,7 @@ vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: () => vi.fn(),
 }));
 
-vi.mock('../../../../api/userService', () => ({
+vi.mock('../../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
@@ -83,7 +83,7 @@ describe('useEventForm', () => {
         });
 
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalledWith(
-            mockE,
+            null,
             result.current.form,
             event,
             mockActions,
@@ -103,17 +103,25 @@ describe('useEventForm', () => {
         expect(typeof result.current.handleCancelSleep).toBe('function');
     });
 
-    it('sets sleepWarning when event is during sleep window and confirms pending submit', async () => {
-        const onClose = vi.fn();
+    it('sets sleepWarning when event is during sleep window', async () => {
+        const event = { id: 1 };
+        const formWithTime = { ...mockInitialForm, start_time: '2026-03-10T23:30:00' };
+        FormUtilsModule.getInitialForm.mockReturnValue(formWithTime);
+        SleepWarningModule.isDuringSleepWindow.mockReturnValue(true);
+        const { result } = renderHook(() => useEventForm(event, vi.fn()));
+        await act(async () => { }); // Wait for sleepSettings to load
+        act(() => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
+        expect(result.current.sleepWarning).toBe(true);
+        FormUtilsModule.getInitialForm.mockReturnValue(mockInitialForm);
+    });
+
+    it('confirms pending submit after sleep warning', async () => {
         const event = { id: 1 };
         FormUtilsModule.getInitialForm.mockReturnValueOnce({ ...mockInitialForm, start_time: '2026-03-10T23:30:00' });
         SleepWarningModule.isDuringSleepWindow.mockReturnValue(true);
-        const { result } = renderHook(() => useEventForm(event, onClose));
+        const { result } = renderHook(() => useEventForm(event, vi.fn()));
         await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
-        // sleepWarning should have been set and then cleared by confirm handler
         await act(async () => { result.current.handleConfirmSleep(); });
-        // validateAndSubmit should have been called at least once (initial submit),
-        // and pendingSubmit path exercised via handleConfirmSleep
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalled();
     });
 
@@ -172,36 +180,35 @@ describe('useEventForm', () => {
     it('falls back to default sleep settings when getUserSettings fails', async () => {
         UserServiceModule.getUserSettings.mockRejectedValueOnce(new Error('fail'));
         const { result } = renderHook(() => useEventForm(null, vi.fn()));
-        await act(async () => {});
+        await act(async () => { });
         expect(result.current.sleepSettings).toEqual({ sleepTime: '23:00', wakeTime: '07:00' });
     });
 
     it('customSubmit handler sets error when title is empty', async () => {
         const onClose = vi.fn();
-        const customSubmit = vi.fn();
+        const customSubmit = vi.fn().mockRejectedValue(new Error('Title is required'));
         FormUtilsModule.getInitialForm.mockReturnValue({ ...mockInitialForm, title: '  ' });
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
-        await act(async () => {});
-        act(() => {
+        await act(async () => { });
+        await act(async () => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
         expect(result.current.error).toBe('Title is required');
-        expect(customSubmit).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();
     });
 
     it('customSubmit handler calls customSubmit and onClose when title is present', async () => {
         const onClose = vi.fn();
-        const customSubmit = vi.fn();
+        const customSubmit = vi.fn().mockResolvedValue(undefined);
         const formWithTitle = { ...mockInitialForm, title: 'My Event' };
         FormUtilsModule.getInitialForm.mockReturnValue(formWithTitle);
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
-        await act(async () => {});
-        act(() => {
+        await act(async () => { });
+        await act(async () => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
         expect(customSubmit).toHaveBeenCalledWith(result.current.form);
@@ -211,7 +218,7 @@ describe('useEventForm', () => {
     it('uses default sleep/wake when getUserSettings returns empty or missing times', async () => {
         UserServiceModule.getUserSettings.mockResolvedValueOnce({});
         const { result } = renderHook(() => useEventForm(null, vi.fn()));
-        await act(async () => {});
+        await act(async () => { });
         expect(result.current.sleepSettings).toEqual({ sleepTime: '23:00', wakeTime: '07:00' });
     });
 
@@ -221,7 +228,7 @@ describe('useEventForm', () => {
         FormUtilsModule.getInitialForm.mockReturnValue({ ...mockInitialForm, start_time: '2026-03-10T14:00:00' });
         SleepWarningModule.isDuringSleepWindow.mockReturnValue(false);
         const { result } = renderHook(() => useEventForm(event, onClose));
-        await act(async () => {});
+        await act(async () => { });
         act(() => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
@@ -243,13 +250,13 @@ describe('useEventForm', () => {
         expect(() => act(() => result.current.handleConfirmSleep())).not.toThrow();
     });
 
-    it('uses empty events array when calendar context has no events', () => {
+    it('uses empty events array when calendar context has no events', async () => {
         mockUseCalendar.mockReturnValueOnce({});
         const onClose = vi.fn();
         const { result } = renderHook(() => useEventForm({ id: 1 }, onClose));
-        act(() => result.current.handleSubmit({ preventDefault: vi.fn() }));
+        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalledWith(
-            expect.anything(),
+            null,
             expect.anything(),
             expect.anything(),
             expect.anything(),
@@ -261,23 +268,25 @@ describe('useEventForm', () => {
         );
     });
 
-    it('handleSubmit with no event argument still calls doSubmit', () => {
+    it('handleSubmit with no event argument still calls doSubmit', async () => {
         const onClose = vi.fn();
         const { result } = renderHook(() => useEventForm({ id: 1 }, onClose));
-        act(() => result.current.handleSubmit());
+        await act(async () => { });
+        await act(async () => { result.current.handleSubmit(); });
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalled();
     });
 
-    it('customSubmit handler sets error when form.title is undefined', () => {
-        const customSubmit = vi.fn();
+    it('customSubmit handler sets error when form.title is undefined', async () => {
+        const customSubmit = vi.fn().mockRejectedValue(new Error('Title is required'));
         const onClose = vi.fn();
         FormUtilsModule.getInitialForm.mockReturnValue({ ...mockInitialForm, title: undefined });
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
-        act(() => result.current.handleSubmit({ preventDefault: vi.fn() }));
+        await act(async () => { });
+        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
         expect(result.current.error).toBe('Title is required');
-        expect(customSubmit).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
     });
 
     it('handleConfirmSave passes setOverlapWarning as confirmFn (7th arg) and it updates state when invoked', async () => {
@@ -287,6 +296,7 @@ describe('useEventForm', () => {
         });
         const onClose = vi.fn();
         const { result } = renderHook(() => useEventForm({ id: 1 }, onClose));
+        await act(async () => { });
         await act(async () => result.current.handleConfirmSave());
         expect(capturedSetOverlap).toBeDefined();
         act(() => capturedSetOverlap([{ id: 2, title: 'Other Event' }]));

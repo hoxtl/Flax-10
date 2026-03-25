@@ -21,6 +21,7 @@ User = get_user_model()
 class CalendarShareViewTests(APITestCase):
 
     """Tests for calendar share view."""
+
     def setUp(self):
         self.user1 = User.objects.create_user(username="user1", email="user1@example.com", password="password", first_name="User", last_name="One")
         self.user2 = User.objects.create_user(username="user2", email="user2@example.com", password="password", first_name="User", last_name="Two")
@@ -109,6 +110,7 @@ class CalendarShareViewTests(APITestCase):
 
 class CalendarShareUserSerializerPhotoTest(APITestCase):
     """Tests for calendar share user serializer photo."""
+
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user1 = User.objects.create_user(username='share1', email='share1@example.com', password='pass', first_name='User', last_name='One')
@@ -162,6 +164,7 @@ class CalendarShareUserSerializerPhotoTest(APITestCase):
 
 class CalendarShareSerializerTest(APITestCase):
     """Tests for calendar share serializer."""
+
     def setUp(self):
         self.owner = User.objects.create_user(username='social_owner', email='social_owner@e.com', password='pass')
         self.viewer = User.objects.create_user(username='social_viewer', email='social_viewer@e.com', password='pass')
@@ -217,3 +220,25 @@ class SocialAndCategoryCoverageTest(TestCase):
         category = Category.objects.create(name='Coverage Category', color='#abcdef', is_default=True)
         self.assertIn('shares with', str(share))
         self.assertEqual(str(category), 'Coverage Category')
+
+
+class CommonSerialiserHelpersTest(TestCase):
+
+    def test_build_profile_photo_url_returns_photo_str_for_http_url(self):
+        from studyFlax.serialisers.common import build_profile_photo_url
+        result = build_profile_photo_url('https://example.com/photo.jpg', None)
+        self.assertEqual(result, 'https://example.com/photo.jpg')
+
+    def test_build_profile_photo_url_returns_none_on_value_error(self):
+        from studyFlax.serialisers.common import build_profile_photo_url
+        from unittest.mock import MagicMock, PropertyMock
+        photo = MagicMock()
+        type(photo).url = PropertyMock(side_effect=ValueError('no file'))
+        photo.__str__ = lambda self: 'some/path.jpg'
+        result = build_profile_photo_url(photo, None)
+        self.assertIsNone(result)
+
+    def test_format_teacher_display_name_returns_clean_when_has_dr_prefix(self):
+        from studyFlax.serialisers.common import format_teacher_display_name
+        result = format_teacher_display_name('Dr. Smith')
+        self.assertEqual(result, 'Dr. Smith')

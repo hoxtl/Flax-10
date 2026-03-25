@@ -1,0 +1,18 @@
+.tabsSection {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.sharedTabs {
+    width: 100%;
+}
+
+.sharedTabs :global([class*="tabBar"]) {
+    margin-bottom: 1.25rem;
+}
+
+.sharedTabs :global([class*="headingTab"]) {
+    padding-inline: 0.2rem;
+}

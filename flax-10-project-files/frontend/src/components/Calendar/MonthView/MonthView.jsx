@@ -1,8 +1,15 @@
+/**
+ * MonthView - Grid calendar displaying events across a full month.
+ * Renders week rows with day cells showing event indicators.
+ */
+
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { getMonthWeeks } from '../utils/dateUtils';
 import { WeekdayHeader } from './WeekdayHeader';
 import { WeekRow } from './WeekRow';
 import './MonthView.css';
+
+/** Month calendar grid with event display and day navigation. */
 
 export function MonthView({ selectedDate, events, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
     const { selectedDate: contextDate, events: contextEvents, readOnly: contextReadOnly } = useCalendar();
@@ -10,12 +17,10 @@ export function MonthView({ selectedDate, events, onDateSelect, readOnly, onEven
     const cur = selectedDate || contextDate;
     const evs = events || contextEvents || [];
     const isReadOnly = readOnly ?? contextReadOnly;
-
     const navToDay = (date) => {
         dispatch?.({ type: 'SET_SELECTED_DATE', payload: date });
         dispatch?.({ type: 'SET_VIEW_MODE', payload: 'day' });
     };
-
     return (
         <div className="month-view">
             <MonthGrid

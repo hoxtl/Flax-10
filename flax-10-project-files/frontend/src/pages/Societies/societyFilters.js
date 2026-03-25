@@ -34,6 +34,7 @@ export const RATIFICATION_FILTERS = [
 ];
 
 /** Returns the human-readable label for a given category ID. */
+
 export function getCategoryLabel(categoryId) {
     const category = SOCIETY_CATEGORY_OPTIONS.find(c => c.id === categoryId);
     return category?.label || categoryId;
@@ -45,6 +46,7 @@ function getSocietyCategories(society) {
 }
 
 /** Determines if a society matches a category filter. */
+
 export function matchesCategory(society, filterId) {
     if (filterId === "all") return true;
     const filter = SOCIETY_CATEGORIES.find(c => c.id === filterId);
@@ -54,6 +56,7 @@ export function matchesCategory(society, filterId) {
 }
 
 /** Counts how many societies match a specific category filter. */
+
 export function countByCategory(societies, filterId) {
     return societies.filter(s => matchesCategory(s, filterId)).length;
 }

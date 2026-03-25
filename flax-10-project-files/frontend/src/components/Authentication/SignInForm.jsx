@@ -1,24 +1,15 @@
-import * as Components from "../Authentication/AuthComponents";
+/*
+ * Sign-in form for the authentication page.
+ */
+
+import * as Components from "./AuthComponents";
+import { AuthInputField } from "./AuthInputField";
 
 function SignInFields({ formData, updateField, loading }) {
   return (
     <>
-      <Components.Input
-        type="text"
-        placeholder="Username"
-        value={formData.username}
-        onChange={updateField("username")}
-        required
-        disabled={loading}
-      />
-      <Components.Input
-        type="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={updateField("password")}
-        required
-        disabled={loading}
-      />
+      <AuthInputField type="text" placeholder="Username" value={formData.username} onChange={updateField("username")} disabled={loading} />
+      <AuthInputField type="password" placeholder="Password" value={formData.password} onChange={updateField("password")} disabled={loading} />
     </>
   );
 }
@@ -37,14 +28,18 @@ function SignInActions({ loading, onToggle }) {
         Don't have an account?
         <span onClick={() => onToggle(false)}>Sign Up</span>
       </Components.MobileToggleButton>
-    </>);}
+    </>
+  );
+}
 
-export const SignInForm = ({ signIn, formData, updateField, onSubmit, loading, onToggle }) => (
-  <Components.SignInContainer $signIn={signIn}>
-    <Components.Form onSubmit={onSubmit}>
-      <Components.Title>Sign in</Components.Title>
-      <SignInFields formData={formData} updateField={updateField} loading={loading} />
-      <SignInActions loading={loading} onToggle={onToggle} />
-    </Components.Form>
-  </Components.SignInContainer>
-);
+export function SignInForm(props) {
+  return (
+    <Components.SignInContainer $signIn={props.signIn}>
+      <Components.Form onSubmit={props.onSubmit}>
+        <Components.Title>Sign in</Components.Title>
+        <SignInFields formData={props.formData} updateField={props.updateField} loading={props.loading} />
+        <SignInActions loading={props.loading} onToggle={props.onToggle} />
+      </Components.Form>
+    </Components.SignInContainer>
+  );
+}

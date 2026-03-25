@@ -1,6 +1,7 @@
 """
 Custom user model extending AbstractUser with role and profile fields.
 """
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -21,6 +22,7 @@ class User(AbstractUser):
 
     bio = models.TextField(blank=True, default="")
     profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
+    pinned_badge_id = models.CharField(max_length=64, blank=True, default="")
 
     weekly_goal_hours = models.IntegerField(default=20)
     role = models.CharField(

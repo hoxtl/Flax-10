@@ -1,6 +1,8 @@
+/* ─── Apple-style Week View ─── */
+
 .week-view {
   background: var(--panel);
-  border-radius: 8px;
+  border-radius: 0;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
@@ -8,24 +10,26 @@
   flex-direction: column;
 }
 
+/* Sticky date header — stays pinned as you scroll hours */
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 90;
   background: var(--panel);
+  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12));
 }
 
 .week-header {
   z-index: 10;
   display: flex;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12));
   background-color: var(--bg);
   flex-shrink: 0;
 }
 
 .week-grid {
   display: flex;
-  flex: 1;
+  min-height: 1440px;
   color: var(--text);
   position: relative;
 }
@@ -35,10 +39,13 @@
   flex-shrink: 0;
 }
 
+/* Day header — Apple-style clean typography */
 .day-header {
   flex: 1;
-  text-align: center;
-  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px 6px;
   background: transparent;
 }
 
@@ -46,65 +53,75 @@
   background-color: var(--primary);
   color: white;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .day-header.is-today .day-name {
   color: var(--primary);
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .day-name {
   display: block;
   font-size: 0.65rem;
   color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .day-number {
-  display: block;
-  font-size: 1rem;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--text);
   cursor: pointer;
   transition: color 0.2s ease;
+  margin-top: 2px;
+  min-width: 28px;
+  min-height: 28px;
 }
 
 .day-number:hover {
   color: var(--primary);
 }
 
+/* Time labels — italic brown, Apple-style */
 .time-labels {
   width: 60px;
   flex-shrink: 0;
 }
 
 .time-label-cell {
-  padding: 0.25rem;
+  padding: 0 8px 0 0;
   text-align: right;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-task);
+  font-size: 0.7rem;
+  color: var(--muted, #5D4037);
+  font-weight: 500;
+  font-style: italic;
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
   box-sizing: border-box;
+  transform: translateY(-6px);
 }
 
+/* Day columns — ultra-thin 0.5px lines */
 .day-column {
   display: flex;
   flex-direction: column;
-  border-left: 1px solid var(--border);
+  border-left: 0.5px solid var(--border, rgba(74, 52, 33, 0.10));
   position: relative;
   flex: 1;
+  min-height: 1440px;
+  overflow: hidden;
 }
 
+/* Hour cells — ultra-thin lines for clean Apple feel */
 .hour-cell {
-  border-bottom: 1px solid var(--border) !important;
+  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.08)) !important;
   box-sizing: border-box;
   position: relative;
   background-image: none;
@@ -116,16 +133,16 @@
 .week-view:has(.draggable-event.resizing) .hour-cell {
   background-image: linear-gradient(to bottom,
       transparent 24%,
-      var(--divider) 25%,
-      var(--divider) 26%,
+      rgba(74, 52, 33, 0.06) 25%,
+      rgba(74, 52, 33, 0.06) 26%,
       transparent 27%,
       transparent 49%,
-      var(--divider) 50%,
-      var(--divider) 51%,
+      rgba(74, 52, 33, 0.06) 50%,
+      rgba(74, 52, 33, 0.06) 51%,
       transparent 52%,
       transparent 74%,
-      var(--divider) 75%,
-      var(--divider) 76%,
+      rgba(74, 52, 33, 0.06) 75%,
+      rgba(74, 52, 33, 0.06) 76%,
       transparent 77%);
 }
 
@@ -137,18 +154,19 @@
 }
 
 .hour-cell:hover {
-  background-color: var(--hover);
+  background-color: var(--hover, rgba(74, 52, 33, 0.02));
 }
 
 .hour-cell:nth-last-child(1) {
-  border-bottom: 2px solid var(--border) !important;
+  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12)) !important;
 }
 
+/* Event cards — floating with 2px gap on each side */
 .column-events {
   position: absolute;
   top: 0;
-  left: 2px;
-  right: 2px;
+  left: 4px;
+  right: 4px;
   bottom: 0;
   pointer-events: none;
 }
@@ -174,11 +192,34 @@
   left: 0;
   right: 0;
   height: 0;
-  border-bottom: 3px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
   pointer-events: none;
   z-index: 15;
 }
 
+/* "Now" Indicator Line — red like Apple */
+.now-line {
+  position: absolute;
+  left: 60px;
+  right: 0;
+  height: 0;
+  border-top: 2px solid #ea4335;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.now-line-dot {
+  position: absolute;
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #ea4335;
+  border-radius: 50%;
+}
+
+/* Fade non-dragged events during drag */
 .week-view:has(.draggable-event.dragging) .draggable-event:not(.dragging) {
   opacity: 0.2;
   pointer-events: none;

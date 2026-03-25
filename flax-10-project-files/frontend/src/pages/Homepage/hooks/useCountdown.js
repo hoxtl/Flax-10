@@ -1,10 +1,7 @@
 /**
  * Countdown to a target time with formatted text and urgency.
- * Updates every 60s normally, every 1s when < 5 minutes away.
- *
- * @param {Date | null} targetTime - When to count down to
- * @returns {{ text: string; urgency: 'relaxed' | 'soon' | 'urgent' }}
  */
+
 import { useState, useEffect } from "react";
 
 function formatCountdownText(msLeft) {
@@ -27,29 +24,34 @@ function getUrgency(msLeft) {
 
 export function useCountdown(targetTime) {
   const [now, setNow] = useState(() => new Date());
-
-  useEffect(() => {
-    if (!targetTime || !(targetTime instanceof Date)) return;
-    let timeoutId;
-
-    const tick = () => {
-      setNow(new Date());
-      const left = targetTime.getTime() - Date.now();
-      if (left <= 0) return;
-      timeoutId = setTimeout(tick, left < 5 * 60 * 1000 ? 1000 : 60000);
-    };
-
-    tick();
-    return () => clearTimeout(timeoutId);
-  }, [targetTime?.getTime()]);
-
-  if (!targetTime || !(targetTime instanceof Date)) {
-    return { text: "", urgency: "relaxed" };
-  }
-
+  useCountdownTicker(targetTime, setNow);
+  if (!isValidTargetTime(targetTime)) return { text: "", urgency: "relaxed" };
   const left = targetTime.getTime() - now.getTime();
-  return {
-    text: formatCountdownText(left) || "",
-    urgency: getUrgency(left),
+  return { text: formatCountdownText(left) || "", urgency: getUrgency(left) };
+}
+
+function useCountdownTicker(targetTime, setNow) {
+  useEffect(() => {
+    if (!isValidTargetTime(targetTime)) return undefined;
+    return startCountdownTicker(targetTime, setNow);
+  }, [targetTime?.getTime(), setNow]);
+}
+
+function startCountdownTicker(targetTime, setNow) {
+  let timeoutId;
+  const tick = () => {
+    setNow(new Date());
+    const left = targetTime.getTime() - Date.now();
+    if (left > 0) timeoutId = setTimeout(tick, getTickDelay(left));
   };
+  tick();
+  return () => clearTimeout(timeoutId);
+}
+
+function isValidTargetTime(targetTime) {
+  return targetTime instanceof Date;
+}
+
+function getTickDelay(msLeft) {
+  return msLeft < 5 * 60 * 1000 ? 1000 : 60000;
 }

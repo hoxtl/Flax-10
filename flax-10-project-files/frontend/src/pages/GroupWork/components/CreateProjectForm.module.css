@@ -1,0 +1,206 @@
+.triggerBtn {
+    min-height: 36px;
+    padding-inline: 16px;
+    box-shadow: none;
+}
+
+.modalPanel {
+    width: min(860px, 96vw);
+    max-height: min(94vh, 920px);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 94%, var(--surface-inner, var(--surface-panel, var(--panel))) 6%) 0%,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 88%, var(--surface-inner, var(--surface-panel, var(--panel))) 12%) 100%
+    );
+    border-color: color-mix(in srgb, var(--groupwork-action-border) 88%, var(--border) 12%);
+    box-shadow:
+        var(--modal-shadow),
+        0 28px 58px color-mix(in srgb, black 28%, transparent),
+        inset 0 1px 0 color-mix(in srgb, white 6%, transparent);
+}
+
+.modalContent {
+    padding-right: 4px;
+    padding-bottom: 10px;
+    overflow: visible !important;
+}
+
+.modalSubtitle {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.modalForm {
+    display: grid;
+    gap: 16px;
+}
+
+.formFields {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: 14px;
+}
+
+.membersField {
+    min-width: 0;
+}
+
+.inputName {
+    grid-column: 1 / -1;
+}
+
+.inputField {
+    min-width: 0;
+}
+
+.fieldLabel {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+}
+
+.optionalText {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.85em;
+    color: var(--muted);
+}
+
+.requiredMark {
+    color: var(--danger);
+}
+
+.dropdownWrap {
+    width: 100%;
+}
+
+.dropdownTrigger {
+    width: 100%;
+    min-height: var(--input-height);
+    padding: var(--input-padding);
+    border: 1px solid color-mix(in srgb, var(--border) 86%, var(--modules-accent-ink) 14%);
+    border-radius: var(--dropdown-radius);
+    background: color-mix(in srgb, var(--surface-inner, var(--surface-raised)) 94%, transparent);
+    color: var(--text);
+    font: inherit;
+    font-size: var(--text-base);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    box-sizing: border-box;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
+}
+
+.dropdownTrigger:hover {
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 28%, var(--border));
+    background: color-mix(in srgb, var(--surface-raised) 76%, var(--surface-inner) 24%);
+}
+
+.dropdownTrigger:focus-visible {
+    outline: none;
+    box-shadow: var(--input-focus-ring);
+}
+
+.datePickerWrap {
+    width: 100%;
+    max-width: none;
+}
+
+.membersPicker {
+    display: grid;
+    gap: 6px;
+}
+
+.membersHint {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.memberSearchEmpty {
+    margin-top: 2px;
+}
+
+.memberSearchEmptyCard {
+    margin: 0;
+    padding: 0.85rem 0.8rem;
+    border-radius: 14px;
+    box-shadow: none;
+    min-height: 104px;
+    background: color-mix(in srgb, var(--surface-inner) 92%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--border) 84%, var(--modules-accent-ink) 16%);
+}
+
+.memberSearchEmptyTitle {
+    font-size: 0.92rem;
+}
+
+.memberSearchEmptyHint {
+    font-size: 0.79rem;
+}
+
+.formFooter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.formError {
+    margin: 0;
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.cancelBtn {
+    min-width: 90px;
+    min-height: 38px;
+}
+
+.submitBtn {
+    height: 38px;
+    padding: 0 20px;
+}
+
+:global([data-mode="dark"]) .modalPanel {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 90%, var(--surface-inner, var(--surface-panel, var(--panel))) 10%) 0%,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 72%, var(--color-bg) 28%) 100%
+    );
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 26%, var(--border) 74%);
+    box-shadow:
+        var(--modal-shadow),
+        0 34px 70px rgba(0, 0, 0, 0.48),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-mode="dark"]) .dropdownTrigger {
+    background: color-mix(in srgb, var(--surface-inner) 88%, var(--surface-panel) 12%);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 18%, var(--border));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-mode="dark"]) .memberSearchEmptyCard {
+    background: color-mix(in srgb, var(--surface-inner) 84%, var(--color-bg) 16%);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border) 78%);
+}
+
+@media (max-width: 768px) {
+    .formFields {
+        grid-template-columns: 1fr;
+    }
+}

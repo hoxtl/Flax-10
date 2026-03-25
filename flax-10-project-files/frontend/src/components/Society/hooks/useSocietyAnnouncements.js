@@ -1,6 +1,11 @@
+/*
+ * useSocietyAnnouncements manages announcement CRUD for a society.
+ */
+
 import * as api from '../../../api/societyApi';
 
 /** Helper to update local society state when an announcement's linked event changes. */
+
 const updateAnnEventState = (setSociety, annId, eventId) => {
     setSociety(prev => ({
         ...prev,
@@ -9,12 +14,14 @@ const updateAnnEventState = (setSociety, annId, eventId) => {
 };
 
 /** Handles the removal of a linked event when an announcement is unsynced. */
+
 const handleRemoval = async (ann, eventOps, onIdUpdate) => {
     await deleteLinkedEvent(ann, eventOps);
     onIdUpdate(ann.id, null);
 };
 
 /** Logic for creating or updating a linked event. */
+
 const handleLinkedUpdate = async (ann, evData, eventOps, onIdUpdate) => {
     if (ann.event_id) return await eventOps.updateEvent(ann.event_id, evData, true);
     const ev = await eventOps.addEvent(evData, true);
@@ -22,17 +29,19 @@ const handleLinkedUpdate = async (ann, evData, eventOps, onIdUpdate) => {
 };
 
 /** Coordinates syncing an announcement with the events system. */
+
 const syncAnnouncement = async (ann, data, eventOps, onIdUpdate) => {
     if (!data.addAsEvent) return handleRemoval(ann, eventOps, onIdUpdate);
     const evData = { ...data, description: data.content, tag: data.tag || null, announcement: ann.id };
     try {
         await handleLinkedUpdate(ann, evData, eventOps, onIdUpdate);
-    } catch (e) {
-        console.error('Failed to sync event:', e);
+    } catch (err) {
+        console.error('Failed to sync announcement with event:', err);
     }
 };
 
 /** Hook for managing society announcements and their lifecycle. */
+
 const appendAnnouncement = (setSociety, ann) =>
     setSociety(prev => ({ ...prev, announcements: [...prev.announcements, ann] }));
 
@@ -57,7 +66,9 @@ const deleteLinkedEvent = async (ann, eventOps) => {
     if (!ann?.event_id) return;
     try {
         await eventOps.deleteEvent(ann.event_id, true);
-    } catch (e) { console.error('Failed to delete linked event:', e); }
+    } catch (err) {
+        console.error('Failed to delete linked event:', err);
+    }
 };
 
 const makeAddAnnouncement = (id, setSociety, eventOps, onIdUpdate) =>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -12,6 +13,7 @@ async function submitOnboarding(year, major) {
   const current = JSON.parse(localStorage.getItem("user") || "{}");
   current.year = year;
   current.major = major;
+  current.has_completed_onboarding = true;
   localStorage.setItem("user", JSON.stringify(current));
   window.dispatchEvent(new Event("auth-changed"));
 }
@@ -27,12 +29,14 @@ function useOnboardingState() {
 
 export default function useOnboarding() {
   const state = useOnboardingState();
+  const { refreshProfile } = useAuth();
   const { year, major, confirmed, setMajor, setConfirmed, setLoading, setDone } = state;
   const handleMajorChange = (val) => { setMajor(val); setConfirmed(false); };
   const handleSubmit = async () => {
     if (!year || !major || !confirmed) return;
     setLoading(true);
-    await submitOnboarding(year, major).catch(console.error);
+    await submitOnboarding(year, major).catch(() => {});
+    await refreshProfile().catch(() => {});
     setLoading(false);
     setDone(true);
   };

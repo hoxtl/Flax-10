@@ -1,5 +1,12 @@
+/**
+ * useAutoScroll - Auto-scrolls calendar view to current time on mount.
+ * Scrolls time grid to show the current hour in view.
+ */
+
 import { useEffect, useRef } from 'react';
 import { SLOT_HEIGHT } from '../calendarConstants';
+
+/** Hook that scrolls a time grid container to the current time. */
 
 export function useAutoScroll(ref, events, dependency) {
     const hasScrolled = useRef(false);

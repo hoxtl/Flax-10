@@ -1,7 +1,14 @@
-export function getGreeting(name) {
+/*
+ * Homepage intelligence display helpers.
+ */
+
+import { doesEventOverlapSleepWindow } from "../../../components/Settings/hooks/useSleepWarning";
+
+export function getGreeting(name, isTeacher = false) {
   const h = new Date().getHours();
   const timeOfDay = h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
-  return `Good ${timeOfDay}${name ? `, ${name}` : ""}.`;
+  const displayName = isTeacher && name ? `Dr. ${name}` : name;
+  return `Good ${timeOfDay}${displayName ? `, ${displayName}` : ""}.`;
 }
 
 export function getTodayLabel() {
@@ -69,64 +76,84 @@ export function formatEventTime(dateLike) {
 
 export function getTravelContext({ upcomingEvent, tflDelays, now, getRelevantDelays, isSevereDisruption }) {
   if (!upcomingEvent?.start_time || !Array.isArray(tflDelays) || tflDelays.length === 0) return null;
-
-  const startMs = new Date(upcomingEvent.start_time).getTime();
-  const minsUntilStart = Math.round((startMs - now.getTime()) / 60000);
-  if (minsUntilStart <= 0 || minsUntilStart > 120) return null;
-
   const relevantDelays = getRelevantDelays(upcomingEvent, tflDelays);
   if (!relevantDelays.length) return null;
+  if (!isUpcomingSoon(upcomingEvent, now)) return null;
+  return buildTravelContext(upcomingEvent, relevantDelays, isSevereDisruption);
+}
 
+export function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays, now, getRelevantDelays, isSevereDisruption, sleepWindow }) {
+  if (currentEvent) {
+    return buildCurrentContext(currentEvent, sleepWindow);
+  }
+  if (overlaps?.length) {
+    return buildOverlapContext(overlaps);
+  }
+  const travelContext = getTravelContext({ upcomingEvent, tflDelays, now, getRelevantDelays, isSevereDisruption });
+  if (travelContext) return travelContext;
+  if (upcomingEvent) {
+    return buildUpcomingContext(upcomingEvent);
+  }
+  return buildIdleContext();
+}
+
+function isUpcomingSoon(upcomingEvent, now) {
+  const startMs = new Date(upcomingEvent.start_time).getTime();
+  const minsUntilStart = Math.round((startMs - now.getTime()) / 60000);
+  return minsUntilStart > 0 && minsUntilStart <= 120;
+}
+
+function buildTravelContext(upcomingEvent, relevantDelays, isSevereDisruption) {
   const primaryDelay = relevantDelays[0];
-  const lineName = primaryDelay?.lineName || "TfL";
-  const severity = primaryDelay?.severityDescription || "Delays";
-  const severe = relevantDelays.some((delay) => isSevereDisruption(delay?.severityDescription));
   const eventTime = formatEventTime(upcomingEvent.start_time);
-  const eventTitle = upcomingEvent.title || "your next class";
-  const locationMeta = upcomingEvent.location ? ` · ${upcomingEvent.location}` : "";
-
+  const severe = relevantDelays.some((delay) => isSevereDisruption(delay?.severityDescription));
   return {
     label: "Travel",
-    text: `${lineName} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime ? `${eventTime} ` : ""}${eventTitle}.`,
-    meta: `${severity}${locationMeta}`,
+    text: `${primaryDelay?.lineName || "TfL"} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime ? `${eventTime} ` : ""}${upcomingEvent.title || "your next class"}.`,
+    meta: `${primaryDelay?.severityDescription || "Delays"}${upcomingEvent.location ? ` · ${upcomingEvent.location}` : ""}`,
     tone: "warning",
     iconKey: "Train",
   };
 }
 
-export function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays, now, getRelevantDelays, isSevereDisruption }) {
-  if (currentEvent) {
-    return {
-      label: "On now",
-      text: `${currentEvent.title}${currentEvent.location ? ` · ${currentEvent.location}` : ""}`,
-      meta: currentEvent.end_time ? `Until ${formatEventTime(currentEvent.end_time)}` : null,
-      tone: "neutral",
-      iconKey: "Clock3",
-    };
-  }
-  if (overlaps?.length) {
-    const first = overlaps[0]?.a?.start_time;
-    return {
-      label: "Attention",
-      text: "You have an overlap in today’s plan.",
-      meta: first ? `Conflict at ${formatEventTime(first)}` : null,
-      tone: "warning",
-      iconKey: "AlertTriangle",
-    };
-  }
-  const travelContext = getTravelContext({ upcomingEvent, tflDelays, now, getRelevantDelays, isSevereDisruption });
-  if (travelContext) {
-    return travelContext;
-  }
-  if (upcomingEvent) {
-    return {
-      label: "Up next",
-      text: `${upcomingEvent.title}${upcomingEvent.location ? ` · ${upcomingEvent.location}` : ""}`,
-      meta: upcomingEvent.start_time ? `Starts ${formatEventTime(upcomingEvent.start_time)}` : null,
-      tone: "neutral",
-      iconKey: "Clock3",
-    };
-  }
+function buildCurrentContext(currentEvent, sleepWindow) {
+  const overlapsSleep = doesEventOverlapSleepWindow(
+    sleepWindow?.sleepTime || "23:00",
+    sleepWindow?.wakeTime || "07:00",
+    currentEvent?.start_time,
+    currentEvent?.end_time,
+  );
+  return {
+    label: "On now",
+    text: `${overlapsSleep ? "😴 " : ""}${currentEvent.title}${currentEvent.location ? ` · ${currentEvent.location}` : ""}`,
+    meta: currentEvent.end_time ? `Until ${formatEventTime(currentEvent.end_time)}` : null,
+    tone: "neutral",
+    iconKey: "Clock3",
+  };
+}
+
+function buildOverlapContext(overlaps) {
+  const first = overlaps[0]?.a?.start_time;
+  return {
+    label: "Attention",
+    text: "You have an overlap in today’s plan.",
+    meta: first ? `Conflict at ${formatEventTime(first)}` : null,
+    tone: "warning",
+    iconKey: "AlertTriangle",
+  };
+}
+
+function buildUpcomingContext(upcomingEvent) {
+  return {
+    label: "Up next",
+    text: `${upcomingEvent.title}${upcomingEvent.location ? ` · ${upcomingEvent.location}` : ""}`,
+    meta: upcomingEvent.start_time ? `Starts ${formatEventTime(upcomingEvent.start_time)}` : null,
+    tone: "neutral",
+    iconKey: "Clock3",
+  };
+}
+
+function buildIdleContext() {
   return {
     label: "Right now",
     text: "You have breathing room before the next thing starts.",

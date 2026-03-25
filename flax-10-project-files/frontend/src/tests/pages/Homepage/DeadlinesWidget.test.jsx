@@ -9,8 +9,14 @@ vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
         get: (_, tag) => ({ children, ...props }) => {
             const Tag = typeof tag === 'string' ? tag : 'div';
-            const { initial, animate, exit, transition, variants, whileHover, ...rest } = props;
-            return <Tag {...rest}>{children}</Tag>;
+            delete props.initial;
+            delete props.animate;
+            delete props.exit;
+            delete props.transition;
+            delete props.variants;
+            delete props.whileHover;
+            delete props.layout;
+            return <Tag {...props}>{children}</Tag>;
         },
     }),
     AnimatePresence: ({ children }) => <>{children}</>,
@@ -18,16 +24,20 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('lucide-react', () => ({
     AlertCircle: () => <svg />,
+    AlarmClock: () => <svg />,
     ArrowRight: () => <svg />,
+    ChevronDown: () => <svg />,
+    ChevronUp: () => <svg />,
+    Clock: () => <svg />,
 }));
 
 import { DeadlinesWidget } from '../../../pages/Homepage/components/DeadlinesWidget';
 
-// Use hour-based offsets to avoid floor() edge cases with days
-const tomorrow = new Date(Date.now() + 25 * 60 * 60 * 1000);    // 25h from now → days=1 → "Tomorrow"
+// Use hour-based offsets to avoid floor() edge cases with days.
+const tomorrow = new Date(Date.now() + 25 * 60 * 60 * 1000);    // 25 hours from now resolves to "Tomorrow".
 const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 const threeWeeks = new Date(Date.now() + 21 * 24 * 60 * 60 * 1000);
-const yesterday = new Date(Date.now() - 22 * 60 * 60 * 1000);  // 22h ago → days=-1 → "1d overdue"
+const yesterday = new Date(Date.now() - 22 * 60 * 60 * 1000);  // 22 hours ago resolves to "1d overdue".
 
 const mockDeadlines = [
     { id: 1, assessment_title: 'Essay 1', start_due_date: tomorrow.toISOString(), module_code: 'CS3001', deadline_type: 'coursework' },
@@ -36,15 +46,15 @@ const mockDeadlines = [
 ];
 
 describe('DeadlinesWidget', () => {
-    it('renders Deadlines header', () => {
+    it('renders Upcoming Deadlines header', () => {
         render(<DeadlinesWidget deadlines={mockDeadlines} />);
-        expect(screen.getByText('Deadlines')).toBeTruthy();
+        expect(screen.getByText('Upcoming Deadlines')).toBeTruthy();
     });
 
     it('renders empty state when no deadlines', () => {
         render(<DeadlinesWidget deadlines={[]} />);
         expect(screen.getByText('No deadlines need attention.')).toBeTruthy();
-        expect(screen.getByText('Upcoming coursework and exams will show up here.')).toBeTruthy();
+        expect(screen.getByText(/Go to my modules/i)).toBeTruthy();
     });
 
     it('renders deadline titles', () => {
@@ -62,8 +72,7 @@ describe('DeadlinesWidget', () => {
             deadline_type: 'coursework',
         }));
         render(<DeadlinesWidget deadlines={manyDeadlines} />);
-        // Only 3 titles should be rendered (MAX_SHOWN = 3)
-        expect(screen.getAllByText(/Task \d/).length).toBe(3);
+        expect(screen.getAllByText(/Task \d/).length).toBe(5);
     });
 
     it('renders module code pills', () => {
@@ -81,18 +90,16 @@ describe('DeadlinesWidget', () => {
     it('calls onSelectDeadline when row clicked', () => {
         const onSelectDeadline = vi.fn();
         render(<DeadlinesWidget deadlines={mockDeadlines} onSelectDeadline={onSelectDeadline} />);
-        const rows = screen.getAllByRole('button');
-        // Click on the deadline row (first module code pill)
         fireEvent.click(screen.getByText('Essay 1'));
         expect(onSelectDeadline).toHaveBeenCalled();
     });
 
-    it('calls onSelectModule when module pill clicked', () => {
-        const onSelectModule = vi.fn();
-        render(<DeadlinesWidget deadlines={mockDeadlines} onSelectModule={onSelectModule} />);
-        const pill = screen.getByText('CS3001');
-        fireEvent.click(pill);
-        expect(onSelectModule).toHaveBeenCalledWith({ code: 'CS3001', id: null });
+    it('does not open the deadline card when a pill is clicked', () => {
+        const onSelectDeadline = vi.fn();
+        render(<DeadlinesWidget deadlines={mockDeadlines} onSelectDeadline={onSelectDeadline} />);
+        fireEvent.click(screen.getByText('CS3001'));
+        fireEvent.click(screen.getByText('COURSEWORK'));
+        expect(onSelectDeadline).not.toHaveBeenCalled();
     });
 
     it('shows "Tomorrow" for deadline due tomorrow', () => {
@@ -105,9 +112,9 @@ describe('DeadlinesWidget', () => {
         expect(screen.getByText('1d overdue')).toBeTruthy();
     });
 
-    it('renders View my modules link', () => {
+    it('does not render the empty-state modules link when deadlines exist', () => {
         render(<DeadlinesWidget deadlines={mockDeadlines} />);
-        expect(screen.getByText('View my modules')).toBeTruthy();
+        expect(screen.queryByText(/Go to my modules/i)).toBeNull();
     });
 
     it('sorts overdue deadlines first', () => {
@@ -152,11 +159,9 @@ describe('DeadlinesWidget', () => {
         expect(screen.getByText('Assignment')).toBeTruthy();
     });
 
-    it('calls onSelectModule with module_id when present', () => {
-        const onSelectModule = vi.fn();
-        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'T', start_due_date: nextWeek.toISOString(), module_code: 'CS3001', module_id: 42, deadline_type: 'assessment' }]} onSelectModule={onSelectModule} />);
-        fireEvent.click(screen.getByText('CS3001'));
-        expect(onSelectModule).toHaveBeenCalledWith({ code: 'CS3001', id: 42 });
+    it('keeps the module code pill visible when module_id is present', () => {
+        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'T', start_due_date: nextWeek.toISOString(), module_code: 'CS3001', module_id: 42, deadline_type: 'assessment' }]} />);
+        expect(screen.getByText('CS3001')).toBeTruthy();
     });
 
     it('calls onSelect when row activated via Enter key', () => {

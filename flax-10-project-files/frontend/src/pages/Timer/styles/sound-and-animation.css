@@ -1,0 +1,322 @@
+/*
+ * Timer page styles chunk.
+ */
+
+.paceAhead {
+    color: #166534;
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+    border: 1px solid color-mix(in srgb, #22c55e 30%, transparent);
+}
+
+.paceOnTrack {
+    color: var(--muted);
+    background: var(--hover);
+    border: var(--card-border);
+}
+
+.paceBehind {
+    color: #92400e;
+    background: color-mix(in srgb, #f59e0b 12%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+}
+
+/* === Music Links (legacy) === */
+
+.musicLinks {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.musicLink {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    background: var(--hover);
+    border: var(--card-border);
+    border-radius: 999px;
+    padding: 0.25rem 0.65rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.musicLink:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* === Music Stations === */
+
+.musicStationsWrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0;
+}
+
+.musicStationsLabel {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--text) 94%, #000);
+}
+
+.musicStationsList {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.musicStationsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    width: 100%;
+}
+
+.musicStationBtn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+    width: 100%;
+    min-height: 52px;
+    padding: 0.62rem 0.78rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--surface-card) 94%, var(--hover));
+    border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+    text-align: left;
+    min-width: 0;
+}
+
+.musicStationBtn:hover {
+    transform: translateY(-1px);
+    color: var(--text);
+    background: color-mix(in srgb, var(--primary) 8%, var(--hover));
+}
+
+.musicStationLabel {
+    min-width: 0;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.15;
+    display: block;
+    font-size: 0.76rem;
+}
+
+.musicStationBtn svg {
+    flex-shrink: 0;
+    color: #9ca3af;
+    opacity: 0.82;
+    transform: scale(0.94);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.musicStationBtnActive svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.musicStation_spotify {
+    color: #6b7280;
+}
+
+.musicStation_spotify:hover,
+.musicStation_spotify.musicStationBtnActive {
+    background: #1db95418;
+    color: #1db954;
+    border-color: #1db95438;
+}
+
+.musicStation_youtube {
+    color: #6b7280;
+}
+
+.musicStation_youtube:hover,
+.musicStation_youtube.musicStationBtnActive {
+    background: #ff000014;
+    color: #ff0000;
+    border-color: #ff000028;
+}
+
+.musicStationBtn svg {
+    flex-shrink: 0;
+}
+
+.musicStationBtn:hover svg {
+    opacity: 1;
+    transform: scale(1);
+    color: currentColor;
+}
+
+/* Embed player */
+
+.musicEmbedWrap {
+    width: 100%;
+    margin-top: 0.2rem;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+    background: var(--surface-card);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.musicEmbedHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0.55rem;
+    background: color-mix(in srgb, var(--hover) 60%, transparent);
+    border-bottom: 1px solid var(--border);
+}
+
+.musicEmbedTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.musicEmbedActions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.musicEmbedExternal {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.musicEmbedExternal:hover {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.musicEmbedClose {
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.musicEmbedClose:hover {
+    color: var(--danger, #ef4444);
+    background: color-mix(in srgb, var(--danger, #ef4444) 10%, transparent);
+}
+
+.musicEmbedIframe {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 0 0 var(--radius-lg, 10px) var(--radius-lg, 10px);
+}
+
+/* === Auto-Start Toggle === */
+
+.autoStartToggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding-top: 0.5rem;
+    border-top: var(--card-border);
+    width: 100%;
+    font-weight: 500;
+}
+
+.autoStartToggle input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* === Page Actions row === */
+
+.pageActions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.pageBackBtn {
+    margin-right: 0.2rem;
+}
+
+.focusEntryBackBtn {
+    align-self: flex-start;
+}
+
+/* === Focus Animation System === */
+
+.focusAnimWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.focusAnimArea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+}
+
+/* Tree animation */
+.treeAnimContainer {
+    position: relative;
+    width: 180px;
+    height: 180px;
+}
+
+.treeGhostLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Tree canvas overlay (leaf particles + sparkles + glow) */
+.treeCanvasOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+/* Focus overlay back button — always visible */
+.focusBackBtn {
+    position: fixed;
+    top: 1.25rem;
+    left: 1.25rem;
+    z-index: 12010;
+    background: color-mix(in srgb, var(--surface-card) 88%, transparent);
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 28%, transparent);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--focus-accent) 14%, transparent);
+}

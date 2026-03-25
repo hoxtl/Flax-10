@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Discover from '../../pages/Discover/Discover';
 
-vi.mock('../../api/userService', () => ({
+vi.mock('../../api/userApi', () => ({
     searchUsers: vi.fn().mockResolvedValue({ results: [], total_count: 0 }),
 }));
 
@@ -24,7 +24,7 @@ vi.mock('../../components/Pagination/Pagination', () => ({
     BackToTop: () => <button data-testid="back-to-top">Top</button>,
 }));
 
-import { searchUsers } from '../../api/userService';
+import { searchUsers } from '../../api/userApi';
 
 describe('Discover', () => {
     beforeEach(() => {
@@ -38,8 +38,9 @@ describe('Discover', () => {
     });
 
     it('renders subtitle', () => {
-        render(<Discover onNavChange={vi.fn()} />);
-        expect(screen.getByText(/Find course mates/)).toBeTruthy();
+        const { container } = render(<Discover onNavChange={vi.fn()} />);
+        const subtitle = container.querySelector('p[class*="subtitle"]');
+        expect(subtitle?.textContent).toContain("Find King's students, course mates, and professors across your subjects.");
     });
 
     it('renders search input', () => {
@@ -56,6 +57,19 @@ describe('Discover', () => {
         searchUsers.mockResolvedValue({ results: [], total_count: 0 });
         render(<Discover onNavChange={vi.fn()} />);
         await waitFor(() => expect(screen.getByText(/No users found/)).toBeTruthy());
+    });
+
+    it('shows only the query-specific empty search state when a search has no matches', async () => {
+        searchUsers.mockResolvedValue({ results: [], total_count: 0 });
+        render(<Discover onNavChange={vi.fn()} />);
+
+        const input = screen.getByPlaceholderText(/Search by name/);
+        fireEvent.change(input, { target: { value: 'lkjnhb' } });
+
+        await waitFor(() => expect(screen.getByText('No users match "lkjnhb"')).toBeTruthy());
+        expect(screen.getByText('Try a different keyword or check your spelling')).toBeTruthy();
+        expect(screen.queryByText(/No users found/)).toBeNull();
+        expect(screen.queryByRole('button', { name: /Clear search/i })).toBeNull();
     });
 
     it('renders user cards when users returned', async () => {

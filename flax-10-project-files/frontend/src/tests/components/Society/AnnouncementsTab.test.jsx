@@ -63,4 +63,19 @@ describe('AnnouncementsTab', () => {
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalled();
     vi.useRealTimers();
   });
+
+  it('renders the empty-state copy for view and edit modes', () => {
+    const { rerender } = renderTab({ announcements: [], editMode: false });
+    expect(screen.getByText('No announcements yet.')).toBeTruthy();
+
+    rerender(<AnnouncementsTab tags={[]} announcements={[]} editMode={true} />);
+    expect(screen.getByText('No announcements yet. Use the sidebar to add one.')).toBeTruthy();
+  });
+
+  it('opens the gallery from a multi-image announcement and hides edit controls in view mode', () => {
+    renderTab({ announcements: announcementsWithMedia, editMode: false });
+    fireEvent.click(screen.getByAltText('Image 2'));
+    expect(screen.getByTestId('gallery-modal')).toBeTruthy();
+    expect(screen.queryByTitle('Edit')).toBeNull();
+  });
 });

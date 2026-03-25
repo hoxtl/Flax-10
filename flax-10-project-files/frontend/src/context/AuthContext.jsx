@@ -1,76 +1,106 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getUserProfile } from '../api/userService';
+/*
+ * Shared auth session and profile context.
+ */
 
-const AuthContext = createContext(null);
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { getUserProfile } from "../api/userApi";
+
+export const AuthContext = createContext(null);
+
+function readStoredUser() {
+  const storedUser = localStorage.getItem("user");
+  if (!storedUser) return null;
+  try {
+    return JSON.parse(storedUser);
+  } catch {
+    return null;
+  }
+}
+
+function mergeStoredUser(user, profile) {
+  const nextUser = { ...(user || {}), ...profile };
+  localStorage.setItem("user", JSON.stringify(nextUser));
+  return nextUser;
+}
+
+function useAuthSessionState() {
+  const [user, setUser] = useState(readStoredUser);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(!!localStorage.getItem("token"));
+  return { user, setUser, profile, setProfile, loading, setLoading, authenticated, setAuthenticated };
+}
+
+function stopLoading(setLoading) {
+  setLoading(false);
+}
+
+function syncProfile(setProfile, setUser, data) {
+  setProfile(data);
+  if (!data) return;
+  setUser((current) => mergeStoredUser(current, data));
+}
+
+function logProfileError() {}
+
+function useRefreshProfile(authenticated, setLoading, setProfile, setUser) {
+  return useCallback(() => {
+    if (!authenticated) return stopLoading(setLoading);
+    return getUserProfile()
+      .then((data) => syncProfile(setProfile, setUser, data))
+      .catch(logProfileError)
+      .finally(() => stopLoading(setLoading));
+  }, [authenticated, setLoading, setProfile, setUser]);
+}
+
+function clearAuthState(setProfile, setUser) {
+  setProfile(null);
+  setUser(null);
+}
+
+function syncAuthChange(setAuthenticated, setProfile, setUser) {
+  const isAuthenticated = !!localStorage.getItem("token");
+  setAuthenticated(isAuthenticated);
+  if (!isAuthenticated) clearAuthState(setProfile, setUser);
+}
+
+function useAuthChangeListener(setAuthenticated, setProfile, setUser) {
+  useEffect(() => {
+    const handleAuthChange = () =>
+      syncAuthChange(setAuthenticated, setProfile, setUser);
+    window.addEventListener("auth-changed", handleAuthChange);
+    return () => window.removeEventListener("auth-changed", handleAuthChange);
+  }, [setAuthenticated, setProfile, setUser]);
+}
+
+function getContextValue(state, refreshProfile) {
+  return {
+    user: state.user,
+    profile: state.profile,
+    loading: state.loading,
+    authenticated: state.authenticated,
+    refreshProfile,
+    setAuthenticated: state.setAuthenticated,
+  };
+}
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(() => {
-        const s = localStorage.getItem('user');
-        if (!s) return null;
-        try { return JSON.parse(s); } catch { return null; }
-    });
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(!!localStorage.getItem('token'));
-
-    console.log('[AuthContext] init - auth:', authenticated, 'loading:', loading);
-
-    const refreshProfile = useCallback(async () => {
-        if (!authenticated) {
-            setLoading(false);
-            return;
-        }
-        try {
-            console.log('[AuthContext] refreshing profile...');
-            const data = await getUserProfile();
-            console.log('[AuthContext] profile fetched:', !!data);
-            setProfile(data);
-            // Sync localStorage user object with fresh profile data
-            if (data) {
-                const updatedUser = { ...user, ...data };
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-                setUser(updatedUser);
-            }
-        } catch (err) {
-            console.error('Failed to fetch user profile:', err);
-        } finally {
-            console.log('[AuthContext] setting loading false');
-            setLoading(false);
-        }
-    }, [authenticated, user]);
-
-    useEffect(() => {
-        refreshProfile();
-    }, [authenticated]);
-
-    // Handle logout/auth changes
-    useEffect(() => {
-        const handleAuthChange = () => {
-            const isAuth = !!localStorage.getItem('token');
-            setAuthenticated(isAuth);
-            if (!isAuth) {
-                setProfile(null);
-                setUser(null);
-            }
-        };
-        window.addEventListener('auth-changed', handleAuthChange);
-        return () => window.removeEventListener('auth-changed', handleAuthChange);
-    }, []);
-
-    const value = {
-        user,
-        profile,
-        loading,
-        authenticated,
-        refreshProfile,
-        setAuthenticated
-    };
-
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const state = useAuthSessionState();
+  const refreshProfile = useRefreshProfile(
+    state.authenticated,
+    state.setLoading,
+    state.setProfile,
+    state.setUser,
+  );
+  useEffect(() => {
+    refreshProfile();
+  }, [refreshProfile]);
+  useAuthChangeListener(state.setAuthenticated, state.setProfile, state.setUser);
+  return <AuthContext.Provider value={getContextValue(state, refreshProfile)}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-    const context = useContext(AuthContext);
-    if (!context) throw new Error('useAuth must be used within AuthProvider');
-    return context;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
 }

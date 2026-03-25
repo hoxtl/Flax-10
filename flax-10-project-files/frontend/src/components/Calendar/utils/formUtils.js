@@ -1,7 +1,15 @@
+/**
+ * formUtils - Event form state management and submission logic.
+ * Handles form initialization, validation, and CRUD operations.
+ */
+
 import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 import { validateDateRange } from './dateValidation';
-import { geocodeAddress } from '../../../api/userService';
+import { geocodeAddress } from '../../../api/geocodeApi';
+import { formatForDateTimeInput } from '../../../utils/dateTimeInput';
+
+/** Creates initial form state from an existing event or defaults. */
 
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event, options);
@@ -53,6 +61,8 @@ function getDefaultForm(options) {
         is_private: false,
     };
 }
+
+/** Validates form and submits event with overlap checking. */
 
 export async function validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, allEvents, forceSave = false) {
     if (e) e.preventDefault();
@@ -119,10 +129,14 @@ async function editSingleOccurrence(event, data, actions, baseId) {
     await actions.addEvent(singleEventData);
 }
 
+/** Deletes an event (including all recurring instances). */
+
 export async function executeDelete(event, actions) {
     const baseId = extractBaseEventId(event.id, event);
     await actions.removeEvent(baseId);
 }
+
+/** Deletes a single occurrence of a recurring event by adding an exception. */
 
 export async function deleteRecurrenceOccurrence(event, actions) {
     const baseId = extractBaseEventId(event.id, event);
@@ -134,26 +148,21 @@ export function isRecurringEvent(event) {
     return hasRecurrence(event);
 }
 
+async function fetchLocationCoords(location) {
+    if (!location || !location.trim()) return null;
+    const coords = await geocodeAddress(location);
+    return coords ? { lat: coords.latitude, lon: coords.longitude, valid: true } : { valid: false };
+}
 async function buildEventData(form) {
     const data = buildBaseEventData(form);
-
-    if (form.location && form.location.trim()) {
-        const coords = await geocodeAddress(form.location);
-        if (coords) {
-            data.location_latitude = coords.latitude;
-            data.location_longitude = coords.longitude;
-            data.location_validated = true;
-        } else {
-            data.location_validated = false;
-        }
+    const loc = await fetchLocationCoords(form.location);
+    if (loc) {
+        data.location_latitude = loc.lat;
+        data.location_longitude = loc.lon;
+        data.location_validated = loc.valid;
     }
-
-    const { frequency, interval, end_date } = form.recurrence || {};
-    if (frequency && frequency !== 'none') {
-        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
-    } else {
-        data.recurrence_rule = null;
-    }
+    const { frequency: f, interval: i, end_date: e } = form.recurrence || {};
+    data.recurrence_rule = (f && f !== 'none') ? { frequency: f, interval: parseInt(i) || 1, end_date: e || null } : null;
     return data;
 }
 
@@ -172,9 +181,5 @@ function buildBaseEventData(form) {
 }
 
 function formatForInput(d) {
-    if (!d) return new Date().toISOString().slice(0, 16);
-    const date = typeof d === 'string' ? new Date(d) : d;
-    const offset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() - offset);
-    return localDate.toISOString().slice(0, 16);
+    return formatForDateTimeInput(d);
 }

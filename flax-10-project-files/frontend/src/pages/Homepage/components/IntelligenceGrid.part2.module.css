@@ -1,0 +1,261 @@
+/* Split from components/IntelligenceGrid.module.css (2/2) */
+.addSheetHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border-base);
+  margin: 0 auto 14px;
+}
+
+.addSheetTitle {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--text-charcoal);
+  margin-bottom: 4px;
+}
+
+.addSheetSubtitle {
+  font-size: 12px;
+  color: var(--text-muted-sage);
+  margin-bottom: 14px;
+}
+
+.addSections {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addSectionTitle {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted-sage);
+}
+
+.addOptionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+.addOptionCard {
+  background: var(--widget-surface);
+  border: 1.5px solid var(--color-border-base);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.addOptionCard:hover {
+  background: var(--color-highlight-soft);
+  transform: translateY(-2px);
+  border-color: var(--text-muted-sage);
+}
+
+.addOptionIcon {
+  font-size: 18px;
+}
+
+.addOptionInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.addOptionLabel {
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text-charcoal);
+}
+
+.addOptionMeta {
+  font-size: 9px;
+  color: var(--text-muted-sage);
+  margin-top: 1px;
+}
+
+/* ── Floating Actions ── */
+.gridActions {
+  position: absolute;
+  top: 320px;
+  right: -70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.iconActionBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-border-base);
+  background: var(--color-card);
+  color: var(--text-muted-sage);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.iconActionBtn:hover {
+  background: var(--color-highlight-soft);
+  color: var(--text-charcoal);
+  border-color: var(--text-muted-sage);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.editBtnActive {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 14px rgba(123, 103, 81, 0.25);
+}
+
+.editBtnWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.editBtnTooltip {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 7px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.editBtnWrap:hover .editBtnTooltip {
+  opacity: 1;
+}
+
+/* ── Resize Controls ── */
+.resizeControls {
+  background: var(--home-edit-control-bg);
+  border: 1.5px solid var(--home-edit-control-border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  gap: 3px;
+  z-index: 30;
+  box-shadow: var(--home-edit-control-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.resizeGroup {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.resizeBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: none !important;
+  background: transparent !important;
+  color: var(--home-edit-control-ink) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0 !important;
+}
+
+.resizeBtn:hover:not(:disabled) {
+  background: var(--home-edit-control-hover-bg) !important;
+  color: var(--home-edit-control-hover-ink) !important;
+}
+
+.resizeBtn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.resizeVal {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--home-edit-control-ink);
+  min-width: 22px;
+  text-align: center;
+}
+
+.resizeDivider {
+  width: 1px;
+  height: 14px;
+  background: var(--home-edit-control-divider);
+  margin: 0 2px;
+}
+
+.widgetWrapper .resizeControls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.widgetWrapper.editMode:hover .resizeControls {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@media (max-width: 767px) {
+  .gridActions {
+    display: none;
+  }
+
+  .afterHeroBar {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0;
+  }
+
+  .mobileActionsBar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .widgetWrapper .resizeControls {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}

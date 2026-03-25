@@ -9,9 +9,10 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock('../../../pages/GroupWork/groupWorkHooks', () => ({
+vi.mock('../../../pages/GroupWork/hooks/groupWorkHooks', () => ({
   getAuthHeaders: () => ({}),
   useGroupProjects: vi.fn(),
+  useGroupProjectSort: vi.fn(() => ({ sortBy: 'deadline', setSortBy: vi.fn() })),
   useSelectedProjectId: vi.fn(),
 }));
 
@@ -19,7 +20,7 @@ vi.mock('../../../pages/GroupWork/GroupWorkDetail', () => ({
   default: () => <div data-testid="groupwork-detail" />,
 }));
 
-import { useGroupProjects, useSelectedProjectId } from '../../../pages/GroupWork/groupWorkHooks';
+import { useGroupProjects, useSelectedProjectId } from '../../../pages/GroupWork/hooks/groupWorkHooks';
 
 describe('GroupWorkIndexPage', () => {
   beforeEach(() => {
@@ -32,6 +33,7 @@ describe('GroupWorkIndexPage', () => {
     useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: true });
     render(<GroupWorkIndexPage />);
     expect(screen.getByTestId('groupwork-skeleton')).toBeTruthy();
-    expect(screen.queryByText('Group work')).toBeNull();
+    // Skeleton uses AppPage and renders the title even while loading.
+    expect(screen.getByText('My Group Projects')).toBeTruthy();
   });
 });

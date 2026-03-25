@@ -1,8 +1,13 @@
+/*
+ * Timer feature file.
+ */
+
 import { useState, useEffect, useMemo } from 'react';
 import styles from './HistoryModal.module.css';
-import { getHistory, clearHistory } from './utils/historyUtils';
+import * as historyUtils from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
 import { useConfirm } from '../../context/ConfirmContext';
+import { useToast } from '../../context/ToastContext';
 import StandardModal from '../common/StandardModal/StandardModal';
 
 const StatsRow = ({ block }) => {
@@ -34,7 +39,7 @@ const ClearButton = ({ onClear }) => {
     return <div className={styles.clearButtonWrap}>{btn}</div>;
 };
 
-const useClearAction = (setHistory, confirm) => {
+const useClearAction = (setHistory, confirm, toast) => {
     const triggerClear = async () => {
         const confirmed = await confirm({
             title: "Clear History",
@@ -42,18 +47,21 @@ const useClearAction = (setHistory, confirm) => {
             isDanger: true,
         });
         if (!confirmed) return;
-        await clearHistory();
+        await historyUtils.clearHistory();
         setHistory([]);
         window.dispatchEvent(new Event('historyCleared'));
+        toast?.('History deleted.');
     };
     return { triggerClear };
 };
 
-const useHistoryData = (confirm) => {
+const useHistoryData = (confirm, toast) => {
     const [history, setHistory] = useState([]);
-    useEffect(() => { getHistory().then(setHistory); }, []);
+    useEffect(() => {
+        historyUtils.getHistory().then(setHistory);
+    }, []);
     const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
-    const { triggerClear } = useClearAction(setHistory, confirm);
+    const { triggerClear } = useClearAction(setHistory, confirm, toast);
     return { history, blocks, triggerClear };
 };
 
@@ -65,7 +73,8 @@ const ModalContent = ({ history, blocks }) => {
 
 export default function HistoryModal({ onClose }) {
     const confirm = useConfirm();
-    const { history, blocks, triggerClear } = useHistoryData(confirm);
+    const toast = useToast();
+    const { history, blocks, triggerClear } = useHistoryData(confirm, toast);
     const content = <ModalContent history={history} blocks={blocks} />;
     const cBtn = history.length > 0 ? <ClearButton onClear={triggerClear} /> : null;
     return (

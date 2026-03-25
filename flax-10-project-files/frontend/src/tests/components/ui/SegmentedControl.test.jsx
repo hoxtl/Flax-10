@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SegmentedControl } from '../../../components/ui/SegmentedControl';
+import { SegmentedControl } from '../../../components/common/SegmentedControl/SegmentedControl';
 
 const MockIcon = () => <svg data-testid="icon" />;
 
@@ -39,8 +39,9 @@ describe('SegmentedControl', () => {
       { value: 'icon', label: '', icon: MockIcon, title: 'Icon option' },
     ];
     render(<SegmentedControl options={options} value="icon" onChange={vi.fn()} />);
+    fireEvent.mouseEnter(screen.getByRole('button'));
     expect(screen.getByTestId('icon')).toBeInTheDocument();
-    expect(screen.getByTitle('Icon option')).toBeInTheDocument();
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Icon option');
   });
 
   it('renders option with both icon and label', () => {

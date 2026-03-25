@@ -1,8 +1,8 @@
+/*
+ * Timer feature file.
+ */
+
 .wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   flex-shrink: 0;
 }
 
@@ -63,63 +63,4 @@
   color: var(--accent);
   font-weight: 700;
   letter-spacing: 0.03em;
-}
-
-/* Tooltip bubble */
-.tooltip {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-6px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.25s ease;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.5rem 1rem;
-  border-radius: 14px;
-  white-space: nowrap;
-
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  z-index: 1000;
-}
-
-/* arrow notch */
-.tooltip::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 10px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.22);
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(20px);
-}
-
-.tooltip.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-  pointer-events: auto;
-}
-
-.tooltipLabel {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.tooltipHint {
-  font-size: 0.72rem;
-  color: var(--muted);
-  opacity: 0.7;
 }

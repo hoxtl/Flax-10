@@ -49,6 +49,16 @@ vi.mock('../../../../context/TagContext', () => ({
     useTags: () => mockTagsState,
 }));
 
+vi.mock('../../../../components/common/TagsSelector/TagsSelector', () => ({
+    TagsSelector: ({ tags, selectedTags, onSelectionChange, emptyHint }) => (
+        <div data-testid="tags-selector">
+            {tags.map(t => (
+                <button key={t.id} onClick={() => onSelectionChange([t])}>{t.label}</button>
+            ))}
+        </div>
+    ),
+}));
+
 describe('EventModal', () => {
     const mockOnClose = vi.fn();
 
@@ -88,8 +98,8 @@ describe('EventModal', () => {
     });
 
     it('should call onClose when overlay clicked', () => {
-        const { container } = renderModal();
-        const overlay = container.firstChild;
+        renderModal();
+        const overlay = document.querySelector('[class*="backdrop"]');
         fireEvent.mouseDown(overlay);
         expect(mockOnClose).toHaveBeenCalled();
     });
@@ -114,8 +124,8 @@ describe('EventModal', () => {
     });
 
     it('should call handleSubmit on submit', () => {
-        const { container } = renderModal();
-        const form = container.querySelector('form');
+        renderModal();
+        const form = document.querySelector('form');
         fireEvent.submit(form);
         expect(mockFormLogic.handleSubmit).toHaveBeenCalled();
     });

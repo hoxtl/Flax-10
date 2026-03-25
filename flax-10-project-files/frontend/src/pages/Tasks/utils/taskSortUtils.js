@@ -1,6 +1,7 @@
-/**
+/*
  * Task sorting utilities.
  */
+
 import {
   PRIORITY_ORDER,
   compareTaskPriority,
@@ -15,7 +16,6 @@ function compareList(a, b, listMap) {
   return (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4);
 }
 
-/** Returns a sorted copy of tasks using the specified sort strategy. */
 export function sortTasks(tasks, sortBy, listMap) {
   const comparators = {
     priority:   (a, b) => compareTaskPriority(a, b),
@@ -24,6 +24,7 @@ export function sortTasks(tasks, sortBy, listMap) {
     "alpha-desc": (a, b) => b.title.localeCompare(a.title),
     list:       (a, b) => compareList(a, b, listMap),
     date_added: (a, b) => (b.id ?? 0) - (a.id ?? 0),
+    date_added_asc: (a, b) => (a.id ?? 0) - (b.id ?? 0),
     est_time:   (a, b) => compareTaskEstimatedTime(a, b),
   };
   return [...tasks].sort(comparators[sortBy] || compareTaskPriority);

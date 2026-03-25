@@ -1,34 +1,43 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getEvents } from '../../../api/eventApi';
-import { getPromptedIds } from '../attendancePromptStorage';
-import { getDateRangeForPrompt, findCandidateEvent } from '../attendancePromptUtils';
+/*
+ * Candidate attendance prompt hook.
+ */
 
-const CHECK_INTERVAL_MS = 60 * 1000;
+import { useCallback, useEffect, useState } from "react";
+import { getEvents } from "../../../api/eventApi";
+import { getLastPromptShownAt, getSkippedIds, setLastPromptShownAt } from "../attendancePromptStorage";
+import { findCandidateEvent, getDateRangeForPrompt } from "../attendancePromptUtils";
 
-const fetchCandidateEvent = async () => {
-  const prompted = getPromptedIds();
-  const { start, end } = getDateRangeForPrompt();
-  const events = await getEvents({ start, end });
-  return findCandidateEvent(events, prompted);
-};
+const CHECK_INTERVAL_MS = 15 * 60 * 1000;
+const REPROMPT_COOLDOWN_MS = 15 * 60 * 1000;
+
+async function loadCandidateEvent() {
+  if ((Date.now() - getLastPromptShownAt()) < REPROMPT_COOLDOWN_MS) return null;
+  const events = await getEvents(getDateRangeForPrompt());
+  const candidate = findCandidateEvent(events, getSkippedIds());
+  if (candidate) setLastPromptShownAt();
+  return candidate;
+}
+
+async function refreshCandidateEvent(setEvent) {
+  try {
+    setEvent(await loadCandidateEvent());
+  } catch {
+    return null;
+  }
+}
+
+function startCandidatePolling(refresh) {
+  refresh();
+  const intervalId = setInterval(refresh, CHECK_INTERVAL_MS);
+  return () => clearInterval(intervalId);
+}
 
 export function useCandidateEvent() {
   const [event, setEvent] = useState(null);
-
-  const checkForPrompt = useCallback(async () => {
-    try {
-      const candidate = await fetchCandidateEvent();
-      if (candidate) setEvent(candidate);
-    } catch {
-      // ignore network errors
-    }
-  }, []);
-
+  const refresh = useCallback(() => refreshCandidateEvent(setEvent), []);
   useEffect(() => {
-    checkForPrompt();
-    const id = setInterval(checkForPrompt, CHECK_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [checkForPrompt]);
-
+    if (event) return undefined;
+    return startCandidatePolling(refresh);
+  }, [event, refresh]);
   return [event, setEvent];
 }

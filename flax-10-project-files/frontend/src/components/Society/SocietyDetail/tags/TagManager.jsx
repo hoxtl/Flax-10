@@ -2,10 +2,11 @@
  * TagManager allows society admins to define, color-code, and delete
  * custom tags for categorizing society events and announcements.
  */
+
 import { useState } from "react";
 import styles from "./TagManager.module.css";
 
-const DEFAULT_COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308"];
+const DEFAULT_COLORS = ["var(--color-light-blue)", "var(--color-error)", "var(--gw-priority-low)", "var(--color-amber)", "var(--chart-accent-purple)", "var(--chart-accent-pink)", "var(--color-teal)", "var(--chart-accent-amber)"];
 const MAX_TAGS = 7;
 
 const isDuplicateTag = (tags, label) =>

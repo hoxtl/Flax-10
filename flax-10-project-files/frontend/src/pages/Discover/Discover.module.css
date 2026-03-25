@@ -121,12 +121,12 @@
 .userRolePill {
     border: 1px solid var(--border);
     background: var(--panel);
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
 }
 
 .username {
     display: inline-flex;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 74%, var(--muted) 26%);
     font-size: 0.9rem;
     margin-bottom: 6px;
     max-width: 100%;
@@ -148,7 +148,7 @@
 .bio {
     margin: 6px 0 0;
     font-size: 0.82rem;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -185,7 +185,7 @@
     font-size: 0.68rem;
     font-weight: 600;
     background: var(--hover);
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 68%, var(--muted) 32%);
     border: 1px solid var(--border);
 }
 
@@ -198,24 +198,7 @@
 
 .viewProfileBtn {
     width: 100%;
-    padding: 8px 0;
-    border: none;
-    border-radius: var(--btn-radius, 8px);
-    background: var(--primary);
-    color: var(--c-white, #fff);
-    font-size: 0.84rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.viewProfileBtn:hover {
-    background: var(--c-olive, var(--primary));
-    transform: translateY(-1px);
-}
-
-.viewProfileBtn:active {
-    transform: translateY(0);
+    justify-content: center;
 }
 
 @media (max-width: 900px) {

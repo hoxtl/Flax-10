@@ -1,4 +1,8 @@
-import { useState, useEffect } from "react";
+/*
+ * CalendarTab adapts the shared calendar UI for a society detail page.
+ */
+
+import { useState } from "react";
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../Calendar/MonthView/MonthView";
 import { CalendarNav } from "../../../../Calendar/header/CalendarHeaderUtils";
@@ -46,7 +50,7 @@ const executeWithConfirm = async (event, handlers, confirmFn) => {
 function handleEventDeletion(handlers, close, confirmFn) {
     return async (event) => {
         try { await executeWithConfirm(event, handlers, confirmFn); }
-        catch (err) { console.error('Deletion failed:', err); }
+        catch (err) { console.error('Failed to delete event:', err); }
         close();
     };
 }

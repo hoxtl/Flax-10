@@ -1,10 +1,11 @@
-/**
+/*
  * Dropdown panel for filtering tasks by list and module code.
  */
 
 import { Search } from "lucide-react";
 
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import { useAuth } from "../../../context/AuthContext";
 import styles from "./TaskFeedToolbar.module.css";
 
 function FilterCheckboxItem({ label, checked, onChange }) {
@@ -53,11 +54,11 @@ function ModuleGroupRow({ group, groupedModuleItems, filterModuleCodes, onToggle
   );
 }
 
-function FilterTabs({ activeFilterTab, onTabChange }) {
+function FilterTabs({ activeFilterTab, onTabChange, hideModules }) {
   return (
     <div className={styles.filterTabs}>
       <button type="button" className={`${styles.filterTab} ${activeFilterTab === "lists" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("lists")}>Lists</button>
-      <button type="button" className={`${styles.filterTab} ${activeFilterTab === "modules" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("modules")}>Modules</button>
+      {!hideModules && <button type="button" className={`${styles.filterTab} ${activeFilterTab === "modules" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("modules")}>Modules</button>}
     </div>
   );
 }
@@ -84,15 +85,18 @@ function ModulesTab({ moduleGroupKeys, groupedModuleItems, filterModuleCodes, on
   );
 }
 
-/** Dropdown panel for filtering tasks by list or module. */
+/* Dropdown panel for filtering tasks by list or module. */
 export default function TaskFilterPanel(props) {
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
+  const activeTab = isTeacher ? "lists" : props.activeFilterTab;
   return (
     <>
-      <FilterTabs activeFilterTab={props.activeFilterTab} onTabChange={props.onTabChange} />
-      <FilterSearch filterQuery={props.filterQuery} onQueryChange={props.onQueryChange} activeFilterTab={props.activeFilterTab} />
+      <FilterTabs activeFilterTab={activeTab} onTabChange={props.onTabChange} hideModules={isTeacher} />
+      <FilterSearch filterQuery={props.filterQuery} onQueryChange={props.onQueryChange} activeFilterTab={activeTab} />
       <div className={styles.filterListContainer}>
-        {props.activeFilterTab === "lists"   && <ListsTab   visibleListItems={props.visibleListItems} filterListIds={props.filterListIds} onToggleList={props.onToggleList} />}
-        {props.activeFilterTab === "modules" && <ModulesTab moduleGroupKeys={props.moduleGroupKeys} groupedModuleItems={props.groupedModuleItems} filterModuleCodes={props.filterModuleCodes} onToggleModule={props.onToggleModule} />}
+        {activeTab === "lists"   && <ListsTab   visibleListItems={props.visibleListItems} filterListIds={props.filterListIds} onToggleList={props.onToggleList} />}
+        {activeTab === "modules" && <ModulesTab moduleGroupKeys={props.moduleGroupKeys} groupedModuleItems={props.groupedModuleItems} filterModuleCodes={props.filterModuleCodes} onToggleModule={props.onToggleModule} />}
       </div>
       <div className={styles.filterActions}>
         <button type="button" className={styles.filterClearBtn} onClick={props.onClearAll}>Clear all</button>

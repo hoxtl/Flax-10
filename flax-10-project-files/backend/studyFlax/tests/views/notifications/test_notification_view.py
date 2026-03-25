@@ -83,3 +83,5 @@ class NotificationAndProfileCoverageTest(TestCase):
         data = build_profile_response(self.user, request)
         self.assertEqual(data['task_count'], 0)
         self.assertEqual(data['module_count'], 0)
+        self.assertIn('profile_completion', data)
+        self.assertIn('last_session_end', data)

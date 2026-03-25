@@ -1,0 +1,105 @@
+/*
+ * TfL journey planner and service disruption API client.
+ */
+
+import tflLineColors from './tflLineColors.json';
+
+const TFL_API_KEY = import.meta.env.VITE_TFL_API_KEY;
+const TFL_BASE = 'https://api.tfl.gov.uk';
+
+const LINE_COLOURS = tflLineColors.lineColours;
+const FALLBACK_COLOUR = tflLineColors.fallbackColour;
+
+function mapLeg(leg, decoder) {
+  return {
+    mode: leg.mode.name,
+    duration: leg.duration,
+    instruction: leg.instruction?.summary || '',
+    departurePoint: leg.departurePoint?.commonName || '',
+    arrivalPoint: leg.arrivalPoint?.commonName || '',
+    routeOptions: (leg.routeOptions || []).map(opt => ({ name: opt.name, lineIdentifier: opt.lineIdentifier })),
+    path: leg.path?.lineString ? decoder(leg.path.lineString) : null,
+  };
+}
+
+function parseJourney(data, decoder) {
+  if (!data.journeys?.length) return null;
+  const fastest = data.journeys[0];
+  return { duration: fastest.duration, legs: fastest.legs.map(leg => mapLeg(leg, decoder)) };
+}
+
+function decodeNextCoord(encoded, index) {
+  let b, shift = 0, result = 0;
+  do {
+    b = encoded.charCodeAt(index++) - 63;
+    result |= (b & 0x1f) << shift;
+    shift += 5;
+  } while (b >= 0x20);
+  const value = (result & 1) ? ~(result >> 1) : (result >> 1);
+  return { value, index };
+}
+
+function buildDelay(line, status) {
+  return {
+    lineName: line.name,
+    mode: line.modeName,
+    severity: status.statusSeverity,
+    severityDescription: status.statusSeverityDescription,
+    reason: status.reason || 'Service Delay/Disruption',
+    color: LINE_COLOURS[line.id] || FALLBACK_COLOUR,
+  };
+}
+
+function extractLineDelays(line) {
+  return line.lineStatuses.filter((s) => s.statusSeverity < 10).map((s) => buildDelay(line, s));
+}
+
+function extractDelays(lines) {
+  return lines.flatMap(extractLineDelays);
+}
+
+export const tflService = {
+  async journeyPlanner(fromLat, fromLng, toLat, toLng) {
+    try {
+      const url = `${TFL_BASE}/Journey/JourneyResults/${fromLat},${fromLng}/to/${toLat},${toLng}?app_key=${TFL_API_KEY}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`TfL API error: ${response.status}`);
+      return parseJourney(await response.json(), this.decodeTfLPolyline);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  decodeTfLPolyline(encoded) {
+    if (!encoded) return [];
+    const poly = [];
+    let index = 0, lat = 0, lng = 0;
+    while (index < encoded.length) {
+      const dLat = decodeNextCoord(encoded, index);
+      lat += dLat.value;
+      index = dLat.index;
+      const dLng = decodeNextCoord(encoded, index);
+      lng += dLng.value;
+      index = dLng.index;
+      poly.push([lng / 1e5, lat / 1e5]);
+    }
+    return poly;
+  },
+
+  async getTfLDelays() {
+    try {
+      const modes = ['tube', 'dlr', 'overground', 'elizabeth-line', 'tram'];
+      const url = `${TFL_BASE}/Line/Mode/${modes.join(',')}/Status?app_key=${TFL_API_KEY}`;
+      const response = await fetch(url);
+      if (response.status === 429) return [];
+      if (!response.ok) throw new Error(`TfL Delays API error: ${response.status}`);
+      return extractDelays(await response.json());
+    } catch {
+      return [];
+    }
+  },
+
+  getDelayLineColor(lineId) {
+    return LINE_COLOURS[lineId] || FALLBACK_COLOUR;
+  },
+};

@@ -1,6 +1,11 @@
 .modal {
-    border: 2px solid #000 !important;
-    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner, var(--surface-card)) 8%),
+        color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%)
+    ) !important;
+    box-shadow: var(--shadow-lg);
 }
 
 .body {
@@ -9,9 +14,32 @@
     gap: var(--space-4);
 }
 
+.warningBanner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    border-radius: 8px;
+}
+
+.warningBannerIcon {
+    flex-shrink: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.warningBannerText {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--warning-text);
+    line-height: 1.5;
+}
+
 .warning {
     font-style: italic;
-    color: var(--primary-strong);
+    color: color-mix(in srgb, var(--text-secondary) 55%, var(--primary-strong) 45%);
     font-size: var(--text-base);
     line-height: 1.55;
     margin: 0;
@@ -23,7 +51,7 @@
     justify-content: flex-end;
     flex-wrap: wrap;
     padding-top: var(--space-3);
-    border-top: 1px solid rgba(51, 51, 51, 0.1);
+    border-top: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
 }
 
 .holdBtn {
@@ -31,21 +59,25 @@
     overflow: hidden;
     padding: var(--btn-padding);
     border-radius: 999px;
-    border: 1.5px solid #333333;
-    background: #ffffff;
-    color: #333333;
+    border: 1px solid color-mix(in srgb, var(--danger) 32%, var(--border));
+    background: var(--surface-inner, var(--surface-card));
+    color: var(--text);
     font: inherit;
     font-weight: 600;
     font-size: var(--btn-font-size);
     cursor: pointer;
     min-width: 120px;
     user-select: none;
-    transition: border-color 0.15s ease;
+    box-shadow:
+        0 10px 18px color-mix(in srgb, black 10%, transparent),
+        inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 
 .holdBtn:hover {
-    border-color: #1a1a1a;
-    background: rgba(51, 51, 51, 0.04);
+    border-color: color-mix(in srgb, var(--danger) 48%, var(--border));
+    background: color-mix(in srgb, var(--danger) 10%, var(--surface-inner, var(--surface-card)));
+    transform: translateY(-1px);
 }
 
 .holdBtnBar {
@@ -53,7 +85,7 @@
     top: 0;
     left: 0;
     height: 100%;
-    background: rgba(51, 51, 51, 0.14);
+    background: color-mix(in srgb, var(--danger) 18%, transparent);
     pointer-events: none;
     z-index: 0;
 }
@@ -61,4 +93,32 @@
 .holdBtnLabel {
     position: relative;
     z-index: 1;
+}
+
+:global([data-mode="dark"]) .modal {
+    border-color: color-mix(in srgb, var(--danger) 18%, var(--border)) !important;
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global([data-mode="dark"]) .warningBanner {
+    background: color-mix(in srgb, var(--danger) 12%, var(--surface-inner, var(--surface-card)));
+    border-color: color-mix(in srgb, var(--danger) 24%, var(--border));
+}
+
+:global([data-mode="dark"]) .warning {
+    color: color-mix(in srgb, var(--text-secondary) 72%, white 28%);
+}
+
+:global([data-mode="dark"]) .holdBtn {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-inner, var(--surface-card)) 92%, transparent),
+        color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%)
+    );
+    border-color: color-mix(in srgb, var(--danger) 28%, var(--border));
+    box-shadow:
+        0 14px 26px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }

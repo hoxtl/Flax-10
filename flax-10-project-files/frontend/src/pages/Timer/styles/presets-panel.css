@@ -1,0 +1,210 @@
+/*
+ * Timer page styles chunk.
+ */
+
+/* === Preset Panel (right sidebar card) === */
+
+.presetPanelCard {
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    box-shadow: var(--card-shadow-rest);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.presetPanelLabel {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    border-left: 3px solid var(--primary);
+    padding-left: 0.5rem;
+}
+
+.presetPanelGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.timerSettingsDivider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0.1rem 0;
+}
+
+.autoBreakContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.65rem;
+}
+
+.autoBreakLabel {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.autoBreakTime {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.autoBreakText {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0;
+}
+
+/* Vertical list layout for presets */
+.presetList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.presetListItemWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+
+.presetListItem {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 1rem;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    gap: 0.4rem;
+    position: relative;
+}
+
+.presetListItemTop {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.presetListIcon {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.presetListItem:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card));
+    transform: translateY(-1px);
+}
+
+.presetListItemActive {
+    border-color: var(--primary);
+    background: var(--primary);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.presetListItemActive .presetListItemName {
+    color: #ffffff;
+}
+
+.presetListItemActive .presetListIcon {
+    filter: brightness(10);
+}
+
+.presetListItemActive .presetDurationTag {
+    background: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.presetListItemActive:hover {
+    background: color-mix(in srgb, var(--primary) 88%, black) !important;
+    border-color: var(--primary) !important;
+}
+
+.presetListItemDisabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.presetListItemName {
+    font-size: 0.79rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: normal;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.presetListItemMeta {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.presetDurationTag {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.2rem 0.4rem;
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    border-radius: 6px;
+    color: var(--muted);
+}
+
+:global([data-mode="dark"]) .presetListItem {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%),
+        color-mix(in srgb, var(--surface-card) 80%, var(--color-bg) 20%)
+    );
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 18%, var(--border) 82%);
+    box-shadow:
+        0 14px 26px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global([data-mode="dark"]) .presetListItem:hover:not(:disabled) {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 88%, var(--surface-inner) 12%),
+        color-mix(in srgb, var(--surface-card) 74%, var(--color-bg) 26%)
+    );
+}
+
+:global([data-mode="dark"]) .presetListItemActive {
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 26%, var(--primary) 74%);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--primary) 56%, var(--surface-card) 44%),
+        color-mix(in srgb, var(--primary) 40%, black 60%)
+    );
+}
+
+:global([data-mode="dark"]) .presetDurationTag {
+    background: color-mix(in srgb, white 7%, var(--surface-inner));
+    color: color-mix(in srgb, var(--text-secondary) 76%, white 24%);
+}
+
+:global([data-mode="dark"]) .presetListItemActive .presetDurationTag {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.88);
+}

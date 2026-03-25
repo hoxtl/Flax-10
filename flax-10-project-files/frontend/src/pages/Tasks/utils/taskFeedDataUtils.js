@@ -1,4 +1,4 @@
-/**
+/*
  * Pure helpers for useTaskFeedData (date bounds, search filter, time buckets).
  * Keeps hook body under line limit.
  */

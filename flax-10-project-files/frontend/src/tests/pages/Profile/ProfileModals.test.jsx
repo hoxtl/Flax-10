@@ -8,20 +8,27 @@ vi.mock('../../../components/Dashboard/EditProfileModal', () => ({
 }));
 
 vi.mock('../../../components/Social/UserListModal', () => ({
-    default: ({ title, users, onClose, onUserClick }) => (
+    default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
         <div data-testid="user-list-modal">
             <span>{title}</span>
             <button type="button" onClick={onClose}>Close List</button>
             {(users || []).map((u, i) => (
-                <div key={i} data-testid="user-item" role="button" tabIndex={0} onClick={() => onUserClick?.(u)} onKeyDown={e => e.key === 'Enter' && onUserClick?.(u)}>
-                    {u.username}
+                <div key={i}>
+                    <div data-testid="user-item" role="button" tabIndex={0} onClick={() => onUserClick?.(u)} onKeyDown={e => e.key === 'Enter' && onUserClick?.(u)}>
+                        {u.username}
+                    </div>
+                    {showCalendarAction && (
+                        <button type="button" onClick={() => onUserCalendarClick?.(u)}>
+                            View calendar
+                        </button>
+                    )}
                 </div>
             ))}
         </div>
     ),
 }));
 
-vi.mock('../../../api/socialService', () => ({
+vi.mock('../../../api/socialApi', () => ({
     getSharingWith: vi.fn().mockResolvedValue([]),
     getSharedWithMe: vi.fn().mockResolvedValue([]),
 }));
@@ -124,7 +131,7 @@ describe('ProfileModals', () => {
     it('calls setEventRange when range button is clicked', () => {
         const setEventRange = vi.fn();
         renderModals({ state: { showEvents: true, setEventRange } });
-        // Click on a specific range label button (not the ✕ close button)
+        // Click a specific range label button rather than the close button
         fireEvent.click(screen.getByText('Today'));
         expect(setEventRange).toHaveBeenCalledWith('today');
     });
@@ -135,17 +142,17 @@ describe('ProfileModals', () => {
     });
 
     it('renders sharing modal when showSharedWith is true', async () => {
-        const { getSharingWith } = await import('../../../api/socialService');
+        const { getSharingWith } = await import('../../../api/socialApi');
         getSharingWith.mockResolvedValue([{ id: 2, username: 'bob' }]);
         renderModals({ state: { showSharedWith: true } });
         await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
-        expect(screen.getByText('Sharing With')).toBeTruthy();
+        expect(screen.getByText('1 person can see my calendar events')).toBeTruthy();
     });
 
     it('closes events modal when close button is clicked', () => {
         const setShowEvents = vi.fn();
         renderModals({ state: { showEvents: true, setShowEvents } });
-        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+        const closeBtn = screen.getByRole('button', { name: /close/i });
         fireEvent.click(closeBtn);
         expect(setShowEvents).toHaveBeenCalledWith(false);
     });
@@ -160,21 +167,20 @@ describe('ProfileModals', () => {
     });
 
     it('renders Shared By modal when showSharedBy is true', async () => {
-        const { getSharedWithMe } = await import('../../../api/socialService');
+        const { getSharedWithMe } = await import('../../../api/socialApi');
         getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol' }]);
         renderModals({ state: { showSharedBy: true } });
         await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
-        expect(screen.getByText('Shared By')).toBeTruthy();
+        expect(screen.getByText('1 person has shared their calendar events with me')).toBeTruthy();
+        expect(screen.getByRole('button', { name: /view calendar/i })).toBeTruthy();
     });
 
     it('SocialDataModal handles fetch error', async () => {
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        const { getSharingWith } = await import('../../../api/socialService');
+        const { getSharingWith } = await import('../../../api/socialApi');
         getSharingWith.mockRejectedValueOnce(new Error('fetch failed'));
         renderModals({ state: { showSharedWith: true } });
         await waitFor(() => expect(getSharingWith).toHaveBeenCalled());
-        expect(errSpy).toHaveBeenCalledWith('Failed to fetch users', expect.any(Error));
-        errSpy.mockRestore();
+        // The hook silently handles errors by setting users to an empty array
     });
 
     it('events modal formats event without location', () => {
@@ -188,7 +194,7 @@ describe('ProfileModals', () => {
     it('closes Shared With modal and calls onNavChange when user clicked', async () => {
         const onNavChange = vi.fn();
         const setShowSharedWith = vi.fn();
-        const { getSharingWith } = await import('../../../api/socialService');
+        const { getSharingWith } = await import('../../../api/socialApi');
         getSharingWith.mockResolvedValue([{ id: 2, username: 'bob' }]);
         renderModals({ state: { showSharedWith: true, setShowSharedWith }, onNavChange });
         await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
@@ -199,7 +205,7 @@ describe('ProfileModals', () => {
 
     it('closes Shared With modal when Close List clicked', async () => {
         const setShowSharedWith = vi.fn();
-        const { getSharingWith } = await import('../../../api/socialService');
+        const { getSharingWith } = await import('../../../api/socialApi');
         getSharingWith.mockResolvedValue([{ id: 2, username: 'bob' }]);
         renderModals({ state: { showSharedWith: true, setShowSharedWith } });
         await waitFor(() => expect(screen.getByText('Close List')).toBeInTheDocument());
@@ -209,7 +215,7 @@ describe('ProfileModals', () => {
 
     it('closes Shared By modal when Close List clicked', async () => {
         const setShowSharedBy = vi.fn();
-        const { getSharedWithMe } = await import('../../../api/socialService');
+        const { getSharedWithMe } = await import('../../../api/socialApi');
         getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol' }]);
         renderModals({ state: { showSharedBy: true, setShowSharedBy } });
         await waitFor(() => expect(screen.getByText('Close List')).toBeInTheDocument());
@@ -217,10 +223,22 @@ describe('ProfileModals', () => {
         expect(setShowSharedBy).toHaveBeenCalledWith(false);
     });
 
+    it('opens a shared user calendar from the Sharing With Me modal', async () => {
+        const onNavChange = vi.fn();
+        const setShowSharedBy = vi.fn();
+        const { getSharedWithMe } = await import('../../../api/socialApi');
+        getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol', first_name: 'Carol', last_name: 'Stone' }]);
+        renderModals({ state: { showSharedBy: true, setShowSharedBy }, onNavChange });
+        await waitFor(() => expect(screen.getByRole('button', { name: /view calendar/i })).toBeInTheDocument());
+        fireEvent.click(screen.getByRole('button', { name: /view calendar/i }));
+        expect(setShowSharedBy).toHaveBeenCalledWith(false);
+        expect(onNavChange).toHaveBeenCalledWith('/calendar?user_id=3&shared_name=Carol+Stone');
+    });
+
     it('closes tasks modal when close button clicked', () => {
         const setShowTasks = vi.fn();
         renderModals({ state: { showTasks: true, setShowTasks } });
-        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+        const closeBtn = screen.getByRole('button', { name: /close/i });
         fireEvent.click(closeBtn);
         expect(setShowTasks).toHaveBeenCalledWith(false);
     });

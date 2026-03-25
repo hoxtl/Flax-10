@@ -61,3 +61,8 @@
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
+
+.animatedItem {
+  margin-bottom: 0.625rem;
+  cursor: default;
+}

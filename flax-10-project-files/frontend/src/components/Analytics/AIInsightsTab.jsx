@@ -1,5 +1,9 @@
+/*
+ * Analytics tab for AI insights and coach chat.
+ */
+
 import { useState } from 'react';
-import analyticsService from '../../api/analyticsService';
+import analyticsService from '../../api/analyticsApi';
 import { InsightsPanel } from './InsightsPanel';
 import { ChatPanel } from './ChatPanel';
 import styles from './AIInsightsTab.module.css';

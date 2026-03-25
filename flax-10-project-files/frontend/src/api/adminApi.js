@@ -1,3 +1,7 @@
+/*
+ * Admin actions for managing users, reports, ratifications, and course changes.
+ */
+
 import { fetchApi } from "./client";
 
 function postJson(url, data) {
@@ -16,12 +20,6 @@ export const banUser = (userId, reason) =>
 
 export const unbanUser = (userId) =>
   postJson(`/admin/users/${userId}/ban/`, { action: "unban" });
-
-// ── Teacher requests ──────────────────────────────────────────────────────────
-export const fetchTeacherRequests = () => fetchApi("/admin/teacher-requests/");
-
-export const resolveTeacherRequest = (userId, decision) =>
-  postJson(`/admin/teacher-requests/${userId}/resolve/`, { decision });
 
 // ── Reported societies ────────────────────────────────────────────────────────
 export const fetchReportedSocieties = () =>
@@ -43,10 +41,6 @@ export const approveRatification = (societyId) =>
 export const rejectRatification = (societyId) =>
   postJson(`/societies/${societyId}/ratification/reject/`, {});
 
-// ── Teacher role request (for regular users) ──────────────────────────────────
-export const requestTeacherRole = (reason = "") =>
-  postJson("/request-teacher-role/", { reason });
-
 // ── Course change requests ────────────────────────────────────────────────────
 export const fetchCourseChangeRequests = () =>
   fetchApi("/admin/course-change-requests/");
@@ -62,6 +56,3 @@ export const getMyCourseChangeRequest = () =>
 
 export const cancelCourseChangeRequest = () =>
   fetchApi("/course-change/my-request/", { method: "DELETE" });
-
-export const cancelTeacherRoleRequest = () =>
-  postJson("/cancel-teacher-role/", {});

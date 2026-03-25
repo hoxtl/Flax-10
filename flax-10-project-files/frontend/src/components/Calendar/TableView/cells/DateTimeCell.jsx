@@ -1,8 +1,14 @@
+/**
+ * DateTimeCell - Date/time display and editing for table view.
+ * Shows formatted time range with inline date picker on edit.
+ */
+
 import { useState } from 'react';
 import { Pencil } from 'lucide-react';
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import { validateEventTimes } from '../../utils/dateValidation';
-import styles from '../TableView.module.css';
+import styles from './DateTimeCell.module.css';
+import commonStyles from '../TableView.module.css';
 import { isAllDay } from '../../utils/eventUtils';
 
 function formatTimeRange(event) {
@@ -51,38 +57,54 @@ function DateEditActions({ onSave, onCancel }) {
     );
 }
 
-export function DateTimeCell({ event, isReadOnly, onSave }) {
+function useDateTimeEditState(event) {
     const [isEditing, setIsEditing] = useState(false);
     const [startValue, setStartValue] = useState(toISOString(event.start_time));
     const [endValue, setEndValue] = useState(toISOString(event.end_time));
     const [error, setError] = useState(null);
+    return { isEditing, setIsEditing, startValue, setStartValue, endValue, setEndValue, error, setError };
+}
 
-    const handleClick = () => {
-        if (isReadOnly) return;
-        setStartValue(toISOString(event.start_time));
-        setEndValue(toISOString(event.end_time));
-        setError(null);
-        setIsEditing(true);
-    };
-
-    const handleSave = () => {
-        const validationError = validateEventTimes({ start_time: startValue, end_time: endValue });
-        if (validationError) { setError(validationError); return; }
-        onSave({ start_time: startValue, end_time: endValue });
-        setIsEditing(false);
-    };
-
-    if (isEditing && !isReadOnly) {
-        return <DateEditForm startValue={startValue} endValue={endValue} onStartChange={setStartValue}
-            onEndChange={setEndValue} error={error} onSave={handleSave} onCancel={() => setIsEditing(false)} />;
-    }
-
+function DateDisplayView({ event, isReadOnly, onClick, isRowHovered }) {
+    const cls = `${commonStyles.editIcon} ${isRowHovered ? commonStyles.editIconVisible : ''}`;
     return (
-        <div className={styles.dateCellContent} onClick={handleClick}>
-            <span className={styles.cellText}>{formatTimeRange(event)}</span>
-            {!isReadOnly && <Pencil size={14} className={styles.editIcon} />}
+        <div className={styles.dateCellContent} onClick={onClick}>
+            <span className={commonStyles.cellText}>{formatTimeRange(event)}</span>
+            {!isReadOnly && <Pencil size={14} className={cls} />}
         </div>
     );
+}
+
+function createClickHandler(event, isReadOnly, state) {
+    return () => {
+        if (isReadOnly) return;
+        state.setStartValue(toISOString(event.start_time));
+        state.setEndValue(toISOString(event.end_time));
+        state.setError(null);
+        state.setIsEditing(true);
+    };
+}
+
+function createSaveHandler(state, onSave) {
+    return () => {
+        const err = validateEventTimes({ start_time: state.startValue, end_time: state.endValue });
+        if (err) { state.setError(err); return; }
+        onSave({ start_time: state.startValue, end_time: state.endValue });
+        state.setIsEditing(false);
+    };
+}
+
+/** Table cell for viewing and editing event date/time with validation. */
+
+export function DateTimeCell({ event, isReadOnly, onSave, isRowHovered }) {
+    const state = useDateTimeEditState(event);
+    const handleClick = createClickHandler(event, isReadOnly, state);
+    const handleSave = createSaveHandler(state, onSave);
+    if (state.isEditing && !isReadOnly) {
+        return <DateEditForm startValue={state.startValue} endValue={state.endValue} onStartChange={state.setStartValue}
+            onEndChange={state.setEndValue} error={state.error} onSave={handleSave} onCancel={() => state.setIsEditing(false)} />;
+    }
+    return <DateDisplayView event={event} isReadOnly={isReadOnly} onClick={handleClick} isRowHovered={isRowHovered} />;
 }
 
 export { isAllDay, formatTimeRange };

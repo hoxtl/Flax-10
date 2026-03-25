@@ -1,57 +1,47 @@
-import { useState, useCallback } from 'react';
+/*
+ * Warns before running actions during a user's sleep window.
+ */
 
-export function isDuringSleepWindow(sleepTime, wakeTime, date = new Date()) {
-  const [sleepH, sleepM] = sleepTime.split(':').map(Number);
-  const [wakeH, wakeM] = wakeTime.split(':').map(Number);
+import { doesEventOverlapSleepWindow, isDuringSleepWindow } from "../sleep/sleepWarningUtils";
+import useSleepWarningState from "./useSleepWarningState";
 
-  const totalMins = date.getHours() * 60 + date.getMinutes();
-  const sleepMins = sleepH * 60 + sleepM;
-  const wakeMins = wakeH * 60 + wakeM;
+export { doesEventOverlapSleepWindow, isDuringSleepWindow };
 
-  if (sleepMins > wakeMins) {
-    return totalMins >= sleepMins || totalMins < wakeMins;
-  }
-
-  return totalMins >= sleepMins && totalMins < wakeMins;
+function getSleepWindow(settings) {
+  return {
+    sleepTime: settings?.sleep_time || "23:00",
+    wakeTime: settings?.wake_time || "07:00",
+  };
 }
 
 export function useSleepWarning(settings) {
-  const [sleepWarning, setSleepWarning] = useState(false);
-  const [pendingAction, setPendingAction] = useState(null);
+  const state = useSleepWarningState();
+  const { sleepTime, wakeTime } = getSleepWindow(settings);
+  const checkSleepAndRun = (taskDate, action) => handleSleepAction(taskDate, action, sleepTime, wakeTime, state);
+  const sleepWarningProps = createSleepWarningProps(state, sleepTime, wakeTime);
+  return { sleepWarning: state.sleepWarning, checkSleepAndRun, sleepWarningProps };
+}
 
-  const sleepTime = settings?.sleep_time || '23:00';
-  const wakeTime = settings?.wake_time || '07:00';
+function handleSleepAction(taskDate, action, sleepTime, wakeTime, state) {
+  const date = taskDate ? new Date(taskDate) : new Date();
+  if (!isDuringSleepWindow(sleepTime, wakeTime, date)) return action();
+  state.setPendingAction(() => action);
+  state.setSleepWarning(true);
+}
 
-  const checkSleepAndRun = useCallback((taskDate, action) => {
-    const date = taskDate ? new Date(taskDate) : new Date();
+function clearSleepWarning(state) {
+  state.setSleepWarning(false);
+  state.setPendingAction(null);
+}
 
-    if (isDuringSleepWindow(sleepTime, wakeTime, date)) {
-      setPendingAction(() => action);
-      setSleepWarning(true);
-    } else {
-      action();
-    }
-  }, [sleepTime, wakeTime]);
-
-  const confirmDespiteWarning = useCallback(() => {
-    pendingAction?.();
-    setSleepWarning(false);
-    setPendingAction(null);
-  }, [pendingAction]);
-
-  const dismissWarning = useCallback(() => {
-    setSleepWarning(false);
-    setPendingAction(null);
-  }, []);
-
+function createSleepWarningProps(state, sleepTime, wakeTime) {
   return {
-    sleepWarning,
-    checkSleepAndRun,
-    sleepWarningProps: {
-      sleepTime,
-      wakeTime,
-      onConfirm: confirmDespiteWarning,
-      onCancel: dismissWarning,
+    sleepTime,
+    wakeTime,
+    onConfirm: () => {
+      state.pendingAction?.();
+      clearSleepWarning(state);
     },
+    onCancel: () => clearSleepWarning(state),
   };
 }

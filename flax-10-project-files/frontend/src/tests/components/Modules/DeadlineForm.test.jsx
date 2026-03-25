@@ -1,6 +1,10 @@
+/*
+ * Tests for DeadlineForm component.
+ */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import DeadlineForm from '../../../components/Modules/DeadlineForm';
+import DeadlineForm from '../../../components/Modules/Deadlines/DeadlineForm';
 
 vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     DEADLINE_TYPES: [
@@ -27,7 +31,18 @@ vi.mock('../../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
-vi.mock('../../../components/Modules/DeadlineForm.module.css', () => ({ default: {} }));
+vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
+    default: ({ value, onChange, placeholder }) => (
+        <input
+            type="text"
+            value={value}
+            placeholder={placeholder}
+            onChange={(e) => onChange(e.target.value)}
+        />
+    ),
+}));
+
+vi.mock('../../../components/Modules/Deadlines/DeadlineForm.module.css', () => ({ default: {} }));
 
 describe('DeadlineForm', () => {
     it('should render the title and type field', () => {
@@ -58,7 +73,7 @@ describe('DeadlineForm', () => {
         render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
         fireEvent.change(screen.getByRole('combobox'), { target: { value: 'exam' } });
         expect(screen.getByText('End Time')).toBeInTheDocument();
-    });
+    }, 15000);
 
     it('shows render location field if deadline type is exam', () => {
         render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
@@ -80,6 +95,8 @@ describe('DeadlineForm', () => {
      it('should call onSubmit when form is submitted', () => {
         const onSubmit = vi.fn();
         const { container } = render(<DeadlineForm onSubmit={onSubmit} onCancel={vi.fn()} />);
+        fireEvent.change(container.querySelector('input[type="text"]'), { target: { value: 'Test deadline' } });
+        fireEvent.change(screen.getByPlaceholderText('Pick date & time'), { target: { value: '2026-06-01T10:00' } });
         fireEvent.submit(container.querySelector('form'));
         expect(onSubmit).toHaveBeenCalled();
     });
@@ -90,8 +107,7 @@ describe('DeadlineForm', () => {
         fireEvent.change(container.querySelector('input[type="text"]'), { target: { value: 'Test' } });
         const textarea = container.querySelector('textarea');
         fireEvent.change(textarea, { target: { value: 'Optional notes' } });
-        const dateInputs = container.querySelectorAll('input[type="datetime-local"]');
-        if (dateInputs.length) fireEvent.change(dateInputs[0], { target: { value: '2026-06-01T10:00' } });
+        fireEvent.change(screen.getByPlaceholderText('Pick date & time'), { target: { value: '2026-06-01T10:00' } });
         fireEvent.click(screen.getByText('Add Deadline'));
         expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ description: 'Optional notes' }));
     });

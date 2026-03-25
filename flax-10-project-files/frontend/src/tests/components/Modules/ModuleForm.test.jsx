@@ -1,3 +1,7 @@
+/*
+ * Tests for ModuleForm component.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
@@ -16,7 +20,7 @@ vi.mock('../../../components/Modules/utils/moduleHelpers', () => ({
     updateForm: vi.fn((field, value, form) => ({ ...form, [field]: value })),
 }));
 
-import ModuleForm from '../../../components/Modules/ModuleForm';
+import ModuleForm from '../../../components/Modules/Modules/ModuleForm';
 import { createModule, updateModule } from '../../../api/moduleApi';
 import { validateForm } from '../../../components/Modules/utils/moduleHelpers';
 
@@ -93,5 +97,38 @@ describe('ModuleForm', () => {
         const form = document.querySelector('form');
         fireEvent.submit(form);
         await waitFor(() => expect(screen.getByText('Server error')).toBeTruthy());
+    });
+
+    it('renders editing mode with Edit Module heading and locked fields', () => {
+        render(<ModuleForm module={defaultModule} onSuccess={vi.fn()} onCancel={vi.fn()} />);
+        expect(screen.getByText('Edit Module')).toBeTruthy();
+        expect(screen.getByText('Update Module')).toBeTruthy();
+    });
+
+    it('hides header when hideHeader=true', () => {
+        render(<ModuleForm module={null} onSuccess={vi.fn()} onCancel={vi.fn()} hideHeader />);
+        expect(screen.queryByText('Create New Module')).not.toBeInTheDocument();
+    });
+
+    it('clears field error when field changes', async () => {
+        validateForm.mockReturnValueOnce({ module_code: 'Required' });
+        render(<ModuleForm module={null} onSuccess={vi.fn()} onCancel={vi.fn()} />);
+        const form = document.querySelector('form');
+        fireEvent.submit(form);
+        await waitFor(() => expect(screen.getByText('Required')).toBeTruthy());
+
+        const moduleCodeInput = document.querySelector('input[type="text"]');
+        if (moduleCodeInput) {
+            fireEvent.change(moduleCodeInput, { target: { value: 'CS101' } });
+            await waitFor(() => expect(screen.queryByText('Required')).not.toBeInTheDocument());
+        }
+    });
+
+    it('toggles recurring checkbox', () => {
+        render(<ModuleForm module={null} onSuccess={vi.fn()} onCancel={vi.fn()} />);
+        const checkbox = screen.getByRole('checkbox');
+        const initialChecked = checkbox.checked;
+        fireEvent.click(checkbox);
+        expect(checkbox.checked).toBe(!initialChecked);
     });
 });

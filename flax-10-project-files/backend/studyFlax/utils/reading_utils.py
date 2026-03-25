@@ -8,17 +8,36 @@ from studyFlax.models.tasks.task_model import Task
 DEFAULT_PAGE_TIME = 2.0
 MINUTES_PER_BLOCK = 25
 
-def get_avg_time_per_page(user):
-    reading_tasks = Task.objects.filter(
+def _completed_reading_tasks(user):
+    return Task.objects.filter(
         user=user, completed=True,
         reading__isnull=False, time_spent_minutes__gt=0
     ).select_related('reading')
-    manual_tasks = Task.objects.filter(
+
+def _completed_manual_page_tasks(user):
+    return Task.objects.filter(
         user=user, completed=True,
         reading__isnull=True, page_count__isnull=False, time_spent_minutes__gt=0,
     )
-    total_pages = sum(task.reading.page_count() for task in reading_tasks) + sum(task.page_count for task in manual_tasks)
-    total_minutes = sum(task.time_spent_minutes for task in reading_tasks) + sum(task.time_spent_minutes for task in manual_tasks)
+
+def _sum_reading_task_pages(tasks):
+    return sum(task.reading.page_count() for task in tasks)
+
+def _sum_task_pages(tasks):
+    return sum(task.page_count for task in tasks)
+
+def _sum_task_minutes(tasks):
+    return sum(task.time_spent_minutes for task in tasks)
+
+def _totals_for_avg_page_time(user):
+    reading_tasks = _completed_reading_tasks(user)
+    manual_tasks = _completed_manual_page_tasks(user)
+    total_pages = _sum_reading_task_pages(reading_tasks) + _sum_task_pages(manual_tasks)
+    total_minutes = _sum_task_minutes(reading_tasks) + _sum_task_minutes(manual_tasks)
+    return total_pages, total_minutes
+
+def get_avg_time_per_page(user):
+    total_pages, total_minutes = _totals_for_avg_page_time(user)
     if total_pages == 0:
         return DEFAULT_PAGE_TIME
     return total_minutes / total_pages

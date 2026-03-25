@@ -1,0 +1,253 @@
+/*
+ * Timer page styles chunk.
+ */
+.leaveNudgeProgressCard {
+    display: grid;
+    gap: 0.32rem;
+    padding: 0.6rem 0.68rem 0.54rem;
+    border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--surface-card) 74%, var(--surface-page));
+    opacity: 0.9;
+}
+
+.leaveNudgeProgressTrack {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 12%, var(--border));
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.leaveNudgeProgressFill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--color-sage-primary, #8BA68F), color-mix(in srgb, var(--color-sage-primary, #8BA68F) 75%, #4ade80));
+    opacity: 0.96;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-sage-primary, #8BA68F) 20%, transparent), 0 6px 14px color-mix(in srgb, var(--color-sage-primary, #8BA68F) 18%, transparent);
+}
+
+.leaveNudgeProgressMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.leaveNudgeProgressMeta span:last-child {
+    color: color-mix(in srgb, var(--focus-accent) 84%, #000);
+    font-style: italic;
+    font-weight: 700;
+}
+
+.leaveNudgeActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.52rem;
+    justify-content: stretch;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    padding-top: 0.62rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+}
+
+.leaveNudgeStayBtn,
+.leaveNudgeBreakBtn,
+.leaveNudgeEndBtn {
+    min-width: 0;
+    width: 100%;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.leaveNudgeBreakBtn {
+    background: color-mix(in srgb, var(--primary) 16%, var(--surface-card)) !important;
+    border-color: color-mix(in srgb, var(--primary) 32%, transparent) !important;
+    color: var(--primary-strong) !important;
+    width: 100% !important;
+    margin-top: 0.32rem !important;
+}
+
+.leaveNudgeBreakBtn:hover {
+    background: color-mix(in srgb, var(--primary) 24%, var(--surface-card)) !important;
+}
+
+.leaveNudgeEndBtn {
+    color: color-mix(in srgb, var(--focus-accent) 84%, #000) !important;
+    border-color: color-mix(in srgb, var(--focus-accent) 36%, var(--border)) !important;
+    background: color-mix(in srgb, var(--surface-card) 94%, var(--hover)) !important;
+}
+
+@media (max-width: 760px) {
+    .leaveNudgeActions {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* End session modal: solid recap-first decision card */
+.endSessionBackdrop {
+    background: rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+}
+
+.endSessionModal {
+    background: var(--surface-card) !important;
+    border: 2px solid var(--primary-strong) !important;
+    box-shadow: var(--modal-shadow) !important;
+}
+
+.endSessionContent {
+    padding: 0 !important;
+}
+
+.endSessionBody {
+    display: grid;
+    gap: 0.88rem;
+    padding: 2rem;
+}
+
+.endSessionHead {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.8rem;
+}
+
+.endSessionTitle {
+    margin: 0;
+    font-size: 1.24rem;
+    line-height: 1.16;
+    letter-spacing: -0.015em;
+    color: var(--text);
+    font-weight: 800;
+}
+
+.endSessionCloseBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+    background: var(--surface-card);
+    color: var(--muted);
+    font-size: 1.56rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.endSessionCloseBtn:hover {
+    background: color-mix(in srgb, var(--hover) 80%, var(--surface-card));
+    color: var(--text-secondary);
+}
+
+.endSessionRecapLabel {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 800;
+    color: var(--text-secondary);
+}
+
+.endSessionRecapText {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    line-height: 1.48;
+}
+
+.endSessionProgressCard {
+    border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--surface-card) 74%, var(--surface-page));
+    padding: 0.62rem 0.72rem 0.58rem;
+    display: grid;
+    gap: 0.34rem;
+    opacity: 0.92;
+}
+
+.endSessionProgressTrack {
+    width: 100%;
+    height: 9px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--border) 92%, transparent);
+}
+
+.endSessionProgressFill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-strong) 100%);
+    opacity: 0.76;
+}
+
+.endSessionProgressMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+.endSessionActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.58rem;
+    padding-top: 0.62rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+}
+
+.endSessionKeepBtn,
+.endSessionQuitBtn {
+    min-width: 156px;
+}
+
+.endSessionKeepBtn {
+    background: var(--primary-strong) !important;
+    border-color: var(--primary-strong) !important;
+    color: var(--color-on-primary, #fff) !important;
+}
+
+.endSessionQuitBtn {
+    background: var(--surface-card) !important;
+    border-color: color-mix(in srgb, var(--border) 90%, transparent) !important;
+    color: var(--text-secondary) !important;
+}
+
+.presetListItemWrap {
+    width: 100%;
+    position: relative;
+}
+
+.presetListItem {
+    width: 100%;
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.18rem;
+    padding: 0.38rem 0.54rem 0.38rem 0.6rem;
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+    background: var(--surface-card);
+    color: var(--text-secondary);
+    text-align: left;
+    transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.presetListItem:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--hover) 75%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--primary) 34%, transparent);
+    transform: translateY(-1px);
+}

@@ -33,15 +33,19 @@ describe('TaskCompletionContext', () => {
         await waitFor(() => expect(screen.getAllByText('Great work!').length).toBeGreaterThan(0));
     });
 
-    it('toast disappears after 2 seconds', () => {
+    it('toast disappears after 2 seconds', async () => {
         vi.useFakeTimers();
         const wrapper = ({ children }) => <TaskCompletionProvider>{children}</TaskCompletionProvider>;
         const { result } = renderHook(() => useTaskCompletion(), { wrapper });
         act(() => { result.current.showCompletionToast('Done!'); });
         expect(screen.queryByText('Done!')).toBeTruthy();
-        act(() => { vi.advanceTimersByTime(2001); });
-        expect(screen.queryByText('Done!')).toBeNull();
+        await act(async () => {
+            vi.advanceTimersByTime(2200);
+            vi.runAllTimers();
+        });
+        // Restore real timers before waitFor so DOM polling can work
         vi.useRealTimers();
+        await waitFor(() => expect(screen.queryByText('Done!')).toBeNull(), { timeout: 3000 });
     });
 
     it('plays sound for non-routine tasks', () => {

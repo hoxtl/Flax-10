@@ -18,7 +18,7 @@ describe('usePopupPosition', () => {
     it('returns anchored position below anchor when space is sufficient', () => {
         const anchorRect = { top: 100, bottom: 150, left: 200 };
         const pos = usePopupPosition(anchorRect);
-        // spaceBelow = 800 - 150 = 650 > 250, so opens below
+        // spaceBelow is 650, which is greater than 250, so the popup opens below.
         expect(pos.top).toBe('158px'); // 150 + 8 margin
         expect(pos.transform).toBe('none');
         expect(pos.position).toBe('fixed');
@@ -27,7 +27,7 @@ describe('usePopupPosition', () => {
     it('returns position above anchor when space below is insufficient', () => {
         const anchorRect = { top: 650, bottom: 700, left: 200 };
         const pos = usePopupPosition(anchorRect);
-        // spaceBelow = 800 - 700 = 100 < 250, spaceAbove = 650 > 100 → opens above
+        // spaceBelow is 100 and spaceAbove is 650, so the popup opens above.
         expect(pos.top).toBe('642px'); // 650 - 8 margin
         expect(pos.transform).toBe('translateY(-100%)');
     });
