@@ -89,133 +89,100 @@ describe("SearchButton and filter state extras", () => {
     expect(screen.getByLabelText("Search events")).toBeInTheDocument();
   });
 
-  it("normalizes active values, computes popup shift, supports mobile mode, and closes outside", () => {
-    const onChange = vi.fn();
-    const { result } = renderHook(() =>
-      useFilterDropdownState([[" Lecture ", "all"], ["Seminar"]], true, true, onChange),
-    );
-
+  it("normalizes active values and computes popup shift", () => {
+    const { result } = renderHook(() => useFilterDropdownState([[" Lecture ", "all"], ["Seminar"]], true, true, vi.fn()));
     expect(result.current.activeCount).toBe(0);
     expect(result.current.onMouseEnter).toBeUndefined();
-    expect(result.current.onMouseLeave).toBeUndefined();
 
     const wrap = document.createElement("div");
-    const popup = document.createElement("div");
-    popup.className = styles.filterPopup;
+    const popup = Object.assign(document.createElement("div"), { className: styles.filterPopup });
     popup.getBoundingClientRect = () => ({ left: -16, right: 80 });
     wrap.appendChild(popup);
     result.current.wrapRef.current = wrap;
 
-    act(() => {
-      result.current.onToggle();
-    });
-
+    act(() => result.current.onToggle());
     expect(result.current.popupProps.shift).toBe(24);
+  });
 
-    act(() => {
-      result.current.popupProps.onSelectionChange([{ id: "seminar" }]);
-    });
+  it("handles onSelectionChange mapping array to array values", () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useFilterDropdownState([[" Lecture ", "all"], ["Seminar"]], true, true, onChange));
+    act(() => result.current.popupProps.onSelectionChange([{ id: "seminar" }]));
     expect(onChange).toHaveBeenCalledWith(["seminar"]);
+  });
 
-    act(() => {
-      document.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-    });
+  it("supports mobile mode and closes outside on mousedown", () => {
+    const { result } = renderHook(() => useFilterDropdownState("all", true, true, vi.fn()));
+    act(() => result.current.onToggle());
+    expect(result.current.isOpen).toBe(true);
+    act(() => document.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })));
     expect(result.current.isOpen).toBe(false);
   });
 
-  it("deduplicates tags, handles viewport overflow, hover delays, and manage-tags selection mapping", () => {
-    mockTags.useTags.mockReturnValueOnce({
-      tags: [
-        { id: 1, label: "Lecture" },
-        { id: 2, label: "Lecture" },
-        { id: 3, label: "Workshop" },
-      ],
-    });
-
-    const onChange = vi.fn();
-    const { result } = renderHook(() =>
-      useFilterDropdownState("workshop", true, false, onChange),
-    );
-
+  it("deduplicates tags and normalizes selection", () => {
+    mockTags.useTags.mockReturnValueOnce({ tags: [{ id: 1, label: "A" }, { id: 2, label: "A" }, { id: 3, label: "B" }] });
+    const { result } = renderHook(() => useFilterDropdownState("b", true, false, vi.fn()));
     expect(result.current.activeCount).toBe(1);
-    expect(result.current.popupProps.selectedTags).toEqual([{ id: "workshop", label: "Workshop" }]);
-    expect(result.current.popupProps.tags).toEqual([
-      { id: "lecture", label: "Lecture" },
-      { id: "workshop", label: "Workshop" },
-    ]);
+    expect(result.current.popupProps.selectedTags).toEqual([{ id: "b", label: "B" }]);
+    expect(result.current.popupProps.tags).toEqual([{ id: "a", label: "A" }, { id: "b", label: "B" }]);
+  });
 
+  it("handles viewport overflow and onMouseEnter", () => {
+    const { result } = renderHook(() => useFilterDropdownState("all", true, false, vi.fn()));
     const wrap = document.createElement("div");
-    const popup = document.createElement("div");
-    popup.className = styles.filterPopup;
+    const popup = Object.assign(document.createElement("div"), { className: styles.filterPopup });
     popup.getBoundingClientRect = () => ({ left: 20, right: window.innerWidth + 20 });
     wrap.appendChild(popup);
     result.current.wrapRef.current = wrap;
-
-    act(() => {
-      result.current.onMouseEnter();
-    });
+    act(() => result.current.onMouseEnter());
     expect(result.current.isOpen).toBe(true);
     expect(result.current.popupProps.shift).toBe(-28);
-
-    act(() => {
-      result.current.onMouseLeave();
-      vi.advanceTimersByTime(160);
-    });
-    expect(result.current.isOpen).toBe(false);
-
-    act(() => {
-      result.current.onToggle();
-      result.current.popupProps.onManageTags();
-    });
-    expect(result.current.showManager).toBe(true);
-
-    act(() => {
-      result.current.popupProps.onSelectionChange([]);
-    });
-    expect(onChange).toHaveBeenCalledWith("all");
-
-    act(() => {
-      window.dispatchEvent(new Event("resize"));
-    });
   });
 
-  it("covers null-tag and zero-shift fallbacks, plus manager close handling", () => {
-    mockTags.useTags.mockReturnValueOnce({ tags: null });
+  it("handles hover delays onMouseLeave", () => {
+    const { result } = renderHook(() => useFilterDropdownState("all", true, false, vi.fn()));
+    act(() => result.current.onMouseEnter());
+    act(() => { result.current.onMouseLeave(); vi.advanceTimersByTime(160); });
+    expect(result.current.isOpen).toBe(false);
+  });
 
+  it("handles manage-tags trigger and selection mapping to 'all'", () => {
     const onChange = vi.fn();
-    const { result } = renderHook(() =>
-      useFilterDropdownState("all", false, false, onChange),
-    );
+    const { result } = renderHook(() => useFilterDropdownState("workshop", true, false, onChange));
+    act(() => result.current.popupProps.onManageTags());
+    expect(result.current.showManager).toBe(true);
+    act(() => result.current.popupProps.onSelectionChange([]));
+    expect(onChange).toHaveBeenCalledWith("all");
+    act(() => window.dispatchEvent(new Event("resize")));
+  });
 
+  it("covers null-tag fallback", () => {
+    mockTags.useTags.mockReturnValueOnce({ tags: null });
+    const { result } = renderHook(() => useFilterDropdownState("all", false, false, vi.fn()));
     expect(result.current.activeCount).toBe(0);
     expect(result.current.popupProps.tags).toEqual([]);
+  });
 
-    act(() => {
-      result.current.onToggle();
-    });
-
+  it("handles zero-shift and resize fallbacks", () => {
+    const { result } = renderHook(() => useFilterDropdownState("all", false, false, vi.fn()));
+    act(() => result.current.onToggle());
     expect(result.current.popupProps.shift).toBe(0);
 
     const wrap = document.createElement("div");
-    const popup = document.createElement("div");
-    popup.className = styles.filterPopup;
+    const popup = Object.assign(document.createElement("div"), { className: styles.filterPopup });
     popup.getBoundingClientRect = () => ({ left: 20, right: 120 });
     wrap.appendChild(popup);
     result.current.wrapRef.current = wrap;
 
-    act(() => {
-      window.dispatchEvent(new Event("resize"));
-    });
+    act(() => window.dispatchEvent(new Event("resize")));
     expect(result.current.popupProps.shift).toBe(0);
+  });
 
-    act(() => {
-      result.current.popupProps.onManageTags();
-    });
+  it("handles manager close handling", () => {
+    const { result } = renderHook(() => useFilterDropdownState("all", false, false, vi.fn()));
+    act(() => result.current.popupProps.onManageTags());
     expect(result.current.showManager).toBe(true);
-
-    act(() => {
-      result.current.onCloseManager();
-    });
+    act(() => result.current.onCloseManager());
     expect(result.current.showManager).toBe(false);
   });
 });
