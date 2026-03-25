@@ -66,7 +66,7 @@ class SocietyListSerialiser(HasReportedMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Society
-        fields = ['id', 'name', 'bio', 'image', 'cover_image', 'categories', 'is_ratified', 'member_count', 'admin_emails', 'has_reported']
+        fields = ['id', 'name', 'bio', 'location', 'image', 'cover_image', 'categories', 'is_ratified', 'member_count', 'admin_emails', 'has_reported']
 
     def get_cover_image(self, obj):
         if obj.image:
@@ -154,6 +154,6 @@ class SocietyDetailSerialiser(HasReportedMixin, serializers.ModelSerializer):
     class Meta:
         model = Society
         fields = [
-            'id', 'name', 'bio', 'about', 'image', 'categories', 'is_ratified', 'ratification_status',
+            'id', 'name', 'bio', 'about', 'location', 'image', 'categories', 'is_ratified', 'ratification_status',
             'date_created', 'member_count', 'tags', 'images', 'announcements', 'events', 'admin_emails', 'has_reported'
         ]

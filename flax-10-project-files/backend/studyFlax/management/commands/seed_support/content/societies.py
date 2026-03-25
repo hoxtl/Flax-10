@@ -34,6 +34,7 @@ def _create_society_from_config(data, index, total):
     defaults = {
         'bio': data['bio'], 'about': data['about'],
         'categories': data.get('categories', []),
+        'location': data.get('location', ''),
         'ratification_status': status, 'is_ratified': (status == 'approved'),
     }
     if data.get('image'):

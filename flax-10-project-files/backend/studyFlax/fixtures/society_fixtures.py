@@ -12,7 +12,8 @@ VALID_CATEGORIES = [
     'social', 'religious', 'volunteering', 'media'
 ]
 
-# Images per category, with gaming merged into social, music and dance into arts, and professional into academic
+# Images per category, with gaming merged into social, music and dance into arts,
+# and professional into academic
 CATEGORY_IMAGES = {
     'sports': ['sports1.jpg', 'sports2.jpg'],
     'cultural': ['cultural1.jpg', 'cultural2.jpg'],
@@ -58,35 +59,11 @@ EVENT_TEMPLATES = {
         ('Trip Planning', 'Plan upcoming society trips.', 17, 60, None, None),
         ('End of Term Party', 'Celebrate the end of term.', 20, 180, None, 5),
     ],
-    'gaming': [
-        ('Weekly Gaming', 'Regular gaming session.', 18, 180, 'weekly', 4),
-        ('Tournament', 'Competitive tournament with prizes.', 14, 240, None, 5),
-        ('Casual Play', 'Drop-in casual gaming.', 19, 120, 'weekly', 1),
-        ('LAN Party', 'Bring your setup for a LAN event.', 12, 480, None, 5),
-    ],
-    'music': [
-        ('Weekly Rehearsal', 'Regular practice session.', 18, 120, 'weekly', 2),
-        ('Concert', 'End of term performance.', 19, 120, None, 5),
-        ('Jam Session', 'Informal music making.', 17, 120, 'weekly', 4),
-        ('Open Mic', 'Perform for fellow students.', 19, 150, None, 4),
-    ],
-    'dance': [
-        ('Weekly Practice', 'Learn and practice choreography.', 18, 90, 'weekly', 2),
-        ('Showcase', 'Performance showcase.', 19, 120, None, 5),
-        ('Beginner Class', 'Introduction for new dancers.', 17, 60, 'weekly', 0),
-        ('Social Dance', 'Practice with partners.', 19, 120, 'biweekly', 4),
-    ],
     'religious': [
         ('Weekly Meeting', 'Regular gathering and discussion.', 18, 90, 'weekly', 3),
         ('Study Circle', 'Scripture study and reflection.', 17, 60, 'weekly', 1),
         ('Community Event', 'Open event for all students.', 14, 120, None, 5),
         ('Charity Drive', 'Fundraising for a good cause.', 10, 240, None, 5),
-    ],
-    'professional': [
-        ('Weekly Workshop', 'Career skills development.', 18, 90, 'weekly', 2),
-        ('Networking Event', 'Meet industry professionals.', 18, 150, None, 3),
-        ('CV Workshop', 'Get feedback on your CV.', 14, 120, None, 5),
-        ('Mock Interviews', 'Practice interview skills.', 17, 120, 'biweekly', 4),
     ],
     'volunteering': [
         ('Weekly Volunteering', 'Regular volunteering shift.', 10, 180, 'weekly', 5),
@@ -102,218 +79,572 @@ EVENT_TEMPLATES = {
     ],
 }
 
+
 def get_events_for_category(category):
     return EVENT_TEMPLATES.get(category, EVENT_TEMPLATES['social'])
 
-# Society data with categories
-# Format: (name, bio, about, category, tags)
-SOCIETY_DATA = [
-    # Sports (14)
-    ('Football Club', 'The beautiful game at KCL.', 'Weekly training and matches.', 'sports', ['Training', 'Match', 'Social']),
-    ('Basketball Society', 'Hoops for all skill levels.', 'Casual and competitive basketball.', 'sports', ['Training', 'Tournament', 'Social']),
-    ('Tennis Club', 'Serve, volley, and have fun.', 'Sessions for all levels.', 'sports', ['Training', 'Match', 'Social']),
-    ('Yoga Society', 'Mind, body, and breath.', 'Weekly yoga sessions.', 'sports', ['Class', 'Workshop', 'Social']),
-    ('Hiking Society', 'Explore the outdoors.', 'Regular hikes and trips.', 'sports', ['Hike', 'Trip', 'Social']),
-    ('Swimming Club', 'Make a splash.', 'Pool sessions and competitions.', 'sports', ['Training', 'Competition', 'Social']),
-    ('Rugby Club', 'Try something new.', 'Training for all experience levels.', 'sports', ['Training', 'Match', 'Social']),
-    ('Badminton Society', 'Shuttlecock and smash.', 'Weekly sessions for all levels.', 'sports', ['Training', 'Tournament', 'Social']),
-    ('Volleyball Club', 'Spike and serve.', 'Beach and indoor volleyball.', 'sports', ['Training', 'Match', 'Social']),
-    ('Cricket Society', 'Bat and ball at KCL.', 'Training and matches.', 'sports', ['Training', 'Match', 'Social']),
-    ('Boxing Club', 'Train like a champion.', 'Fitness and technique sessions.', 'sports', ['Training', 'Fitness', 'Social']),
-    ('Cycling Society', 'Two wheels, endless roads.', 'Group rides and tours.', 'sports', ['Ride', 'Trip', 'Social']),
-    ('Climbing Club', 'Reach new heights.', 'Indoor and outdoor climbing.', 'sports', ['Training', 'Trip', 'Social']),
-    ('Athletics Club', 'Track and field.', 'Running, jumping, throwing.', 'sports', ['Training', 'Competition', 'Social']),
-
-    # Cultural (10)
-    ('Chinese Society', 'Celebrating Chinese culture.', 'Events and language exchange.', 'cultural', ['Cultural', 'Social', 'Festival']),
-    ('African Caribbean Society', 'Celebrating heritage.', 'Cultural events and discussions.', 'cultural', ['Cultural', 'Social', 'Performance']),
-    ('Indian Society', 'Indian culture and traditions.', 'Diwali, Bollywood nights, and more.', 'cultural', ['Cultural', 'Festival', 'Social']),
-    ('Korean Society', 'Korean culture at KCL.', 'K-culture events and socials.', 'cultural', ['Cultural', 'Social', 'Festival']),
-    ('Latin American Society', 'Celebrating Latin culture.', 'Dance, food, and music.', 'cultural', ['Cultural', 'Social', 'Performance']),
-    ('Japanese Society', 'Japanese culture and language.', 'Anime, food, and traditions.', 'cultural', ['Cultural', 'Social', 'Festival']),
-    ('Middle Eastern Society', 'Celebrating Middle Eastern heritage.', 'Food, music, and culture.', 'cultural', ['Cultural', 'Social', 'Performance']),
-    ('European Society', 'European cultures united.', 'Exchange and celebration.', 'cultural', ['Cultural', 'Social', 'Festival']),
-    ('South Asian Society', 'South Asian heritage.', 'Festivals and community.', 'cultural', ['Cultural', 'Festival', 'Social']),
-    ('Southeast Asian Society', 'Southeast Asian culture.', 'Food and traditions.', 'cultural', ['Cultural', 'Social', 'Festival']),
-
-    # Academic (10)
-    ('Tech Society', 'Technology and innovation.', 'Hackathons and workshops.', 'academic', ['Workshop', 'Hackathon', 'Networking']),
-    ('Literature Society', 'Exploring books.', 'Book club and writing workshops.', 'academic', ['Book Club', 'Workshop', 'Reading']),
-    ('Debate Society', 'Argue with style.', 'Weekly debates and competitions.', 'academic', ['Debate', 'Workshop', 'Competition']),
-    ('MedSoc', 'Medical students society.', 'Academic and social events.', 'academic', ['Workshop', 'Social', 'Networking']),
-    ('Engineering Society', 'Building the future.', 'Projects and industry talks.', 'academic', ['Workshop', 'Project', 'Networking']),
-    ('Physics Society', 'Exploring the universe.', 'Lectures and stargazing.', 'academic', ['Lecture', 'Workshop', 'Social']),
-    ('Chemistry Society', 'Molecules and reactions.', 'Lab demos and events.', 'academic', ['Workshop', 'Demo', 'Social']),
-    ('Biology Society', 'Life sciences at KCL.', 'Field trips and talks.', 'academic', ['Trip', 'Lecture', 'Social']),
-    ('Psychology Society', 'Understanding the mind.', 'Talks and research events.', 'academic', ['Lecture', 'Workshop', 'Social']),
-    ('History Society', 'Learning from the past.', 'Talks and museum trips.', 'academic', ['Lecture', 'Trip', 'Social']),
-
-    # Arts (8)
-    ('Art Club', 'Creative expression.', 'Art projects and exhibitions.', 'arts', ['Exhibition', 'Workshop', 'Social']),
-    ('Photography Society', 'Through the lens.', 'Photo walks and exhibitions.', 'arts', ['Photo Walk', 'Exhibition', 'Workshop']),
-    ('Drama Society', 'Theatre and performance.', 'Produce plays and shows.', 'arts', ['Rehearsal', 'Performance', 'Social']),
-    ('Painting Society', 'Colours on canvas.', 'Painting sessions and exhibitions.', 'arts', ['Workshop', 'Exhibition', 'Social']),
-    ('Sculpture Club', '3D art creation.', 'Sculpting workshops.', 'arts', ['Workshop', 'Exhibition', 'Social']),
-    ('Digital Art Society', 'Art meets technology.', 'Digital creation workshops.', 'arts', ['Workshop', 'Exhibition', 'Social']),
-    ('Fashion Society', 'Style and design.', 'Fashion shows and workshops.', 'arts', ['Show', 'Workshop', 'Social']),
-    ('Creative Writing Society', 'Words and stories.', 'Writing workshops and readings.', 'arts', ['Workshop', 'Reading', 'Social']),
-
-    # Gaming (8)
-    ('Board Game Society', 'Fun and games.', 'Weekly game nights.', 'gaming', ['Game Night', 'Tournament', 'Social']),
-    ('Esports Society', 'Competitive gaming.', 'Tournaments and teams.', 'gaming', ['Tournament', 'Social', 'Training']),
-    ('Chess Club', 'Strategic thinking.', 'Learn and compete.', 'gaming', ['Tournament', 'Training', 'Social']),
-    ('Poker Society', 'Cards and strategy.', 'Poker nights and tournaments.', 'gaming', ['Game Night', 'Tournament', 'Social']),
-    ('Trading Card Society', 'Collect and compete.', 'TCG tournaments and trading.', 'gaming', ['Tournament', 'Trading', 'Social']),
-    ('RPG Society', 'Role-playing adventures.', 'D&D and more.', 'gaming', ['Campaign', 'Social', 'Workshop']),
-    ('Puzzle Society', 'Brain teasers and challenges.', 'Puzzle solving events.', 'gaming', ['Competition', 'Social', 'Workshop']),
-    ('Retro Gaming Club', 'Classic games revived.', 'Retro gaming sessions.', 'gaming', ['Game Night', 'Social', 'Tournament']),
-
-    # Music (8)
-    ('A Cappella Group', 'Vocal harmony.', 'Arrange and perform.', 'music', ['Rehearsal', 'Performance', 'Social']),
-    ('Jazz Band', 'Swing and bebop.', 'Jam sessions and gigs.', 'music', ['Jam Session', 'Performance', 'Workshop']),
-    ('Orchestra', 'Classical music.', 'Rehearsals and concerts.', 'music', ['Rehearsal', 'Concert', 'Social']),
-    ('DJ Society', 'Beats and mixing.', 'Learn to DJ and perform.', 'music', ['Workshop', 'Performance', 'Social']),
-    ('Rock Band Society', 'Rock and roll.', 'Band sessions and gigs.', 'music', ['Rehearsal', 'Performance', 'Social']),
-    ('Choir', 'Singing together.', 'Choral performances.', 'music', ['Rehearsal', 'Concert', 'Social']),
-    ('Guitar Society', 'Six strings of fun.', 'Learn and jam.', 'music', ['Workshop', 'Jam Session', 'Social']),
-    ('Electronic Music Society', 'Beats and synths.', 'Production workshops.', 'music', ['Workshop', 'Performance', 'Social']),
-
-    # Dance (4)
-    ('K-Pop Dance Society', 'K-Pop choreography.', 'Learn the latest moves.', 'dance', ['Practice', 'Performance', 'Social']),
-    ('Salsa Society', 'Latin dance.', 'Salsa and bachata.', 'dance', ['Beginner', 'Social', 'Workshop']),
-    ('Hip Hop Dance', 'Street dance.', 'Classes and battles.', 'dance', ['Practice', 'Battle', 'Social']),
-    ('Ballroom Dancing', 'Elegant partner dance.', 'Learn classic dances.', 'dance', ['Class', 'Social', 'Competition']),
-
-    # Religious (4)
-    ('Islamic Society', 'Faith and community.', 'Prayer and events.', 'religious', ['Lecture', 'Social', 'Community']),
-    ('Christian Union', 'Faith and fellowship.', 'Meetings and outreach.', 'religious', ['Meeting', 'Study', 'Social']),
-    ('Jewish Society', 'Jewish life at KCL.', 'Cultural and religious events.', 'religious', ['Cultural', 'Social', 'Festival']),
-    ('Hindu Society', 'Hindu traditions.', 'Festivals and gatherings.', 'religious', ['Cultural', 'Festival', 'Social']),
-
-    # Social (10)
-    ('Comedy Society', 'Laughs and good times.', 'Stand-up and improv.', 'social', ['Open Mic', 'Workshop', 'Social']),
-    ('Wine Society', 'Fine wines.', 'Tastings and trips.', 'social', ['Tasting', 'Social', 'Trip']),
-    ('Cooking Society', 'Culinary adventures.', 'Cook and eat together.', 'social', ['Workshop', 'Social', 'Tasting']),
-    ('Coffee Society', 'Coffee appreciation.', 'Tastings and cafe trips.', 'social', ['Tasting', 'Social', 'Trip']),
-    ('Tea Society', 'Tea appreciation.', 'Tastings and ceremonies.', 'social', ['Tasting', 'Social', 'Workshop']),
-    ('Baking Society', 'Sweet treats.', 'Bake sales and workshops.', 'social', ['Workshop', 'Social', 'Bake Sale']),
-    ('Travel Society', 'Explore the world.', 'Trip planning and adventures.', 'social', ['Trip', 'Social', 'Planning']),
-    ('Book Club', 'Reading together.', 'Monthly book discussions.', 'social', ['Discussion', 'Social', 'Reading']),
-    ('Quiz Society', 'Test your knowledge.', 'Weekly pub quizzes.', 'social', ['Quiz', 'Social', 'Competition']),
-    ('Networking Society', 'Make connections.', 'Networking events.', 'social', ['Networking', 'Social', 'Workshop']),
-
-    # Professional (8)
-    ('Investment Society', 'Markets and trading.', 'Workshops and competitions.', 'professional', ['Workshop', 'Competition', 'Networking']),
-    ('Law Society', 'For future lawyers.', 'Mooting and networking.', 'professional', ['Mooting', 'Networking', 'Workshop']),
-    ('Consulting Society', 'Business strategy.', 'Case competitions and talks.', 'professional', ['Competition', 'Workshop', 'Networking']),
-    ('Entrepreneurship Society', 'Start something new.', 'Pitch events and mentorship.', 'professional', ['Pitch', 'Workshop', 'Networking']),
-    ('Marketing Society', 'Brand and promote.', 'Marketing workshops and events.', 'professional', ['Workshop', 'Competition', 'Networking']),
-    ('Finance Society', 'Money matters.', 'Industry talks and workshops.', 'professional', ['Workshop', 'Networking', 'Competition']),
-    ('Data Science Society', 'Insights from data.', 'Workshops and projects.', 'professional', ['Workshop', 'Project', 'Networking']),
-    ('Product Management Society', 'Building products.', 'PM workshops and case studies.', 'professional', ['Workshop', 'Case Study', 'Networking']),
-
-    # Volunteering (8)
-    ('Volunteering Society', 'Give back.', 'Regular volunteering.', 'volunteering', ['Volunteering', 'Social', 'Community']),
-    ('Environmental Society', 'Sustainability.', 'Climate action and campaigns.', 'volunteering', ['Campaign', 'Workshop', 'Social']),
-    ('RAG Society', 'Raise and Give.', 'Charity fundraising.', 'volunteering', ['Fundraiser', 'Social', 'Community']),
-    ('Tutoring Society', 'Help others learn.', 'Peer tutoring sessions.', 'volunteering', ['Tutoring', 'Social', 'Community']),
-    ('Homeless Outreach Society', 'Supporting the homeless.', 'Outreach and fundraising.', 'volunteering', ['Outreach', 'Fundraiser', 'Community']),
-    ('Animal Welfare Society', 'Helping animals.', 'Shelter visits and fundraising.', 'volunteering', ['Volunteering', 'Fundraiser', 'Social']),
-    ('Refugee Support Society', 'Supporting refugees.', 'Language help and integration.', 'volunteering', ['Volunteering', 'Community', 'Social']),
-    ('Mental Health Society', 'Wellbeing awareness.', 'Campaigns and support.', 'volunteering', ['Campaign', 'Workshop', 'Community']),
-
-    # Media (8)
-    ('Film Society', 'Cinema lovers.', 'Screenings and filmmaking.', 'media', ['Screening', 'Workshop', 'Social']),
-    ('Radio Society', 'Student radio.', 'Run shows and broadcast.', 'media', ['Show', 'Workshop', 'Social']),
-    ('Newspaper Society', 'Student journalism.', 'Write and report.', 'media', ['Meeting', 'Workshop', 'Social']),
-    ('Podcast Society', 'Audio storytelling.', 'Create and share podcasts.', 'media', ['Recording', 'Workshop', 'Social']),
-    ('TV Society', 'Student television.', 'Produce shows and content.', 'media', ['Production', 'Workshop', 'Social']),
-    ('Documentary Society', 'Real stories.', 'Documentary screenings and making.', 'media', ['Screening', 'Production', 'Social']),
-    ('Animation Society', 'Bring drawings to life.', 'Animation workshops.', 'media', ['Workshop', 'Production', 'Social']),
-    ('Social Media Society', 'Digital content.', 'Content creation workshops.', 'media', ['Workshop', 'Social', 'Production']),
-]
-
-def build_society_seed_data():
-    result = []
-    for name, bio, about, category, tags in SOCIETY_DATA:
-        society = build_society_dict(name, bio, about, category, tags)
-        result.append(society)
-    return result
 
 # Map old categories to consolidated ones
 CATEGORY_MAPPING = {
     'gaming': 'social', 'music': 'arts', 'dance': 'arts', 'professional': 'academic'
 }
 
-ABOUT_OPENERS = {
-    'sports': "{name} gives students a regular way to stay active, build confidence, and meet teammates outside their course.",
-    'cultural': "{name} is a welcoming community for students who want to celebrate culture, share traditions, and feel at home on campus.",
-    'academic': "{name} brings together curious students who want to take ideas beyond lectures and into practical conversations, projects, and skill-building.",
-    'arts': "{name} is built for students who enjoy making, performing, and sharing creative work in a supportive setting.",
-    'gaming': "{name} is a relaxed place to play, compete, and make friends through regular sessions that balance fun with a little healthy rivalry.",
-    'music': "{name} gives musicians and music lovers a place to rehearse, perform, and grow their confidence throughout the year.",
-    'dance': "{name} is a friendly way to move, learn new routines, and build confidence through regular practice and performance opportunities.",
-    'religious': "{name} offers a steady sense of community for reflection, support, and shared faith during the busyness of university life.",
-    'social': "{name} is designed to make campus feel smaller, with easy entry points for new members and a social calendar that stays approachable.",
-    'professional': "{name} helps students build confidence beyond the classroom through practical workshops, peer support, and industry-facing events.",
-    'volunteering': "{name} combines community action with a strong social core, giving members meaningful ways to contribute while meeting people who care about the same issues.",
-    'media': "{name} is for students who want to make things people can actually watch, hear, read, or share, with room to learn new production skills as you go.",
-}
-
-ABOUT_CLOSERS = {
-    'sports': "Expect a mix of coached sessions, friendly competition, and post-event socials that make it easy to get to know people.",
-    'cultural': "Across the term, the society mixes celebration, conversation, and shared experiences so both new and returning members can take part comfortably.",
-    'academic': "Members can drop in for one event, or get more involved over time through committee work, collaborations, and bigger showcase moments.",
-    'arts': "There is space for complete beginners as well as experienced members, so joining feels just as natural for trying something new as it does for sharpening your craft.",
-    'gaming': "Whether you are there for tournaments or low-pressure hangouts, the atmosphere is meant to stay inclusive, social, and easy to join mid-term.",
-    'music': "From informal rehearsals to bigger showcase moments, the society aims to make creative progress feel collaborative rather than intimidating.",
-    'dance': "Beginners are still able to join in, and regular members get chances to refine technique, perform, and help shape the group's energy.",
-    'religious': "Regular gatherings are paired with wider community events, giving members both familiar routines and open opportunities to connect with others.",
-    'social': "Most events are intentionally low-pressure, so you can come along casually, bring a friend, and get involved without already knowing anyone.",
-    'professional': "It works well for students who want career momentum without losing the friendly, student-led feel that makes societies enjoyable.",
-    'volunteering': "The goal is to make giving back feel practical, consistent, and genuinely social rather than like another isolated commitment.",
-    'media': "Members usually learn by making, so projects are hands-on and collaborative from the start instead of feeling closed off to newcomers.",
+# KCL campus locations per category
+CATEGORY_LOCATIONS = {
+    'sports': 'Strand Sports Centre, Surrey Street, London WC2R 2NS',
+    'cultural': "King's Building, Strand Campus, London WC2R 2LS",
+    'academic': 'Bush House, 30 Aldwych, London WC2B 4BG',
+    'arts': 'Anatomy Museum, Strand Campus, London WC2R 2LS',
+    'social': 'K Bar, Strand Campus, London WC2R 2LS',
+    'religious': 'Stamp Room, Strand Campus, London WC2R 2LS',
+    'volunteering': "Guy's Campus, Great Maze Pond, London SE1 9RT",
+    'media': 'Macadam Building, Portugal Street, London WC2A 2JR',
+    'music': 'Great Hall, Strand Campus, London WC2R 2LS',
+    'dance': 'Strand Sports Centre, Surrey Street, London WC2R 2NS',
+    'gaming': 'Nash Fleming Common Room, Strand Campus, London WC2R 2LS',
+    'professional': 'Bush House, 30 Aldwych, London WC2B 4BG',
 }
 
 
-def _normalise_phrase(text):
-    phrase = str(text or "").strip().rstrip(".")
-    if not phrase:
-        return ""
-    return phrase[0].lower() + phrase[1:]
+# Society data — 30 carefully curated entries with rich about text
+# Format: (name, bio, about, category, tags, location_override)
+SOCIETY_DATA = [
+    # Sports (5)
+    (
+        'Football Club',
+        'The beautiful game at KCL — open to all skill levels.',
+        (
+            "Football Club is the largest sports society at King's, bringing together students "
+            "from every faculty who share a passion for the game. Whether you've played since "
+            "childhood or never laced up boots competitively, you'll find a place in our "
+            "weekly training sessions on Wednesdays and regular fixtures against other London "
+            "university clubs throughout the academic year. The club competes in BUCS leagues "
+            "and runs social events each term, including a pre-season tour and an end-of-year "
+            "awards dinner."
+        ),
+        'sports',
+        ['Training', 'Match', 'Social', 'BUCS'],
+        None,
+    ),
+    (
+        'Basketball Society',
+        'Hoops for all — casual pick-up games to competitive league play.',
+        (
+            "Basketball Society caters to everyone from complete beginners wanting to learn the "
+            "basics to seasoned players looking for structured competition. We run open gym "
+            "sessions twice a week at the Strand Sports Centre where you can improve your "
+            "shooting, passing, and defensive skills with coaching from experienced players. "
+            "The society fields both men's and mixed teams in the BUCS league, and our end-of-term "
+            "socials are some of the most attended events on campus."
+        ),
+        'sports',
+        ['Training', 'Tournament', 'Social', 'BUCS'],
+        None,
+    ),
+    (
+        'Yoga Society',
+        'Find balance — mindful yoga sessions for body and mind.',
+        (
+            "Yoga Society offers a calm and focused space in the middle of a busy academic week. "
+            "Sessions run every Monday and Thursday evening in the Anatomy Museum Studio, "
+            "suitable for complete beginners through to experienced practitioners. We cover "
+            "a variety of styles including Hatha, Vinyasa, and restorative yoga, with occasional "
+            "weekend workshops led by visiting instructors from London studios. Many members "
+            "find regular practice noticeably improves their focus and sleep — something worth "
+            "checking against your analytics before committing to a new time slot."
+        ),
+        'sports',
+        ['Class', 'Workshop', 'Mindfulness', 'Beginner-Friendly'],
+        'Anatomy Museum Studio, Strand Campus, London WC2R 2LS',
+    ),
+    (
+        'Climbing Club',
+        'Reach new heights — indoor and outdoor bouldering for all levels.',
+        (
+            "Climbing Club runs weekly sessions at a local bouldering gym as well as organising "
+            "day trips to outdoor crags in the South East throughout the year. Beginners start "
+            "with top-rope fundamentals and progress quickly with peer coaching from the club's "
+            "more experienced members. We keep group sizes small so everyone gets meaningful "
+            "time on the wall. Annual highlights include an Easter trip to Font in France and "
+            "a competition at a major London climbing centre."
+        ),
+        'sports',
+        ['Bouldering', 'Outdoor', 'Training', 'Trip'],
+        'Vauxwall Climbing Centre, 77 Glasshill St, London SE1 0QR',
+    ),
+    (
+        'Athletics Club',
+        'Track, field, and road running — train with a team behind you.',
+        (
+            "Athletics Club welcomes sprinters, distance runners, jumpers, and throwers alike. "
+            "We train twice weekly at Crystal Palace National Sports Centre and hold regular "
+            "time trials and intra-club competitions across the season. The club competes in "
+            "BUCS Athletics Championships and the LUSL road relay, and a dedicated coaching "
+            "team means new members develop quickly. Social runs along the South Bank are a "
+            "popular way to wind down between heavier training blocks."
+        ),
+        'sports',
+        ['Track', 'Road Running', 'Competition', 'BUCS'],
+        'Crystal Palace National Sports Centre, Ledrington Road, London SE19 2BB',
+    ),
+
+    # Cultural (4)
+    (
+        'Chinese Society',
+        'Celebrating Chinese culture, language, and community at KCL.',
+        (
+            "Chinese Society is one of the most active cultural societies on campus, running "
+            "events throughout the year that bring together students interested in Chinese "
+            "heritage — whether or not they have a personal connection to it. Highlights "
+            "include Lunar New Year celebrations in the Great Hall, monthly hotpot nights, "
+            "and a language exchange programme paired with native Mandarin speakers. We also "
+            "organise cultural trips to London's Chinatown and host visiting speakers from "
+            "Chinese arts and business communities. New members are warmly welcomed at any "
+            "point in the year."
+        ),
+        'cultural',
+        ['Festival', 'Language Exchange', 'Food', 'Social'],
+        None,
+    ),
+    (
+        'African Caribbean Society',
+        'Celebrating the richness of African and Caribbean heritage at King's.',
+        (
+            "African Caribbean Society exists to celebrate, preserve, and share the diverse "
+            "cultures of Africa and the Caribbean in a vibrant, inclusive environment. Our "
+            "calendar includes AFROBEATS nights, spoken word events, a Black History Month "
+            "programme, and Carnival prep workshops. The society also runs important "
+            "conversations about representation and community in higher education, creating "
+            "a support network for students who share this background. Weekly socials are "
+            "casual and welcoming — bring your friends and come as you are."
+        ),
+        'cultural',
+        ['Performance', 'Social', 'Cultural Night', 'Workshops'],
+        None,
+    ),
+    (
+        'Indian Society',
+        'From Diwali to Bollywood — Indian culture in the heart of London.',
+        (
+            "Indian Society is a vibrant home for students who want to celebrate and explore "
+            "South Asian culture at university. Our flagship event is Diwali Night — a "
+            "spectacular evening of music, dance, and food that regularly sells out. Beyond "
+            "the major events, we run Bollywood dance workshops, cricket socials, and "
+            "collaborative evenings with other cultural societies. Freshers are particularly "
+            "encouraged to join early as the society is a fantastic way to meet people and "
+            "feel at home in a new city."
+        ),
+        'cultural',
+        ['Diwali', 'Dance', 'Cricket', 'Festival'],
+        None,
+    ),
+    (
+        'Korean Society',
+        "K-culture at KCL — K-pop, food, language, and more.",
+        (
+            "Korean Society brings together students fascinated by Korean culture in all its "
+            "forms — from K-pop and K-drama to Korean food, skincare, and language. We run "
+            "K-pop dance workshops every fortnight, monthly Korean BBQ nights near campus, "
+            "and a popular language exchange scheme with Korean international students. "
+            "Our annual Korean Culture Night is a highlight of the spring term, featuring "
+            "live performances and traditional food. The community is friendly, fast-growing, "
+            "and open to anyone who wants to get involved."
+        ),
+        'cultural',
+        ['K-Pop', 'Dance', 'Food', 'Language'],
+        None,
+    ),
+
+    # Academic (4)
+    (
+        'Tech Society',
+        'Building, hacking, and exploring the frontiers of technology.',
+        (
+            "Tech Society is the go-to community for students who want to do more with "
+            "technology than their course alone covers. We run weekly workshops on topics "
+            "ranging from machine learning and web development to cybersecurity and "
+            "blockchain. Our flagship event is KCL Hackathon — a 24-hour build competition "
+            "that attracts over 300 participants from across London each spring. Members also "
+            "get access to industry networking evenings with engineers from top London tech "
+            "firms, and a dedicated Slack channel for project collaboration and job leads. "
+            "All levels of experience are welcome; the community is supportive by design."
+        ),
+        'academic',
+        ['Hackathon', 'Workshops', 'Networking', 'Projects'],
+        'Bush House, North East Wing, 30 Aldwych, London WC2B 4BG',
+    ),
+    (
+        'Debate Society',
+        'Sharp arguments, structured rounds, and competitive debating at every level.',
+        (
+            "Debate Society trains students in British Parliamentary debate format and "
+            "competes at national tournaments including EUDC, WUDC, and Varsity against UCL "
+            "and LSE. Weekly sessions are split between beginners' workshops — which teach "
+            "structure, rebuttal, and persuasion from scratch — and practice rounds for "
+            "experienced debaters preparing for competition. Former members have gone on to "
+            "careers in law, politics, and journalism, crediting the society with giving them "
+            "communication skills they use every day. No prior experience is needed to join."
+        ),
+        'academic',
+        ['Competition', 'Workshop', 'Public Speaking', 'Beginner-Friendly'],
+        'Great Hall, Strand Campus, London WC2R 2LS',
+    ),
+    (
+        'Law Society',
+        "Mooting, networking, and career prep for King's law students.",
+        (
+            "Law Society is the largest student society at The Dickson Poon School of Law, "
+            "running a full calendar of professional development and social events throughout "
+            "the year. Our mooting competition gives students the chance to argue cases in "
+            "front of practising barristers, and our firm networking evenings have helped "
+            "members secure training contracts and vacation schemes. We also run CV and "
+            "interview workshops, a mentorship scheme with young lawyers, and an annual "
+            "Law Ball. Membership is open to all students regardless of faculty."
+        ),
+        'academic',
+        ['Mooting', 'Networking', 'Careers', 'Social'],
+        'Dickson Poon School of Law, Strand Campus, London WC2R 2LS',
+    ),
+    (
+        'Entrepreneurship Society',
+        'Start something. Pitch it. Build it. Find your co-founder here.',
+        (
+            "Entrepreneurship Society supports students at every stage of the startup journey "
+            "— from first idea to early traction. Our weekly workshops cover topics like "
+            "product-market fit, fundraising, legal basics, and growth marketing, delivered "
+            "by founders and investors from the London startup ecosystem. The society runs "
+            "KCL Pitch Night each term, where student teams present to a panel of real "
+            "investors for feedback and prizes. Our co-founder matching programme has helped "
+            "launch several active ventures, and members get access to exclusive startup "
+            "job boards and accelerator programmes."
+        ),
+        'academic',
+        ['Pitch', 'Workshops', 'Startup', 'Networking'],
+        'Bush House, South East Wing, 30 Aldwych, London WC2B 4BG',
+    ),
+
+    # Arts (4)
+    (
+        'Drama Society',
+        'Performing arts at KCL — theatre, comedy, and original productions.',
+        (
+            "Drama Society produces three full-length theatrical productions each year, "
+            "ranging from Shakespeare and Chekhov to original student-written scripts. "
+            "Rehearsals take place in the Greenwood Theatre near Guy's Campus, and we "
+            "perform to audiences of several hundred across each run. Alongside main stage "
+            "productions, the society runs an annual comedy night, a one-act festival for "
+            "student directors, and weekly skills sessions in acting, voice, and movement. "
+            "You don't need previous experience to audition — what matters is enthusiasm "
+            "and commitment to the rehearsal schedule."
+        ),
+        'arts',
+        ['Theatre', 'Auditions', 'Comedy', 'Directing'],
+        'Greenwood Theatre, 55 Weston Street, London SE1 3RR',
+    ),
+    (
+        'Photography Society',
+        'See the world through a different lens — shoots, exhibitions, and dark-room sessions.',
+        (
+            "Photography Society is for everyone from complete beginners using a smartphone "
+            "to students with years of experience behind a DSLR. We run themed photo walks "
+            "around London each fortnight, cover both analogue and digital technique in our "
+            "workshops, and hold an end-of-year exhibition where members display their best "
+            "work on campus. The society has access to a dark room facility for film "
+            "photographers and a gear lending scheme so cost is never a barrier to "
+            "participating. Guest critiques from professional photographers are a regular "
+            "feature in the spring term."
+        ),
+        'arts',
+        ['Photo Walks', 'Exhibition', 'Dark Room', 'Workshop'],
+        "Weston Room, Guy's Campus, London SE1 9RT",
+    ),
+    (
+        'Orchestra',
+        'Classical music brought to life — rehearsals, concerts, and tours.',
+        (
+            "KCL Orchestra brings together students at all levels of classical musicianship "
+            "for a rigorous and rewarding programme of rehearsals and performances. We "
+            "rehearse every Wednesday evening in the Great Hall and give two major concerts "
+            "each term — including a Christmas concert and a summer showcase. The repertoire "
+            "spans Baroque to contemporary, with guest conductors joining for the flagship "
+            "performances. Orchestral auditions are held at the start of each term, and "
+            "chamber groups form naturally from within the orchestra for smaller, more "
+            "intimate performances throughout the year."
+        ),
+        'arts',
+        ['Rehearsal', 'Concert', 'Classical', 'Auditions'],
+        'Great Hall, Strand Campus, London WC2R 2LS',
+    ),
+    (
+        'Creative Writing Society',
+        'Write, share, and get better — a community for writers of all kinds.',
+        (
+            "Creative Writing Society provides a consistent, supportive environment for "
+            "students who write fiction, poetry, non-fiction, screenwriting, or anything in "
+            "between. Our weekly sessions alternate between guided writing exercises, "
+            "workshop-style peer feedback rounds, and craft talks from guest authors "
+            "published with major houses. We publish an annual literary magazine — 'Strand' "
+            "— which features the best writing from our members, and run a competitive short "
+            "story prize each spring. The atmosphere is encouraging rather than critical, "
+            "making it easy to join even if you've never shown your writing to anyone before."
+        ),
+        'arts',
+        ['Fiction', 'Poetry', 'Workshop', 'Magazine'],
+        'Norfolk Building, Strand Campus, London WC2R 2LS',
+    ),
+
+    # Social (4)
+    (
+        'Cooking Society',
+        'Cook, eat, and connect — weekly meals made with friends.',
+        (
+            "Cooking Society turns a basic life skill into one of the most social things you "
+            "can do at university. Each week a small group of members gather in one of the "
+            "campus kitchens to cook a themed meal together — anything from pasta nights and "
+            "street food themes to elaborate multi-course dinners. The society also runs "
+            "occasional cooking workshops led by professional chefs and hosts charity bake "
+            "sales throughout the year. All dietary requirements are catered for, and no "
+            "cooking experience is needed — just an appetite."
+        ),
+        'social',
+        ['Cooking', 'Food', 'Social', 'Workshop'],
+        "Guy's Campus, Great Maze Pond, London SE1 9RT",
+    ),
+    (
+        'Board Game Society',
+        'Strategy, luck, and a lot of laughs — board games for every taste.',
+        (
+            "Board Game Society runs open game nights twice a week in the Nash Fleming "
+            "Common Room, with a library of over 150 games available to borrow. Whether "
+            "you want to try a 30-minute party game or commit to a three-hour strategy "
+            "session, there's always a table for you. The society also runs an annual "
+            "Games Weekend — a two-day event open to all members — and enters teams into "
+            "the London University Board Game League. It's one of the easiest societies "
+            "to drop into mid-term because there's no commitment beyond showing up."
+        ),
+        'social',
+        ['Strategy', 'Party Games', 'Weekly Sessions', 'Tournament'],
+        'Nash Fleming Common Room, Strand Campus, London WC2R 2LS',
+    ),
+    (
+        'Travel Society',
+        'Explore the world — group trips, travel tips, and adventure planning.',
+        (
+            "Travel Society organises group trips for students who want to explore beyond "
+            "London during term breaks and long weekends. Past destinations have included "
+            "Lisbon, Budapest, Edinburgh, and the Amalfi Coast. Beyond organised trips, "
+            "we run practical travel evenings covering budgeting, visa processes, and "
+            "packing light, and our online community is an active hub for finding travel "
+            "companions and sharing recommendations. Membership comes with access to "
+            "group discounts on transport and accommodation through our partner network."
+        ),
+        'social',
+        ['Trips', 'Budgeting', 'Adventure', 'Community'],
+        None,
+    ),
+    (
+        'Quiz Society',
+        'Trivia nights, pub quizzes, and competitive general knowledge.',
+        (
+            "Quiz Society runs weekly pub quiz nights at a local venue near campus every "
+            "Thursday, open to teams of up to six. Questions span general knowledge, "
+            "current affairs, science, pop culture, and specialist rounds that rotate "
+            "each week. The society also competes in the UK University Quiz Championships "
+            "and holds its own internal league table that runs across the full academic "
+            "year. New members can join a team or form their own — either way, the evenings "
+            "are low-pressure and genuinely fun regardless of how much you know."
+        ),
+        'social',
+        ['Pub Quiz', 'Competition', 'Teams', 'Weekly'],
+        'The Lyceum Tavern, 354 Strand, London WC2R 0HS',
+    ),
+
+    # Religious (3)
+    (
+        'Islamic Society',
+        "Faith, community, and support for Muslim students at King's.",
+        (
+            "Islamic Society — KCL ISOC — is one of the largest faith societies at the "
+            "university, providing a spiritual home and vibrant community for Muslim students "
+            "and anyone interested in learning about Islam. We organise Jumu'ah prayers on "
+            "campus, run weekly circles covering Quran recitation, Islamic history, and "
+            "contemporary Muslim thought, and hold the annual ISOC dinner which draws "
+            "hundreds of attendees each spring. The society also leads a food drive during "
+            "Ramadan and coordinates volunteering with local charities. Non-Muslims are "
+            "always welcome at our open events."
+        ),
+        'religious',
+        ['Prayer', 'Study Circle', 'Community', 'Charity'],
+        'Stamp Room, Strand Campus, London WC2R 2LS',
+    ),
+    (
+        'Christian Union',
+        'Faith and fellowship — a community for Christian students at KCL.',
+        (
+            "Christian Union is a non-denominational community of Christian students that "
+            "meets weekly for Bible study, worship, and mutual encouragement. Our main "
+            "weekly meeting takes place on Tuesday evenings and draws students from across "
+            "the university. Beyond the regular meetings we run a summer mission, an "
+            "annual weekend away in the first term, and regular socials that are open to "
+            "anyone curious about the Christian faith. We're affiliated with UCCF and "
+            "maintain strong links with local churches across London."
+        ),
+        'religious',
+        ['Bible Study', 'Worship', 'Mission', 'Social'],
+        'Stamp Room, Strand Campus, London WC2R 2LS',
+    ),
+    (
+        'Hindu Society',
+        'Hindu traditions, culture, and community at King's College London.',
+        (
+            "Hindu Society celebrates the richness of Hindu culture through a programme of "
+            "religious, cultural, and social events throughout the year. Our calendar "
+            "includes Diwali puja, Holi celebrations, and an annual cultural evening "
+            "featuring classical music and dance performances. We run weekly spiritual "
+            "discussions and yoga sessions, and participate in the national Hindu student "
+            "networks through Hind Swaraj. The society is a welcoming space for practising "
+            "Hindus and equally for anyone who wants to learn more about one of the "
+            "world's oldest and most diverse traditions."
+        ),
+        'religious',
+        ['Puja', 'Festival', 'Yoga', 'Cultural'],
+        "Guy's Campus, Great Maze Pond, London SE1 9RT",
+    ),
+
+    # Volunteering (3)
+    (
+        'Environmental Society',
+        'Climate action, sustainability, and environmental advocacy at KCL.',
+        (
+            "Environmental Society is driven by students who want to do more than just "
+            "learn about climate change — they want to act on it. We run weekly litter picks "
+            "along the South Bank, campaign for greener practices across the university, "
+            "and host public lectures from researchers, activists, and policy makers working "
+            "on environmental issues. Each term culminates in a larger community project "
+            "such as planting sessions in Southwark or a sustainability fair on the Strand. "
+            "Members are also connected to London-wide student climate networks and national "
+            "environmental organisations for further volunteering opportunities."
+        ),
+        'volunteering',
+        ['Campaign', 'Litter Pick', 'Lectures', 'Community'],
+        "Guy's Campus, Great Maze Pond, London SE1 9RT",
+    ),
+    (
+        'Tutoring Society',
+        'Help others learn — peer tutoring for local schools and fellow students.',
+        (
+            "Tutoring Society organises weekly tutoring sessions at secondary schools near "
+            "campus, giving KCL students the chance to support GCSE and A-level pupils in "
+            "subjects ranging from maths and sciences to English and languages. Tutors are "
+            "matched to pupils based on subject expertise and availability, with sessions "
+            "typically running for one hour on weekday afternoons. The society also runs "
+            "an internal peer tutoring scheme for KCL students who want subject support, "
+            "making the exchange genuinely two-directional. It's a rewarding way to "
+            "consolidate your own understanding while making a real difference."
+        ),
+        'volunteering',
+        ['Schools', 'Peer Support', 'Teaching', 'Weekly'],
+        None,
+    ),
+    (
+        'Mental Health Society',
+        'Wellbeing, awareness, and open conversations about mental health.',
+        (
+            "Mental Health Society works to reduce the stigma around mental health at "
+            "university through awareness campaigns, peer support events, and community "
+            "building. We run a weekly wellbeing drop-in at the Strand Campus café, train "
+            "members in Mental Health First Aid, and organise larger events during "
+            "Mental Health Awareness Week each May. The society also advocates directly "
+            "to the university on student welfare issues and publishes a termly newsletter "
+            "with mental health resources, self-care tips, and member stories. It's a "
+            "gentle, non-clinical community — you don't need to be struggling to join."
+        ),
+        'volunteering',
+        ['Wellbeing', 'Awareness', 'Drop-in', 'First Aid'],
+        'Strand Campus Café, London WC2R 2LS',
+    ),
+
+    # Media (3)
+    (
+        'Film Society',
+        'Cinema lovers unite — screenings, filmmaking, and film criticism at KCL.',
+        (
+            "Film Society runs weekly film screenings in the lecture theatres on Strand "
+            "Campus, covering everything from classic Hollywood to contemporary world "
+            "cinema. Each screening is followed by a structured discussion, and the "
+            "society publishes reviews and essays in its online journal. Beyond passive "
+            "viewing, we run short filmmaking workshops where members pitch, shoot, and "
+            "edit their own projects. Our annual Short Film Festival is open to all "
+            "entries from KCL students and takes place in the Greenwood Theatre each "
+            "June. No film background is needed — just an interest in watching and "
+            "talking about cinema."
+        ),
+        'media',
+        ['Screenings', 'Filmmaking', 'Discussion', 'Festival'],
+        'Greenwood Theatre, 55 Weston Street, London SE1 3RR',
+    ),
+    (
+        'Newspaper Society',
+        "The Strand — King's student newspaper since 1986.",
+        (
+            "The Strand is KCL's independent student newspaper, run entirely by student "
+            "journalists, editors, designers, and photographers. The paper publishes "
+            "termly print editions and maintains a live online platform for breaking news "
+            "and comment pieces. New members can contribute in whatever role suits them "
+            "— writing, photography, illustration, editing, or social media management. "
+            "The editorial team meets weekly in the Macadam Building to assign stories "
+            "and review copy, and senior editors mentor newer writers throughout the year. "
+            "It's an excellent portfolio-builder and a direct route into student journalism "
+            "networks across the UK."
+        ),
+        'media',
+        ['Journalism', 'Writing', 'Photography', 'Editing'],
+        'Macadam Building, Portugal Street, London WC2A 2JR',
+    ),
+    (
+        'Podcast Society',
+        'Audio storytelling — create, record, and publish your own podcasts.',
+        (
+            "Podcast Society gives students access to professional recording equipment and "
+            "the knowledge to use it, all within a collaborative community of audio "
+            "storytellers. We run weekly sessions covering interview technique, sound "
+            "editing, RSS distribution, and building an audience. Members can launch their "
+            "own shows independently or join existing society productions on topics ranging "
+            "from current affairs and sports to mental health and music reviews. All "
+            "finished episodes are published under the KCL Podcasts umbrella, giving each "
+            "show instant visibility within the student community."
+        ),
+        'media',
+        ['Recording', 'Editing', 'Storytelling', 'Production'],
+        'Macadam Building, Portugal Street, London WC2A 2JR',
+    ),
+]
 
 
-def _join_tags(tags):
-    cleaned = [str(tag).strip() for tag in (tags or []) if str(tag).strip()]
-    if not cleaned:
-        return ""
-    if len(cleaned) == 1:
-        return cleaned[0]
-    if len(cleaned) == 2:
-        return f"{cleaned[0]} and {cleaned[1]}"
-    return f"{', '.join(cleaned[:-1])}, and {cleaned[-1]}"
+def build_society_seed_data():
+    result = []
+    for entry in SOCIETY_DATA:
+        name, bio, about, category, tags, location_override = entry
+        society = build_society_dict(name, bio, about, category, tags, location_override)
+        result.append(society)
+    return result
 
 
-def build_rich_about(name, bio, about, category, tags):
-    focus = _normalise_phrase(about) or _normalise_phrase(bio) or "shared interests"
-    tag_copy = _join_tags(tags)
-    first = ABOUT_OPENERS.get(category, ABOUT_OPENERS['social']).format(name=name)
-    second = f"Typical weeks revolve around {focus}"
-    if tag_copy:
-        second += f", with members often joining for {tag_copy.lower()}"
-    second += "."
-    third = ABOUT_CLOSERS.get(category, ABOUT_CLOSERS['social'])
-    return f"{first} {second}\n\n{third}"
-
-def build_society_dict(name, bio, about, category, tags):
+def build_society_dict(name, bio, about, category, tags, location_override=None):
     image = get_random_category_image(category)
     mapped_category = CATEGORY_MAPPING.get(category, category)
+    location = location_override or CATEGORY_LOCATIONS.get(category, '')
     return {
-        'name': name, 'bio': bio, 'about': build_rich_about(name, bio, about, category, tags),
-        'categories': [mapped_category], 'tags': tags,
+        'name': name,
+        'bio': bio,
+        'about': about,
+        'categories': [mapped_category],
+        'tags': tags,
+        'location': location,
         'events': get_events_for_category(category),
         'image': f'http://localhost:8000/static/seed_images/societies/{image}',
     }
+
 
 def get_random_category_image(category):
     mapped = CATEGORY_MAPPING.get(category, category)
@@ -322,15 +653,16 @@ def get_random_category_image(category):
     original_images = [img for img in images if img.startswith(original_prefix)] if original_prefix else []
     return random.choice(original_images or images)
 
+
 def build_event_datetime(hour, duration_mins, day_of_week=None):
     base_date = get_next_occurrence(day_of_week)
     start = timezone.make_aware(datetime.combine(base_date, datetime.min.time().replace(hour=hour)))
     end = start + timedelta(minutes=duration_mins)
     return start, end
 
+
 def get_next_occurrence(day_of_week):
     """Get the next date for a given day of week (0=Mon, 6=Sun)."""
-
     today = timezone.now().date()
     if day_of_week is None:
         return today + timedelta(days=7)

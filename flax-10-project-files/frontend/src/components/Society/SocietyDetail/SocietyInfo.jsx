@@ -3,7 +3,7 @@
  */
 
 import { useState } from "react";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, MapPin } from "lucide-react";
 import Badge from "../../common/Badge/Badge";
 import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
 import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
@@ -18,11 +18,21 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
+            {society.location && <LocationRow location={society.location} />}
             <Stats society={society} onViewMembers={onViewMembers}
                 isSubscribed={isSubscribed} onToggleSubscription={onToggleSubscription} />
             {!canEdit && !society.is_admin && <SocietyInsightBanner society={society} />}
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
                 onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
+        </div>
+    );
+}
+
+function LocationRow({ location }) {
+    return (
+        <div className={styles.locationRow}>
+            <MapPin size={13} className={styles.locationIcon} aria-hidden="true" />
+            <span className={styles.locationText}>{location}</span>
         </div>
     );
 }
