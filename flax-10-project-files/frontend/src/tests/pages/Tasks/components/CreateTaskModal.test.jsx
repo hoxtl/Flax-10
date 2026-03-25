@@ -45,7 +45,7 @@ vi.mock("../../../../components/common/StandardModal/StandardModal", () => ({
 }));
 
 vi.mock("../../../../components/common/TextInput/TextInput", () => ({
-  default: ({ multiline, ...props }) =>
+  default: ({ multiline, inputClassName, ...props }) =>
     multiline ? <textarea {...props} /> : <input {...props} />,
 }));
 
@@ -89,11 +89,8 @@ describe("CreateTaskModal coverage", () => {
   });
 
   it("wires the create-mode field interactions", () => {
-    const state = buildState();
-    hookMock.mockReturnValue(state);
-
+    const state = buildState(); hookMock.mockReturnValue(state);
     render(<CreateTaskModal addToScheduleLabel="Add to plan" />);
-
     fireEvent.change(screen.getByLabelText(/Task name/i), { target: { value: "Updated title" } });
     fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: "Updated description" } });
     fireEvent.click(screen.getByRole("button", { name: "Set due" }));
@@ -118,20 +115,10 @@ describe("CreateTaskModal coverage", () => {
 
   it("covers edit-mode labels, validation messaging, and clearing an active priority", () => {
     const state = buildState({
-      isEditMode: true,
-      saveError: "Unable to save",
-      form: {
-        title: "Task",
-        description: "Desc",
-        due_date: "2026-03-09T09:00",
-        estimated_blocks: 1,
-        task_list: "1",
-        priority: "medium",
-        module: "10",
-      },
+      isEditMode: true, saveError: "Unable to save",
+      form: { title: "Task", description: "Desc", due_date: "2026-03-09T09:00", estimated_blocks: 1, task_list: "1", priority: "medium", module: "10" }
     });
     hookMock.mockReturnValue(state);
-
     render(<CreateTaskModal onDeleteTask={vi.fn()} />);
 
     expect(screen.getByRole("alert")).toHaveTextContent("Unable to save");

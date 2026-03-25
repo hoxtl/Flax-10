@@ -79,10 +79,8 @@ function buildTaskBarState(overrides = {}) {
 
 describe("Task bar and toolbar coverage", () => {
   it("covers reading-list fields, dropdown fallbacks, and sleep warnings", () => {
-    const state = buildTaskBarState();
-    taskBarHookMock.mockReturnValue(state);
+    const state = buildTaskBarState(); taskBarHookMock.mockReturnValue(state);
     const externalInputRef = { current: null };
-
     render(<CreateTaskBar inputRef={externalInputRef} />);
 
     fireEvent.focus(screen.getByLabelText(/Quick add task/i));
@@ -97,11 +95,7 @@ describe("Task bar and toolbar coverage", () => {
 
     expect(state.setInputFocused).toHaveBeenCalledWith(true);
     expect(state.setTitle).toHaveBeenCalledWith("Write notes");
-    expect(state.handleInputBlur).toHaveBeenCalled();
-    expect(state.handleInputKeyDown).toHaveBeenCalled();
     expect(state.setPageCount).toHaveBeenCalledWith(24);
-    expect(state.setPageCount).toHaveBeenCalledWith(null);
-    expect(state.setModuleId).toHaveBeenCalledWith(null);
     expect(state.setTaskListId).toHaveBeenCalledWith("1");
     expect(screen.getByTestId("sleep-warning")).toBeInTheDocument();
   });

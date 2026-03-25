@@ -59,23 +59,11 @@ describe("TaskFeed coverage", () => {
   });
 
   it("uses sidebar modal data and suppresses subtitles on mobile", () => {
-    responsiveMock.mockReturnValue({
-      isMobile: true,
-      showMobileLists: false,
-      setShowMobileLists: vi.fn(),
-    });
-
+    responsiveMock.mockReturnValue({ isMobile: true, showMobileLists: false, setShowMobileLists: vi.fn() });
     render(
       <TaskFeed
-        {...buildProps({
-          lists: undefined,
-          activeListId: "99",
-          sidebarProps: {
-            lists: [{ id: 2, name: "Sidebar list" }],
-            tasks: [{ id: 3, title: "Sidebar task" }],
-          },
-        })}
-      />,
+        {...buildProps({ lists: undefined, activeListId: "99", sidebarProps: { lists: [{ id: 2, name: "Sidebar list" }], tasks: [{ id: 3, title: "Sidebar task" }] } })}
+      />
     );
 
     expect(screen.getByTestId("subtitle")).toHaveTextContent("");

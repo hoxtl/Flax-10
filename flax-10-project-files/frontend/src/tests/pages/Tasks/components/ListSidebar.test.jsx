@@ -122,14 +122,13 @@ describe("ListSidebar coverage", () => {
     sidebarStateMock.mockReturnValue(buildState());
   });
 
-  it("covers teacher sections, rename handlers, archive toggles, and delete dialogs", () => {
-    const state = buildState({ renamingId: 1, showArchived: true, deleteListId: 3, permDeleteId: 9, ctxMenu: { x: 12, y: 24, listId: 3 } });
+  it("covers teacher sections and rename handlers", () => {
+    const state = buildState({ renamingId: 1, ctxMenu: { x: 12, y: 24, listId: 3 } });
     const props = buildProps();
     authMock.mockReturnValue({ profile: { role: "teacher" } }); sidebarStateMock.mockReturnValue(state);
     render(<ListSidebar {...props} />);
 
     expect(screen.getByText("Lectures")).toBeInTheDocument();
-
     fireEvent.click(screen.getByRole("button", { name: "Save rename" }));
     expect(props.onRenameList).toHaveBeenCalledWith(1, "Renamed list");
     fireEvent.click(screen.getByRole("button", { name: "Cancel rename" }));
@@ -138,10 +137,16 @@ describe("ListSidebar coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Rename menu" }));
     expect(state.setRenamingId).toHaveBeenCalledWith(3);
     expect(state.setCtxMenu).toHaveBeenCalledWith(null);
+  });
+
+  it("covers archive toggles and delete dialogs", () => {
+    const state = buildState({ showArchived: true, deleteListId: 3, permDeleteId: 9, ctxMenu: { x: 12, y: 24, listId: 3 } });
+    const props = buildProps();
+    authMock.mockReturnValue({ profile: { role: "teacher" } }); sidebarStateMock.mockReturnValue(state);
+    render(<ListSidebar {...props} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Delete menu" }));
     expect(state.setDeleteListId).toHaveBeenCalledWith(3);
-
     fireEvent.click(screen.getByRole("button", { name: /archived/i }));
     expect(state.setShowArchived).toHaveBeenCalledWith(expect.any(Function));
 
