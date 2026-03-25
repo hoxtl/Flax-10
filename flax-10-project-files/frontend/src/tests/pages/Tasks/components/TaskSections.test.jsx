@@ -39,67 +39,26 @@ describe("Tasks section coverage", () => {
   });
 
   it("forwards completed-task actions and disables editing for reading lists", () => {
-    const onToggleComplete = vi.fn();
-    const onDeleteTask = vi.fn();
-    const onEditTask = vi.fn();
-
-    const firstRender = render(
-      <CompletedTasksSection
-        tasks={[{ id: 1, title: "Essay", task_list: 1, completed: true }]}
-        sortBy="priority"
-        listMap={{ "1": { idx: 0, name: "Inbox" } }}
-        lists={[{ id: 1, name: "Inbox", color: "#fff" }]}
-        onToggleComplete={onToggleComplete}
-        onDeleteTask={onDeleteTask}
-        onEditTask={onEditTask}
-      />,
-    );
+    const onToggle = vi.fn(); const onDelete = vi.fn(); const onEdit = vi.fn();
+    const { unmount } = render(<CompletedTasksSection tasks={[{ id: 1, title: "Essay", task_list: 1, completed: true }]} sortBy="priority" listMap={{ "1": { idx: 0, name: "Inbox" } }} lists={[{ id: 1, name: "Inbox", color: "#fff" }]} onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />);
 
     fireEvent.click(screen.getByRole("button", { name: "toggle" }));
     fireEvent.click(screen.getByRole("button", { name: "delete" }));
     fireEvent.click(screen.getByRole("button", { name: "edit" }));
 
-    expect(onToggleComplete).toHaveBeenCalledWith(1, true);
-    expect(onDeleteTask).toHaveBeenCalledWith(1);
-    expect(onEditTask).toHaveBeenCalledWith(1, { title: "Renamed" }, { source: "test" });
+    expect(onToggle).toHaveBeenCalledWith(1, true);
+    expect(onDelete).toHaveBeenCalledWith(1);
+    expect(onEdit).toHaveBeenCalledWith(1, { title: "Renamed" }, { source: "test" });
 
-    firstRender.unmount();
-
-    render(
-      <CompletedTasksSection
-        tasks={[{ id: 2, title: "Reading", task_list: 2, completed: true }]}
-        sortBy="priority"
-        listMap={{ "2": { idx: 1, name: "CS101 - Systems" } }}
-        lists={[{ id: 2, name: "CS101 - Systems", color: "#eee" }]}
-        onToggleComplete={onToggleComplete}
-        onDeleteTask={onDeleteTask}
-        onEditTask={onEditTask}
-      />,
-    );
-
+    unmount();
+    render(<CompletedTasksSection tasks={[{ id: 2, title: "Reading", task_list: 2, completed: true }]} sortBy="priority" listMap={{ "2": { idx: 1, name: "CS101 - Systems" } }} lists={[{ id: 2, name: "CS101 - Systems", color: "#eee" }]} onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />);
     expect(screen.queryByRole("button", { name: "edit" })).not.toBeInTheDocument();
   });
 
   it("toggles suggested readings and removes added readings even without an onTaskAdded callback", async () => {
-    getSuggestedReadings.mockResolvedValue([
-      {
-        id: 1,
-        title: "Matching reading",
-        module_code: "PH4505",
-        module_name: "Astrophysics",
-        page_count: 12,
-      },
-    ]);
+    getSuggestedReadings.mockResolvedValue([{ id: 1, title: "Matching reading", module_code: "PH4505", module_name: "Ast", page_count: 12 }]);
     convertReadingToTask.mockResolvedValue({});
-
-    render(
-      <SuggestedReadingsSection
-        activeList={{ id: 7, name: "PH4505 - Astrophysics" }}
-        taskCount={1}
-        pendingTasks={[]}
-        completedTasks={[]}
-      />,
-    );
+    render(<SuggestedReadingsSection activeList={{ id: 7, name: "PH4505 - Astrophysics" }} taskCount={1} pendingTasks={[]} completedTasks={[]} />);
 
     expect(await screen.findByText("Matching reading")).toBeInTheDocument();
 
@@ -110,7 +69,6 @@ describe("Tasks section coverage", () => {
     expect(await screen.findByText("Matching reading")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /\+ Add as task/i }));
-
     await waitFor(() => expect(convertReadingToTask).toHaveBeenCalledWith(1));
     await waitFor(() => expect(screen.queryByText("Matching reading")).not.toBeInTheDocument());
   });
