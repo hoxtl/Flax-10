@@ -1,150 +1,254 @@
-# Team *Flax-10* Major Group Project (StudyFlax)
+# StudyFlax — Team Flax-10 Major Group Project
 
-## Project topic
-Academic - Time management system for students in higher education
+**Module:** 5CCS2SEG Software Engineering Group Project
+**Academic Year:** 2025/26
+**Project Topic:** Academic Time Management System for Students in Higher Education
 
-## Team members
-The members of the team are:
-- *Aishah Ahmed*
-- *Eric Almeida*
-- *Zerun (Harry) Chen*
-- *Cate Tay (Cate) Chew*
-- *Indixora Jozal*
-- *Kausar Khan*
-- *Hamed Latif*
-- *Dian Mahmood*
-- *Binuli Nevanma Markawitage*
+---
 
-## Project structure
-The project is called `StudyFlax`.  It currently consists of: 
+## Table of Contents
 
-## Deployed version of the application
-The deployed version of the application can be found at [*INSERT LINK*].
+1. [Project Description](#project-description)
+2. [Authors](#authors)
+3. [Project Structure](#project-structure)
+4. [Deployed Application](#deployed-application)
+5. [Access Credentials](#access-credentials)
+6. [Installation Instructions](#installation-instructions)
+7. [Third-Party Source Code and Libraries](#third-party-source-code-and-libraries)
+8. [Use of AI Assistance](#use-of-ai-assistance)
 
-## User Fixtures and Admin
-1. Admin: johndoe | Password: 1234
-2. Regular user: janedoe | Password: 1234
-3. Regular user: charlie | Password: 1234
+---
 
-## Installation instructions
+## Project Description
 
-(Installation of Nix is assumed for the following instruction. If not please access https://nixos.org/download/#download-nix for instructions.)
+StudyFlax is a web-based academic time management platform built for students and teachers at King's College London. Designed to bring clarity and structure to university life, it empowers students to organise their schedules, track deadlines, and take control of their academic workload — all in one place. Teachers can engage with and support their students through the platform, while administrators oversee and manage the system as a whole.
 
-**Setup the Nix Development Environment(Linux/MacOS)**
-- cd Your current directory to .../Flax-10
-- Copy and run the following command:
+---
 
-```
-$ nix --extra-experimental-features 'nix-command flakes' develop -c bash
-```
-- Note that you can configure these experimental-features to be turned on permanently through ```/etc/nix/nix.conf``` by adding ```experimental-features 'nix-command flakes'``` .
-- Now the flake script will automatically configure the venv and npm environment.
-- After the script executed, you will end up returning to the bash terminal. Activate venv or run npm dev within Nix as you wish!
+## Authors
 
-**Setup the Nix Development Environment(Windows)**
-- This walkthrough will be using Docker for setting up Nix, and this instruction will follow this idea. You are much welcomed using WSL and following the Linux/MacOS instructions above.
-- Open your Docker Desktop and find the Docker Desktop Terminal.
-- Inside the terminal, cd to your Flax-10 repository folder, and then execute the following commands:
+The following members contributed to the development of this software:
 
-```
-docker volume create nix-store
-```
+- Aishah Ahmed
+- Eric Almeida
+- Zerun (Harry) Chen
+- Cate Tay (Cate) Chew
+- Indixora Jozal
+- Kausar Khan
+- Hamed Latif
+- Dian Mahmood
+- Binuli Nevanma Markawitage
 
-then,
+---
+
+## Project Structure
+
+The repository is organised as follows:
 
 ```
-docker run --rm -it `
-	-v "${PWD}:/work" `
-	-v nix-store:/nix `
-	-w /work `
-	nixos/nix:latest
-```
-(If this does not work, try this signle-line concatenated version of dock run command):
-
-```
-docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest
+Flax-10/
+├── flax-10-project-files/
+│   ├── backend/        # Django REST API backend
+│   └── frontend/       # React + Vite frontend
+├── flake.nix           # Nix development environment configuration
+└── README.md
 ```
 
-and then,
+The system consists of two primary components:
 
-```
-git -C "/work" add "flake.nix"
-```
+- **Backend:** A Django REST Framework API connected to a PostgreSQL database.
+- **Frontend:** A React application built with Vite, communicating with the backend via REST API.
 
-finally,
+---
 
-```
+## Deployed Application
+
+The deployed version of the application can be found at: https://flax-10-production.up.railway.app/
+
+The Django admin panel (for local development) is accessible at: http://localhost:8000/admin/
+
+---
+
+## Access Credentials
+
+The following fixture accounts are available for testing and assessment purposes. All accounts use the password: `1234`
+
+| Username  | Role            | Password |
+| --------- | --------------- | -------- |
+| `johndoe` | Student & Admin | `1234`   |
+| `janedoe` | Student         | `1234`   |
+| `amiller` | Teacher         | `1234`   |
+| `charlie` | Student         | `1234`   |
+
+> **Admin Access:** The `johndoe` account holds administrator privileges. In addition to the Django admin panel at http://localhost:8000/admin/, admin features are also accessible directly through the main application by signing in with the username `johndoe` and the password `1234`.
+
+> **Seeded Users:** Additional user accounts are available, generated using the [Faker](https://faker.readthedocs.io/) library as part of the database seeding process. These accounts can be viewed and managed via the Django admin panel when signed in as `johndoe`.
+
+---
+
+## Installation Instructions
+
+### Prerequisites
+
+- [Nix Package Manager](https://nixos.org/download/#download-nix) must be installed before proceeding.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) is required for Windows users who are not using WSL.
+
+---
+
+### Linux / macOS
+
+1. Open a terminal and navigate to the root of the repository:
+
+   ```bash
+   cd /path/to/Flax-10
+   ```
+
+2. Enter the Nix development environment:
+
+   ```bash
+   nix --extra-experimental-features 'nix-command flakes' develop -c bash
+   ```
+
+   > **Tip:** To enable these experimental features permanently, add the following line to `/etc/nix/nix.conf`:
+   > ```
+   > experimental-features = nix-command flakes
+   > ```
+
+3. The Nix flake script will automatically configure the Python virtual environment and npm environment. Once complete, you will be returned to the bash terminal, from which you may activate the virtual environment or run the frontend development server.
+
+---
+
+### Windows (via Docker)
+
+> Alternatively, Windows users may use WSL and follow the Linux/macOS instructions above.
+
+1. Open Docker Desktop and navigate to the Docker Desktop Terminal.
+
+2. Change directory to the cloned repository folder and run the following commands in order:
+
+   **Create a persistent Nix store volume:**
+   ```bash
+   docker volume create nix-store
+   ```
+
+   **Launch the NixOS container:**
+   ```bash
+   docker run --rm -it \
+     -v "${PWD}:/work" \
+     -v nix-store:/nix \
+     -w /work \
+     nixos/nix:latest
+   ```
+
+   If the above does not work, use the single-line equivalent:
+   ```bash
+   docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest
+   ```
+
+3. Inside the NixOS container, stage the flake file:
+
+   ```bash
+   git -C "/work" add "flake.nix"
+   ```
+
+4. Enter the Nix development environment:
+
+   ```bash
+   nix --extra-experimental-features 'nix-command flakes' develop -c bash
+   ```
+
+> **Note:** The container is configured to remove itself upon exit (`--rm`). The `docker run` command must be re-run each time you wish to re-enter the environment.
+
+---
+
+### Setting Up the Local PostgreSQL Database
+
+1. After installing PostgreSQL, open the `psql` terminal.
+
+2. When prompted for connection details (server, database, username), press **Enter** to accept the defaults until prompted for a password.
+
+3. The Django `settings.py` is pre-configured with default PostgreSQL parameters. The default password is `1234`. Update the password in `settings.py` to match the one set for your local PostgreSQL user if it differs.
+
+4. Once PostgreSQL is running, apply Django database migrations:
+
+   ```bash
+   python manage.py migrate
+   ```
+
+---
+
+### Re-entering the Nix Environment
+
+Each time you wish to resume development, re-enter the Nix shell by running the following from the repository root:
+
+```bash
 nix --extra-experimental-features 'nix-command flakes' develop -c bash
 ```
 
-- Notice now you have entered the NixOS container, which is created by the command ```docker run```  above from the official NixOS image repository held by Docker. You also set up a volume where all the nix related files will be stored(```/nix```).
-- Inside the NixOS terminal interface within your Nix environment, feel free activate your venv or run npm dev!
+Docker users must re-run the full `docker run` command as described above.
 
-**Setup the local PostgreSQL database server**
-- After installing postgresql release, open the psql terminal.
-- There will be prompted connection detail provided by psql in the form of ```Server [localhost]```, ```Database [postgres]```, etc, and it is sufficient for setting up a test server. So we keep pressing enter until the terminal asks you for a password for the user with name specified by ```USERNAME[your username]```, by default it is postgres.
-- Django ```settings.py``` is configured to be compatible with these default parameters, however you will need your password offered to the psql terminal to replace the password specified in the ```settings.py```. By default it is 1234.
-- Now you should have a PostgreSQL server running in the background. Have fun ```python manage.py migrate``` your django project!
+---
 
-**Nix Terminal Post Installation Access Notification**
+## Third-Party Source Code and Libraries
 
-- Each time after installation would you want to access nix shell again, run
+The following third-party packages and tools were used directly in the development of this software.
 
-```
-nix --extra-experimental-features 'nix-command flakes' develop -c bash
-```
+### Package Management
 
-at your repository directory.
+| Package | Version | Purpose                              |
+| ------- | ------- | ------------------------------------ |
+| Nix     | 2.33.2  | Reproducible environment management  |
+| npm     | 10.8.2  | JavaScript package management        |
 
-For docker users, you will need to run the ```docker run...``` command mentioned above, as the container is set to self-destructive after exit by ```--rm```.
+### Frontend Dependencies
 
-## Sources
-- Mention any external sources / AI generated code
+**Runtime**
 
-**Package Management Software**
+| Package   | Version | Purpose              |
+| --------- | ------- | -------------------- |
+| react     | 19.2.0  | UI component library |
+| react-dom | 19.2.0  | React DOM renderer   |
 
-| Package   | Version | Purpose            |
-| --------- | ------- | ------------------ |
-| Nix	    | 2.33.2  | Enviromental package management      |
-| npm	    | 10.8.2  | JavaScript package management |
+**Development**
 
-**Frontend Packages**
+| Package                     | Version | Purpose                                    |
+| --------------------------- | ------- | ------------------------------------------ |
+| vite                        | 7.2.4   | Frontend build tool and development server |
+| @vitejs/plugin-react        | 5.1.1   | React fast-refresh and JSX support         |
+| eslint                      | 9.39.1  | JavaScript/TypeScript linter               |
+| @eslint/js                  | 9.39.1  | Core ESLint rule definitions               |
+| eslint-plugin-react-hooks   | 7.0.1   | React Hooks linting rules                  |
+| eslint-plugin-react-refresh | 0.4.24  | Fast-refresh linting support               |
+| globals                     | 16.5.0  | Shared global variable definitions         |
+| @types/react                | 19.2.5  | TypeScript typings for React               |
+| @types/react-dom            | 19.2.3  | TypeScript typings for React DOM           |
+| canvas-confetti             | 1.9.4   | Confetti animation support                 |
+| framer-motion               | 12.34.0 | Web animation library                      |
 
-- Runtime Dependencies
-
-| Package   | Version | Purpose            |
-| --------- | ------- | ------------------ |
-| react     | 19.2.0  | UI library         |
-| react-dom | 19.2.0  | React DOM renderer |
-
-- Development Dependencies
-
-| Package                     | Version | Purpose                            |
-| --------------------------- | ------- | ---------------------------------- |
-| vite                        | 7.2.4   | Frontend build tool & dev server   |
-| @vitejs/plugin-react        | 5.1.1   | React fast-refresh & JSX support   |
-| eslint                      | 9.39.1  | JavaScript/TypeScript linter       |
-| @eslint/js                  | 9.39.1  | Core ESLint rule definitions       |
-| eslint-plugin-react-hooks   | 7.0.1   | React Hooks linting rules          |
-| eslint-plugin-react-refresh | 0.4.24  | Fast-refresh linting support       |
-| globals                     | 16.5.0  | Shared global variable definitions |
-| @types/react                | 19.2.5  | TypeScript typings for React       |
-| @types/react-dom            | 19.2.3  | TypeScript typings for React DOM   |
-| canvas-confetti             | 1.9.4   | Confetti visual fx support in html5  |
-| framer-motion               | 12.34.0 | Web animation library  |
-
-**Backend Packages**
+### Backend Dependencies
 
 | Package             | Version | Purpose                                         |
 | ------------------- | ------- | ----------------------------------------------- |
 | Django              | 5.2.0   | Web framework                                   |
-| faker		          | 40.4.0  | Fake data generator			                  |
+| faker               | 40.4.0  | Fake data generation for database seeding       |
 | djangorestframework | 3.16.1  | REST API framework for Django                   |
-| psycopg             | 3.3.2   | PostgreSQL driver (modern async-capable core)   |
+| psycopg             | 3.3.2   | PostgreSQL driver (async-capable core)          |
 | psycopg-binary      | 3.3.2   | Precompiled psycopg binaries for local/dev use  |
 | asgiref             | 3.11.1  | ASGI utilities used by Django                   |
-| sqlparse            | 0.5.5   | SQL parsing & formatting (used by Django ORM)   |
+| sqlparse            | 0.5.5   | SQL parsing and formatting (used by Django ORM) |
 | virtualenv          | 20.36.1 | Isolated Python environment creation            |
 | distlib             | 0.4.0   | Dependency utility library (virtualenv backend) |
 | filelock            | 3.20.1  | Cross-platform file locking                     |
 | platformdirs        | 4.5.0   | OS-specific directory resolution                |
+
+---
+
+## Use of AI Assistance
+
+This project made use of AI tools in the following capacities:
+
+- **Conceptual understanding:** AI tools were used to help the team understand and explain technical concepts, particularly when learning and navigating the React ecosystem for the first time.
+- **GitHub Copilot (via GitHub Student Developer Pack):** Used throughout development to receive real-time feedback on code quality, suggest new features, and support the team in writing and improving code incrementally.
+- **Testing support:** AI assistance was used to aid in the planning and writing of tests, helping to identify edge cases and improve overall test coverage.
+
+All AI-assisted contributions were reviewed, understood, and integrated by members of the team. No AI-generated code was incorporated without verification.
