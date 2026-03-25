@@ -52,6 +52,23 @@ describe("BadgesSection", () => {
     render(<BadgesSection badges={[]} onOpen={vi.fn()} />);
     expect(screen.getByText("0")).toBeTruthy();
   });
+
+  it("handles missing badges and shows the overflow badge when more than six exist", () => {
+    const badges = Array.from({ length: 7 }, (_, index) => ({
+      id: index + 1,
+      tier: index === 0 ? undefined : "gold",
+      label: `Badge ${index + 1}`,
+      emoji: "🏅",
+      description: `Badge ${index + 1}`,
+    }));
+
+    const { rerender } = render(<BadgesSection onOpen={vi.fn()} />);
+    expect(screen.getByText("0")).toBeTruthy();
+
+    rerender(<BadgesSection badges={badges} onOpen={vi.fn()} />);
+    expect(screen.getByText("+1 more")).toBeTruthy();
+    expect(screen.getByText("Badge 1")).toBeTruthy();
+  });
 });
 
 describe("ModulesSection", () => {

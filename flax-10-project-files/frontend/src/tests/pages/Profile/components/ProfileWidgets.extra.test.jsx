@@ -19,9 +19,11 @@ vi.mock("../../../../hooks/useCountUp", () => ({
 
 import {
   BadgesBanner,
+  ModulesSection,
   ModulesSocietiesWidget,
   PersonaCard,
   QuickStatsRail,
+  SocietiesSection,
   StudyDNA,
 } from "../../../../pages/Profile/components/ProfileWidgets";
 import { CommonGroundSection } from "../../../../pages/Profile/components/widgets/CommonGround";
@@ -66,6 +68,11 @@ describe("profile widget extras", () => {
     expect(container.firstChild).toBeNull();
   });
 
+  it("renders zero-value items when hideZeroItems is omitted", () => {
+    render(<QuickStatsRail totalHours={1.2} sessionCount={0} moduleCount={0} />);
+    expect(screen.getByText("Sessions")).toBeInTheDocument();
+  });
+
   it("badges banner supports click and keyboard activation", () => {
     const onOpen = vi.fn();
     const badges = Array.from({ length: 11 }, (_, index) => ({
@@ -108,6 +115,76 @@ describe("profile widget extras", () => {
     expect(onNavigate).toHaveBeenCalledWith("/societies?id=7");
   });
 
+  it("covers hidden tabs, tab resets, and society fallback avatars", async () => {
+    const onNavigate = vi.fn();
+    const { rerender } = render(
+      <ModulesSocietiesWidget
+        modules={["CS101"]}
+        societies={[{ name: "No Id Society" }]}
+        onNavigate={onNavigate}
+        role="student"
+        canViewSocieties={false}
+      />
+    );
+
+    await screen.findByText("Intro to CS");
+    expect(screen.queryByRole("button", { name: "Societies" })).toBeNull();
+
+    rerender(
+      <ModulesSocietiesWidget
+        modules={["CS101"]}
+        societies={[{ id: 9, name: "Fallback Society" }]}
+        onNavigate={onNavigate}
+        role="student"
+        canViewSocieties
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Societies" }));
+    fireEvent.click(screen.getByRole("button", { name: "Modules" }));
+    expect(screen.getByText("CS101")).toBeInTheDocument();
+
+    rerender(
+      <ModulesSocietiesWidget
+        modules={["CS101"]}
+        societies={null}
+        onNavigate={onNavigate}
+        role="student"
+        canViewSocieties
+      />
+    );
+    expect(screen.queryByText("Fallback Society")).toBeNull();
+  });
+
+  it("keeps the societies tab stable when societies become null", async () => {
+    const onNavigate = vi.fn();
+    const { rerender } = render(
+      <ModulesSocietiesWidget
+        modules={["CS101"]}
+        societies={[{ id: 4, name: "Music Society" }]}
+        onNavigate={onNavigate}
+        role="student"
+        canViewSocieties
+      />
+    );
+
+    await screen.findByText("Intro to CS");
+    fireEvent.click(screen.getByRole("button", { name: "Societies" }));
+    expect(screen.getByText("Music Society")).toBeInTheDocument();
+
+    rerender(
+      <ModulesSocietiesWidget
+        modules={["CS101"]}
+        societies={null}
+        onNavigate={onNavigate}
+        role="student"
+        canViewSocieties
+      />
+    );
+
+    expect(screen.queryByText("Music Society")).toBeNull();
+  });
+
   it("renders teacher modules directly and returns null for students without modules", async () => {
     const onNavigate = vi.fn();
     const { rerender, container } = render(
@@ -120,6 +197,44 @@ describe("profile widget extras", () => {
 
     rerender(<ModulesSocietiesWidget modules={[]} societies={[]} onNavigate={onNavigate} role="student" />);
     await waitFor(() => expect(container.firstChild).toBeNull());
+  });
+
+  it("renders teacher cards without names and society initials without navigation ids", async () => {
+    const onNavigate = vi.fn();
+    getModulesMock.mockResolvedValueOnce([{ module_code: "CS101", module_name: null }]);
+    const { rerender } = render(<ModulesSocietiesWidget modules={["CS101"]} societies={[]} onNavigate={onNavigate} role="teacher" />);
+
+    await screen.findByText("Teaching module");
+    fireEvent.click(screen.getByText("CS101"));
+    expect(onNavigate).toHaveBeenCalledWith("modules_CS101");
+
+    rerender(<ModulesSocietiesWidget modules={["CS101"]} societies={[{ name: "Art Club" }]} onNavigate={onNavigate} role="student" canViewSocieties />);
+    fireEvent.click(screen.getByRole("button", { name: "Societies" }));
+    fireEvent.click(screen.getByText("Art Club"));
+    expect(onNavigate).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("A")).toBeInTheDocument();
+  });
+
+  it("covers standalone module and society sections, including empty and image branches", async () => {
+    const onNavigate = vi.fn();
+    const { rerender, container } = render(
+      <ModulesSection modules={["CS101"]} onNavigate={onNavigate} role="student" />
+    );
+
+    await screen.findByText("Intro to CS");
+    fireEvent.click(screen.getByText("CS101"));
+    expect(onNavigate).toHaveBeenCalledWith("modules_CS101");
+
+    rerender(<ModulesSection modules={[]} onNavigate={onNavigate} role="student" />);
+    expect(container.firstChild).toBeNull();
+
+    rerender(<SocietiesSection societies={[{ id: 4, name: "Image Society", image: "/cover.png" }]} onNavigate={onNavigate} />);
+    expect(screen.getByAltText("Image Society")).toHaveAttribute("src", "/cover.png");
+    fireEvent.click(screen.getByText("Image Society"));
+    expect(onNavigate).toHaveBeenCalledWith("/societies?id=4");
+
+    rerender(<SocietiesSection societies={[]} onNavigate={onNavigate} />);
+    expect(container.firstChild).toBeNull();
   });
 
   it("profile widget adds pointer cursor when clickable", () => {
@@ -183,6 +298,10 @@ describe("profile widget extras", () => {
     getModulesMock.mockResolvedValueOnce({ results: [{ module_code: "XY1", module_name: "Extra" }] });
     const success = renderHook(() => useModuleNameMap());
     await waitFor(() => expect(success.result.current).toEqual({ XY1: "Extra" }));
+
+    getModulesMock.mockResolvedValueOnce({});
+    const emptyPayload = renderHook(() => useModuleNameMap());
+    await waitFor(() => expect(emptyPayload.result.current).toEqual({}));
 
     getModulesMock.mockRejectedValueOnce(new Error("fail"));
     const failure = renderHook(() => useModuleNameMap());
