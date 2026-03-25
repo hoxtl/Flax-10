@@ -22,12 +22,15 @@ The data tier is a PostgreSQL database accessed exclusively through Django's ORM
 
 External services (OpenAI, Mapbox, and the TfL API) are called from the application tier only, never from the frontend. This ensures that API keys remain server-side and that the backend can validate and transform external responses before returning them to the client.
 
-\begin{figure}[h]
+\begin{figure}[!h]
     \centering
-    % TODO: insert three-tier architecture diagram here
+    \adjustbox{max width=\linewidth, max totalheight=0.56\textheight}{%
+        \includegraphics{figures/three_tier_architecture.png}%
+    }
     \caption{Three-tier architecture of StudyFlax.}
     \label{fig:architecture}
 \end{figure}
+\clearpage
 
 \section{Frontend Design}
 \label{sect:frontend}
