@@ -6,12 +6,56 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from studyFlax.models import Enrollment
+from studyFlax.models import Enrollment, SocietyMembership
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.fixtures.data_fixtures import (
     module_task_templates, personal_task_fixtures, task_list_fixtures,
     teacher_task_list_fixtures, teacher_personal_task_fixtures,
 )
+
+SOCIETY_TASK_FIXTURES = (
+    (
+        "Plan the next {society} committee agenda",
+        "Set priorities for the next committee meeting, confirm owners, and keep the society plan moving.",
+        "high",
+        2,
+        1,
+    ),
+    (
+        "Publish this week's {society} update",
+        "Draft a clear post for members covering the next event, reminders, and anything that needs sign-off.",
+        "medium",
+        1,
+        2,
+    ),
+    (
+        "Review new {society} member requests",
+        "Check recent joins, answer any questions, and make sure new members know what is happening next.",
+        "medium",
+        1,
+        4,
+    ),
+    (
+        "Update the {society} event checklist",
+        "Check venue, timings, and promotion details so the next session runs smoothly.",
+        "low",
+        1,
+        6,
+    ),
+)
+
+SEEDED_TASK_DUE_HOUR = 20
+SEEDED_TASK_DUE_MINUTE = 0
+
+
+def _apply_seed_due_time(date_value):
+    return date_value.replace(
+        hour=SEEDED_TASK_DUE_HOUR,
+        minute=SEEDED_TASK_DUE_MINUTE,
+        second=0,
+        microsecond=0,
+    )
+
 
 def _create_task_lists(user):
     lists_by_name = {}
@@ -61,9 +105,7 @@ def _adjust_blocks(mod, title_tmpl, estimated_blocks):
     return estimated_blocks
 
 def _build_due_date(now, days_from_now):
-    return (now + timedelta(days=days_from_now)).replace(
-        hour=23, minute=59, second=0, microsecond=0,
-    )
+    return _apply_seed_due_time(now + timedelta(days=days_from_now))
 
 def _build_completed_at(now, due_date, completed):
     if not completed:
@@ -161,11 +203,72 @@ def _seed_tasks_for_user(user, now):
     total += _seed_personal_tasks(user, lists_by_name, personal_list, now)
     return total
 
+
+def _ensure_society_task_list(user, society):
+    task_list, created = TaskList.objects.get_or_create(
+        user=user,
+        society=society,
+        defaults={
+            "name": f"{society.name} Admin",
+            "category": "society",
+        },
+    )
+    updates = []
+    if task_list.category != "society":
+        task_list.category = "society"
+        updates.append("category")
+    if task_list.name != f"{society.name} Admin":
+        task_list.name = f"{society.name} Admin"
+        updates.append("name")
+    if updates and not created:
+        task_list.save(update_fields=updates)
+    return task_list
+
+
+def _seed_society_task_list(user, society, task_list, now):
+    if Task.objects.filter(user=user, task_list=task_list).exists():
+        return 0
+
+    count = 0
+    for title_template, description_template, priority, blocks, days in SOCIETY_TASK_FIXTURES:
+        Task.objects.create(
+            user=user,
+            task_list=task_list,
+            title=title_template.format(society=society.name),
+            description=description_template.format(society=society.name),
+            priority=priority,
+            due_date=_build_due_date(now, days),
+            estimated_blocks=blocks,
+            completed=False,
+        )
+        count += 1
+    return count
+
+
+def seed_society_tasks_for_user(user, now):
+    memberships = list(
+        SocietyMembership.objects.filter(user=user, role__in=["admin", "editor"]).select_related("society")
+    )
+    total = 0
+    for membership in memberships:
+        task_list = _ensure_society_task_list(user, membership.society)
+        total += _seed_society_task_list(user, membership.society, task_list, now)
+    return total
+
+
+def create_society_tasks(stdout):
+    now = timezone.now()
+    memberships = SocietyMembership.objects.filter(role__in=["admin", "editor"]).select_related("user")
+    users = {membership.user_id: membership.user for membership in memberships}
+    total = sum(seed_society_tasks_for_user(user, now) for user in users.values())
+    stdout.write(f"  \u2713  {'Society tasks':<14} {total:,}")
+
 def _ensure_task_due_today(user, lists_by_module, now):
     """If no tasks are due today, set the first module task's due date to today."""
 
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    today_due = _apply_seed_due_time(now)
     has_today = Task.objects.filter(
         user=user, due_date__gte=today_start, due_date__lte=today_end
     ).exists()
@@ -173,7 +276,7 @@ def _ensure_task_due_today(user, lists_by_module, now):
         return
     first_task = Task.objects.filter(user=user).order_by('due_date').first()
     if first_task:
-        first_task.due_date = today_end
+        first_task.due_date = today_due
         first_task.save(update_fields=['due_date'])
 
 def seed_new_user_tasks(user, now):

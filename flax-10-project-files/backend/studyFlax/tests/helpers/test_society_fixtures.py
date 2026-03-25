@@ -39,6 +39,8 @@ class SocietyFixturesTest(TestCase):
         result = build_society_dict("Test", "Bio", "About", "sports", ["Tag1"])
         self.assertEqual(result["name"], "Test")
         self.assertIn("sports", result["categories"])
+        self.assertGreater(len(result["about"]), 80)
+        self.assertIn("\n\n", result["about"])
 
     def test_get_random_category_image(self):
         from studyFlax.fixtures.society_fixtures import get_random_category_image
@@ -76,4 +78,3 @@ class SocietyFixturesTest(TestCase):
         from studyFlax.fixtures.society_fixtures import get_next_occurrence
 
         self.assertIsNotNone(get_next_occurrence(None))
-

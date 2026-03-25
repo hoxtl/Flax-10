@@ -37,6 +37,26 @@ def _task_list_name(obj):
     return getattr(task_list, "name", None)
 
 
+def _task_list_society(obj):
+    task_list = getattr(obj, "task_list", None)
+    return getattr(task_list, "society", None)
+
+
+def _task_list_society_id(obj):
+    society = _task_list_society(obj)
+    return getattr(society, "id", None)
+
+
+def _task_list_society_name(obj):
+    society = _task_list_society(obj)
+    return getattr(society, "name", None)
+
+
+def _society_attr(obj, field):
+    society = getattr(obj, "society", None)
+    return getattr(society, field, None)
+
+
 def _reading(obj):
     return getattr(obj, "reading", None) if obj.reading_id else None
 
@@ -59,13 +79,21 @@ class TaskListSerialiser(serializers.ModelSerializer):
     """Serialiser for task lists with a count of incomplete tasks."""
 
     task_count = serializers.SerializerMethodField()
+    society_id = serializers.SerializerMethodField()
+    society_name = serializers.SerializerMethodField()
 
     class Meta:
         model = TaskList
-        fields = ['id', 'name', 'category', 'archived', 'task_count', 'created_at']
+        fields = ['id', 'name', 'category', 'archived', 'task_count', 'created_at', 'society_id', 'society_name']
 
     def get_task_count(self, obj):
         return obj.tasks.filter(completed=False).count()
+
+    def get_society_id(self, obj):
+        return _society_attr(obj, "id")
+
+    def get_society_name(self, obj):
+        return _society_attr(obj, "name")
 
 class TaskSerialiser(serializers.ModelSerializer):
     """Serialiser for individual tasks with related field summaries."""
@@ -73,6 +101,8 @@ class TaskSerialiser(serializers.ModelSerializer):
     module_code = serializers.SerializerMethodField()
     module_name = serializers.SerializerMethodField()
     list_name = serializers.SerializerMethodField()
+    society_id = serializers.SerializerMethodField()
+    society_name = serializers.SerializerMethodField()
     reading_id = serializers.SerializerMethodField()
     reading_page_count = serializers.SerializerMethodField()
     reading_chapter = serializers.SerializerMethodField()
@@ -85,6 +115,7 @@ class TaskSerialiser(serializers.ModelSerializer):
         model = Task
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code', 'module_name',
+            'society_id', 'society_name',
             'group_project', 'group_project_name', 'assigned_to', 'assignees_info',
             'title', 'description', 'priority', 'status', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
@@ -101,6 +132,12 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def _get_list_name(self, obj):
         return _task_list_name(obj)
+
+    def _get_society_id(self, obj):
+        return _task_list_society_id(obj)
+
+    def _get_society_name(self, obj):
+        return _task_list_society_name(obj)
 
     def _get_reading_id(self, obj):
         return obj.reading_id if obj.reading_id else None
@@ -150,6 +187,8 @@ class TaskSerialiser(serializers.ModelSerializer):
 TaskSerialiser.get_module_code = TaskSerialiser._get_module_code
 TaskSerialiser.get_module_name = TaskSerialiser._get_module_name
 TaskSerialiser.get_list_name = TaskSerialiser._get_list_name
+TaskSerialiser.get_society_id = TaskSerialiser._get_society_id
+TaskSerialiser.get_society_name = TaskSerialiser._get_society_name
 TaskSerialiser.get_reading_id = TaskSerialiser._get_reading_id
 TaskSerialiser.get_reading_page_count = TaskSerialiser._get_reading_page_count
 TaskSerialiser.get_reading_chapter = TaskSerialiser._get_reading_chapter

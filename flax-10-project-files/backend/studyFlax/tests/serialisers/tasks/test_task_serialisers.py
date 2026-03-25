@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework import status
 
 from studyFlax.models.tasks.task_model import Task, TaskList
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.factories import make_society, make_user
 
 
 class TaskSerializerTest(TestCase):
@@ -41,6 +41,26 @@ class TaskSerializerTest(TestCase):
         Task.objects.create(user=self.user, task_list=task_list, title='Done', completed=True)
         serializer = TaskListSerialiser(task_list)
         self.assertEqual(serializer.data['task_count'], 1)
+
+    def test_task_and_list_serializers_expose_society_context(self):
+        from studyFlax.serialisers.tasks.task_serialisers import TaskListSerialiser, TaskSerialiser
+
+        society = make_society("Chess Society")
+        task_list = TaskList.objects.create(
+            user=self.user,
+            name="Chess Society Admin",
+            category="society",
+            society=society,
+        )
+        task = Task.objects.create(user=self.user, task_list=task_list, title="Plan the next committee agenda")
+
+        list_data = TaskListSerialiser(task_list).data
+        task_data = TaskSerialiser(task).data
+
+        self.assertEqual(list_data["society_id"], society.id)
+        self.assertEqual(list_data["society_name"], "Chess Society")
+        self.assertEqual(task_data["society_id"], society.id)
+        self.assertEqual(task_data["society_name"], "Chess Society")
 
     def test_sync_status_in_validated_data_sets_completed(self):
         from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser

@@ -17,6 +17,7 @@ class TaskList(models.Model):
         ('private', 'Private'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_lists')
+    society = models.ForeignKey('studyFlax.Society', on_delete=models.SET_NULL, null=True, blank=True, related_name='task_lists')
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='personal')
     archived = models.BooleanField(default=False)

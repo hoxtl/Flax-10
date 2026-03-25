@@ -34,7 +34,7 @@ from .seed_support.users.calendar_shares import (
 )
 from .seed_support.events.events import create_events_for_users
 from .seed_support.content.modules import create_modules, create_deadlines, create_enrollments
-from .seed_support.content.tasks import create_tasks
+from .seed_support.content.tasks import create_tasks, create_society_tasks
 from .seed_support.groups.groups import (
     create_group_projects, create_group_memberships, create_group_tasks, seed_group_availability,
 )
@@ -213,6 +213,7 @@ class Command(BaseCommand):
         create_society_memberships(self.stdout)
         create_society_events(self.stdout)
         create_society_images(self.stdout)
+        create_society_tasks(self.stdout)
         self.stdout.write(f"  \u2713  {'Societies':<14} {Society.objects.count():,}")
         create_group_projects(self.stdout)
         create_group_memberships(self.stdout)

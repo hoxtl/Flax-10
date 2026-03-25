@@ -6,6 +6,12 @@ from django.core.management.base import BaseCommand
 
 from studyFlax.models.society.society_calendar_sync_model import SocietyCalendarSync
 from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.management.commands.seed_support.content.societies import (
+    create_societies,
+    create_society_events,
+    create_society_images,
+    create_society_memberships,
+)
 
 
 def _ensure_seed_membership(user, society, role):
@@ -26,4 +32,8 @@ class Command(BaseCommand):
     help = "Seed societies and memberships"
 
     def handle(self, *args, **options):
-        self.stdout.write("Society seeding not yet implemented.")
+        create_societies(self.stdout)
+        create_society_memberships(self.stdout)
+        create_society_events(self.stdout)
+        create_society_images(self.stdout)
+        self.stdout.write(self.style.SUCCESS("Society seeding complete."))
