@@ -99,7 +99,10 @@ const selectPhysicsCourse = () => {
 const renderExternalAccountState = async (pendingValue = [{ status: "pending", desired_course: "Physics" }], externalUser = defaultExternalUser) => {
   getMyCourseChangeRequest.mockResolvedValueOnce(pendingValue);
   const state = renderHook(() => useAccountFormState(externalUser));
-  await waitFor(() => expect(state.result.current.currentCourse).toBeDefined());
+  await waitFor(() => {
+    expect(state.result.current.currentCourse).toBe("Maths");
+    expect(state.result.current.pendingRequest).toMatchObject({ requested_course: "Physics" });
+  });
   return state;
 };
 

@@ -25,7 +25,7 @@ vi.mock("../../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => ({ loadEvents: vi.fn() }),
 }));
 
-vi.mock("../../../../../components/Common/Tooltip/Tooltip", () => ({
+vi.mock("../../../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
@@ -39,7 +39,7 @@ vi.mock("../../../../../components/common/ConfirmModal/ConfirmModal", () => ({
   ),
 }));
 
-vi.mock("../../../../../components/Common/RescheduleEvents/rescheduleEventConflicts", () => ({
+vi.mock("../../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => ({
   buildConflictResolutionPlan: (...args) => buildConflictResolutionPlan(...args),
   applyConflictResolutionPlan: (...args) => applyConflictResolutionPlan(...args),
   buildConflictResolutionToastMessage: (...args) => buildConflictResolutionToastMessage(...args),

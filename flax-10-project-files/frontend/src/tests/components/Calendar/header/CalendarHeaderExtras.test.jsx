@@ -87,7 +87,7 @@ vi.mock("../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => ({ loadEvents: vi.fn() }),
 }));
 
-vi.mock("../../../../components/Common/RescheduleEvents/rescheduleEventConflicts", () => ({
+vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => ({
   buildConflictResolutionPlan: (...args) => mockBuildPlan(...args),
   applyConflictResolutionPlan: (...args) => mockApplyPlan(...args),
   buildConflictResolutionToastMessage: (...args) => mockToastMessage(...args),
@@ -122,7 +122,7 @@ describe("Calendar header extras", () => {
     fireEvent.click(screen.getByLabelText("Reschedule my events"));
     fireEvent.click(screen.getByText("Reschedule now"));
 
-    expect(mockBuildPlan).toHaveBeenCalled();
+    await waitFor(() => expect(mockBuildPlan).toHaveBeenCalled());
     await waitFor(() => expect(mockApplyPlan).toHaveBeenCalledWith({ operations: [{ id: "move-1" }] }, mockEditEvent));
     await waitFor(() => expect(mockToast).toHaveBeenCalledWith("Rescheduled 1 event"));
   });

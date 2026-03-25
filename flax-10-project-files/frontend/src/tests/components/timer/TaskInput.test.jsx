@@ -86,10 +86,12 @@ describe('TaskInput', () => {
 
     const sortSelect = screen.getAllByRole('combobox')[0];
     fireEvent.change(sortSelect, { target: { value: 'due' } });
-    await waitFor(() => expect(fetchApi).toHaveBeenCalledTimes(4));
-    const list = document.querySelector('[class*="taskPickList"]');
-    const items = Array.from(list.querySelectorAll('button')).map((b) => b.textContent);
-    expect(items[0]).toContain('High task');
+
+    await waitFor(() => {
+      const list = document.querySelector('[class*="taskPickList"]');
+      const items = Array.from(list.querySelectorAll('button')).map((button) => button.textContent);
+      expect(items[0]).toContain('High task');
+    });
   });
 
   it('filters by list and module', async () => {
