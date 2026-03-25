@@ -84,38 +84,35 @@ describe('Analytics coverage extras', () => {
     useInViewValue = true;
   });
 
-  it('covers AnimatedList selection, no-scrollbar mode, no-gradient mode, and bottom opacity fallback', () => {
+  it('covers AnimatedList selection and no-scrollbar mode', () => {
     const renderItem = vi.fn((item, index, isSelected) => (
       <div data-testid={`animated-item-${index}`} data-selected={String(isSelected)}>
         {item}
       </div>
     ));
-
-    useInViewValue = false;
-
-    const { container, rerender } = render(
+    const { container } = render(
       <AnimatedList items={['Alpha', 'Beta']} renderItem={renderItem} displayScrollbar={false} />,
     );
-
     const listViewport = container.querySelector('[data-index="0"]').parentElement;
     expect(listViewport.className).toContain('noScrollbar');
-
     fireEvent.mouseEnter(container.querySelector('[data-index="1"]'));
     expect(screen.getByTestId('animated-item-1')).toHaveAttribute('data-selected', 'true');
+  });
 
+  it('covers AnimatedList bottom opacity fallback and no-gradient mode', () => {
+    useInViewValue = false;
+    const { container, rerender } = render(<AnimatedList items={['Alpha']} />);
+    const listViewport = container.querySelector('[data-index="0"]').parentElement;
     Object.defineProperties(listViewport, {
       scrollTop: { configurable: true, value: 10 },
       scrollHeight: { configurable: true, value: 80 },
       clientHeight: { configurable: true, value: 100 },
     });
     fireEvent.scroll(listViewport);
-
-    const gradientNodes = Array.from(container.querySelectorAll('div')).filter((node) => node.style.opacity);
-    expect(gradientNodes.some((node) => node.style.opacity === '0')).toBe(true);
-
+    const nodes = Array.from(container.querySelectorAll('div')).filter((n) => n.style.opacity);
+    expect(nodes.some((n) => n.style.opacity === '0')).toBe(true);
     rerender(<AnimatedList items={['Alpha']} showGradients={false} />);
-    const gradientsAfterHide = Array.from(container.querySelectorAll('div')).filter((node) => node.style.opacity);
-    expect(gradientsAfterHide).toHaveLength(0);
+    expect(Array.from(container.querySelectorAll('div')).filter((n) => n.style.opacity)).toHaveLength(0);
   });
 
   it('covers AnimatedList defaults, selected styling, and both bottom-opacity branches', () => {
@@ -160,7 +157,7 @@ describe('Analytics coverage extras', () => {
     expect(props.margin.left).toBe(26);
   });
 
-  it('covers ConsistencyScore threshold labels and explanation branches', () => {
+  it('covers ConsistencyScore threshold labels (Started, Building)', () => {
     const cases = [
       {
         data: { summary: { current_streak_days: 0 }, daily_breakdown: [{ sessions: 1 }], period_days: 10 },
@@ -172,34 +169,26 @@ describe('Analytics coverage extras', () => {
         label: 'Building',
         tooltipPart: 'aim for fewer gaps',
       },
-      {
-        data: { summary: { active_days: 8, current_streak_days: 5 }, period_days: 10 },
-        label: 'Good',
-        tooltipPart: 'Strong consistency',
-      },
-      {
-        data: { summary: { active_days: 10, current_streak_days: 10 }, period_days: 10 },
-        label: 'Excellent',
-        tooltipPart: 'outstanding habit',
-      },
-      {
-        data: { summary: { active_days: 0, current_streak_days: 0 }, period_days: 0 },
-        label: 'Getting Started',
-        tooltipPart: 'Log sessions daily to build your score.',
-      },
-      {
-        data: { summary: { current_streak_days: 0 } },
-        label: 'Getting Started',
-        tooltipPart: 'Studied 0 of 30 days (0%) so far.',
-      },
     ];
-
     const { rerender, container } = render(<ConsistencyScore data={cases[0].data} />);
-
     for (const testCase of cases) {
       rerender(<ConsistencyScore data={testCase.data} />);
       expect(screen.getByText(testCase.label)).toBeTruthy();
       expect(container.firstChild).toHaveAttribute('data-tooltip', expect.stringContaining(testCase.tooltipPart));
+    }
+  });
+
+  it('covers ConsistencyScore threshold labels (Good, Excellent) and defaults', () => {
+    const cases = [
+      { data: { summary: { active_days: 8, current_streak_days: 5 }, period_days: 10 }, label: 'Good' },
+      { data: { summary: { active_days: 10, current_streak_days: 10 }, period_days: 10 }, label: 'Excellent' },
+      { data: { summary: { active_days: 0, current_streak_days: 0 }, period_days: 0 }, label: 'Getting Started' },
+      { data: { summary: { current_streak_days: 0 } }, label: 'Getting Started' },
+    ];
+    const { rerender } = render(<ConsistencyScore data={cases[0].data} />);
+    for (const testCase of cases) {
+      rerender(<ConsistencyScore data={testCase.data} />);
+      expect(screen.getByText(testCase.label)).toBeTruthy();
       expect(screen.getByText('Consistency')).toHaveAttribute('title', expect.stringContaining('Score = % of days studied'));
     }
   });

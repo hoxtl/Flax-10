@@ -104,8 +104,6 @@ describe("Dashboard sidebar extras", () => {
   it("handles desktop sidebar user menu actions", () => {
     const onSettingsClick = vi.fn();
     const onLogoutClick = vi.fn();
-    const onProfileClick = vi.fn();
-
     const { container } = render(
       <SidebarDesktop
         active="home"
@@ -113,18 +111,25 @@ describe("Dashboard sidebar extras", () => {
         user={{ name: "Alice", email: "a@a.com" }}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
-        onProfileClick={onProfileClick}
       />,
     );
-
     fireEvent.mouseEnter(container.firstChild);
     fireEvent.click(screen.getByText("Alice"));
     expect(screen.getByText("Profile")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Settings"));
     fireEvent.click(screen.getByText("Log out"));
-    fireEvent.click(screen.getByText("Profile"));
     expect(onSettingsClick).toHaveBeenCalled();
     expect(onLogoutClick).toHaveBeenCalled();
+  });
+
+  it("handles desktop sidebar profile click action", () => {
+    const onProfileClick = vi.fn();
+    const { container } = render(
+      <SidebarDesktop active="home" onChange={vi.fn()} user={{ name: "Alice" }} onProfileClick={onProfileClick} />,
+    );
+    fireEvent.mouseEnter(container.firstChild);
+    fireEvent.click(screen.getByText("Alice"));
+    fireEvent.click(screen.getByText("Profile"));
     expect(onProfileClick).toHaveBeenCalled();
   });
 
