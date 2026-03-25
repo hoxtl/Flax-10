@@ -69,36 +69,30 @@ describe("commandBarActions", () => {
 });
 
 describe("QuickCommandBar", () => {
-  it("opens from the slash shortcut, filters actions, triggers the primary action, and closes", () => {
-    const onNavChange = vi.fn();
-    const onOpenTask = vi.fn();
-
-    render(<QuickCommandBar onNavChange={onNavChange} onOpenTask={onOpenTask} />);
-
+  it("opens the bar from the slash shortcut or custom event", () => {
+    render(<QuickCommandBar onNavChange={vi.fn()} onOpenTask={vi.fn()} />);
     fireEvent.keyDown(window, { key: "/" });
-    expect(screen.getByText("Quick actions")).toBeInTheDocument();
-
-    const input = screen.getByPlaceholderText("Type to filter actions…");
-    fireEvent.change(input, { target: { value: "analytics" } });
-    fireEvent.keyDown(screen.getByPlaceholderText("Type to filter actions…"), { key: "ArrowDown", code: "ArrowDown" });
-    expect(screen.getByText("Quick actions")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /View analytics/i }));
-    expect(onNavChange).toHaveBeenCalledWith("analytics");
-
-    fireEvent.keyDown(window, { key: "/" });
-    fireEvent.mouseDown(screen.getByText("Quick actions").closest("div"));
-    expect(screen.getByText("Quick actions")).toBeInTheDocument();
-    fireEvent.mouseDown(screen.getByText("Quick actions").closest("div").parentElement.parentElement);
-    expect(screen.queryByText("Quick actions")).not.toBeInTheDocument();
-
-    fireEvent(window, new Event("quick-actions:open"));
     expect(screen.getByText("Quick actions")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Esc" }));
     expect(screen.queryByText("Quick actions")).not.toBeInTheDocument();
+    fireEvent(window, new Event("quick-actions:open"));
+    expect(screen.getByText("Quick actions")).toBeInTheDocument();
+  });
 
-    const inputTarget = document.createElement("input");
-    document.body.appendChild(inputTarget);
-    fireEvent.keyDown(inputTarget, { key: "/" });
+  it("filters and executes a navigation action", () => {
+    const onNavChange = vi.fn();
+    render(<QuickCommandBar onNavChange={onNavChange} onOpenTask={vi.fn()} />);
+    fireEvent(window, new Event("quick-actions:open"));
+    fireEvent.change(screen.getByPlaceholderText(/filter/), { target: { value: "analytics" } });
+    fireEvent.click(screen.getByRole("button", { name: /analytics/i }));
+    expect(onNavChange).toHaveBeenCalledWith("analytics");
+  });
+
+  it("closes the bar when clicking the backdrop", () => {
+    render(<QuickCommandBar onNavChange={vi.fn()} onOpenTask={vi.fn()} />);
+    fireEvent(window, new Event("quick-actions:open"));
+    const backdrop = screen.getByText("Quick actions").closest("div").parentElement.parentElement;
+    fireEvent.mouseDown(backdrop);
     expect(screen.queryByText("Quick actions")).not.toBeInTheDocument();
   });
 

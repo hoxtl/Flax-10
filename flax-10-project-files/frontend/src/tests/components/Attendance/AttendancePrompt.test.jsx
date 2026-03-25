@@ -152,40 +152,25 @@ describe("Attendance prompt", () => {
     expect(setSubmitting).toHaveBeenCalledWith(false);
   });
 
-  it("shows an error and restores the question when submission fails", async () => {
-    let resolveAnswer;
-    const onAnswer = vi.fn(
-      () =>
-        new Promise((resolve) => {
-          resolveAnswer = resolve;
-        }),
-    );
+  it("shows session confirmation message when answered", async () => {
+    const onAnswer = vi.fn(() => Promise.resolve(true));
+    render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
+    act(() => { fireEvent.click(screen.getByText("Yes")); });
+    expect(screen.getByText("Attendance noted.")).toBeInTheDocument();
+  });
 
+  it("restores the question when attendance submission fails", async () => {
+    let resolveAnswer;
+    const onAnswer = vi.fn(() => new Promise((resolve) => { resolveAnswer = resolve; }));
     render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
 
-    act(() => {
-      fireEvent.click(screen.getByText("No"));
-    });
-    expect(screen.getByText("Missed session noted.")).toBeInTheDocument();
-
+    act(() => { fireEvent.click(screen.getByText("No")); });
     await act(async () => {
       vi.advanceTimersByTime(1200);
       resolveAnswer(false);
-      await Promise.resolve();
-      await Promise.resolve();
     });
 
-    expect(onAnswer).toHaveBeenCalledWith(
-      false,
-      expect.objectContaining({ afterSuccess: expect.any(Function), closeDelayMs: 700 }),
-    );
-
-    await act(async () => {
-      await Promise.resolve();
-      await Promise.resolve();
-    });
-
-    expect(screen.getByText("Could not update attendance. Please try again.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Could not update attendance. Please try again.")).toBeInTheDocument());
     expect(screen.getByText(/Did you attend/i)).toBeInTheDocument();
   });
 

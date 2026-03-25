@@ -106,34 +106,31 @@ describe("IntelligenceGrid", () => {
     vi.clearAllMocks();
   });
 
-  it("toggles edit mode, opens the add sheet, and adds widgets without duplicating existing ones", () => {
+  it("toggles edit mode and handles add sheet visibility", () => {
     const props = createProps();
-    const { rerender } = render(<IntelligenceGrid {...props} />);
-
+    render(<IntelligenceGrid {...props} />);
     fireEvent.click(screen.getAllByText("toggle-edit")[0]);
     expect(props.setEdit).toHaveBeenCalledWith(true);
-    expect(props.setShowAdd).not.toHaveBeenCalledWith(false);
-
     fireEvent.click(screen.getByText("open-add-sheet"));
     expect(props.setShowAdd).toHaveBeenCalledWith(true);
+  });
 
-    const editingProps = createProps({ edit: true, showAdd: true });
-    rerender(<IntelligenceGrid {...editingProps} />);
-
-    fireEvent.click(screen.getAllByText("toggle-edit")[0]);
-    expect(editingProps.setEdit).toHaveBeenCalledWith(false);
-    expect(editingProps.setShowAdd).toHaveBeenCalledWith(false);
-
+  it("handles adding new and duplicate widgets without re-adding existing ones", () => {
+    const props = createProps({ edit: true, showAdd: true });
+    render(<IntelligenceGrid {...props} />);
     fireEvent.click(screen.getByText("add-new"));
-    const addNewUpdater = editingProps.setLayout.mock.calls[0][0];
-    expect(addNewUpdater(["hero", "todayTasks"])).toEqual(["hero", "todayTasks", "newWidget"]);
-
+    const addNewUpdater = props.setLayout.mock.calls[0][0];
+    expect(addNewUpdater(["hero"])).toEqual(["hero", "newWidget"]);
     fireEvent.click(screen.getByText("add-duplicate"));
-    const duplicateUpdater = editingProps.setLayout.mock.calls[1][0];
-    expect(duplicateUpdater(["hero", "todayTasks"])).toEqual(["hero", "todayTasks"]);
+    const duplicateUpdater = props.setLayout.mock.calls[1][0];
+    expect(duplicateUpdater(["hero"])).toEqual(["hero"]);
+  });
 
+  it("closes the add sheet through its close handler", () => {
+    const props = createProps({ edit: true, showAdd: true });
+    render(<IntelligenceGrid {...props} />);
     fireEvent.click(screen.getByText("close-sheet"));
-    expect(editingProps.setShowAdd).toHaveBeenCalledWith(false);
+    expect(props.setShowAdd).toHaveBeenCalledWith(false);
   });
 
   it("reorders widgets through the drag-and-drop callbacks and ignores same-target drops", () => {

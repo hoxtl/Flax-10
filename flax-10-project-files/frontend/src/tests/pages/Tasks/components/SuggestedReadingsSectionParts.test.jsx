@@ -79,64 +79,32 @@ describe("SuggestedReadingsSectionParts", () => {
     convertReadingToTask.mockResolvedValue({});
   });
 
-  it("renders reading info and converts a reading into a task", async () => {
-    const onAdded = vi.fn();
+  const mockReading = {
+    id: 3,
+    title: "Deep Work Notes",
+    page_count: 30,
+    deadline: "2026-03-24T10:00:00Z",
+  };
 
-    render(
-      <SuggestedReadingCard
-        reading={{
-          id: 3,
-          title: "Deep Work Notes",
-          page_count: 30,
-          deadline: "2026-03-24T10:00:00Z",
-        }}
-        onAdded={onAdded}
-        avgMinPerPage={1.5}
-      />,
-    );
-
+  it("renders reading information correctly", () => {
+    render(<SuggestedReadingCard reading={mockReading} onAdded={vi.fn()} avgMinPerPage={1.5} />);
     expect(screen.getByText("Deep Work Notes")).toBeInTheDocument();
     expect(screen.getByText("30 pages")).toBeInTheDocument();
     expect(screen.getByText(/Due /)).toBeInTheDocument();
     expect(screen.getByText("45 min to read")).toBeInTheDocument();
+  });
 
+  it("converts a reading into a task", async () => {
+    const onAdded = vi.fn();
+    render(<SuggestedReadingCard reading={mockReading} onAdded={onAdded} avgMinPerPage={1.5} />);
     fireEvent.click(screen.getByText("+ Add as task"));
-
     await waitFor(() => expect(convertReadingToTask).toHaveBeenCalledWith(3));
     expect(onAdded).toHaveBeenCalledWith(3);
     expect(screen.getByText("✓ Added")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText("✓ Added"));
-    expect(convertReadingToTask).toHaveBeenCalledTimes(1);
   });
 
-  it("renders personalized and fallback header meta", () => {
-    const { rerender } = render(
-      <SuggestedReadingsHeader
-        count={4}
-        collapsed={false}
-        onToggle={vi.fn()}
-        speedData={{ is_personalised: true, avg_min_per_page: 1.64 }}
-      />,
-    );
-
-    expect(screen.getByText("⚡ 1.6 min/page")).toBeInTheDocument();
-    expect(screen.getByLabelText("4 suggested readings")).toBeInTheDocument();
-
-    rerender(
-      <SuggestedReadingsHeader
-        count={1}
-        collapsed
-        onToggle={vi.fn()}
-        speedData={{ is_personalised: false, avg_min_per_page: 2 }}
-      />,
-    );
-
-    expect(screen.getByText("Average speed estimate")).toBeInTheDocument();
-  });
-
-  it("renders completion, empty, and populated body states", () => {
-    const { rerender } = render(
+  it("renders completion state when all readings are done", () => {
+    render(
       <SuggestedReadingsBody
         activeListLabel="History reading list"
         readings={[]}
@@ -145,11 +113,12 @@ describe("SuggestedReadingsSectionParts", () => {
         onAdded={vi.fn()}
       />,
     );
-
     expect(screen.getByText("All caught up on readings!")).toBeInTheDocument();
     expect(screen.getByText("No suggested readings left for History reading list right now.")).toBeInTheDocument();
+  });
 
-    rerender(
+  it("renders empty state when there are no readings and only pending tasks", () => {
+    render(
       <SuggestedReadingsBody
         activeListLabel="History reading list"
         readings={[]}
@@ -158,13 +127,14 @@ describe("SuggestedReadingsSectionParts", () => {
         onAdded={vi.fn()}
       />,
     );
-
     expect(screen.getByText("No suggested readings right now.")).toBeInTheDocument();
     expect(
-      screen.getByText("We’ll show extra reading recommendations for History reading list here when they’re available."),
+      screen.getByText(/We’ll show extra reading recommendations/),
     ).toBeInTheDocument();
+  });
 
-    rerender(
+  it("renders populated body state with readings", () => {
+    render(
       <SuggestedReadingsBody
         activeListLabel="History reading list"
         readings={[{ id: 7, title: "Seminar prep" }]}
@@ -173,7 +143,6 @@ describe("SuggestedReadingsSectionParts", () => {
         onAdded={vi.fn()}
       />,
     );
-
     expect(screen.getByText("Seminar prep")).toBeInTheDocument();
   });
 

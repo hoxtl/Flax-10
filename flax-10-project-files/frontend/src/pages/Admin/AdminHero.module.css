@@ -1,0 +1,136 @@
+/*
+ * Admin hero and launch button styles.
+ */
+
+.reportingHero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: clamp(1.2rem, 2vw, 1.8rem);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--primary, #6c47ff) 14%, transparent), transparent 46%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface, #fff) 96%, var(--primary, #6c47ff) 4%), color-mix(in srgb, var(--surface, #fff) 99%, #f4efe8 1%));
+  border: 1px solid color-mix(in srgb, var(--primary, #6c47ff) 10%, var(--border, #e5e7eb));
+  box-shadow:
+    0 16px 42px color-mix(in srgb, black 10%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 32%, transparent);
+}
+
+.reportingHeroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  flex: 1 1 480px;
+}
+
+.reportingHeroTitle {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 850;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+  color: var(--text, #111);
+}
+
+.reportingHeroText {
+  margin: 0;
+  max-width: 58ch;
+  color: color-mix(in srgb, var(--text, #111) 72%, var(--muted, #888) 28%);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.adminLaunchButton {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+  min-width: 0;
+  padding: 1rem 1.1rem;
+  border-radius: 24px;
+  text-decoration: none;
+  color: var(--text, #111);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--primary, #6c47ff) 18%, transparent), transparent 58%),
+    linear-gradient(145deg, color-mix(in srgb, var(--surface, #fff) 93%, var(--primary, #6c47ff) 7%), color-mix(in srgb, var(--surface, #fff) 88%, black 12%));
+  border: 1px solid color-mix(in srgb, var(--primary, #6c47ff) 18%, var(--border, #e5e7eb));
+  box-shadow:
+    0 18px 40px color-mix(in srgb, black 16%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 16%, transparent);
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.adminLaunchButton:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary, #6c47ff) 48%, transparent);
+  box-shadow:
+    0 22px 46px color-mix(in srgb, black 20%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--primary, #6c47ff) 14%, transparent);
+}
+
+.adminLaunchButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary, #6c47ff) 78%, white 22%);
+  outline-offset: 4px;
+}
+
+.adminActionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  padding: 0.38rem 0.72rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface, #fff) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary, #6c47ff) 16%, transparent);
+  color: color-mix(in srgb, var(--text, #111) 84%, var(--primary, #6c47ff) 16%);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.adminLaunchBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.adminLaunchTitle {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.adminLaunchCopy {
+  color: color-mix(in srgb, var(--text, #111) 78%, var(--muted, #888) 22%);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.adminLaunchArrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--primary, #6c47ff) 82%, var(--text, #111) 18%);
+}
+
+.adminLaunchMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: color-mix(in srgb, var(--text, #111) 66%, var(--muted, #888) 34%);
+  font-size: 0.82rem;
+  font-weight: 600;
+}

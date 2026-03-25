@@ -337,15 +337,19 @@ async function withLoading(setLoading, task) {
 async function runPlanWithToasts(plan, props) {
   try {
     const failureCount = await runConflictResolution(plan, props.editEvent);
-    if (failureCount === plan.operations.length) {
-      props.showToast("Couldn't reschedule your events. Some conflicts are read-only.");
-      return;
-    }
-    await refreshConflictState(props);
-    props.showToast(buildResolutionMessage(plan, failureCount), { durationMs: 8500 });
+    handleResolutionResult(plan, failureCount, props);
   } catch {
     props.showToast("Couldn't reschedule your events. Try again.");
   }
+}
+
+function handleResolutionResult(plan, failureCount, props) {
+  if (failureCount === plan.operations.length) {
+    props.showToast("Couldn't reschedule your events. Some conflicts are read-only.");
+    return;
+  }
+  refreshConflictState(props);
+  props.showToast(buildResolutionMessage(plan, failureCount), { durationMs: 8500 });
 }
 
 async function runConflictResolution(plan, editEvent) {

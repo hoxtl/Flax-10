@@ -81,30 +81,23 @@ describe("useSchedulingState", () => {
     expect(result.current.studyTimeProps.hasUnsaved).toBe(false);
   });
 
-  it("saves week and worktime preferences and keeps current values when APIs return nullish settings", async () => {
-    const onWeekPreferenceSave = vi.fn().mockResolvedValue(null);
-    const onWorktimePreferenceSave = vi.fn().mockResolvedValue({ worktime_preference: "" });
-    const { result } = renderHook(() => useSchedulingState({
-      onStudyTimeSave: vi.fn(),
-      onWeekPreferenceSave,
-      onWorktimePreferenceSave,
-    }));
-
+  it("updates and saves week preferences", async () => {
+    const onWeekSave = vi.fn().mockResolvedValue(null);
+    const { result } = renderHook(() => useSchedulingState({ onStudyTimeSave: vi.fn(), onWeekPreferenceSave: onWeekSave, onWorktimePreferenceSave: vi.fn() }));
     await waitFor(() => expect(result.current.loading).toBe(false));
-
-    act(() => {
-      result.current.weekPreferenceProps.onWeekPreferenceChange("weekends");
-      result.current.worktimeProps.onWorktimePreferenceChange("day");
-    });
-
-    await act(async () => {
-      await result.current.weekPreferenceProps.onSubmit({ preventDefault: vi.fn() });
-      await result.current.worktimeProps.onSubmit({ preventDefault: vi.fn() });
-    });
-
-    expect(onWeekPreferenceSave).toHaveBeenCalledWith({ week_preference: "weekends" });
-    expect(onWorktimePreferenceSave).toHaveBeenCalledWith({ worktime_preference: "day" });
+    act(() => { result.current.weekPreferenceProps.onWeekPreferenceChange("weekends"); });
+    await act(async () => { await result.current.weekPreferenceProps.onSubmit({ preventDefault: vi.fn() }); });
+    expect(onWeekSave).toHaveBeenCalledWith({ week_preference: "weekends" });
     expect(result.current.weekPreferenceProps.weekPreference).toBe("weekends");
+  });
+
+  it("updates and saves worktime preferences", async () => {
+    const onWorktimeSave = vi.fn().mockResolvedValue({ worktime_preference: "" });
+    const { result } = renderHook(() => useSchedulingState({ onStudyTimeSave: vi.fn(), onWeekPreferenceSave: vi.fn(), onWorktimePreferenceSave: onWorktimeSave }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    act(() => { result.current.worktimeProps.onWorktimePreferenceChange("day"); });
+    await act(async () => { await result.current.worktimeProps.onSubmit({ preventDefault: vi.fn() }); });
+    expect(onWorktimeSave).toHaveBeenCalledWith({ worktime_preference: "day" });
     expect(result.current.worktimeProps.worktimePreference).toBe("day");
   });
 });

@@ -76,36 +76,30 @@ describe("floating chat", () => {
     expect(screen.getByText("Custom prompt")).toBeInTheDocument();
   });
 
-  it("builds route prompts, prompt visibility, open events, and close handlers", () => {
+  it("sets route-specific prompt text for shared calendars", () => {
     const wrapper = ({ children }) => (
-      <MemoryRouter initialEntries={["/calendar?user_id=4&shared_name=Alex"]}>
-        {children}
-      </MemoryRouter>
+      <MemoryRouter initialEntries={["/calendar?user_id=4&shared_name=Alex"]}>{children}</MemoryRouter>
     );
-
-    const { result, rerender } = renderHook(() => useFloatingChatState(), { wrapper });
-
-    expect(result.current.showPrompt).toBe(true);
+    const { result } = renderHook(() => useFloatingChatState(), { wrapper });
     expect(result.current.promptText).toMatch(/meeting times/i);
+    expect(result.current.showPrompt).toBe(true);
+  });
+
+  it("handles prompt minimization and fab toggling", () => {
+    const { result } = renderHook(() => useFloatingChatState(), { wrapper: MemoryRouter });
     act(() => result.current.minimizePrompt());
     expect(result.current.minimized).toBe(true);
-
     act(() => result.current.toggleFab());
     expect(result.current.minimized).toBe(false);
+  });
 
+  it("opens the chat via custom event", () => {
+    const { result } = renderHook(() => useFloatingChatState(), { wrapper: MemoryRouter });
     act(() => {
-      window.dispatchEvent(new CustomEvent("flax-open-chat", { detail: { initialMessage: "Hello there" } }));
+      window.dispatchEvent(new CustomEvent("flax-open-chat", { detail: { initialMessage: "Hi" } }));
     });
     expect(result.current.open).toBe(true);
     expect(result.current.renderWindow()).toBeTruthy();
-
-    const routeWrapper = ({ children }) => (
-      <MemoryRouter initialEntries={["/modules"]}>
-        {children}
-      </MemoryRouter>
-    );
-
-    rerender({ wrapper: routeWrapper });
   });
 
   it("renders the floating window panel and closes it through the returned callback", () => {

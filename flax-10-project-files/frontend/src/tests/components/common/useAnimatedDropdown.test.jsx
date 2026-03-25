@@ -120,33 +120,33 @@ describe("useAnimatedDropdownState", () => {
   });
 
   describe("grouped dropdown", () => {
-    it("opens on hover, flips upward, and manages listeners", () => {
-      vi.useFakeTimers();
-      const onOpenChange = vi.fn();
-      const addSpy = vi.spyOn(window, "addEventListener");
-      const removeSpy = vi.spyOn(window, "removeEventListener");
-      const { result, rerender, props } = renderGroupedDropdown({ onOpenChange });
-      const baseProps = { ...props };
-      expect(result.current.selectedLabel).toBe("Choose");
-      const container = document.createElement("div");
-      container.getBoundingClientRect = () => ({ top: 500, bottom: 550, left: 40, width: 150 });
-      act(() => {
-        result.current.containerRef.current = container;
-        result.current.handleMouseEnter();
+      it("opens on hover when enabled", () => {
+        vi.useFakeTimers();
+        const onOpen = vi.fn();
+        const { result } = renderGroupedDropdown({ onOpenChange: onOpen });
+        act(() => { result.current.handleMouseEnter(); });
+        expect(onOpen).toHaveBeenCalledWith(true);
       });
-      expect(onOpenChange).toHaveBeenCalledWith(true);
-      rerender({ ...baseProps, isOpen: true });
-      expect(result.current.openUpward).toBe(true);
-      expect(result.current.coords).toEqual({ top: 500, left: 40, width: 150 });
-      expect(addSpy).toHaveBeenCalledWith("scroll", expect.any(Function), true);
-      act(() => {
-        result.current.handleMouseLeave();
-        vi.runAllTimers();
+
+      it("flips the menu upward when space is tight at the bottom", () => {
+        const { result, rerender, props } = renderGroupedDropdown();
+        const box = { top: 500, bottom: 550, left: 40, width: 150 };
+        const el = { getBoundingClientRect: () => box };
+        act(() => { result.current.containerRef.current = el; result.current.handleMouseEnter(); });
+        rerender({ ...props, isOpen: true });
+        expect(result.current.openUpward).toBe(true);
+        expect(result.current.coords).toEqual({ top: 500, left: 40, width: 150 });
       });
-      expect(onOpenChange).toHaveBeenCalledWith(false);
-      rerender({ ...baseProps, isOpen: false });
-      expect(removeSpy).toHaveBeenCalledWith("scroll", expect.any(Function), true);
-    });
+
+      it("manages scroll listeners while the menu is open", () => {
+        const add = vi.spyOn(window, "addEventListener");
+        const remove = vi.spyOn(window, "removeEventListener");
+        const { rerender, props } = renderGroupedDropdown();
+        rerender({ ...props, isOpen: true });
+        expect(add).toHaveBeenCalledWith("scroll", expect.any(Function), true);
+        rerender({ ...props, isOpen: false });
+        expect(remove).toHaveBeenCalledWith("scroll", expect.any(Function), true);
+      });
 
     it("filters grouped options and builds upward menu styles", () => {
       expect(getFilteredDropdownOptions(groupedOptions, true, true, "be")).toEqual([

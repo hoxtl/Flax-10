@@ -38,33 +38,36 @@ describe('TodayBanner', () => {
     statStripSpy.mockReset();
   });
 
-  it('renders the shared analytics stat strip with seeded summary ranges', async () => {
+  const mockAnalytics = () => {
     analyticsService.getSummary.mockImplementation((days) => Promise.resolve({
-      summary: {
-        1: { total_sessions: 2 },
-        7: { active_days: 4 },
-        30: { current_streak_days: 5, total_sessions: 12, total_study_hours: 17.5 },
-      }[days],
+      summary: { 1: { total_sessions: 2 }, 7: { active_days: 4 }, 30: { current_streak_days: 5, total_sessions: 12, total_study_hours: 17.5 } }[days],
     }));
+  };
 
+  it('renders the stat strip and calls analytics for each range', async () => {
+    mockAnalytics();
+    render(<TodayBanner />);
+    await waitFor(() => expect(screen.getByTestId('stat-strip')).toBeInTheDocument());
+    expect(analyticsService.getSummary).toHaveBeenCalledTimes(3);
+    [1, 7, 30].forEach(d => expect(analyticsService.getSummary).toHaveBeenCalledWith(d));
+  });
+
+  it('passes correctly mapped analytics items to StatStrip', async () => {
+    mockAnalytics();
+    render(<TodayBanner />);
+    await waitFor(() => {
+      const { items } = statStripSpy.mock.calls.at(-1)[0];
+      expect(items.find(i => i.key === 'streak')).toMatchObject({ value: 5, suffix: 'd' });
+      expect(items.find(i => i.key === 'sessions')).toMatchObject({ value: 12 });
+      expect(items.find(i => i.key === 'weekly-goal')).toMatchObject({ value: 4 });
+      expect(items.find(i => i.key === 'focus-time')).toMatchObject({ value: 17.5 });
+    });
+  });
+
+  it('propagates streak data to parent callback', async () => {
+    mockAnalytics();
     const onStreakData = vi.fn();
     render(<TodayBanner onStreakData={onStreakData} />);
-
-    await waitFor(() => expect(screen.getByTestId('stat-strip')).toBeInTheDocument());
-
-    expect(analyticsService.getSummary).toHaveBeenCalledTimes(3);
-    expect(analyticsService.getSummary).toHaveBeenCalledWith(1);
-    expect(analyticsService.getSummary).toHaveBeenCalledWith(7);
-    expect(analyticsService.getSummary).toHaveBeenCalledWith(30);
-
-    const { items } = statStripSpy.mock.calls.at(-1)[0];
-    expect(items).toEqual(expect.arrayContaining([
-      expect.objectContaining({ key: 'streak', value: 5, suffix: 'd' }),
-      expect.objectContaining({ key: 'sessions', value: 12, tooltip: 'Last 30 days' }),
-      expect.objectContaining({ key: 'weekly-goal', value: 4, suffix: ' / 7', tooltip: 'Active days this week' }),
-      expect.objectContaining({ key: 'focus-time', value: 17.5, suffix: 'h', tooltip: 'Last 30 days' }),
-    ]));
-    expect(items.find((item) => item.key === 'streak')?.meta).toBeUndefined();
-    expect(onStreakData).toHaveBeenCalledWith({ current_streak_days: 5, total_sessions: 2 });
+    await waitFor(() => expect(onStreakData).toHaveBeenCalledWith({ current_streak_days: 5, total_sessions: 2 }));
   });
 });

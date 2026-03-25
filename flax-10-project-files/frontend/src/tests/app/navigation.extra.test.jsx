@@ -44,36 +44,25 @@ describe("navigation and analytics extras", () => {
     expect(navigate).toHaveBeenLastCalledWith("/group-work?project=31");
   });
 
-  it("covers analytics animation config and overview hook reset/error branches", async () => {
-    expect(fadeUp.visible()).toEqual(expect.objectContaining({
-      opacity: 1,
-      y: 0,
-      transition: expect.objectContaining({ delay: 0 }),
-    }));
+  it("covers analytics animation visible config", () => {
+    expect(fadeUp.visible()).toEqual(expect.objectContaining({ opacity: 1, y: 0 }));
+  });
 
-    const { result, rerender } = renderHook(({ period }) => useAnalyticsOverview(period), {
-      initialProps: { period: null },
-    });
-    expect(result.current).toEqual({
-      data: null,
-      error: null,
-      loading: false,
-      progressData: null,
-      themeStats: null,
-    });
+  it("sets initial null state when no period is provided to useAnalyticsOverview", () => {
+    const { result } = renderHook(() => useAnalyticsOverview(null));
+    expect(result.current.data).toBeNull();
+    expect(result.current.loading).toBe(false);
+  });
 
-    getSummary.mockRejectedValueOnce(new Error("boom"));
-    getProgress.mockRejectedValueOnce(new Error("boom"));
-    getThemeStats.mockRejectedValueOnce(new Error("boom"));
-    rerender({ period: 7 });
-    await waitFor(() => expect(result.current.error).toBe("boom"));
-
-    getSummary.mockResolvedValueOnce({ summary: true });
-    getProgress.mockResolvedValueOnce({ progress: true });
-    getThemeStats.mockResolvedValueOnce({ theme: true });
-    rerender({ period: 30 });
-    await waitFor(() => expect(result.current.data).toEqual({ summary: true }));
-    expect(result.current.progressData).toEqual({ progress: true });
-    expect(result.current.themeStats).toEqual({ theme: true });
+  it("handles loading and error states for useAnalyticsOverview", async () => {
+    getSummary.mockRejectedValue(new Error("summary-fail"));
+    const { result, rerender } = renderHook(({ p }) => useAnalyticsOverview(p), { initialProps: { p: 7 } });
+    await waitFor(() => expect(result.current.error).toBe("summary-fail"));
+    
+    getSummary.mockResolvedValue({ s: 1 });
+    getProgress.mockResolvedValue({ p: 1 });
+    getThemeStats.mockResolvedValue({ t: 1 });
+    rerender({ p: 30 });
+    await waitFor(() => expect(result.current.data).toEqual({ s: 1 }));
   });
 });

@@ -83,32 +83,21 @@ describe("useLocationAutocomplete", () => {
     expect(screen.getByTestId("suggestion-count")).toHaveTextContent("0");
   });
 
-  it("prevents immediate reopen after selection, then reopens and closes outside", async () => {
+  it("prevents immediate reopen after selection", async () => {
     const onChangeSpy = vi.fn();
-    fetch.mockResolvedValue({
-      json: async () => ({
-        features: [{ id: "1", place_name: "Strand Campus, London", text: "Strand Campus" }],
-      }),
-    });
-
     render(<LocationAutocompleteHarness onChangeSpy={onChangeSpy} />);
-
-    const input = screen.getByLabelText("location-input");
-    fireEvent.change(input, { target: { value: "Strand" } });
-    await delay(320);
-    await waitFor(() => expect(screen.getByTestId("suggestion-count")).toHaveTextContent("1"));
-
     fireEvent.click(screen.getByText("select-location"));
     expect(onChangeSpy).toHaveBeenCalledWith("King's Building");
+    fireEvent.focus(screen.getByLabelText("location-input"));
     expect(screen.getByTestId("show-state")).toHaveTextContent("false");
+  });
 
-    fireEvent.focus(input);
-    expect(screen.getByTestId("show-state")).toHaveTextContent("false");
-
+  it("reopens suggestions after selection cooldown and closes on outside click", async () => {
+    render(<LocationAutocompleteHarness onChangeSpy={vi.fn()} />);
+    fireEvent.click(screen.getByText("select-location"));
     await delay(220);
-    fireEvent.focus(input);
+    fireEvent.focus(screen.getByLabelText("location-input"));
     expect(screen.getByTestId("show-state")).toHaveTextContent("true");
-
     fireEvent.mouseDown(document.body);
     await waitFor(() => expect(screen.getByTestId("show-state")).toHaveTextContent("false"));
   });

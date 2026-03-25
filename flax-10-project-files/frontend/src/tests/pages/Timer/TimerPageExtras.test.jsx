@@ -200,33 +200,27 @@ describe("Timer page extras", () => {
       expect(document.title).toBe("StudyFlax");
     });
 
-    it("handles keyboard shortcuts, transient flags, and fullscreen", async () => {
+    it("handles keyboard shortcuts for timer control", async () => {
       const effects = await loadTimerEffects();
       const t = { isActive: true, togglePause: vi.fn(), setIsActive: vi.fn(), resetTimer: vi.fn() };
-      const shortcuts = renderHook(() => effects.useTimerShortcuts({
-        t,
-        setShowShortcuts: vi.fn((fn) => fn(false)),
-        setFocusMode: vi.fn(),
-        openFocusMode: vi.fn(),
-        closeOverlays: vi.fn(),
-        focusMode: false,
-      }));
+      renderHook(() => effects.useTimerShortcuts({ t, setShowShortcuts: vi.fn(), setFocusMode: vi.fn(), openFocusMode: vi.fn(), closeOverlays: vi.fn(), focusMode: false }));
       ["?", " ", "r", "f", "Escape"].forEach((key) => fireEvent.keyDown(window, { key }));
       expect(t.togglePause).toHaveBeenCalled();
       expect(t.resetTimer).toHaveBeenCalled();
-      shortcuts.unmount();
+    });
 
-      renderHook(() => effects.useTransientFlags({
-        showFocusTransition: true,
-        setShowFocusTransition: vi.fn(),
-        showPageSkeleton: true,
-        setShowPageSkeleton: vi.fn(),
-        minFocusSkeletonMs: 100,
-      }));
+    it("handles transient focus transition and skeleton flags", async () => {
+      const effects = await loadTimerEffects();
+      const setShowFocusTransition = vi.fn();
+      const setShowPageSkeleton = vi.fn();
+      renderHook(() => effects.useTransientFlags({ showFocusTransition: true, setShowFocusTransition, showPageSkeleton: true, setShowPageSkeleton, minFocusSkeletonMs: 100 }));
+      expect(setShowFocusTransition).not.toHaveBeenCalled();
+    });
 
+    it("requests fullscreen when focus mode is pending", async () => {
+      const effects = await loadTimerEffects();
       const requestFullscreen = vi.fn().mockResolvedValue(undefined);
       document.documentElement.requestFullscreen = requestFullscreen;
-      document.fullscreenElement = null;
       renderHook(() => effects.useFocusFullscreen({ focusMode: true, focusFullscreenPending: true, setFocusFullscreenPending: vi.fn() }));
       await waitFor(() => expect(requestFullscreen).toHaveBeenCalled());
     });

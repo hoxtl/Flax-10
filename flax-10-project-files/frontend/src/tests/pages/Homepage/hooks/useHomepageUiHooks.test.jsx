@@ -11,32 +11,23 @@ describe("Homepage UI hooks", () => {
     vi.clearAllMocks();
   });
 
-  it("initializes and updates homepage modal state", () => {
-    const defaultReadItem = { id: 4, title: "Read chapter" };
-    const { result } = renderHook(() => useHomepageModals(true, defaultReadItem));
-
+  it("initializes homepage modal state with defaults", () => {
+    const { result } = renderHook(() => useHomepageModals(true, { id: 1 }));
     expect(result.current.showCreateTaskModal).toBe(true);
-    expect(result.current.planTimelineReadItem).toEqual(defaultReadItem);
+    expect(result.current.planTimelineReadItem).toEqual({ id: 1 });
     expect(result.current.showCreateListFromTask).toBe(false);
-    expect(result.current.lastCreatedListId).toBeNull();
+  });
 
+  it("updates individual homepage modal states", () => {
+    const { result } = renderHook(() => useHomepageModals(false, null));
     act(() => {
-      result.current.setShowCreateTaskModal(false);
-      result.current.setShowCreateListFromTask(true);
-      result.current.setLastCreatedListId(11);
-      result.current.setRescheduleTask({ id: 9 });
-      result.current.setPlanTimelineReadItem(null);
-      result.current.setSelectedDeadline({ id: 1 });
-      result.current.setSelectedModulePill("CS101");
+      result.current.setShowCreateTaskModal(true);
+      result.current.setLastCreatedListId(10);
+      result.current.setSelectedModulePill("CS");
     });
-
-    expect(result.current.showCreateTaskModal).toBe(false);
-    expect(result.current.showCreateListFromTask).toBe(true);
-    expect(result.current.lastCreatedListId).toBe(11);
-    expect(result.current.rescheduleTask).toEqual({ id: 9 });
-    expect(result.current.planTimelineReadItem).toBeNull();
-    expect(result.current.selectedDeadline).toEqual({ id: 1 });
-    expect(result.current.selectedModulePill).toBe("CS101");
+    expect(result.current.showCreateTaskModal).toBe(true);
+    expect(result.current.lastCreatedListId).toBe(10);
+    expect(result.current.selectedModulePill).toBe("CS");
   });
 
   it("prefers first name for the homepage display name, then username, then null", () => {

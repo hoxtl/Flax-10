@@ -76,31 +76,23 @@ describe("CampusMap hooks", () => {
     expect(result.current.ui.mobileInitialOpen).toBe(true);
   });
 
-  it("useDisruptions loads disruption data and retries on an interval", async () => {
-    let intervalCallback = null;
-    vi.spyOn(window, "setInterval").mockImplementation((callback) => {
-      intervalCallback = callback;
-      return 1;
-    });
-    vi.spyOn(window, "clearInterval").mockImplementation(() => {});
-    tflService.getTfLDelays
-      .mockResolvedValueOnce([{ id: 1, name: "Central" }])
-      .mockResolvedValueOnce([{ id: 2, name: "Northern" }]);
-
-    const { result, unmount } = renderHook(() => useDisruptions());
+  it("useDisruptions loads initial disruption data", async () => {
+    tflService.getTfLDelays.mockResolvedValueOnce([{ id: 1, name: "C" }]);
+    const { result } = renderHook(() => useDisruptions());
     await flushEffects();
-
     expect(result.current.loading).toBe(false);
-    expect(result.current.disruptions).toEqual([{ id: 1, name: "Central" }]);
+    expect(result.current.disruptions).toEqual([{ id: 1, name: "C" }]);
+  });
 
-    await act(async () => {
-      await intervalCallback?.();
-    });
+  it("useDisruptions retries on an interval", async () => {
+    let cb = null;
+    vi.spyOn(window, "setInterval").mockImplementation((c) => { cb = c; return 1; });
+    tflService.getTfLDelays.mockResolvedValueOnce([{ id: 1, name: "C" }]).mockResolvedValueOnce([{ id: 2, name: "N" }]);
+    const { result } = renderHook(() => useDisruptions());
     await flushEffects();
-
-    expect(result.current.disruptions).toEqual([{ id: 2, name: "Northern" }]);
-
-    unmount();
+    await act(async () => { await cb?.(); });
+    await flushEffects();
+    expect(result.current.disruptions).toEqual([{ id: 2, name: "N" }]);
   });
 
   it("useDisruptions swallows fetch failures and still clears loading", async () => {

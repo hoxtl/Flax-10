@@ -20,31 +20,15 @@ describe("landing page components", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders section navigation with badges and scrolls to the chosen section", () => {
+  it("renders section navigation with badges", () => {
+    render(<LandingSectionNav activeSection={1} sectionRefs={{ current: [] }} sections={[{ id: "h", title: "H", badge: "I" }, { id: "f", title: "F" }]} styles={styles} />);
+    expect(screen.getByText("I")).toBeInTheDocument();
+  });
+
+  it("scrolls to the chosen section on click", () => {
     const scrollIntoView = vi.fn();
-    const sectionRefs = {
-      current: [
-        { scrollIntoView },
-        { scrollIntoView: vi.fn() },
-      ],
-    };
-
-    render(
-      <LandingSectionNav
-        activeSection={1}
-        sectionRefs={sectionRefs}
-        sections={[
-          { id: "hero", title: "Hero", badge: "Intro" },
-          { id: "features", title: "Features" },
-        ]}
-        styles={styles}
-      />,
-    );
-
-    expect(screen.getByText("Intro")).toBeInTheDocument();
-    expect(screen.getByText("Section 2")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Go to Hero" }));
+    render(<LandingSectionNav activeSection={1} sectionRefs={{ current: [{ scrollIntoView }, { scrollIntoView: vi.fn() }] }} sections={[{ id: "h", title: "H" }, { id: "f", title: "F" }]} styles={styles} />);
+    fireEvent.click(screen.getByRole("button", { name: /go to h/i }));
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
   });
 });

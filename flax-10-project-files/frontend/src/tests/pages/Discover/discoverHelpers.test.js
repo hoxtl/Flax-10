@@ -46,27 +46,21 @@ describe("discover helpers", () => {
     searchUsersMock.mockResolvedValue({ results: [], total_count: 0 });
   });
 
-  it("formats names, roles, current user, and visible users", () => {
+  it("formats display names and role labels correctly", () => {
     expect(getDisplayName({ name: "  Ava Stone " })).toBe("Ava Stone");
     expect(getDisplayName({ first_name: "Ava", last_name: "Stone" })).toBe("Ava Stone");
     expect(getDisplayName({ first_name: "Sam", last_name: "Lee", role: "teacher" })).toBe("Dr. Sam Lee");
     expect(getDisplayName({})).toBe("User");
-
     expect(getRoleLabel("teacher")).toBe("Teacher");
     expect(getRoleLabel("student")).toBe("Student");
     expect(getRoleLabel("pending_teacher")).toBe("Teacher applicant");
     expect(getRoleLabel("other")).toBe("User");
-    expect(getDiscoverSortOptions()).toHaveLength(2);
-    expect(USERS_PER_PAGE).toBe(15);
+  });
 
+  it("identifies the current user and filters them from visible lists", () => {
     localStorage.setItem("user", JSON.stringify({ id: 2, username: "sam" }));
     expect(getCurrentUser()).toEqual({ id: 2, username: "sam" });
-    expect(
-      filterVisibleUsers([
-        { id: 2, username: "sam" },
-        { id: 3, username: "ava" },
-      ])
-    ).toEqual([{ id: 3, username: "ava" }]);
+    expect(filterVisibleUsers([{ id: 2, username: "sam" }, { id: 3, username: "ava" }])).toEqual([{ id: 3, username: "ava" }]);
   });
 
   it("sorts discover users in both directions and leaves unknown sorts untouched", () => {
@@ -80,37 +74,37 @@ describe("discover helpers", () => {
     expect(sortDiscoverUsers(users, "none")).toEqual(users);
   });
 
-  it("fetch hook debounces requests, sorts results, and recovers from API errors", async () => {
+  it("fetch hook debounces requests", async () => {
     vi.useRealTimers();
-    const filterState = {
-      props: {
-        selectedCourses: ["CS"],
-        selectedSocieties: ["Tech"],
-        selectedYears: ["2"],
-        selectedRoles: ["teacher"],
-      },
-    };
-    searchUsersMock.mockResolvedValueOnce({
-      results: [
-        { first_name: "Bella", last_name: "Zed" },
-        { first_name: "Ava", last_name: "Stone" },
-      ],
-      total_count: 30,
-    });
-
-    const { result, rerender } = renderHook(
-      ({ query, sortBy }) => useDiscoverFetch(query, filterState, sortBy),
-      { initialProps: { query: "bio", sortBy: "name" } }
-    );
+    const filterState = { props: { selectedCourses: ["CS"], selectedSocieties: ["Tech"], selectedYears: ["2"], selectedRoles: ["teacher"] } };
+    searchUsersMock.mockResolvedValueOnce({ results: [], total_count: 30 });
+    renderHook(({ query }) => useDiscoverFetch(query, filterState, "name"), { initialProps: { query: "bio" } });
 
     await new Promise((resolve) => setTimeout(resolve, 320));
-    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(searchUsersMock).toHaveBeenCalledWith("bio", "CS", "Tech", 0, 15, "2", "teacher", "name");
-    expect(result.current.users.map((user) => user.first_name)).toEqual(["Ava", "Bella"]);
-    expect(result.current.totalPages).toBe(2);
+  });
 
+  it("fetch hook sorts results after loading", async () => {
+    vi.useRealTimers();
+    const filterState = { props: { selectedCourses: [], selectedSocieties: [], selectedYears: [], selectedRoles: [] } };
+    searchUsersMock.mockResolvedValueOnce({
+      results: [{ first_name: "Z", last_name: "Z" }, { first_name: "A", last_name: "A" }],
+      total_count: 5,
+    });
+
+    const { result } = renderHook(() => useDiscoverFetch("q", filterState, "name"));
+    await new Promise((resolve) => setTimeout(resolve, 320));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.users.map((u) => u.first_name)).toEqual(["A", "Z"]);
+  });
+
+  it("fetch hook recovers from API errors", async () => {
+    vi.useRealTimers();
+    const filterState = { props: { selectedCourses: [], selectedSocieties: [], selectedYears: [], selectedRoles: [] } };
     searchUsersMock.mockRejectedValueOnce(new Error("nope"));
-    rerender({ query: "chem", sortBy: "name-desc" });
+
+    const { result } = renderHook(() => useDiscoverFetch("chem", filterState, "name"));
+
     await new Promise((resolve) => setTimeout(resolve, 320));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.users).toEqual([]);

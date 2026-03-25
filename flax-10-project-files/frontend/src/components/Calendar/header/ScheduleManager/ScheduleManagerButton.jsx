@@ -69,15 +69,19 @@ async function withBusyState(setBusy, task) {
 async function runReschedulePlan(plan, editEvent, showToast) {
   try {
     const result = await applyConflictResolutionPlan(plan, editEvent);
-    const failureCount = result?.failures?.length ?? 0;
-    if (failureCount === plan.operations.length) {
-      showToast("Couldn't reschedule your events. Some conflicts are read-only.");
-      return;
-    }
-    showToast(buildScheduleMessage(plan, failureCount));
+    handleRescheduleResult(plan, result, showToast);
   } catch {
     showToast("Couldn't reschedule your events. Try again.");
   }
+}
+
+function handleRescheduleResult(plan, result, showToast) {
+  const failureCount = result?.failures?.length ?? 0;
+  if (failureCount === plan.operations.length) {
+    showToast("Couldn't reschedule your events. Some conflicts are read-only.");
+    return;
+  }
+  showToast(buildScheduleMessage(plan, failureCount));
 }
 
 function buildScheduleMessage(plan, failureCount) {

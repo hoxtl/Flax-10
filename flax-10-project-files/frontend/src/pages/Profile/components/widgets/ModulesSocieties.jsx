@@ -4,6 +4,7 @@ import Card from "../../../../components/common/Card/Card";
 import ProfileWidget from "./ProfileWidget";
 import widgetStyles from "./ProfileWidgets.module.css";
 import badgeStyles from "./ProfileBadgesModules.module.css";
+import teacherStyles from "./ProfileTeacherModules.module.css";
 import teachingCardColors from './teachingCardColors.json';
 const styles = { ...widgetStyles, ...badgeStyles };
 const TEACHING_CARD_COLORS = teachingCardColors;
@@ -67,15 +68,15 @@ function TeacherModuleCard({ code, name, color, onNavigate }) {
   return (
     <button
       type="button"
-      className={styles.teacherModuleCard}
+      className={teacherStyles.teacherModuleCard}
       style={{ borderLeftColor: color }}
       onClick={() => onNavigate?.(`modules_${code}`)}
     >
-      <div className={styles.teacherModuleIcon} style={{ background: `${color}18`, color }} aria-hidden="true">📚</div>
-      <div className={styles.teacherModuleContent}>
-        <p className={styles.teacherModuleLabel}>Teaching module</p>
-        <div className={styles.teacherModuleCode}>{code}</div>
-        {name && <p className={styles.teacherModuleName}>{name}</p>}
+      <div className={teacherStyles.teacherModuleIcon} style={{ background: `${color}18`, color }} aria-hidden="true">📚</div>
+      <div className={teacherStyles.teacherModuleContent}>
+        <p className={teacherStyles.teacherModuleLabel}>Teaching module</p>
+        <div className={teacherStyles.teacherModuleCode}>{code}</div>
+        {name && <p className={teacherStyles.teacherModuleName}>{name}</p>}
       </div>
     </button>
   );
@@ -84,9 +85,9 @@ function TeacherModuleCard({ code, name, color, onNavigate }) {
 function TeacherModulesSection({ modules, nameMap, onNavigate }) {
   if (!modules?.length) return null;
   return (
-    <Card padding="lg" className={styles.teacherModulesSection}>
-      <p className={styles.teacherModulesEyebrow}>Modules I Teach</p>
-      <div className={styles.teacherModulesGrid}>
+    <Card padding="lg" className={teacherStyles.teacherModulesSection}>
+      <p className={teacherStyles.teacherModulesEyebrow}>Modules I Teach</p>
+      <div className={teacherStyles.teacherModulesGrid}>
         {modules.map((code, index) => (
           <TeacherModuleCard
             key={code}

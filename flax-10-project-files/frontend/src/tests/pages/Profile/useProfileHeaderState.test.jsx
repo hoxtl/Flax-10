@@ -14,71 +14,38 @@ describe("useProfileHeaderState", () => {
     vi.clearAllMocks();
   });
 
-  it("opens and closes header collections and persona state", () => {
-    const { result } = renderHook(() =>
-      useProfileHeaderState({ pinned_badge_id: "9" }, { canEditProfile: true }, vi.fn()),
-    );
-
-    act(() => {
-      result.current.openAchievements();
-      result.current.openSocieties();
-      result.current.setPersonaState("Deep Focus", "14:00");
-      result.current.setSocieties([{ id: 1, name: "Chess" }]);
-    });
-
-    expect(result.current.showAchievements).toBe(true);
-    expect(result.current.showSocieties).toBe(true);
+  it("updates persona and peak hour state", () => {
+    const { result } = renderHook(() => useProfileHeaderState({}, { canEditProfile: true }, vi.fn()));
+    act(() => { result.current.setPersonaState("Deep Focus", "14:00"); });
     expect(result.current.persona).toBe("Deep Focus");
     expect(result.current.peakHour).toBe("14:00");
-    expect(result.current.societies).toEqual([{ id: 1, name: "Chess" }]);
-    expect(result.current.pinnedBadgeId).toBe("9");
+  });
 
-    act(() => {
-      result.current.closeAchievements();
-      result.current.closeSocieties();
-    });
-
+  it("toggles achievements and societies collection visibility", () => {
+    const { result } = renderHook(() => useProfileHeaderState({}, { canEditProfile: true }, vi.fn()));
+    act(() => { result.current.openAchievements(); result.current.openSocieties(); });
+    expect(result.current.showAchievements).toBe(true);
+    expect(result.current.showSocieties).toBe(true);
+    act(() => { result.current.closeAchievements(); result.current.closeSocieties(); });
     expect(result.current.showAchievements).toBe(false);
     expect(result.current.showSocieties).toBe(false);
   });
 
-  it("pins and unpins badges only when the profile is editable", async () => {
-    const reload = vi.fn();
-    const { result, rerender } = renderHook(
-      ({ profileData, visibility }) => useProfileHeaderState(profileData, visibility, reload),
-      {
-        initialProps: {
-          profileData: { pinned_badge_id: "9" },
-          visibility: { canEditProfile: false },
-        },
-      },
-    );
-
-    await act(async () => {
-      await result.current.handlePinBadge("4");
-    });
+  it("prevents pinning badges when the profile is not editable", async () => {
+    const { result } = renderHook(() => useProfileHeaderState({ pinned_badge_id: "9" }, { canEditProfile: false }, vi.fn()));
+    await act(async () => { await result.current.handlePinBadge("4"); });
     expect(fetchApiMock).not.toHaveBeenCalled();
+  });
 
-    rerender({
-      profileData: { pinned_badge_id: "9" },
-      visibility: { canEditProfile: true },
-    });
+  it("pins and unpins badges when profile is editable", async () => {
+    const reload = vi.fn();
+    const { result } = renderHook(() => useProfileHeaderState({ pinned_badge_id: "9" }, { canEditProfile: true }, reload));
 
-    await act(async () => {
-      await result.current.handlePinBadge("4");
-    });
-    expect(fetchApiMock).toHaveBeenCalledWith("/profile/", {
-      method: "PATCH",
-      body: JSON.stringify({ pinned_badge_id: "4" }),
-    });
+    await act(async () => { await result.current.handlePinBadge("4"); });
+    expect(fetchApiMock).toHaveBeenCalledWith("/profile/", expect.objectContaining({ method: "PATCH", body: '{"pinned_badge_id":"4"}' }));
     expect(reload).toHaveBeenCalled();
 
-    await act(async () => {
-      await result.current.handlePinBadge("9");
-    });
-    expect(fetchApiMock).toHaveBeenLastCalledWith("/profile/", {
-      method: "PATCH",
-      body: JSON.stringify({ pinned_badge_id: "" }),
-    });
+    await act(async () => { await result.current.handlePinBadge("9"); });
+    expect(fetchApiMock).toHaveBeenLastCalledWith("/profile/", expect.objectContaining({ method: "PATCH", body: '{"pinned_badge_id":""}' }));
   });
 });

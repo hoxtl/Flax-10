@@ -75,94 +75,56 @@ describe("module card branch coverage", () => {
     isEnrolledInMock.mockReturnValue(false);
   });
 
-  it("renders fallback schedule, classmates, tutor photo, and assignment counts", () => {
-    render(
-      <ModulesCard
-        module={{
-          id: 1,
-          module_code: "LAW101",
-          module_name: "Intro Law",
-          classmates_count: 1,
-          assignment_count: 2,
-          created_by_name: "Jane Tutor",
-        }}
-        enrollments={[]}
-        isTeacher={false}
-        onViewModule={vi.fn()}
-        onEnrollmentToggle={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-        onManageDeadlines={vi.fn()}
-        onManageReadings={vi.fn()}
-      />
-    );
-
+  it("renders basic module information and schedule", () => {
+    render(<ModulesCard module={{ id: 1, module_code: "LAW101", module_name: "Intro Law" }} enrollments={[]} isTeacher={false} onViewModule={vi.fn()} onEnrollmentToggle={vi.fn()} onEdit={vi.fn()} onDelete={vi.fn()} onManageDeadlines={vi.fn()} onManageReadings={vi.fn()} />);
     expect(screen.getByText("LLB")).toBeInTheDocument();
     expect(screen.getByText("Law")).toBeInTheDocument();
     expect(screen.getByText("📅 TBA TBA")).toBeInTheDocument();
-    expect(screen.getByText("📋 2 assignments")).toBeInTheDocument();
+  });
+
+  it("renders classmate links and tutor photos", () => {
+    render(<ModulesCard module={{ id: 1, module_code: "LAW101", classmates_count: 1, created_by_name: "Jane Tutor" }} enrollments={[]} isTeacher={false} onViewModule={vi.fn()} onEnrollmentToggle={vi.fn()} onEdit={vi.fn()} onDelete={vi.fn()} onManageDeadlines={vi.fn()} onManageReadings={vi.fn()} />);
     expect(screen.getByRole("link", { name: /1 classmate/i })).toHaveAttribute("href", "/users?module=LAW101");
     expect(screen.getByAltText("Jane Tutor")).toBeInTheDocument();
   });
 
-  it("uses taskCountsByModule fallback and allows student detail toggles", () => {
-    const onViewModule = vi.fn();
-    const onEnrollmentToggle = vi.fn();
-    render(
-      <ModulesCard
-        module={{
-          id: 2,
-          module_code: "CS202",
-          module_name: "Systems",
-          start_time: "2026-04-10T09:00:00",
-          end_time: "2026-04-10T11:00:00",
-        }}
-        enrollments={[]}
-        isTeacher={false}
-        onViewModule={onViewModule}
-        onEnrollmentToggle={onEnrollmentToggle}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-        onManageDeadlines={vi.fn()}
-        onManageReadings={vi.fn()}
-        taskCountsByModule={{ CS202: 1 }}
-      />
-    );
+  it("renders assignment counts", () => {
+    render(<ModulesCard module={{ id: 1, assignment_count: 2 }} enrollments={[]} isTeacher={false} onViewModule={vi.fn()} onEnrollmentToggle={vi.fn()} onEdit={vi.fn()} onDelete={vi.fn()} onManageDeadlines={vi.fn()} onManageReadings={vi.fn()} />);
+    expect(screen.getByText("📋 2 assignments")).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByText("View details"));
-    fireEvent.click(screen.getByText("+ Enrol"));
-
-    expect(onViewModule).toHaveBeenCalledWith(expect.objectContaining({ id: 2 }));
-    expect(onEnrollmentToggle).toHaveBeenCalledWith(expect.objectContaining({ id: 2 }));
+  it("uses taskCountsByModule fallback for assignment count", () => {
+    render(<ModulesCard module={{ id: 2, module_code: "CS" }} enrollments={[]} isTeacher={false} taskCountsByModule={{ CS: 1 }} onViewModule={vi.fn()} onEnrollmentToggle={vi.fn()} onEdit={vi.fn()} onDelete={vi.fn()} onManageDeadlines={vi.fn()} onManageReadings={vi.fn()} />);
     expect(screen.getByText("📋 1 assignment")).toBeInTheDocument();
   });
 
-  it("reading card handles missing chapter and both delete dialog paths", () => {
-    const onDelete = vi.fn();
-    render(
-      <ReadingCard
-        reading={{
-          id: 3,
-          title: "Handbook",
-          start_page: 1,
-          end_page: 10,
-          page_count: 10,
-          duration_minutes: 15,
-          deadline: "2026-04-13T00:00:00Z",
-        }}
-        isTeacher
-        onEdit={vi.fn()}
-        onDelete={onDelete}
-      />
-    );
+  it("handles module detail view and enrollment toggle", () => {
+    const onViewModule = vi.fn();
+    const onEnrollmentToggle = vi.fn();
+    render(<ModulesCard module={{ id: 2 }} enrollments={[]} isTeacher={false} onViewModule={onViewModule} onEnrollmentToggle={onEnrollmentToggle} onEdit={vi.fn()} onDelete={vi.fn()} onManageDeadlines={vi.fn()} onManageReadings={vi.fn()} />);
+    fireEvent.click(screen.getByText("View details"));
+    fireEvent.click(screen.getByText("+ Enrol"));
+    expect(onViewModule).toHaveBeenCalled();
+    expect(onEnrollmentToggle).toHaveBeenCalled();
+  });
 
+  it("renders reading card with missing chapter logic", () => {
+    render(<ReadingCard reading={{ id: 3, title: "H", start_page: 1, end_page: 10, page_count: 10, duration_minutes: 15, deadline: "2026-04-13T00:00:00Z" }} isTeacher onEdit={vi.fn()} onDelete={vi.fn()} />);
     expect(screen.queryByText(/Chapter/)).not.toBeInTheDocument();
     expect(screen.getByText("Due 13 Apr 2026")).toBeInTheDocument();
+  });
 
+  it("handles reading card delete cancellation", () => {
+    const onDelete = vi.fn();
+    render(<ReadingCard reading={{ id: 3, title: "H" }} isTeacher onEdit={vi.fn()} onDelete={onDelete} />);
     fireEvent.click(screen.getByText("Delete reading"));
     fireEvent.click(screen.getByText("Cancel reading delete"));
     expect(onDelete).not.toHaveBeenCalled();
+  });
 
+  it("handles reading card delete confirmation", () => {
+    const onDelete = vi.fn();
+    render(<ReadingCard reading={{ id: 3, title: "H" }} isTeacher onEdit={vi.fn()} onDelete={onDelete} />);
     fireEvent.click(screen.getByText("Delete reading"));
     fireEvent.click(screen.getByText("Confirm reading delete"));
     expect(onDelete).toHaveBeenCalled();

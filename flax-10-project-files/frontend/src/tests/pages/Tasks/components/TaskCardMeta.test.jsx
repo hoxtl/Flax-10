@@ -9,34 +9,27 @@ function renderMeta(ui) {
 }
 
 describe("TaskCardMeta", () => {
-  it("renders list, module, society, people, and project pills", () => {
-    const onParentClick = vi.fn();
+  it("renders basic list and module pills", () => {
+    renderMeta(<TaskCardMeta listName="Inbox" task={{ module_code: "CS101", module_id: 7 }} />);
+    expect(screen.getByText("Inbox")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /CS101/ })).toHaveAttribute("href", "/modules?moduleId=7");
+  });
 
+  it("renders society, people, and project pills", () => {
+    renderMeta(<TaskCardMeta task={{ society_name: "Chess", society_id: 9, assignees_count: 2, group_project_name: "TP" }} />);
+    expect(screen.getByRole("link", { name: /Chess/ })).toHaveAttribute("href", "/societies?id=9");
+    expect(screen.getByText("2 people")).toBeInTheDocument();
+    expect(screen.getByText("TP")).toBeInTheDocument();
+  });
+
+  it("stops click propagation to parent when clicking pills", () => {
+    const onParentClick = vi.fn();
     renderMeta(
       <div onClick={onParentClick}>
-        <TaskCardMeta
-          listName="Inbox"
-          listColour="#ff5500"
-          isCompleted
-          task={{
-            module_code: "CS101",
-            module_id: 7,
-            society_name: "Chess Club",
-            society_id: 9,
-            assignees_count: 3,
-            group_project_name: "Final Presentation",
-          }}
-        />
-      </div>,
+        <TaskCardMeta task={{ module_code: "CS101" }} />
+      </div>
     );
-
-    expect(screen.getByText("Inbox")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Open CS101 module/i })).toHaveAttribute("href", "/modules?moduleId=7");
-    expect(screen.getByRole("link", { name: /Open Chess Club/i })).toHaveAttribute("href", "/societies?id=9");
-    expect(screen.getByRole("link", { name: /Open users/i })).toHaveTextContent("3 people");
-    expect(screen.getByText("Final Presentation")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("link", { name: /Open CS101 module/i }));
+    fireEvent.click(screen.getByRole("link"));
     expect(onParentClick).not.toHaveBeenCalled();
   });
 

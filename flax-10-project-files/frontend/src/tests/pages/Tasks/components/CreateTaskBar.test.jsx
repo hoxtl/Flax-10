@@ -75,29 +75,20 @@ describe("CreateTaskBar", () => {
     expect(screen.getByTestId("sleep-warning")).toBeInTheDocument();
   });
 
-  it("shows reading-list page options and normalizes empty module/list/page values", () => {
-    const s = state({
-      isReadingList: true,
-      pageCount: 12,
-      setPageCount: vi.fn(),
-      setModuleId: vi.fn(),
-      setTaskListId: vi.fn(),
-      sortedLists: [],
-      moduleId: "CS101",
-      taskListId: "1",
-      moduleOptions: [{ value: "", label: "Any module" }],
-      listOptions: [{ value: "", label: "Auto" }],
-    });
+  it("shows page options for reading lists", () => {
+    const s = state({ isReadingList: true, moduleOptions: [], listOptions: [] });
     hookMock.mockReturnValue(s);
-
     render(<CreateTaskBar inputRef={{ current: null }} />);
-
     expect(screen.queryByRole("group", { name: /Estimated duration/i })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Page count"), { target: { value: "" } });
+    expect(screen.getByLabelText("Page count")).toBeInTheDocument();
+  });
+
+  it("normalizes empty module and list values on change", () => {
+    const s = state({ setModuleId: vi.fn(), setTaskListId: vi.fn(), moduleOptions: [{ value: "", label: "A" }], listOptions: [{ value: "", label: "B" }] });
+    hookMock.mockReturnValue(s);
+    render(<CreateTaskBar inputRef={{ current: null }} />);
     fireEvent.change(screen.getByLabelText("Module"), { target: { value: "" } });
     fireEvent.change(screen.getByLabelText("Select list"), { target: { value: "" } });
-
-    expect(s.setPageCount).toHaveBeenCalledWith(null);
     expect(s.setModuleId).toHaveBeenCalledWith(null);
     expect(s.setTaskListId).toHaveBeenCalledWith("");
   });

@@ -128,27 +128,15 @@ describe("IntelligenceWidgetRenderer", () => {
   });
 
   it("counts upcoming deadlines and society events for the hero widget", () => {
-    const props = {
-      ...baseProps,
-      profile: {
-        role: "teacher",
-        summary: { societies: [{ society_id: 5, name: "Chess Club" }] },
-      },
-      upcomingDeadlines: [
-        { id: 1, start_due_date: "2026-03-09T10:00:00Z" },
-        { id: 2 },
-        { id: 3, start_due_date: "2026-03-11T10:00:00Z" },
-      ],
-      calendarEvents: [
-        { id: 10, kind: "society", society_id: 5, society_name: "Chess Club", start_time: "2024-03-10T10:00:00Z" },
-        { id: 11, kind: "society", society_id: 8, society_name: "Other Club", start_time: "2024-03-10T10:00:00Z" },
-        { id: 12, kind: "lecture", start_time: "2024-03-10T10:00:00Z" },
-      ],
-    };
-
+    const props = { ...baseProps, upcomingDeadlines: [{ id: 1, start_due_date: "2026-03-09T10:00:00Z" }, { id: 2 }], calendarEvents: [{ id: 10, kind: "society", society_id: 5, start_time: "2024-03-10T10:00:00Z" }] };
     renderWidget("hero", props);
-    expect(screen.getByTestId("hero").textContent).toContain('"deadlinesCount":2');
+    expect(screen.getByTestId("hero").textContent).toContain('"deadlinesCount":1');
     expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
+  it("handles course change dismissal and teacher role in hero", () => {
+    const props = { ...baseProps, profile: { role: "teacher", summary: { societies: [] } } };
+    renderWidget("hero", props);
     expect(screen.getByTestId("hero").textContent).toContain('"isTeacher":true');
     screen.getByText("dismiss-course-change").click();
     expect(props.dashboard.setShowCourseChange).toHaveBeenCalledWith(false);

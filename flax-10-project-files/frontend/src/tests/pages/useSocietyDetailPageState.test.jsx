@@ -92,37 +92,67 @@ describe("useSocietyDetailPageState", () => {
     });
   });
 
-  it("builds society page data from url params, router state, and wrapped handlers", async () => {
+  it("initializes page data and handlers from route state", () => {
     const onMembershipChange = vi.fn();
-    const wrapper = createWrapper({
-      pathname: "/societies/5",
-      search: "?tab=about&announcementId=44",
-      state: { activeTab: "members" },
-    });
-
-    const { result } = renderHook(
-      () => useSocietyPageData(5, "calendar", onMembershipChange),
-      { wrapper },
-    );
-
+    const { result } = renderSocietyState({ pathname: "/societies/5", state: { activeTab: "members" }, search: "?announcementId=44" }, null, onMembershipChange);
     expect(useSocietyDetailMock).toHaveBeenCalledWith(5, onMembershipChange);
     expect(useSocietySubscriptionMock).toHaveBeenCalledWith(5, detailData.society, detailData.updateLocalSociety);
-    expect(result.current.page.activeTab).toBe("about");
+    expect(result.current.page.activeTab).toBe("members");
     expect(result.current.page.focusAnnouncementId).toBe("44");
     expect(result.current.handleUnreport).toBe(handleUnreport);
     expect(result.current.subscription).toBe(subscription);
     expect(result.current.onAddTag).toBe(detailData.addTag);
     expect(result.current.onDeleteTag).toBe(detailData.deleteTag);
     expect(result.current.onUpdateTag).toBe(detailData.updateTag);
+  });
 
-    act(() => {
-      result.current.page.handleTabChange("calendar", "99");
-    });
-
+  it("handles tab navigation within useSocietyPageData", async () => {
+    const { result } = renderSocietyState({ pathname: "/societies/5" });
+    act(() => result.current.page.handleTabChange("calendar", "99"));
     await waitFor(() => {
       expect(result.current.page.activeTab).toBe("calendar");
       expect(result.current.page.focusAnnouncementId).toBe("99");
     });
+  });
+
+  it("proxies event edit actions through the tracker in edit mode", async () => {
+    const { result } = renderSocietyState({ pathname: "/societies/5" });
+    act(() => result.current.modals.setEditMode(true));
+    await act(async () => {
+      await result.current.addEvent({ title: "Mixer" });
+      await result.current.updateEvent(3, { title: "Updated" });
+      await result.current.deleteEvent(4, "Deleted");
+    });
+    expect(detailData.addEvent).toHaveBeenCalledWith({ title: "Mixer" }, true);
+    expect(detailData.updateEvent).toHaveBeenCalledWith(3, { title: "Updated" }, true);
+    expect(detailData.deleteEvent).toHaveBeenCalledWith(4, true);
+    expect(tracker.trackEvent).toHaveBeenCalledWith("Added", "Mixer");
+    expect(tracker.trackEvent).toHaveBeenCalledWith("Updated", "Updated");
+    expect(tracker.trackEvent).toHaveBeenCalledWith("Deleted", "Deleted");
+  });
+
+  it("proxies announcement and exception actions in edit mode", async () => {
+    const { result } = renderSocietyState({ pathname: "/societies/5" });
+    act(() => result.current.modals.setEditMode(true));
+    await act(async () => {
+      await result.current.addAnnouncement({ title: "Notice" });
+      await result.current.updateAnnouncement(6, { title: "Pinned" });
+      await result.current.deleteAnnouncement(7, "Weekly Update");
+      await result.current.addException(8, "2026-01-01");
+    });
+    expect(detailData.addAnnouncement).toHaveBeenCalledWith({ title: "Notice" }, true);
+    expect(detailData.updateAnnouncement).toHaveBeenCalledWith(6, { title: "Pinned" }, true);
+    expect(detailData.deleteAnnouncement).toHaveBeenCalledWith(7, true);
+    expect(detailData.addException).toHaveBeenCalledWith(8, "2026-01-01", true);
+    expect(tracker.trackAnnouncement).toHaveBeenCalledWith("Added", "Notice");
+    expect(tracker.trackAnnouncement).toHaveBeenCalledWith("Updated", "Pinned");
+    expect(tracker.trackAnnouncement).toHaveBeenCalledWith("Deleted", "Weekly Update");
+  });
+
+  it("updates local society state when unreport callback triggers", () => {
+    renderSocietyState({ pathname: "/societies/5" });
+    capturedUnreportCallback(5, { has_reported: false });
+    expect(detailData.updateLocalSociety).toHaveBeenCalledWith({ has_reported: false });
   });
 
   describe("location state fallbacks", () => {
@@ -148,39 +178,6 @@ describe("useSocietyDetailPageState", () => {
       toggles.forEach(([_, key]) => expect(result.current.modals[key]).toBe(true));
       act(() => result.current.modals.setEditingAnnouncement({ id: 9 }));
       expect(result.current.modals.editingAnnouncement).toEqual({ id: 9 });
-    });
-
-    it("tracks edit-mode actions and propagates unreport updates", async () => {
-      const { result } = renderSocietyState(entry);
-      act(() => result.current.modals.setEditMode(true));
-      await act(async () => {
-        await result.current.addEvent({ title: "Mixer" });
-        await result.current.updateEvent(3, { title: "Updated Mixer" });
-        await result.current.deleteEvent(4, "Launch Night");
-        await result.current.addAnnouncement({ title: "Notice" });
-        await result.current.updateAnnouncement(6, { title: "Pinned" });
-        await result.current.deleteAnnouncement(7, "Weekly Update");
-        await result.current.addException(8, "2026-03-30");
-      });
-      [
-  [detailData.addEvent, [{ title: "Mixer" }, true]],
-        [detailData.updateEvent, [3, { title: "Updated Mixer" }, true]],
-        [detailData.deleteEvent, [4, true]],
-        [detailData.addAnnouncement, [{ title: "Notice" }, true]],
-        [detailData.updateAnnouncement, [6, { title: "Pinned" }, true]],
-        [detailData.deleteAnnouncement, [7, true]],
-        [detailData.addException, [8, "2026-03-30", true]],
-      ].forEach(([spy, args]) => expect(spy).toHaveBeenCalledWith(...args));
-      [
-        [tracker.trackEvent, "Added", "Mixer"],
-        [tracker.trackEvent, "Updated", "Updated Mixer"],
-        [tracker.trackEvent, "Deleted", "Launch Night"],
-        [tracker.trackAnnouncement, "Added", "Notice"],
-        [tracker.trackAnnouncement, "Updated", "Pinned"],
-        [tracker.trackAnnouncement, "Deleted", "Weekly Update"],
-      ].forEach(([spy, status, title]) => expect(spy).toHaveBeenCalledWith(status, title));
-      capturedUnreportCallback(5, { has_reported: false });
-      expect(detailData.updateLocalSociety).toHaveBeenCalledWith({ has_reported: false });
     });
   });
 

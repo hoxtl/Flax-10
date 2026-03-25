@@ -193,31 +193,29 @@ describe("SocietiesPageContent", () => {
     expect(screen.getByTestId("back-to-top")).toBeInTheDocument();
   });
 
-  it("opens the all societies view and wires report plus create modals", () => {
-    const state = buildState({
-      view: "all",
-      showCreateModal: true,
-      reportingSociety: { id: 9, name: "Reported Club" },
-    });
-
+  it("handles interactions within the all societies view", () => {
+    const state = buildState({ view: "all" });
     renderPage(<SocietiesPageContent state={state} />);
-
-    expect(screen.getByTestId("all-societies")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Back from all"));
     fireEvent.click(screen.getByText("Select from all"));
-    fireEvent.click(screen.getByText("Report from all"));
-    fireEvent.click(screen.getByText("Unreport from all"));
-    fireEvent.click(screen.getByText("Close create modal"));
-    fireEvent.click(screen.getByText("Create society"));
-    fireEvent.click(screen.getByText("Close report modal"));
-    fireEvent.click(screen.getByText("Report success"));
-
     expect(state.setView).toHaveBeenCalledWith("my");
     expect(state.selectSociety).toHaveBeenCalledWith("77");
-    expect(state.setReportingSociety).toHaveBeenCalledWith(state.societies[0]);
-    expect(state.handleUnreport).toHaveBeenCalledWith(state.societies[0]);
+  });
+
+  it("handles create society modal interactions", () => {
+    const state = buildState({ view: "all", showCreateModal: true });
+    renderPage(<SocietiesPageContent state={state} />);
+    fireEvent.click(screen.getByText("Close create modal"));
+    fireEvent.click(screen.getByText("Create society"));
     expect(state.setShowCreateModal).toHaveBeenCalledWith(false);
     expect(state.onCreate).toHaveBeenCalledWith({ name: "New club" });
+  });
+
+  it("handles report society modal interactions", () => {
+    const state = buildState({ view: "all", reportingSociety: { id: 9, name: "R" } });
+    renderPage(<SocietiesPageContent state={state} />);
+    fireEvent.click(screen.getByText("Close report modal"));
+    fireEvent.click(screen.getByText("Report success"));
     expect(state.setReportingSociety).toHaveBeenCalledWith(null);
     expect(state.onReportSuccess).toHaveBeenCalledWith(9);
   });

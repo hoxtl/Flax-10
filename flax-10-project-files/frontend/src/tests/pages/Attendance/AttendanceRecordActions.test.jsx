@@ -45,28 +45,17 @@ describe("AttendanceRecordActions", () => {
     expect(buttons[1]).toBeDisabled();
   });
 
-  it("renders past-event buttons and respects the submitting state", () => {
+  it("disables buttons when submitting", () => {
     isEventInPastMock.mockReturnValue(true);
-    const onRecord = vi.fn();
-    const { rerender } = render(
-      <AttendanceRecordActions
-        event={{ id: 7, start_time: "2026-03-01T12:00:00Z" }}
-        submittingId={7}
-        onRecord={onRecord}
-      />,
-    );
-
+    render(<AttendanceRecordActions event={{ id: 7 }} submittingId={7} onRecord={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Attended" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Missed" })).toBeDisabled();
+  });
 
-    rerender(
-      <AttendanceRecordActions
-        event={{ id: 7, start_time: "2026-03-01T12:00:00Z" }}
-        submittingId={null}
-        onRecord={onRecord}
-      />,
-    );
-
+  it("calls onRecord when buttons are clicked", () => {
+    isEventInPastMock.mockReturnValue(true);
+    const onRecord = vi.fn();
+    render(<AttendanceRecordActions event={{ id: 7 }} submittingId={null} onRecord={onRecord} />);
     fireEvent.click(screen.getByRole("button", { name: "Attended" }));
     fireEvent.click(screen.getByRole("button", { name: "Missed" }));
     expect(onRecord).toHaveBeenCalledWith(7, true);

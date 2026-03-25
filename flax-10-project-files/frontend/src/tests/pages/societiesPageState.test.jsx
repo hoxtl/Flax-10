@@ -69,31 +69,28 @@ describe("useSocietiesPage", () => {
     expect(params.get("id")).toBeNull();
   });
 
-  it("exposes modal state, handles create flow, and marks societies as reported", async () => {
+  it("toggles society creation and reporting modal state", () => {
     const { result, rerender } = renderHook(() => useSocietiesPage());
-
     act(() => {
       result.current.setShowCreateModal(true);
-      result.current.setReportingSociety({ id: 7, name: "Debate Society" });
+      result.current.setReportingSociety({ id: 7, name: "D" });
     });
     rerender();
-
     expect(result.current.showCreateModal).toBe(true);
-    expect(result.current.reportingSociety).toEqual({ id: 7, name: "Debate Society" });
+    expect(result.current.reportingSociety).toEqual({ id: 7, name: "D" });
+  });
 
-    await act(async () => {
-      await result.current.onCreate({ name: "New club" });
-    });
+  it("handles society creation flow", async () => {
+    const { result, rerender } = renderHook(() => useSocietiesPage());
+    await act(async () => { await result.current.onCreate({ name: "N" }); });
     rerender();
-
-    expect(societiesState.handleCreate).toHaveBeenCalledWith({ name: "New club" });
+    expect(societiesState.handleCreate).toHaveBeenCalledWith({ name: "N" });
     expect(result.current.showCreateModal).toBe(false);
-    expect(params.get("id")).toBe("23");
+  });
 
-    act(() => {
-      result.current.onReportSuccess(7);
-    });
-
+  it("handles reporting success logic", () => {
+    const { result } = renderHook(() => useSocietiesPage());
+    act(() => { result.current.onReportSuccess(7); });
     expect(societiesState.updateSocietyLocally).toHaveBeenCalledWith(7, { has_reported: true });
   });
 

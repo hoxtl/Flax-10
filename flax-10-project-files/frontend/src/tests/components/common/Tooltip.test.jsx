@@ -24,38 +24,29 @@ describe("Tooltip", () => {
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
-  it("supports alternate positions and class names", () => {
+  it("supports bottom and left positions and class names", () => {
     const { rerender } = render(
-      <Tooltip content="Bottom tip" position="bottom" wrapperClassName="wrap" className="tip">
+      <Tooltip content="Bottom tip" position="bottom" className="tip">
         <span>Item</span>
       </Tooltip>
     );
-
     const wrapper = screen.getByText("Item").parentElement;
     wrapper.getBoundingClientRect = () => ({ top: 100, bottom: 120, left: 50, right: 150, width: 100, height: 20 });
     fireEvent.mouseEnter(wrapper);
     expect(screen.getByRole("tooltip")).toHaveClass("tip");
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Bottom tip");
 
     fireEvent.mouseLeave(wrapper);
-    rerender(
-      <Tooltip content="Left tip" position="left">
-        <span>Item</span>
-      </Tooltip>
-    );
-    const leftWrapper = screen.getByText("Item").parentElement;
-    leftWrapper.getBoundingClientRect = () => ({ top: 100, bottom: 120, left: 50, right: 150, width: 100, height: 20 });
-    fireEvent.mouseEnter(leftWrapper);
+    rerender(<Tooltip content="Left tip" position="left"><span>Item</span></Tooltip>);
+    fireEvent.mouseEnter(wrapper);
     expect(screen.getByRole("tooltip")).toHaveTextContent("Left tip");
+  });
 
-    fireEvent.mouseLeave(leftWrapper);
-    rerender(
-      <Tooltip content="Right tip" position="right">
-        <span>Item</span>
-      </Tooltip>
-    );
-    const rightWrapper = screen.getByText("Item").parentElement;
-    rightWrapper.getBoundingClientRect = () => ({ top: 100, bottom: 120, left: 50, right: 150, width: 100, height: 20 });
-    fireEvent.mouseEnter(rightWrapper);
+  it("supports the right position", () => {
+    render(<Tooltip content="Right tip" position="right"><span>Item</span></Tooltip>);
+    const wrapper = screen.getByText("Item").parentElement;
+    wrapper.getBoundingClientRect = () => ({ top: 100, bottom: 120, left: 50, right: 150, width: 100, height: 20 });
+    fireEvent.mouseEnter(wrapper);
     expect(screen.getByRole("tooltip")).toHaveTextContent("Right tip");
   });
 });

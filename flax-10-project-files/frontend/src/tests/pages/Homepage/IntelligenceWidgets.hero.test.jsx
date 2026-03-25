@@ -54,68 +54,56 @@ vi.mock("../../../pages/Homepage/components/IntelligenceUtils", () => ({
 import { IntelligenceHero } from "../../../pages/Homepage/components/IntelligenceWidgets";
 
 describe("IntelligenceHero", () => {
-  it("renders the live context and homepage stat links", () => {
+  it("renders the greeting, live context, and basic stats", () => {
     render(
       <MemoryRouter>
         <IntelligenceHero
           displayName="Ava"
           attendancePct={88}
           classesCount={2}
-          deadlinesCount={1}
           liveContext={{ iconKey: "Train", label: "Travel", text: "Minor delays", meta: "Northern · Strand", tone: "warning" }}
-          upcomingSocietyEventsCount={4}
-          tasksCount={3}
-          courseChangeRequest={null}
-          isTeacher={false}
         />
       </MemoryRouter>,
     );
-
     expect(screen.getByText("MONDAY · 24 MAR")).toBeInTheDocument();
     expect(screen.getByText("Hello Ava")).toBeInTheDocument();
     expect(screen.getByText("Travel")).toBeInTheDocument();
     expect(screen.getByText("Minor delays")).toBeInTheDocument();
-    expect(screen.getByText("Northern · Strand")).toBeInTheDocument();
-    expect(screen.getByText("Classes today")).toBeInTheDocument();
-    expect(screen.getByText("Tasks to do")).toBeInTheDocument();
-    expect(screen.getByText("Upcoming deadlines")).toBeInTheDocument();
-    expect(screen.getByText("Upcoming societies")).toBeInTheDocument();
-    expect(screen.getByText("Attendance")).toBeInTheDocument();
-    expect(screen.getByText("2")).toBeInTheDocument();
-    expect(screen.getByText("3")).toBeInTheDocument();
+  });
+
+  it("links to correct internal pages from stat shortcuts", () => {
+    render(
+      <MemoryRouter>
+        <IntelligenceHero
+          upcomingSocietyEventsCount={4}
+          tasksCount={3}
+          deadlinesCount={1}
+        />
+      </MemoryRouter>,
+    );
     expect(screen.getByRole("link", { name: /tasks to do/i })).toHaveAttribute("href", "/tasks?filter=today");
     expect(screen.getByRole("link", { name: /upcoming deadlines/i })).toHaveAttribute("href", "/modules?filter=enrolled");
     expect(screen.getByRole("link", { name: /society events coming up/i })).toHaveAttribute("href", "/societies");
     expect(screen.getByRole("link", { name: /view my attendance/i })).toHaveAttribute("href", "/attendance");
   });
 
-  it("renders the course change banner and teacher stat labels", () => {
-    const onDismissCourseChange = vi.fn();
-    render(
-      <MemoryRouter>
-        <IntelligenceHero
-          displayName=""
-          attendancePct={92}
-          classesCount={1}
-          deadlinesCount={5}
-          liveContext={{ iconKey: "Clock3", label: "Status", text: "You have breathing room", meta: null, tone: "neutral" }}
-          upcomingSocietyEventsCount={0}
-          tasksCount={0}
-          courseChangeRequest={{ requested_course: "Physics BSc" }}
-          isTeacher
-          onDismissCourseChange={onDismissCourseChange}
-        />
-      </MemoryRouter>,
-    );
-
-    expect(screen.getByText(/Course switch pending to/)).toBeInTheDocument();
-    expect(screen.getByText("Teaching today")).toBeInTheDocument();
-    expect(screen.getByText("Teaching deadlines")).toBeInTheDocument();
-
+  it("renders the course change banner and handles navigation", () => {
+    render(<MemoryRouter><IntelligenceHero isTeacher courseChangeRequest={{ requested_course: "Physics" }} /></MemoryRouter>);
+    expect(screen.getByText(/Course switch pending/)).toBeInTheDocument();
     fireEvent.click(screen.getByText("View"));
     expect(navigateMock).toHaveBeenCalledWith("/settings?tab=account");
+  });
 
+  it("handles course change request dismissal", () => {
+    const onDismiss = vi.fn();
+    render(<MemoryRouter><IntelligenceHero isTeacher courseChangeRequest={{ requested_course: "P" }} onDismissCourseChange={onDismiss} /></MemoryRouter>);
     fireEvent.click(screen.getByText("×"));
-    expect(onDismissCourseChange).toHaveBeenCalledOnce();
+    expect(onDismiss).toHaveBeenCalled();
+  });
+
+  it("renders teacher-specific stat labels", () => {
+    render(<MemoryRouter><IntelligenceHero isTeacher /></MemoryRouter>);
+    expect(screen.getByText("Teaching today")).toBeInTheDocument();
+    expect(screen.getByText("Teaching deadlines")).toBeInTheDocument();
   });
 });

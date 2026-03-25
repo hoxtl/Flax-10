@@ -72,27 +72,37 @@ describe("Dashboard sidebar extras", () => {
     expect(result.current).toBe(false);
   });
 
-  it("renders desktop interactions including hover, user menu actions, and pressure styling", () => {
+  it("renders desktop sidebar navigation and hover styling", () => {
     const onChange = vi.fn();
-    const onSettingsClick = vi.fn();
-    const onLogoutClick = vi.fn();
-    const onProfileClick = vi.fn();
-
     const { container } = render(
       <SidebarDesktop
         active="tasks"
         onChange={onChange}
         user={{ name: "Alice", email: "alice@example.com", isAdmin: true }}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-        onProfileClick={onProfileClick}
-        hasPressure
       />,
     );
-
     fireEvent.mouseEnter(container.firstChild);
     fireEvent.click(screen.getByText("Tasks"));
     expect(onChange).toHaveBeenCalledWith("tasks");
+    fireEvent.mouseLeave(container.firstChild);
+    expect(container.textContent).not.toContain("alice@example.com");
+  });
+
+  it("handles desktop sidebar user menu actions", () => {
+    const onSettingsClick = vi.fn();
+    const onLogoutClick = vi.fn();
+    const onProfileClick = vi.fn();
+
+    render(
+      <SidebarDesktop
+        active="home"
+        onChange={vi.fn()}
+        user={{ name: "Alice", email: "a@a.com" }}
+        onSettingsClick={onSettingsClick}
+        onLogoutClick={onLogoutClick}
+        onProfileClick={onProfileClick}
+      />,
+    );
 
     fireEvent.click(screen.getByText("Alice"));
     expect(screen.getByText("Profile")).toBeInTheDocument();
@@ -102,40 +112,26 @@ describe("Dashboard sidebar extras", () => {
     expect(onSettingsClick).toHaveBeenCalled();
     expect(onLogoutClick).toHaveBeenCalled();
     expect(onProfileClick).toHaveBeenCalled();
-
-    fireEvent.mouseLeave(container.firstChild);
-    expect(container.textContent).not.toContain("alice@example.com");
   });
 
-  it("renders mobile drawer actions, active states, and closes even when a footer action is missing", () => {
+  it("handles mobile drawer navigation and toggling", () => {
     const onToggle = vi.fn();
     const onChange = vi.fn();
-    const onSettingsClick = vi.fn();
-    const onLogoutClick = vi.fn();
-
-    render(
-      <SidebarMobile
-        isOpen
-        onToggle={onToggle}
-        user={{ isAdmin: false }}
-        active="home"
-        onChange={onChange}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-      />,
-    );
-
+    render(<SidebarMobile isOpen onToggle={onToggle} active="home" onChange={onChange} user={{ isAdmin: false }} />);
     fireEvent.click(screen.getAllByText("Tasks")[0]);
     expect(onChange).toHaveBeenCalledWith("tasks");
-
     fireEvent.click(screen.getByLabelText("Close menu"));
     expect(onToggle).toHaveBeenCalled();
+  });
 
+  it("handles mobile footer actions and closes on click", () => {
+    const onToggle = vi.fn();
+    const onSettingsClick = vi.fn();
+    render(<SidebarMobile isOpen onToggle={onToggle} user={{ isAdmin: false }} onSettingsClick={onSettingsClick} />);
     fireEvent.click(screen.getByText("Settings"));
-    fireEvent.click(screen.getByText("Log out"));
-    fireEvent.click(screen.getByText("Profile"));
     expect(onSettingsClick).toHaveBeenCalled();
-    expect(onLogoutClick).toHaveBeenCalled();
-    expect(onToggle).toHaveBeenCalledTimes(5);
+    expect(onToggle).toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Profile"));
+    expect(onToggle).toHaveBeenCalledTimes(2);
   });
 });

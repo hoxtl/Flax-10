@@ -4,30 +4,19 @@ import { renderHook, act } from "@testing-library/react";
 import { useSocietyBrowseFilters } from "../../pages/Societies/useSocietyBrowseFilters";
 
 describe("useSocietyBrowseFilters", () => {
-  it("updates search, sort, category, and can clear filters", () => {
+  it("updates search search and sort criteria", () => {
     const { result } = renderHook(() => useSocietyBrowseFilters());
+    act(() => { result.current.setSearch("p"); result.current.setSortBy("m"); });
+    expect(result.current.search).toBe("p");
+    expect(result.current.sortBy).toBe("m");
+  });
 
-    const sports = { id: "sports", label: "Sports" };
-    const arts = { id: "arts", label: "Arts" };
-
-    act(() => {
-      result.current.setSearch("photo");
-      result.current.setSortBy("members");
-      result.current.setCategory([sports, arts]);
-      result.current.toggleFilter("ratified", "ratified");
-    });
-
-    expect(result.current.search).toBe("photo");
-    expect(result.current.sortBy).toBe("members");
-    expect(result.current.filters).toEqual({
-      ratified: "ratified",
-      category: [sports, arts],
-    });
-
-    act(() => {
-      result.current.clearFilters();
-    });
-
+  it("updates and clears diverse filter categories", () => {
+    const { result } = renderHook(() => useSocietyBrowseFilters());
+    const cat = { id: "s", label: "S" };
+    act(() => { result.current.setCategory([cat]); result.current.toggleFilter("r", "r"); });
+    expect(result.current.filters).toEqual({ r: "r", category: [cat] });
+    act(() => { result.current.clearFilters(); });
     expect(result.current.filters).toEqual({ ratified: "all", category: [] });
   });
 
