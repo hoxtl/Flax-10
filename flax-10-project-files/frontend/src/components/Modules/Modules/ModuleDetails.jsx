@@ -1,7 +1,6 @@
 /*
  * Detailed view of a single module with schedule, deadlines, and readings.
  */
-<<<<<<< HEAD
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -18,13 +17,6 @@ import PrimaryButton from '../../common/primary_button/PrimaryButton.jsx';
 import Tooltip from '../../common/tooltip/Tooltip.jsx';
 import LocationLink from '../../common/location_link/LocationLink.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
-=======
-import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
-import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
-import { formatDate } from '../../Calendar/utils/dateUtils.js';
-import { getInitials } from '../../Authentication/utils/userUtils.js';
-import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
-import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
 >>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './ModuleDetails.module.css';
