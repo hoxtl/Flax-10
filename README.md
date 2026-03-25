@@ -132,16 +132,16 @@ The following fixture accounts are available for testing and assessment purposes
    ```
 
    **Launch the NixOS container:**
-   ```bash
-   docker run --rm -it \
-     -v "${PWD}:/work" \
-     -v nix-store:/nix \
-     -w /work \
+   ```powershell
+   docker run --rm -it `
+     -v "${PWD}:/work" `
+     -v nix-store:/nix `
+     -w /work `
      nixos/nix:latest
    ```
 
    If the above does not work, use the single-line equivalent:
-   ```bash
+   ```powershell
    docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest
    ```
 
