@@ -35,7 +35,7 @@ export default function OnboardingModal({ isOpen, onComplete }) {
   const [openDropdowns, setOpenDropdowns] = useState({ course: false, year: false });
   if (!isOpen) return null;
   return (
-    <StandardModal onClose={onComplete} hideHeader size="md" modalClassName={getOnboardingPanelClass(state, openDropdowns)} contentClassName={styles.modal} dismissOnBackdrop={false}>
+  <StandardModal onClose={onComplete} hideHeader size="lg" modalClassName={getOnboardingPanelClass(state, openDropdowns)} contentClassName={styles.modal} dismissOnBackdrop={false}>
       <ModalContent state={state} onComplete={onComplete} onDropdownOpenChange={(field, open) => setOpenDropdowns((current) => ({ ...current, [field]: open }))} />
     </StandardModal>
   );

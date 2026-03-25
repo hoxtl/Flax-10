@@ -1,12 +1,13 @@
 /* StandardModal handles overlay and container positioning */
 .onboardingPanel {
-  width: min(640px, 95vw);
-  max-height: min(540px, 82vh);
+  width: min(760px, 96vw);
+  max-height: min(620px, 86vh);
+  overflow: visible;
   transition: max-height 0.24s ease, width 0.24s ease;
 }
 
 .onboardingPanelExpanded {
-  max-height: min(720px, 90vh);
+  max-height: min(780px, 92vh);
 }
 
 .modal {
@@ -115,10 +116,10 @@
 
 @media (max-width: 640px) {
   .onboardingPanel {
-    max-height: min(600px, 88vh);
+    max-height: min(660px, 90vh);
   }
 
   .onboardingPanelExpanded {
-    max-height: min(720px, 92vh);
+    max-height: min(780px, 94vh);
   }
 }

@@ -47,7 +47,7 @@ export function getEventType(event) {
     if (typeof event.source === 'string' && event.source.startsWith('module_')) return 'module';
     if (event.source === 'timetable') return 'timetable';
     if (event.module) return 'module';
-    if (event.source && event.external_id) return 'timetable';
+    if (event.source && event.external_id && event.source !== 'task') return 'timetable';
     const tagName = (event.tag_name || (typeof event.tag === 'object' ? event.tag?.name : '') || '').toLowerCase().trim();
     if (tagName && FIXED_TAG_NAMES.has(tagName)) return 'timetable';
     return 'personal';

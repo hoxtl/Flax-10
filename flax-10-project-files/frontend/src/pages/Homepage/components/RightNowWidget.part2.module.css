@@ -242,6 +242,20 @@
   margin: 3px 0 0;
 }
 
+.nextMetaDivider {
+  margin: 0 6px;
+  color: var(--widget-text-tertiary);
+}
+
+.nextLocationLink {
+  color: var(--widget-accent);
+  font-weight: 600;
+}
+
+.nextLocationText {
+  font-size: inherit;
+}
+
 .nowEmpty {
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;

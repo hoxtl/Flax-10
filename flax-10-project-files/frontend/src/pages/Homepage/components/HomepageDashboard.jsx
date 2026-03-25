@@ -6,7 +6,7 @@ import { isToday } from "../../../components/Calendar/utils/dateUtils";
 import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/taskApi";
 import { EventPopups } from "../../../components/Calendar/EventPopups";
 import { useAuth } from "../../../context/AuthContext";
-import BackToTop from "../../../components/Common/BackToTop/BackToTop";
+import BackToTop from "../../../components/common/BackToTop/BackToTop";
 import { TaskWidgetSlot } from "./TaskWidgetSlot";
 import { DeadlinesWidget } from "./DeadlinesWidget";
 import IntelligenceRow from "./IntelligenceRow";
@@ -108,7 +108,7 @@ function getTimelineCoreProps(props) {
 }
 
 function getTimelineActionProps(props) {
-  return { handleConflictAutoMove: props.reschedule.handleConflictAutoMove, handleConflictPushTomorrow: props.reschedule.handleConflictPushTomorrow, handleQuickStartGap: props.reschedule.handleQuickStartGap, handleResolveTimelineConflicts: props.reschedule.handleResolveTimelineConflicts, handleReschedule: props.reschedule.handleReschedule, handleTaskToggle: props.handleTaskToggle, handleTimelineDelete: props.reschedule.handleTimelineDelete, openModal: props.openModal, openTimelinePopup: props.openTimelinePopup, resolveConflictsLoading: props.reschedule.resolveConflictsLoading };
+  return { handleAutoSchedule: props.reschedule.handleAutoSchedule, autoScheduleLoading: props.reschedule.autoScheduleLoading, handleConflictAutoMove: props.reschedule.handleConflictAutoMove, handleConflictPushTomorrow: props.reschedule.handleConflictPushTomorrow, handleQuickStartGap: props.reschedule.handleQuickStartGap, handleResolveTimelineConflicts: props.reschedule.handleResolveTimelineConflicts, handleReschedule: props.reschedule.handleReschedule, handleTaskToggle: props.handleTaskToggle, handleTimelineDelete: props.reschedule.handleTimelineDelete, openModal: props.openModal, openTimelinePopup: props.openTimelinePopup, resolveConflictsLoading: props.reschedule.resolveConflictsLoading };
 }
 
 function getModalStateProps(props) {

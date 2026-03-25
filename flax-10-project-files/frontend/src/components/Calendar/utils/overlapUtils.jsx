@@ -1,10 +1,15 @@
 export function eventsOverlap(event1, event2) {
-    if (event1.id === event2.id) return false;
+    if (event1 === event2) return false;
     const start1 = new Date(event1.start_time);
     const end1 = new Date(event1.end_time);
     const start2 = new Date(event2.start_time);
     const end2 = new Date(event2.end_time);
     return start1 < end2 && start2 < end1;
+}
+
+export function getEventKey(event) {
+    // Use a composite key so overlapping occurrences sharing the same id still get distinct layout slots
+    return `${event.id}-${new Date(event.start_time).getTime()}-${new Date(event.end_time).getTime()}`;
 }
 
 export function findOverlappingEvents(event, allEvents) {
@@ -31,7 +36,7 @@ function processGroup(groupEvents, columnsMap) {
 
     groupEvents.forEach(event => {
         const col = findAvailableColumn(event, columnEnds);
-        groupResults.set(event.id, { column: col });
+        groupResults.set(getEventKey(event), { column: col });
         columnEnds[col] = new Date(event.end_time);
     });
 
@@ -45,8 +50,8 @@ function findAvailableColumn(event, columnEnds) {
 }
 
 function assignTotalColumns(groupResults, totalColumns, columnsMap) {
-    groupResults.forEach((val, id) => {
-        columnsMap.set(id, { column: val.column, totalColumns });
+    groupResults.forEach((val, key) => {
+        columnsMap.set(key, { column: val.column, totalColumns });
     });
 }
 

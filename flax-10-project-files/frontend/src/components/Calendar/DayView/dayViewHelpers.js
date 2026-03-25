@@ -1,4 +1,4 @@
-import { calculateEventColumns } from '../utils/overlapUtils';
+import { calculateEventColumns, getEventKey } from '../utils/overlapUtils';
 
 export function getHoursOfDay() {
     return Array.from({ length: 24 }, (_, i) => i);
@@ -57,7 +57,7 @@ function getBaseStyle(start, end, slotHeight) {
 
 function getLayout(event, allEvents) {
     if (!allEvents || allEvents.length <= 1) return null;
-    return calculateEventColumns(allEvents).get(event.id);
+    return calculateEventColumns(allEvents).get(getEventKey(event));
 }
 
 function applyLayout(style, layout) {

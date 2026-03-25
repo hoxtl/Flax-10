@@ -7,7 +7,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { isToday } from "../../../components/Calendar/utils/dateUtils";
 import { ConfirmModal } from "../../../components/common";
-import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { MiniTimeline } from "./MiniTimeline";
 import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 
@@ -44,7 +44,11 @@ function TimelineHeader(props) {
     <div className={widgetStyles.widgetHeader}>
       <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
       <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
-      <div className={props.styles.timelineHeaderRight}><CalendarLink styles={props.styles} /><RescheduleEventsButton {...props} /></div>
+      <div className={props.styles.timelineHeaderRight}>
+        <CalendarLink styles={props.styles} />
+        <AutoScheduleButton {...props} />
+        <RescheduleEventsButton {...props} />
+      </div>
     </div>
   );
 }
@@ -55,6 +59,18 @@ function CalendarLink({ styles }) {
     <PrimaryButton type="button" size="small" pill className={styles.timelineHeaderButton} onClick={() => navigate("/calendar")}>
       View my calendar
     </PrimaryButton>
+  );
+}
+
+function AutoScheduleButton({ handleAutoSchedule, autoScheduleLoading, styles }) {
+  if (!handleAutoSchedule) return null;
+  const label = autoScheduleLoading ? "Scheduling…" : "Auto schedule study time";
+  return (
+    <Motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+      <PrimaryButton size="small" pill className={styles.timelineHeaderButton} onClick={handleAutoSchedule} aria-label="Auto schedule study time" disabled={autoScheduleLoading}>
+        {label}
+      </PrimaryButton>
+    </Motion.div>
   );
 }
 

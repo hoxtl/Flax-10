@@ -1,8 +1,7 @@
 /* Apple-style Event Cards — tag-colored background tint */
 .draggable-event {
     position: absolute;
-    left: 4px;
-    right: 4px;
+    box-sizing: border-box;
     border-left: 3px solid var(--primary, #7B6751);
     border-radius: 6px;
     box-shadow: none;

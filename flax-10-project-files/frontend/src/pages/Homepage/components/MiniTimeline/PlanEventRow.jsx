@@ -2,7 +2,7 @@
  * Plan timeline single-event row.
  */
 
-import { formatTime } from "../../utils/dateFormatUtils";
+import { formatTime12h } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
@@ -17,8 +17,8 @@ function getNextFreeRow(rows, row, durationMins) {
 
 function getEventMeta(row, rows, getTag, sleepWindow) {
   const { item, durationMins } = row;
-  const startTime = item.start_time ? formatTime(item.start_time) : "";
-  const endTime = item.end_time && item.end_time !== item.start_time ? formatTime(item.end_time) : "";
+  const startTime = item.start_time ? formatTime12h(item.start_time) : "";
+  const endTime = item.end_time && item.end_time !== item.start_time ? formatTime12h(item.end_time) : "";
   const tagName = getTag?.(item.tag)?.name ?? item.tag_name ?? "";
   return {
     startTime,

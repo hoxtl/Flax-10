@@ -13,6 +13,7 @@ import { DraggableEvent } from "../DraggableEvent";
 import { getHoursOfDay, calculateEventStyle, formatHour } from "./dayViewHelpers";
 import { useAutoScroll } from "../hooks/useAutoScroll";
 import { SLOT_HEIGHT } from "../calendarConstants";
+import { getEventKey } from "../utils/overlapUtils";
 import { CurrentTimeLine } from "../components/CurrentTimeLine";
 import "./DayView.css";
 
@@ -39,7 +40,7 @@ function EventsLayer({ events, date, readOnly }) {
   return (
     <div className="events-layer">
       {events.map((e) => (
-        <DraggableEvent key={e.id} event={e} readOnly={readOnly}
+        <DraggableEvent key={getEventKey(e)} event={e} readOnly={readOnly}
           style={calculateEventStyle(e, SLOT_HEIGHT, events, date)} minWidthForDetails={25} />
       ))}
     </div>

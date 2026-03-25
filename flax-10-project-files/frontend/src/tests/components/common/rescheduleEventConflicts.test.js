@@ -62,4 +62,18 @@ describe("rescheduleEventConflicts", () => {
 
     expect(buildConflictResolutionToastMessage(plan)).toBe('Cleared 1 conflict · "Study at library" moved to tomorrow.');
   });
+
+  it("moves task-sourced events when resolving conflicts", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const events = [
+      { id: "task-1", source: "task", title: "Essay Draft", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T10:00:00Z") },
+      { id: "task-2", source: "task", title: "Notes", start_time: iso("2026-03-23T09:15:00Z"), end_time: iso("2026-03-23T10:15:00Z") },
+    ];
+
+    const plan = buildConflictResolutionPlan(events, selectedDate);
+
+    expect(plan.operations).toHaveLength(1);
+    expect(plan.operations[0].event.id).toBe("task-2");
+    expect(plan.unresolved).toHaveLength(0);
+  });
 });

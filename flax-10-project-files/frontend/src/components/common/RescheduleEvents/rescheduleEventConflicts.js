@@ -50,12 +50,18 @@ export function buildConflictResolutionPlan(events = [], selectedDate = new Date
 }
 
 export async function applyConflictResolutionPlan(plan, editEvent) {
+  const failures = [];
   for (const operation of plan.operations) {
-    await editEvent(extractBaseEventId(operation.event.id, operation.event), {
-      start_time: operation.start.toISOString(),
-      end_time: operation.end.toISOString(),
-    });
+    try {
+      await editEvent(extractBaseEventId(operation.event.id, operation.event), {
+        start_time: operation.start.toISOString(),
+        end_time: operation.end.toISOString(),
+      });
+    } catch {
+      failures.push(operation);
+    }
   }
+  return { failures };
 }
 
 export async function undoConflictResolutionPlan(plan, editEvent) {
@@ -70,7 +76,7 @@ export async function undoConflictResolutionPlan(plan, editEvent) {
 export function buildConflictResolutionToastMessage(plan) {
   const fixedUnresolvedCount = plan.unresolved.filter((item) => item.reason === "fixed").length;
   const noSlotCount = plan.unresolved.filter((item) => item.reason === "no-slot").length;
-  if (!plan.operations.length && !plan.unresolved.length) return "No overlaps to clear.";
+  if (!plan.operations.length && !plan.unresolved.length) return "No overlap events.";
   if (!plan.operations.length && fixedUnresolvedCount && !noSlotCount) return "These overlaps are fixed lectures, societies, or deadline items, so they stay in place.";
   if (!plan.operations.length && noSlotCount && !fixedUnresolvedCount) return "Couldn't find a conflict-free slot for some events.";
   const movedCount = plan.operations.length;
@@ -179,7 +185,8 @@ function getGroupAnchor(group, movable) {
 }
 
 function isMovableEvent(event) {
-  return Boolean(event?.id) && !isReadOnlyEvent(event);
+  if (!event?.id) return false;
+  return !isReadOnlyEvent(event);
 }
 
 function getDurationMs(event) {

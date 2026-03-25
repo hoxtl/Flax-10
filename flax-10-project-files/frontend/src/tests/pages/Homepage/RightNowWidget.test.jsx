@@ -203,11 +203,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-<<<<<<< HEAD
-        expect(screen.getByText('Day complete — nice work!')).toBeTruthy();
-=======
         expect(screen.getByText('Tomorrow Meeting')).toBeTruthy();
->>>>>>> origin
     });
 
     it('shows single event in header', () => {
@@ -237,10 +233,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
         });
         expect(screen.getByText('Live Now')).toBeTruthy();
-<<<<<<< HEAD
-=======
         expect(screen.getByText('Up Next')).toBeTruthy();
->>>>>>> origin
     });
 
     it('shows current event when isNow returns true', () => {
@@ -285,11 +278,7 @@ describe('RightNowWidget', () => {
             navigatorContext: {},
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-<<<<<<< HEAD
-        expect(screen.getByText('Free day — enjoy it!')).toBeTruthy();
-=======
         expect(screen.getByText('Tomorrow Meeting')).toBeTruthy();
->>>>>>> origin
     });
 
     it('end of day shows completed and events attended', () => {
@@ -301,10 +290,7 @@ describe('RightNowWidget', () => {
             ],
             taskWidgetItemsOnly: [{ id: 1, title: 'Done', completed: true }],
         });
-<<<<<<< HEAD
-=======
         expect(screen.getByText(/1\/1 tasks/)).toBeTruthy();
->>>>>>> origin
         expect(screen.getByText(/1 event attended/)).toBeTruthy();
     });
 

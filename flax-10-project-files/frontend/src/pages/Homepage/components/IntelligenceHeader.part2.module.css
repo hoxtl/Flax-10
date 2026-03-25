@@ -33,7 +33,7 @@
 }
 
 .nextStepLabel {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -48,7 +48,7 @@
 .nextStepText {
   margin: 0;
   color: var(--widget-text-primary);
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-heading);
   font-size: 0.89rem;
   font-weight: 700;
   line-height: 1.24;
@@ -56,7 +56,7 @@
 }
 
 .nextStepMeta {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.64rem;
   font-weight: 700;
   color: var(--home-now-time);

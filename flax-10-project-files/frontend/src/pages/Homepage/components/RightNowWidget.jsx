@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Clock, Sparkles, Sun } from "lucide-react";
 import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
+import LocationLink from "../../../components/common/LocationLink/LocationLink";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useRightNowData } from "../hooks/useRightNowData";
 import {
@@ -126,7 +127,21 @@ function EventPreview({ event }) {
   return (
     <>
       <p className={styles.upNextTitle}>{event.title}</p>
-      {event.start_time && <p className={styles.upNextDetails}>{formatTime(event.start_time)}</p>}
+      {event.start_time && (
+        <p className={styles.upNextDetails}>
+          {formatTime(event.start_time)}
+          {event.location && (
+            <>
+              <span className={styles.nextMetaDivider}>·</span>
+              <LocationLink
+                location={event.location}
+                className={styles.nextLocationLink}
+                textClassName={styles.nextLocationText}
+              />
+            </>
+          )}
+        </p>
+      )}
     </>
   );
 }
@@ -268,7 +283,16 @@ function NextEventDetails({ nextEvent, countdown }) {
       <span className={styles.nextMeta}>
         at {formatTime(nextEvent.start_time)}
         {countdown.text ? ` · ${countdown.text}` : ""}
-        {nextEvent.location ? ` · ${nextEvent.location}` : ""}
+        {nextEvent.location && (
+          <>
+            <span className={styles.nextMetaDivider}>·</span>
+            <LocationLink
+              location={nextEvent.location}
+              className={styles.nextLocationLink}
+              textClassName={styles.nextLocationText}
+            />
+          </>
+        )}
       </span>
     </div>
   );

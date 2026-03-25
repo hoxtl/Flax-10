@@ -55,6 +55,22 @@
     min-height: 1440px;
 }
 
+.day-view .draggable-event {
+    min-width: 0;
+}
+
+.day-view .event-title,
+.day-view .event-time,
+.day-view .society-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    max-width: 100%;
+    display: block;
+}
+
 .time-slot {
     height: 60px;
     border-bottom: 1px solid var(--border, rgba(74, 52, 33, 0.12));
@@ -119,6 +135,8 @@
     left: 0;
     right: 0;
     bottom: 0;
+    padding: 0 4px;
+    box-sizing: border-box;
     pointer-events: none;
     z-index: 10;
 }

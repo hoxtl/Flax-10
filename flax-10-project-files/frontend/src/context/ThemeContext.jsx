@@ -4,6 +4,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { fetchApi } from "../api/client";
+import { updateUserSettings } from "../api/userApi";
 
 const ThemeContext = createContext();
 const VALID_MODES = ["light", "dark"];
@@ -64,6 +65,14 @@ function usePersistedAttribute(attribute, storageKey, value) {
   }, [attribute, storageKey, value]);
 }
 
+function usePersistedTheme(theme) {
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("colorTheme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+}
+
 function isValidChange(nextValue, currentValue, validValues) {
   return nextValue !== currentValue && validValues.includes(nextValue);
 }
@@ -74,11 +83,23 @@ function useThemeControls(mode, applyModeChange, theme, setThemeState) {
   return { setMode, setTheme, toggleMode: () => setMode(mode === "light" ? "dark" : "light") };
 }
 
+function useThemePersistence(mode, theme) {
+  const lastSaved = useRef({ mode: null, theme: null });
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    if (lastSaved.current.mode === mode && lastSaved.current.theme === theme) return;
+    lastSaved.current = { mode, theme };
+    updateUserSettings({ mode, theme }).catch(() => {});
+  }, [mode, theme]);
+}
+
 export function ThemeProvider({ children, initialTheme, initialMode }) {
   const { mode, setModeState, theme, setThemeState } = useThemePreferences(initialTheme, initialMode);
   const { applyModeChange } = useThemeSession(mode, setModeState);
   const controls = useThemeControls(mode, applyModeChange, theme, setThemeState);
   usePersistedAttribute("data-mode", "mode", mode);
-  usePersistedAttribute("data-theme", "colorTheme", theme);
+  usePersistedTheme(theme);
+  useThemePersistence(mode, theme);
   return <ThemeContext.Provider value={{ mode, theme, ...controls }}>{children}</ThemeContext.Provider>;
 }

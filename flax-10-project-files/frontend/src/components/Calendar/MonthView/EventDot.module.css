@@ -1,7 +1,8 @@
 /* EventDot colour override for coloured event dots. */
 
 .eventDotColored {
-  color: white;
+  --dot-text: #ffffff;
+  color: var(--dot-text, #ffffff);
   border-left: none;
   background-color: var(--dot-bg, transparent);
 }
