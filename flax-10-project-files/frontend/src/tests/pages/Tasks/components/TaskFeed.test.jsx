@@ -1,141 +1,128 @@
-/* Tests for TaskFeed component rendering and user interactions */
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "../../../../utils/test-utils";
-import TaskFeed from "../../../../pages/Tasks/components/TaskFeed";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 
-const useTaskFeedDataMock = vi.hoisted(() => vi.fn());
+const taskFeedDataMock = vi.hoisted(() => vi.fn());
+const responsiveMock = vi.hoisted(() => vi.fn());
+const subtitleMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../../../../pages/Tasks/hooks/useTaskFeedData", () => ({
-  default: useTaskFeedDataMock,
+  default: taskFeedDataMock,
 }));
 
-vi.mock("../../../../pages/Tasks/components/CreateTaskBar", () => ({
-  default: () => <div data-testid="create-task-bar" />,
-}));
-vi.mock("../../../../pages/Tasks/components/TaskFeedToolbar", () => ({
-  default: () => <div data-testid="task-feed-toolbar" />,
-}));
-vi.mock("../../../../pages/Tasks/components/CompletedTasksSection", () => ({
-  default: ({ tasks }) => <div data-testid="completed-block">{tasks.length}</div>,
-}));
-vi.mock("../../../../pages/Tasks/components/TaskSection", () => ({
-  default: ({ title }) => <div data-testid="task-section">{title}</div>,
-}));
-vi.mock("../../../../pages/Tasks/components/SuggestedReadingsSection", () => ({
-  default: () => <div data-testid="suggested-readings-section" />,
-}));
-vi.mock("../../../../components/ui/EstTimeHelpBanner", () => ({
-  default: () => <div data-testid="est-time-help" />,
+vi.mock("../../../../pages/Tasks/components/useTaskFeedResponsive", () => ({
+  default: responsiveMock,
 }));
 
-function data(overrides = {}) {
+vi.mock("../../../../pages/Tasks/components/TaskFeedSubtitle", () => ({
+  getTaskFeedSubtitle: subtitleMock,
+}));
+
+vi.mock("../../../../pages/Tasks/components/TaskFeedContent", () => ({
+  default: ({ vm }) => (
+    <div>
+      <span data-testid="subtitle">{vm.taskFeedSubtitle}</span>
+      <span data-testid="active-list">{vm.activeList?.name ?? "none"}</span>
+      <span data-testid="reading-list">{String(vm.readingList)}</span>
+      <span data-testid="modal-lists">{vm.modalLists.map((list) => list.name).join(",")}</span>
+      <span data-testid="modal-tasks">{vm.modalTasks.map((task) => task.title).join(",")}</span>
+    </div>
+  ),
+}));
+
+import TaskFeed from "../../../../pages/Tasks/components/TaskFeed";
+
+function buildFeedData() {
   return {
     headerTitle: "Inbox",
-    search: "",
-    setSearch: vi.fn(),
-    sortBy: "priority",
-    setSortBy: vi.fn(),
-    searchInputRef: { current: null },
-    filterRef: { current: null },
-    isFilterOpen: false,
-    setIsFilterOpen: vi.fn(),
-    activeFilterCount: 0,
-    activeFilterTab: "lists",
-    setActiveFilterTab: vi.fn(),
-    filterQuery: "",
-    setFilterQuery: vi.fn(),
-    visibleListItems: [],
-    filterListIds: [],
-    toggleListFilter: vi.fn(),
-    moduleGroupKeys: [],
-    groupedVisibleModuleItems: {},
-    filterModuleCodes: [],
-    toggleModuleFilter: vi.fn(),
-    clearAllFilters: vi.fn(),
-    showSearchEmptyState: false,
-    overdue: [],
-    today: [],
-    thisWeek: [],
-    later: [],
-    completed: [],
-    filtered: [],
-    filteredCompleted: [],
-    completedTodayCount: 0,
-    completedWeekCount: 0,
-    completedLaterCount: 0,
-    allTasksCombined: [],
-    todayEmptyCardProps: null,
-    sectionProps: { sortBy: "priority", listMap: {}, lists: [], hideListBadge: false, searchQuery: "" },
+    sectionProps: {},
+  };
+}
+
+function buildProps(overrides = {}) {
+  return {
+    tasks: [{ id: 1, title: "Prop task" }],
+    lists: [{ id: 7, name: "Reading List - History" }],
+    activeFilter: "all",
+    activeListId: "7",
+    onToggleComplete: vi.fn(),
+    onDeleteTask: vi.fn(),
+    onEditTask: vi.fn(),
     ...overrides,
   };
 }
 
-describe("TaskFeed", () => {
+describe("TaskFeed coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    taskFeedDataMock.mockReturnValue(buildFeedData());
+    subtitleMock.mockReturnValue("Desktop subtitle");
   });
 
-  it("renders today view sections", () => {
-    useTaskFeedDataMock.mockReturnValue(data({ overdue: [{ id: 1 }], today: [{ id: 2 }] }));
-    render(<TaskFeed activeFilter="today" lists={[]} onToggleComplete={vi.fn()} onDeleteTask={vi.fn()} onEditTask={vi.fn()} onCreateTask={vi.fn()} onAddTask={vi.fn()} />);
-    expect(screen.getByText("Inbox")).toBeInTheDocument();
-    expect(screen.getAllByTestId("task-section").length).toBe(2);
-  });
+  it("uses sidebar modal data and suppresses subtitles on mobile", () => {
+    responsiveMock.mockReturnValue({
+      isMobile: true,
+      showMobileLists: false,
+      setShowMobileLists: vi.fn(),
+    });
 
-  it("renders this week sections", () => {
-    useTaskFeedDataMock.mockReturnValue(data({ today: [{ id: 1 }], thisWeek: [{ id: 2 }] }));
-    render(<TaskFeed activeFilter="this_week" lists={[]} onToggleComplete={vi.fn()} onDeleteTask={vi.fn()} onEditTask={vi.fn()} />);
-    expect(screen.getAllByTestId("task-section").length).toBe(2);
-  });
-
-  it("renders all tasks section by default", () => {
-    useTaskFeedDataMock.mockReturnValue(data({ allTasksCombined: [{ id: 1 }] }));
-    render(<TaskFeed activeFilter="all" lists={[]} onToggleComplete={vi.fn()} onDeleteTask={vi.fn()} onEditTask={vi.fn()} />);
-    expect(screen.getByText("All tasks")).toBeInTheDocument();
-  });
-
-  it("renders search empty state and clears query", () => {
-    const setSearch = vi.fn();
-    useTaskFeedDataMock.mockReturnValue(data({ showSearchEmptyState: true, search: "abc", setSearch }));
-    render(<TaskFeed activeFilter="all" lists={[]} onToggleComplete={vi.fn()} onDeleteTask={vi.fn()} onEditTask={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /Clear search/i }));
-    expect(setSearch).toHaveBeenCalledWith("");
-  });
-
-  it("renders completed block when completed tasks are filtered", () => {
-    useTaskFeedDataMock.mockReturnValue(data({ filteredCompleted: [{ id: 99 }] }));
-    render(<TaskFeed activeFilter="all" lists={[]} onToggleComplete={vi.fn()} onDeleteTask={vi.fn()} onEditTask={vi.fn()} />);
-    expect(screen.getByTestId("completed-block")).toHaveTextContent("1");
-  });
-
-  it("renders suggested reading list section for module reading lists", () => {
-    useTaskFeedDataMock.mockReturnValue(data());
     render(
       <TaskFeed
-        activeFilter="all"
-        activeListId="7"
-        lists={[{ id: 7, name: "MA4101 - Calculus I" }]}
-        onToggleComplete={vi.fn()}
-        onDeleteTask={vi.fn()}
-        onEditTask={vi.fn()}
-      />
+        {...buildProps({
+          lists: undefined,
+          activeListId: "99",
+          sidebarProps: {
+            lists: [{ id: 2, name: "Sidebar list" }],
+            tasks: [{ id: 3, title: "Sidebar task" }],
+          },
+        })}
+      />,
     );
-    expect(screen.getByTestId("suggested-readings-section")).toBeInTheDocument();
+
+    expect(screen.getByTestId("subtitle")).toHaveTextContent("");
+    expect(screen.getByTestId("active-list")).toHaveTextContent("none");
+    expect(screen.getByTestId("reading-list")).toHaveTextContent("false");
+    expect(screen.getByTestId("modal-lists")).toHaveTextContent("Sidebar list");
+    expect(screen.getByTestId("modal-tasks")).toHaveTextContent("Sidebar task");
   });
 
-  it("uses module-focused subtitle copy for reading lists", () => {
-    useTaskFeedDataMock.mockReturnValue(data({ headerTitle: "AI4404 - Reinforcement Learning" }));
+  it("uses prop fallbacks and computes desktop reading-list subtitles", () => {
+    responsiveMock.mockReturnValue({
+      isMobile: false,
+      showMobileLists: false,
+      setShowMobileLists: vi.fn(),
+    });
+
+    render(<TaskFeed {...buildProps()} />);
+
+    expect(screen.getByTestId("subtitle")).toHaveTextContent("Desktop subtitle");
+    expect(screen.getByTestId("active-list")).toHaveTextContent("Reading List - History");
+    expect(screen.getByTestId("reading-list")).toHaveTextContent("true");
+    expect(screen.getByTestId("modal-lists")).toHaveTextContent("Reading List - History");
+    expect(screen.getByTestId("modal-tasks")).toHaveTextContent("Prop task");
+    expect(subtitleMock).toHaveBeenCalledWith(
+      { id: 7, name: "Reading List - History" },
+      true,
+    );
+  });
+
+  it("falls back to empty mobile modal data when no list sources are provided", () => {
+    responsiveMock.mockReturnValue({
+      isMobile: false,
+      showMobileLists: false,
+      setShowMobileLists: vi.fn(),
+    });
+
     render(
       <TaskFeed
-        activeFilter="all"
-        activeListId="7"
-        lists={[{ id: 7, name: "AI4404 - Reinforcement Learning" }]}
-        onToggleComplete={vi.fn()}
-        onDeleteTask={vi.fn()}
-        onEditTask={vi.fn()}
-      />
+        {...buildProps({
+          lists: undefined,
+          tasks: undefined,
+          sidebarProps: undefined,
+        })}
+      />,
     );
-    expect(screen.getByText(/Keep your/i)).toBeInTheDocument();
-    expect(screen.getByText(/Reinforcement Learning \(AI4404\)/i)).toBeInTheDocument();
+
+    expect(screen.getByTestId("modal-lists")).toHaveTextContent("");
+    expect(screen.getByTestId("modal-tasks")).toHaveTextContent("");
   });
 });

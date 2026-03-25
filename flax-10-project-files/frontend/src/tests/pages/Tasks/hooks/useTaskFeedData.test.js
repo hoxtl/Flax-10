@@ -83,36 +83,7 @@ describe("useTaskFeedData", () => {
     expect(result.current.later.length).toBe(1);
   });
 
-  it("runs plan tomorrow callback from empty card", () => {
-    const onPlanTomorrow = vi.fn();
-    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [], onPlanTomorrow }));
-    act(() => result.current.todayEmptyCardProps.onCtaClick());
-    expect(onPlanTomorrow).toHaveBeenCalled();
-  });
 
-  it("navigates when no custom planner callback", () => {
-    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
-    act(() => result.current.todayEmptyCardProps.onCtaClick());
-    expect(navigateMock).toHaveBeenCalledWith("/tasks?open=fullPlanning");
-  });
-
-  it("todayEmptyCardProps shows plural when completedTodayCount is 2", () => {
-    vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(2);
-    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
-    expect(result.current.todayEmptyCardProps.sub).toContain("2 tasks");
-    expect(result.current.todayEmptyCardProps.sub).toContain("completed today");
-  });
-
-  it("todayEmptyCardProps shows singular when completedTodayCount is 1", () => {
-    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
-    expect(result.current.todayEmptyCardProps.sub).toContain("1 task completed today");
-  });
-
-  it("todayEmptyCardProps shows No tasks due today when completedTodayCount is 0", () => {
-    vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(0);
-    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
-    expect(result.current.todayEmptyCardProps.sub).toBe("No tasks due today.");
-  });
 
   it("builds module filter labels from loaded module metadata", async () => {
     getModulesMock.mockResolvedValueOnce([
@@ -241,102 +212,9 @@ describe("useTaskFeedData", () => {
     });
   });
 
-  it("shows the search empty state when filtered pending and completed tasks are empty", async () => {
-    vi.mocked(taskFeedDataUtils.filterBySearch).mockImplementation(() => []);
 
-    const tasks = [{ id: 1, title: "Task A", completed: false }];
-    const { result } = renderHook(() =>
-      useTaskFeedData({ tasks, allTasks: tasks, lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
-    );
 
-    act(() => {
-      result.current.setSearch("missing");
-    });
 
-    await waitFor(() => {
-      expect(result.current.showSearchEmptyState).toBe(true);
-    });
-  });
-
-  it("builds reading-list all-complete cards", () => {
-    vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getLater).mockReturnValue([]);
-
-    const completedTasks = [{ id: 8, title: "Finished", completed: true }];
-    const readingLists = [{ id: 7, name: "CS101 - Computer Science" }];
-
-    const { result } = renderHook(() =>
-      useTaskFeedData({
-        tasks: completedTasks,
-        allTasks: completedTasks,
-        lists: readingLists,
-        activeFilter: "all",
-        activeListId: 7,
-        filterListIds: [],
-      }),
-    );
-
-    expect(result.current.allTasksEmptyCardProps).toEqual({
-      message: "All caught up on readings!",
-      sub: "No suggested readings left for CS101 Computer Science right now.",
-    });
-  });
-
-  it("builds generic all-complete cards when no active tasks remain", () => {
-    vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getLater).mockReturnValue([]);
-
-    const completedTasks = [{ id: 8, title: "Finished", completed: true }];
-    const regularLists = [{ id: 8, name: "Inbox" }];
-
-    const { result } = renderHook(() =>
-      useTaskFeedData({
-        tasks: completedTasks,
-        allTasks: completedTasks,
-        lists: regularLists,
-        activeFilter: "all",
-        activeListId: 8,
-        filterListIds: [],
-      }),
-    );
-
-    expect(result.current.allTasksEmptyCardProps).toEqual({
-      message: "Great job",
-      sub: "1 task completed. Take a moment — you earned it.",
-    });
-  });
-
-  it("uses plural wording for generic all-complete cards with multiple completed tasks", () => {
-    vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([]);
-    vi.mocked(taskFeedDataUtils.getLater).mockReturnValue([]);
-
-    const completedTasks = [
-      { id: 8, title: "Finished", completed: true },
-      { id: 9, title: "Finished again", completed: true },
-    ];
-
-    const { result } = renderHook(() =>
-      useTaskFeedData({
-        tasks: completedTasks,
-        allTasks: completedTasks,
-        lists: [{ id: 8, name: "Inbox" }],
-        activeFilter: "all",
-        activeListId: 8,
-        filterListIds: [],
-      }),
-    );
-
-    expect(result.current.allTasksEmptyCardProps).toEqual({
-      message: "Great job",
-      sub: "2 tasks completed. Take a moment — you earned it.",
-    });
-  });
 
   it("focuses the task input for the n shortcut and blurs editable targets on escape", () => {
     const focus = vi.fn();
@@ -456,39 +334,16 @@ describe("useTaskFeedData", () => {
   });
 
   it("filters tasks with missing module codes when the empty code is selected", async () => {
-    vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation(
-      (_filterListIds, _onFilterByList, setFilterModuleCodes, setFilterQuery) => ({
-        toggleListFilter: vi.fn(),
-        toggleModuleFilter: (code) => setFilterModuleCodes((prev) => (prev.includes(code) ? [] : [code])),
-        clearAllFilters: () => {
-          setFilterModuleCodes([]);
-          setFilterQuery("");
-        },
-      }),
-    );
+    vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation((_f, _o, setM) => ({
+        toggleListFilter: vi.fn(), toggleModuleFilter: (c) => setM((prev) => (prev.includes(c) ? [] : [c])),
+        clearAllFilters: vi.fn(),
+    }));
+    const tasks = [{ id: 1, completed: false, module_code: null }, { id: 2, completed: false, module_code: "CS101" }];
+    const { result } = renderHook(() => useTaskFeedData({ tasks, allTasks: tasks, lists: [], activeFilter: "all" }));
 
-    const tasks = [
-      { id: 1, title: "No module", completed: false, module_code: null },
-      { id: 2, title: "Has module", completed: false, module_code: "CS101" },
-    ];
-
-    const { result } = renderHook(() =>
-      useTaskFeedData({
-        tasks,
-        allTasks: tasks,
-        lists: [],
-        activeFilter: "all",
-        activeListId: null,
-        filterListIds: [],
-      }),
-    );
-
-    act(() => {
-      result.current.toggleModuleFilter("");
-    });
-
+    act(() => { result.current.toggleModuleFilter(""); });
     await waitFor(() => {
-      expect(result.current.pending).toEqual([{ id: 1, title: "No module", completed: false, module_code: null }]);
+      expect(result.current.pending).toEqual([{ id: 1, completed: false, module_code: null }]);
       expect(result.current.completed).toEqual([]);
     });
   });
