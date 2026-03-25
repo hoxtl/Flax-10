@@ -95,8 +95,12 @@
     }
 }
 
-@media (max-width: 768px) {
-    .sectionCard {
-        padding: 0.9rem;
-    }
+.disabledBtn {
+    opacity: 0.55;
+    cursor: not-allowed !important;
+}
+
+.disabledWrapper {
+    display: inline-flex;
+    cursor: not-allowed;
 }

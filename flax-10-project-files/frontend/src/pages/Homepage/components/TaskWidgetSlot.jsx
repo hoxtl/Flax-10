@@ -10,6 +10,7 @@ import { TaskContextMenu } from "../../Tasks/components/TaskCard";
 import { TaskWidgetRow } from "./TaskWidgetRow";
 import { TaskWidgetAllDone, TaskWidgetCompletedSection, TaskWidgetEmpty } from "./TaskWidgetSections";
 import { ShowMoreButton } from "../../../components/Modules/shared/widgetParts.jsx";
+import { useTaskWidgetState } from "./useTaskWidgetState";
 import {
   expandBodyVariants,
   listVariants,
@@ -143,6 +144,7 @@ function TaskWidgetMenu({ ctxMenu, onDeleteTask, onEditTask, onInlineTaskEdit, s
   );
 }
 
+
 function openEdit(ctxMenu, onEditTask, setCtxMenu) {
   onEditTask?.(ctxMenu.task);
   setCtxMenu(null);
@@ -151,25 +153,4 @@ function openEdit(ctxMenu, onEditTask, setCtxMenu) {
 async function deleteTask(ctxMenu, onDeleteTask, setCtxMenu) {
   await onDeleteTask?.(ctxMenu.task);
   setCtxMenu(null);
-}
-
-function useTaskWidgetState(props) {
-  const [ctxMenu, setCtxMenu] = useState(null);
-  const [showCompleted, setShowCompleted] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const taskGroups = useMemo(() => getTaskGroups(props.taskWidgetList, props.row), [props.row, props.taskWidgetList]);
-  return { ...taskGroups, ctxMenu, setCtxMenu, expanded, setExpanded, showCompleted, setShowCompleted };
-}
-
-function getTaskGroups(taskWidgetList, _row) {
-  const incompleteTasks = taskWidgetList.filter((task) => !task.completed);
-  const completedTasks = taskWidgetList.filter((task) => task.completed);
-  const visibleLimit = 3;
-  return {
-    allTasksDone: taskWidgetList.length > 0 && taskWidgetList.every((task) => task.completed),
-    completedTasks,
-    initialTasks: incompleteTasks.slice(0, visibleLimit),
-    extraTasks: incompleteTasks.slice(visibleLimit),
-    visibleCompleted: completedTasks,
-  };
 }
