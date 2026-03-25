@@ -1,7 +1,5 @@
 # StudyFlax — Team Flax-10 Major Group Project
 
-**Module:** 5CCS2SEG Software Engineering Group Project
-**Academic Year:** 2025/26
 **Project Topic:** Academic Time Management System for Students in Higher Education
 
 ---
@@ -21,7 +19,7 @@
 
 ## Project Description
 
-StudyFlax is a web-based academic time management platform built for students and teachers at King's College London. Designed to bring clarity and structure to university life, it empowers students to organise their schedules, track deadlines, and take control of their academic workload — all in one place. Teachers can engage with and support their students through the platform, while administrators oversee and manage the system as a whole.
+StudyFlax is a web-based academic time management platform built for students and teachers at King's College London. It allows students to organise their schedules, track deadlines, and manage their academic workload in one place. Teachers can create modules, set deadlines, and assign work to their students, whilst the admin oversees and manages the system as a whole.
 
 ---
 
@@ -80,7 +78,7 @@ The following fixture accounts are available for testing and assessment purposes
 | `amiller` | Teacher         | `1234`   |
 | `charlie` | Student         | `1234`   |
 
-> **Admin Access:** The `johndoe` account holds administrator privileges. In addition to the Django admin panel at http://localhost:8000/admin/, admin features are also accessible directly through the main application by signing in with the username `johndoe` and the password `1234`.
+> **Admin Access:** The `johndoe` account holds administrator privileges. In addition to the Django admin panel at http://localhost:8000/admin/, admin features are also accessible directly through the main application by signing in with the username `johndoe` and the password `1234`. Additionally, there is a reference to the Django admin panel inside the `johndoe` admin page.
 
 > **Seeded Users:** Additional user accounts are available, generated using the [Faker](https://faker.readthedocs.io/) library as part of the database seeding process. These accounts can be viewed and managed via the Django admin panel when signed in as `johndoe`.
 
