@@ -62,7 +62,7 @@ function PathItem({ p, flip, intensity, speed }) {
 
 function FloatingPaths({ flip, count, intensity, speed }) {
   const flipUsed = flip ?? 1;
-  const paths = useMemo(() => buildPaths(flip, count, intensity), [count, flip, intensity]);
+  const paths = useMemo(() => buildPaths(flipUsed, count, intensity), [count, flipUsed, intensity]);
 
   return (
     <div className={styles.paths}>

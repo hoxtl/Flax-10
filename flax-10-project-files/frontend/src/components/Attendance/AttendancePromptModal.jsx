@@ -145,13 +145,17 @@ function useDisplayPercentage(answeredWith, overall) {
   return useMemo(() => computeDisplayPct(answeredWith, overall, computeAttendancePct(overall)), [answeredWith, overall]);
 }
 
-  const handleAnswer = (attended) => {
+function useAnswerHandler({ answerState, onAnswer, overall, refetch }) {
+  const { setAnsweredWith, setSubmitError, timerRef } = answerState;
+
+  return useCallback((attended) => {
     setSubmitError("");
     setAnsweredWith(attended);
     timerRef.current = setTimeout(() => {
-      void runAnswer(attended);
+      void handleSubmitAnswer(attended, { answerState, onAnswer, overall, refetch });
     }, 1200);
-  };
+  }, [answerState, onAnswer, overall, refetch, setAnsweredWith, setSubmitError, timerRef]);
+}
 
 async function handleSubmitAnswer(attended, context) {
   const success = await context.onAnswer(attended, { afterSuccess: context.refetch, closeDelayMs: 700 });

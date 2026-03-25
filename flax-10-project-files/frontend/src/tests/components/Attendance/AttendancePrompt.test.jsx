@@ -223,10 +223,6 @@ describe("Attendance prompt", () => {
     expect(setSubmitting).toHaveBeenCalledWith(false);
   });
 
-<<<<<<< HEAD
-  it("shows session confirmation message when answered", async () => {
-    const onAnswer = vi.fn(() => Promise.resolve(true));
-=======
   it("returns early when there is no event or a submission is already in progress", async () => {
     const setEvent = vi.fn();
     const setSubmitting = vi.fn();
@@ -242,33 +238,21 @@ describe("Attendance prompt", () => {
     expect(setSubmitting).not.toHaveBeenCalled();
   });
 
-  it("shows an error and restores the question when submission fails", async () => {
-    let resolveAnswer;
-    const onAnswer = vi.fn(
-      () =>
-        new Promise((resolve) => {
-          resolveAnswer = resolve;
-        }),
-    );
-
->>>>>>> main
+  it("shows session confirmation message when answered", async () => {
+    const onAnswer = vi.fn(() => Promise.resolve(true));
     render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
     act(() => { fireEvent.click(screen.getByText("Yes")); });
-    expect(screen.getByText("Attendance noted.")).toBeInTheDocument();
+    expect(screen.getByText("Attendance recorded!")).toBeInTheDocument();
   });
 
   it("restores the question when attendance submission fails", async () => {
-    let resolveAnswer;
-    const onAnswer = vi.fn(() => new Promise((resolve) => { resolveAnswer = resolve; }));
+    vi.useRealTimers();
+    const onAnswer = vi.fn().mockResolvedValue(false);
     render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
 
-    act(() => { fireEvent.click(screen.getByText("No")); });
-    await act(async () => {
-      vi.advanceTimersByTime(1200);
-      resolveAnswer(false);
-    });
-
-    await waitFor(() => expect(screen.getByText("Could not update attendance. Please try again.")).toBeInTheDocument());
+    fireEvent.click(screen.getByText("No"));
+    
+    await waitFor(() => expect(screen.getByText("Could not update attendance. Please try again.")).toBeInTheDocument(), { timeout: 4000 });
     expect(screen.getByText(/Did you attend/i)).toBeInTheDocument();
   });
 
