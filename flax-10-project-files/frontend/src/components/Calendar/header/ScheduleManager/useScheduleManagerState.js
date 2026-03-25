@@ -1,6 +1,7 @@
 /*
  * Schedule manager state hook and handlers.
  */
+
 import { useEffect, useState } from "react";
 import { deleteSchedule, getSchedules, renameSchedule } from "../../../../api/scheduleApi";
 

@@ -1,6 +1,7 @@
 /*
  * Homepage timeline section.
  */
+
 import { motion as Motion } from "framer-motion";
 import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";

@@ -1,6 +1,7 @@
 /*
  * Compact timeline widget for upcoming events.
  */
+
 import { useMemo } from "react";
 import { Clock, Calendar, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
