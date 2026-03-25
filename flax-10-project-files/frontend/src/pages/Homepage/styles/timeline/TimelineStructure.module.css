@@ -1,3 +1,3 @@
 /* Homepage CSS barrel for styles/timeline/TimelineStructure.module.css */
-@import "./TimelineStructure.part1.module.css";
-@import "./TimelineStructure.part2.module.css";
+@import "./TimelineStructure.header-and-rows.module.css";
+@import "./TimelineStructure.gaps-and-quick-add.module.css";

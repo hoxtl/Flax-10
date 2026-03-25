@@ -1,8 +1,8 @@
 /* Homepage CSS barrel for styles/HomepageSlots.module.css */
-@import "./HomepageSlots.part1.module.css";
-@import "./HomepageSlots.part2.module.css";
-@import "./HomepageSlots.part3.module.css";
-@import "./HomepageSlots.part4.module.css";
-@import "./HomepageSlots.part5.module.css";
-@import "./HomepageSlots.part6.module.css";
-@import "./HomepageSlots.part7.module.css";
+@import "./HomepageSlots.layout-and-progress.module.css";
+@import "./HomepageSlots.legacy-deadlines-and-timer.module.css";
+@import "./HomepageSlots.right-now-cards.module.css";
+@import "./HomepageSlots.deadline-overlays-and-focus.module.css";
+@import "./HomepageSlots.focus-windows-and-analytics.module.css";
+@import "./HomepageSlots.focus-deadlines-and-progress.module.css";
+@import "./HomepageSlots.nudges-weekly-and-scheduling.module.css";
