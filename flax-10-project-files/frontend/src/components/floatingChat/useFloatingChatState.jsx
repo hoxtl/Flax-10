@@ -24,7 +24,7 @@ const ROUTE_PROMPTS = [
   { key: "settings", path: "/settings", message: SETTINGS_PROMPT_MESSAGE, text: "Need help using the app? Ask Flax." },
 ];
 
-function getSharedCalendarPrompt(search = "") {
+function getSharedCalendarPrompt(search) {
   const params = new URLSearchParams(search);
   const sharedUserId = params.get("user_id");
   if (!sharedUserId) return null;
@@ -43,7 +43,7 @@ function getRoutePrompt(pathname, isTeacher = false) {
   };
 }
 
-function getPromptContext(location, isTeacher = false) {
+function getPromptContext(location, isTeacher) {
   const sharedPrompt = location.pathname.startsWith("/calendar") ? getSharedCalendarPrompt(location.search) : null;
   return sharedPrompt || getRoutePrompt(location.pathname, isTeacher) || HIDDEN_PROMPT;
 }

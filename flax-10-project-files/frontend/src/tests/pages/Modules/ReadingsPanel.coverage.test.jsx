@@ -73,6 +73,7 @@ vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: ({ task, onClose }) => (
     <div data-testid="task-info-modal">
       <div>{task.title}</div>
+      <div data-testid="task-module-code">{String(task.module_code)}</div>
       <div data-testid="task-page-count">{String(task.page_count)}</div>
       <button onClick={onClose}>close-modal</button>
     </div>
@@ -134,6 +135,35 @@ describe("ReadingsPanel coverage", () => {
     expect(screen.getByText("Your reading list will appear here when tutors add materials.")).toBeInTheDocument();
   });
 
+  it("handles undefined readings and falls back for missing metadata", async () => {
+    const edgeReadings = [
+      {
+        id: 9,
+        title: null,
+        module_name: "Philosophy",
+      },
+      {
+        id: 10,
+        title: "History: Intro",
+        module_name: "History",
+      },
+      {
+        id: 11,
+        title: "No due date",
+      },
+    ];
+
+    const { rerender } = render(<ReadingsPanel readings={undefined} onReadingAdded={vi.fn()} />);
+    expect(screen.getByText("No readings assigned")).toBeInTheDocument();
+
+    rerender(<ReadingsPanel readings={edgeReadings} onReadingAdded={vi.fn()} />);
+    expect(screen.getAllByTestId("countdown-distant")).toHaveLength(3);
+    fireEvent.click(screen.getByText("Intro"));
+    expect(await screen.findByTestId("task-info-modal")).toBeInTheDocument();
+    expect(screen.getByTestId("task-module-code")).toHaveTextContent("null");
+    expect(screen.getByTestId("task-page-count")).toHaveTextContent("null");
+  });
+
   it("sorts, expands, and opens the modal with computed page counts", async () => {
     const onReadingAdded = vi.fn();
     render(<ReadingsPanel readings={readings} onReadingAdded={onReadingAdded} />);
@@ -152,5 +182,27 @@ describe("ReadingsPanel coverage", () => {
     expect(screen.getByTestId("task-page-count")).toHaveTextContent("null");
     fireEvent.click(screen.getAllByRole("button", { name: "add reading" })[3]);
     expect(onReadingAdded).toHaveBeenCalledWith(3);
+  });
+
+  it("applies overdue, critical, and urgent highlight classes", () => {
+    const highlightedReadings = [
+      {
+        id: 21,
+        title: "Urgent reading",
+        deadline: "overdue-2026-03-20",
+      },
+      {
+        id: 22,
+        title: "Critical reading",
+        deadline: "critical-2026-03-21",
+      },
+    ];
+
+    render(<ReadingsPanel readings={highlightedReadings} onReadingAdded={vi.fn()} />);
+
+    const urgentRow = screen.getByText("Urgent reading").closest("div[style*='--deadline-row-accent']");
+    const criticalRow = screen.getByText("Critical reading").closest("div[style*='--deadline-row-accent']");
+    expect(urgentRow.className).toContain("urgent-glow");
+    expect(criticalRow.className).toContain("rowCritical");
   });
 });

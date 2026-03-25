@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 // ---------------------------------------------------------------------------
@@ -93,6 +93,25 @@ describe("toggleFab", () => {
     act(() => result.current.toggleFab()); // close
     expect(result.current.open).toBe(false);
   });
+
+  it("opens the guided prompt message and renders a closable chat window", () => {
+    const { result } = renderHook(() => useFloatingChatState(), {
+      wrapper: makeWrapper("/tasks"),
+    });
+
+    act(() => result.current.minimizePrompt());
+    expect(result.current.minimized).toBe(true);
+
+    act(() => result.current.openPrompt());
+    expect(result.current.open).toBe(true);
+    expect(result.current.minimized).toBe(false);
+
+    render(result.current.renderWindow());
+    expect(screen.getByTestId("initial-message")).toHaveTextContent("Hey! I have a task I need to plan.");
+
+    act(() => screen.getByRole("button", { name: "Close panel" }).click());
+    expect(result.current.open).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -164,6 +183,13 @@ describe("route prompts", () => {
     expect(result.current.promptText).toMatch(/meeting times/i);
     expect(result.current.promptMessage).toMatch(/Sam/);
   });
+
+  it("falls back to a generic shared-calendar name when shared_name is missing", () => {
+    const { result } = renderHook(() => useFloatingChatState(), {
+      wrapper: makeWrapper("/calendar", "?user_id=42"),
+    });
+    expect(result.current.promptMessage).toMatch(/this person/);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -193,6 +219,19 @@ describe("useRoutePromptReset", () => {
     // should have cleared initialMessage.
     // We can indirectly verify by checking renderWindow still works (it passes "" to StudyCoachPanel).
     expect(result.current.renderWindow).toBeDefined();
+  });
+
+  it("normalizes non-string open events to an empty initial message", () => {
+    const { result } = renderHook(() => useFloatingChatState(), {
+      wrapper: makeWrapper("/tasks"),
+    });
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("flax-open-chat", { detail: { initialMessage: 42 } }));
+    });
+
+    render(result.current.renderWindow());
+    expect(screen.getByTestId("initial-message")).toHaveTextContent("");
   });
 });
 

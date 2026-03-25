@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 const useModulesMock = vi.fn();
@@ -80,6 +80,15 @@ describe("modulesPageHooks coverage", () => {
     expect(studentHook.result.current.showForm).toBe(true);
   });
 
+  it("treats missing user storage as a student role", async () => {
+    const hook = renderHook(() => useModulesPageState(), {
+      wrapper: routerWrapper("/modules"),
+    });
+
+    await waitFor(() => expect(hook.result.current.isTeacher).toBe(false));
+    expect(hook.result.current.filterMode).toBe("enrolled");
+  });
+
   it("syncs moduleId and code query params into the viewing state", async () => {
     localStorage.setItem("user", JSON.stringify({ role: "teacher" }));
 
@@ -94,6 +103,36 @@ describe("modulesPageHooks coverage", () => {
     });
 
     await waitFor(() => expect(codeHook.result.current.viewingModule?.module_code).toBe("AA200"));
+  });
+
+  it("falls back from an unmatched moduleId to the code search param", async () => {
+    localStorage.setItem("user", JSON.stringify({ role: "teacher" }));
+    useModulesMock.mockReturnValue({
+      loading: false,
+      modules: [
+        { id: 1, module_code: undefined },
+        { id: 2, module_code: "AA200" },
+      ],
+      enrollments: [{ module: 1 }],
+    });
+
+    const hook = renderHook(() => useModulesPageState(), {
+      wrapper: routerWrapper("/modules?moduleId=999&code=aa200"),
+    });
+
+    await waitFor(() => expect(hook.result.current.viewingModule?.module_code).toBe("AA200"));
+  });
+
+  it("leaves the current view unchanged when only an unknown moduleId is provided", async () => {
+    localStorage.setItem("user", JSON.stringify({ role: "teacher" }));
+
+    const hook = renderHook(() => useModulesPageState(), {
+      wrapper: routerWrapper("/modules?moduleId=999"),
+    });
+
+    await waitFor(() => expect(hook.result.current.filterMode).toBe("all"));
+    expect(hook.result.current.viewingModule).toBeNull();
+    expect(hook.result.current.searchQuery).toBe("");
   });
 
   it("uses the URL code as search text when unmatched while preserving an initial module match", async () => {
@@ -121,5 +160,39 @@ describe("modulesPageHooks coverage", () => {
     expect(state.setSearchQuery).toHaveBeenCalledWith("AA");
     expect(state.setFilterMode).toHaveBeenCalledWith("enrolled");
     expect(useModuleSortingMock).toHaveBeenCalledWith(hook.modules);
+  });
+
+  it("resets module page state when the show-all event fires", async () => {
+    localStorage.setItem("user", JSON.stringify({ role: "teacher" }));
+
+    const { result } = renderHook(() => useModulesPageState("", false), {
+      wrapper: routerWrapper("/modules?filter=enrolled"),
+    });
+
+    await waitFor(() => expect(result.current.filterMode).toBe("enrolled"));
+
+    act(() => {
+      result.current.setShowForm(true);
+      result.current.setEditingModule({ id: 2 });
+      result.current.setViewingModule({ id: 1 });
+      result.current.setDeadlineModule({ id: 1 });
+      result.current.setReadingModule({ id: 1 });
+      result.current.setSearchQuery("AA200");
+      result.current.setFilterMode("enrolled");
+    });
+
+    act(() => {
+      window.dispatchEvent(new Event("modules:show-all"));
+    });
+
+    await waitFor(() => {
+      expect(result.current.showForm).toBeNull();
+      expect(result.current.editingModule).toBeNull();
+      expect(result.current.viewingModule).toBeNull();
+      expect(result.current.deadlineModule).toBeNull();
+      expect(result.current.readingModule).toBeNull();
+      expect(result.current.searchQuery).toBe("");
+      expect(result.current.filterMode).toBe("all");
+    });
   });
 });
