@@ -45,16 +45,13 @@ describe('useCarouselGestures', () => {
         expect(mockEl.removeEventListener).toHaveBeenCalled();
     });
 
-    it('triggers prev/next only for large swipes and ignores missing touch data', () => {
+    it('triggers next for large right-to-left swipes', () => {
         const handlers = {};
         const mockEl = {
-            addEventListener: vi.fn((name, fn) => {
-                handlers[name] = fn;
-            }),
+            addEventListener: vi.fn((name, fn) => { handlers[name] = fn; }),
             removeEventListener: vi.fn(),
         };
-        const prev = vi.fn();
-        const next = vi.fn();
+        const prev = vi.fn(), next = vi.fn();
         const ref = { current: mockEl };
 
         renderHook(() => useCarouselGestures(ref, { prev, next }));
@@ -62,15 +59,39 @@ describe('useCarouselGestures', () => {
         handlers.touchstart({ changedTouches: [{ clientX: 100 }] });
         handlers.touchend({ changedTouches: [{ clientX: 10 }] });
         expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    it('triggers prev for large left-to-right swipes', () => {
+        const handlers = {};
+        const mockEl = {
+            addEventListener: vi.fn((name, fn) => { handlers[name] = fn; }),
+            removeEventListener: vi.fn(),
+        };
+        const prev = vi.fn(), next = vi.fn();
+        const ref = { current: mockEl };
+
+        renderHook(() => useCarouselGestures(ref, { prev, next }));
 
         handlers.touchstart({ changedTouches: [{ clientX: 10 }] });
         handlers.touchend({ changedTouches: [{ clientX: 100 }] });
         expect(prev).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignores swipes with missing touch data', () => {
+        const handlers = {};
+        const mockEl = {
+            addEventListener: vi.fn((name, fn) => { handlers[name] = fn; }),
+            removeEventListener: vi.fn(),
+        };
+        const prev = vi.fn(), next = vi.fn();
+        const ref = { current: mockEl };
+
+        renderHook(() => useCarouselGestures(ref, { prev, next }));
 
         handlers.touchstart({});
         handlers.touchend({});
-        expect(prev).toHaveBeenCalledTimes(1);
-        expect(next).toHaveBeenCalledTimes(1);
+        expect(prev).not.toHaveBeenCalled();
+        expect(next).not.toHaveBeenCalled();
     });
 
     it('handles null ref gracefully', () => {

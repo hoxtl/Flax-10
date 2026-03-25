@@ -82,34 +82,33 @@ describe("TaskCardMeta", () => {
     expect(screen.getByTitle("Open users")).toHaveTextContent("4 people");
   });
 
-  it("stops propagation from society and people links", () => {
+  it("stops propagation from society link", () => {
     const onParentClick = vi.fn();
-
     renderMeta(
       <div onClick={onParentClick}>
-        <TaskCardMeta
-          task={{
-            module_code: "CS505",
-            society_name: "Robotics Club",
-            people_count: 2,
-          }}
-        />
+        <TaskCardMeta task={{ society_name: "Robotics Club" }} />
       </div>,
     );
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true });
+    const stopPropagation = vi.fn();
+    Object.defineProperty(event, "stopPropagation", { value: stopPropagation });
+    screen.getByTitle("Open Robotics Club").dispatchEvent(event);
+    expect(stopPropagation).toHaveBeenCalled();
+    expect(onParentClick).not.toHaveBeenCalled();
+  });
 
-    const dispatchWithStop = (element) => {
-      const event = new MouseEvent("click", { bubbles: true, cancelable: true });
-      const stopPropagation = vi.fn();
-      Object.defineProperty(event, "stopPropagation", { value: stopPropagation });
-      element.dispatchEvent(event);
-      return stopPropagation;
-    };
-
-    const societyStop = dispatchWithStop(screen.getByTitle("Open Robotics Club"));
-    const peopleStop = dispatchWithStop(screen.getByTitle("Open users"));
-
-    expect(societyStop).toHaveBeenCalled();
-    expect(peopleStop).toHaveBeenCalled();
+  it("stops propagation from people link", () => {
+    const onParentClick = vi.fn();
+    renderMeta(
+      <div onClick={onParentClick}>
+        <TaskCardMeta task={{ people_count: 2 }} />
+      </div>,
+    );
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true });
+    const stopPropagation = vi.fn();
+    Object.defineProperty(event, "stopPropagation", { value: stopPropagation });
+    screen.getByTitle("Open users").dispatchEvent(event);
+    expect(stopPropagation).toHaveBeenCalled();
     expect(onParentClick).not.toHaveBeenCalled();
   });
 });

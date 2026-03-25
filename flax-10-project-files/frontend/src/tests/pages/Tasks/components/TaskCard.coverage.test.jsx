@@ -268,67 +268,47 @@ describe("TaskCard coverage", () => {
     expect(completionMock.showCompletionToast).not.toHaveBeenCalled();
   });
 
-  it("covers storage fallbacks, timer updates, burst cleanup, and edit-modal callbacks", async () => {
-    const originalSessionStorage = window.sessionStorage;
-    const blockedSessionStorage = {
-      getItem: vi.fn(() => {
-        throw new Error("blocked");
-      }),
-      setItem: vi.fn(),
-      removeItem: vi.fn(),
-      clear: vi.fn(),
-    };
-    Object.defineProperty(window, "sessionStorage", {
-      configurable: true,
-      value: blockedSessionStorage,
-    });
-    Object.defineProperty(globalThis, "sessionStorage", {
-      configurable: true,
-      value: blockedSessionStorage,
-    });
+  it("handles storage fallbacks and blocked session storage", () => {
+    const original = window.sessionStorage;
+    const blocked = { getItem: vi.fn(() => { throw new Error("b"); }), setItem: vi.fn(), removeItem: vi.fn(), clear: vi.fn() };
+    Object.defineProperty(window, "sessionStorage", { configurable: true, value: blocked });
+    Object.defineProperty(globalThis, "sessionStorage", { configurable: true, value: blocked });
 
-    const onEdit = vi.fn();
-    renderWithRouter(
-      <TaskCard
-        {...buildProps({
-          task: { ...buildProps().task, id: 22, priority: "low" },
-          onEdit,
-        })}
-      />,
-    );
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...buildProps().task, id: 22 } })} />);
+    expect(screen.getByText("Read book")).toBeInTheDocument();
 
+    Object.defineProperty(window, "sessionStorage", { configurable: true, value: original });
+    Object.defineProperty(globalThis, "sessionStorage", { configurable: true, value: original });
+  });
+
+  it("handles external timer task-id updates", async () => {
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...buildProps().task, id: 22 } })} />);
     const card = screen.getByTitle(/Right-click for more options/i);
-    const initialClassName = card.className;
-
+    const initial = card.className;
     await act(async () => {
       window.dispatchEvent(new StorageEvent("storage", { key: "timerTaskId", newValue: "22" }));
     });
+    await waitFor(() => expect(card.className).not.toBe(initial));
+  });
 
-    await waitFor(() => expect(card.className).not.toBe(initialClassName));
-
+  it("handles burst cleanup after task completion", async () => {
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...buildProps().task, id: 22 } })} />);
     vi.useFakeTimers();
     fireEvent.click(screen.getByLabelText(/Mark complete/i));
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(500);
-    });
+    await act(async () => { await vi.advanceTimersByTimeAsync(500); });
     vi.useRealTimers();
+    expect(completionMock.showCompletionToast).toHaveBeenCalled();
+  });
 
-    fireEvent.contextMenu(card);
+  it("handles edit-modal save and close callbacks", () => {
+    const onEdit = vi.fn();
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...buildProps().task, id: 22 }, onEdit })} />);
+    fireEvent.contextMenu(screen.getByTitle(/Right-click for more options/i));
     fireEvent.click(screen.getByRole("button", { name: /Edit/i }));
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close" }));
-
     expect(onEdit).toHaveBeenCalledWith({ title: "Updated" });
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByTestId("edit-modal")).not.toBeInTheDocument();
-
-    Object.defineProperty(window, "sessionStorage", {
-      configurable: true,
-      value: originalSessionStorage,
-    });
-    Object.defineProperty(globalThis, "sessionStorage", {
-      configurable: true,
-      value: originalSessionStorage,
-    });
   });
 
   it("covers non-matching storage events, default edit lists, link clicks, and non-enter keys", async () => {
