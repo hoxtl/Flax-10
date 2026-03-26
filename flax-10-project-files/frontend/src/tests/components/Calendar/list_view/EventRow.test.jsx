@@ -29,7 +29,7 @@ vi.mock('../../../../components/calendar/utils/eventStyleUtils', () => ({
     getEventTheme: (event) => ({ color: event.noAccent ? undefined : '#7B6751' }),
 }));
 
-vi.mock('../../../../components/common/Badge/Badge', () => ({
+vi.mock('../../../../components/common/badge/Badge', () => ({
     default: ({ children }) => <span data-testid="badge">{children}</span>,
 }));
 

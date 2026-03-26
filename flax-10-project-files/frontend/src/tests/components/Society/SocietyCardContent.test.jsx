@@ -2,13 +2,11 @@ import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { MemoryRouter } from "react-router-dom";
+import { SocietyCardContent } from "../../../components/Society/SocietyCardContent";
 
-import { SocietyCardContent } from "../../../components/society/SocietyCardContent";
-
-function renderWithRouter(ui) {
-  return render(<MemoryRouter>{ui}</MemoryRouter>);
-}
+vi.mock("../../../components/common/EntityLinkChip/EntityLinkChip", () => ({
+  default: ({ children, to, className }) => <a href={to} className={className}>{children}</a>,
+}));
 
 describe("SocietyCardContent", () => {
   const society = {
@@ -21,7 +19,7 @@ describe("SocietyCardContent", () => {
   };
 
   it("renders the overlay version when the card has no image", () => {
-    renderWithRouter(<SocietyCardContent society={society} hasImage={false} RatifiedBadge={({ isRatified }) => <span>{String(isRatified)}</span>} />);
+    render(<SocietyCardContent society={society} hasImage={false} RatifiedBadge={({ isRatified }) => <span>{String(isRatified)}</span>} />);
 
     expect(screen.getByText("Robotics Society")).toBeInTheDocument();
     expect(screen.getByText("18 members")).toBeInTheDocument();
@@ -31,7 +29,7 @@ describe("SocietyCardContent", () => {
   });
 
   it("renders content without the overlay when an image exists", () => {
-    renderWithRouter(<SocietyCardContent society={{ ...society, upcoming_events_count: 1, related_tasks_count: 1 }} hasImage RatifiedBadge={null} />);
+    render(<SocietyCardContent society={{ ...society, upcoming_events_count: 1, related_tasks_count: 1 }} hasImage RatifiedBadge={null} />);
 
     expect(screen.getByRole("link", { name: "Robotics Society" })).toHaveAttribute("href", "/societies?id=5");
     expect(screen.getByText(/1 event/)).toBeInTheDocument();
@@ -39,7 +37,7 @@ describe("SocietyCardContent", () => {
   });
 
   it("falls back to event and task counts from alternate fields", () => {
-    renderWithRouter(
+    render(
       <SocietyCardContent
         society={{ ...society, upcoming_events_count: null, events_count: 4, related_tasks_count: null, tasks_count: 5 }}
         hasImage
@@ -52,7 +50,7 @@ describe("SocietyCardContent", () => {
   });
 
   it("builds the task link even when the society name is missing", () => {
-    renderWithRouter(
+    render(
       <SocietyCardContent
         society={{ ...society, name: "", upcoming_events_count: 1, related_tasks_count: 1 }}
         hasImage
@@ -65,7 +63,7 @@ describe("SocietyCardContent", () => {
   });
 
   it("hides related links when counts are non-positive or missing", () => {
-    renderWithRouter(
+    render(
       <SocietyCardContent
         society={{ ...society, upcoming_events_count: null, events_count: null, events: [], related_tasks_count: null, tasks_count: 0 }}
         hasImage
@@ -79,7 +77,7 @@ describe("SocietyCardContent", () => {
   });
 
   it("treats non-array events as missing", () => {
-    renderWithRouter(
+    render(
       <SocietyCardContent
         society={{ ...society, upcoming_events_count: null, events_count: null, events: null, related_tasks_count: 1 }}
         hasImage
@@ -92,7 +90,7 @@ describe("SocietyCardContent", () => {
   });
 
   it("falls back to a missing task count when no task totals are provided", () => {
-    renderWithRouter(
+    render(
       <SocietyCardContent
         society={{ ...society, upcoming_events_count: 2, related_tasks_count: null, tasks_count: undefined }}
         hasImage

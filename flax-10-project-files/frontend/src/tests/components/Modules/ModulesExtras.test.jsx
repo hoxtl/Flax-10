@@ -22,7 +22,7 @@ import { renderHook, act } from '@testing-library/react';
 vi.mock('../../../components/modules/modules/ModuleCourseFilter.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
-vi.mock('../../../components/common/Card/CardGrid.module.css', () => ({
+vi.mock('../../../components/common/card/CardGrid.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 

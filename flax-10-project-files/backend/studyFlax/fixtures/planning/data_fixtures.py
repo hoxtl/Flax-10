@@ -192,12 +192,12 @@ personal_task_fixtures = (
     ("Build this week's flashcard pack","Turn lecture takeaways into an Anki deck you can actually reuse later.",    "low",    2,  2, "Personal"),
     ("Track spending this week",        "Log all expenses and check you're on budget.",                              "low",    1,  2, "Finance"),
 
-    ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "high",   1,  3, "Internships"),
+    ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "urgent", 1,  3, "Internships"),
     ("Seminar talking points prep",     "Re-read the core text and draft two sharp questions for discussion.",       "medium", 2,  3, "Personal"),
     ("GP appointment",                  "Nothing urgent — just a general check-up.",                                 "low",    1,  3, "Health"),
 
     ("Book dentist appointment",        "Overdue — call and book for sometime next month.",                          "low",    1,  4, "Health"),
-    ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "high",   4,  4, "Personal"),
+    ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "urgent", 4,  4, "Personal"),
 
     ("Update CV",                       "Add the latest project or placement before applying to grad roles.",        "medium", 2,  5, "Internships"),
     ("Draft personal statement section","Write 200 words on your academic motivation.",                              "high",   3,  5, "Internships"),

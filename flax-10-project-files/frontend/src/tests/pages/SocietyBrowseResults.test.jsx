@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-vi.mock("../../components/common/Card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
+vi.mock("../../components/common/card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
 
 vi.mock("../../components/society/SocietyCard", () => ({
   default: ({ society, onClick, onReport, onUnreport }) => (

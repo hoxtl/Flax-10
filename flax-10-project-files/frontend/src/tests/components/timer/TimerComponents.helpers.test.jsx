@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { commitInput, formatTime, handleInput, handleKey } from "../../../components/timer/TimerComponents";
+import { commitInput, formatTime, handleInput, handleKey } from "../../../components/Timer/TimerComponents";
 
 describe("TimerComponents helpers", () => {
   it("formats positive and negative values", () => {

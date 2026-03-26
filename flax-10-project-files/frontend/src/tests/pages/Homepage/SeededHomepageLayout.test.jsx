@@ -47,7 +47,7 @@ vi.mock("../../../pages/homepage/components/IntelligenceGrid", () => ({
   default: ({ layout }) => <div data-testid="homepage-layout">{layout.join("|")}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/IntelligenceWidgetRenderer", () => ({
+vi.mock("../../../pages/homepage/components/intelligenceWidgetRenderer", () => ({
   renderIntelligenceWidget: () => null,
 }));
 

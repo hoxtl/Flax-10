@@ -12,18 +12,7 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/common/generic_summary_modal/GenericSummaryModal.module.css', () => ({
-    default: {
-        container: 'container',
-        list: 'list',
-        topContent: 'topContent',
-        loadingItem: 'loadingItem',
-        loadingAvatar: 'loadingAvatar',
-        loadingInfo: 'loadingInfo',
-        loadingLine: 'loadingLine',
-        loadingLineShort: 'loadingLineShort',
-    },
-}));
+vi.mock('../../../components/common/generic_summary_modal/GenericSummaryModal.module.css', () => ({ default: {} }));
 
 describe('GenericSummaryModal', () => {
     it('returns null when isOpen is false', () => {
@@ -99,42 +88,5 @@ describe('GenericSummaryModal', () => {
         );
         expect(screen.getByTestId('children')).toBeInTheDocument();
         expect(screen.getByText('Child Content')).toBeInTheDocument();
-    });
-
-    it('renders loading rows when loading is true', () => {
-        const { container } = render(
-            <GenericSummaryModal isOpen={true} onClose={vi.fn()} title="Title" items={[]} loading />
-        );
-        expect(container.querySelectorAll('.loadingItem')).toHaveLength(5);
-    });
-
-    it('prefers emptyContent over the default empty state', () => {
-        render(
-            <GenericSummaryModal
-                isOpen={true}
-                onClose={vi.fn()}
-                title="Title"
-                items={[]}
-                emptyContent={<div data-testid="custom-empty">Custom empty</div>}
-            />
-        );
-        expect(screen.getByTestId('custom-empty')).toBeInTheDocument();
-        expect(screen.queryByText('No items found.')).toBeNull();
-    });
-
-    it('applies custom container and list classes', () => {
-        const { container } = render(
-            <GenericSummaryModal
-                isOpen={true}
-                onClose={vi.fn()}
-                title="Title"
-                items={[{ id: 1, name: 'Alice' }]}
-                renderItem={(item) => <span key={item.id}>{item.name}</span>}
-                containerClassName="outer-shell"
-                listClassName="inner-list"
-            />
-        );
-        expect(container.querySelector('.container.outer-shell')).toBeTruthy();
-        expect(container.querySelector('.list.inner-list')).toBeTruthy();
     });
 });

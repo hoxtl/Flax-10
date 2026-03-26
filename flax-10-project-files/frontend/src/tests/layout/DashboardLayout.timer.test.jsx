@@ -16,7 +16,7 @@ import DashboardLayout from "../../layout/DashboardLayout";
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
 
-vi.mock("../../components/dashboard/Sidebar", async () => {
+vi.mock("../../components/dashboard/sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });
@@ -90,7 +90,6 @@ vi.mock("../../components/dashboard/WeekBar", () => ({ default: () => <div data-
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
-<<<<<<< HEAD
 vi.mock("../../components/auth/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
 =======
 vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
@@ -99,9 +98,6 @@ vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div
 vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
 vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
 >>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
-=======
-vi.mock("../../components/Auth/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
->>>>>>> main
 vi.mock("react-router-dom", () => ({
   useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
 }));

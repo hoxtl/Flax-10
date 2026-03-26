@@ -29,7 +29,7 @@ vi.mock("../../../../../components/calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => ({ loadEvents }),
 }));
 
-vi.mock("../../../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 

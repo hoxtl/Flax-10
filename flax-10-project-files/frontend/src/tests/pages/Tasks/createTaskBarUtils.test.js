@@ -3,33 +3,9 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import {
-  buildQuickAddPayload,
-  clampEstimateMinutes,
-  normalizeEstimateMinutesInput,
-  runQuickAdd,
-} from "../../../pages/tasks/utils/createTaskBarUtils";
+import { buildQuickAddPayload, runQuickAdd } from "../../../pages/tasks/utils/createTaskBarUtils";
 
 describe("createTaskBarUtils", () => {
-  describe("estimate normalization", () => {
-    it("clamps raw minute values into the supported range", () => {
-      expect(clampEstimateMinutes("abc")).toBe(25);
-      expect(clampEstimateMinutes(1)).toBe(5);
-      expect(clampEstimateMinutes(250)).toBe(240);
-      expect(clampEstimateMinutes(50)).toBe(50);
-    });
-
-    it("normalizes empty and invalid values using the provided fallback", () => {
-      expect(normalizeEstimateMinutesInput("", 60)).toBe(60);
-      expect(normalizeEstimateMinutesInput(null, 15)).toBe(15);
-      expect(normalizeEstimateMinutesInput(undefined, 300)).toBe(240);
-      expect(normalizeEstimateMinutesInput("oops", 2)).toBe(5);
-      expect(normalizeEstimateMinutesInput(75, 25)).toBe(75);
-      expect(normalizeEstimateMinutesInput("", undefined)).toBe(25);
-      expect(normalizeEstimateMinutesInput("oops", null)).toBe(25);
-    });
-  });
-
   describe("buildQuickAddPayload", () => {
     it("builds payload with taskListId when set", () => {
       const state = { sortedLists: [{ id: 1 }], taskListId: "5", estimatedMinutes: 50, moduleId: null, defaultDueDate: "2026-03-15" };
@@ -84,13 +60,12 @@ describe("createTaskBarUtils", () => {
     });
 
     it("calls onAddTask and clears state on success", async () => {
-      const state = { saving: false, setSaving: vi.fn(), title: "T", setTitle: vi.fn(), setModuleId: vi.fn(), setPageCount: vi.fn(), sortedLists: [], taskListId: null, estimatedBlocks: 1, moduleId: null, defaultDueDate: null };
+      const state = { saving: false, setSaving: vi.fn(), title: "T", setTitle: vi.fn(), setModuleId: vi.fn(), sortedLists: [], taskListId: null, estimatedBlocks: 1, moduleId: null, defaultDueDate: null };
       const onAddTask = vi.fn().mockResolvedValue(undefined);
       await runQuickAdd(state, onAddTask, "Task");
       expect(onAddTask).toHaveBeenCalledWith(expect.objectContaining({ title: "Task" }));
       expect(state.setTitle).toHaveBeenCalledWith("");
       expect(state.setModuleId).toHaveBeenCalledWith(null);
-      expect(state.setPageCount).toHaveBeenCalledWith(null);
       expect(state.setSaving).toHaveBeenCalledWith(true);
       expect(state.setSaving).toHaveBeenCalledWith(false);
     });

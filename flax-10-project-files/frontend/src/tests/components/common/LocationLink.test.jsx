@@ -25,9 +25,9 @@ vi.mock("react-router-dom", async () => {
     };
 });
 
-vi.mock("../../../components/common/location_link/LocationLink.module.css", () => ({ default: { link: "link", icon: "icon", text: "text" } }));
+vi.mock("../../../components/common/LocationLink/LocationLink.module.css", () => ({ default: { link: "link", icon: "icon", text: "text" } }));
 
-import LocationLink from "../../../components/common/location_link/LocationLink";
+import LocationLink from "../../../components/common/LocationLink/LocationLink";
 
 describe("LocationLink", () => {
     it("returns null when location is missing", () => {

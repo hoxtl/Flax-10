@@ -40,37 +40,4 @@ describe("TaskInfoModal", () => {
     expect(screen.getByText("Speed")).toBeInTheDocument();
     expect(await screen.findByText("1.7 min/page")).toBeInTheDocument();
   });
-
-  it("shows reading-list placeholders and omits the list row when no list name is provided", async () => {
-    getReadingSpeed.mockResolvedValueOnce({});
-
-    render(
-      <TaskInfoModal
-        task={{
-          id: 6,
-          title: "Reading prep",
-          description: "",
-          priority: "medium",
-          due_date: null,
-          estimated_blocks: 1,
-        }}
-        listName="Reading List - Philosophy"
-        onClose={vi.fn()}
-      />,
-    );
-
-    await waitFor(() => expect(getReadingSpeed).toHaveBeenCalled());
-    expect(screen.getAllByText("—").length).toBeGreaterThan(1);
-  });
-
-  it("omits the list information row when listName is missing", () => {
-    render(
-      <TaskInfoModal
-        task={{ id: 7, title: "Essay plan", priority: "medium", estimated_blocks: 1, due_date: null }}
-        onClose={vi.fn()}
-      />,
-    );
-
-    expect(screen.queryByText(/^List$/)).not.toBeInTheDocument();
-  });
 });

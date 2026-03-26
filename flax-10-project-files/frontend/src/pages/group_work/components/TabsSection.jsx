@@ -2,7 +2,7 @@
  * GroupWork detail tabs.
  */
 
-import Tabs from "../../../components/common/Tabs/Tabs";
+import Tabs from "../../../components/common/tabs/Tabs";
 import GroupTasksTab from "../GroupTasksTab";
 import AvailabilityTab from "../AvailabilityTab";
 import ProjectProgress from "./ProjectProgress";

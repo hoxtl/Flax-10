@@ -32,14 +32,7 @@ export function buildMenuStyle(openUpward, usePortal, coords, menuMaxHeight) {
     const bottom = openUpward ? window.innerHeight - coords.top + 4 : "auto";
     Object.assign(style, { position: "fixed", top, bottom, left: coords.left, width: "max-content", minWidth: coords.width, zIndex: 10001, margin: 0 });
   }
-  let effectiveMaxHeight = menuMaxHeight || 260;
-  if (usePortal && coords) {
-    const availableSpace = openUpward
-      ? coords.top - 20
-      : window.innerHeight - coords.top - 20;
-    effectiveMaxHeight = Math.min(effectiveMaxHeight, Math.max(160, availableSpace));
-  }
-  style.maxHeight = effectiveMaxHeight;
+  if (menuMaxHeight) style.maxHeight = menuMaxHeight;
   return style;
 }
 

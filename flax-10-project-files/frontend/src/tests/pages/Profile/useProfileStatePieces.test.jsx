@@ -11,7 +11,7 @@ vi.mock("../../../context/AuthContext", () => ({
   useAuth: () => authState,
 }));
 
-vi.mock("../../../pages/profile/hooks/profileDataLoaders", () => ({
+vi.mock("../../../pages/Profile/hooks/profileDataLoaders", () => ({
   loadTaskCount: (...args) => loadTaskCountMock(...args),
   tryLoadEvents: (...args) => tryLoadEventsMock(...args),
   tryLoadProfile: (...args) => tryLoadProfileMock(...args),
@@ -22,7 +22,7 @@ import {
   useModalState,
   useProfileData,
   useTaskCountData,
-} from "../../../pages/profile/hooks/useProfileStatePieces";
+} from "../../../pages/Profile/hooks/useProfileStatePieces";
 
 describe("useProfileStatePieces", () => {
   beforeEach(() => {

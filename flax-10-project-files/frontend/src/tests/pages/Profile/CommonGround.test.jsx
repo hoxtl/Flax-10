@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CommonGroundSection } from '../../../pages/profile/components/widgets/CommonGround';
 
-vi.mock('../../../components/common/Card/Card', () => ({
+vi.mock('../../../components/common/card/Card', () => ({
   default: ({ children, className }) => <div className={className} data-testid="card">{children}</div>,
 }));
 

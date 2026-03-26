@@ -57,15 +57,10 @@ function validateProjectForm(form) {
   return errors;
 }
 
-function normaliseDeadline(value) {
-  if (!value) return value;
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value;
-}
-
 function buildProjectPayload(form) {
   const payload = {
     name: form.name,
-    deadline: normaliseDeadline(form.deadline),
+    deadline: form.deadline,
     member_ids: form.members.map((member) => member.id),
   };
   const courseCode = String(form.course_code || "").trim();

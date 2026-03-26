@@ -17,7 +17,7 @@ vi.mock('../../../api/tagApi', () => ({
     getTags: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
+vi.mock('../../../components/calendar/header/calendarHeaderUtils', () => ({
     CalendarNav: ({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) => (
         <div className="nav">
             <button type="button" onClick={onPrev}>&lt;</button>

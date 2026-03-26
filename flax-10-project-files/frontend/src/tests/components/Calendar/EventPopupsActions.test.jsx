@@ -5,20 +5,20 @@ vi.mock('../../../context/CalendarContext', () => ({
   useEventModal: vi.fn(), useEventPopup: vi.fn(), useCalendarDispatch: vi.fn(), useCalendar: vi.fn(() => ({})),
   useEventDelete: vi.fn(() => ({ openDelete: vi.fn(), isDeleteOpen: false }))
 }));
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: vi.fn(() => ({ loadEvents: vi.fn() })),
   useEventActions: vi.fn(() => ({ removeEvent: vi.fn(), addException: vi.fn() }))
 }));
-vi.mock('../../../components/calendar/event_modal/EventModal', () => ({ EventModal: () => <div data-testid="event-modal-mock" /> }));
-vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({ EventPopover: ({ event, actions }) => (<div><span>{event?.title}</span>{actions?.map((a, i) => (<button key={i} onClick={a.onClick}>{a.label}</button>))}</div>) }));
+vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({ EventModal: () => <div data-testid="event-modal-mock" /> }));
+vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({ EventPopover: ({ event, actions }) => (<div><span>{event?.title}</span>{actions?.map((a, i) => (<button key={i} onClick={a.onClick}>{a.label}</button>))}</div>) }));
 vi.mock('../../../context/TagContext', () => ({ useTags: vi.fn(() => ({ refreshTags: vi.fn(), getTag: vi.fn() })) }));
 vi.mock('../../../context/ToastContext', () => ({ useToast: vi.fn(() => vi.fn()) }));
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({ getEventType: vi.fn(() => 'personal'), hasRecurrence: vi.fn(() => false) }));
-import { EventPopups } from '../../../components/calendar/EventPopups';
+vi.mock('../../../components/Calendar/utils/eventUtils', () => ({ getEventType: vi.fn(() => 'personal'), hasRecurrence: vi.fn(() => false) }));
+import { EventPopups } from '../../../components/Calendar/EventPopups';
 import { useEventModal, useEventPopup, useEventDelete } from '../../../context/CalendarContext';
 import { useToast } from '../../../context/ToastContext';
 import { useTags } from '../../../context/TagContext';
-import { getEventType } from '../../../components/calendar/utils/eventUtils';
+import { getEventType } from '../../../components/Calendar/utils/eventUtils';
 const setupPopup = (evt, rO = false) => useEventPopup.mockReturnValue({ popupEvent: evt, popupAnchorRect: { top: 0, left: 0, width: 100, height: 30 }, closePopup: vi.fn(), readOnly: rO });
 describe('EventPopups Generic', () => {
   const mockOpenD = vi.fn(), mockToast = vi.fn(), mockRefreshTags = vi.fn();

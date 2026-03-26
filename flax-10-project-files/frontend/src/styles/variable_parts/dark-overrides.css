@@ -59,7 +59,6 @@
   --sage: #a3b18a;
   --accent: var(--color-primary);
   --danger: #d97a65;
-  --danger-hover: color-mix(in srgb, var(--danger) 88%, white);
   --danger-bg: rgba(192, 90, 62, 0.2);
   --danger-border: rgba(192, 90, 62, 0.5);
 

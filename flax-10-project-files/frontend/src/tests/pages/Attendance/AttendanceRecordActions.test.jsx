@@ -7,7 +7,7 @@ vi.mock("lucide-react", () => ({
   Ban: () => <span>ban-icon</span>,
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ content, children }) => (
     <div data-testid="tooltip">
       <span>{content}</span>

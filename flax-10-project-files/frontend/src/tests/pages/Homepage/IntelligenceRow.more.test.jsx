@@ -44,7 +44,7 @@ vi.mock("../../../pages/homepage/components/IntelligenceGrid", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/IntelligenceWidgetRenderer", () => ({
+vi.mock("../../../pages/homepage/components/intelligenceWidgetRenderer", () => ({
   renderIntelligenceWidget: (...args) => dashboardState.renderIntelligenceWidget(...args),
 }));
 

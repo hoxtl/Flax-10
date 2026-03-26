@@ -17,7 +17,7 @@ vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   normaliseModuleCode: (...args) => normaliseModuleCodeMock(...args),
 }));
 
-vi.mock("../../../components/Auth/utils/userUtils.js", () => ({
+vi.mock("../../../components/auth/utils/userUtils.js", () => ({
   getInitials: (name) => (name ? name.split(" ").map((part) => part[0]).join("") : "T"),
 }));
 
@@ -28,7 +28,7 @@ vi.mock("../../../components/modules/modules/moduleTutorUtils", () => ({
   },
 }));
 
-vi.mock("../../../components/common/Card/GridCard", () => ({
+vi.mock("../../../components/common/card/GridCard", () => ({
   default: ({ children, onClick, className, style }) => (
     <div role="button" tabIndex={0} onClick={onClick} className={className} style={style}>
       {children}

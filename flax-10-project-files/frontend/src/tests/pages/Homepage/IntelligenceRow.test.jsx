@@ -43,14 +43,9 @@ vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
     })),
 }));
 
-<<<<<<< HEAD
 vi.mock('../../../components/ui/bento-grid', () => ({
     BentoGrid: ({ children }) => <div data-testid="bento-grid">{children}</div>,
     BentoCard: ({ children, className }) => <div data-testid="bento-card" className={className}>{children}</div>,
-=======
-vi.mock("../../../pages/homepage/components/IntelligenceWidgetRenderer", () => ({
-  renderIntelligenceWidget: (...args) => state.renderIntelligenceWidget(...args),
->>>>>>> main
 }));
 
 import IntelligenceRow from '../../../pages/Homepage/components/IntelligenceRow';

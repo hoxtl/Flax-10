@@ -10,7 +10,7 @@ vi.mock("framer-motion", () => ({
   useReducedMotion: () => reduceMotion(),
 }));
 
-import { LeaveTimerModal, EndEarlyModal } from "../../../components/timer/popups/ExitModals";
+import { LeaveTimerModal, EndEarlyModal } from "../../../components/Timer/popups/ExitModals";
 
 describe("Exit modals coverage", () => {
   it("uses the reduced-motion progress branch and onTakeBreak when provided", () => {

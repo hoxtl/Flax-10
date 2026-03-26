@@ -1,0 +1,446 @@
+/* Row-level styles shared by deadline and reading widgets */
+
+/* --- Deadline rows --- */
+.deadlineRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 52px;
+    border-radius: 14px;
+    border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
+    border-left: 4px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft, var(--border)));
+<<<<<<< HEAD
+    background: var(--modules-inline-surface, var(--surface-inner, var(--panel)));
+=======
+    background: var(--surface-inner, var(--panel));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+    padding: 0.55rem 0.85rem;
+    transition: border-color 0.2s ease;
+}
+
+.deadlineRow:hover {
+    border-color: var(--text);
+}
+
+<<<<<<< HEAD
+:global([data-mode="dark"]) .deadlineRow {
+    background: color-mix(in srgb, var(--modules-inline-surface, var(--surface-inner)) 90%, var(--surface-card) 10%);
+    border-color: color-mix(in srgb, var(--color-highlight) 18%, var(--border) 82%);
+    box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global([data-mode="dark"]) .deadlineRow:hover {
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border) 78%);
+}
+
+.rowOverdue {
+    background: color-mix(in srgb, var(--danger) 8%, var(--modules-inline-surface, var(--surface-card)));
+=======
+.rowOverdue {
+    background: color-mix(in srgb, var(--danger) 6%, var(--surface-card));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+    border-color: color-mix(in srgb, var(--danger) 25%, var(--border));
+    border-left-color: var(--home-urgency-danger);
+}
+
+.rowCritical {
+<<<<<<< HEAD
+    background: color-mix(in srgb, var(--warning, orange) 7%, var(--modules-inline-surface, var(--surface-card)));
+    border-left-color: var(--home-urgency-warning);
+}
+
+:global([data-mode="dark"]) .rowCritical {
+    background: color-mix(in srgb, var(--warning, orange) 10%, var(--modules-inline-surface, var(--surface-card)));
+}
+
+=======
+    background: color-mix(in srgb, var(--warning, orange) 5%, var(--surface-card));
+    border-left-color: var(--home-urgency-warning);
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+.rowUrgentGlow {
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+    box-shadow:
+        0 0 0 1.5px color-mix(in srgb, var(--danger) 20%, transparent),
+        0 0 8px color-mix(in srgb, var(--danger) 18%, transparent);
+}
+
+.deadlineRowLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.deadlinePills {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.moduleCodePill {
+<<<<<<< HEAD
+    --chip-padding: 0.14rem 0.56rem;
+    --chip-font-size: 0.62rem;
+    --chip-font-weight: 800;
+    min-height: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: default;
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, white 16%, transparent),
+        0 4px 10px color-mix(in srgb, black 10%, transparent);
+}
+
+.typePill {
+    --chip-padding: 0.14rem 0.56rem;
+    --chip-font-size: 0.62rem;
+    --chip-font-weight: 800;
+    min-height: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, white 10%, transparent),
+        0 1px 3px color-mix(in srgb, black 7%, transparent);
+}
+
+:global([data-mode="dark"]) .moduleCodePill {
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 28%, var(--modules-chip-border-strong));
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-inner) 84%, var(--modules-accent-ink) 16%),
+        color-mix(in srgb, var(--surface-card) 86%, var(--modules-accent-ink) 14%)
+    );
+    color: color-mix(in srgb, var(--text) 88%, var(--modules-accent-on-solid) 12%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 16px rgba(0, 0, 0, 0.18);
+=======
+    display: inline-flex;
+    align-items: center;
+    border: 0.5px solid var(--modules-chip-border-strong);
+    background: var(--modules-chip-bg-strong);
+    color: var(--modules-chip-fg);
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.moduleCodePill:hover {
+    background: var(--modules-accent-ink);
+    color: var(--modules-accent-on-solid);
+}
+
+.typePill {
+    display: inline-flex;
+    align-items: center;
+    border: 0.5px solid var(--modules-chip-border);
+    background: var(--modules-chip-bg);
+    color: var(--modules-chip-fg);
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+}
+
+.deadlineTitle {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.daysLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: var(--modules-due-future);
+}
+
+<<<<<<< HEAD
+.widgetRowMeta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    flex-shrink: 0;
+}
+
+.widgetPriorityPill {
+    min-width: 0 !important;
+    min-height: 30px !important;
+    padding: 0.28rem 0.68rem !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.05em !important;
+}
+
+.taskCheckbox {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--home-task-checkbox-border, var(--widget-border));
+    background: var(--home-task-checkbox-bg, var(--surface-raised, var(--surface-card)));
+    box-shadow: var(--home-task-checkbox-shadow, none);
+    color: color-mix(in srgb, var(--home-task-checkbox-border, var(--widget-border)) 88%, var(--text));
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.taskCheckbox::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--home-urgency-success) 70%, white 30%);
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.taskCheckbox:hover {
+    border-color: color-mix(in srgb, var(--home-urgency-warning) 52%, var(--home-task-checkbox-border, var(--widget-border)));
+    box-shadow:
+        var(--home-task-checkbox-shadow, none),
+        0 0 0 1px color-mix(in srgb, var(--home-urgency-warning) 18%, transparent);
+    background: color-mix(in srgb, var(--home-urgency-warning) 6%, var(--home-task-checkbox-bg, var(--surface-card)));
+    transform: translateY(-1px);
+}
+
+.taskCheckbox[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--home-urgency-success) 58%, transparent);
+    background: color-mix(in srgb, var(--home-urgency-success) 22%, var(--surface-card));
+    color: color-mix(in srgb, var(--home-urgency-success) 72%, white 28%);
+}
+
+.taskCheckbox[aria-pressed="true"]::before {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 9px;
+    border-right: 2px solid var(--color-bg);
+    border-bottom: 2px solid var(--color-bg);
+    transform: rotate(40deg) translate(-1px, -1px);
+    z-index: 1;
+}
+
+.taskCheckbox[aria-pressed="true"]::after {
+    opacity: 0.95;
+    transform: scale(1);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--home-urgency-success) 16%, transparent);
+}
+
+.taskCheckbox:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    outline-offset: 2px;
+}
+
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+/* --- Priority pills (matches TaskCard) --- */
+.priorityPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+<<<<<<< HEAD
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+=======
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+    font-size: 0.6rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.priorityPill_overdue {
+    background: var(--modules-priority-overdue-bg);
+    color: var(--modules-priority-overdue-fg);
+}
+
+.priorityPill_critical {
+    background: var(--modules-priority-critical-bg);
+    color: var(--modules-priority-critical-fg);
+}
+
+.priorityPill_urgent {
+    background: var(--modules-priority-urgent-bg);
+    color: var(--modules-priority-urgent-fg);
+}
+
+.due_overdue {
+    color: var(--modules-priority-overdue-fg);
+    font-weight: 700;
+}
+
+.due_today {
+    color: var(--modules-priority-overdue-fg);
+    font-weight: 700;
+}
+
+.due_tomorrow {
+    color: var(--modules-priority-critical-fg);
+    font-weight: 700;
+}
+
+.due_future {
+    color: var(--modules-due-future);
+    font-weight: 600;
+}
+
+.duePillIcon {
+    flex-shrink: 0;
+}
+
+/* --- Reading rows (matches deadline row style) --- */
+.readingRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 52px;
+    border-radius: 14px;
+    border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
+    border-left: 4px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft, var(--border)));
+<<<<<<< HEAD
+    background: var(--modules-inline-surface, var(--surface-inner, var(--panel)));
+=======
+    background: var(--surface-inner, var(--panel));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+    padding: 0.55rem 0.85rem;
+    transition: border-color 0.2s ease;
+}
+
+.readingRow:hover {
+    border-color: var(--text);
+}
+
+<<<<<<< HEAD
+:global([data-mode="dark"]) .readingRow {
+    background: color-mix(in srgb, var(--modules-inline-surface, var(--surface-inner)) 90%, var(--surface-card) 10%);
+    border-color: color-mix(in srgb, var(--color-highlight) 18%, var(--border) 82%);
+    box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global([data-mode="dark"]) .readingRow:hover {
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border) 78%);
+}
+
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+.readingRowClickable {
+    cursor: pointer;
+}
+
+.readingRowLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.readingTitle {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.addedLabel {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--success-text);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.readingAddButton,
+.nudgeAddButton {
+    padding-inline: 0.85rem;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+/* --- Smart nudge --- */
+.nudgeBanner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 14px;
+    border: 0.5px solid color-mix(in srgb, var(--warning, orange) 30%, var(--border));
+    background: color-mix(in srgb, var(--warning, orange) 6%, var(--surface-card));
+    color: var(--text);
+}
+
+.nudgeIcon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.nudgeText {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.nudgeText strong {
+    font-weight: 800;
+    color: var(--modules-accent-ink);
+}
+
+.nudgeActions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    margin-left: auto;
+}

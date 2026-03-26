@@ -1,5 +1,5 @@
 .block {
-    background: linear-gradient(90deg, var(--panel, #f0efec) 0%, var(--hover, #e8e6e2) 50%, var(--panel, #f0efec) 100%);
+    background: linear-gradient(90deg, var(--panel, #f8f7f4) 0%, rgba(232, 236, 242, 0.92) 35%, rgba(245, 248, 252, 0.98) 50%, rgba(232, 236, 242, 0.92) 65%, var(--panel, #f8f7f4) 100%);
     background-size: 240% 100%;
     animation: shimmer 1.15s linear infinite;
     border-radius: 12px;

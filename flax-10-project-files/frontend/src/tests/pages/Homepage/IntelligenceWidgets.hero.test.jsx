@@ -46,7 +46,7 @@ vi.mock("lucide-react", () => {
   };
 });
 
-vi.mock("../../../pages/homepage/components/IntelligenceUtils", () => ({
+vi.mock("../../../pages/homepage/components/intelligenceUtils", () => ({
   getGreeting: (name) => `Hello ${name || "there"}`,
   getTodayLabel: () => "MONDAY · 24 MAR",
 }));

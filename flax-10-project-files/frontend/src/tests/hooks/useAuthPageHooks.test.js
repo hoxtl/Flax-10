@@ -10,7 +10,7 @@ const submitSignInMock = vi.fn();
 const submitSignUpMock = vi.fn();
 const buildAuthLandingSectionsMock = vi.fn();
 
-vi.mock("../../components/Auth/hooks/useAuthForm", () => ({
+vi.mock("../../components/auth/hooks/useAuthForm", () => ({
   useAuthForm: (...args) => useAuthFormMock(...args),
 }));
 

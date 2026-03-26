@@ -32,7 +32,6 @@ const taskBarActionNames = [
   "setEstimatedMinutes",
   "setModuleId",
   "setTaskListId",
-  "setListError",
 ];
 
 const baseTaskBarState = {
@@ -49,7 +48,6 @@ const baseTaskBarState = {
   listOptions: [{ value: "1", label: "Inbox" }],
   sleepWarning: false,
   sleepWarningProps: {},
-  listError: false,
 };
 
 function state(overrides = {}) {
@@ -108,12 +106,5 @@ describe("CreateTaskBar", () => {
     fireEvent.change(screen.getByLabelText("Select list"), { target: { value: "" } });
     expect(s.setModuleId).toHaveBeenCalledWith(null);
     expect(s.setTaskListId).toHaveBeenCalledWith(1);
-  });
-
-  it("renders the list dropdown in its error state", () => {
-    hookMock.mockReturnValue(state({ listError: true }));
-    render(<CreateTaskBar inputRef={{ current: null }} />);
-    expect(screen.getByText("*")).toBeInTheDocument();
-    expect(screen.getByLabelText("Select list")).toBeInTheDocument();
   });
 });

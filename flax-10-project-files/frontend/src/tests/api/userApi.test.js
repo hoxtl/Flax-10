@@ -111,9 +111,9 @@ describe('userService', () => {
         mockFetch({ results: [] });
         await api.searchUsers('alice', 'Computer Science', 'Chess', 0, 20, 'Year 2');
         const url = global.fetch.mock.calls[0][0];
-        expect(url).toContain('course=Computer%20Science');
+        expect(url).toContain('course=Computer+Science');
         expect(url).toContain('society=Chess');
-        expect(url).toContain('year=Year%202');
+        expect(url).toContain('year=Year+2');
     });
 
     it('searchUsers with roleFilter appends role param', async () => {
