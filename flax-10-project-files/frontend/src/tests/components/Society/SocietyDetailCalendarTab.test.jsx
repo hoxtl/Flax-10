@@ -23,7 +23,7 @@ vi.mock('../../../components/calendar/month_view/MonthView', () => ({
   ),
 }));
 
-vi.mock('../../../components/calendar/header/calendarHeaderUtils', () => ({
+vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
   CalendarNav: ({ showToday, onPrev, onNext, onToday, onDatePick }) => (
     <div data-testid="calendar-nav">
       <button type="button" onClick={onPrev}>prev</button>

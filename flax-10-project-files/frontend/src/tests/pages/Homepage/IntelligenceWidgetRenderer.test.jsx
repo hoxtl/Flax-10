@@ -66,7 +66,7 @@ vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   getEventType: (...args) => getEventTypeMock(...args),
 }));
 
-import { renderIntelligenceWidget } from "../../../pages/homepage/components/intelligenceWidgetRenderer";
+import { renderIntelligenceWidget } from "../../../pages/homepage/components/IntelligenceWidgetRenderer";
 
 function Slot6Marker(props) {
   return <div data-testid="slot6-base">{JSON.stringify(props)}</div>;

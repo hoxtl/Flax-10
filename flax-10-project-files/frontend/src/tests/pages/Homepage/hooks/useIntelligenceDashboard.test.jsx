@@ -36,21 +36,21 @@ const {
 vi.mock("../../../../api/tflApi", () => ({ tflService: tflServiceMock }));
 vi.mock("../../../../api/adminApi", () => ({ getMyCourseChangeRequest: (...args) => getMyCourseChangeRequestMock(...args) }));
 vi.mock("../../../../api/userApi", () => ({ updateUserSettings: (...args) => updateUserSettingsMock(...args) }));
-vi.mock("../../../../components/Analytics/useAttendanceStats", () => ({ default: attendanceStatsSpy }));
-vi.mock("../../../../components/Analytics/attendanceChartConfig", () => ({ getAttendancePercentage: (...args) => getAttendancePercentageMock(...args) }));
+vi.mock("../../../../components/analytics/useAttendanceStats", () => ({ default: attendanceStatsSpy }));
+vi.mock("../../../../components/analytics/attendanceChartConfig", () => ({ getAttendancePercentage: (...args) => getAttendancePercentageMock(...args) }));
 vi.mock("../../../../lib/termConfig", () => ({ loadTermConfig: (...args) => loadTermConfigMock(...args) }));
-vi.mock("../../../../pages/Homepage/components/IntelligenceUtils", () => ({
+vi.mock("../../../../pages/homepage/components/IntelligenceUtils", () => ({
   getCurrentEvent: (...args) => getCurrentEventMock(...args),
   getLiveContext: (...args) => getLiveContextMock(...args),
   getUpcomingEvent: (...args) => getUpcomingEventMock(...args),
 }));
-vi.mock("../../../../pages/Homepage/utils/kclTflMapping", () => ({
+vi.mock("../../../../pages/homepage/utils/kclTflMapping", () => ({
   getRelevantDelays: (...args) => getRelevantDelaysMock(...args),
   isSevereDisruption: (...args) => isSevereDisruptionMock(...args),
 }));
-vi.mock("../../../../pages/Analytics/hooks/useAnalyticsOverview", () => ({ default: analyticsOverviewSpy }));
+vi.mock("../../../../pages/analytics/hooks/useAnalyticsOverview", () => ({ default: analyticsOverviewSpy }));
 
-import { getSemesterProgress, useIntelligenceDashboard } from "../../../../pages/Homepage/hooks/useIntelligenceDashboard";
+import { getSemesterProgress, useIntelligenceDashboard } from "../../../../pages/homepage/hooks/useIntelligenceDashboard";
 
 const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
 

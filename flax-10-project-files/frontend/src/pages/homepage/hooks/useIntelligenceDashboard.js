@@ -9,7 +9,7 @@ import { updateUserSettings } from "../../../api/userApi";
 import useAttendanceStats from "../../../components/analytics/useAttendanceStats";
 import { getAttendancePercentage } from "../../../components/analytics/attendanceChartConfig";
 import { loadTermConfig } from "../../../lib/termConfig";
-import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/intelligenceUtils";
+import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/IntelligenceUtils";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
 import useAnalyticsOverview from "../../analytics/hooks/useAnalyticsOverview";
 

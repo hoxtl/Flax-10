@@ -9,25 +9,25 @@ const isTodayMock = vi.fn(() => false);
 const loadScheduleSettingsMock = vi.fn();
 const submitAutoScheduleWithPrefsMock = vi.fn();
 
-vi.mock("../../../../pages/Homepage/utils/index", () => ({
+vi.mock("../../../../pages/homepage/utils/index", () => ({
   formatTime: (...args) => formatTimeMock(...args),
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/utils/ScheduleAutoForm", () => ({
+vi.mock("../../../../pages/homepage/utils/scheduleAutoForm", () => ({
   buildScheduleAutoForm: (...args) => buildScheduleAutoFormMock(...args),
 }));
 
-vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
   overlapsDay: (...args) => overlapsDayMock(...args),
   isToday: (...args) => isTodayMock(...args),
 }));
 
-vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => id),
 }));
 
-vi.mock("../../../../components/Schedules/auto/autoScheduleActions", () => ({
+vi.mock("../../../../components/schedules/auto/autoScheduleActions", () => ({
   loadScheduleSettings: (...args) => loadScheduleSettingsMock(...args),
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefsMock(...args),
 }));
@@ -38,7 +38,7 @@ vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts
   buildConflictResolutionToastMessage: vi.fn(() => "No conflicts."),
 }));
 
-import { useHomepageReschedule } from "../../../../pages/Homepage/hooks/useHomepageReschedule";
+import { useHomepageReschedule } from "../../../../pages/homepage/hooks/useHomepageReschedule";
 
 function buildProps(overrides = {}) {
   return {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import ProfileSkeleton from "../../../pages/Profile/components/ProfileSkeleton";
+import ProfileSkeleton from "../../../pages/profile/components/ProfileSkeleton";
 
 describe("ProfileSkeleton", () => {
   it("renders the header skeleton and the default right column widgets", () => {

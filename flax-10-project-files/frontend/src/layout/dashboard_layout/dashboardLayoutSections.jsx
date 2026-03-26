@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 
 import styles from "../DashboardLayout.module.css";
 import TopBar from "../../components/dashboard/Topbar";
-import Sidebar from "../../components/dashboard/sidebar";
+import Sidebar from "../../components/dashboard/Sidebar";
 import WeekBar from "../../components/dashboard/WeekBar";
 
 function getContentStyle(activeNav) {

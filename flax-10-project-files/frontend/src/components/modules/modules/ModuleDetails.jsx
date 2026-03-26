@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../calendar/utils/dateUtils.js';
-import { getInitials } from '../../auth/utils/userUtils.js';
+import { getInitials } from '../../Auth/utils/userUtils.js';
 import { useAuth } from '../../../context/AuthContext.jsx';
 import Badge from '../../common/badge/Badge.jsx';
 import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';

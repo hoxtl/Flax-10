@@ -3,11 +3,11 @@
  */
 
 import styles from "../AuthPage.module.css";
-import * as Components from "../../../components/auth/AuthComponents";
-import { ErrorMessage } from "../../../components/auth/ErrorMessage";
-import { AuthOverlay } from "../../../components/auth/Overlay";
-import { SignInForm } from "../../../components/auth/SignInForm";
-import { SignUpForm } from "../../../components/auth/SignUpForm";
+import * as Components from "../../../components/Auth/AuthComponents";
+import { ErrorMessage } from "../../../components/Auth/ErrorMessage";
+import { AuthOverlay } from "../../../components/Auth/Overlay";
+import { SignInForm } from "../../../components/Auth/SignInForm";
+import { SignUpForm } from "../../../components/Auth/SignUpForm";
 
 export function AuthForms(props) {
   const commonProps = {
