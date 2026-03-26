@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import SuccessScreen from '../../../components/Onboarding/SuccessScreen';
+import SuccessScreen from '../../../components/onboarding/SuccessScreen';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -9,7 +9,7 @@ vi.mock('framer-motion', () => ({
   },
 }));
 
-vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: ({ children, onClick }) => <button type="button" onClick={onClick}>{children}</button>,
 }));
 

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/Calendar/header/CalendarHeaderUtils';
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/calendar/header/calendarHeaderUtils';
 
 vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
@@ -17,13 +17,13 @@ vi.mock('lucide-react', () => ({
     Tag: () => <span data-testid="tag-icon" />,
 }));
 
-vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
+vi.mock('../../../../components/calendar/header/DatePickerButton', () => ({
     DatePickerButton: ({ selectedDate, onDatePick }) => (
         <button type="button" onClick={() => onDatePick?.(selectedDate)} data-testid="date-picker">Pick</button>
     ),
 }));
 
-vi.mock('../../../../components/common/SegmentedControl/SegmentedControl', () => ({
+vi.mock('../../../../components/common/segmented_control/SegmentedControl', () => ({
     SegmentedControl: ({ options, value, onChange }) => (
         <div data-testid="segmented-control">
             {options.map((o) => (
@@ -34,7 +34,7 @@ vi.mock('../../../../components/common/SegmentedControl/SegmentedControl', () =>
     ),
 }));
 
-vi.mock('../../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../../components/common/animated_dropdown', () => ({
     default: ({ customTrigger, options, onChange, value }) => (
         <div data-testid="animated-dropdown">
             {customTrigger}
@@ -55,7 +55,7 @@ vi.mock('../../../../context/TagContext', () => ({
     }),
 }));
 
-vi.mock('../../../../components/common/TagsSelector/TagsSelector', () => ({
+vi.mock('../../../../components/common/tags_selector/TagsSelector', () => ({
     TagsSelector: ({ tags }) => (
         <div data-testid="tags-selector">
             {tags.map((tag) => <span key={tag.id}>{tag.label}</span>)}
@@ -63,7 +63,7 @@ vi.mock('../../../../components/common/TagsSelector/TagsSelector', () => ({
     ),
 }));
 
-vi.mock('../../../../components/Tags/TagManagerModal', () => ({
+vi.mock('../../../../components/tags/TagManagerModal', () => ({
     default: () => <div data-testid="tag-manager-modal" />,
 }));
 

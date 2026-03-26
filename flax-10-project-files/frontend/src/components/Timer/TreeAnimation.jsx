@@ -3,7 +3,7 @@
  */
 
 import styles from './TreeAnimation.module.css';
-import { FOLIAGE_POINTS, FRUIT_POINTS, POT_POINTS, SOIL_POINTS, TRUNK_POINTS } from './focusAnimation/treePixels';
+import { FOLIAGE_POINTS, FRUIT_POINTS, POT_POINTS, SOIL_POINTS, TRUNK_POINTS } from './focus_animation/treePixels';
 
 const Pixel = ({ x, y, cls }) => <rect x={x} y={y} width="1" height="1" className={cls} />;
 

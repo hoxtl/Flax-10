@@ -10,23 +10,23 @@ import { createFnMap } from '../../utils/testBuilderUtils';
 // ---------------------------------------------------------------------------
 // CSS module mocks
 // ---------------------------------------------------------------------------
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
-vi.mock('../../../components/Timer/TreeAnimation.module.css', () => ({
+vi.mock('../../../components/timer/TreeAnimation.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
 // ---------------------------------------------------------------------------
 // Dependency mocks for TimerCircle
 // ---------------------------------------------------------------------------
-vi.mock('../../../components/Timer/FocusAnimation', () => ({
+vi.mock('../../../components/timer/FocusAnimation', () => ({
   default: ({ progress, mode, isActive, showPicker }) => (
     <div data-testid="focus-animation" data-progress={progress} data-mode={mode} data-active={String(isActive)} data-showpicker={String(showPicker)} />
   ),
 }));
 
-vi.mock('../../../components/Timer/TimerComponents', () => ({
+vi.mock('../../../components/timer/TimerComponents', () => ({
   TimerDisplay: ({ timeLeft, mode, isOvertime }) => (
     <div data-testid="timer-display" data-timeleft={timeLeft} data-mode={mode} data-overtime={String(isOvertime)} />
   ),
@@ -48,8 +48,8 @@ vi.stubGlobal('cancelAnimationFrame', vi.fn());
 // ---------------------------------------------------------------------------
 // Imports under test
 // ---------------------------------------------------------------------------
-import TimerCircle, { TimerRing } from '../../../components/Timer/TimerCircle';
-import FocusAnimation from '../../../components/Timer/FocusAnimation';
+import TimerCircle, { TimerRing } from '../../../components/timer/TimerCircle';
+import FocusAnimation from '../../../components/timer/FocusAnimation';
 
 // ---------------------------------------------------------------------------
 // Helper timer state

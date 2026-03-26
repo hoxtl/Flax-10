@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { sortTasks } from "../../../pages/Tasks/utils/taskSortUtils";
+import { sortTasks } from "../../../pages/tasks/utils/taskSortUtils";
 
 describe("taskSortUtils", () => {
   const listMap = { "1": { name: "List A" }, "2": { name: "List B" } };

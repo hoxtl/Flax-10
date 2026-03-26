@@ -11,7 +11,7 @@ vi.mock('../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-import StudyHoursChart from '../../../components/Analytics/StudyHoursChart';
+import StudyHoursChart from '../../../components/analytics/StudyHoursChart';
 import { useTheme } from '../../../context/ThemeContext';
 
 const mockData = [

@@ -1,11 +1,11 @@
 /* Derived data for the homepage mini timeline. */
 
 import { useMemo } from "react";
-import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { DAY_END_HOUR, DAY_START_HOUR } from "../utils/timelineUtils";
 import { computePlanTimelineRows } from "../utils/planTimelineRows";
 import { isNow } from "../utils/eventUtils";
-import { deriveAssignedGapTasks, deriveBestFreeRowId, deriveGapDeadlineFallbacks } from "./miniTimeline/assignmentUtils";
+import { deriveAssignedGapTasks, deriveBestFreeRowId, deriveGapDeadlineFallbacks } from "./mini_timeline/assignmentUtils";
 
 function getDayBounds(selectedDate) {
   const start = new Date(selectedDate);

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import ImageGalleryModal from '../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal';
+import ImageGalleryModal from '../../../components/society/society_detail/image_handlers/ImageGalleryModal';
 
 vi.mock(
-  '../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal.module.css',
+  '../../../components/society/society_detail/image_handlers/ImageGalleryModal.module.css',
   () => ({
     default: {
       overlay: 'overlay',
@@ -19,7 +19,7 @@ vi.mock(
   }),
 );
 
-vi.mock('../../../components/Society/hooks/useCarouselNavigation', () => {
+vi.mock('../../../components/society/hooks/useCarouselNavigation', () => {
   const state = { index: 0 };
   return {
     useCarouselNavigation: vi.fn((length, initial) => {

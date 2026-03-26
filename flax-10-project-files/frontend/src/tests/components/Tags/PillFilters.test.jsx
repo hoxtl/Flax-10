@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import PillFilters from '../../../components/Tags/PillFilters';
+import PillFilters from '../../../components/tags/PillFilters';
 
 const mockTags = [
     { id: 1, label: 'Work', color: '#ff0000', icon: '💼' },
@@ -8,7 +8,7 @@ const mockTags = [
 ];
 
 // Mock CSS modules
-vi.mock('../../../components/Tags/PillFilters.module.css', () => ({
+vi.mock('../../../components/tags/PillFilters.module.css', () => ({
     default: { row: 'row', pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' },
 }));
 
@@ -16,7 +16,7 @@ vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({ tags: mockTags })),
 }));
 
-vi.mock('../../../components/Tags/TagManagerModal', () => ({
+vi.mock('../../../components/tags/TagManagerModal', () => ({
     default: ({ onClose }) => (
         <div data-testid="tag-manager-modal">
             <button onClick={onClose}>Close Modal</button>
@@ -24,7 +24,7 @@ vi.mock('../../../components/Tags/TagManagerModal', () => ({
     ),
 }));
 
-vi.mock('../../../components/Tags/utils/pillUtils', () => ({
+vi.mock('../../../components/tags/utils/pillUtils', () => ({
     countByType: vi.fn((items = []) => ({
         all: items.length,
         work: items.filter(i => (i.tag_details?.label || i.tag || '').toLowerCase() === 'work').length,
@@ -33,7 +33,7 @@ vi.mock('../../../components/Tags/utils/pillUtils', () => ({
 }));
 
 // Mock pillFilterOptions helpers so labels are plain (no counts)
-vi.mock('../../../components/Tags/pillFilters/pillFilterOptions', () => ({
+vi.mock('../../../components/tags/pill_filters/pillFilterOptions', () => ({
     createPillFilterOptions: (tags, counts) => [
         { value: 'all', label: 'All' },
         ...(tags || []).map(t => ({ value: t.label.toLowerCase(), label: t.label })),
@@ -48,7 +48,7 @@ vi.mock('../../../components/Tags/pillFilters/pillFilterOptions', () => ({
 }));
 
 // Mock AnimatedDropdown to render options as individual pill buttons
-vi.mock('../../../components/common/AnimatedDropdown/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, className }) => (
         <div>
             {(options || []).map(o => {
@@ -75,7 +75,7 @@ vi.mock('lucide-react', () => ({
 }));
 
 import { useTags } from '../../../context/TagContext';
-import { countByType } from '../../../components/Tags/utils/pillUtils';
+import { countByType } from '../../../components/tags/utils/pillUtils';
 
 describe('PillFilters', () => {
     const defaultProps = {

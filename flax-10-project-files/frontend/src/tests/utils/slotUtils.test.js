@@ -3,7 +3,7 @@ import {
   isNightSlot,
   getNextFreeSlotToday,
   getAllFreeWindowsToday,
-} from '../../pages/Homepage/utils/slotUtils';
+} from '../../pages/homepage/utils/slotUtils';
 
 const mockIsToday = vi.fn();
 const mockOverlapsDay = vi.fn();

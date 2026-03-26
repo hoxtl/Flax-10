@@ -2,16 +2,16 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../../pages/Profile/utils/profileHelpers", () => ({
+vi.mock("../../../../pages/profile/utils/profileHelpers", () => ({
   buildInitials: () => "AB",
   buildFullName: (user) => user?.name || `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "Guest",
 }));
 
-vi.mock("../../../../components/Social/ShareButton", () => ({
+vi.mock("../../../../components/social/ShareButton", () => ({
   default: ({ onToggle }) => <button data-testid="share-toggle" onClick={() => onToggle?.(true)}>Share</button>,
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, ...props }) => <button type="button" onClick={onClick} {...props}>{children}</button>,
 }));
 
@@ -19,7 +19,7 @@ vi.mock("../../../../utils/tutorPhotoFallback", () => ({
   getResolvedUserPhoto: () => "",
 }));
 
-import ProfileHeader from "../../../../pages/Profile/components/ProfileHeader";
+import ProfileHeader from "../../../../pages/profile/components/ProfileHeader";
 
 const handlers = {
   onEditProfile: vi.fn(),

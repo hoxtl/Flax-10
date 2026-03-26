@@ -4,7 +4,7 @@
 
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useAutoScroll } from '../../../../components/Calendar/hooks/useAutoScroll';
+import { useAutoScroll } from '../../../../components/calendar/hooks/useAutoScroll';
 import { createMockRef, setupRAFMock, mockTime } from '../mocks/calendarMocks';
 
 describe('useAutoScroll', () => {

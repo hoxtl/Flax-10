@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import EditProfileModal from '../../../components/Dashboard/EditProfileModal';
+import EditProfileModal from '../../../components/dashboard/EditProfileModal';
 
 const updateUserProfileMock = vi.fn();
 
@@ -8,7 +8,7 @@ vi.mock('../../../api/userApi', () => ({
   updateUserProfile: (...args) => updateUserProfileMock(...args),
 }));
 
-vi.mock('../../../components/Auth/utils/userUtils', () => ({
+vi.mock('../../../components/auth/utils/userUtils', () => ({
   getInitials: () => 'AB',
 }));
 

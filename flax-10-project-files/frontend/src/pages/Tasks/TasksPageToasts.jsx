@@ -4,7 +4,7 @@
 
 import { AnimatePresence } from "framer-motion";
 
-import AppToast from "../../components/common/AppToast/AppToast";
+import AppToast from "../../components/common/app_toast/AppToast";
 
 function UndoToastItem(props) {
   if (!props.toastUndo) return null;

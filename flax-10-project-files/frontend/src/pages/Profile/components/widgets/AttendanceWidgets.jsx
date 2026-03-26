@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Card from "../../../../components/common/Card/Card";
+import Card from "../../../../components/common/card/Card";
 import ProfileWidget from "./ProfileWidget";
 import AttendanceCharts from "./attendance/AttendanceCharts";
 import {

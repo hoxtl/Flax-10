@@ -3,15 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const isNowMock = vi.fn();
 const getAllFreeWindowsTodayMock = vi.fn();
 
-vi.mock("../../../pages/Homepage/utils/eventUtils", () => ({
+vi.mock("../../../pages/homepage/utils/eventUtils", () => ({
   isNow: (...args) => isNowMock(...args),
 }));
 
-vi.mock("../../../pages/Homepage/utils/slotUtils", () => ({
+vi.mock("../../../pages/homepage/utils/slotUtils", () => ({
   getAllFreeWindowsToday: (...args) => getAllFreeWindowsTodayMock(...args),
 }));
 
-import { getNavigatorContext, getOverlappingPairs } from "../../../pages/Homepage/utils/navigatorUtils";
+import { getNavigatorContext, getOverlappingPairs } from "../../../pages/homepage/utils/navigatorUtils";
 
 describe("navigatorUtils", () => {
   beforeEach(() => {

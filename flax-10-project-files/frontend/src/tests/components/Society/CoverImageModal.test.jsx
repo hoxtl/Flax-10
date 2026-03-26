@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import CoverImageModal from '../../../components/Society/SocietyDetail/imageHandlers/CoverImageModal';
+import CoverImageModal from '../../../components/society/society_detail/image_handlers/CoverImageModal';
 
-vi.mock('../../../components/Society/SocietyDetail/imageHandlers/ImageManagerComponents.module.css', () => ({
+vi.mock('../../../components/society/society_detail/image_handlers/ImageManagerComponents.module.css', () => ({
   default: {
     backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title', close: 'close', hint: 'hint',
     grid: 'grid', addCard: 'addCard', addIcon: 'addIcon', imageCard: 'imageCard', pinned: 'pinned',

@@ -4,7 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useEventPopupListener } from '../../../../components/Calendar/hooks/useEventPopupListener';
+import { useEventPopupListener } from '../../../../components/calendar/hooks/useEventPopupListener';
 
 const mockOpenPopup = vi.fn();
 const mockEvents = [{ id: 1, title: 'Test Event' }, { id: 2, title: 'Other' }];

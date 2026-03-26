@@ -4,7 +4,7 @@
 
 import { Search } from "lucide-react";
 
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import EmptyState from "../../../components/common/empty_state/EmptyState";
 import { useAuth } from "../../../context/AuthContext";
 import styles from "./TaskFeedToolbar.module.css";
 

@@ -9,5 +9,5 @@ export { ActionMenu } from "./ActionMenu";
 export { ViewModeButton } from "./ViewModeButton";
 export { ViewSettingsMenu } from "./ViewSettingsMenu";
 export { SearchButton } from "./SearchButton";
-export { ScheduleManagerButton } from "./ScheduleManager/ScheduleManagerButton";
+export { ScheduleManagerButton } from "./schedule_manager/ScheduleManagerButton";
 export { FilterDropdownButton } from "./FilterDropdownButton";

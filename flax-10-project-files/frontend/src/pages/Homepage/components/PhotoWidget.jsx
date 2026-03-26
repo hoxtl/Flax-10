@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ImageIcon, Upload } from "lucide-react";
-import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
+import SharedWidgetHeader from "../../../components/common/widget_header/WidgetHeader";
 import styles from "../styles/PhotoWidget.module.css";
 
 const PHOTO_KEY = "homepage_photo_src";

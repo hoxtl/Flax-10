@@ -7,12 +7,12 @@ const isRoutineOrEventTaskMock = vi.fn();
 const isTodayMock = vi.fn();
 const overlapsDayMock = vi.fn();
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
   overlapsDay: (...args) => overlapsDayMock(...args),
 }));
 
-vi.mock("../../../pages/Homepage/utils/index", () => ({
+vi.mock("../../../pages/homepage/utils/index", () => ({
   getAllFreeWindowsToday: (...args) => getAllFreeWindowsTodayMock(...args),
   getNavigatorContext: (...args) => getNavigatorContextMock(...args),
   isNow: (...args) => isNowMock(...args),
@@ -40,7 +40,7 @@ import {
   getTodayFreeWindows,
   getTomorrowFirstEvent,
   getUpcomingItems,
-} from "../../../pages/Homepage/utils/homepageViewModel";
+} from "../../../pages/homepage/utils/homepageViewModel";
 
 const now = new Date("2026-03-24T09:00:00.000Z");
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import PageHeader from '../../../components/common/PageHeader/PageHeader';
+import PageHeader from '../../../components/common/page_header/PageHeader';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -14,7 +14,7 @@ vi.mock('framer-motion', () => ({
   },
 }));
 
-vi.mock('../../../components/common/BackButton/BackButton.jsx', () => ({
+vi.mock('../../../components/common/back_button/BackButton.jsx', () => ({
   default: ({ onClick, className }) => (
     <button type="button" onClick={onClick} className={className}>Back</button>
   ),

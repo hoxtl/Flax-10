@@ -9,7 +9,7 @@ vi.mock("../../../../api/taskApi", () => ({
   deleteTask: (...args) => deleteTaskMock(...args),
 }));
 
-import { useHomepageActions } from "../../../../pages/Homepage/hooks/useHomepageActions";
+import { useHomepageActions } from "../../../../pages/homepage/hooks/useHomepageActions";
 
 function buildActionsProps(overrides = {}) {
   return {

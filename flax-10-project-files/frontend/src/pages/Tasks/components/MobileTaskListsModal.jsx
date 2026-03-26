@@ -2,7 +2,7 @@
  * Mobile-only modal for picking a task list.
  */
 
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import StandardModal from "../../../components/common/standard_modal/StandardModal";
 
 import { computeListSidebarCounts } from "../utils/listSidebarUtils";
 import { EmptyListsState, MobileListSection } from "./MobileTaskListsParts";

@@ -4,10 +4,10 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useFilterDropdownState } from '../../../components/Calendar/header/useFilterDropdownState';
+import { useFilterDropdownState } from '../../../components/calendar/header/useFilterDropdownState';
 
 // Mock CSS module
-vi.mock('../../../components/Calendar/header/CalendarHeaderUtils.module.css', () => ({
+vi.mock('../../../components/calendar/header/CalendarHeaderUtils.module.css', () => ({
     default: { filterPopup: 'filterPopup' },
 }));
 

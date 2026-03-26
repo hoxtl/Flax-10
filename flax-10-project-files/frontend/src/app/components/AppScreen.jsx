@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
+import ScrollToTop from "../../components/common/scroll_to_top/ScrollToTop";
 import DashboardLayout from "../../layout/DashboardLayout";
 import { ScreenWrap } from "./ScreenWrap";
 import { AppProviders } from "./AppProviders";

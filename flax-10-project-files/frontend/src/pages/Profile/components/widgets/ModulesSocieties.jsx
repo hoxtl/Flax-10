@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getModules } from "../../../../api/moduleApi";
-import Card from "../../../../components/common/Card/Card";
+import Card from "../../../../components/common/card/Card";
 import ProfileWidget from "./ProfileWidget";
 import widgetStyles from "./ProfileWidgets.module.css";
 import badgeStyles from "./ProfileBadgesModules.module.css";

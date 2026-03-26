@@ -3,7 +3,7 @@
  */
 
 import * as Components from "./AuthComponents";
-import PasswordStrength from "../common/PasswordStrength";
+import PasswordStrength from "../common/password_strength";
 import { AuthInputField } from "./AuthInputField";
 
 function NameRow({ formData, updateField, loading }) {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import * as utils from '../../../../../components/Society/hooks/utils/societyHookUtils';
+import * as utils from '../../../../../components/society/hooks/utils/societyHookUtils';
 
 describe('societyHookUtils', () => {
     it('normalizeIsoTime', () => {

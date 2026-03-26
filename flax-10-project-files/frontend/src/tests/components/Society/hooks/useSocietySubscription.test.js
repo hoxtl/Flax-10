@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useSocietySubscription } from '../../../../components/Society/hooks/useSocietySubscription';
+import { useSocietySubscription } from '../../../../components/society/hooks/useSocietySubscription';
 
 vi.mock('../../../../api/societyApi', () => ({
     toggleSubscription: vi.fn(() => Promise.resolve()),

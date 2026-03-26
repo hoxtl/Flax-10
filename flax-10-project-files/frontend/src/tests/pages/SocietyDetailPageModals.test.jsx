@@ -11,32 +11,32 @@ import { buildPageData } from "./societyDetailPageTestUtils";
 
 const useSocietyPageDataMock = vi.fn();
 
-vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
+vi.mock("../../pages/societies/useSocietyDetailPageState", () => ({
   useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
   useSocietyInit: vi.fn(),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SocietyHero", () => ({
+vi.mock("../../components/society/society_detail/SocietyHero", () => ({
   default: () => <div>hero</div>,
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SocietyInfo", () => ({
+vi.mock("../../components/society/society_detail/SocietyInfo", () => ({
   default: () => <div>info</div>,
 }));
 
-vi.mock("../../components/Society/SocietyDetail/tabs/SocietyTabs", () => ({
+vi.mock("../../components/society/society_detail/tabs/SocietyTabs", () => ({
   default: () => <div>tabs</div>,
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SocietySidebar", () => ({
+vi.mock("../../components/society/society_detail/SocietySidebar", () => ({
   default: () => <div>sidebar</div>,
 }));
 
-vi.mock("../../components/Society/SocietyDetail/imageHandlers/CoverImageModal", () => ({
+vi.mock("../../components/society/society_detail/image_handlers/CoverImageModal", () => ({
   default: ({ images }) => <div data-testid="cover-modal">{images.length}</div>,
 }));
 
-vi.mock("../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal", () => ({
+vi.mock("../../components/society/society_detail/image_handlers/ImageGalleryModal", () => ({
   default: ({ images, initialIndex }) => (
     <div data-testid="gallery-modal">
       <span>{images.length}</span>
@@ -45,7 +45,7 @@ vi.mock("../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal"
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SettingsModal", () => ({
+vi.mock("../../components/society/society_detail/SettingsModal", () => ({
   default: ({ members, ratificationStatus, isRatified, isAdmin }) => (
     <div data-testid="settings-modal">
       <span>{members.length}</span>
@@ -56,11 +56,11 @@ vi.mock("../../components/Society/SocietyDetail/SettingsModal", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({
+vi.mock("../../components/society/society_detail/ReportSocietyModal", () => ({
   default: ({ society }) => <div data-testid="report-modal">{society.name}</div>,
 }));
 
-vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({
+vi.mock("../../components/society/society_detail/MemberDirectoryModal", () => ({
   default: ({ societyName, isAdmin }) => (
     <div data-testid="members-modal">
       <span>{societyName}</span>
@@ -69,7 +69,7 @@ vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal", () => ({
+vi.mock("../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal", () => ({
   default: ({ societyId, tags = [] }) => (
     <div data-testid="announcement-modal">
       <span>{societyId}</span>
@@ -78,11 +78,11 @@ vi.mock("../../components/Society/SocietyDetail/tabs/announcementTab/Announcemen
   ),
 }));
 
-vi.mock("../../components/common/BackButton/BackButton.jsx", () => ({
+vi.mock("../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ label }) => <button type="button">{label}</button>,
 }));
 
-import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
+import SocietyDetailPage from "../../pages/societies/SocietyDetailPage";
 
 const modalDataDefaults = {
   society: {

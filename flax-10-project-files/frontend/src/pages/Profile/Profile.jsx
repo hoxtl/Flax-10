@@ -3,9 +3,9 @@
  */
 
 import { useEffect } from "react";
-import BackButton from "../../components/common/BackButton/BackButton.jsx";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
-import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
+import BackButton from "../../components/common/back_button/BackButton.jsx";
+import EmptyState from "../../components/common/empty_state/EmptyState";
+import ScrollToTop from "../../components/common/scroll_to_top/ScrollToTop";
 import { useAuth } from "../../context/AuthContext";
 import AchievementsModal from "./AchievementsModal";
 import { ProfileCalendar } from "./ProfileCalendar";

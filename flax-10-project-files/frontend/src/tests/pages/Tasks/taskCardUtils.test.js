@@ -12,7 +12,7 @@ import {
   formatFocusBlocks,
   PRIORITY_LABELS,
   PRIORITY_MARKS,
-} from "../../../pages/Tasks/utils/taskCardUtils";
+} from "../../../pages/tasks/utils/taskCardUtils";
 
 describe("taskCardUtils", () => {
   describe("getModuleColor", () => {

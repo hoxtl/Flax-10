@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import styles from "./QuickAddModal.module.css";
 import { useTags } from "../../context/TagContext";
-import Badge from "../common/Badge/Badge";
-import StandardModal from "../common/StandardModal/StandardModal";
+import Badge from "../common/badge/Badge";
+import StandardModal from "../common/standard_modal/StandardModal";
 import { getModules } from "../../api/moduleApi";
 
 const CORE_TYPES = [

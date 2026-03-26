@@ -4,7 +4,7 @@
  */
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import { DatePickerButton } from "./DatePickerButton";
 import styles from "./CalendarHeaderUtils.module.css";
 

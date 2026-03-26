@@ -51,26 +51,26 @@ import {
   loadTaskCount,
   tryLoadEvents,
   tryLoadProfile,
-} from "../../../pages/Profile/hooks/profileDataLoaders";
+} from "../../../pages/profile/hooks/profileDataLoaders";
 import {
   saveWeeklyGoal,
   useCurrentUserSummary,
   usePeakHour,
   useProfileAnalytics,
   useSuggestionState,
-} from "../../../pages/Profile/hooks/useProfileInsights";
+} from "../../../pages/profile/hooks/useProfileInsights";
 import {
   socialDataFetchers,
   useModuleNameMap,
   useSocialUsers,
   useTasksModalData,
-} from "../../../pages/Profile/hooks/useProfileModalsData";
+} from "../../../pages/profile/hooks/useProfileModalsData";
 import {
   useEventsData,
   useModalState,
   useProfileData,
   useTaskCountData,
-} from "../../../pages/Profile/hooks/useProfileStatePieces";
+} from "../../../pages/profile/hooks/useProfileStatePieces";
 
 describe("profile hook extras", () => {
   beforeEach(() => {

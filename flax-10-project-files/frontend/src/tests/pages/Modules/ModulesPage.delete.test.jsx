@@ -3,15 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const useModulesPageStateMock = vi.fn();
 
-vi.mock("../../../pages/Modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
   useModulesPageState: (...args) => useModulesPageStateMock(...args),
 }));
 
-vi.mock("../../../pages/Modules/ModulesPageResults.jsx", () => ({
+vi.mock("../../../pages/modules/ModulesPageResults.jsx", () => ({
   MainView: () => <div>Main view</div>,
 }));
 
-vi.mock("../../../pages/Modules/ModulesPageChrome.jsx", () => ({
+vi.mock("../../../pages/modules/ModulesPageChrome.jsx", () => ({
   AnimatedContent: () => <div>Animated content</div>,
   ModulesPageModals: () => <div>Page modals</div>,
   ModulesSkeleton: () => <div data-testid="modules-skeleton" />,
@@ -19,7 +19,7 @@ vi.mock("../../../pages/Modules/ModulesPageChrome.jsx", () => ({
   getViewKey: () => "modules-list",
 }));
 
-vi.mock("../../../components/common/HoldConfirmModal/HoldConfirmModal.jsx", () => ({
+vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal.jsx", () => ({
   default: ({ title, onConfirm, onCancel }) => (
     <div>
       <span>{title}</span>
@@ -29,7 +29,7 @@ vi.mock("../../../components/common/HoldConfirmModal/HoldConfirmModal.jsx", () =
   ),
 }));
 
-import ModulesPage from "../../../pages/Modules/ModulesPage";
+import ModulesPage from "../../../pages/modules/ModulesPage";
 
 describe("ModulesPage delete modal", () => {
   const originalEnv = process.env.NODE_ENV;

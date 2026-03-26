@@ -5,9 +5,9 @@
 import { useState } from 'react';
 import { convertReadingToTask } from '../../../api/readingApi';
 import { createTask } from '../../../api/taskApi';
-import { getUrgencyTier } from '../Deadlines/upcomingDeadlinesUtils';
+import { getUrgencyTier } from '../deadlines/upcomingDeadlinesUtils';
 import { useToast } from '../../../context/ToastContext';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import PrimaryButton from '../../common/primary_button/PrimaryButton';
 
 async function submitAsTask(setState, onAdded, toast, itemId, successMessage, errorMessage, submitTask) {
     setState('loading');

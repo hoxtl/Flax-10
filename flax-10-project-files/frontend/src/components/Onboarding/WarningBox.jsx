@@ -1,5 +1,5 @@
 import { motion as Motion } from "framer-motion";
-import FilterCheckbox from "../common/FilterCheckbox/FilterCheckbox";
+import FilterCheckbox from "../common/filter_checkbox/FilterCheckbox";
 import styles from "./OnboardingModal.module.css";
 
 const boxStyle = {

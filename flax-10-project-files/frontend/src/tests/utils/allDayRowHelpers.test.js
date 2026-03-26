@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
-import { calculateEventLayout } from '../../components/Calendar/WeekView/components/allDayRowHelpers';
+import { calculateEventLayout } from '../../components/calendar/week_view/components/allDayRowHelpers';
 
-vi.mock('../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../components/calendar/utils/dateUtils', () => ({
     isSameDay: vi.fn((a, b) => {
         return new Date(a).toDateString() === new Date(b).toDateString();
     }),
 }));
 
-vi.mock('../../components/Calendar/utils/eventDisplayUtils', () => ({
+vi.mock('../../components/calendar/utils/eventDisplayUtils', () => ({
     getAllDayVisualRange: vi.fn((event) => {
         if (!event.all_day) return null;
         return { start: new Date(event.start_time), end: new Date(event.end_time || event.start_time) };

@@ -2,14 +2,14 @@ import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
+import DeadlineCountdown from "../../../components/common/deadline_countdown/DeadlineCountdown";
 import {
   getDaysLabel,
   getDueStatusClass,
   getTierPriority,
   getUrgencyTier,
   isUrgentTier,
-} from "../../../components/common/DeadlineCountdown/deadlineCountdownUtils";
+} from "../../../components/common/deadline_countdown/deadlineCountdownUtils";
 
 describe("DeadlineCountdown", () => {
   beforeEach(() => {

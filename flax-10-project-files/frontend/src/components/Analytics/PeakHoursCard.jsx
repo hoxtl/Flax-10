@@ -4,7 +4,7 @@
 
 import { motion } from 'framer-motion';
 import styles from './InsightCards.module.css';
-import EmptyState from '../common/EmptyState/EmptyState';
+import EmptyState from '../common/empty_state/EmptyState';
 
 const MotionDiv = motion.div;
 

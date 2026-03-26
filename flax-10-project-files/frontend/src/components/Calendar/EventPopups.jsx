@@ -6,14 +6,14 @@
 import { useConfirm } from '../../context/ConfirmContext';
 import { useToast } from '../../context/ToastContext';
 import { useEventModal, useEventPopup, useEventDelete } from '../../context/CalendarContext';
-import { EventModal } from './EventModal/EventModal';
-import { EventPopover } from './EventPopover/EventPopover';
+import { EventModal } from './event_modal/EventModal';
+import { EventPopover } from './event_popover/EventPopover';
 import { useTags } from '../../context/TagContext';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { unsyncCalendar } from '../../api/societyApi';
-import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
+import HoldConfirmModal from '../common/hold_confirm_modal/HoldConfirmModal';
 
 /** Main entry point for calendar popups. */
 

@@ -6,12 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import { tflService } from "../../../api/tflApi";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import { updateUserSettings } from "../../../api/userApi";
-import useAttendanceStats from "../../../components/Analytics/useAttendanceStats";
-import { getAttendancePercentage } from "../../../components/Analytics/attendanceChartConfig";
+import useAttendanceStats from "../../../components/analytics/useAttendanceStats";
+import { getAttendancePercentage } from "../../../components/analytics/attendanceChartConfig";
 import { loadTermConfig } from "../../../lib/termConfig";
-import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/IntelligenceUtils";
+import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/intelligenceUtils";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
-import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
+import useAnalyticsOverview from "../../analytics/hooks/useAnalyticsOverview";
 
 export const CATALOGUE = [
   { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 1, minRow: 1, maxRow: 1, section: "Essentials" },

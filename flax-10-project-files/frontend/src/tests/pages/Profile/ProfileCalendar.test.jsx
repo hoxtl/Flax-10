@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ProfileCalendar } from '../../../pages/Profile/ProfileCalendar';
+import { ProfileCalendar } from '../../../pages/profile/ProfileCalendar';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 
 vi.mock('../../../context/CalendarContext', () => ({
@@ -13,7 +13,7 @@ vi.mock('../../../context/ResizeHighlightContext', () => ({
     ResizeHighlightProvider: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
+vi.mock('../../../components/calendar/month_view/MonthView', () => ({
     MonthView: ({ readOnly, onMoreClick }) => (
         <div data-testid="month-view" data-readonly={String(readOnly)}>
             <button type="button" onClick={() => onMoreClick && onMoreClick(new Date('2024-03-08'))}>
@@ -23,19 +23,19 @@ vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
     ),
 }));
 
-vi.mock('../../../components/Calendar/EventPopups', () => ({
+vi.mock('../../../components/calendar/EventPopups', () => ({
     EventPopups: () => <div data-testid="event-popups" />,
 }));
 
-vi.mock('../../../components/Calendar/EventsSummaryModal/EventsSummaryModal', () => ({
+vi.mock('../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
     EventsSummaryModal: ({ isOpen }) => isOpen ? <div data-testid="summary-modal" /> : null,
 }));
 
-vi.mock('../../../components/Calendar/header/NavigationButtons', () => ({
+vi.mock('../../../components/calendar/header/NavigationButtons', () => ({
     NavigationButtons: () => <div data-testid="nav-buttons" />,
 }));
 
-vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
+vi.mock('../../../components/calendar/header/calendarHeaderUtils', () => ({
     CalendarNav: ({ onPrev, onNext, onToday, title }) => (
         <div data-testid="nav-buttons">
             <span>{title}</span>
@@ -46,7 +46,7 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
     ),
 }));
 
-vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/calendar/utils/dateUtils', () => ({
     addMonths: vi.fn((d, n) => d),
     formatMonthYear: vi.fn(() => 'March 2024'),
     isSameMonth: vi.fn(() => false),

@@ -7,7 +7,7 @@ vi.mock("../../../../api/taskApi", () => ({
   fetchArchivedTaskLists: vi.fn(),
 }));
 
-import useTaskListsLoad from "../../../../pages/Tasks/hooks/useTaskListsLoad";
+import useTaskListsLoad from "../../../../pages/tasks/hooks/useTaskListsLoad";
 import { fetchTaskLists, fetchArchivedTaskLists } from "../../../../api/taskApi";
 
 describe("useTaskListsLoad", () => {

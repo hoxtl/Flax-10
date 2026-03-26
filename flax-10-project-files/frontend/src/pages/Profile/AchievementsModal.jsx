@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import styles from "./AchievementsModal.module.css";
-import StandardModal from "../../components/common/StandardModal/StandardModal";
+import StandardModal from "../../components/common/standard_modal/StandardModal";
 import achievementTierColors from "./achievementTierColors.json";
 
 const ALL_BADGES = [

@@ -4,16 +4,16 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ProfileModals from '../../../pages/Profile/ProfileModals';
+import ProfileModals from '../../../pages/profile/ProfileModals';
 
 import { createFnMap } from '../../utils/testBuilderUtils';
 
-vi.mock('../../../components/Dashboard/EditProfileModal', () => ({
+vi.mock('../../../components/dashboard/EditProfileModal', () => ({
     default: ({ isOpen, onClose }) =>
         isOpen ? <div data-testid="edit-profile-modal"><button onClick={onClose}>Close Edit</button></div> : null,
 }));
 
-vi.mock('../../../components/Social/UserListModal', () => ({
+vi.mock('../../../components/social/UserListModal', () => ({
     default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
         <div data-testid="user-list-modal">
             <span>{title}</span>

@@ -3,7 +3,7 @@
  */
 
 import { banReportedSociety, dismissReport, fetchReportedSocieties } from "../../../api/adminApi";
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import styles from "../styles";
 import { ADMIN_LIST_PAGE_SIZE } from "../constants";
 import { useAsyncAction } from "../hooks/useAsyncAction";

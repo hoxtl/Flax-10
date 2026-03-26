@@ -10,7 +10,7 @@ import {
   filterTasksByListAndFilter,
   buildTasksPageHandlers,
   buildTasksPageViewProps,
-} from "../../../pages/Tasks/utils/tasksPageUtils";
+} from "../../../pages/tasks/utils/tasksPageUtils";
 
 describe("tasksPageUtils", () => {
   describe("getTodayEndISO", () => {

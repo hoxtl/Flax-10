@@ -4,7 +4,7 @@
 
 import { MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { ModulePill, TypePill, getModulePillColors } from "./ModulePill";
 
 function getModuleInfo(selectedModulePill, enrolledModules) {

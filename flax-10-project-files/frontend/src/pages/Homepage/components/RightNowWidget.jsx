@@ -5,8 +5,8 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Clock, Sparkles, Sun } from "lucide-react";
-import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
-import LocationLink from "../../../components/common/LocationLink/LocationLink";
+import SharedWidgetHeader from "../../../components/common/widget_header/WidgetHeader";
+import LocationLink from "../../../components/common/location_link/LocationLink";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useRightNowData } from "../hooks/useRightNowData";
 import {
@@ -27,7 +27,7 @@ import {
   buildWidgetProps,
   formatTimerLabel,
   timerProgress,
-} from "./RightNowWidget.viewmodel.js";
+} from "./rightNowWidget.viewmodel.js";
 import styles from "./RightNowWidget.module.css";
 
 function useLiveClock() {

@@ -2,8 +2,8 @@
  * Plan read detail modal.
  */
 
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import { formatTime } from "../utils/dateFormatUtils";
 
 export function PlanReadDetailModal(props) {

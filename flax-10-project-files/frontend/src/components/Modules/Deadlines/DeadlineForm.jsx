@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../utils/deadlineUtils.js';
-import AnimatedDropdown from '../../common/AnimatedDropdown';
+import AnimatedDropdown from '../../common/animated_dropdown';
 import styles from './DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
 import { buildValidationState, failValidation, finishValidation, ModuleFormActions, ModuleFormField, requireFieldValue } from '../shared/moduleFormParts';

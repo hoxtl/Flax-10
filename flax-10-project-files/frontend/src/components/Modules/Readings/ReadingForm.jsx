@@ -3,7 +3,7 @@
  */
 
 import {useState} from 'react';
-import styles from '../Deadlines/DeadlineForm.module.css';
+import styles from '../deadlines/DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
 import { buildValidationState, failValidation, ModuleFormActions, ModuleFormField, requireFieldValue } from '../shared/moduleFormParts';
 

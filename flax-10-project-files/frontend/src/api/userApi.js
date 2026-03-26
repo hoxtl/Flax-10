@@ -51,10 +51,9 @@ function buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearF
   if (societyFilter) params.append('society', societyFilter);
   if (yearFilter) params.append('year', yearFilter);
   if (roleFilter) params.append('role', roleFilter);
-  return `/users/search/?${params.toString()}`;
+  return `/users/search/?${params.toString().replace(/\+/g, '%20')}`;
 }
 
 export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '', roleFilter = '', sortBy = 'name') {
   return fetchApi(buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearFilter, roleFilter, sortBy));
 }
-

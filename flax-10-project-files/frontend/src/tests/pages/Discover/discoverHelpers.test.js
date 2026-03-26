@@ -10,7 +10,7 @@ vi.mock("../../../api/userApi", () => ({
   searchUsers: (...args) => searchUsersMock(...args),
 }));
 
-vi.mock("../../../components/Social/UserSearch", () => ({
+vi.mock("../../../components/social/UserSearch", () => ({
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),
   useClickOutside: (...args) => useClickOutsideMock(...args),
@@ -24,8 +24,8 @@ import {
   getRoleLabel,
   sortDiscoverUsers,
   USERS_PER_PAGE,
-} from "../../../pages/Discover/discoverHelpers";
-import { useDiscoverFetch, useDiscoverSearch } from "../../../pages/Discover/discoverHooks";
+} from "../../../pages/discover/discoverHelpers";
+import { useDiscoverFetch, useDiscoverSearch } from "../../../pages/discover/discoverHooks";
 
 describe("discover helpers", () => {
   beforeEach(() => {

@@ -2,19 +2,19 @@ import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import WidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
-import widgetStyles from "../../Modules/DashboardWidgets.module.css";
-import rowStyles from "../../Modules/DashboardRows.module.css";
-import { TaskContextMenu } from "../../Tasks/components/TaskCard";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+import WidgetHeader from "../../../components/common/widget_header/WidgetHeader";
+import widgetStyles from "../../modules/DashboardWidgets.module.css";
+import rowStyles from "../../modules/DashboardRows.module.css";
+import { TaskContextMenu } from "../../tasks/components/TaskCard";
 import { TaskWidgetRow } from "./TaskWidgetRow";
 import { TaskWidgetAllDone, TaskWidgetCompletedSection, TaskWidgetEmpty } from "./TaskWidgetSections";
-import { ShowMoreButton } from "../../../components/Modules/shared/widgetParts.jsx";
+import { ShowMoreButton } from "../../../components/modules/shared/widgetParts.jsx";
 import { useTaskWidgetState } from "./useTaskWidgetState";
 import {
   expandBodyVariants,
   listVariants,
-} from "../../../components/Modules/shared/widgetVariants.js";
+} from "../../../components/modules/shared/widgetVariants.js";
 
 const styles = { ...widgetStyles, ...rowStyles };
 

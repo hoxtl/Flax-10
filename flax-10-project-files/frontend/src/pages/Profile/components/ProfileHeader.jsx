@@ -8,8 +8,8 @@ import widgetStyles from "./widgets/ProfileWidgets.module.css";
 import headerStyles from "./ProfileHeader.module.css";
 import badgeStyles from "./ProfileHeaderBadges.module.css";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
-import ShareButton from "../../../components/Social/ShareButton";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import ShareButton from "../../../components/social/ShareButton";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };
 

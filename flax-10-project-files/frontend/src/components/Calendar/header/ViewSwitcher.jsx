@@ -3,7 +3,7 @@
  * Segmented control for calendar view modes.
  */
 
-import { SegmentedControl } from "../../common/SegmentedControl/SegmentedControl";
+import { SegmentedControl } from "../../common/segmented_control/SegmentedControl";
 
 export function ViewSwitcher({ modes, activeMode, onChange }) {
   return (

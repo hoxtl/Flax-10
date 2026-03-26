@@ -4,8 +4,8 @@
 
 import { motion } from "framer-motion";
 import styles from "./EstTimeHelpBanner.module.css";
-import { useEstTimeHelpBanner } from "./est-time-help-banner/useEstTimeHelpBanner";
-import { openFlaxChat } from "./est-time-help-banner/estTimeHelpBannerUtils";
+import { useEstTimeHelpBanner } from "./est_time_help_banner/useEstTimeHelpBanner";
+import { openFlaxChat } from "./est_time_help_banner/estTimeHelpBannerUtils";
 
 const MotionDiv = motion.div;
 

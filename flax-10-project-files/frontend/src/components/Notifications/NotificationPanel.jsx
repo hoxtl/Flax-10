@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { useNotifications } from "../../context/NotificationContext";
 import { executeNotificationAction, hasNotificationAction, parseNotificationAction } from "./utils/notificationAction";
-import "./NotificationPanel.css";
+import "./notification-panel.css";
 
 export function NotificationPanel() {
   const { isOpen, notifications, closePanel, markAllRead, dismissNotification, clearAll } = useNotifications();

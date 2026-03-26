@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { useGlowPosition } from "../../../components/ui/bento-grid/useGlowPosition";
+import { useGlowPosition } from "../../../components/ui/bento_grid/useGlowPosition";
 
 describe("useGlowPosition", () => {
   it("starts centered and resets back to the center", () => {

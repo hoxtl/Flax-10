@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ReportSocietyModal from '../../../components/Society/SocietyDetail/ReportSocietyModal';
+import ReportSocietyModal from '../../../components/society/society_detail/ReportSocietyModal';
 import * as societyApi from '../../../api/societyApi';
 
 vi.mock('../../../api/societyApi', () => ({
     reportSociety: vi.fn(),
 }));
 
-vi.mock('../../../components/Society/SocietyDetail/ReportSocietyModal.module.css', () => ({
+vi.mock('../../../components/society/society_detail/ReportSocietyModal.module.css', () => ({
     default: { container: 'container', textarea: 'textarea', error: 'error', actions: 'actions', cancelButton: 'cancelButton', submitButton: 'submitButton' },
 }));
 

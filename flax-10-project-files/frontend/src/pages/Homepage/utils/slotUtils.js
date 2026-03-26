@@ -2,7 +2,7 @@
  * Homepage slot/window helpers. Pure functions only.
  */
 
-import { isToday, overlapsDay } from "../../../components/Calendar/utils/dateUtils";
+import { isToday, overlapsDay } from "../../../components/calendar/utils/dateUtils";
 
 function getDayBounds(selectedDate) {
   const dayStart = new Date(selectedDate);

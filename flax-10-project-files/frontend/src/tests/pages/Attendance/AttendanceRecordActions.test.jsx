@@ -7,7 +7,7 @@ vi.mock("lucide-react", () => ({
   Ban: () => <span>ban-icon</span>,
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ content, children }) => (
     <div data-testid="tooltip">
       <span>{content}</span>
@@ -16,11 +16,11 @@ vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Attendance/utils/attendanceEventDate", () => ({
+vi.mock("../../../pages/attendance/utils/attendanceEventDate", () => ({
   isEventInPast: (...args) => isEventInPastMock(...args),
 }));
 
-import AttendanceRecordActions from "../../../pages/Attendance/components/AttendanceRecordActions";
+import AttendanceRecordActions from "../../../pages/attendance/components/AttendanceRecordActions";
 
 describe("AttendanceRecordActions", () => {
   beforeEach(() => {

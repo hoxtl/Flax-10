@@ -14,7 +14,7 @@ vi.mock("../../../../api/moduleApi", () => ({
   getModules: (...args) => getModulesMock(...args),
 }));
 
-vi.mock("../../../../components/Timer/taskInput/taskInputUtils", () => ({
+vi.mock("../../../../components/timer/task_input/taskInputUtils", () => ({
   buildListItems: (lists = []) => lists.map((list) => ({ value: list.id, label: list.name })),
   filterListItems: (items) => items,
   groupModuleItems: (items) => ({ All: items }),
@@ -24,11 +24,11 @@ vi.mock("../../../../lib/allTasksCompleteMessages", () => ({
   getClearMessage: () => "Great job",
 }));
 
-vi.mock("../../../../pages/Tasks/utils/taskFeedUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/taskFeedUtils", () => ({
   getHeaderTitle: () => "Header",
 }));
 
-vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/taskFeedDataUtils", () => ({
   buildDateBounds: vi.fn(() => ({
     now: new Date("2026-03-08T10:00:00Z"),
     dayStart: new Date("2026-03-08T00:00:00Z"),
@@ -50,8 +50,8 @@ vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
   })),
 }));
 
-import useTaskFeedData from "../../../../pages/Tasks/hooks/useTaskFeedData";
-import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
+import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
+import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
 
 describe("useTaskFeedData", () => {
   beforeEach(() => {

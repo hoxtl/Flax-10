@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import BasePill from '../../../components/Tags/BasePill';
+import BasePill from '../../../components/tags/BasePill';
 
-vi.mock('../../../components/Tags/PillFilters.module.css', () => ({ default: { pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' } }));
+vi.mock('../../../components/tags/PillFilters.module.css', () => ({ default: { pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' } }));
 
 describe('BasePill', () => {
   it('renders label and calls onClick when clicked', () => {

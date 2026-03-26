@@ -6,11 +6,11 @@ import { motion as Motion } from "framer-motion";
 import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { ConfirmModal } from "../../../components/common";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import { MiniTimeline } from "./MiniTimeline";
-import widgetStyles from "../../Modules/DashboardWidgets.module.css";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+import { MiniTimeline } from "./mini_timeline";
+import widgetStyles from "../../modules/DashboardWidgets.module.css";
 
 const SECTION_ANIMATION = { opacity: 0, y: 30 };
 const SECTION_VISIBLE = { opacity: 1, y: 0 };

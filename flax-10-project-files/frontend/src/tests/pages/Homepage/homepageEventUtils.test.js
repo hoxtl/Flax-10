@@ -6,7 +6,7 @@ import {
   isNow,
   isRoutineEvent,
   stripEmojiFromTitle,
-} from "../../../pages/Homepage/utils/eventUtils";
+} from "../../../pages/homepage/utils/eventUtils";
 
 describe("homepageEventUtils", () => {
   it("strips emojis reliably from input strings", () => {

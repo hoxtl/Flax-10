@@ -7,16 +7,16 @@ vi.mock('../../api/notificationApi', () => ({
     fetchNotifications: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/browserNotification', () => ({
+vi.mock('../../components/notifications/utils/browserNotification', () => ({
     requestPermission: vi.fn(),
     sendBrowserNotification: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/notificationSound', () => ({
+vi.mock('../../components/notifications/utils/notificationSound', () => ({
     playNotificationSound: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/notificationAction', () => ({
+vi.mock('../../components/notifications/utils/notificationAction', () => ({
     parseNotificationAction: vi.fn(() => null),
 }));
 
@@ -49,7 +49,7 @@ describe('useNotificationLoader', () => {
     });
 
     it('should call requestPermission on mount', async () => {
-        const { requestPermission } = await import('../../components/Notifications/utils/browserNotification');
+        const { requestPermission } = await import('../../components/notifications/utils/browserNotification');
         requestPermission.mockClear();
         api.fetchNotifications.mockResolvedValue([]);
         renderHook(() => useNotificationLoader());
@@ -154,7 +154,7 @@ describe('useNotificationPolling', () => {
     });
 
     it('should not send browser notification for reminder type', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         sendBrowserNotification.mockClear();
 
         const fresh = [{ id: 77, title: 'Reminder', notification_type: 'reminder' }];
@@ -172,7 +172,7 @@ describe('useNotificationPolling', () => {
     });
 
     it('should send browser notification for non-reminder type', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         sendBrowserNotification.mockClear();
 
         const fresh = [{ id: 55, title: 'Alert', message: 'Hello', notification_type: 'info' }];

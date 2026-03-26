@@ -11,14 +11,14 @@ import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import { getUserSettings } from "../../../api/userApi";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
-import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
+import { useSleepWarning } from "../../../components/settings/hooks/useSleepWarning";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
-import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
+import { CheckBurst } from "../../../components/task_celebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
 import { TaskInfoModal } from "./TaskInfoModal";
 import TaskCardMeta from "./TaskCardMeta";
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/animated_dropdown";
 import { formatDueDate, getCompletedDueLabel, splitEstimatedBlocks, PRIORITY_LABELS, PRIORITY_MARKS } from "../utils/taskCardUtils";
 
 import cardStyles from "./TaskCard.module.css";

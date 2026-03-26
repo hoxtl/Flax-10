@@ -19,14 +19,14 @@ vi.mock('../../../lib/kclCourses', () => ({
         'Arts & Humanities': ['History'],
     },
 }));
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     default: ({ value, onChange, placeholder, onFocus }) => (
         <input value={value} onChange={e => onChange(e.target.value)}
             placeholder={placeholder} onFocus={onFocus} data-testid="search-bar" />
     ),
 }));
 
-import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/Social/UserSearch';
+import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/social/UserSearch';
 
 describe('UserResultItem', () => {
     it('renders user name and handle', () => {

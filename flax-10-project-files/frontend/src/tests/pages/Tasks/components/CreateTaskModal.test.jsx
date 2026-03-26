@@ -7,7 +7,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { createFnMap } from "../../../utils/testBuilderUtils";
 
-import CreateTaskModal from "../../../../pages/Tasks/components/CreateTaskModal";
+import CreateTaskModal from "../../../../pages/tasks/components/CreateTaskModal";
 
 const hookMock = vi.hoisted(() => vi.fn());
 const createTaskModalDefaults = {
@@ -23,7 +23,7 @@ const createTaskModalDefaults = {
   isReadingList: false,
 };
 
-vi.mock("../../../../pages/Tasks/hooks/useCreateTaskModal", () => ({
+vi.mock("../../../../pages/tasks/hooks/useCreateTaskModal", () => ({
   useCreateTaskModal: hookMock,
 }));
 
@@ -38,7 +38,7 @@ vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ options = [], onChange, placeholder }) => (
     <div data-testid={placeholder}>
       {options.map((option) => (
@@ -50,19 +50,19 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, pill, variant, size, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../../components/common/StandardModal/StandardModal", () => ({
+vi.mock("../../../../components/common/standard_modal/StandardModal", () => ({
   default: ({ children }) => <div data-testid="modal-shell">{children}</div>,
 }));
 
-vi.mock("../../../../components/common/TextInput/TextInput", () => ({
+vi.mock("../../../../components/common/text_input/TextInput", () => ({
   default: ({ multiline, inputClassName, ...props }) =>
     multiline ? <textarea {...props} /> : <input {...props} />,
 }));

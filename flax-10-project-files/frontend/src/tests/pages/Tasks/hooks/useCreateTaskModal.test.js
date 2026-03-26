@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const sleepWarningHookMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
+vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
   useSleepWarning: sleepWarningHookMock,
 }));
 
@@ -20,14 +20,14 @@ vi.mock("../../../../api/moduleApi", () => ({
   getEnrollments: vi.fn(),
 }));
 
-vi.mock("../../../../pages/Tasks/utils/createTaskModalUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/createTaskModalUtils", () => ({
   runCreateTaskSave: vi.fn(),
 }));
 
-import { useCreateTaskModal } from "../../../../pages/Tasks/hooks/useCreateTaskModal";
+import { useCreateTaskModal } from "../../../../pages/tasks/hooks/useCreateTaskModal";
 import { getEnrollments, getModules } from "../../../../api/moduleApi";
 import { getUserSettings } from "../../../../api/userApi";
-import { runCreateTaskSave } from "../../../../pages/Tasks/utils/createTaskModalUtils";
+import { runCreateTaskSave } from "../../../../pages/tasks/utils/createTaskModalUtils";
 
 const defaultLists = [
   { id: 1, name: "Inbox" },

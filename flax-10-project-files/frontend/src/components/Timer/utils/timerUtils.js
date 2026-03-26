@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
-import { requestPermission } from '../../Notifications/utils/browserNotification';
+import { requestPermission } from '../../notifications/utils/browserNotification';
 
 export const getProgress = (t) => {
     if (t.mode === 'break' || t.timeLeft <= 0) return 100;

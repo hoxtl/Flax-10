@@ -5,19 +5,19 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import TasksPage from "../../../pages/Tasks/TasksPage";
+import TasksPage from "../../../pages/tasks/TasksPage";
 
-vi.mock("../../../pages/Tasks/hooks/useTasksPage", () => ({
+vi.mock("../../../pages/tasks/hooks/useTasksPage", () => ({
   default: vi.fn(),
 }));
 
-vi.mock("../../../pages/Tasks/components/TaskFeed", () => ({ default: () => <div data-testid="task-feed" /> }));
-vi.mock("../../../pages/Tasks/components/ListSidebar", () => ({ default: () => <div data-testid="list-sidebar" /> }));
-vi.mock("../../../pages/Tasks/components/CreateTaskModal", () => ({ default: () => <div data-testid="create-task-modal" /> }));
-vi.mock("../../../pages/Tasks/components/CreateListModal", () => ({ default: () => <div data-testid="create-list-modal" /> }));
-vi.mock("../../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock("../../../pages/tasks/components/TaskFeed", () => ({ default: () => <div data-testid="task-feed" /> }));
+vi.mock("../../../pages/tasks/components/ListSidebar", () => ({ default: () => <div data-testid="list-sidebar" /> }));
+vi.mock("../../../pages/tasks/components/CreateTaskModal", () => ({ default: () => <div data-testid="create-task-modal" /> }));
+vi.mock("../../../pages/tasks/components/CreateListModal", () => ({ default: () => <div data-testid="create-list-modal" /> }));
+vi.mock("../../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 
-import useTasksPage from "../../../pages/Tasks/hooks/useTasksPage";
+import useTasksPage from "../../../pages/tasks/hooks/useTasksPage";
 
 describe("TasksPage", () => {
   const defaultPageProps = {
