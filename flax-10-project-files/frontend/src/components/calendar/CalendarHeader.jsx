@@ -27,7 +27,7 @@ import {
   SearchButton,
   ScheduleManagerButton,
   FilterDropdownButton,
-} from "./header/calendarHeaderUtils";
+} from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import "./calendar-header.css";
