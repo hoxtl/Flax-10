@@ -20,6 +20,7 @@ from ..helpers.test_case_support import BaseTestCase
 
 class ScheduleViewsTests(BaseTestCase):
     """Tests schedule views."""
+
     def setUp(self):
         super().setUp()
         self.url = '/api/schedules/'

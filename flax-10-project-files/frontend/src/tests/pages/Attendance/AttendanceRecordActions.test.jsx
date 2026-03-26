@@ -16,11 +16,11 @@ vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   ),
 }));
 
-vi.mock("../../../pages/attendance/utils/attendanceEventDate", () => ({
+vi.mock("../../../pages/Attendance/utils/attendanceEventDate", () => ({
   isEventInPast: (...args) => isEventInPastMock(...args),
 }));
 
-import AttendanceRecordActions from "../../../pages/attendance/components/AttendanceRecordActions";
+import AttendanceRecordActions from "../../../pages/Attendance/components/AttendanceRecordActions";
 
 describe("AttendanceRecordActions", () => {
   beforeEach(() => {

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/society/hooks/useSocietyCalendarSync', () => ({
+vi.mock('../../../components/Society/hooks/useSocietyCalendarSync', () => ({
     useSocietyCalendarSync: vi.fn(() => ({ isSynced: false, loading: false, toggleSync: vi.fn() })),
 }));
 
-import SyncButton from '../../../components/society/society_detail/tabs/calendar_tab/SyncButton';
-import { useSocietyCalendarSync } from '../../../components/society/hooks/useSocietyCalendarSync';
+import SyncButton from '../../../components/Society/society_detail/tabs/calendar_tab/SyncButton';
+import { useSocietyCalendarSync } from '../../../components/Society/hooks/useSocietyCalendarSync';
 
 describe('SyncButton', () => {
     it('shows "Sync to Calendar" when not synced', () => {

@@ -1,15 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { HistoryRailSection } from '../../../../components/timer/history_panel/HistoryRailSection';
+import { HistoryRailSection } from '../../../../components/Timer/history_panel/HistoryRailSection';
 
-vi.mock('../../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
 
-vi.mock('../../../../components/timer/utils/historyFormatter', () => ({
+vi.mock('../../../../components/Timer/utils/historyFormatter', () => ({
   formatDuration: (s) => (s ? `${Math.floor(s / 60)}m` : null),
   formatTimeRange: (start, end) => (start && end ? '10:00–11:00' : null),
 }));
 
-vi.mock('../../../../components/timer/history_panel/historyPanelUtils', () => ({
+vi.mock('../../../../components/Timer/history_panel/historyPanelUtils', () => ({
   getModuleLabel: (block) => block.module || null,
 }));
 

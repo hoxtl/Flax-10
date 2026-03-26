@@ -4,22 +4,23 @@
  */
 
 import styles from "./SocietyDetailPage.module.css";
-import SocietyHero from "../../components/society/society_detail/SocietyHero";
-import SocietyInfo from "../../components/society/society_detail/SocietyInfo";
-import SocietyTabs from "../../components/society/society_detail/tabs/SocietyTabs";
-import SocietySidebar from "../../components/society/society_detail/SocietySidebar";
-import CoverImageModal from "../../components/society/society_detail/image_handlers/CoverImageModal";
-import ImageGalleryModal from "../../components/society/society_detail/image_handlers/ImageGalleryModal";
-import SettingsModal from "../../components/society/society_detail/SettingsModal";
-import AnnouncementModal from "../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal";
-import ReportSocietyModal from "../../components/society/society_detail/ReportSocietyModal";
-import MemberDirectoryModal from "../../components/society/society_detail/MemberDirectoryModal";
+import SocietyHero from "../../components/Society/society_detail/SocietyHero";
+import SocietyInfo from "../../components/Society/society_detail/SocietyInfo";
+import SocietyTabs from "../../components/Society/society_detail/tabs/SocietyTabs";
+import SocietySidebar from "../../components/Society/society_detail/SocietySidebar";
+import CoverImageModal from "../../components/Society/society_detail/image_handlers/CoverImageModal";
+import ImageGalleryModal from "../../components/Society/society_detail/image_handlers/ImageGalleryModal";
+import SettingsModal from "../../components/Society/society_detail/SettingsModal";
+import AnnouncementModal from "../../components/Society/society_detail/tabs/announcement_tab/AnnouncementModal";
+import ReportSocietyModal from "../../components/Society/society_detail/ReportSocietyModal";
+import MemberDirectoryModal from "../../components/Society/society_detail/MemberDirectoryModal";
 import { Flag } from "lucide-react";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import BackButton from "../../components/common/back_button/BackButton.jsx";
+import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { useLocation } from "react-router-dom";
 import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
-import { getImageUrls } from "./societyDetailPageUtils";
+import { getImageUrls } from "./SocietyDetailPageUtils";
 
 function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;
@@ -69,7 +70,8 @@ const TabSection = ({ data }) => (
 const DetailLayout = ({ data, handlers, onBack, isAdmin }) => (
     <div className={styles.page}>
         <TopBar onBack={onBack} onSettings={() => handlers.setS(true)} isAdmin={isAdmin}
-            onReport={() => handlers.onReport()} hasReported={data.society.has_reported} onUnreport={() => data.handleUnreport(data.society)} />
+            onReport={() => handlers.onReport()} hasReported={data.society.has_reported} onUnreport={() => data.handleUnreport(data.society)}
+            societyName={data.society.name} />
         <SocietyHero society={data.society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })}
             onImageClick={(index) => handlers.setG({ index })} onEditImages={() => handlers.setCE(true)} />
         <SocietyInfo society={data.society} editMode={data.modals.editMode} onUpdateSociety={data.updateSociety}
@@ -125,10 +127,17 @@ function ReportButton({ hasReported, onReport, onUnreport }) {
 
 /** Common header for the detail view including navigation and settings. */
 
-function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported }) {
+function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported, societyName }) {
+    const crumbs = [
+        { label: "Societies", navKey: "societies" },
+        { label: societyName || "Society" },
+    ];
     return (
         <div className={styles.topBar}>
-            <BackButton onClick={onBack} label="Back to All Societies" />
+            <div>
+                <Breadcrumb crumbs={crumbs} />
+                <BackButton onClick={onBack} label="Back to All Societies" />
+            </div>
             <div className={styles.topBarActions}>
                 <ReportButton hasReported={hasReported} onReport={onReport} onUnreport={onUnreport} />
                 {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}

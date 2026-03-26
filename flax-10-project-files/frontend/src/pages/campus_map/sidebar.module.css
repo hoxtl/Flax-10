@@ -1,6 +1,43 @@
 /**
  * Campus map sidebar-specific styles.
  */
+
+.campusDropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  background: var(--surface-inner);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.campusDropdownTrigger:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.campusDropdownChevron {
+  margin-left: auto;
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
+.campusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--campus-dot-color);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 .locationChip {
   display: flex;
   align-items: center;

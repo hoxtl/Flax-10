@@ -7,7 +7,7 @@ vi.mock("../../../../components/common/Card/Card", () => ({
   default: ({ children, ...props }) => <div data-testid="card" {...props}>{children}</div>,
 }));
 
-vi.mock("../../../../components/analytics/StudyHeatmap", () => ({
+vi.mock("../../../../components/Analytics/StudyHeatmap", () => ({
   default: (props) => {
     studyHeatmapMock(props);
     return <div data-testid="study-heatmap" />;
@@ -17,7 +17,7 @@ vi.mock("../../../../components/analytics/StudyHeatmap", () => ({
 import {
   ContributionHeatmap,
   FocusHeatmapWidget,
-} from "../../../../pages/profile/components/widgets/FocusHeatmap";
+} from "../../../../pages/Profile/components/widgets/FocusHeatmap";
 
 describe("FocusHeatmap widgets", () => {
   beforeEach(() => {

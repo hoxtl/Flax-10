@@ -8,6 +8,7 @@ import MemberAvatar from "./MemberAvatar";
 import { getDisplayName } from "../utils/memberAvatarUtils";
 import FilterButton from "../../../components/common/filter_button/FilterButton";
 import { useClickOutside } from "../../../components/common/hooks/useClickOutside";
+import SelectableMemberRow from "./SelectableMemberRow";
 import styles from "./MemberFilter.module.css";
 
 function useMemberFilter() {
@@ -18,13 +19,15 @@ function useMemberFilter() {
 }
 
 function MemberItem({ member, checked, onToggle }) {
-    return (
-        <div className={styles.item} onClick={() => onToggle(String(member.user))}>
-            <input type="checkbox" checked={checked} onChange={() => onToggle(String(member.user))} className={styles.checkbox} onClick={(e) => e.stopPropagation()} />
-            <MemberAvatar member={member} size={22} />
-            <span className={styles.itemLabel}>{getDisplayName(member)}</span>
-        </div>
-    );
+  return (
+    <SelectableMemberRow
+      member={member}
+      checked={checked}
+      onToggle={onToggle}
+      classNames={{ row: styles.item, checkbox: styles.checkbox, label: styles.itemLabel }}
+      avatarSize={22}
+    />
+  );
 }
 
 function DropdownContent({ members, selectedUsers, onToggle }) {

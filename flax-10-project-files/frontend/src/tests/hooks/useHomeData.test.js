@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useHomeData } from '../../pages/homepage/hooks/useHomeData';
+import { useHomeData } from '../../pages/Homepage/hooks/useHomeData';
 
-vi.mock('../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../components/Calendar/utils/dateUtils', () => ({
     overlapsDay: vi.fn((start, end, date) => {
         // Simple overlap: just check the date matches
         return start.toDateString() === date.toDateString();

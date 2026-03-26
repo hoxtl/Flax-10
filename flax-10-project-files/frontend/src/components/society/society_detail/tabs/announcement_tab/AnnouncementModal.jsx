@@ -6,10 +6,10 @@
 import { useState, useRef } from "react";
 import styles from "./AnnouncementModal.module.css";
 import { handleFileSelect, MAX_IMAGES } from "./announcementModalHelpers";
-import { TimeRow } from "../../../../calendar/event_modal/components/TimeRow";
-import { RecurrenceField } from "../../../../calendar/event_modal/components/RecurrenceField";
-import { FormField } from "../../../../calendar/event_modal/components/FormField";
-import { TagField } from "../../../../calendar/event_modal/components/TagField";
+import { TimeRow } from "../../../../Calendar/event_modal/components/TimeRow";
+import { RecurrenceField } from "../../../../Calendar/event_modal/components/RecurrenceField";
+import { FormField } from "../../../../Calendar/event_modal/components/FormField";
+import { TagField } from "../../../../Calendar/event_modal/components/TagField";
 import ConfirmModal from "../../../../common/confirm_modal/ConfirmModal";
 import StandardModal from "../../../../common/standard_modal/StandardModal";
 import PrimaryButton from "../../../../common/primary_button/PrimaryButton";

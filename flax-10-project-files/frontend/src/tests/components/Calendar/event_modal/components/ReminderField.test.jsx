@@ -1,17 +1,32 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ReminderField } from '../../../../../components/calendar/event_modal/components/ReminderField';
-import { CustomReminderInput, PermissionStatus } from '../../../../../components/calendar/event_modal/components/ReminderFieldParts';
+import { ReminderField } from '../../../../../components/Calendar/event_modal/components/ReminderField';
+import { CustomReminderInput, PermissionStatus } from '../../../../../components/Calendar/event_modal/components/ReminderFieldParts';
+
+function stubNotification(permission = 'granted', requestPermission = vi.fn().mockResolvedValue(permission)) {
+    vi.stubGlobal('Notification', {
+        requestPermission,
+        permission,
+    });
+    return requestPermission;
+}
+
+function restoreNotificationGlobals() {
+    vi.unstubAllGlobals();
+}
+
+function renderPermissionStatusWithNotification(permission, requestPermission) {
+    const stubbedRequestPermission = stubNotification(permission, requestPermission);
+    render(<PermissionStatus />);
+    return stubbedRequestPermission;
+}
 
 describe('ReminderField', () => {
     const mockOnChange = vi.fn();
 
     beforeEach(() => {
         vi.clearAllMocks();
-        global.Notification = {
-            requestPermission: vi.fn().mockResolvedValue('granted'),
-            permission: 'granted',
-        };
+        stubNotification();
     });
 
     it('should render with no reminders', () => {
@@ -104,45 +119,29 @@ describe('ReminderField', () => {
     });
 
     it('should request permission on toggle if default', async () => {
-        const requestPermission = vi.fn().mockResolvedValue('granted');
-        vi.stubGlobal('Notification', {
-            requestPermission,
-            permission: 'default'
-        });
+        const requestPermission = stubNotification('default');
         render(<ReminderField value={[]} onChange={mockOnChange} />);
         fireEvent.click(screen.getByText('No reminders'));
         const checkbox = screen.getByText('5 min before');
         fireEvent.click(checkbox);
         expect(requestPermission).toHaveBeenCalled();
-        vi.unstubAllGlobals();
+        restoreNotificationGlobals();
     });
 
     it('renders denied permission status', () => {
-        vi.stubGlobal('Notification', {
-            requestPermission: vi.fn(),
-            permission: 'denied',
-        });
-
-        render(<PermissionStatus />);
+        renderPermissionStatusWithNotification('denied', vi.fn());
         expect(screen.getByText('Notifications blocked')).toBeInTheDocument();
-
-        vi.unstubAllGlobals();
+        restoreNotificationGlobals();
     });
 
     it('requests permission from the enable button and updates the status', async () => {
-        const requestPermission = vi.fn().mockResolvedValue('granted');
-        vi.stubGlobal('Notification', {
-            requestPermission,
-            permission: 'default',
-        });
-
-        render(<PermissionStatus />);
+        const requestPermission = renderPermissionStatusWithNotification('default', vi.fn().mockResolvedValue('granted'));
         fireEvent.click(screen.getByRole('button', { name: 'Enable notifications' }));
 
         await waitFor(() => expect(screen.getByText('Notifications enabled')).toBeInTheDocument());
         expect(requestPermission).toHaveBeenCalled();
 
-        vi.unstubAllGlobals();
+        restoreNotificationGlobals();
     });
 
     it('shows not supported when the Notification API is unavailable', () => {

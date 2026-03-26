@@ -2,10 +2,9 @@
  * GroupWork project header metadata.
  */
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
-import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
@@ -13,8 +12,21 @@ import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName, openMemberProfile, getStoredViewer } from "../utils/memberAvatarUtils";
+import GroupWorkProjectModuleBadge from "./ProjectModuleBadge";
+import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
+import { useAuth } from "../../../context/AuthContext";
 import styles from "./ProjectHeader.module.css";
+
+export function ProjectModuleTag({ project }) {
+  return (
+    <GroupWorkProjectModuleBadge
+      project={project}
+      linkClassName={styles.metaLink}
+      badgeClassName={styles.modulePill}
+      codeClassName={styles.moduleCode}
+    />
+  );
+}
 
 export function ProjectHeaderMeta({ project, members, teamMembers = [], onMemberAdded, onMemberRemove, onDeleteProject }) {
   return (
@@ -28,19 +40,6 @@ export function ProjectHeaderMeta({ project, members, teamMembers = [], onMember
         onDeleteProject={onDeleteProject}
       />
     </div>
-  );
-}
-
-function ProjectModuleTag({ project }) {
-  if (!project.course_code && !project.module_name) return null;
-
-  return (
-    <Link to={`/modules?code=${encodeURIComponent(project.course_code || "")}`} className={styles.metaLink}>
-      <Badge className={styles.modulePill}>
-        {project.course_code ? <span className={styles.moduleCode}>{project.course_code}</span> : null}
-        <span>{project.module_name || project.course_code}</span>
-      </Badge>
-    </Link>
   );
 }
 
@@ -63,11 +62,12 @@ export function ProjectTeacherMeta({ project }) {
   );
 }
 
-function currentUserIsOwner(members) {
-  const viewer = getStoredViewer();
-  const viewerId = String(viewer.id ?? viewer.user ?? "");
-  if (!viewerId) return false;
-  return members.some((m) => String(m.user ?? "") === viewerId && m.role === "owner");
+function useIsOwner(members) {
+  const { profile } = useAuth();
+  return useMemo(() => {
+    if (!profile?.id) return false;
+    return members.some((m) => String(m.user ?? "") === String(profile.id) && m.role === "owner");
+  }, [members, profile?.id]);
 }
 
 function TeamAvatarStrip({ members }) {
@@ -114,7 +114,7 @@ function TeamManagementPanel({ project, teamMembers, onMemberAdded, onMemberRemo
 
 function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDeleteProject }) {
   const [isEditing, setIsEditing] = useState(false);
-  const canManageTeam = currentUserIsOwner(teamMembers);
+  const canManageTeam = useIsOwner(teamMembers);
   const teamCount = teamMembers.length;
   const removalFlow = useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject);
   if (!members.length && !teamMembers.length) return null;

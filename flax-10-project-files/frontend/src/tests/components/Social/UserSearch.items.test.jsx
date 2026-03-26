@@ -26,7 +26,7 @@ vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     ),
 }));
 
-import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/social/UserSearch';
+import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/Social/UserSearch';
 
 describe('UserResultItem', () => {
     it('renders user name and handle', () => {

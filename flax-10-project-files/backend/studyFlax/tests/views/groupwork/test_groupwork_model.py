@@ -16,6 +16,7 @@ from studyFlax.tests.helpers.test_case_support import BaseTestCase
 
 class GroupworkModelStrTests(BaseTestCase):
     """Tests groupwork model str."""
+
     def test_group_project_str(self):
         project = GroupProject.objects.create(name="My Project", owner=self.user)
         self.assertEqual(str(project), "My Project")

@@ -63,18 +63,18 @@ vi.mock('../../../components/common/empty_state/EmptyState', () => ({
   default: (...args) => emptyStateMock(...args),
 }));
 
-import AnimatedList from '../../../components/analytics/AnimatedList';
-import AttendanceBarChart from '../../../components/analytics/AttendanceBarChart';
-import { ConsistencyScore } from '../../../components/analytics/ConsistencyScore';
-import PlannedVsActualChart from '../../../components/analytics/PlannedVsActualChart';
-import ProductivityCard from '../../../components/analytics/ProductivityCard';
-import ProductivityCards from '../../../components/analytics/ProductivityCards';
-import StudyHeatmap from '../../../components/analytics/StudyHeatmap';
-import StudyHoursChart from '../../../components/analytics/StudyHoursChart';
-import SummaryCards from '../../../components/analytics/SummaryCards';
-import ThemeUsageChart from '../../../components/analytics/ThemeUsageChart';
-import ThemeUsageLegend from '../../../components/analytics/ThemeUsageLegend';
-import useAttendanceStats from '../../../components/analytics/useAttendanceStats';
+import AnimatedList from '../../../components/Analytics/AnimatedList';
+import AttendanceBarChart from '../../../components/Analytics/AttendanceBarChart';
+import { ConsistencyScore } from '../../../components/Analytics/ConsistencyScore';
+import PlannedVsActualChart from '../../../components/Analytics/PlannedVsActualChart';
+import ProductivityCard from '../../../components/Analytics/ProductivityCard';
+import ProductivityCards from '../../../components/Analytics/ProductivityCards';
+import StudyHeatmap from '../../../components/Analytics/StudyHeatmap';
+import StudyHoursChart from '../../../components/Analytics/StudyHoursChart';
+import SummaryCards from '../../../components/Analytics/SummaryCards';
+import ThemeUsageChart from '../../../components/Analytics/ThemeUsageChart';
+import ThemeUsageLegend from '../../../components/Analytics/ThemeUsageLegend';
+import useAttendanceStats from '../../../components/Analytics/useAttendanceStats';
 
 describe('Analytics coverage extras', () => {
   beforeEach(() => {

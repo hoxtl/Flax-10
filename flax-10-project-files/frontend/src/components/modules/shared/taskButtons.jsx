@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { convertReadingToTask } from '../../../api/readingApi';
 import { createTask } from '../../../api/taskApi';
-import { getUrgencyTier } from '../deadlines/upcomingDeadlinesUtils';
+import { getUrgencyTier } from '../Deadlines/upcomingDeadlinesUtils';
 import { useToast } from '../../../context/ToastContext';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 

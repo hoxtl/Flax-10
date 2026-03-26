@@ -53,14 +53,14 @@ const useSearchInitMock = vi.fn();
 const useFilterStateMock = vi.fn();
 const useClickOutsideMock = vi.fn();
 
-vi.mock("../../../components/social/UserSearch", () => ({
+vi.mock("../../../components/Social/UserSearch", () => ({
   FilterSection: () => <div data-testid="filter-section" />,
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),
   useClickOutside: (...args) => useClickOutsideMock(...args),
 }));
 
-vi.mock("../../../components/pagination/Pagination", () => ({
+vi.mock("../../../components/Pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages }) => (
     <div data-testid="pagination">
       {currentPage}/{totalPages}
@@ -146,13 +146,13 @@ vi.mock("../../../components/common", () => ({
 }));
 
 // ── Imports (after mocks) ────────────────────────────────────────────────────
-import Discover from "../../../pages/discover/Discover";
+import Discover from "../../../pages/Discover/Discover";
 import {
   DiscoverSkeleton,
   DiscoverToolbar,
   UsersGrid,
-} from "../../../pages/discover/DiscoverComponents";
-import { useDiscoverFetch } from "../../../pages/discover/discoverHooks";
+} from "../../../pages/Discover/DiscoverComponents";
+import { useDiscoverFetch } from "../../../pages/Discover/discoverHooks";
 
 // ── Helpers for filter state mock ────────────────────────────────────────────
 function makeFilterState(overrides = {}) {

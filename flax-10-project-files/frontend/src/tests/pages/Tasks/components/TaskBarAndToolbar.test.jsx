@@ -10,7 +10,7 @@ import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const taskBarHookMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../../pages/tasks/hooks/useCreateTaskBar", () => ({
+vi.mock("../../../../pages/Tasks/hooks/useCreateTaskBar", () => ({
   default: taskBarHookMock,
 }));
 
@@ -46,12 +46,12 @@ vi.mock("../../../../components/common/search_bar", () => ({
   ),
 }));
 
-import CreateTaskBar from "../../../../pages/tasks/components/CreateTaskBar";
+import CreateTaskBar from "../../../../pages/Tasks/components/CreateTaskBar";
 import {
   ToolbarSearch,
   ToolbarViewLists,
-} from "../../../../pages/tasks/components/TaskFeedToolbarParts";
-import useTaskFeedResponsive from "../../../../pages/tasks/components/useTaskFeedResponsive";
+} from "../../../../pages/Tasks/components/TaskFeedToolbarParts";
+import useTaskFeedResponsive from "../../../../pages/Tasks/components/useTaskFeedResponsive";
 
 const taskBarDefaults = {
   title: "",

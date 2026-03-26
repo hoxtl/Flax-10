@@ -63,19 +63,21 @@ function buildAttendanceTabs(model) {
 }
 
 function RecordTabContent({ model }) {
-  if (model.unmarkedEvents.length === 0) return <AttendanceEmptyPanel message="All caught up - no unrecorded events." />;
+  if (model.unmarkedEvents.length === 0) return <AttendanceEmptyPanel message="All caught up" hint="No events left to record — you're on top of it." />;
   return <RecordAttendanceList events={model.unmarkedEvents} onRecorded={model.refetchAll} />;
 }
 
 function MarkedTabContent({ model }) {
-  if (model.markedEvents.length === 0) return <AttendanceEmptyPanel message="No marked events yet." />;
+  if (model.markedEvents.length === 0) return <AttendanceEmptyPanel message="No marked events yet" hint="Events you've recorded will appear here." />;
   return <MarkedAttendanceList markedEvents={model.markedEvents} onRecorded={model.refetchAll} />;
 }
 
-function AttendanceEmptyPanel({ message }) {
+function AttendanceEmptyPanel({ message, hint }) {
   return (
-    <div className={listStyles.recordSection}>
-      <p className={listStyles.recordHint}>{message}</p>
+    <div className={listStyles.emptyStateWrap}>
+      <span className={listStyles.emptyStateIcon} aria-hidden="true">✓</span>
+      <p className={listStyles.emptyStateTitle}>{message}</p>
+      {hint && <p className={listStyles.emptyStateHint}>{hint}</p>}
     </div>
   );
 }

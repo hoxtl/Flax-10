@@ -3,8 +3,7 @@
  */
 
 import { useState } from "react";
-import { AnimatePresence, motion as Motion } from "framer-motion";
-import { FileText, Calendar, Clock, Timer, ChevronDown } from "lucide-react";
+import { FileText, Calendar, Clock, Timer } from "lucide-react";
 
 import EmptyState from "../../../components/common/empty_state/EmptyState";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
@@ -12,7 +11,7 @@ import PrimaryButton from "../../../components/common/primary_button/PrimaryButt
 import { convertReadingToTask } from "../../../api/readingApi";
 
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
-import { SECTION_BODY_ANIM } from "../constants/taskAnimations";
+import { CollapsibleCountChip, CollapsibleSectionBody } from "./TaskSectionShared";
 import sectionStyles from "./TaskFeedSections.module.css";
 import styles from "./SuggestedReadingsSection.module.css";
 
@@ -81,12 +80,7 @@ function SuggestedReadingsHeaderMeta({ speedData }) {
 }
 
 function SuggestedReadingsHeaderCount({ count, collapsed }) {
-  return (
-    <span className={sectionStyles.sectionStatsChip}>
-      <span className={sectionStyles.sectionCountWrap}><span className={sectionStyles.sectionCountPill} aria-label={`${count} suggested readings`}>{count}</span></span>
-      <span className={sectionStyles.sectionChevronBtn} aria-hidden><Motion.span className={sectionStyles.sectionChevron} animate={{ rotate: collapsed ? -90 : 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}><ChevronDown size={16} /></Motion.span></span>
-    </span>
-  );
+  return <CollapsibleCountChip count={count} label={`${count} suggested readings`} collapsed={collapsed} />;
 }
 
 export function SuggestedReadingsHeader({ count, collapsed, onToggle, speedData }) {
@@ -119,5 +113,5 @@ export function SuggestedReadingsBody({ activeListLabel, readings, pendingTasks,
 }
 
 export function SuggestedReadingsCollapse({ collapsed, children }) {
-  return <AnimatePresence initial={false}>{!collapsed && <Motion.div key="suggested-readings-body" {...SECTION_BODY_ANIM} style={{ overflow: "hidden" }}>{children}</Motion.div>}</AnimatePresence>;
+  return <CollapsibleSectionBody collapsed={collapsed} bodyKey="suggested-readings-body">{children}</CollapsibleSectionBody>;
 }

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 
-import { validateDateRange, validateEventTimes } from '../../components/calendar/utils/dateValidation';
-import { buildWeekLabels, getWeekIndexForDate } from '../../components/calendar/utils/weekUtils';
-import { getEventTheme } from '../../components/calendar/utils/eventStyleUtils';
-import { expandRecurringEvents } from '../../components/calendar/utils/recurrenceUtils';
+import { validateDateRange, validateEventTimes } from '../../components/Calendar/utils/dateValidation';
+import { buildWeekLabels, getWeekIndexForDate } from '../../components/Calendar/utils/weekUtils';
+import { getEventTheme } from '../../components/Calendar/utils/eventStyleUtils';
+import { expandRecurringEvents } from '../../components/Calendar/utils/recurrenceUtils';
 
 describe('dateValidation', () => {
     describe('validateDateRange', () => {

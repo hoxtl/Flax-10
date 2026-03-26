@@ -5,7 +5,7 @@ import {
   MIN_ESTIMATE_MINUTES,
   POMODORO_BLOCK_MINUTES,
   normalizeEstimateMinutesInput,
-} from "../../../pages/tasks/utils/createTaskBarUtils";
+} from "../../../pages/Tasks/utils/createTaskBarUtils";
 
 const DEFAULT_PRESETS = [
   { value: 25, label: "25m", ariaLabel: "25 minutes" },

@@ -5,7 +5,7 @@ import {
     formatTime, formatDate, formatMonthYear, formatDayLabel, getGreeting,
     parseDateInput, formatDateTime, formatShortDate, formatDateWithYear,
     formatDateRange, formatTimeRange, addHourToTime
-} from '../../components/calendar/utils/dateUtils';
+} from '../../components/Calendar/utils/dateUtils';
 
 describe('dateUtils', () => {
     const date = new Date(2026, 1, 15);
@@ -208,7 +208,7 @@ describe('dateUtils', () => {
         });
 
         it('overlapsDay (true)', async () => {
-            const { overlapsDay } = await import('../../components/calendar/utils/dateUtils');
+            const { overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
             const day = new Date(2026, 1, 15);
             expect(overlapsDay(new Date(2026, 1, 15, 10), new Date(2026, 1, 15, 11), day)).toBe(true);
             expect(overlapsDay(new Date(2026, 1, 15, 0), new Date(2026, 1, 16, 0), day)).toBe(true);
@@ -217,7 +217,7 @@ describe('dateUtils', () => {
         });
 
         it('overlapsDay (false)', async () => {
-            const { overlapsDay } = await import('../../components/calendar/utils/dateUtils');
+            const { overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
             const day = new Date(2026, 1, 15);
             expect(overlapsDay(new Date(2026, 1, 14, 10), new Date(2026, 1, 14, 11), day)).toBe(false);
             expect(overlapsDay(new Date(2026, 1, 16, 10), new Date(2026, 1, 16, 11), day)).toBe(false);
@@ -226,7 +226,7 @@ describe('dateUtils', () => {
         });
 
         it('isAllDayEvent', async () => {
-            const { isAllDayEvent } = await import('../../components/calendar/utils/eventDisplayUtils');
+            const { isAllDayEvent } = await import('../../components/Calendar/utils/eventDisplayUtils');
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 10) })).toBe(false);
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 10), end_time: new Date(2026, 1, 16, 9) })).toBe(false);
             expect(isAllDayEvent({ start_time: new Date(2026, 1, 15, 0), end_time: new Date(2026, 1, 16, 0) })).toBe(true);

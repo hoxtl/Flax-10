@@ -1,29 +1,69 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Profile from '../../../pages/profile/Profile';
-import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/profile/hooks/useProfile';
-import { useProfileSummary } from '../../../pages/profile/hooks/useProfileSummary';
-import { useProfileVisibility } from '../../../pages/profile/hooks/useProfileVisibility';
-import { fetchApi } from '../../../api/client';
+import Profile from '../../../pages/Profile/Profile';
+
 import { createFnMap } from '../../utils/testBuilderUtils';
 const useAuthMock = vi.fn();
-vi.mock('../../../pages/profile/hooks/useProfile', () => ({
-  useProfileState: vi.fn(), useProfileBodyData: vi.fn(), useProfileContent: vi.fn(),
+
+vi.mock('../../../pages/Profile/hooks/useProfile', () => ({
+  useProfileState: vi.fn(),
+  useProfileBodyData: vi.fn(),
+  useProfileContent: vi.fn(),
 }));
-vi.mock('../../../pages/profile/hooks/useProfileSummary', () => ({ useProfileSummary: vi.fn() }));
-vi.mock('../../../pages/profile/hooks/useProfileVisibility', () => ({ useProfileVisibility: vi.fn() }));
-vi.mock('../../../context/AuthContext', () => ({ useAuth: () => useAuthMock() }));
-vi.mock('../../../context/ThemeContext', () => ({ useTheme: () => ({ mode: 'light' }) }));
-vi.mock('../../../api/analyticsApi', () => ({ default: { getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })) } }));
-vi.mock('../../../api/moduleApi', () => ({ getModules: vi.fn(() => Promise.resolve([])) }));
-vi.mock('../../../api/client', () => ({ fetchApi: vi.fn(() => Promise.resolve({})) }));
-vi.mock('../../../pages/profile/ProfileModals', () => ({ default: () => <div data-testid="profile-modals" /> }));
-vi.mock('../../../pages/profile/ProfileCalendar', () => ({ ProfileCalendar: () => <div data-testid="profile-calendar" /> }));
-vi.mock('../../../components/social/ShareButton', () => ({ default: () => <button data-testid="share-button">Share</button> }));
-vi.mock('../../../pages/profile/AchievementsModal', () => ({
+
+vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
+  useProfileSummary: vi.fn(),
+}));
+
+vi.mock('../../../pages/Profile/hooks/useProfileVisibility', () => ({
+  useProfileVisibility: vi.fn(),
+}));
+
+vi.mock('../../../context/AuthContext', () => ({
+  useAuth: () => useAuthMock(),
+}));
+
+vi.mock('../../../context/ThemeContext', () => ({
+  useTheme: () => ({ mode: 'light' }),
+}));
+
+vi.mock('../../../api/analyticsApi', () => ({
+  default: {
+    getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })),
+  },
+}));
+
+vi.mock('../../../api/moduleApi', () => ({
+  getModules: vi.fn(() => Promise.resolve([])),
+}));
+
+vi.mock('../../../api/client', () => ({
+  fetchApi: vi.fn(() => Promise.resolve({})),
+}));
+
+vi.mock('../../../pages/Profile/ProfileModals', () => ({
+  default: () => <div data-testid="profile-modals" />,
+}));
+
+vi.mock('../../../pages/Profile/ProfileCalendar', () => ({
+  ProfileCalendar: () => <div data-testid="profile-calendar" />,
+}));
+
+vi.mock('../../../components/Social/ShareButton', () => ({
+  default: () => <button data-testid="share-button">Share</button>,
+}));
+
+vi.mock('../../../pages/Profile/AchievementsModal', () => ({
   default: ({ onClose }) => <div data-testid="achievements-modal"><button onClick={onClose}>Close</button></div>,
 }));
+
+import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/Profile/hooks/useProfile';
+import { useProfileSummary } from '../../../pages/Profile/hooks/useProfileSummary';
+import { useProfileVisibility } from '../../../pages/Profile/hooks/useProfileVisibility';
+import analyticsService from '../../../api/analyticsApi';
+import { fetchApi } from '../../../api/client';
+
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
 const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', year: 'Year 2', major: 'Physics', module_count: 3 };
 const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones', year: 'Year 3', major: 'Chemistry' };

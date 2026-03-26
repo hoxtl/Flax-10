@@ -4,11 +4,11 @@
 
 import { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { useChangeTracker } from "../../components/society/hooks/useChangeTracker";
-import { useSocietyDetail } from "../../components/society/hooks/useSocietyDetail";
-import { useSocietySubscription } from "../../components/society/hooks/useSocietySubscription";
-import { useUnreportSociety } from "../../components/society/hooks/useUnreportSociety";
-import { scrollContentToTop, wrapAddAnnouncement, wrapAddEvent, wrapDeleteAnnouncement, wrapDeleteEvent, wrapUpdateAnnouncement, wrapUpdateEvent } from "./societyDetailPageUtils";
+import { useChangeTracker } from "../../components/Society/hooks/useChangeTracker";
+import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
+import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
+import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
+import { scrollContentToTop, wrapAddAnnouncement, wrapAddEvent, wrapDeleteAnnouncement, wrapDeleteEvent, wrapUpdateAnnouncement, wrapUpdateEvent } from "./SocietyDetailPageUtils";
 
 function usePageState(initialTab, location) {
   const [params, setParams] = useSearchParams();

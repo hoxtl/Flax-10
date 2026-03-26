@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useCalendarEvents, useEventActions } from '../../components/calendar/hooks/useCalendarEvents';
+import { useCalendarEvents, useEventActions } from '../../components/Calendar/hooks/useCalendarEvents';
 
 const useCalendarMock = vi.fn();
 const useCalendarDispatchMock = vi.fn();
@@ -24,7 +24,7 @@ vi.mock('../../api/eventApi', () => ({
   addExceptionDate: (...args) => addExceptionDateMock(...args),
 }));
 
-vi.mock('../../components/calendar/hooks/calendarHelpers', () => ({
+vi.mock('../../components/Calendar/hooks/calendarHelpers', () => ({
   getDateRangeForView: (...args) => getDateRangeForViewMock(...args),
 }));
 

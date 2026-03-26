@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { getTaskFeedSubtitle } from "../../../../pages/tasks/components/TaskFeedSubtitle";
+import { getTaskFeedSubtitle } from "../../../../pages/Tasks/components/TaskFeedSubtitle";
 
 function renderSubtitle(activeList, isReadingActive) {
   render(<div>{getTaskFeedSubtitle(activeList, isReadingActive)}</div>);

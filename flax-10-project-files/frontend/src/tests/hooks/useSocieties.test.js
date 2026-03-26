@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useSocieties } from '../../components/society/hooks/useSocieties';
+import { useSocieties } from '../../components/Society/hooks/useSocieties';
 
 vi.mock('../../api/societyApi', () => ({
     fetchSocieties: vi.fn(),
@@ -25,14 +25,19 @@ describe('useSocieties', () => {
         requestRatification.mockResolvedValue({});
     });
 
+    async function renderLoadedHook() {
+        const hook = renderHook(() => useSocieties());
+        await waitFor(() => expect(hook.result.current.loading).toBe(false));
+        return hook;
+    }
+
     it('starts with loading=true', () => {
         const { result } = renderHook(() => useSocieties());
         expect(result.current.loading).toBe(true);
     });
 
     it('loads societies on mount', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         expect(result.current.societies).toEqual(mockSocieties);
     });
 
@@ -44,8 +49,7 @@ describe('useSocieties', () => {
     });
 
     it('refresh reloads societies', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         const newSocieties = [{ id: 3, name: 'Art Club' }];
         fetchSocieties.mockResolvedValueOnce(newSocieties);
         await act(async () => { await result.current.refresh(); });
@@ -53,8 +57,7 @@ describe('useSocieties', () => {
     });
 
     it('handleCreate creates a new society', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         await act(async () => {
             await result.current.handleCreate({ name: 'New Society', collaborators: [] });
         });
@@ -62,8 +65,7 @@ describe('useSocieties', () => {
     });
 
     it('handleCreate adds society to list', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         await act(async () => {
             await result.current.handleCreate({ name: 'New Society', collaborators: [] });
         });
@@ -71,8 +73,7 @@ describe('useSocieties', () => {
     });
 
     it('handleCreate adds collaborators', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         const collaborators = [{ username: 'alice', role: 'editor' }];
         await act(async () => {
             await result.current.handleCreate({ name: 'New Society', collaborators });
@@ -81,8 +82,7 @@ describe('useSocieties', () => {
     });
 
     it('handleCreate requests ratification when flag is set', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         await act(async () => {
             await result.current.handleCreate({
                 name: 'New Society',
@@ -94,8 +94,7 @@ describe('useSocieties', () => {
     });
 
     it('does not request ratification when flag is false', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         await act(async () => {
             await result.current.handleCreate({
                 name: 'New Society',
@@ -107,8 +106,7 @@ describe('useSocieties', () => {
     });
 
     it('handleCreate converts camelCase keys to snake_case', async () => {
-        const { result } = renderHook(() => useSocieties());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        const { result } = await renderLoadedHook();
         await act(async () => {
             await result.current.handleCreate({ societyName: 'Test', collaborators: [] });
         });

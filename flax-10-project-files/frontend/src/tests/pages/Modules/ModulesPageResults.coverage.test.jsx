@@ -89,7 +89,7 @@ vi.mock("../../../components/common/search_empty_state/SearchEmptyState.jsx", ()
   ),
 }));
 
-vi.mock("../../../components/pagination/Pagination.jsx", () => ({
+vi.mock("../../../components/Pagination/Pagination.jsx", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) => (
     <div>
       <div>{`Page ${currentPage} / ${totalPages}`}</div>
@@ -99,11 +99,11 @@ vi.mock("../../../components/pagination/Pagination.jsx", () => ({
   BackToTop: () => <div>BackToTop</div>,
 }));
 
-vi.mock("../../../components/modules/modules/ModuleCourseFilter", () => ({
+vi.mock("../../../components/Modules/Modules/ModuleCourseFilter", () => ({
   default: () => <div>CourseFilter</div>,
 }));
 
-vi.mock("../../../components/modules/modules/ModuleGrid.jsx", () => ({
+vi.mock("../../../components/Modules/Modules/ModuleGrid.jsx", () => ({
   default: ({ modules, onDelete, onEdit, onViewModule }) => (
     <div data-testid="module-grid">
       {modules.map((module) => (
@@ -118,25 +118,25 @@ vi.mock("../../../components/modules/modules/ModuleGrid.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/modules/hooks/useModuleSorting.js", () => ({
+vi.mock("../../../components/Modules/hooks/useModuleSorting.js", () => ({
   default: function UseModuleSortingMock(...args) {
     return useModuleSortingMock(...args);
   },
 }));
 
-vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
+vi.mock("../../../components/Modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-vi.mock("../../../pages/modules/MyModulesDashboard.jsx", () => ({
+vi.mock("../../../pages/Modules/MyModulesDashboard.jsx", () => ({
   default: () => <div>MyModulesDashboard</div>,
 }));
 
-vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/Modules/modulesPageHooks.js", () => ({
   useMainModuleView: (...args) => useMainModuleViewMock(...args),
 }));
 
-import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/modules/ModulesPageResults.jsx";
+import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/Modules/ModulesPageResults.jsx";
 
 function buildSorting(overrides = {}) {
   return {

@@ -158,7 +158,7 @@ vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ title, subtitle, children }) => <div><h1>{title}</h1><div>{subtitle}</div>{children}</div>,
 }));
 
-vi.mock("../../../components/pagination/Pagination", () => ({
+vi.mock("../../../components/Pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 

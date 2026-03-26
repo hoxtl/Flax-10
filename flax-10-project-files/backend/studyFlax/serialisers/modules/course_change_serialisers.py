@@ -8,6 +8,7 @@ from studyFlax.models.auth.course_change_request_model import CourseChangeReques
 
 class CourseChangeRequestSerialiser(serializers.ModelSerializer):
     """Serialiser for course change request."""
+
     user_id = serializers.IntegerField(source='user.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     first_name = serializers.CharField(source='user.first_name', read_only=True)
@@ -16,6 +17,7 @@ class CourseChangeRequestSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for course change request serialiser."""
+
         model = CourseChangeRequest
         fields = [
             'id',

@@ -8,9 +8,9 @@ import {
     formatHour,
     calculateEventStyle,
     calculateNewEndTime,
-} from '../../../components/calendar/day_view/dayViewHelpers';
+} from '../../../components/Calendar/day_view/dayViewHelpers';
 
-vi.mock('../../../components/calendar/utils/overlapUtils', () => ({
+vi.mock('../../../components/Calendar/utils/overlapUtils', () => ({
     getEventKey: vi.fn((event) => `${event.id}-${new Date(event.start_time).getTime()}-${new Date(event.end_time).getTime()}`),
     calculateEventColumns: vi.fn((events) => {
         const map = new Map();
@@ -19,7 +19,7 @@ vi.mock('../../../components/calendar/utils/overlapUtils', () => ({
     }),
 }));
 
-const { calculateEventColumns, getEventKey } = await import('../../../components/calendar/utils/overlapUtils');
+const { calculateEventColumns, getEventKey } = await import('../../../components/Calendar/utils/overlapUtils');
 
 describe('getHoursOfDay', () => {
     it('returns array of 24 hours', () => {

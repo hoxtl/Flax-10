@@ -9,6 +9,7 @@ from django.conf import settings
 
 class SocietyReport(models.Model):
     """User report raised against a society."""
+
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='reports')
     reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='society_reports_submitted')
     reason = models.TextField()
@@ -16,6 +17,7 @@ class SocietyReport(models.Model):
 
     class Meta:
         """Metadata for society report."""
+
         ordering = ['-created_at']
 
     def __str__(self):

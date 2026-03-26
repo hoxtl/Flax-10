@@ -8,6 +8,7 @@ from .user_model import User
 
 class CourseChangeRequest(models.Model):
     """Requested change to a user's recorded course."""
+
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
@@ -29,6 +30,7 @@ class CourseChangeRequest(models.Model):
 
     class Meta:
         """Metadata for course change request."""
+
         ordering = ['-created_at']
 
     def __str__(self):

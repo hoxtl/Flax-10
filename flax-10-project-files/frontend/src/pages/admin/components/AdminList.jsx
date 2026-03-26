@@ -5,6 +5,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../styles";
 import { rowAnim, stagger } from "../utils/adminMotion";
+import AdminDecisionButtons from "./AdminDecisionButtons";
 
 export function AnimatedList({ items, renderItem }) {
   return (
@@ -31,4 +32,24 @@ export function ListInfo({ children, extraMeta, meta, name }) {
 
 export function ListActions({ children }) {
   return <div className={styles.listActions}>{children}</div>;
+}
+
+function stopAndRun(event, onDecide, id, action) {
+  event.stopPropagation();
+  onDecide(id, action);
+}
+
+export function DecisionListRow({ busy, cursor, extraMeta, id, meta, name, navigate, onDecide }) {
+  return (
+    <ListRow onClick={navigate} style={{ cursor }}>
+      <ListInfo name={name} meta={meta} extraMeta={extraMeta} />
+      <ListActions>
+        <AdminDecisionButtons
+          busy={busy === id}
+          onApprove={(event) => stopAndRun(event, onDecide, id, "approve")}
+          onReject={(event) => stopAndRun(event, onDecide, id, "reject")}
+        />
+      </ListActions>
+    </ListRow>
+  );
 }

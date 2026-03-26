@@ -15,6 +15,7 @@ User = get_user_model()
 
 class ToggleSubscriptionViewTest(TestCase):
     """Tests toggle subscription view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="subuser", email="sub@test.com", password="pass")

@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock CSS modules
-vi.mock('../../pages/societies/SocietiesPage.module.css', () => ({ default: {} }));
+vi.mock('../../pages/Societies/SocietiesPage.module.css', () => ({ default: {} }));
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -18,7 +18,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock Skeletons
-vi.mock('../../pages/societies/SocietySkeletons', () => ({
+vi.mock('../../pages/Societies/SocietySkeletons', () => ({
     SocietiesSkeleton: () => <div>Loading...</div>
 }));
 
@@ -31,12 +31,12 @@ const mockUseSocieties = {
     updateSocietyLocally: vi.fn(),
 };
 
-vi.mock('../../components/society/hooks/useSocieties', () => ({
+vi.mock('../../components/Society/hooks/useSocieties', () => ({
     useSocieties: () => mockUseSocieties,
 }));
 
 // Mock child components
-vi.mock('../../pages/societies/AllSocieties', () => ({
+vi.mock('../../pages/Societies/AllSocieties', () => ({
     default: ({ onBack, onSelect, societies, onReport, onUnreport }) => (
         <div data-testid="all-societies">
             <button onClick={onBack}>BackFromAll</button>
@@ -51,7 +51,7 @@ vi.mock('../../pages/societies/AllSocieties', () => ({
     ),
 }));
 
-vi.mock('../../pages/societies/SocietySection', () => ({
+vi.mock('../../pages/Societies/SocietySection', () => ({
     default: ({ title, type, onAction, onSelect, items, onReport }) => {
         const titleStr = title || (type === 'admin' ? 'Managed Societies' : 'My Memberships');
         return (
@@ -69,7 +69,7 @@ vi.mock('../../pages/societies/SocietySection', () => ({
     },
 }));
 
-vi.mock('../../pages/societies/SocietyDetailPage', () => ({
+vi.mock('../../pages/Societies/SocietyDetailPage', () => ({
     default: ({ societyId, onBack }) => (
         <div data-testid="society-detail">
             <span>{societyId}</span>
@@ -78,7 +78,7 @@ vi.mock('../../pages/societies/SocietyDetailPage', () => ({
     ),
 }));
 
-vi.mock('../../components/society/CreateSocietyModal', () => ({
+vi.mock('../../components/Society/CreateSocietyModal', () => ({
     default: ({ onClose, onCreate }) => (
         <div data-testid="create-society-modal">
             <button onClick={onClose}>CloseCreate</button>
@@ -87,7 +87,7 @@ vi.mock('../../components/society/CreateSocietyModal', () => ({
     ),
 }));
 
-vi.mock('../../components/society/society_detail/ReportSocietyModal', () => ({
+vi.mock('../../components/Society/society_detail/ReportSocietyModal', () => ({
     default: ({ society, onClose, onReportSuccess }) => (
         <div data-testid="report-modal">
             <span>Report: {society?.name}</span>
@@ -107,7 +107,7 @@ vi.mock('../../api/societyApi', () => ({
     unreportSociety: (...args) => unreportSocietyMock(...args),
 }));
 
-import SocietiesPage from '../../pages/societies/SocietiesPage';
+import SocietiesPage from '../../pages/Societies/SocietiesPage';
 
 function renderWithRouter(ui) {
     return render(<MemoryRouter>{ui}</MemoryRouter>);

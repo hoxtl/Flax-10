@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { TimerProvider, persistTimerTask, useTimerContext } from '../../context/TimerContext';
 
-vi.mock('../../components/timer/hooks/useTimerLogic', () => ({
+vi.mock('../../components/Timer/hooks/useTimerLogic', () => ({
     useTimerLogic: vi.fn(() => ({
         isActive: false,
         isPaused: false,

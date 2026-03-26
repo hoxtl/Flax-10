@@ -24,6 +24,7 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 class SuggestionViewTests(BaseTestCase):
     """Tests suggestion view."""
+
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)

@@ -7,7 +7,7 @@ vi.mock("../../../api/client", () => ({
   fetchApi: (...args) => fetchApiMock(...args),
 }));
 
-import { useProfileHeaderState } from "../../../pages/profile/useProfileHeaderState";
+import { useProfileHeaderState } from "../../../pages/Profile/useProfileHeaderState";
 
 describe("useProfileHeaderState", () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useMonthDayDrop } from '../../components/calendar/hooks/useMonthDayDrop';
+import { useMonthDayDrop } from '../../components/Calendar/hooks/useMonthDayDrop';
 
 const useCalendarMock = vi.fn();
 const useConfirmMock = vi.fn();
@@ -12,12 +12,12 @@ const hasRecurrenceMock = vi.fn();
 
 vi.mock('../../context/CalendarContext', () => ({ useCalendar: () => useCalendarMock() }));
 vi.mock('../../context/ConfirmContext', () => ({ useConfirm: () => useConfirmMock() }));
-vi.mock('../../components/calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
-vi.mock('../../components/calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
-vi.mock('../../components/calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
+vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
+vi.mock('../../components/Calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
+vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
 const isReadOnlyEventMock = vi.fn(() => false);
 
-vi.mock('../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../components/Calendar/utils/eventUtils', () => ({
   isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),
@@ -52,23 +52,31 @@ describe('useMonthDayDrop', () => {
     });
   });
 
+  function renderMonthDayDrop(date = '2026-03-10T00:00:00Z') {
+    return renderHook(() => useMonthDayDrop(new Date(date)));
+  }
+
+  async function dropEvent(data, type = 'EVENT') {
+    await onDrop({ type, data });
+  }
+
   it('returns drop props and ignores non-event payloads', async () => {
-    const { result } = renderHook(() => useMonthDayDrop(new Date('2026-03-09T00:00:00Z')));
+    const { result } = renderMonthDayDrop('2026-03-09T00:00:00Z');
 
     expect(result.current.dropProps).toEqual({ 'data-drop': true });
     expect(result.current.isOver).toBe(false);
 
-    await onDrop({ type: 'NOT_EVENT', data: {} });
+    await dropEvent({}, 'NOT_EVENT');
     expect(editEvent).not.toHaveBeenCalled();
     expect(addEvent).not.toHaveBeenCalled();
   });
 
   it('moves non-recurring event when overlap check passes', async () => {
     hasRecurrenceMock.mockReturnValue(false);
-    renderHook(() => useMonthDayDrop(new Date('2026-03-10T00:00:00Z')));
+    renderMonthDayDrop();
 
     const event = { id: 42, start_time: '2026-03-09T08:30:00Z', end_time: '2026-03-09T09:30:00Z' };
-    await onDrop({ type: 'EVENT', data: event });
+    await dropEvent(event);
 
     expect(checkOverlapWithConfirmMock).toHaveBeenCalled();
     expect(editEvent).toHaveBeenCalledWith(42, expect.objectContaining({
@@ -79,18 +87,18 @@ describe('useMonthDayDrop', () => {
 
   it('does not edit event when overlap check fails', async () => {
     checkOverlapWithConfirmMock.mockResolvedValue(false);
-    renderHook(() => useMonthDayDrop(new Date('2026-03-10T00:00:00Z')));
+    renderMonthDayDrop();
 
-    await onDrop({ type: 'EVENT', data: { id: 12, start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' } });
+    await dropEvent({ id: 12, start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' });
     expect(editEvent).not.toHaveBeenCalled();
   });
 
   it('moves all recurring events when confirm resolves true', async () => {
     hasRecurrenceMock.mockReturnValue(true);
     confirmFn.mockResolvedValue(true);
-    renderHook(() => useMonthDayDrop(new Date('2026-03-10T00:00:00Z')));
+    renderMonthDayDrop();
 
-    await onDrop({ type: 'EVENT', data: { id: '5-occ', start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' } });
+    await dropEvent({ id: '5-occ', start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' });
 
     expect(confirmFn).toHaveBeenCalled();
     expect(editEvent).toHaveBeenCalledWith(5, expect.any(Object));
@@ -101,7 +109,7 @@ describe('useMonthDayDrop', () => {
   it('moves only one occurrence for recurring event when confirm resolves false', async () => {
     hasRecurrenceMock.mockReturnValue(true);
     confirmFn.mockResolvedValue(false);
-    renderHook(() => useMonthDayDrop(new Date('2026-03-10T00:00:00Z')));
+    renderMonthDayDrop();
 
     const recurring = {
       id: '7-occ',
@@ -112,7 +120,7 @@ describe('useMonthDayDrop', () => {
       end_time: '2026-03-09T09:00:00Z',
     };
 
-    await onDrop({ type: 'EVENT', data: recurring });
+    await dropEvent(recurring);
 
     expect(addException).toHaveBeenCalledWith(7, '2026-03-09');
     expect(addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'Lecture', location: 'room' }));

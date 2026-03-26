@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import OnboardingModal from '../../../components/onboarding/OnboardingModal';
+import OnboardingModal from '../../../components/Onboarding/OnboardingModal';
 
 vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...props }) => <div {...props}>{children}</div> },
@@ -8,15 +8,15 @@ vi.mock('framer-motion', () => ({
 }));
 
 const useOnboardingMock = vi.hoisted(() => vi.fn());
-vi.mock('../../../components/onboarding/hooks/useOnboarding', () => ({
+vi.mock('../../../components/Onboarding/hooks/useOnboarding', () => ({
   default: useOnboardingMock,
 }));
 
-vi.mock('../../../components/onboarding/OnboardingForm', () => ({
+vi.mock('../../../components/Onboarding/OnboardingForm', () => ({
   default: () => <div>Mocked Form</div>,
 }));
 
-vi.mock('../../../components/onboarding/SuccessScreen', () => ({
+vi.mock('../../../components/Onboarding/SuccessScreen', () => ({
   default: ({ major }) => <div>{`Success ${major}`}</div>,
 }));
 

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Settings from "../../pages/settings/Settings";
+import Settings from "../../pages/Settings/Settings";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../components/settings/SettingsUI", () => ({
+vi.mock("../../components/Settings/SettingsUI", () => ({
   SettingsSidebar: ({ activeTab, onChange }) => (
     <div data-testid="settings-tabs">
       <button onClick={() => onChange("account")}>Account</button>
@@ -30,19 +30,19 @@ vi.mock("../../components/settings/SettingsUI", () => ({
     message ? <div data-testid="error-banner">{message}</div> : null,
 }));
 
-vi.mock("../../components/settings/AccountForm", () => ({
+vi.mock("../../components/Settings/AccountForm", () => ({
   default: ({ onSave, isSaving }) => (
     <div data-testid="account-form">AccountForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/SecurityForm", () => ({
+vi.mock("../../components/Settings/SecurityForm", () => ({
   default: ({ onSave, isSaving, error }) => (
     <div data-testid="security-form">SecurityForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/PreferencesPanel", () => ({
+vi.mock("../../components/Settings/PreferencesPanel", () => ({
   default: ({ activeSubTab }) => {
     const labels = {
       sleep: "sleep-schedule-panel",
@@ -60,19 +60,19 @@ vi.mock("../../components/settings/PreferencesPanel", () => ({
   },
 }));
 
-vi.mock("../../components/settings/HomeAddressForm", () => ({
+vi.mock("../../components/Settings/HomeAddressForm", () => ({
   default: ({ onSave, isSaving, error }) => (
     <div data-testid="home-address-form">HomeAddressForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/SleepSchedulePanel", () => ({
+vi.mock("../../components/Settings/SleepSchedulePanel", () => ({
   SleepSchedulePanel: ({ onSave, isSaving }) => (
     <div data-testid="sleep-schedule-panel">SleepSchedulePanel</div>
   ),
 }));
 
-vi.mock("../../components/settings/hooks/useSettingsHandlers", () => ({
+vi.mock("../../components/Settings/hooks/useSettingsHandlers", () => ({
   default: vi.fn(() => ({
     isSaving: false,
     passwordError: null,
@@ -89,7 +89,7 @@ vi.mock("../../components/settings/hooks/useSettingsHandlers", () => ({
   })),
 }));
 
-import useSettingsHandlers from "../../components/settings/hooks/useSettingsHandlers";
+import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
 
 describe("Settings", () => {
   beforeEach(() => {

@@ -1,15 +1,13 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { DraggableEvent } from '../../../components/calendar/DraggableEvent';
-import * as useDragDrop from '../../../components/calendar/hooks/useDragDrop';
-import * as useEventResizeModule from '../../../components/calendar/hooks/useEventResize';
+import { DraggableEvent } from '../../../components/Calendar/DraggableEvent';
+import * as useDragDrop from '../../../components/Calendar/hooks/useDragDrop';
+import * as useEventResizeModule from '../../../components/Calendar/hooks/useEventResize';
 import * as ConfirmContextModule from '../../../context/ConfirmContext';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 
-// ---------------------------------------------------------------------------
 // Hoisted mocks
-// ---------------------------------------------------------------------------
 
 const { mockOpenPopup, mockOpenModal, mockOpenDelete, mockConfirm } = vi.hoisted(() => ({
     mockOpenPopup: vi.fn(),
@@ -18,11 +16,11 @@ const { mockOpenPopup, mockOpenModal, mockOpenDelete, mockConfirm } = vi.hoisted
     mockConfirm: vi.fn(() => Promise.resolve(null)),
 }));
 
-vi.mock('../../../components/calendar/hooks/useDragDrop', () => ({
+vi.mock('../../../components/Calendar/hooks/useDragDrop', () => ({
     useDrag: vi.fn(() => ({ dragProps: {}, isDragging: false })),
 }));
 
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
     useEventActions: vi.fn(() => ({
         editEvent: vi.fn(),
         removeEvent: vi.fn(),
@@ -51,7 +49,7 @@ vi.mock('../../../context/ConfirmContext', () => ({
     useConfirm: vi.fn(() => mockConfirm),
 }));
 
-vi.mock('../../../components/calendar/hooks/useEventResize', () => ({
+vi.mock('../../../components/Calendar/hooks/useEventResize', () => ({
     useEventResize: vi.fn(() => ({
         handleResizeStart: vi.fn(),
         isResizing: false,
@@ -59,11 +57,11 @@ vi.mock('../../../components/calendar/hooks/useEventResize', () => ({
     })),
 }));
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
     formatTime: vi.fn((d) => d.toTimeString().slice(0, 5)),
 }));
 
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../components/Calendar/utils/eventUtils', () => ({
     getEventType: vi.fn((event) => event.source || 'personal'),
     hasRecurrence: vi.fn(() => false),
 }));
@@ -75,12 +73,12 @@ vi.mock('../../../context/TagContext', () => ({
     })),
 }));
 
-vi.mock('../../../components/calendar/utils/eventStyleUtils', () => ({
+vi.mock('../../../components/Calendar/utils/eventStyleUtils', () => ({
     getEventTheme: vi.fn(() => ({ color: '#3b82f6', background: '#dbeafe' })),
 }));
 
 // CSS module mock
-vi.mock('../../../pages/tasks/components/TaskCardContextMenu.module.css', () => ({
+vi.mock('../../../pages/Tasks/components/TaskCardContextMenu.module.css', () => ({
     default: {
         ctxMenu: 'ctxMenu',
         ctxItem: 'ctxItem',
@@ -89,11 +87,9 @@ vi.mock('../../../pages/tasks/components/TaskCardContextMenu.module.css', () => 
     },
 }));
 
-// ---------------------------------------------------------------------------
 // Test fixtures
-// ---------------------------------------------------------------------------
 
-import { getEventType, hasRecurrence } from '../../../components/calendar/utils/eventUtils';
+import { getEventType, hasRecurrence } from '../../../components/Calendar/utils/eventUtils';
 
 const personalEvent = {
     id: 1,
@@ -129,9 +125,7 @@ const moduleEvent = {
     source: 'module',
 };
 
-// ---------------------------------------------------------------------------
 // Tests
-// ---------------------------------------------------------------------------
 
 describe('DraggableEvent Styles Coverage', () => {
     beforeEach(() => {
@@ -146,9 +140,7 @@ describe('DraggableEvent Styles Coverage', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: false });
     });
 
-    // -----------------------------------------------------------------------
     // parseWidth – different formats
-    // -----------------------------------------------------------------------
 
     it('renders correctly with percentage width string', () => {
         render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '75%' }} />);
@@ -170,9 +162,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(screen.queryByText(/\d{2}:\d{2}/)).toBeNull();
     });
 
-    // -----------------------------------------------------------------------
     // getReadOnlyClassName – module and timetable
-    // -----------------------------------------------------------------------
 
     it('applies timetable-event class for module type', () => {
         getEventType.mockReturnValue('module');
@@ -200,9 +190,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(el.classList.contains('timetable-event')).toBe(false);
     });
 
-    // -----------------------------------------------------------------------
     // EventContent isCompact branch
-    // -----------------------------------------------------------------------
 
     it('adds compact class to event-content when height < 28', () => {
         const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '20px', width: '100%' }} />);
@@ -215,9 +203,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(container.querySelector('.event-content.compact')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // EventCard resizePreview overrides height
-    // -----------------------------------------------------------------------
 
     it('uses resizePreview for event height when set', () => {
         vi.mocked(useEventResizeModule.useEventResize).mockReturnValue({ handleResizeStart: vi.fn(), isResizing: true, resizePreview: 120 });
@@ -236,9 +222,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(container.querySelector('.resizing')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // Society name shown only when showDetails is true
-    // -----------------------------------------------------------------------
 
     it('shows society name when height >= 30 and width is sufficient', () => {
         getEventType.mockReturnValue('society');
@@ -252,9 +236,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(screen.queryByText('Chess Club')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // readOnly prop forces ReadOnlyEvent even for personal events
-    // -----------------------------------------------------------------------
 
     it('ReadOnlyEvent has no resize-handle even for personal events when readOnly', () => {
         const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} readOnly={true} />);
@@ -268,9 +250,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(mockOpenPopup).toHaveBeenCalledWith(societyEvent, expect.anything(), true);
     });
 
-    // -----------------------------------------------------------------------
     // dragging class applied while isDragging
-    // -----------------------------------------------------------------------
 
     it('applies dragging class when isDragging is true', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: true });

@@ -27,15 +27,15 @@ import {
   groupedCourses,
   normaliseCourseRequest,
   setCachedPendingRequest,
-} from "../../../components/settings/account/accountCourseRequests";
-import { getInitialAccountData, hasAccountChanges, YEAR_OPTIONS } from "../../../components/settings/account/accountFormConfig";
-import useAccountFormState from "../../../components/settings/account/useAccountFormState";
-import useCourseRequestFeedback from "../../../components/settings/account/useCourseRequestFeedback";
+} from "../../../components/Settings/account/accountCourseRequests";
+import { getInitialAccountData, hasAccountChanges, YEAR_OPTIONS } from "../../../components/Settings/account/accountFormConfig";
+import useAccountFormState from "../../../components/Settings/account/useAccountFormState";
+import useCourseRequestFeedback from "../../../components/Settings/account/useCourseRequestFeedback";
 import {
   createAccountSubmitHandler,
   createCancelCourseRequestHandler,
   createCourseRequestSuccessHandler,
-} from "../../../components/settings/account/useCourseRequestActions";
+} from "../../../components/Settings/account/useCourseRequestActions";
 
 const defaultProfile = {
   first_name: "Alice",

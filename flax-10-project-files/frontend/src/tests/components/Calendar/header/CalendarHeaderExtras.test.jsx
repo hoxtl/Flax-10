@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { MobileDateStrip } from "../../../../components/calendar/header/MobileDateStrip";
-import { SearchButton } from "../../../../components/calendar/header/SearchButton";
-import { ViewModeButton } from "../../../../components/calendar/header/ViewModeButton";
-import { ScheduleManagerButton } from "../../../../components/calendar/header/schedule_manager/ScheduleManagerButton";
+import { MobileDateStrip } from "../../../../components/Calendar/header/MobileDateStrip";
+import { SearchButton } from "../../../../components/Calendar/header/SearchButton";
+import { ViewModeButton } from "../../../../components/Calendar/header/ViewModeButton";
+import { ScheduleManagerButton } from "../../../../components/Calendar/header/schedule_manager/ScheduleManagerButton";
 
 const mockToast = vi.fn();
 const mockEditEvent = vi.fn();
@@ -12,7 +12,7 @@ const mockBuildPlan = vi.fn();
 const mockApplyPlan = vi.fn();
 const mockToastMessage = vi.fn();
 
-vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
+vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
   getStartOfWeek: vi.fn(() => new Date("2026-03-23T00:00:00.000Z")),
   addDays: vi.fn((date, days) => {
     const next = new Date(date);
@@ -62,7 +62,7 @@ vi.mock("../../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/calendar/header/schedule_manager/ScheduleManagerDialog", () => ({
+vi.mock("../../../../components/Calendar/header/schedule_manager/ScheduleManagerDialog", () => ({
   ScheduleManagerDialog: ({ open, onClose }) => (
     <div>
       <span>{open ? "dialog-open" : "dialog-closed"}</span>
@@ -82,7 +82,7 @@ vi.mock("../../../../context/ToastContext", () => ({
   useToast: () => mockToast,
 }));
 
-vi.mock("../../../../components/calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent: mockEditEvent }),
   useCalendarEvents: () => ({ loadEvents: vi.fn() }),
 }));

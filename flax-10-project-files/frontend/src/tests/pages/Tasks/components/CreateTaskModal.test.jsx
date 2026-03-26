@@ -7,7 +7,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 import { createFnMap } from "../../../utils/testBuilderUtils";
 
-import CreateTaskModal from "../../../../pages/tasks/components/CreateTaskModal";
+import CreateTaskModal from "../../../../pages/Tasks/components/CreateTaskModal";
 
 const hookMock = vi.hoisted(() => vi.fn());
 const createTaskModalDefaults = {
@@ -23,7 +23,7 @@ const createTaskModalDefaults = {
   isReadingList: false,
 };
 
-vi.mock("../../../../pages/tasks/hooks/useCreateTaskModal", () => ({
+vi.mock("../../../../pages/Tasks/hooks/useCreateTaskModal", () => ({
   useCreateTaskModal: hookMock,
 }));
 

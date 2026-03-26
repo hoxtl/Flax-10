@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../components/calendar/event_modal/components/LocationAutoComplete", () => ({
+vi.mock("../../../components/Calendar/event_modal/components/LocationAutoComplete", () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input
       aria-label="Address"
@@ -16,16 +16,16 @@ vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message, variant }) => <div>{variant}:{message}</div>,
 }));
 
-vi.mock("../../../components/settings/SettingsContextCard", () => ({
+vi.mock("../../../components/Settings/SettingsContextCard", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
-vi.mock("../../../components/settings/SettingsUI", () => ({
+vi.mock("../../../components/Settings/SettingsUI", () => ({
   SectionHeader: ({ title }) => <div>{title}</div>,
   SubmitButton: ({ label }) => <button type="submit">{label}</button>,
 }));
 
-import HomeAddressFormLayout from "../../../components/settings/HomeAddressFormLayout";
+import HomeAddressFormLayout from "../../../components/Settings/HomeAddressFormLayout";
 
 describe("HomeAddressFormLayout", () => {
   it("renders without an inline alert when there is no error", () => {

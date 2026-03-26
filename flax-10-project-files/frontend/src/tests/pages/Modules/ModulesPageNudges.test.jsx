@@ -6,11 +6,11 @@ const getDayCountMock = vi.fn();
 const addDeadlineAddedMock = vi.fn();
 const addReadingAddedMock = vi.fn();
 
-vi.mock("../../../components/modules/deadlines/upcomingDeadlinesUtils", () => ({
+vi.mock("../../../components/Modules/Deadlines/upcomingDeadlinesUtils", () => ({
   getDayCount: (...args) => getDayCountMock(...args),
 }));
 
-vi.mock("../../../components/modules/shared/taskButtons.jsx", () => ({
+vi.mock("../../../components/Modules/shared/taskButtons.jsx", () => ({
   AddDeadlineToTasksButton: ({ deadline, onAdded }) => (
     <button onClick={() => { addDeadlineAddedMock(deadline.id); onAdded(deadline.id); }}>
       Add deadline
@@ -23,7 +23,7 @@ vi.mock("../../../components/modules/shared/taskButtons.jsx", () => ({
   ),
 }));
 
-import SmartNudge from "../../../pages/modules/SmartNudge";
+import SmartNudge from "../../../pages/Modules/SmartNudge";
 
 describe("ModulesPageNudges", () => {
   beforeEach(() => {

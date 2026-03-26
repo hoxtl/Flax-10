@@ -4,7 +4,7 @@
  */
 
 import styles from "./CategorySelector.module.css";
-import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/societies/societyFilters";
+import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
 import AnimatedDropdown from "../common/animated_dropdown";
 
 const CATEGORY_DROPDOWN_OPTIONS = [

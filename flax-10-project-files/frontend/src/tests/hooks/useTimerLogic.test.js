@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useTimerLogic } from '../../components/timer/hooks/useTimerLogic';
-import * as historyUtils from '../../components/timer/utils/historyUtils';
+import { useTimerLogic } from '../../components/Timer/hooks/useTimerLogic';
+import * as historyUtils from '../../components/Timer/utils/historyUtils';
 
-vi.mock('../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
     useNotify: () => vi.fn(),
 }));
 

@@ -18,6 +18,7 @@ def _mock_session(end_time, duration):
 
 class ComputeAverageDurationTest(TestCase):
     """Tests compute average duration."""
+
     def test_empty_sessions_returns_zero(self):
         from studyFlax.views.analytics.session_analytics_service import compute_average_duration
         self.assertEqual(compute_average_duration([]), 0)
@@ -35,6 +36,7 @@ class ComputeAverageDurationTest(TestCase):
 
 class ComputeRecentActiveDaysTest(TestCase):
     """Tests compute recent active days."""
+
     def test_session_within_window_counts(self):
         from studyFlax.views.analytics.session_analytics_service import compute_recent_active_days
         s = _mock_session(timezone.now() - timedelta(days=1), 60)
@@ -54,6 +56,7 @@ class ComputeRecentActiveDaysTest(TestCase):
 
 class ComputeActiveDaysTest(TestCase):
     """Tests compute active days."""
+
     def test_multiple_sessions_same_day_count_once(self):
         from studyFlax.views.analytics.session_analytics_service import compute_active_days
         noon = timezone.now().replace(hour=12, minute=0, second=0, microsecond=0)
@@ -73,6 +76,7 @@ class ComputeActiveDaysTest(TestCase):
 
 class FmtHourTest(TestCase):
     """Tests fmt hour."""
+
     def test_midnight_formats_as_12am(self):
         from studyFlax.views.analytics.session_analytics_service import fmt_hour
         self.assertEqual(fmt_hour(0), '12am')

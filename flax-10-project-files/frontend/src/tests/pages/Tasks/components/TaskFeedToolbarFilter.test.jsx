@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
-import ToolbarFilterPanel from "../../../../pages/tasks/components/TaskFeedToolbarFilter";
+import ToolbarFilterPanel from "../../../../pages/Tasks/components/TaskFeedToolbarFilter";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -10,7 +10,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../../pages/tasks/components/TaskFilterPanel", () => ({
+vi.mock("../../../../pages/Tasks/components/TaskFilterPanel", () => ({
   default: () => <div data-testid="task-filter-panel" />,
 }));
 

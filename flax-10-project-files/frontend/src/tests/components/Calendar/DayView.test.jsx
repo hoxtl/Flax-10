@@ -9,49 +9,49 @@ vi.mock('../../../context/CalendarContext', () => ({
     useEventPopup: vi.fn(() => ({ openPopup: vi.fn() })),
 }));
 
-vi.mock('../../../components/calendar/hooks/useAutoScroll', () => ({
+vi.mock('../../../components/Calendar/hooks/useAutoScroll', () => ({
     useAutoScroll: vi.fn(() => ({ scrollRef: { current: null } })),
 }));
 
-vi.mock('../../../components/calendar/week_view/components/AllDayRow', () => ({
+vi.mock('../../../components/Calendar/week_view/components/AllDayRow', () => ({
     AllDayRow: ({ days, events }) => (
         <div data-testid="all-day-row" data-days={days.length} data-events={events.length} />
     ),
 }));
 
-vi.mock('../../../components/calendar/DraggableEvent', () => ({
+vi.mock('../../../components/Calendar/DraggableEvent', () => ({
     DraggableEvent: ({ event, readOnly }) => (
         <div data-testid="draggable-event" data-readonly={String(readOnly)}>{event.title}</div>
     ),
 }));
 
-vi.mock('../../../components/calendar/day_view/dayViewHelpers', () => ({
+vi.mock('../../../components/Calendar/day_view/dayViewHelpers', () => ({
     getHoursOfDay: vi.fn(() => [8, 9, 10]),
     calculateEventStyle: vi.fn(() => ({ top: 0, height: 60 })),
     formatHour: vi.fn(h => `${h}:00`),
 }));
 
-vi.mock('../../../components/calendar/day_view/TimeSlot', () => ({
+vi.mock('../../../components/Calendar/day_view/TimeSlot', () => ({
     TimeSlot: ({ hour, readOnly }) => (
         <div data-testid="time-slot" data-hour={hour} data-readonly={String(readOnly)} />
     ),
 }));
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
     overlapsDay: vi.fn(() => true),
     isSameDay: vi.fn(() => true),
 }));
 
-vi.mock('../../../components/calendar/utils/eventDisplayUtils', () => ({
+vi.mock('../../../components/Calendar/utils/eventDisplayUtils', () => ({
     shouldShowInTimeGrid: vi.fn(() => true),
     getAllDayVisualRange: vi.fn(() => ({ startCol: 1, endCol: 2 })),
 }));
 
-vi.mock('../../../components/calendar/calendarConstants', () => ({
+vi.mock('../../../components/Calendar/calendarConstants', () => ({
     SLOT_HEIGHT: 60,
 }));
 
-import { DayView } from '../../../components/calendar/day_view/DayView';
+import { DayView } from '../../../components/Calendar/day_view/DayView';
 
 const date = new Date('2024-03-04');
 

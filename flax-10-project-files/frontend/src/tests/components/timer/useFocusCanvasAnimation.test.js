@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, render } from '@testing-library/react';
 import React from 'react';
-import { useFocusCanvasAnimation } from '../../../components/timer/focus_animation/useFocusCanvasAnimation';
+import { useFocusCanvasAnimation } from '../../../components/Timer/focus_animation/useFocusCanvasAnimation';
 
 // Mock treePixels
-vi.mock('../../../components/timer/focus_animation/treePixels', () => ({
+vi.mock('../../../components/Timer/focus_animation/treePixels', () => ({
     BRANCH_TIPS: [
         { x: 10, y: 20 },
         { x: 30, y: 40 },
@@ -15,7 +15,7 @@ vi.mock('../../../components/timer/focus_animation/treePixels', () => ({
 }));
 
 // Mock focusCanvasColors.json
-vi.mock('../../../components/timer/focus_animation/focusCanvasColors.json', () => ({
+vi.mock('../../../components/Timer/focus_animation/focusCanvasColors.json', () => ({
     default: {
         glowBreakBase: '100,200,100',
         glowWorkBase: '50,100,200',
@@ -224,8 +224,8 @@ describe('useFocusCanvasAnimation', () => {
     });
 
     it('draws sparkles (scale >= 0.05) and keeps leaves alive (life > 0)', () => {
-        // Set phase to PI/2 so sin(PI/2) = 1.0 >= 0.05 → sparkle is drawn
-        // Set random to 0.5 so leaf.life starts at 0.5 → won't drop to 0 in one frame
+        // Set phase to PI/2 so sin(PI/2) = 1.0 >= 0.05  -  sparkle is drawn
+        // Set random to 0.5 so leaf.life starts at 0.5  -  won't drop to 0 in one frame
         const randomSpy = vi.spyOn(Math, 'random').mockImplementation(() => 0.5);
 
         function TestComp() {
@@ -245,7 +245,7 @@ describe('useFocusCanvasAnimation', () => {
     });
 
     it('drawGlow fallback skips fillRect when it is not available on ctx', () => {
-        // createRadialGradient is absent → fallback path; fillRect also absent → skips fillRect
+        // createRadialGradient is absent  -  fallback path; fillRect also absent  -  skips fillRect
         const ctxNoGradientNoFillRect = { ...mockCtx, createRadialGradient: undefined, fillRect: undefined };
         HTMLCanvasElement.prototype.getContext = vi.fn(() => ctxNoGradientNoFillRect);
 

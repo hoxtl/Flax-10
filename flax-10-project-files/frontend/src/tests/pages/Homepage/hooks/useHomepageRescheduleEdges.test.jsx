@@ -3,17 +3,54 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const extractBaseEventIdMock = vi.fn((id) => id);
 const formatTimeMock = vi.fn(() => "10:00");
 const getNextFreeSlotTodayMock = vi.fn(() => null);
-vi.mock("../../../../pages/homepage/utils/index", () => ({
-  formatTime: (...a) => formatTimeMock(...a), getAllFreeWindowsToday: vi.fn(() => []), getNextFreeSlotToday: (...a) => getNextFreeSlotTodayMock(...a), isRoutineEvent: vi.fn(() => false),
+
+vi.mock("../../../../pages/Homepage/utils/index", () => ({
+  formatTime: (...args) => formatTimeMock(...args),
+  getAllFreeWindowsToday: vi.fn(() => []),
+  getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
+  isRoutineEvent: vi.fn(() => false),
 }));
-vi.mock("../../../../components/calendar/utils/eventUtils", () => ({ extractBaseEventId: (...a) => extractBaseEventIdMock(...a) }));
-vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => ({ applyConflictResolutionPlan: vi.fn(), buildConflictResolutionPlan: vi.fn(), buildConflictResolutionToastMessage: vi.fn() }));
-import { useHomepageReschedule } from "../../../../pages/homepage/hooks/useHomepageReschedule";
-const buildRescheduleProps = (o = {}) => ({
-  addEvent: vi.fn().mockResolvedValue(), deleteTask: vi.fn().mockResolvedValue(), editEvent: vi.fn().mockResolvedValue(), loadEvents: vi.fn().mockResolvedValue(), refetchTasks: vi.fn(), removeEvent: vi.fn().mockResolvedValue(), selectedDate: new Date("2026-03-24T09:00:00Z"), showToast: vi.fn(), sortedEvents: [], ...o,
-});
-describe("useHomepageReschedule Standard", () => {
-  beforeEach(() => vi.clearAllMocks());
+
+vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
+  extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
+}));
+
+const conflictMocks = vi.hoisted(() => ({
+  applyConflictResolutionPlan: vi.fn(),
+  buildConflictResolutionPlan: vi.fn(),
+  buildConflictResolutionToastMessage: vi.fn(),
+}));
+
+vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => conflictMocks);
+
+import { useHomepageReschedule } from "../../../../pages/Homepage/hooks/useHomepageReschedule";
+
+function buildRescheduleProps(overrides = {}) {
+  return {
+    addEvent: vi.fn().mockResolvedValue(undefined),
+    deleteTask: vi.fn().mockResolvedValue(undefined),
+    editEvent: vi.fn().mockResolvedValue(undefined),
+    loadEvents: vi.fn().mockResolvedValue(undefined),
+    refetchTasks: vi.fn(),
+    removeEvent: vi.fn().mockResolvedValue(undefined),
+    selectedDate: new Date("2026-03-24T09:00:00Z"),
+    showToast: vi.fn(),
+    sortedEvents: [],
+    ...overrides,
+  };
+}
+
+describe("useHomepageReschedule extra branches", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    conflictMocks.buildConflictResolutionPlan.mockReturnValue({
+      operations: [{ event: { id: 1, title: "Office hour" } }],
+      unresolved: [],
+    });
+    conflictMocks.buildConflictResolutionToastMessage.mockReturnValue("Cleared 1 conflict.");
+    conflictMocks.applyConflictResolutionPlan.mockResolvedValue(undefined);
+  });
+
   it("shows error toast when rescheduleTomorrow fails", async () => {
     const props = buildRescheduleProps({ addEvent: vi.fn().mockRejectedValue(new Error("n")) });
     const { result } = renderHook(() => useHomepageReschedule(props));

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
-import TaskCardMeta from "../../../../pages/tasks/components/TaskCardMeta";
+import TaskCardMeta from "../../../../pages/Tasks/components/TaskCardMeta";
 
 function renderMeta(ui) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);

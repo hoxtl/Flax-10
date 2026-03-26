@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PlanFreeRow } from '../../../../pages/homepage/components/mini_timeline/PlanFreeRow';
+import { PlanFreeRow } from '../../../../pages/Homepage/components/mini_timeline/PlanFreeRow';
 
 const mockStyles = new Proxy({}, { get: (_, key) => key });
 

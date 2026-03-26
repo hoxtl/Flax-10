@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Bell, BellOff } from "lucide-react";
 import Badge from "../../common/Badge/Badge";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
+import LocationLink from "../../common/location_link/LocationLink";
 import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
@@ -18,12 +19,25 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
         <div className={styles.info}>
             <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
             <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
+            {society.location && <LocationRow location={society.location} />}
             <Stats society={society} onViewMembers={onViewMembers}
                 isSubscribed={isSubscribed} onToggleSubscription={onToggleSubscription} />
             {!canEdit && !society.is_admin && <SocietyInsightBanner society={society} />}
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
                 onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
         </div>
+    );
+}
+
+function LocationRow({ location }) {
+    return (
+        <LocationLink
+            location={location}
+            className={styles.locationRow}
+            iconClassName={styles.locationIcon}
+            textClassName={styles.locationText}
+            iconSize={13}
+        />
     );
 }
 

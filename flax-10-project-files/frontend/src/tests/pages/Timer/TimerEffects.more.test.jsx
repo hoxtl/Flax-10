@@ -6,7 +6,7 @@ import {
   useTimerDocumentTitle,
   useTimerShortcuts,
   useTransientFlags,
-} from "../../../pages/timer/hooks/useTimerPageEffects";
+} from "../../../pages/Timer/hooks/useTimerPageEffects";
 
 describe("timer effect extra coverage", () => {
   beforeEach(() => {

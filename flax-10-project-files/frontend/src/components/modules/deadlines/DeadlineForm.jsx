@@ -7,7 +7,7 @@ import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../uti
 import AnimatedDropdown from '../../common/animated_dropdown';
 import styles from './DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
-import { buildValidationState, failValidation, finishValidation, ModuleFormActions, ModuleFormField, requireFieldValue } from '../shared/moduleFormParts';
+import { buildValidationState, failValidation, finishValidation, ModuleFormField, ModuleFormFooter, requireFieldValue } from '../shared/moduleFormParts';
 const EMPTY_FORM = { title: '', deadline_type: 'coursework', start_due_date: '', end_due_date: '', location: '', description: '' };
 
 function Field({ label, children }) {
@@ -95,8 +95,7 @@ export default function DeadlineForm({ initial, onSubmit, onCancel }) {
             {TYPES_WITH_END_DATE.includes(form.deadline_type) && <EndDateField value={form.end_due_date} onChange={onChange} />}
             {TYPES_WITH_LOCATION.includes(form.deadline_type) && <LocationField value={form.location} onChange={onChange} />}
             <DescriptionField value={form.description} onChange={onChange} />
-            {error && <div className={styles.error}> {error}</div>}
-            <ModuleFormActions onCancel={onCancel} isEditing={!!initial} createLabel="Add Deadline" styles={styles} />
+            <ModuleFormFooter createLabel="Add Deadline" error={error} isEditing={!!initial} onCancel={onCancel} styles={styles} />
         </form>
     );
 }

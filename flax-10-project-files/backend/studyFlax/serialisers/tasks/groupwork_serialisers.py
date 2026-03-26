@@ -35,6 +35,7 @@ def absolute_photo_url(photo_path, request):
 
 class GroupProjectSerialiser(serializers.ModelSerializer):
     """Serialiser for group project."""
+
     course_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     member_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True, default=0)
@@ -49,6 +50,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for group project serialiser."""
+
         model = GroupProject
         fields = [
             "id",
@@ -85,6 +87,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
 
 class GroupMembershipSerialiser(serializers.ModelSerializer):
     """Serialiser for group membership."""
+
     user_name = serializers.CharField(source="user.username", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
@@ -92,6 +95,7 @@ class GroupMembershipSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for group membership serialiser."""
+
         model = GroupMembership
         fields = [
             "id",

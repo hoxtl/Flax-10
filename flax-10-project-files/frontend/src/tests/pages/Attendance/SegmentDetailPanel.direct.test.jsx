@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import SegmentDetailPanel from "../../../pages/attendance/components/SegmentDetailPanel";
+import SegmentDetailPanel from "../../../pages/Attendance/components/SegmentDetailPanel";
 
-vi.mock("../../../pages/attendance/components/SegmentDetailHeader", () => ({
+vi.mock("../../../pages/Attendance/components/SegmentDetailHeader", () => ({
   default: ({ segmentLabel, count, onClose }) => (
     <div>
       <span>{segmentLabel}</span>
@@ -15,7 +15,7 @@ vi.mock("../../../pages/attendance/components/SegmentDetailHeader", () => ({
   ),
 }));
 
-vi.mock("../../../pages/attendance/components/SegmentDetailList", () => ({
+vi.mock("../../../pages/Attendance/components/SegmentDetailList", () => ({
   default: ({ events, toggling, onToggleStatus }) => (
     <div>
       <span data-testid="events-count">{events.length}</span>

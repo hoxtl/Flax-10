@@ -18,6 +18,7 @@ class EventAttendance(models.Model):
 
     class Meta:
         """Metadata for event attendance."""
+
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "event"],

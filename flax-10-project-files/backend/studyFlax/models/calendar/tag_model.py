@@ -10,6 +10,7 @@ from .category_model import Category
 
 class Tag(models.Model):
     """Custom tag for organising calendar events."""
+
     name = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

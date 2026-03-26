@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { PresetCard } from '../../../components/timer/presets/PresetCard';
+import { PresetCard } from '../../../components/Timer/presets/PresetCard';
 
-vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
   default: {
     presetListItem: 'presetListItem',
     presetListItemActive: 'presetListItemActive',
@@ -20,7 +20,7 @@ const isPresetActive = vi.fn();
 const getPresetDurationTag = vi.fn();
 const getPresetIcon = vi.fn();
 
-vi.mock('../../../components/timer/utils/presetUtils', () => ({
+vi.mock('../../../components/Timer/utils/presetUtils', () => ({
   isPresetActive: (...args) => isPresetActive(...args),
   getPresetDurationTag: (...args) => getPresetDurationTag(...args),
   getPresetIcon: (...args) => getPresetIcon(...args),

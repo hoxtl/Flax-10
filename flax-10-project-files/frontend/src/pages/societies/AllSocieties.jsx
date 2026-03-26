@@ -10,7 +10,7 @@ import { ToolbarSortControl } from "../../components/common/page_toolbar/PageToo
 import SearchBar from "../../components/common/search_bar";
 import AnimatedDropdown from "../../components/common/animated_dropdown";
 import { TagsSelector } from "../../components/common/tags_selector/TagsSelector";
-import { BackToTop } from "../../components/pagination/Pagination";
+import { BackToTop } from "../../components/Pagination/Pagination";
 import BackButton from "../../components/common/back_button/BackButton.jsx";
 import { SocietyBrowseResults } from "./SocietyBrowseResults";
 import { RATIFICATION_FILTERS, SOCIETY_CATEGORIES } from "./societyFilters";

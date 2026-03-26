@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
-import SleepBanner from '../../../pages/homepage/components/SleepBanner';
+import SleepBanner from '../../../pages/Homepage/components/SleepBanner';
 
 vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn(),
 }));
 
-vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     isDuringSleepWindow: vi.fn(),
 }));
 
 import { getUserSettings } from '../../../api/userApi';
-import { isDuringSleepWindow } from '../../../components/settings/hooks/useSleepWarning';
+import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
 
 describe('SleepBanner', () => {
     beforeEach(() => {

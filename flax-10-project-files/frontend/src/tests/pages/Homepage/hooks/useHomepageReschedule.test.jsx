@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useHomepageReschedule } from "../../../../pages/homepage/hooks/useHomepageReschedule";
+import { useHomepageReschedule } from "../../../../pages/Homepage/hooks/useHomepageReschedule";
 
 const conflictMocks = vi.hoisted(() => ({
   applyConflictResolutionPlan: vi.fn(),
@@ -9,14 +9,14 @@ const conflictMocks = vi.hoisted(() => ({
   buildConflictResolutionToastMessage: vi.fn(),
 }));
 
-vi.mock("../../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../../pages/Homepage/utils/index", () => ({
   formatTime: vi.fn(() => "09:00"),
   getAllFreeWindowsToday: vi.fn(() => []),
   getNextFreeSlotToday: vi.fn(() => null),
   isRoutineEvent: vi.fn(() => false),
 }));
 
-vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
+vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => id),
 }));
 

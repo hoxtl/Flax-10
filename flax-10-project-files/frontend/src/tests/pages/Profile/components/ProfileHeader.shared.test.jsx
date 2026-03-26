@@ -2,12 +2,12 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../../pages/profile/utils/profileHelpers", () => ({
+vi.mock("../../../../pages/Profile/utils/profileHelpers", () => ({
   buildInitials: () => "AB",
   buildFullName: (user) => user?.name || `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "Guest",
 }));
 
-vi.mock("../../../../components/social/ShareButton", () => ({
+vi.mock("../../../../components/Social/ShareButton", () => ({
   default: ({ onToggle }) => <button data-testid="share-toggle" onClick={() => onToggle?.(true)}>Share</button>,
 }));
 
@@ -19,7 +19,7 @@ vi.mock("../../../../utils/tutorPhotoFallback", () => ({
   getResolvedUserPhoto: (user) => user?.profile_photo_url || "",
 }));
 
-import ProfileHeader from "../../../../pages/profile/components/ProfileHeader";
+import ProfileHeader from "../../../../pages/Profile/components/ProfileHeader";
 
 const handlers = {
   onEditProfile: vi.fn(),

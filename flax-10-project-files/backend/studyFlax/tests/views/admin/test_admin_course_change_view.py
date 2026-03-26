@@ -15,6 +15,7 @@ from studyFlax.tests.helpers.test_model_builders import make_user, make_superuse
 
 class CourseChangeRequestTest(TestCase):
     """Tests course change request."""
+
     def setUp(self):
         self.admin = make_superuser()
         self.user = make_user('cc_user')
@@ -150,6 +151,7 @@ class CourseChangeRequestTest(TestCase):
 
 class CourseChangeServiceUnitTest(TestCase):
     """Tests course change service unit."""
+
     def setUp(self):
         self.user = make_user('svc_user')
 

@@ -7,9 +7,9 @@ const mockDragUtils = vi.hoisted(() => ({
     handleDragOverEffect: vi.fn(),
 }));
 
-vi.mock('../../components/calendar/utils/dragUtils', () => mockDragUtils);
+vi.mock('../../components/Calendar/utils/dragUtils', () => mockDragUtils);
 
-import { useDrag, useDrop } from '../../components/calendar/hooks/useDragDrop';
+import { useDrag, useDrop } from '../../components/Calendar/hooks/useDragDrop';
 
 describe('useDrag', () => {
     beforeEach(() => {

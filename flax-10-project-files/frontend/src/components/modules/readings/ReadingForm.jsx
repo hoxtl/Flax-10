@@ -3,9 +3,9 @@
  */
 
 import {useState} from 'react';
-import styles from '../deadlines/DeadlineForm.module.css';
+import styles from '../Deadlines/DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
-import { buildValidationState, failValidation, ModuleFormActions, ModuleFormField, requireFieldValue } from '../shared/moduleFormParts';
+import { buildValidationState, failValidation, ModuleFormField, ModuleFormFooter, requireFieldValue } from '../shared/moduleFormParts';
 
 const EMPTY_FORM = { title: '', chapter: '', start_page: '', end_page:'', deadline: '', estimated_minutes: '',};
 
@@ -136,8 +136,7 @@ export default function ReadingForm({ initial, onSubmit, onCancel }) {
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
             <ReadingFormFields form={form} onChange={onChange} />
-            {error && <div className={styles.error}>{error}</div>}
-            <ModuleFormActions onCancel={onCancel} isEditing={!!initial} createLabel="Add Reading" styles={styles} />
+            <ModuleFormFooter createLabel="Add Reading" error={error} isEditing={!!initial} onCancel={onCancel} styles={styles} />
         </form>
     );
 }

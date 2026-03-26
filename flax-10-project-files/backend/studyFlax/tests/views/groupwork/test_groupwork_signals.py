@@ -13,6 +13,7 @@ from studyFlax.tests.helpers.test_model_builders import make_user
 
 class GroupworkSignalTests(BaseTestCase):
     """Tests groupwork signal."""
+
     def test_member_added_creates_notification(self):
         project = GroupProject.objects.create(name="Signals", owner=self.user)
         GroupMembership.objects.create(project=project, user=self.user, role="owner")

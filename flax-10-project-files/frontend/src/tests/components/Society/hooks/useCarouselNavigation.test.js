@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../../../components/society/hooks/useCarouselNavigation';
+import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../../../components/Society/hooks/useCarouselNavigation';
 
 describe('useCarouselNavigation', () => {
     it('starts at initialIndex', () => {

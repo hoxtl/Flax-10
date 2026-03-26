@@ -14,6 +14,7 @@ User = get_user_model()
 
 class LoginViewTest(TestCase):
     """Tests login view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -40,6 +41,7 @@ class LoginViewTest(TestCase):
 
 class LoginNonExistentUserTest(TestCase):
     """Tests login non existent user."""
+
     def setUp(self):
         self.client = APIClient()
         self.url = '/api/auth/login/'
@@ -51,6 +53,7 @@ class LoginNonExistentUserTest(TestCase):
 
 class LoginBannedUserTest(TestCase):
     """Tests login banned user."""
+
     def setUp(self):
         self.url = '/api/auth/login/'
         self.user = User.objects.create_user(

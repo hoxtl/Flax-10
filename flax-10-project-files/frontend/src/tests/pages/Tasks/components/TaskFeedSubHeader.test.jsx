@@ -23,15 +23,15 @@ vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../../pages/tasks/components/CreateTaskBar", () => ({
+vi.mock("../../../../pages/Tasks/components/CreateTaskBar", () => ({
   default: (props) => <div data-testid="create-task-bar">{props.defaultListId}</div>,
 }));
 
-vi.mock("../../../../pages/tasks/components/TaskFeedToolbar", () => ({
+vi.mock("../../../../pages/Tasks/components/TaskFeedToolbar", () => ({
   default: (props) => <div data-testid="task-feed-toolbar">{props.search}</div>,
 }));
 
-import TaskFeedSubHeader from "../../../../pages/tasks/components/TaskFeedSubHeader";
+import TaskFeedSubHeader from "../../../../pages/Tasks/components/TaskFeedSubHeader";
 
 const dataActionNames = [
   "setSearch",

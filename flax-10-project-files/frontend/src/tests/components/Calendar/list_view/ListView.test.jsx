@@ -4,7 +4,7 @@
 
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ListView } from '../../../../components/calendar/list_view/ListView';
+import { ListView } from '../../../../components/Calendar/list_view/ListView';
 import { createMockEvent } from '../mocks/calendarMocks';
 
 let mockViewMode = 'month';
@@ -18,17 +18,17 @@ vi.mock('../../../../hooks/usePagination', () => ({
     usePagination: (items, size) => ({ currentPage: 1, totalPages: Math.ceil(items.length / size) || 1, currentItems: items.slice(0, size), setPage: vi.fn() }),
 }));
 
-vi.mock('../../../../components/calendar/list_view/EventRow', () => ({
+vi.mock('../../../../components/Calendar/list_view/EventRow', () => ({
     EventRow: ({ event }) => <div data-testid="event-row">{event.title}</div>,
     ConflictRow: ({ events }) => <div data-testid="conflict-row">{events.map((event) => event.title).join(', ')}</div>,
 }));
 
-vi.mock('../../../../components/pagination/Pagination', () => ({
+vi.mock('../../../../components/Pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages }) => <div data-testid="pagination">{currentPage}/{totalPages}</div>,
     BackToTop: () => <div data-testid="back-to-top" />,
 }));
 
-vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
     getEffectiveTagName: (e) => e.tag_name || 'default',
     sortByStartTime: (events) => [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time)),
     isAllDay: (event) => !!event.all_day,
