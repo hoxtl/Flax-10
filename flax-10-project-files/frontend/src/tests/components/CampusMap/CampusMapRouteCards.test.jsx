@@ -21,6 +21,11 @@ describe("TflRouteCard", () => {
     expect(screen.getByText("TfL API down")).toBeTruthy();
   });
 
+  it("returns null when route data is missing", () => {
+    const { container } = render(<TflRouteCard loading={false} />);
+    expect(container.innerHTML).toBe("");
+  });
+
   it("renders route details and toggles instructions", () => {
     const tflRouteInfo = { duration: 25, legs: [{ mode: "tube", routeOptions: [{ name: "Jubilee" }], departurePoint: "A", arrivalPoint: "B", duration: 10 }] };
     const onToggle = vi.fn();
