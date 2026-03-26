@@ -23,7 +23,7 @@ except ImportError:
     OpenAIError = Exception
     openai_available = False
 
-OPENAI_API_ERROR_TYPES = (OpenAIError, IndexError, TypeError, KeyError, AttributeError)
+OPENAI_API_ERROR_TYPES = (OpenAIError, IndexError, TypeError, KeyError, AttributeError, Exception)
 
 
 def _response_error(message, code):

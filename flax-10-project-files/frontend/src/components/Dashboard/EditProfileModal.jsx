@@ -96,7 +96,7 @@ function ModalForm({ form, user, onClose, onSubmit }) {
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   const form = useEditProfileForm(user);
   if (!isOpen) return null;
-  const handleSubmit = buildEditProfileSubmitHandler(form, user, onSave);
+  const handleSubmit = buildEditProfileSubmitHandler(form, user, onSave, onClose);
   return (
     <StandardModal
       title="Edit Profile"

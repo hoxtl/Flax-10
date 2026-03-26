@@ -79,7 +79,13 @@ function CompactDonutLayout({ canvasClassName, chart, data, chartProps, legendTo
 }
 
 export function CompactOverallDonut({ overallData, onSegmentClick }) {
-  if (!overallData.length) return <p className={styles.compactAttendanceEmpty}>No attendance records yet.</p>;
+  if (!overallData.length) return (
+    <div className={styles.compactAttendanceEmptyWrap}>
+      <span className={styles.compactAttendanceEmptyIcon} aria-hidden="true">📊</span>
+      <p className={styles.compactAttendanceEmpty}>No attendance yet</p>
+      <p className={styles.compactAttendanceEmptyHint}>Mark events as attended or missed to see your stats here.</p>
+    </div>
+  );
   const chartProps = { width: 240, height: 210, margin: { top: 10, bottom: 10, left: 10, right: 10 }, innerRadius: 38, outerRadius: 84, cornerRadius: 4 };
   return (
     <div className={styles.compactAttendanceDonut} onClick={handleDonutClick}>

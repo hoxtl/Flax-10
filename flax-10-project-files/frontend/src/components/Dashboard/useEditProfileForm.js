@@ -108,7 +108,7 @@ async function validateUsernameAvailability(username, currentUsername, setError,
   return true;
 }
 
-export function buildEditProfileSubmitHandler(form, user, onSave) {
+export function buildEditProfileSubmitHandler(form, user, onSave, onClose) {
   const { username, bio, profilePhoto, removePhoto, setLoading, setError, setSaveSignal } = form;
   return async (event) => {
     event.preventDefault();
@@ -116,7 +116,10 @@ export function buildEditProfileSubmitHandler(form, user, onSave) {
     setError("");
     if (!validateUsername(username, setError, setLoading)) return;
     if (!(await validateUsernameAvailability(username, user?.username, setError, setLoading))) return;
-    await submitProfileUpdate(buildFormData(username, bio, profilePhoto, removePhoto), onSave, setError, () => setSaveSignal((count) => count + 1));
+    await submitProfileUpdate(buildFormData(username, bio, profilePhoto, removePhoto), onSave, setError, () => {
+      setSaveSignal((count) => count + 1);
+      onClose?.();
+    });
     setLoading(false);
   };
 }

@@ -208,7 +208,7 @@ SOCIETY_DATA = [
     ),
     (
         'African Caribbean Society',
-        'Celebrating the richness of African and Caribbean heritage at King's.',
+        '''Celebrating the richness of African and Caribbean heritage at King's.''',
         (
             "African Caribbean Society exists to celebrate, preserve, and share the diverse "
             "cultures of Africa and the Caribbean in a vibrant, inclusive environment. Our "
