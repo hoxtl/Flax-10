@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { TaskContextMenu } from "../../../../pages/Tasks/components/TaskCard";
+import { createRejectablePromise } from "../hooks/taskHookTestUtils";
 
 const sleepWarningHookMock = vi.hoisted(() => vi.fn());
 
@@ -22,6 +23,29 @@ const defaultTask = { id: 1, title: "T1", module_code: "KCL1", due_date: "2026-0
 const defaultLists = [{ id: 1, name: "Inbox", color: "#ccc" }, { id: 2, name: "Work", color: "#eee" }];
 function renderWithRouter(ui) { return render(<MemoryRouter>{ui}</MemoryRouter>); }
 
+function renderTaskContextMenu(props = {}) {
+  return renderWithRouter(
+    <TaskContextMenu
+      task={defaultTask}
+      onDelete={vi.fn()}
+      onEdit={vi.fn()}
+      lists={defaultLists}
+      pos={{ x: 10, y: 20 }}
+      onClose={vi.fn()}
+      {...props}
+    />,
+  );
+}
+
+function openMoveListMenu() {
+  fireEvent.click(screen.getByRole("button", { name: /Move to list/i }));
+}
+
+function resetAndOpenDueDateMenu() {
+  fireEvent.click(screen.getByRole("button", { name: /Back/i }));
+  fireEvent.click(screen.getByRole("button", { name: /Set due date/i }));
+}
+
 describe("TaskContextMenu", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -31,21 +55,20 @@ describe("TaskContextMenu", () => {
   it("covers menu back buttons, invalid moves, due removal, sleep warnings, and outside clicks", async () => {
     getUserSettings.mockRejectedValueOnce(new Error("offline"));
     sleepWarningHookMock.mockReturnValue({ sleepWarning: true, sleepWarningProps: {}, checkSleepAndRun: (_d, cb) => cb() });
-    const onClose = vi.fn(); const onEdit = vi.fn();
-    renderWithRouter(<TaskContextMenu task={defaultTask} onDelete={vi.fn()} onEdit={onEdit} lists={defaultLists} pos={{ x: 10, y: 20 }} onClose={onClose} />);
+    const onClose = vi.fn();
+    const onEdit = vi.fn();
+    renderTaskContextMenu({ onClose, onEdit });
 
     expect(screen.getByTestId("sleep-warning")).toBeInTheDocument();
     fireEvent.mouseDown(screen.getByRole("button", { name: /Set due date/i }));
     expect(onClose).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("button", { name: /Move to list/i }));
+    openMoveListMenu();
     fireEvent.click(screen.getByRole("button", { name: /invalid option/i }));
     expect(onEdit).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("button", { name: /Back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Set due date/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Back/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Set due date/i }));
+    resetAndOpenDueDateMenu();
+    resetAndOpenDueDateMenu();
     fireEvent.click(screen.getByRole("button", { name: /Clear date/i }));
 
     expect(onEdit).toHaveBeenCalledWith({ due_date: null }, { source: "context-menu", action: "set-due-date", dueDate: null });
@@ -54,25 +77,25 @@ describe("TaskContextMenu", () => {
     await waitFor(() => expect(getUserSettings).toHaveBeenCalled());
   });
 
-  it("covers empty move values and missing source list names in the context menu", () => {
+  it("covers empty move values and missing source list names in the context menu", async () => {
     const onEdit = vi.fn();
-    renderWithRouter(<TaskContextMenu task={{ ...defaultTask, task_list: null }} onDelete={vi.fn()} onEdit={onEdit} lists={[{ id: 2, name: "Work" }]} pos={{ x: 10, y: 20 }} onClose={vi.fn()} />);
+    renderTaskContextMenu({ task: { ...defaultTask, task_list: null }, onEdit, lists: [{ id: 2, name: "Work" }] });
 
-    fireEvent.click(screen.getByRole("button", { name: /Move to list/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Work/i }));
+    act(() => openMoveListMenu());
+    fireEvent.click(await screen.findByRole("button", { name: /Work/i }));
     expect(onEdit).toHaveBeenCalledWith({ task_list: 2 }, expect.objectContaining({ fromListName: undefined }));
   });
 
   it("handles missing sleep settings and ignores late failures after unmount", async () => {
     getUserSettings.mockResolvedValueOnce({});
-    const m1 = renderWithRouter(<TaskContextMenu task={defaultTask} onDelete={vi.fn()} onEdit={vi.fn()} lists={defaultLists} pos={{ x: 10, y: 20 }} onClose={vi.fn()} />);
+    const m1 = renderTaskContextMenu();
     await waitFor(() => expect(getUserSettings).toHaveBeenCalled());
     m1.unmount();
 
-    let rejectSettings;
-    getUserSettings.mockReturnValueOnce(new Promise((_, r) => { rejectSettings = r; }));
-    const m2 = renderWithRouter(<TaskContextMenu task={defaultTask} onDelete={vi.fn()} onEdit={vi.fn()} lists={defaultLists} pos={{ x: 10, y: 20 }} onClose={vi.fn()} />);
+    const { promise, rejectPromise } = createRejectablePromise();
+    getUserSettings.mockReturnValueOnce(promise);
+    const m2 = renderTaskContextMenu();
     m2.unmount();
-    await act(async () => { rejectSettings(new Error("late failure")); });
+    await act(async () => { rejectPromise(new Error("late failure")); });
   });
 });

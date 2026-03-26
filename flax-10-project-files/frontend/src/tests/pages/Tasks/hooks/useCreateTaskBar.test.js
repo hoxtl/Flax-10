@@ -19,6 +19,7 @@ import useCreateTaskBar from "../../../../pages/Tasks/hooks/useCreateTaskBar";
 import { getModules, getEnrollments } from "../../../../api/moduleApi";
 import { getUserSettings } from "../../../../api/userApi";
 import { runQuickAdd } from "../../../../pages/Tasks/utils/createTaskBarUtils";
+import { createRejectablePromise } from "./taskHookTestUtils";
 
 describe("useCreateTaskBar", () => {
   beforeEach(() => {
@@ -257,12 +258,8 @@ describe("useCreateTaskBar", () => {
   });
 
   it("ignores rejected sleep-setting results after unmount", async () => {
-    let rejectSettings;
-    getUserSettings.mockReturnValueOnce(
-      new Promise((_, reject) => {
-        rejectSettings = reject;
-      }),
-    );
+    const { promise, rejectPromise } = createRejectablePromise();
+    getUserSettings.mockReturnValueOnce(promise);
 
     const { unmount } = renderHook(() =>
       useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], onAddTask: vi.fn() }),
@@ -271,7 +268,7 @@ describe("useCreateTaskBar", () => {
     unmount();
 
     await act(async () => {
-      rejectSettings(new Error("late settings failure"));
+      rejectPromise(new Error("late settings failure"));
       await Promise.resolve();
     });
   });

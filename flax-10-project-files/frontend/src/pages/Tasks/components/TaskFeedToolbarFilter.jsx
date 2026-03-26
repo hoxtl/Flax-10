@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { Filter } from "lucide-react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 
+import { DROPDOWN_MOTION_PROPS } from "../../../components/common/dropdownMotion";
 import TaskFilterPanel from "./TaskFilterPanel";
 
 import styles from "./TaskFeedToolbar.module.css";
@@ -54,10 +55,7 @@ function FilterPanelDialog({ panelProps }) {
       role="dialog"
       aria-label="Task filters"
       onClick={(event) => event.stopPropagation()}
-      initial={{ opacity: 0, y: -8, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -8, scale: 0.98 }}
-      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      {...DROPDOWN_MOTION_PROPS}
       style={FILTER_ORIGIN_STYLE}
     >
       <TaskFilterPanel {...panelProps} />

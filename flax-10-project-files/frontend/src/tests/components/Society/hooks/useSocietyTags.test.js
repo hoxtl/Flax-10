@@ -23,10 +23,21 @@ describe('useSocietyTags', () => {
         });
     });
 
+    function renderTagsHook() {
+        return renderHook(() => useSocietyTags(mockId, mockSoc, setSociety));
+    }
+
+    async function updateTag(tagId, payload) {
+        const { result } = renderTagsHook();
+        await act(async () => {
+            await result.current.updateTag(tagId, payload);
+        });
+    }
+
     it('addTag calls api and updates state', async () => {
         const newTag = { id: 11, name: 'T2' };
         api.createSocietyTag.mockResolvedValue(newTag);
-        const { result } = renderHook(() => useSocietyTags(mockId, mockSoc, setSociety));
+        const { result } = renderTagsHook();
         
         await act(async () => {
             const res = await result.current.addTag({ name: 'T2' });
@@ -40,11 +51,7 @@ describe('useSocietyTags', () => {
     it('updateTag calls api and updates state', async () => {
         const updatedTag = { id: 10, name: 'T1-Up' };
         api.updateSocietyTag.mockResolvedValue(updatedTag);
-        const { result } = renderHook(() => useSocietyTags(mockId, mockSoc, setSociety));
-        
-        await act(async () => {
-            await result.current.updateTag(10, { name: 'T1-Up' });
-        });
+        await updateTag(10, { name: 'T1-Up' });
         expect(api.updateSocietyTag).toHaveBeenCalledWith(mockId, 10, { name: 'T1-Up' });
         expect(mockSoc.tags[0].name).toBe('T1-Up');
     });
@@ -53,14 +60,13 @@ describe('useSocietyTags', () => {
         const updatedTag = { id: 10, name: 'T1-Up' };
         api.updateSocietyTag.mockResolvedValue(updatedTag);
         mockSoc = { id: 1, tags: [{ id: 10, name: 'T1' }, { id: 11, name: 'T2' }] };
-        const { result } = renderHook(() => useSocietyTags(mockId, mockSoc, setSociety));
-        await act(async () => { await result.current.updateTag(10, { name: 'T1-Up' }); });
+        await updateTag(10, { name: 'T1-Up' });
         expect(mockSoc.tags[1].id).toBe(11); // T2 remains unchanged
     });
 
     it('deleteTag calls api and updates state', async () => {
         api.deleteSocietyTag.mockResolvedValue({});
-        const { result } = renderHook(() => useSocietyTags(mockId, mockSoc, setSociety));
+        const { result } = renderTagsHook();
         
         await act(async () => {
             await result.current.deleteTag(10);

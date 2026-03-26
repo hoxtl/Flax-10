@@ -24,6 +24,7 @@ import { useCreateTaskModal } from "../../../../pages/Tasks/hooks/useCreateTaskM
 import { getEnrollments, getModules } from "../../../../api/moduleApi";
 import { getUserSettings } from "../../../../api/userApi";
 import { runCreateTaskSave } from "../../../../pages/Tasks/utils/createTaskModalUtils";
+import { createRejectablePromise } from "./taskHookTestUtils";
 
 function buildProps(overrides = {}) {
   return {
@@ -230,12 +231,8 @@ describe("useCreateTaskModal coverage", () => {
   });
 
   it("ignores rejected sleep-setting results after unmount", async () => {
-    let rejectSettings;
-    getUserSettings.mockReturnValueOnce(
-      new Promise((_, reject) => {
-        rejectSettings = reject;
-      }),
-    );
+    const { promise, rejectPromise } = createRejectablePromise();
+    getUserSettings.mockReturnValueOnce(promise);
 
     const { unmount } = renderHook(() =>
       useCreateTaskModal(buildProps()),
@@ -244,7 +241,7 @@ describe("useCreateTaskModal coverage", () => {
     unmount();
 
     await act(async () => {
-      rejectSettings(new Error("late settings failure"));
+      rejectPromise(new Error("late settings failure"));
       await Promise.resolve();
     });
   });
