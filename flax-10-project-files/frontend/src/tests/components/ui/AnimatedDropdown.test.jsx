@@ -173,4 +173,16 @@ describe('AnimatedDropdown', () => {
     expect(screen.getAllByText('Beta')[1]).toBeInTheDocument();
     expect(screen.getAllByText('Beta')[1].closest('button')).toBeInTheDocument();
   });
+
+  it('selects a grouped option and shows the flat selected state', () => {
+    const grouped = [
+      { label: 'Letters', options: [{ value: 'a1', label: 'Alpha' }, { value: 'a2', label: 'Beta' }] },
+    ];
+    const onChange = vi.fn();
+
+    render(<AnimatedDropdown value="a2" onChange={onChange} placeholder="Grouped" options={grouped} grouped isOpen={true} />);
+    expect(screen.getAllByText('Beta')[1].closest('button')?.className).toContain('dropdownItemActive');
+    fireEvent.click(screen.getByText('Alpha'));
+    expect(onChange).toHaveBeenCalledWith('a1');
+  });
 });

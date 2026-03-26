@@ -230,6 +230,14 @@ describe("SocietyDetailPage Modals", () => {
       expect(onDelete).toHaveBeenCalledTimes(1);
       expect(onBack).toHaveBeenCalledTimes(1);
     });
+
+    it("deletes a society without an external delete callback", async () => {
+      const data = renderDetailPageWithData(interactiveOverrides, { onBack: vi.fn() });
+
+      fireEvent.click(screen.getByText("delete-society"));
+
+      await waitFor(() => expect(data.deleteSociety).toHaveBeenCalledTimes(1));
+    });
   });
 
   it("publishes tracked changes before leaving edit mode", async () => {

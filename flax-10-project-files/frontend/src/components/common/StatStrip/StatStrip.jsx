@@ -14,12 +14,12 @@ const TONE_CLASS = {
   accent: styles.valueAccent,
 };
 
-function buildValueClass(item) {
+export function buildValueClass(item) {
   return [styles.value, item.tone ? TONE_CLASS[item.tone] : '', item.valueClassName || '']
     .filter(Boolean).join(' ');
 }
 
-function buildMetaClass(item) {
+export function buildMetaClass(item) {
   return [styles.meta, item.metaClassName || ''].filter(Boolean).join(' ');
 }
 
@@ -45,14 +45,14 @@ function StatItemContent({ item }) {
   );
 }
 
-function buildItemSlotClass(item) {
+export function buildItemSlotClass(item) {
   return [
     styles.itemSlot,
     item.to || item.onClick ? styles.itemSlotInteractive : '',
   ].filter(Boolean).join(' ');
 }
 
-function ItemShell({ children, item }) {
+export function ItemShell({ children, item }) {
   const className = buildItemSlotClass(item);
   const ariaLabel = item.ariaLabel || item.tooltip || item.label;
   if (item.to) {

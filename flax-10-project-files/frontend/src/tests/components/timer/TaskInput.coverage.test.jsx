@@ -1,5 +1,6 @@
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearTask, openPicker, pickRecommendedTask, selectTask } from "../../../components/Timer/TaskInput";
 
 const taskPickerState = {
   open: false,
@@ -90,5 +91,43 @@ describe("TaskInput coverage", () => {
 
     expect(onChange).toHaveBeenCalledWith("Recommended");
     expect(onTaskSelect).toHaveBeenCalledWith({ id: 9, title: "Recommended" });
+  });
+
+  it("covers the helper branches for open, clear, select, and no-recommendation", async () => {
+    const state = {
+      open: false,
+      loadTasks: vi.fn(),
+      setOpen: vi.fn(),
+      setSelectedTaskId: vi.fn(),
+      setRecommendedTaskId: vi.fn(),
+      recommendedTask: null,
+    };
+    const onChange = vi.fn();
+    const onTaskSelect = vi.fn();
+    const onClearTask = vi.fn();
+
+    openPicker(state);
+    expect(state.loadTasks).toHaveBeenCalledTimes(1);
+    expect(state.setOpen).toHaveBeenCalledWith(expect.any(Function));
+
+    state.open = true;
+    openPicker(state);
+    expect(state.loadTasks).toHaveBeenCalledTimes(1);
+
+    clearTask(state, onChange, onClearTask);
+    expect(state.setSelectedTaskId).toHaveBeenCalledWith(null);
+    expect(onChange).toHaveBeenCalledWith("");
+    expect(onClearTask).toHaveBeenCalled();
+    expect(state.setRecommendedTaskId).toHaveBeenCalledWith(null);
+
+    selectTask({ id: 11, title: "Essay" }, state, onChange, onTaskSelect);
+    expect(onChange).toHaveBeenCalledWith("Essay");
+    expect(onTaskSelect).toHaveBeenCalledWith({ id: 11, title: "Essay" });
+
+    pickRecommendedTask(state, onChange, onTaskSelect);
+    await act(async () => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(onTaskSelect).not.toHaveBeenCalledWith(expect.objectContaining({ id: 0 }));
   });
 });

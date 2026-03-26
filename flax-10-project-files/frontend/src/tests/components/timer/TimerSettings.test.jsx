@@ -21,6 +21,16 @@ const testUpdate = () => {
     helpers.blurInput(0);
     // Should reset to 1 (min for work)
     expect(onUpdate).toHaveBeenCalledWith('work', 1);
+
+    const breakInput = screen.getAllByRole('spinbutton')[1];
+    fireEvent.change(breakInput, { target: { value: '10' } });
+    helpers.blurInput(1);
+    expect(onUpdate).toHaveBeenCalledWith('break', 10);
+
+    const sessionsInput = screen.getAllByRole('spinbutton')[2];
+    fireEvent.change(sessionsInput, { target: { value: '6' } });
+    helpers.blurInput(2);
+    expect(onUpdate).toHaveBeenCalledWith('sessions', 6);
 };
 
 const testFocus = () => {

@@ -33,7 +33,7 @@ export const TimerDisplay = ({ timeLeft, mode, isOvertime }) => {
 };
 
 
-const getModeText = (mode, isOvertime, isBreakOvertime) => {
+export const getModeText = (mode, isOvertime, isBreakOvertime) => {
     if (mode === 'work') return isOvertime ? 'Overtime' : 'Focus';
     return isBreakOvertime ? 'Break Overtime' : 'Break';
 };
@@ -91,21 +91,21 @@ export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, 
     );
 };
 
-const handleInput = (e, min, setLocal, onError) => {
+export const handleInput = (e, min, setLocal, onError) => {
     const num = parseInt(e.target.value);
     const isMin = !isNaN(num) && num < min;
     setLocal(isMin ? min : e.target.value);
     if (onError) onError(isMin);
 };
 
-const commitInput = (local, value, min, setLocal, onUpdate, onError) => {
+export const commitInput = (local, value, min, setLocal, onUpdate, onError) => {
     const final = Math.max(parseInt(local) || min, min);
     setLocal(final);
     if (final !== value) onUpdate(final);
     if (onError) onError(false);
 };
 
-const handleKey = (e, local, min, onError) => {
+export const handleKey = (e, local, min, onError) => {
     if (e.key === 'Enter') return e.target.blur();
     if (e.key !== 'ArrowDown') return;
     if (local !== '' && parseInt(local) > min) return;

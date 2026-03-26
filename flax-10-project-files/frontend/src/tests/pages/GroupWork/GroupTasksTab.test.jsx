@@ -104,7 +104,9 @@ function buildDefaultState(overrides = {}) {
       addTask: vi.fn().mockResolvedValue({}),
     },
     filterUsers: [],
-    setFilterUsers: vi.fn(),
+    setFilterUsers: vi.fn((updater) => {
+      if (typeof updater === "function") updater([]);
+    }),
     taskView: "list",
     setTaskView: vi.fn(),
     showAddModal: false,
@@ -193,6 +195,31 @@ describe("GroupTasksTab", () => {
     });
   });
 
+  it("applies the alternate filter branch when the user is already selected", () => {
+    const state = buildDefaultState({
+      filterUsers: [1],
+      setFilterUsers: vi.fn((updater) => {
+        if (typeof updater === "function") updater([1]);
+      }),
+    });
+    useGroupTasksTabStateMock.mockReturnValue(state);
+    renderComponent();
+
+    fireEvent.click(screen.getByText("Toggle member filter"));
+    expect(state.setFilterUsers).toHaveBeenCalled();
+  });
+
+  it("covers the non-completing toggle branch from timeline view", () => {
+    const state = buildDefaultState({
+      taskView: "timeline",
+    });
+    useGroupTasksTabStateMock.mockReturnValue(state);
+    renderComponent();
+
+    fireEvent.click(screen.getByText("Toggle timeline task"));
+    expect(toastMock).not.toHaveBeenCalledWith("Task completed!", expect.anything());
+  });
+
   it("adds a task from the modal and from the board view", () => {
     const state = buildDefaultState({
       taskView: "board",
@@ -227,5 +254,10 @@ describe("GroupTasksTab", () => {
 
     renderComponent();
     expect(screen.getByTestId("task-timeline-view")).toBeInTheDocument();
+  });
+
+  it("falls back to the default members array when none is provided", () => {
+    render(<GroupTasksTab projectId={1} onStatsUpdate={vi.fn()} />);
+    expect(screen.getByText("Task One")).toBeInTheDocument();
   });
 });

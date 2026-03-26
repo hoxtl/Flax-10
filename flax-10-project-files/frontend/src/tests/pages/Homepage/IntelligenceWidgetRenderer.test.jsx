@@ -168,6 +168,62 @@ describe("IntelligenceWidgetRenderer", () => {
     expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
   });
 
+  it("counts mixed hero inputs across deadline and society event branches", () => {
+    const props = {
+      ...baseProps,
+      upcomingDeadlines: [
+        { id: 1, start_due_date: "2026-03-09T10:00:00Z" },
+        { id: 2 },
+      ],
+      calendarEvents: [
+        { id: 31, kind: "society", society_id: 7, start_time: "2024-03-10T10:00:00Z" },
+        { id: 32, kind: "society", society_name: "Robotics Society", start_time: "2024-03-11T10:00:00Z" },
+        { id: 33, kind: "society", society_id: 7 },
+      ],
+      profile: { role: "student", summary: { societies: [{ society_id: 7, name: "Robotics Society" }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"deadlinesCount":1');
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":2');
+  });
+
+  it("falls back to empty hero counts when the supporting data is missing", () => {
+    const props = {
+      ...baseProps,
+      upcomingDeadlines: undefined,
+      calendarEvents: undefined,
+      slot5Data: undefined,
+      profile: { role: "student", summary: { societies: [] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"deadlinesCount":0');
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":0');
+  });
+
+  it("counts society memberships using the id fallback when the name is empty", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [{ id: 41, kind: "society", society_id: 99, start_time: "2024-03-10T10:00:00Z" }],
+      profile: { role: "student", summary: { societies: [{ id: 99, name: "" }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
+  it("counts society memberships from the timeline fallback using the id fallback", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [],
+      slot5Data: {
+        now: "2024-03-08T10:00:00Z",
+        sortedEvents: [{ id: 51, kind: "society", society_id: 99, start_time: "2024-03-10T10:00:00Z" }],
+      },
+      profile: { role: "student", summary: { societies: [{ id: 99, name: "" }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
   it("handles course change dismissal and teacher role in hero", () => {
     const props = { ...baseProps, profile: { role: "teacher", summary: { societies: [] } } };
     renderWidget("hero", props);

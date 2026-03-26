@@ -5,7 +5,7 @@ vi.mock("react-router-dom", () => ({
   Link: ({ to, children, ...props }) => <a href={to} {...props}>{children}</a>,
 }));
 
-import StatStrip from "../../../components/common/StatStrip/StatStrip";
+import StatStrip, { buildItemSlotClass, buildMetaClass, buildValueClass } from "../../../components/common/StatStrip/StatStrip";
 
 vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children, content }) => (
@@ -66,5 +66,12 @@ describe("StatStrip", () => {
     expect(screen.getByRole("button", { name: "Break" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Break" }));
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("covers the class helpers directly", () => {
+    expect(buildValueClass({ tone: "accent", valueClassName: "custom-value" })).toContain("custom-value");
+    expect(buildMetaClass({ metaClassName: "custom-meta" })).toContain("custom-meta");
+    expect(buildItemSlotClass({ to: "/focus" })).toContain("itemSlotInteractive");
+    expect(buildItemSlotClass({ onClick: vi.fn() })).toContain("itemSlotInteractive");
   });
 });

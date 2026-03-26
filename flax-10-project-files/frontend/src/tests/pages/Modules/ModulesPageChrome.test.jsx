@@ -24,6 +24,7 @@ vi.mock("../../../components/Modules/Modules/ModuleForm.jsx", () => ({
     <div>
       <div>{module ? "Editing module" : "New module"}</div>
       <button onClick={() => onSuccess({ id: 9, module_code: "CS9" }, !module)}>Save module</button>
+      <button onClick={() => onSuccess({ id: 9, module_code: "CS9" }, false)}>Save existing module</button>
       <button onClick={onCancel}>Cancel module form</button>
     </div>
   ),
@@ -210,6 +211,15 @@ describe("ModulesPageChrome", () => {
     expect(state.setEditingModule).toHaveBeenCalledWith(null);
   });
 
+  it("ignores create-modal updates when the form reports an existing module", () => {
+    const state = buildState({ showForm: true, viewingModule: null, editingModule: null });
+    render(<AnimatedContent state={state} viewKey="create" MainView={() => null} />);
+    fireEvent.click(screen.getByText("Save existing module"));
+    expect(state.hook.handleModuleCreated).not.toHaveBeenCalled();
+    expect(state.setShowForm).toHaveBeenCalledWith(false);
+    expect(state.setEditingModule).toHaveBeenCalledWith(null);
+  });
+
   it("renders the animated detail and list panes when not editing", () => {
     const detailsState = buildState({ showForm: false, viewingModule: { id: 5, module_code: "CS5" } });
     const MainView = ({ state }) => <div>{state.viewingModule ? "details" : "list"}</div>;
@@ -225,6 +235,11 @@ describe("ModulesPageChrome", () => {
   it("closes edit and create modals through StandardModal", () => {
     const editState = buildState({ showForm: true, viewingModule: null, editingModule: { id: 4 } });
     const { rerender } = render(<AnimatedContent state={editState} viewKey="edit" MainView={() => null} />);
+    fireEvent.click(screen.getByText("Cancel module form"));
+    expect(editState.setShowForm).toHaveBeenCalledWith(false);
+    expect(editState.setEditingModule).toHaveBeenCalledWith(null);
+
+    rerender(<AnimatedContent state={editState} viewKey="edit" MainView={() => null} />);
     fireEvent.click(screen.getByText("Close modal"));
     expect(editState.setShowForm).toHaveBeenCalledWith(false);
     expect(editState.setEditingModule).toHaveBeenCalledWith(null);
