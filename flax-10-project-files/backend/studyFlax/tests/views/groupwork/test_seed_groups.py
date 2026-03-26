@@ -1,4 +1,6 @@
-"""Tests for completed group task assignment helpers."""
+"""
+Tests for seeded group tasks.
+"""
 
 import random
 from types import SimpleNamespace
@@ -9,6 +11,7 @@ from studyFlax.management.commands.seed_helpers.groupwork.tasks import _build_co
 
 
 class SeedGroupTaskAssignmentsTest(SimpleTestCase):
+    """Tests seed group task assignments."""
     def test_completed_task_assignments_cover_every_member(self):
         members = [
             SimpleNamespace(username=f"member_{index}")

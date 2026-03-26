@@ -18,7 +18,6 @@ class ModuleViewTests(BaseTestCase):
     """Tests for module view."""
 
     def setUp(self):
-        """Set up the test case."""
         super().setUp()
         self.user.role = 'teacher'
         self.user.save()
@@ -30,7 +29,6 @@ class ModuleViewTests(BaseTestCase):
         )
 
     def test_teacher_can_create_module(self):
-        """Test teacher can create module."""
         data = dict(module_code='4CCS1DST', module_name='Data Structures',
             start_time=timezone.now().isoformat(),
             end_time=(timezone.now() + timedelta(hours=1)).isoformat())
@@ -38,42 +36,35 @@ class ModuleViewTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_student_cannot_create_module(self):
-        """Test student cannot create module."""
         self.user.role = 'student'
         self.user.save()
         response = self.client.post('/api/modules/', {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_list_modules(self):
-        """Test list modules."""
         response = self.client.get('/api/modules/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_module(self):
-        """Test get module."""
         response = self.client.get(f'/api/modules/{self.module.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['module_code'], '5CCS2SEG')
 
     def test_get_nonexistent_module(self):
-        """Test get nonexistent module."""
         response = self.client.get('/api/modules/9999/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_teacher_can_update_own_module(self):
-        """Test teacher can update own module."""
         response = self.client.put(f'/api/modules/{self.module.id}/', {'module_name': 'Updated'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['module_name'], 'Updated')
 
     def test_teacher_can_delete_own_module(self):
-        """Test teacher can delete own module."""
         response = self.client.delete(f'/api/modules/{self.module.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Module.objects.filter(id=self.module.id).exists())
 
     def test_teacher_delete_unenrols_students_and_notifies_them(self):
-        """Test teacher delete unenrols students and notifies them."""
         student = User.objects.create_user(
             username='module_student',
             email='module_student@example.com',
@@ -92,7 +83,6 @@ class ModuleViewTests(BaseTestCase):
         self.assertEqual(notification.action_url, '/modules')
 
     def test_teacher_update_notifies_enrolled_students_about_changes(self):
-        """Test teacher update notifies enrolled students about changes."""
         student = User.objects.create_user(
             username='updated_student',
             email='updated_student@example.com',
@@ -114,7 +104,6 @@ class ModuleViewTests(BaseTestCase):
         self.assertEqual(notification.action_url, f'/modules?code={self.module.module_code}')
 
     def test_teacher_cannot_update_module_with_duplicate_code(self):
-        """Test teacher cannot update module with duplicate code."""
         Module.objects.create(
             module_code='TAKEN001', module_name='Taken',
             created_by=self.user,
@@ -129,7 +118,6 @@ class ModuleViewTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_duplicate_module_code_fails(self):
-        """Test duplicate module code fails."""
         data = dict(module_code='5CCS2SEG', module_name='Duplicate',
             start_time=timezone.now().isoformat(),
             end_time=(timezone.now() + timedelta(hours=1)).isoformat())
@@ -140,7 +128,6 @@ class ModuleSerialiserTests(TestCase):
     """Tests for module serialiser."""
 
     def setUp(self):
-        """Set up the test case."""
         self.factory = APIRequestFactory()
         self.teacher = User.objects.create_user(
             username='serial_teacher',
@@ -160,7 +147,6 @@ class ModuleSerialiserTests(TestCase):
         )
 
     def create_module_payload(self):
-        """Create module payload."""
         start_time = timezone.now()
         end_time = start_time + timedelta(hours=1)
         return {
@@ -171,7 +157,6 @@ class ModuleSerialiserTests(TestCase):
         }
 
     def test_teacher_must_create_modules(self):
-        """Test teacher must create modules."""
         request = self.factory.get('/')
         request.user = self.student
         serializer = ModuleSerialiser(data=self.create_module_payload(), context={'request': request})
@@ -179,7 +164,6 @@ class ModuleSerialiserTests(TestCase):
         self.assertTrue(serializer.errors)
 
     def test_is_recurring_true_creates_rule(self):
-        """Test is recurring true creates rule."""
         request = self.factory.get('/')
         request.user = self.teacher
         serializer = ModuleSerialiser(data=self.create_module_payload(), context={'request': request})
@@ -188,7 +172,6 @@ class ModuleSerialiserTests(TestCase):
         self.assertIsNotNone(module.recurrence_rule)
 
     def test_is_recurring_false_skips_rule(self):
-        """Test is recurring false skips rule."""
         request = self.factory.get('/')
         request.user = self.teacher
         payload = self.create_module_payload()
@@ -200,7 +183,6 @@ class ModuleSerialiserTests(TestCase):
         self.assertIsNone(module.recurrence_rule)
 
     def test_created_by_name_unknown_without_owner(self):
-        """Test created by name unknown without owner."""
         serializer = ModuleSerialiser()
 
         class FakeModule:
@@ -208,14 +190,12 @@ class ModuleSerialiserTests(TestCase):
 
             @property
             def created_by(self):
-                """Created by."""
                 raise Exception("RelatedObjectDoesNotExist")
 
         result = serializer.get_created_by_name(FakeModule())
         self.assertEqual(result, 'Unknown')
 
     def test_created_by_email_none_on_exception(self):
-        """Test created by email none on exception."""
         serializer = ModuleSerialiser()
 
         class FakeModule:
@@ -223,7 +203,6 @@ class ModuleSerialiserTests(TestCase):
 
             @property
             def created_by(self):
-                """Created by."""
                 raise Exception("RelatedObjectDoesNotExist")
 
         result = serializer.get_created_by_email(FakeModule())
@@ -233,7 +212,6 @@ class ModuleViewCoverageTest(TestCase):
     """Tests for module view branches not yet covered."""
 
     def setUp(self):
-        """Set up the test case."""
         self.client = APIClient()
         self.teacher = User.objects.create_user(
             username='mv_teacher', email='mv_teacher@test.com', password='pass'
@@ -251,13 +229,11 @@ class ModuleViewCoverageTest(TestCase):
         )
 
     def test_student_gets_all_modules(self):
-        """Test student gets all modules."""
         self.client.force_authenticate(user=self.student)
         response = self.client.get('/api/modules/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_module_permission_denied_for_non_owner(self):
-        """Test update module permission denied for non owner."""
         other_teacher = User.objects.create_user(
             username='mv_other', email='mv_other@test.com', password='pass'
         )
@@ -268,7 +244,6 @@ class ModuleViewCoverageTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_module_permission_denied_for_non_owner(self):
-        """Test delete module permission denied for non owner."""
         other_teacher = User.objects.create_user(
             username='mv_del', email='mv_del@test.com', password='pass'
         )
@@ -283,29 +258,24 @@ class ModuleNotificationsTest(TestCase):
     """Tests for module notification helper branches."""
 
     def test_notify_module_updated_does_nothing_for_empty_fields(self):
-        """Test notify module updated does nothing for empty fields."""
         from studyFlax.views.modules.module_notifications import notify_module_updated
         from unittest.mock import MagicMock
         module = MagicMock()
         notify_module_updated(module, [])
 
     def test_format_updated_fields_empty_returns_details(self):
-        """Test format updated fields empty returns details."""
         from studyFlax.views.modules.module_notifications import _format_updated_fields
         self.assertEqual(_format_updated_fields([]), 'details')
 
     def test_format_updated_fields_one_label(self):
-        """Test format updated fields one label."""
         from studyFlax.views.modules.module_notifications import _format_updated_fields
         self.assertEqual(_format_updated_fields(['module_code']), 'module code')
 
     def test_format_updated_fields_two_labels(self):
-        """Test format updated fields two labels."""
         from studyFlax.views.modules.module_notifications import _format_updated_fields
         self.assertEqual(_format_updated_fields(['module_code', 'module_name']), 'module code and module name')
 
     def test_format_updated_fields_three_labels(self):
-        """Test format updated fields three labels."""
         from studyFlax.views.modules.module_notifications import _format_updated_fields
         self.assertEqual(
             _format_updated_fields(['module_code', 'module_name', 'description']),
@@ -313,6 +283,5 @@ class ModuleNotificationsTest(TestCase):
         )
 
     def test_format_updated_fields_four_or_more_returns_details(self):
-        """Test format updated fields four or more returns details."""
         from studyFlax.views.modules.module_notifications import _format_updated_fields
         self.assertEqual(_format_updated_fields(['module_code', 'module_name', 'description', 'semester']), 'details')

@@ -10,10 +10,11 @@ from rest_framework import status
 
 from studyFlax.models.authentication.course_change_request_model import CourseChangeRequest
 from studyFlax.models.authentication.user_settings_model import UserSettings
-from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
+from studyFlax.tests.helpers.test_model_builders import make_user, make_superuser, authed_client
 
 
 class CourseChangeRequestTest(TestCase):
+    """Tests course change request."""
     def setUp(self):
         self.admin = make_superuser()
         self.user = make_user('cc_user')
@@ -148,6 +149,7 @@ class CourseChangeRequestTest(TestCase):
 
 
 class CourseChangeServiceUnitTest(TestCase):
+    """Tests course change service unit."""
     def setUp(self):
         self.user = make_user('svc_user')
 

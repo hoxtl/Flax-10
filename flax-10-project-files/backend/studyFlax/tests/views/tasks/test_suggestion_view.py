@@ -1,4 +1,6 @@
-"""Backend tests for meeting suggestion and response views."""
+"""
+Tests for suggestion views.
+"""
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -8,9 +10,11 @@ from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMember
 from django.utils import timezone
 from datetime import timedelta
 
+
 User = get_user_model()
 
 class SuggestionViewsTest(TestCase):
+    """Tests suggestion views."""
     def setUp(self):
         self.client = APIClient()
         self.owner = User.objects.create_user(username="owner", email="o@e.com", password="p")

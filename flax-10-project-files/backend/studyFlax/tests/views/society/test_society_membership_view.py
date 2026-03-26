@@ -10,6 +10,7 @@ from rest_framework.test import APIClient
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
 
+
 User = get_user_model()
 
 class MembershipViewCoverageTest(TestCase):

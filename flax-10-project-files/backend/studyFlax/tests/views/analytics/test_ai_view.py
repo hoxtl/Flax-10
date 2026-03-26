@@ -37,7 +37,6 @@ class AuthenticatedAiTest(TestCase):
     """Base class for AI view tests requiring an authenticated client."""
 
     def setUp(self):
-        """Set up the test case."""
         self.client = APIClient()
         self.user = make_user()
         self.client.force_authenticate(user=self.user)
@@ -46,14 +45,12 @@ class GetAiInsightsViewTest(AuthenticatedAiTest):
     """Tests for the get-AI-insights endpoint."""
 
     def test_requires_auth(self):
-        """Test the endpoint requires authentication."""
         self.client.force_authenticate(user=None)
         response = self.client.post('/api/analytics/ai-insights/', {'days': 30})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @patch('studyFlax.views.analytics.ai_view.openai_available', False)
     def test_returns_503_when_openai_not_installed(self):
-        """Test missing OpenAI returns a 503 response."""
         response = self.client.post('/api/analytics/ai-insights/', {'days': 30})
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
         self.assertIn('OpenAI package', response.data['error'])
@@ -61,7 +58,6 @@ class GetAiInsightsViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('django.conf.settings.OPENAI_API_KEY', '', create=True)
     def test_returns_503_when_no_api_key(self):
-        """Test missing API keys return a 503 response."""
         with patch('studyFlax.views.analytics.ai_view.settings') as mock_settings:
             mock_settings.OPENAI_API_KEY = None
             response = self.client.post('/api/analytics/ai-insights/', {'days': 30})
@@ -71,7 +67,6 @@ class GetAiInsightsViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_returns_insights_on_success(self, mock_settings, mock_openai_cls):
-        """Test successful requests return insights."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -87,7 +82,6 @@ class GetAiInsightsViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_returns_500_on_openai_error(self, mock_settings, mock_openai_cls):
-        """Test OpenAI errors return a 500 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -100,7 +94,6 @@ class GetAiInsightsViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_uses_custom_days_param(self, mock_settings, mock_openai_cls):
-        """Test custom day ranges are reflected in context."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -114,7 +107,6 @@ class GetAiInsightsViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_invalid_days_param_returns_400(self, mock_settings):
-        """Test invalid day values return a 400 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         response = self.client.post('/api/analytics/ai-insights/', {'days': 'notanumber'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -124,7 +116,6 @@ class GetAiInsightsViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_incomplete_openai_response_returns_500(self, mock_settings, mock_openai_cls):
-        """Test incomplete OpenAI replies return a 500 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -138,21 +129,18 @@ class AiChatViewTest(AuthenticatedAiTest):
     """Tests for the AI chat endpoint."""
 
     def test_requires_auth(self):
-        """Test the chat endpoint requires authentication."""
         self.client.force_authenticate(user=None)
         response = self.client.post('/api/analytics/ai-chat/', {'messages': []})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @patch('studyFlax.views.analytics.ai_view.openai_available', False)
     def test_returns_503_when_openai_not_installed(self):
-        """Test missing OpenAI returns a 503 response."""
         response = self.client.post('/api/analytics/ai-chat/', {'messages': [{'role': 'user', 'content': 'Hi'}]})
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
 
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_returns_503_when_no_api_key(self, mock_settings):
-        """Test missing API keys return a 503 response."""
         mock_settings.OPENAI_API_KEY = None
         response = self.client.post('/api/analytics/ai-chat/', {'messages': [{'role': 'user', 'content': 'Hi'}]})
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -160,7 +148,6 @@ class AiChatViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_returns_400_with_no_messages(self, mock_settings):
-        """Test empty messages return a 400 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         response = self.client.post('/api/analytics/ai-chat/', {'messages': []})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -170,7 +157,6 @@ class AiChatViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_returns_reply_on_success(self, mock_settings, mock_openai_cls):
-        """Test successful requests return a reply."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -189,7 +175,6 @@ class AiChatViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_returns_500_on_openai_error(self, mock_settings, mock_openai_cls):
-        """Test OpenAI errors return a 500 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -205,7 +190,6 @@ class AiChatViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_missing_messages_key_returns_400(self, mock_settings):
-        """Test missing messages keys return a 400 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         response = self.client.post('/api/analytics/ai-chat/', {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -213,7 +197,6 @@ class AiChatViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_invalid_days_param_returns_400(self, mock_settings):
-        """Test invalid day values return a 400 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         response = self.client.post(
             '/api/analytics/ai-chat/',
@@ -227,7 +210,6 @@ class AiChatViewTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_chat_incomplete_response_returns_500(self, mock_settings, mock_openai_cls):
-        """Test incomplete chat replies return a 500 response."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -245,26 +227,22 @@ class OpenAIResponseValidationTest(TestCase):
     """Tests for OpenAI response validation helpers."""
 
     def test_is_openai_response_valid_with_empty_choices(self):
-        """Test empty choices fail validation."""
         from studyFlax.views.analytics.ai_view import _is_openai_response_valid
         response = MagicMock()
         response.choices = []
         self.assertFalse(_is_openai_response_valid(response))
 
     def test_is_openai_response_valid_with_no_choices_attr(self):
-        """Test missing choices fail validation."""
         from studyFlax.views.analytics.ai_view import _is_openai_response_valid
         response = MagicMock()
         response.choices = None
         self.assertFalse(_is_openai_response_valid(response))
 
     def test_extract_days_with_non_integer_string(self):
-        """Test non-integer day values return none."""
         from studyFlax.views.analytics.ai_view import _extract_days
         self.assertIsNone(_extract_days('abc'))
 
     def test_extract_days_with_none_returns_default(self):
-        """Test missing day values return defaults."""
         from studyFlax.views.analytics.ai_view import _extract_days
         self.assertEqual(_extract_days(None, 30), 30)
 
@@ -272,7 +250,6 @@ class OpenAIImportCoverageTest(TestCase):
     """Covers the openai import try/except branch."""
 
     def test_openai_import_branch_with_mock_module(self):
-        """Test mocked OpenAI imports set availability."""
         import importlib
         import sys
         fake_openai = MagicMock()
@@ -291,27 +268,23 @@ class AiScheduleParserTest(TestCase):
     """Tests for AI schedule parsing utilities."""
 
     def test_strip_code_fence_with_json_prefix(self):
-        """Test fenced JSON content is stripped."""
         from studyFlax.views.analytics.ai_schedule import strip_code_fence
         content = '```json\n[{"title": "Study"}]\n```'
         result = strip_code_fence(content)
         self.assertIn('"title"', result)
 
     def test_strip_code_fence_without_json_prefix(self):
-        """Test fenced content without JSON is stripped."""
         from studyFlax.views.analytics.ai_schedule import strip_code_fence
         content = '```\n[{"title": "Study"}]\n```'
         result = strip_code_fence(content)
         self.assertIn('"title"', result)
 
     def test_parse_schedule_events_returns_empty_for_non_list(self):
-        """Test non-list JSON returns no events."""
         from studyFlax.views.analytics.ai_schedule import parse_schedule_events
         result = parse_schedule_events('{"key": "value"}')
         self.assertEqual(result, [])
 
     def test_parse_schedule_events_returns_list_on_valid_json(self):
-        """Test valid JSON returns parsed events."""
         from studyFlax.views.analytics.ai_schedule import parse_schedule_events
         result = parse_schedule_events('[{"title": "Study"}]')
         self.assertEqual(len(result), 1)
@@ -323,7 +296,6 @@ class AiChatScheduleExtractionFailureTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_chat_returns_200_when_schedule_fetch_fails(self, mock_settings, mock_openai_cls):
-        """Test schedule fetch failures still return success."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
@@ -342,7 +314,6 @@ class AiChatScheduleExtractionFailureTest(AuthenticatedAiTest):
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
     def test_chat_returns_200_when_schedule_response_incomplete(self, mock_settings, mock_openai_cls):
-        """Test incomplete schedule replies still return success."""
         mock_settings.OPENAI_API_KEY = 'test-key'
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client

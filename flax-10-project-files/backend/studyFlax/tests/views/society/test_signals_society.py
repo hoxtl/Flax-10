@@ -13,7 +13,8 @@ from studyFlax.models.society.society_event_model import SocietyEvent
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_announcement_model import SocietyAnnouncement
 from studyFlax.models.notifications.notification_model import Notification
-from studyFlax.tests.helpers.factories import make_user, make_society, make_society_event
+from studyFlax.tests.helpers.test_model_builders import make_user, make_society, make_society_event
+
 
 User = get_user_model()
 

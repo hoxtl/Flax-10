@@ -6,8 +6,9 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.tests.helpers.factories import make_task_list, make_user
+from studyFlax.tests.helpers.test_model_builders import make_task_list, make_user
 from studyFlax.models.tasks.task_model import TaskList
+
 
 class TaskListListViewTest(TestCase):
     """Tests for task list list view."""

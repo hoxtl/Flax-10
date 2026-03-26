@@ -13,7 +13,6 @@ class DeadlineViewTests(BaseTestCase):
     """Tests for Deadline views."""
 
     def setUp(self):
-        """Set up the test case."""
         super().setUp()
         self.user.role = 'teacher'
         self.user.save()
@@ -32,7 +31,6 @@ class DeadlineViewTests(BaseTestCase):
         self.detail_url = f'/api/modules/{self.module.id}/deadlines/{self.deadline.id}/'
 
     def create_teacher(self, username):
-        """Create a teacher for deadline tests."""
         return self.user.__class__.objects.create_user(
             username=username,
             email=f'{username}@example.com',
@@ -59,45 +57,38 @@ class DeadlineViewTests(BaseTestCase):
         )
 
     def test_list_deadlines(self):
-        """Test list deadlines."""
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_teacher_can_create_deadline(self):
-        """Test teacher can create deadline."""
         data = dict(title='Essay', deadline_type='coursework',
             start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_student_cannot_create_deadline(self):
-        """Test student cannot create deadline."""
         self.user.role = 'student'
         self.user.save()
         response = self.client.post(self.list_url, {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_deadline(self):
-        """Test get deadline."""
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['title'], 'CW1')
 
     def test_teacher_can_update_deadline(self):
-        """Test teacher can update deadline."""
         response = self.client.put(self.detail_url, {'title': 'Updated'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['title'], 'Updated')
 
     def test_teacher_can_delete_deadline(self):
-        """Test teacher can delete deadline."""
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Deadline.objects.filter(id=self.deadline.id).exists())
 
     def test_delete_removes_calendar_events(self):
-        """Test delete removes calendar events."""
         CalendarEvent.objects.create(
             user=self.user, module=self.module, title='Event',
             source='module_deadline', external_id=str(self.deadline.id),
@@ -107,7 +98,6 @@ class DeadlineViewTests(BaseTestCase):
         self.assertFalse(CalendarEvent.objects.filter(external_id=str(self.deadline.id)).exists())
 
     def test_end_date_is_after_start_date(self):
-        """Test end date is after start date."""
         start = timezone.now() + timedelta(days=7)
         payload = dict(title='Exam', deadline_type='exam',
             start_due_date=start.isoformat(),
@@ -116,7 +106,6 @@ class DeadlineViewTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_upcoming_deadlines_are_future_dates(self):
-        """Test upcoming deadlines are future dates."""
         self.user.role = 'student'
         self.user.save()
         Enrollment.objects.create(student=self.user, module=self.module)
@@ -127,7 +116,6 @@ class DeadlineViewTests(BaseTestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_teacher_upcoming_deadlines_only_include_owned_modules(self):
-        """Test teacher upcoming deadlines only include owned modules."""
         other_teacher = self.create_teacher('other_teacher')
         self.create_module_deadline(other_teacher, 'GN4101')
         response = self.client.get('/api/deadlines/upcoming/')
@@ -136,7 +124,6 @@ class DeadlineViewTests(BaseTestCase):
         self.assertEqual(response.data[0]['module_code'], '5CCS2SEG')
 
     def test_create_deadline_creates_events_for_enrolled_students(self):
-        """Test create deadline creates events for enrolled students."""
         self.user.role = 'student'
         self.user.save()
         Enrollment.objects.create(student=self.user, module=self.module)
@@ -149,12 +136,10 @@ class DeadlineViewTests(BaseTestCase):
         ).exists())
 
     def deadline_payload(self):
-        """Build a deadline payload for requests."""
         return dict(title='New Deadline', deadline_type='coursework',
             start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
 
     def test_update_deadline_invalid_non_teacher(self):
-        """Test update deadline invalid non teacher."""
         deadline = Deadline.objects.create(
             module=self.module, title='D1',
             deadline_type='coursework',
