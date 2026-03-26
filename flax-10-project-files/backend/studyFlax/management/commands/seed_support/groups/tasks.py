@@ -6,7 +6,7 @@ import random
 from datetime import timedelta
 
 from studyFlax.models.tasks.task_model import Task
-from studyFlax.fixtures.groupwork_fixtures import GROUP_TASK_TEMPLATES
+from studyFlax.fixtures.groupwork.groupwork_fixtures import GROUP_TASK_TEMPLATES
 
 PROJECT_TASK_STATUS_PATTERNS = (
     ("todo", "todo", "in_progress", "todo", "todo"),
@@ -56,9 +56,13 @@ def _completed_pick_count(members, rng):
 def _multi_member_assignments(members, completed_indexes, rng):
     """Assign varied members to completed tasks."""
 
-    assignments = {}
+    assignments = {index: [] for index in completed_indexes}
+    for offset, member in enumerate(members):
+        assignments[completed_indexes[offset % len(completed_indexes)]].append(member)
     for task_index in completed_indexes:
-        assignments[task_index] = rng.sample(members, _completed_pick_count(members, rng))
+        pool = [member for member in members if member not in assignments[task_index]]
+        extra_total = max(_completed_pick_count(members, rng) - len(assignments[task_index]), 0)
+        assignments[task_index].extend(rng.sample(pool, min(extra_total, len(pool))))
     return assignments
 
 

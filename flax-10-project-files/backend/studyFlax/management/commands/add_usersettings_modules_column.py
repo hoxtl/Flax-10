@@ -34,9 +34,13 @@ def _apply_migration(cursor, table, stdout, style):
     stdout.write(style.SUCCESS(f"Added column {table}.modules."))
 
 class Command(BaseCommand):
+    """Add the missing `modules` column to `UserSettings` when needed."""
+
     help = "Add studyFlax_usersettings.modules column if missing (safe to run multiple times)."
 
     def handle(self, *args, **options):
+        """Run the column check and add the column when it is missing."""
+
         table = UserSettings._meta.db_table
         with connection.cursor() as cursor:
             _apply_migration(cursor, table, self.stdout, self.style)

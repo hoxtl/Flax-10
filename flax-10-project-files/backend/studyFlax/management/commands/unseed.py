@@ -44,6 +44,8 @@ def get_superuser_data():
     ]
 
 def truncate_tables(cursor, tables, stdout):
+    """Truncate the supplied tables and echo each cleared table name."""
+
     # Truncate in a single statement so PostgreSQL acquires the table locks
     # in one consistent pass instead of deadlocking halfway through.
     quoted_tables = ', '.join(f'"{table}"' for table in tables)
@@ -70,6 +72,9 @@ def _attempt_restore(payload):
         return (payload.get("username", "?"), str(exc))
 
 def restore_superusers(superusers_data, stdout):
+    """Restore preserved superusers after the database wipe completes."""
+
+    del stdout
     if not superusers_data:
         return []
     results = [_attempt_restore(_build_superuser_payload(d)) for d in superusers_data]
@@ -103,6 +108,8 @@ def _print_success_footer(stdout, style):
     stdout.write("")
 
 def confirm_truncate(stdout):
+    """Prompt for confirmation before wiping the seeded tables."""
+
     for line in _confirm_truncate_lines():
         stdout.write(line)
     answer = input("  Type 'yes' to confirm: ")
@@ -129,6 +136,8 @@ class Command(BaseCommand):
     help = 'Cleans the database using PostgreSQL TRUNCATE CASCADE, preserving superusers.'
 
     def handle(self, *args, **options):
+        """Clear seeded data and restore any pre-existing superusers."""
+
         superusers_data = get_superuser_data()
         self._warn_on_empty_superusers(superusers_data)
         if not self._confirmed():

@@ -149,6 +149,8 @@ def _ensure_fixture_users_own_projects(student_modules, rng):
         _top_up_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)
 
 def create_group_projects(stdout):
+    """Create the seeded group projects."""
+
     now = timezone.now()
     rng = random.Random(PROJECT_OWNER_SEED)
     students = _get_student_pool()
@@ -170,6 +172,8 @@ def _run_membership_seeding(projects, students, showcase_student, student_module
     ensure_member_count_spread(projects, students, module_students, membership_counts, rng)
 
 def create_group_memberships(stdout):
+    """Create the seeded memberships for all seeded group projects."""
+
     rng = random.Random(PROJECT_MEMBER_SEED)
     context = _build_seed_project_context(timezone.now())
     students = context["students"]
@@ -188,6 +192,8 @@ def create_group_memberships(stdout):
         post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 
 def create_group_tasks(stdout):
+    """Create the seeded task sets for all seeded group projects."""
+
     now = timezone.now()
     context = _build_seed_project_context(now)
     projects = sorted(context["projects"], key=lambda project: (project.course_code, project.name))
@@ -203,6 +209,8 @@ def _seed_project_availability(project, now):
     _seed_meeting_suggestions_for_project(project, members, now)
 
 def seed_group_availability(stdout):
+    """Seed availability events and meeting suggestions for group projects."""
+
     now = timezone.now()
     context = _build_seed_project_context(now)
     for project in context["projects"]:

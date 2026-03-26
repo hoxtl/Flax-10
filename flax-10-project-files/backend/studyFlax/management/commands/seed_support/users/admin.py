@@ -58,6 +58,8 @@ def _create_course_change_if_missing(user, rng):
     return True
 
 def seed_course_change_requests(stdout):
+    """Seed pending course-change requests for non-fixture users."""
+
     rng = random.Random("studyflax-course-changes-v1")
     pool = _non_fixture_users()
     if not pool:
@@ -80,6 +82,8 @@ def _create_society_report_if_missing(society, reporter, reason, pairs_used):
     return True
 
 def seed_society_reports(stdout):
+    """Seed society reports for ratified societies."""
+
     rng = random.Random("studyflax-society-reports-v1")
     societies = list(Society.objects.filter(is_ratified=True))
     pool = _non_fixture_users()

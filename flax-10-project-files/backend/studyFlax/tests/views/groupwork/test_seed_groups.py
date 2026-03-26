@@ -1,8 +1,11 @@
+"""Tests for completed group task assignment helpers."""
+
+import random
 from types import SimpleNamespace
 
 from django.test import SimpleTestCase
 
-from studyFlax.management.commands.seed_groups import _build_completed_task_assignments
+from studyFlax.management.commands.seed_support.groups.tasks import _build_completed_task_assignments
 
 
 class SeedGroupTaskAssignmentsTest(SimpleTestCase):
@@ -15,6 +18,7 @@ class SeedGroupTaskAssignmentsTest(SimpleTestCase):
         assignments = _build_completed_task_assignments(
             members,
             ("done", "todo", "done", "in_progress", "todo"),
+            random.Random("seed-groups-test"),
         )
 
         assigned_usernames = {
@@ -32,6 +36,7 @@ class SeedGroupTaskAssignmentsTest(SimpleTestCase):
         assignments = _build_completed_task_assignments(
             members,
             ("todo", "in_progress", "todo", "todo", "todo"),
+            random.Random("seed-groups-empty"),
         )
 
         self.assertEqual(assignments, {})

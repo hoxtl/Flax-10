@@ -55,6 +55,9 @@ JOHNDOE_BIO = (
 )
 
 def create_admin_user(stdout):
+    """Create the default admin fixture user when it does not already exist."""
+
+    del stdout
     if User.objects.filter(username='johndoe').exists():
         return
     User.objects.create_superuser(
@@ -97,6 +100,8 @@ def _create_single_fixture_user(data, stdout):
     _update_fixture_user(user, data)
 
 def create_fixture_users(stdout):
+    """Create and report the named fixture users for the seed dataset."""
+
     role_order = {'admin': 0, 'student': 1, 'teacher': 2}
     ordered_fixtures = sorted(
         FIXTURE_USERS,

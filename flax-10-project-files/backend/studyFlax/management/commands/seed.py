@@ -6,23 +6,18 @@ import random
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.db import connection
 
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
     Module, Enrollment, Deadline, Reading, UserSettings,
     Society, CalendarShare,
 )
-from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
-from studyFlax.models.society.society_report_model import SocietyReport
 from studyFlax.models.notifications.notification_model import Notification
-from studyFlax.models.tasks.task_model import Task, TaskList
+from studyFlax.models.tasks.task_model import Task
 from studyFlax.models.groupwork.groupwork_model import GroupProject
 from studyFlax.models.calendar.event_attendance_model import EventAttendance
-from studyFlax.fixtures.data_fixtures import (
-    category_fixtures, tag_fixtures, recurrence_fixtures,
-    MODULE_PILL_COLORS,
-)
+from studyFlax.fixtures.planning.data_fixtures import MODULE_PILL_COLORS
+from studyFlax.fixtures.users.user_fixtures import category_fixtures, recurrence_fixtures, tag_fixtures
 from .seed_support.users.users import (
     FIXTURE_USERS, ROLE_LABELS,
     create_admin_user, create_fixture_users, create_random_users,
@@ -46,9 +41,9 @@ from .seed_support.content.societies import (
 from .seed_support.readings.readings import create_readings
 from .seed_support.events.attendance import seed_attendance
 from .seed_support.users.admin import seed_course_change_requests, seed_society_reports
+from .seed_support.core.usersettings import ensure_usersettings_seed_compatibility
 
 User = get_user_model()
-LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
 SOFT_TAG_COLORS = {
     "Lecture": "#C98C56",
     "Deadline": "#7F5B63",
@@ -73,21 +68,6 @@ def _seed_user_pool():
     return list(User.objects.filter(role__in=['student', 'teacher']))
 
 
-def _table_columns(table_name):
-    with connection.cursor() as cursor:
-        return {column.name for column in connection.introspection.get_table_description(cursor, table_name)}
-
-
-def _apply_legacy_column_fix(table_name):
-    """Apply default and null fix for legacy widget sizes column."""
-
-    alter_sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{LEGACY_WIDGET_SIZES_COLUMN}" SET DEFAULT \'{{}}\'::jsonb;'
-    update_sql = f'UPDATE "{table_name}" SET "{LEGACY_WIDGET_SIZES_COLUMN}" = \'{{}}\'::jsonb WHERE "{LEGACY_WIDGET_SIZES_COLUMN}" IS NULL;'
-    with connection.cursor() as cursor:
-        cursor.execute(alter_sql)
-        cursor.execute(update_sql)
-
-
 def _display_role(username, role):
     return 'admin/student' if username == 'johndoe' else role
 
@@ -106,12 +86,16 @@ class Command(BaseCommand):
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
     def add_arguments(self, parser):
+        """Register the optional teacher-count override for seed runs."""
+
         parser.add_argument(
             '--teacher-count', type=int, default=14,
             help='Target total number of teacher accounts.',
         )
 
     def handle(self, *args, **options):
+        """Seed the backend with the full development dataset."""
+
         if _is_already_seeded():
             self._print_already_seeded_warning()
             return
@@ -143,10 +127,7 @@ class Command(BaseCommand):
         self.stdout.write("")
 
     def _ensure_usersettings_seed_compatibility(self):
-        table_name = UserSettings._meta.db_table
-        if LEGACY_WIDGET_SIZES_COLUMN not in _table_columns(table_name):
-            return
-        _apply_legacy_column_fix(table_name)
+        ensure_usersettings_seed_compatibility(UserSettings._meta.db_table)
 
     def _load_shared_data(self):
         self.users = _seed_user_pool()
