@@ -3,7 +3,7 @@
  */
 
 import { Link } from "react-router-dom";
-import Badge from "../../../components/common/badge/Badge";
+import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";

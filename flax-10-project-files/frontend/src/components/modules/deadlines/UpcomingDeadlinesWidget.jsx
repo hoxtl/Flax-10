@@ -5,7 +5,7 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
-import Badge from '../../common/badge/Badge';
+import Badge from '../../common/Badge/Badge';
 import DeadlineCountdown from '../../common/deadline_countdown/DeadlineCountdown';
 import urgentGlowStyles from '../../common/urgent_glow/UrgentGlow.module.css';
 import {

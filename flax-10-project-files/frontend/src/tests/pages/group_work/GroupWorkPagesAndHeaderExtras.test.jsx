@@ -209,7 +209,7 @@ vi.mock("../../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label }) => <button type="button" onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../components/common/badge/Badge", () => ({
+vi.mock("../../../components/common/Badge/Badge", () => ({
   default: ({ children }) => <span>{children}</span>,
 }));
 

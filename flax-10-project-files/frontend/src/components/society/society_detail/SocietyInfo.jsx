@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { Bell, BellOff } from "lucide-react";
-import Badge from "../../common/badge/Badge";
+import Badge from "../../common/Badge/Badge";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
 import styles from "./SocietyInfo.module.css";

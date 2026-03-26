@@ -9,7 +9,7 @@ import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.
 import { formatDate } from '../../calendar/utils/dateUtils.js';
 import { getInitials } from '../../auth/utils/userUtils.js';
 import { useAuth } from '../../../context/AuthContext.jsx';
-import Badge from '../../common/badge/Badge.jsx';
+import Badge from '../../common/Badge/Badge.jsx';
 import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/deadline_countdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/back_button/BackButton.jsx';
