@@ -5,9 +5,7 @@ import {
   deriveGapDeadlineFallbacks,
 } from "../../../../../pages/homepage/hooks/mini_timeline/assignmentUtils";
 
-// ---------------------------------------------------------------------------
 // Mock taskUtils so tests are isolated from focusPlanner internals
-// ---------------------------------------------------------------------------
 
 vi.mock("../../../../../pages/homepage/utils/taskUtils", () => ({
   taskDurationMins: (task) => (task?.estimated_blocks ?? 1) * 25,
@@ -17,9 +15,7 @@ vi.mock("../../../../../pages/homepage/utils/taskUtils", () => ({
   },
 }));
 
-// ---------------------------------------------------------------------------
 // Fixtures
-// ---------------------------------------------------------------------------
 
 const NOW = new Date("2024-06-01T12:00:00Z");
 
@@ -39,9 +35,7 @@ const TASK_URGENT_OVERDUE = {
 };
 const TASK_COMPLETED = { id: "t4", title: "Done task", priority: "low", estimated_blocks: 1, completed: true };
 
-// ---------------------------------------------------------------------------
 // deriveBestFreeRowId
-// ---------------------------------------------------------------------------
 
 describe("deriveBestFreeRowId", () => {
   it("returns null when rows is empty", () => {
@@ -56,15 +50,15 @@ describe("deriveBestFreeRowId", () => {
     // score for each free row uses getGapScore; with no tasks suggested the score is just row.minutes
     // Both rows should still be evaluated and the one with higher minutes wins
     const result = deriveBestFreeRowId([FREE_ROW_A, FREE_ROW_B], [], NOW);
-    // row-a has 60 minutes, row-b has 30 → row-a wins
+    // row-a wins because it offers 60 minutes and row-b offers 30.
     expect(result).toBe("row-a");
   });
 
   it("returns the free row id with the best score (overdue + urgent boost)", () => {
     // TASK_URGENT_OVERDUE gets +240 (overdue) +140 (urgent) = +380 on top of row minutes
-    // row-b has only 30 mins but fits t3 (estimated_blocks:2 → 50 mins <= 60 for row-a but > 30 for row-b)
-    // row-a (60 mins) fits t3 → score = 60 + 240 + 140 = 440
-    // row-b (30 mins) doesn't fit t3 → score = 30
+    // row-b only has 30 minutes, so t3 cannot fit there.
+    // row-a fits t3, which gives it the highest score.
+    // row-b keeps only its base row score.
     const result = deriveBestFreeRowId([FREE_ROW_A, FREE_ROW_B], [TASK_URGENT_OVERDUE], NOW);
     expect(result).toBe("row-a");
   });
@@ -74,9 +68,7 @@ describe("deriveBestFreeRowId", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // deriveAssignedGapTasks
-// ---------------------------------------------------------------------------
 
 describe("deriveAssignedGapTasks", () => {
   const emptySlottedIds = new Set();
@@ -205,9 +197,7 @@ describe("deriveAssignedGapTasks", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // deriveGapDeadlineFallbacks
-// ---------------------------------------------------------------------------
 
 describe("deriveGapDeadlineFallbacks", () => {
   const SUGGESTION_A = { assessment_title: "Essay 1" };
@@ -268,7 +258,7 @@ describe("deriveGapDeadlineFallbacks", () => {
       [SUGGESTION_A],
       slottedTitles,
     );
-    // SUGGESTION_A.assessment_title is "Essay 1" → "Revision: Essay 1" is slotted → filtered out
+    // Essay 1 already has a matching revision title in slottedTitles.
     expect(result["row-a"]).toBeUndefined();
   });
 

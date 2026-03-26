@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
-// ---------------------------------------------------------------------------
 // Mock the API module before importing the hook
-// ---------------------------------------------------------------------------
 
 vi.mock("../../../../../api/userApi", () => ({
   getUserSettings: vi.fn(),

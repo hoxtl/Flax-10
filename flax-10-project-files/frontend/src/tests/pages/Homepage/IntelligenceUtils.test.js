@@ -1,3 +1,7 @@
+/*
+ * Tests for homepage intelligence utility helpers and live-context copy.
+ */
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const overlapSleepMock = vi.fn();
@@ -33,6 +37,10 @@ const baseLiveContextInput = {
 
 const buildLiveContextInput = (overrides = {}) => ({ ...baseLiveContextInput, ...overrides });
 
+function expectLiveContextMatch(overrides, expected) {
+  expect(getLiveContext(buildLiveContextInput(overrides))).toEqual(expected);
+}
+
 describe("IntelligenceUtils", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -45,7 +53,7 @@ describe("IntelligenceUtils", () => {
   });
 
   describe("format helpers", () => {
-    it("greets people with or without honorifics", () => {
+    it("greets people with or without titles", () => {
       expect(getGreeting("Pat", true)).toBe("Good Morning, Dr. Pat.");
       expect(getGreeting("Ava", false)).toBe("Good Morning, Ava.");
       expect(getGreeting("Sam")).toBe("Good Morning, Sam.");
@@ -262,35 +270,29 @@ describe("IntelligenceUtils", () => {
       });
     });
 
-    it("handles current and upcoming events without optional metadata", () => {
+    it("handles current events without optional metadata", () => {
       overlapSleepMock.mockReturnValue(false);
-      expect(
-        getLiveContext(
-          buildLiveContextInput({
-            currentEvent: {
-              start_time: "2026-03-24T09:30:00.000Z",
-              end_time: null,
-              title: "Solo focus",
-            },
-          }),
-        ),
-      ).toEqual({
+      expectLiveContextMatch({
+        currentEvent: {
+          start_time: "2026-03-24T09:30:00.000Z",
+          end_time: null,
+          title: "Solo focus",
+        },
+      }, {
         iconKey: "Clock3",
         label: "On now",
         meta: null,
         text: "Solo focus",
         tone: "neutral",
       });
+    });
 
-      expect(
-        getLiveContext(
-          buildLiveContextInput({
-            upcomingEvent: {
-              title: "Unnamed block",
-            },
-          }),
-        ),
-      ).toEqual({
+    it("handles upcoming events without optional metadata", () => {
+      expectLiveContextMatch({
+        upcomingEvent: {
+          title: "Unnamed block",
+        },
+      }, {
         iconKey: "Clock3",
         label: "Up next",
         meta: null,

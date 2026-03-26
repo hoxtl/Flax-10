@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePopoverDismiss } from "../../../../../pages/homepage/hooks/mini_timeline/usePopoverDismiss";
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 
 function makeRef(element = null) {
   return { current: element };
@@ -16,9 +14,7 @@ function fireMousedown(target) {
   document.dispatchEvent(event);
 }
 
-// ---------------------------------------------------------------------------
 // Tests
-// ---------------------------------------------------------------------------
 
 describe("usePopoverDismiss", () => {
   let onClose;
