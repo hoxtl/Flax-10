@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { validateForm, getFormData, updateForm } from '../../components/modules/utils/moduleHelpers';
+import { validateForm, getFormData, updateForm } from '../../components/Modules/utils/moduleHelpers';
 
 describe('moduleHelpers', () => {
     it('getFormData returns default empty form', () => {

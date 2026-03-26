@@ -12,6 +12,7 @@ from studyFlax.models.modules.module_model import Module
 
 class TaskList(models.Model):
     """Task collection owned by a user."""
+
     CATEGORY_CHOICES = [
         ('uni', 'University'),
         ('society', 'Society'),
@@ -30,6 +31,7 @@ class TaskList(models.Model):
 
 class Task(models.Model):
     """Task tracked for a user or project."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
     assigned_to = models.ManyToManyField(User, related_name='assigned_tasks', blank=True)
     group_project = models.ForeignKey(GroupProject, on_delete=models.CASCADE, null=True, blank=True, related_name='tasks')

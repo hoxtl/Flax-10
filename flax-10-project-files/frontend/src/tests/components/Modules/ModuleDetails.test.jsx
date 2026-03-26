@@ -5,7 +5,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import ModuleDetails from '../../../components/modules/modules/ModuleDetails';
+import ModuleDetails from '../../../components/Modules/Modules/ModuleDetails';
 
 const useAuthMock = vi.hoisted(() => vi.fn(() => ({ profile: null })));
 
@@ -14,10 +14,10 @@ vi.mock('../../../utils/moduleUtils', () => ({
     formatDuration: vi.fn(() => '1h'),
 }));
 
-vi.mock('../../../components/modules/modules/ModuleDetails.module.css', () => ({ default: {} }));
-vi.mock('../../../components/modules/styles/ModuleHero.module.css', () => ({ default: {} }));
-vi.mock('../../../components/modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
-vi.mock('../../../components/modules/styles/ModuleDeadlines.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/Modules/ModuleDetails.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleHero.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleDeadlines.module.css', () => ({ default: {} }));
 vi.mock('../../../context/AuthContext.jsx', () => ({
     useAuth: useAuthMock,
 }));

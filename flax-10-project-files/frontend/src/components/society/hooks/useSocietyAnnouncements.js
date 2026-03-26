@@ -36,7 +36,6 @@ const syncAnnouncement = async (ann, data, eventOps, onIdUpdate) => {
     try {
         await handleLinkedUpdate(ann, evData, eventOps, onIdUpdate);
     } catch (err) {
-        console.error('Failed to sync announcement with event:', err);
     }
 };
 
@@ -67,7 +66,6 @@ const deleteLinkedEvent = async (ann, eventOps) => {
     try {
         await eventOps.deleteEvent(ann.event_id, true);
     } catch (err) {
-        console.error('Failed to delete linked event:', err);
     }
 };
 

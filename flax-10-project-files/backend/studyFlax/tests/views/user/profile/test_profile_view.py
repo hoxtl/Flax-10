@@ -196,6 +196,7 @@ class ProfileViewHelpersTest(TestCase):
 
 class SuggestStudySessionViewTest(TestCase):
     """Tests suggest study session view."""
+
     def setUp(self):
         self.client = APIClient()
         self.sender = User.objects.create_user(

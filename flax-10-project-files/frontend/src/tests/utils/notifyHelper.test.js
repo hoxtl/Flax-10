@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createNotify } from '../../components/modules/utils/notifyHelper';
+import { createNotify } from '../../components/Modules/utils/notifyHelper';
 
 describe('createNotify', () => {
     it('calls addNotification with Done title for non-error', () => {

@@ -15,8 +15,8 @@ import {
   SocietiesSection,
   StudyDNA,
   ThisWeek,
-} from "../../../../pages/profile/components/ProfileWidgets";
-import { useAttendanceWidgetData } from "../../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData";
+} from "../../../../pages/Profile/components/ProfileWidgets";
+import { useAttendanceWidgetData } from "../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData";
 
 export { beforeEach, expect, fireEvent, render, screen, vi, waitFor };
 export { BadgesSection, CompactAttendanceTile, MiniHeatmap, ModulesSection, PersonaCard, SocietiesSection, StudyDNA, ThisWeek, useAttendanceWidgetData };

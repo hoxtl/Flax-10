@@ -2,7 +2,7 @@
  * Task picker option card.
  */
 
-import styles from '../../../pages/timer/TimerPage.module.css';
+import styles from '../../../pages/Timer/TimerPage.module.css';
 import { getTaskDurationLabel, getTaskUrgencyTone } from './taskInputUtils';
 
 function getUrgencyClass(urgencyTone) {

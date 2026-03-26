@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import useSettingsState from "../../components/settings/hooks/useSettingsState";
+import useSettingsState from "../../components/Settings/hooks/useSettingsState";
 
 describe("useSettingsState", () => {
   it("starts with empty/default values and updates each state bucket", () => {

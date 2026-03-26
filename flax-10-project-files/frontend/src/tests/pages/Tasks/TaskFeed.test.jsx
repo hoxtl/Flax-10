@@ -26,7 +26,7 @@ vi.mock('lucide-react', () => ({
 vi.mock('../../../components/ui/est_time_help_banner', () => ({
     default: () => <div data-testid="est-time-banner" />,
 }));
-vi.mock('../../../pages/tasks/components/TaskCard', () => ({
+vi.mock('../../../pages/Tasks/components/TaskCard', () => ({
     default: ({ task, onToggle, onDelete }) => (
         <div data-testid={`task-card-${task.id}`}>
             <span>{task.title}</span>
@@ -35,10 +35,10 @@ vi.mock('../../../pages/tasks/components/TaskCard', () => ({
         </div>
     ),
 }));
-vi.mock('../../../pages/tasks/components/CreateTaskBar', () => ({
+vi.mock('../../../pages/Tasks/components/CreateTaskBar', () => ({
     default: () => <div data-testid="create-task-bar" />,
 }));
-vi.mock('../../../pages/tasks/components/SuggestedReadingsSection', () => ({
+vi.mock('../../../pages/Tasks/components/SuggestedReadingsSection', () => ({
     default: () => <div data-testid="suggested-readings-section" />,
 }));
 vi.mock('../../../components/common/animated_dropdown', () => ({
@@ -48,7 +48,7 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
         </select>
     ),
 }));
-vi.mock('../../../pages/tasks/components/AllTasksCompleteCard', () => ({
+vi.mock('../../../pages/Tasks/components/AllTasksCompleteCard', () => ({
     default: ({ message, sub, ctaLabel, onCtaClick }) => (
         <div data-testid="all-complete-card">
             <p>{message}</p>
@@ -68,7 +68,7 @@ vi.stubGlobal('localStorage', {
 });
 mockStore['user'] = JSON.stringify({ first_name: 'John', username: 'jdoe' });
 
-import TaskFeed from '../../../pages/tasks/components/TaskFeed';
+import TaskFeed from '../../../pages/Tasks/components/TaskFeed';
 const now = new Date();
 const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
 const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);

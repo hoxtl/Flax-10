@@ -20,8 +20,6 @@ import { calcCompletionSegments } from '../../../pages/group_work/utils/taskStat
 import { shouldShowPopupAbove } from '../../../pages/group_work/utils/taskAssigneeUtils';
 import { getCollaboratorCount } from '../../../pages/group_work/utils/projectStatsUtils';
 
-// projectRowUtils
-
 describe('projectRowUtils – formatProjectDate', () => {
   it('formats a valid Date object as a short GB locale string', () => {
     const result = formatProjectDate(new Date('2026-03-24'));
@@ -141,8 +139,6 @@ describe('projectRowUtils – compareProjectsBySort', () => {
   });
 });
 
-// projectStatsUtils
-
 describe('projectStatsUtils – getCollaboratorCount', () => {
   it('falls back to 1 when neither members nor member_count is present', () => {
     expect(getCollaboratorCount([{}])).toBe(1);
@@ -153,8 +149,6 @@ describe('projectStatsUtils – getCollaboratorCount', () => {
     expect(getCollaboratorCount(projects)).toBe(5);
   });
 });
-
-// taskAssigneeUtils
 
 describe('taskAssigneeUtils – shouldShowPopupAbove', () => {
   afterEach(() => {
@@ -179,8 +173,6 @@ describe('taskAssigneeUtils – shouldShowPopupAbove', () => {
     expect(shouldShowPopupAbove(rect)).toBe(true);
   });
 });
-
-// taskTimelineUtils
 
 describe('taskTimelineUtils – placeTasksIntoWeeks (edge cases)', () => {
   it('ignores tasks without a due_date', () => {
@@ -221,8 +213,6 @@ describe('taskTimelineUtils – placeTasksIntoWeeks (edge cases)', () => {
     expect(week2Total).toBe(1);
   });
 });
-
-// taskStatsUtils
 
 describe('taskStatsUtils – calcCompletionSegments (extra branches)', () => {
   it('handles tasks with 3 assignees, distributing share equally', () => {

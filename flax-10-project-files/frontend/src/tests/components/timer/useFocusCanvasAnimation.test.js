@@ -224,7 +224,6 @@ describe('useFocusCanvasAnimation', () => {
     });
 
     it('draws sparkles (scale >= 0.05) and keeps leaves alive (life > 0)', () => {
-        // These values keep the sparkle visible and the leaf alive for one frame.
         const randomSpy = vi.spyOn(Math, 'random').mockImplementation(() => 0.5);
 
         function TestComp() {
@@ -244,7 +243,6 @@ describe('useFocusCanvasAnimation', () => {
     });
 
     it('drawGlow fallback skips fillRect when it is not available on ctx', () => {
-        // Without createRadialGradient or fillRect, the fallback exits quietly.
         const ctxNoGradientNoFillRect = { ...mockCtx, createRadialGradient: undefined, fillRect: undefined };
         HTMLCanvasElement.prototype.getContext = vi.fn(() => ctxNoGradientNoFillRect);
 

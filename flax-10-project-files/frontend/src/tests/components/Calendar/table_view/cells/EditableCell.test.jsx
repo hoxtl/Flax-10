@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EditableCell } from '../../../../../components/calendar/table_view/cells/EditableCell';
+import { EditableCell } from '../../../../../components/Calendar/table_view/cells/EditableCell';
 
 describe('EditableCell', () => {
     beforeEach(() => {

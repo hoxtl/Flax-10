@@ -24,7 +24,7 @@ vi.mock("../../../../../components/common/tags_selector/TagsSelector", () => ({
   },
 }));
 
-vi.mock("../../../../../components/tags/TagManagerModal", () => ({
+vi.mock("../../../../../components/Tags/TagManagerModal", () => ({
   default: ({ onClose }) => (
     <button type="button" onClick={onClose}>
       close-manager
@@ -32,7 +32,7 @@ vi.mock("../../../../../components/tags/TagManagerModal", () => ({
   ),
 }));
 
-import { TagField } from "../../../../../components/calendar/event_modal/components/TagField";
+import { TagField } from "../../../../../components/Calendar/event_modal/components/TagField";
 
 describe("TagField", () => {
   beforeEach(() => {

@@ -16,17 +16,17 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../pages/homepage/hooks/useCountdown', () => ({
+vi.mock('../../../pages/Homepage/hooks/useCountdown', () => ({
     useCountdown: vi.fn(() => ({ text: '5m' })),
 }));
 
-vi.mock('../../../pages/homepage/utils/kclTflMapping', () => ({
+vi.mock('../../../pages/Homepage/utils/kclTflMapping', () => ({
     getRelevantDelays: vi.fn(() => []),
     getTflLinesForLocation: vi.fn(() => []),
     isSevereDisruption: vi.fn(() => false),
 }));
 
-vi.mock('../../../pages/homepage/utils/eventUtils', () => ({
+vi.mock('../../../pages/Homepage/utils/eventUtils', () => ({
     isNow: vi.fn(() => false),
 }));
 
@@ -40,9 +40,9 @@ vi.mock('../../../api/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue(null),
 }));
 
-import { RightNowWidget } from '../../../pages/homepage/components/RightNowWidget';
-import * as eventUtils from '../../../pages/homepage/utils/eventUtils';
-import * as kclTflMapping from '../../../pages/homepage/utils/kclTflMapping';
+import { RightNowWidget } from '../../../pages/Homepage/components/RightNowWidget';
+import * as eventUtils from '../../../pages/Homepage/utils/eventUtils';
+import * as kclTflMapping from '../../../pages/Homepage/utils/kclTflMapping';
 import { getHomeAddress } from '../../../api/userApi';
 import { tflService } from '../../../api/tflApi';
 

@@ -20,6 +20,7 @@ def _make_user():
 
 class SafeCreateEnrollmentEventsTest(TestCase):
     """Tests safe create enrollment events."""
+
     def setUp(self):
         self.user = _make_user()
         self.module = MagicMock()
@@ -41,6 +42,7 @@ class SafeCreateEnrollmentEventsTest(TestCase):
 
 class LogEnrollmentCreationErrorTest(TestCase):
     """Tests log enrollment creation error."""
+
     def setUp(self):
         self.user = _make_user()
         self.module = MagicMock()

@@ -7,12 +7,12 @@ const isRoutineOrEventTaskMock = vi.fn();
 const isTodayMock = vi.fn();
 const overlapsDayMock = vi.fn();
 
-vi.mock("../../../components/calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
   overlapsDay: (...args) => overlapsDayMock(...args),
 }));
 
-vi.mock("../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../pages/Homepage/utils/index", () => ({
   getAllFreeWindowsToday: (...args) => getAllFreeWindowsTodayMock(...args),
   getNavigatorContext: (...args) => getNavigatorContextMock(...args),
   isNow: (...args) => isNowMock(...args),
@@ -42,7 +42,7 @@ import {
   getTodayFreeWindows,
   getTomorrowFirstEvent,
   getUpcomingItems,
-} from "../../../pages/homepage/utils/homepageViewModel";
+} from "../../../pages/Homepage/utils/homepageViewModel";
 
 function buildTask(id, title, dueDate, priority = "medium") {
   return {

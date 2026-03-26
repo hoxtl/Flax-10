@@ -13,6 +13,7 @@ from studyFlax.tests.helpers.test_model_builders import make_user, make_superuse
 
 class RequestCourseChangeTest(TestCase):
     """Tests request course change."""
+
     def setUp(self):
         self.user = make_user()
         self.url = '/api/course-change/request/'
@@ -55,6 +56,7 @@ class RequestCourseChangeTest(TestCase):
 
 class MyCourseChangeRequestTest(TestCase):
     """Tests my course change request."""
+
     def setUp(self):
         self.user = make_user()
         self.url = '/api/course-change/my-request/'
@@ -80,6 +82,7 @@ class MyCourseChangeRequestTest(TestCase):
 
 class ListCourseChangeRequestsTest(TestCase):
     """Tests list course change requests."""
+
     def setUp(self):
         self.admin = make_superuser()
         self.user = make_user()
@@ -112,6 +115,7 @@ class ListCourseChangeRequestsTest(TestCase):
 
 class ResolveCourseChangeRequestTest(TestCase):
     """Tests resolve course change request."""
+
     def setUp(self):
         self.admin = make_superuser()
         self.user = make_user()

@@ -9,6 +9,7 @@ from ..calendar.recurrence_rule_model import RecurrenceRule
 
 class Module(models.Model):
     """Academic module available for enrolment."""
+
     module_code = models.CharField(max_length=20, unique=True)
     module_name = models.CharField(max_length=200)
     description = models.TextField(blank=True)

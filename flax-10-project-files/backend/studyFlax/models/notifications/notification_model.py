@@ -21,6 +21,7 @@ NOTIFICATION_TYPES = [
 
 class Notification(models.Model):
     """Notification shown to a user in the app."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
     title = models.CharField(max_length=200)
     message = models.TextField(blank=True)
@@ -33,6 +34,7 @@ class Notification(models.Model):
 
     class Meta:
         """Metadata for notification."""
+
         ordering = ['-created_at']
 
     def __str__(self):

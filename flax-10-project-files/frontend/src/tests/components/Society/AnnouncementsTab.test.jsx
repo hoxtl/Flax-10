@@ -1,13 +1,13 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import AnnouncementsTab from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementsTab';
+import AnnouncementsTab from '../../../components/Society/society_detail/tabs/announcement_tab/AnnouncementsTab';
 import * as Mocks from './societyTestMocks';
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
   formatShortDate: () => 'Mar 9',
 }));
 
-vi.mock('../../../components/society/society_detail/image_handlers/ImageGalleryModal', () => ({
+vi.mock('../../../components/Society/society_detail/image_handlers/ImageGalleryModal', () => ({
   default: ({ onClose }) => (
     <div data-testid="gallery-modal">
       <button onClick={onClose}>close</button>

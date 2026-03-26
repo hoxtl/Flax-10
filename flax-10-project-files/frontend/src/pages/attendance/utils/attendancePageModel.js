@@ -6,7 +6,7 @@ import { recordAttendance } from "../../../api/attendanceApi";
 import { buildByTypeChartData, buildOverallChartData, withByTypeColors } from "./attendanceChartData";
 import { buildMarkedEvents, buildUnmarkedEvents } from "./attendanceRecords";
 import { buildSegmentEvents, buildSegmentLabel } from "./attendanceSegments";
-import { buildAttendanceSummary, getByTypeStats, getOverallStats } from "./attendanceSummary";
+import { buildAttendanceSummary, getByTypeStats, getOverallStats } from "./AttendanceSummary";
 
 function createRefetchAll(statsState, recordsState) {
   return () => {

@@ -13,7 +13,7 @@ vi.mock("../../../../api/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock("../../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
+vi.mock("../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
   useAttendanceWidgetData: vi.fn(),
 }));
 
@@ -21,7 +21,7 @@ vi.mock("@mui/x-charts/PieChart", () => ({
   PieChart: (props) => <div data-testid="pie-chart" data-hide-legend={props.hideLegend ? "true" : "false"} />,
 }));
 
-vi.mock("../../../../pages/attendance/components/SegmentDetailPanel", () => ({
+vi.mock("../../../../pages/Attendance/components/SegmentDetailPanel", () => ({
   default: () => <div data-testid="segment-detail-panel" />,
 }));
 

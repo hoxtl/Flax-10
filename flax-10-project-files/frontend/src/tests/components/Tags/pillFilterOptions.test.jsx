@@ -5,12 +5,12 @@ import {
   getUniqueTags,
   createPillFilterOptions,
   getActiveFilterLabel,
-} from "../../../components/tags/pill_filters/pillFilterOptions";
+} from "../../../components/Tags/pill_filters/pillFilterOptions";
 import {
   FilterTriggerButton,
   ManageTagsButton,
-} from "../../../components/tags/pill_filters/PillFilterControls";
-import { usePillFilterOptions } from "../../../components/tags/pill_filters/usePillFilterOptions";
+} from "../../../components/Tags/pill_filters/PillFilterControls";
+import { usePillFilterOptions } from "../../../components/Tags/pill_filters/usePillFilterOptions";
 
 vi.mock("../../../context/TagContext", () => ({
   useTags: vi.fn(() => ({
@@ -22,7 +22,7 @@ vi.mock("../../../context/TagContext", () => ({
   })),
 }));
 
-vi.mock("../../../components/tags/utils/pillUtils", () => ({
+vi.mock("../../../components/Tags/utils/pillUtils", () => ({
   countByType: vi.fn(() => ({ all: 5, lecture: 3, lab: 2 })),
 }));
 

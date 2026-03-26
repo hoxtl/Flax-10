@@ -4,6 +4,7 @@
 
 import styles from "../../pages/campus_map/routes.module.css";
 import { travelDistance, travelTime } from "./mapUtils";
+import ExpandablePillButton from "../common/expandable_pill_button/ExpandablePillButton";
 
 function StepsList({ steps }) {
   return (
@@ -23,7 +24,7 @@ function StepsList({ steps }) {
 
 function WalkingRouteDetails({ instructionMode, onToggleInstructions, routeInfo }) {
   return (
-    <div className={styles.modeCard}><div className={styles.modeCardHeader}><span className={styles.modeIcon}>🚶</span><div className={styles.modeInfo}><span className={styles.modeName}>Walking</span><span className={styles.modeBadge}>Available now</span></div></div><div className={styles.modeStats}><div className={styles.modeStat}><span className={styles.modeStatValue}>{travelTime(routeInfo.duration)}</span><span className={styles.modeStatLabel}>Duration</span></div><div className={styles.modeStatDivider} /><div className={styles.modeStat}><span className={styles.modeStatValue}>{travelDistance(routeInfo.distance)}</span><span className={styles.modeStatLabel}>Distance</span></div></div><button className={styles.stepsToggle} onClick={onToggleInstructions}>{instructionMode ? "Hide" : "Show"} directions <span>{instructionMode ? "▲" : "▼"}</span></button>{instructionMode && <StepsList steps={routeInfo.steps} />}</div>
+    <div className={styles.modeCard}><div className={styles.modeCardHeader}><span className={styles.modeIcon}>🚶</span><div className={styles.modeInfo}><span className={styles.modeName}>Walking</span><span className={styles.modeBadge}>Available now</span></div></div><div className={styles.modeStats}><div className={styles.modeStat}><span className={styles.modeStatValue}>{travelTime(routeInfo.duration)}</span><span className={styles.modeStatLabel}>Duration</span></div><div className={styles.modeStatDivider} /><div className={styles.modeStat}><span className={styles.modeStatValue}>{travelDistance(routeInfo.distance)}</span><span className={styles.modeStatLabel}>Distance</span></div></div><ExpandablePillButton expanded={instructionMode} onToggle={onToggleInstructions} collapsedLabel="Show directions" expandedLabel="Hide directions" />{instructionMode && <StepsList steps={routeInfo.steps} />}</div>
   );
 }
 

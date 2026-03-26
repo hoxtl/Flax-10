@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import GenericSummaryModal from "../../common/generic_summary_modal/GenericSummaryModal";
 import SummaryItem from "../../common/generic_summary_modal/SummaryItem";
-import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT, getFilteredEvents } from "../../../pages/profile/utils/profileHelpers";
+import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT, getFilteredEvents } from "../../../pages/Profile/utils/profileHelpers";
 import LocationLink from "../../common/location_link/LocationLink";
 import styles from "./EventsSummaryModal.module.css";
 

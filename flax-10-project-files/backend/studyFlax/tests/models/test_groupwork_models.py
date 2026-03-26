@@ -13,6 +13,7 @@ User = get_user_model()
 
 class GroupWorkModelTest(TestCase):
     """Tests group work model."""
+
     def setUp(self):
         self.user1 = User.objects.create_user(username="u1", email="u1@e.com", password="p")
         self.user2 = User.objects.create_user(username="u2", email="u2@e.com", password="p")

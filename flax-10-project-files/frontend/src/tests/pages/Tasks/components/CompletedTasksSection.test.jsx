@@ -1,9 +1,9 @@
 /* Tests for CompletedTasksSection component rendering and visibility toggling */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import CompletedTasksSection from "../../../../pages/tasks/components/CompletedTasksSection";
+import CompletedTasksSection from "../../../../pages/Tasks/components/CompletedTasksSection";
 
-vi.mock("../../../../pages/tasks/components/TaskCard", () => ({
+vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
   default: ({ task }) => <div data-testid="task-card">{task.title}</div>,
 }));
 

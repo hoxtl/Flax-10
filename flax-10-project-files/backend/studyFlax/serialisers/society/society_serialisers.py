@@ -36,32 +36,40 @@ class SilentNotificationMixin:
 
 class SocietyTagSerialiser(serializers.ModelSerializer):
     """Serialiser for society tag."""
+
     class Meta:
         """Metadata for society tag serialiser."""
+
         model = SocietyTag
         fields = ['id', 'label', 'color']
 
 class SocietyImageSerialiser(serializers.ModelSerializer):
     """Serialiser for society image."""
+
     class Meta:
         """Metadata for society image serialiser."""
+
         model = SocietyImage
         fields = ['id', 'url', 'is_cover']
 
 class SocietyAnnouncementImageSerialiser(serializers.ModelSerializer):
     """Serialiser for society announcement image."""
+
     class Meta:
         """Metadata for society announcement image serialiser."""
+
         model = SocietyAnnouncementImage
         fields = ['id', 'url', 'order']
 
 class SocietyMembershipSerialiser(serializers.ModelSerializer):
     """Serialiser for society membership."""
+
     username = serializers.CharField(source='user.username', read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
 
     class Meta:
         """Metadata for society membership serialiser."""
+
         model = SocietyMembership
         fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin', 'is_subscribed', 'profile_photo_url']
 
@@ -70,14 +78,16 @@ class SocietyMembershipSerialiser(serializers.ModelSerializer):
 
 class SocietyListSerialiser(HasReportedMixin, serializers.ModelSerializer):
     """Serialiser for society list."""
+
     member_count = serializers.IntegerField(read_only=True)
     cover_image = serializers.SerializerMethodField()
     has_reported = serializers.SerializerMethodField()
 
     class Meta:
         """Metadata for society list serialiser."""
+
         model = Society
-        fields = ['id', 'name', 'bio', 'image', 'cover_image', 'categories', 'is_ratified', 'member_count', 'admin_emails', 'has_reported']
+        fields = ['id', 'name', 'bio', 'location', 'image', 'cover_image', 'categories', 'is_ratified', 'member_count', 'admin_emails', 'has_reported']
 
     def get_cover_image(self, obj):
         if obj.image:
@@ -87,6 +97,7 @@ class SocietyListSerialiser(HasReportedMixin, serializers.ModelSerializer):
 
 class SocietyAnnouncementSerialiser(SilentNotificationMixin, serializers.ModelSerializer):
     """Serialiser for society announcement."""
+
     images = SocietyAnnouncementImageSerialiser(many=True, read_only=True)
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
     event_id = serializers.SerializerMethodField()
@@ -97,6 +108,7 @@ class SocietyAnnouncementSerialiser(SilentNotificationMixin, serializers.ModelSe
 
     class Meta:
         """Metadata for society announcement serialiser."""
+
         model = SocietyAnnouncement
         fields = [
             'id', 'title', 'content', 'tag', 'tag_data',
@@ -105,6 +117,7 @@ class SocietyAnnouncementSerialiser(SilentNotificationMixin, serializers.ModelSe
 
 class SocietyEventSerialiser(SilentNotificationMixin, serializers.ModelSerializer):
     """Serialiser for society event."""
+
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
 
     def to_representation(self, instance):
@@ -115,6 +128,7 @@ class SocietyEventSerialiser(SilentNotificationMixin, serializers.ModelSerialize
 
     class Meta:
         """Metadata for society event serialiser."""
+
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
@@ -131,6 +145,7 @@ class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for society event calendar serialiser."""
+
         model = SocietyEvent
         fields = [
             'id', 'title', 'description', 'location', 'start_time', 'end_time',
@@ -163,6 +178,7 @@ def get_society_color(society_id):
 
 class SocietyDetailSerialiser(HasReportedMixin, serializers.ModelSerializer):
     """Serialiser for society detail."""
+
     member_count = serializers.IntegerField(read_only=True)
     tags = SocietyTagSerialiser(many=True, read_only=True)
     images = SocietyImageSerialiser(many=True, read_only=True)
@@ -172,8 +188,9 @@ class SocietyDetailSerialiser(HasReportedMixin, serializers.ModelSerializer):
 
     class Meta:
         """Metadata for society detail serialiser."""
+
         model = Society
         fields = [
-            'id', 'name', 'bio', 'about', 'image', 'categories', 'is_ratified', 'ratification_status',
+            'id', 'name', 'bio', 'about', 'location', 'image', 'categories', 'is_ratified', 'ratification_status',
             'date_created', 'member_count', 'tags', 'images', 'announcements', 'events', 'admin_emails', 'has_reported'
         ]

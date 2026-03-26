@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { buildTasksPageHandlers } from "../../../pages/tasks/utils/tasksPageUtils";
+import { buildTasksPageHandlers } from "../../../pages/Tasks/utils/tasksPageUtils";
 
 describe("tasksPageHandlers", () => {
   it("returns object with all handlers", () => {

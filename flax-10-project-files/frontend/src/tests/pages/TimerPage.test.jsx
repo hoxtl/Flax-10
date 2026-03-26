@@ -10,23 +10,23 @@ const { mockGetHistory } = vi.hoisted(() => ({
     mockGetHistory: vi.fn(),
 }));
 
-vi.mock('../../components/timer/utils/historyUtils', async () => {
-    const actual = await vi.importActual('../../components/timer/utils/historyUtils');
+vi.mock('../../components/Timer/utils/historyUtils', async () => {
+    const actual = await vi.importActual('../../components/Timer/utils/historyUtils');
     return {
         ...actual,
         getHistory: mockGetHistory,
     };
 });
 
-vi.mock('../../components/timer/TreeAnimation', () => ({
+vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
 }));
 
-vi.mock('../../components/timer/FocusAnimation', () => ({
+vi.mock('../../components/Timer/FocusAnimation', () => ({
     default: () => <div data-testid="focus-animation" />,
 }));
 
-vi.mock('../../components/timer/TodayBanner', () => ({
+vi.mock('../../components/Timer/TodayBanner', () => ({
     default: () => <div data-testid="today-banner" />,
 }));
 
@@ -50,7 +50,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
     useNotify: () => vi.fn(),
 }));
 
@@ -62,8 +62,8 @@ vi.mock('react-router-dom', () => ({
 
 let mockNotificationPermission = 'granted';
 const mockRequestPermission = vi.fn();
-vi.mock('../../components/timer/utils/timerUtils', async () => {
-    const actual = await vi.importActual('../../components/timer/utils/timerUtils');
+vi.mock('../../components/Timer/utils/timerUtils', async () => {
+    const actual = await vi.importActual('../../components/Timer/utils/timerUtils');
     return {
         ...actual,
         useNotificationPermission: () => ({ permission: mockNotificationPermission, request: mockRequestPermission }),

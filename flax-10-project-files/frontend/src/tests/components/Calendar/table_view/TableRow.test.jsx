@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TableRow } from '../../../../components/calendar/table_view/TableRow';
+import { TableRow } from '../../../../components/Calendar/table_view/TableRow';
 import { createMockEvent } from '../mocks/calendarMocks';
 
 const mockRemoveEvent = vi.fn();
@@ -14,34 +14,34 @@ vi.mock('../../../../context/TagContext', () => ({
     useTags: () => ({ tags: [{ id: 1, label: 'Work', color: '#7B6751' }] }),
 }));
 
-vi.mock('../../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({
     useEventActions: () => ({ removeEvent: mockRemoveEvent }),
 }));
 
-vi.mock('../../../../components/calendar/hooks/useQuickActions', () => ({
+vi.mock('../../../../components/Calendar/hooks/useQuickActions', () => ({
     useQuickActions: (event) => event.noQuickAction ? null : event.society_name ? mockQuickAction : null,
 }));
 
-vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
     getEventType: (e) => e.module ? 'module' : e.society_name ? 'society' : 'personal',
     isReadOnlyEvent: (e) => !!e.module || !!e.society_name,
 }));
 
-vi.mock('../../../../components/calendar/utils/eventStyleUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/eventStyleUtils', () => ({
     getEventTheme: (event) => ({ color: event.noAccent ? undefined : '#7B6751' }),
 }));
 
-vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
     isSameDay: (a, b) => a.toDateString() === b.toDateString(),
 }));
 
-vi.mock('../../../../components/calendar/table_view/cells/EditableCell', () => ({
+vi.mock('../../../../components/Calendar/table_view/cells/EditableCell', () => ({
     EditableCell: ({ value, isEditing, onChange, onKeyDown }) => isEditing
         ? <input data-testid="editable-input" value={value} onChange={e => onChange(e.target.value)} onKeyDown={onKeyDown} />
         : <span data-testid="cell-text">{value || '—'}</span>,
 }));
 
-vi.mock('../../../../components/calendar/table_view/cells/TagEditCell', () => ({
+vi.mock('../../../../components/Calendar/table_view/cells/TagEditCell', () => ({
     TagEditCell: ({ event, onEdit }) => (
         <button type="button" data-testid="tag-cell" onClick={onEdit}>
             {event.tag?.name || event.tag_name || 'No tag'}
@@ -49,13 +49,13 @@ vi.mock('../../../../components/calendar/table_view/cells/TagEditCell', () => ({
     ),
 }));
 
-vi.mock('../../../../components/calendar/table_view/cells/LocationEditCell', () => ({
+vi.mock('../../../../components/Calendar/table_view/cells/LocationEditCell', () => ({
     LocationEditCell: ({ value, isEditing, onChange, onSave }) => isEditing
         ? <input data-testid="location-editor" value={value || ''} onChange={e => onChange(e.target.value)} onBlur={onSave} />
         : <span data-testid="location-cell">{value || ''}</span>,
 }));
 
-vi.mock('../../../../components/calendar/table_view/cells/DateTimeCell', () => ({
+vi.mock('../../../../components/Calendar/table_view/cells/DateTimeCell', () => ({
     DateTimeCell: ({ event, onSave }) => (
         <button type="button" data-testid="date-cell" onClick={() => onSave('2026-03-16T09:00:00Z')}>
             {event.start_time}

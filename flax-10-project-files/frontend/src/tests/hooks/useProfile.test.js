@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useProfileState, useProfileBodyData, useProfileContent } from '../../pages/profile/hooks/useProfile';
+import { useProfileState, useProfileBodyData, useProfileContent } from '../../pages/Profile/hooks/useProfile';
 
 const refreshProfileMock = vi.fn();
 const useAuthMock = vi.fn();
@@ -27,14 +27,14 @@ vi.mock('../../api/eventApi', () => ({
   getEvents: vi.fn(),
 }));
 
-vi.mock('../../pages/profile/utils/profileHelpers', () => ({
+vi.mock('../../pages/Profile/utils/profileHelpers', () => ({
   getFilteredEvents: vi.fn((events) => events || []),
   getUpcomingCount: vi.fn(() => 0),
 }));
 
 import { getUserProfile, getAnotherUserProfile } from '../../api/userApi';
 import { getEvents } from '../../api/eventApi';
-import { getFilteredEvents, getUpcomingCount } from '../../pages/profile/utils/profileHelpers';
+import { getFilteredEvents, getUpcomingCount } from '../../pages/Profile/utils/profileHelpers';
 
 const mockProfile = {
   id: 1,

@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { HistoryRailSection } from "../../../../components/timer/history_panel/HistoryRailSection";
+import { HistoryRailSection } from "../../../../components/Timer/history_panel/HistoryRailSection";
 import {
   filterVisibleBlocks,
   getModuleLabel,
   getSevenDayFocusSeries,
   groupBlocksByHorizon,
-} from "../../../../components/timer/history_panel/historyPanelUtils";
+} from "../../../../components/Timer/history_panel/historyPanelUtils";
 
 describe("history panel extras", () => {
   it("covers history utils edge cases", () => {

@@ -42,7 +42,7 @@ vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     ),
 }));
 
-import UserSearch, { useSearchInit, FilterSection } from '../../../components/social/UserSearch';
+import UserSearch, { useSearchInit, FilterSection } from '../../../components/Social/UserSearch';
 
 import { searchUsers } from '../../../api/userApi';
 import { fetchSocieties } from '../../../api/societyApi';

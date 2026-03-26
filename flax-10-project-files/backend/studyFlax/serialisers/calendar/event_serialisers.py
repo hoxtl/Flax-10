@@ -10,13 +10,16 @@ from .tag_serialisers import TagSerialiser
 
 class RecurrenceSerialiser(serializers.ModelSerializer):
     """Serialiser for recurrence."""
+
     class Meta:
         """Metadata for recurrence serialiser."""
+
         model = RecurrenceRule
         fields = ['id', 'frequency', 'interval', 'end_date', 'count', 'exception_dates']
 
 class CalendarEventSerialiser(serializers.ModelSerializer):
     """Serialiser for calendar event."""
+
     tag_details = TagSerialiser(source='tag', read_only=True)
     tag_name = serializers.CharField(source='tag.name', read_only=True, allow_null=True)
     recurrence_details = RecurrenceSerialiser(source='recurrence_rule', read_only=True)
@@ -25,6 +28,7 @@ class CalendarEventSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for calendar event serialiser."""
+
         model = CalendarEvent
         fields = ['id', 'title', 'description',
         'start_time', 'end_time', 'location',
@@ -36,6 +40,7 @@ class CalendarEventSerialiser(serializers.ModelSerializer):
 
 class CalendarEventCreateSerialiser(serializers.ModelSerializer):
     """Serialiser for calendar event create."""
+
     recurrence_rule = serializers.JSONField(required=False, allow_null=True)
     tag = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     location_latitude = serializers.FloatField(required=False, allow_null=True)
@@ -44,6 +49,7 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for calendar event create serialiser."""
+
         model = CalendarEvent
         fields = ['id', 'title', 'description',
         'start_time', 'end_time', 'location', 'tag',

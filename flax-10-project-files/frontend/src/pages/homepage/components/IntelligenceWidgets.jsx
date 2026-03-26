@@ -7,7 +7,7 @@ import { BookOpen, Calendar } from "lucide-react";
 import { createElement } from "react";
 import { useNavigate } from "react-router-dom";
 import StatStrip from "../../../components/common/stat_strip/StatStrip";
-import WelcomeBackgroundPaths from "../../../components/welcome/WelcomeBackgroundPaths";
+import WelcomeBackgroundPaths from "../../../components/Welcome/WelcomeBackgroundPaths";
 import { useCountUp } from "../../../hooks/useCountUp";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceHeader.module.css";

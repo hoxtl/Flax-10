@@ -8,7 +8,7 @@ vi.mock("../../../../../api/userApi", () => ({
 }));
 
 import { getUserSettings } from "../../../../../api/userApi";
-import { useSleepWindow } from "../../../../../pages/homepage/hooks/mini_timeline/useSleepWindow";
+import { useSleepWindow } from "../../../../../pages/Homepage/hooks/mini_timeline/useSleepWindow";
 
 const DEFAULT_SLEEP_WINDOW = { sleepTime: "23:00", wakeTime: "07:00" };
 

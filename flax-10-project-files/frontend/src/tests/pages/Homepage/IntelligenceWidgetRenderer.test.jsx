@@ -4,7 +4,7 @@ import React from "react";
 
 const getEventTypeMock = vi.fn((event) => event.kind || "other");
 
-vi.mock("../../../pages/homepage/components/IntelligenceWidgets", () => ({
+vi.mock("../../../pages/Homepage/components/IntelligenceWidgets", () => ({
   IntelligenceHero: (props) => (
     <div data-testid="hero">
       <button type="button" onClick={props.onDismissCourseChange}>dismiss-course-change</button>
@@ -13,60 +13,60 @@ vi.mock("../../../pages/homepage/components/IntelligenceWidgets", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/RightNowWidget", () => ({
+vi.mock("../../../pages/Homepage/components/RightNowWidget", () => ({
   RightNowWidget: (props) => <div data-testid="right-now">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/HomepageTimelineSection", () => ({
+vi.mock("../../../pages/Homepage/components/HomepageTimelineSection", () => ({
   HomepageTimelineSection: (props) => <div data-testid="big-timeline">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/SemesterOverviewWidget", () => ({
+vi.mock("../../../pages/Homepage/components/SemesterOverviewWidget", () => ({
   default: (props) => <div data-testid="semester">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/StudyStreakWidget", () => ({
+vi.mock("../../../pages/Homepage/components/StudyStreakWidget", () => ({
   default: () => <div data-testid="study-streak">study streak</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/WeeklyGoalWidget", () => ({
+vi.mock("../../../pages/Homepage/components/WeeklyGoalWidget", () => ({
   default: () => <div data-testid="weekly-goal">weekly goal</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/PhotoWidget", () => ({
+vi.mock("../../../pages/Homepage/components/PhotoWidget", () => ({
   default: (props) => <div data-testid="photo">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/ProductivityCards", () => ({
+vi.mock("../../../components/Analytics/ProductivityCards", () => ({
   default: (props) => <div data-testid="productivity-cards">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/DailyBreakdownChart", () => ({
+vi.mock("../../../components/Analytics/DailyBreakdownChart", () => ({
   default: (props) => <div data-testid="daily-breakdown">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/StudyHeatmap", () => ({
+vi.mock("../../../components/Analytics/StudyHeatmap", () => ({
   default: (props) => <div data-testid="heatmap">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/AttendanceChart", () => ({
+vi.mock("../../../components/Analytics/AttendanceChart", () => ({
   default: () => <div data-testid="attendance-chart">attendance</div>,
 }));
 
-vi.mock("../../../components/analytics/InsightCards", () => ({
+vi.mock("../../../components/Analytics/InsightCards", () => ({
   ConsistencyScore: (props) => <div data-testid="consistency">{JSON.stringify(props)}</div>,
   PeakHoursCard: (props) => <div data-testid="peak-hours">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/TinyTimelineWidget", () => ({
+vi.mock("../../../pages/Homepage/components/TinyTimelineWidget", () => ({
   TinyTimelineWidget: (props) => <div data-testid="tiny-timeline">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
   getEventType: (...args) => getEventTypeMock(...args),
 }));
 
-import { renderIntelligenceWidget } from "../../../pages/homepage/components/IntelligenceWidgetRenderer";
+import { renderIntelligenceWidget } from "../../../pages/Homepage/components/IntelligenceWidgetRenderer";
 
 function Slot6Marker(props) {
   return <div data-testid="slot6-base">{JSON.stringify(props)}</div>;

@@ -7,6 +7,14 @@ import { AnimatedDashboardContent } from "./AnimatedDashboardContent";
 import { OnboardingWrapper } from "./OnboardingWrapper";
 import { useSyncNavFromUrl } from "../hooks/useSyncNavFromUrl";
 import { useNavHandler } from "../navigation/useNavHandler";
+import { useTourCheck } from "../hooks/useTourCheck";
+import AppTour from "../../components/common/AppTour/AppTour";
+
+function TourWrapper({ activeNav }) {
+  const [showTour, completeTour] = useTourCheck();
+  if (!showTour || activeNav !== 'home') return null;
+  return <AppTour onDone={completeTour} />;
+}
 
 export function AppScreen({ activeNav, setActiveNav, user }) {
   const location = useLocation();
@@ -20,6 +28,7 @@ export function AppScreen({ activeNav, setActiveNav, user }) {
           <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} onNavChange={handleNavChange} />
         </DashboardLayout>
         <OnboardingWrapper />
+        <TourWrapper activeNav={activeNav} />
       </AppProviders>
     </ScreenWrap>
   );

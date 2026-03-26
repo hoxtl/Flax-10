@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useDeadlineModal } from '../../components/modules/hooks/useDeadlineModal';
+import { useDeadlineModal } from '../../components/Modules/hooks/useDeadlineModal';
 
 const getDeadlinesMock = vi.fn();
 const createDeadlineMock = vi.fn();

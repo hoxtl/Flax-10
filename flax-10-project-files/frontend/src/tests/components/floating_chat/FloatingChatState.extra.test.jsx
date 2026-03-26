@@ -164,7 +164,6 @@ describe("route prompts", () => {
     const { result } = renderHook(() => useFloatingChatState(), {
       wrapper: makeWrapper("/calendar"),
     });
-    // Without user_id, the shared-calendar prompt stays hidden.
     expect(result.current.showPrompt).toBe(false);
   });
 
@@ -245,7 +244,6 @@ describe("useFirstPromptVisit", () => {
     act(() => result.current.minimizePrompt());
     expect(result.current.minimized).toBe(true);
 
-    // Re-rendering on the same route should not reopen the prompt.
     rerender();
     expect(result.current.minimized).toBe(true); // unchanged
   });

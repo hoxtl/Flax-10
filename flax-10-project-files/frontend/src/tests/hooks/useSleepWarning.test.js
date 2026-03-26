@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, afterEach } from 'vitest';
-import { useSleepWarning, isDuringSleepWindow, doesEventOverlapSleepWindow } from '../../components/settings/hooks/useSleepWarning';
+import { useSleepWarning, isDuringSleepWindow, doesEventOverlapSleepWindow } from '../../components/Settings/hooks/useSleepWarning';
 
 const makeDate = (h, m = 0) => { const d = new Date(); d.setHours(h, m, 0, 0); return d; };
 

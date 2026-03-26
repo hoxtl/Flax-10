@@ -12,12 +12,12 @@ import PageTransition from "../../components/common/page_transition/PageTransiti
 import SearchBar from "../../components/common/search_bar/SearchBar.jsx";
 import Tabs from "../../components/common/Tabs/Tabs";
 import { SegmentedControl } from "../../components/common/segmented_control/SegmentedControl";
-import { Pagination, BackToTop } from "../../components/pagination/Pagination.jsx";
+import { Pagination, BackToTop } from "../../components/Pagination/Pagination.jsx";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState.jsx";
-import ModuleGrid from "../../components/modules/modules/ModuleGrid.jsx";
-import ModuleCourseFilter from "../../components/modules/modules/ModuleCourseFilter";
-import useModuleSorting from "../../components/modules/hooks/useModuleSorting.js";
-import { filterModules } from "../../components/modules/utils/moduleUtils.js";
+import ModuleGrid from "../../components/Modules/Modules/ModuleGrid.jsx";
+import ModuleCourseFilter from "../../components/Modules/Modules/ModuleCourseFilter";
+import useModuleSorting from "../../components/Modules/hooks/useModuleSorting.js";
+import { filterModules } from "../../components/Modules/utils/moduleUtils.js";
 import MyModulesDashboard from "./MyModulesDashboard.jsx";
 import styles from "./ModulesPage.module.css";
 import { useMainModuleView } from "./modulesPageHooks.js";

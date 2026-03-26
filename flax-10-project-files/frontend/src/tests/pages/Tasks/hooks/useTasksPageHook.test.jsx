@@ -3,10 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../../../pages/tasks/hooks/useTasks", () => ({
+vi.mock("../../../../pages/Tasks/hooks/useTasks", () => ({
   default: vi.fn(() => ({ tasks: [], initialLoading: false })),
 }));
-vi.mock("../../../../pages/tasks/hooks/useTaskLists", () => ({
+vi.mock("../../../../pages/Tasks/hooks/useTaskLists", () => ({
   default: vi.fn(() => ({ lists: [], archivedLists: [], loading: false })),
 }));
 
@@ -24,9 +24,9 @@ const helpers = vi.hoisted(() => ({
   })),
 }));
 
-vi.mock("../../../../pages/tasks/utils/tasksPageUtils", () => helpers);
+vi.mock("../../../../pages/Tasks/utils/tasksPageUtils", () => helpers);
 
-import useTasksPage from "../../../../pages/tasks/hooks/useTasksPage";
+import useTasksPage from "../../../../pages/Tasks/hooks/useTasksPage";
 
 function wrapperWithUrl(url) {
   return function Wrapper({ children }) {

@@ -10,19 +10,19 @@ vi.mock('../../../api/moduleApi', () => ({
     updateModule: vi.fn().mockResolvedValue({ id: 1 }),
 }));
 
-vi.mock('../../../components/modules/utils/moduleUtils', () => ({
+vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     serialiseModule: vi.fn(data => data),
 }));
 
-vi.mock('../../../components/modules/utils/moduleHelpers', () => ({
+vi.mock('../../../components/Modules/utils/moduleHelpers', () => ({
     validateForm: vi.fn(() => ({})),
     getFormData: vi.fn(module => module || {}),
     updateForm: vi.fn((field, value, form) => ({ ...form, [field]: value })),
 }));
 
-import ModuleForm from '../../../components/modules/modules/ModuleForm';
+import ModuleForm from '../../../components/Modules/Modules/ModuleForm';
 import { createModule, updateModule } from '../../../api/moduleApi';
-import { validateForm } from '../../../components/modules/utils/moduleHelpers';
+import { validateForm } from '../../../components/Modules/utils/moduleHelpers';
 
 const defaultModule = {
     id: 1,

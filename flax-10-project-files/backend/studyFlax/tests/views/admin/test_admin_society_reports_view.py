@@ -14,6 +14,7 @@ from studyFlax.tests.helpers.test_model_builders import make_user, make_superuse
 
 class AdminReportedSocietiesTest(TestCase):
     """Tests admin reported societies."""
+
     def setUp(self):
         self.admin = make_superuser()
         self.list_url = '/api/admin/reported-societies/'
@@ -51,6 +52,7 @@ class AdminReportedSocietiesTest(TestCase):
 
 class BanReportedSocietyTest(TestCase):
     """Tests ban reported society."""
+
     def setUp(self):
         self.admin = make_superuser()
         self.reporter = make_user('reporter_ban')

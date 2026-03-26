@@ -48,6 +48,7 @@ def _make_reading(module, title="Chapter 1", start=1, end=20, deadline=None, est
 
 class ReadingUtilsTests(BaseTestCase):
     """Tests reading utils."""
+
     def setUp(self):
         super().setUp()
         self.teacher = _make_teacher()

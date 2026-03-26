@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SocietyCard from '../../../components/society/SocietyCard';
+import SocietyCard from '../../../components/Society/SocietyCard';
 
 const society = {
     id: 1,

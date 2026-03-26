@@ -13,7 +13,7 @@ const useCalendar = vi.fn();
 const dispatch = vi.fn();
 const useSwipeNavigation = vi.fn();
 
-vi.mock("../../../components/calendar/hooks/useMonthDayDrop", () => ({
+vi.mock("../../../components/Calendar/hooks/useMonthDayDrop", () => ({
   useMonthDayDrop: (...args) => useMonthDayDrop(...args),
 }));
 
@@ -28,26 +28,26 @@ vi.mock("../../../context/TagContext", () => ({
   useTags: (...args) => useTags(...args),
 }));
 
-vi.mock("../../../components/calendar/hooks/useDragDrop", () => ({
+vi.mock("../../../components/Calendar/hooks/useDragDrop", () => ({
   useDrag: (...args) => useDrag(...args),
 }));
 
-vi.mock("../../../components/calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
   getEventType: (...args) => getEventType(...args),
 }));
 
-vi.mock("../../../components/calendar/utils/eventStyleUtils", () => ({
+vi.mock("../../../components/Calendar/utils/eventStyleUtils", () => ({
   getEventTheme: (...args) => getEventTheme(...args),
 }));
 
-vi.mock("../../../components/calendar/hooks/useSwipeNavigation", () => ({
+vi.mock("../../../components/Calendar/hooks/useSwipeNavigation", () => ({
   useSwipeNavigation: (...args) => useSwipeNavigation(...args),
 }));
 
-import { DayCell } from "../../../components/calendar/month_view/DayCell";
-import { EventDot, MoreEvents } from "../../../components/calendar/month_view/EventDot";
-import { WeekRow } from "../../../components/calendar/month_view/WeekRow";
-import { SwipeMonthView } from "../../../components/calendar/month_view/SwipeMonthView";
+import { DayCell } from "../../../components/Calendar/month_view/DayCell";
+import { EventDot, MoreEvents } from "../../../components/Calendar/month_view/EventDot";
+import { WeekRow } from "../../../components/Calendar/month_view/WeekRow";
+import { SwipeMonthView } from "../../../components/Calendar/month_view/SwipeMonthView";
 
 describe("MonthView parts", () => {
   beforeEach(() => {

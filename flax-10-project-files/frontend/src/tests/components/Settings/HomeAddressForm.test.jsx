@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import HomeAddressForm from '../../../components/settings/HomeAddressForm';
+import HomeAddressForm from '../../../components/Settings/HomeAddressForm';
 
 vi.mock('../../../api/userApi', () => ({
     getHomeAddress: vi.fn(),

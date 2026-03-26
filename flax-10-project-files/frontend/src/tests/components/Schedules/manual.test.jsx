@@ -5,13 +5,13 @@ import {
   filterScheduleEvents,
   toggleSelectedEventId,
   getManualScheduleError,
-} from "../../../components/schedules/manual/manualScheduleUtils";
-import { loadScheduleTaggedEvents } from "../../../components/schedules/manual/loadScheduleTaggedEvents";
-import { submitManualSchedule } from "../../../components/schedules/manual/submitManualSchedule";
-import { useManualScheduleForm } from "../../../components/schedules/manual/useManualScheduleForm";
-import { ManualScheduleFields } from "../../../components/schedules/manual/ManualScheduleFields";
-import { ManualScheduleEventList } from "../../../components/schedules/manual/ManualScheduleEventList";
-import { ManualScheduleForm } from "../../../components/schedules/manual/ManualScheduleForm";
+} from "../../../components/Schedules/manual/manualScheduleUtils";
+import { loadScheduleTaggedEvents } from "../../../components/Schedules/manual/loadScheduleTaggedEvents";
+import { submitManualSchedule } from "../../../components/Schedules/manual/submitManualSchedule";
+import { useManualScheduleForm } from "../../../components/Schedules/manual/useManualScheduleForm";
+import { ManualScheduleFields } from "../../../components/Schedules/manual/ManualScheduleFields";
+import { ManualScheduleEventList } from "../../../components/Schedules/manual/ManualScheduleEventList";
+import { ManualScheduleForm } from "../../../components/Schedules/manual/ManualScheduleForm";
 
 const getEventsMock = vi.fn();
 const createScheduleMock = vi.fn();

@@ -21,8 +21,6 @@ vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
     }),
 }));
 
-// extractBaseEventId
-
 describe('extractBaseEventId', () => {
     it('returns event._baseId if present', () => {
         expect(extractBaseEventId('100_1', { _baseId: 99 })).toBe(99);
@@ -62,8 +60,6 @@ describe('extractBaseEventId', () => {
     });
 });
 
-// hasRecurrence
-
 describe('hasRecurrence', () => {
     it('returns false for null event', () => {
         expect(hasRecurrence(null)).toBe(false);
@@ -97,8 +93,6 @@ describe('hasRecurrence', () => {
         expect(hasRecurrence({ id: 1, title: 'Normal' })).toBe(false);
     });
 });
-
-// getEventType
 
 describe('getEventType', () => {
     it('returns "personal" for null event', () => {
@@ -178,8 +172,6 @@ describe('getEventType', () => {
     });
 });
 
-// isReadOnlyEvent
-
 describe('isReadOnlyEvent', () => {
     it('returns false for personal event', () => {
         expect(isReadOnlyEvent({ id: 1, title: 'Personal' })).toBe(false);
@@ -197,8 +189,6 @@ describe('isReadOnlyEvent', () => {
         expect(isReadOnlyEvent({ tag_name: 'lecture' })).toBe(true);
     });
 });
-
-// getEffectiveTagName
 
 describe('getEffectiveTagName', () => {
     it('returns "other" for null event', () => {
@@ -242,8 +232,6 @@ describe('getEffectiveTagName', () => {
     });
 });
 
-// sortByStartTime
-
 describe('sortByStartTime', () => {
     it('sorts events ascending by start_time', () => {
         const events = [
@@ -276,8 +264,6 @@ describe('sortByStartTime', () => {
         expect(sortByStartTime(events)).toEqual(events);
     });
 });
-
-// isAllDay
 
 describe('isAllDay', () => {
     it('returns true when all_day flag is set', () => {
@@ -323,8 +309,6 @@ describe('isAllDay', () => {
         })).toBe(true);
     });
 });
-
-// getVisibleEventsInView
 
 describe('getVisibleEventsInView', () => {
     it('returns empty array for null events', () => {

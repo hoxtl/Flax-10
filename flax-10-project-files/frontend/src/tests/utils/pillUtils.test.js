@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { countByType } from '../../components/tags/utils/pillUtils';
+import { countByType } from '../../components/Tags/utils/pillUtils';
 
 describe('countByType', () => {
   it('returns all count for empty array', () => {

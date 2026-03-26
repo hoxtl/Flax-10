@@ -85,8 +85,6 @@ import SuccessScreen from "../../../components/onboarding/SuccessScreen";
 import WarningBox from "../../../components/onboarding/WarningBox";
 import OnboardingForm from "../../../components/onboarding/OnboardingForm";
 
-// SuccessScreen
-
 describe("SuccessScreen", () => {
   it("renders the celebration emoji", () => {
     render(<SuccessScreen major="Computer Science" onComplete={vi.fn()} />);
@@ -116,7 +114,6 @@ describe("SuccessScreen", () => {
   });
 });
 
-// WarningBox
 // WarningBox is mocked above so that OnboardingForm can use it.
 // The mock faithfully replicates the public API so we test via the mock import.
 
@@ -162,8 +159,6 @@ describe("WarningBox (via mock – tests public interface contract)", () => {
     expect(screen.getByTestId("warning-confirm")).toBeChecked();
   });
 });
-
-// OnboardingForm
 
 describe("OnboardingForm – submit button state", () => {
   const base = {
@@ -237,8 +232,6 @@ describe("OnboardingForm – submit button state", () => {
     ).not.toBeDisabled();
   });
 });
-
-// WarningSection visibility
 
 describe("WarningSection inside OnboardingForm", () => {
   const base = {

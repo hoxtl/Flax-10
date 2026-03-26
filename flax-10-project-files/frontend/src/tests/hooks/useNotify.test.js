@@ -1,27 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useNotify } from '../../components/notifications/hooks/useNotify';
+import { useNotify } from '../../components/Notifications/hooks/useNotify';
 
 vi.mock('../../context/NotificationContext', () => ({
     useNotifications: vi.fn(() => ({ addNotification: vi.fn() })),
 }));
 
-vi.mock('../../components/notifications/utils/browserNotification', () => ({
+vi.mock('../../components/Notifications/utils/browserNotification', () => ({
     sendBrowserNotification: vi.fn(),
 }));
 
-vi.mock('../../components/notifications/utils/notificationSound', () => ({
+vi.mock('../../components/Notifications/utils/notificationSound', () => ({
     playNotificationSound: vi.fn(),
 }));
 
-vi.mock('../../components/notifications/utils/notificationAction', () => ({
+vi.mock('../../components/Notifications/utils/notificationAction', () => ({
     createNotificationAction: vi.fn((url, scrollToId) => ({ url, scrollToId })),
 }));
 
 import { useNotifications } from '../../context/NotificationContext';
-import { sendBrowserNotification } from '../../components/notifications/utils/browserNotification';
-import { playNotificationSound } from '../../components/notifications/utils/notificationSound';
-import { createNotificationAction } from '../../components/notifications/utils/notificationAction';
+import { sendBrowserNotification } from '../../components/Notifications/utils/browserNotification';
+import { playNotificationSound } from '../../components/Notifications/utils/notificationSound';
+import { createNotificationAction } from '../../components/Notifications/utils/notificationAction';
 
 describe('useNotify', () => {
     let addNotification;

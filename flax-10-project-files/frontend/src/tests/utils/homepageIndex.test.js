@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import * as homepageUtils from '../../pages/homepage/utils/index';
+import * as homepageUtils from '../../pages/Homepage/utils/index';
 
 describe('Homepage utils barrel export', () => {
   it('exports formatTime from dateFormatUtils', () => {

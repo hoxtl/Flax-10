@@ -17,7 +17,7 @@ vi.mock("../../../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-import { TimeRow } from "../../../../../components/calendar/event_modal/components/TimeRow";
+import { TimeRow } from "../../../../../components/Calendar/event_modal/components/TimeRow";
 
 describe("TimeRow", () => {
   it("renders date-time inputs when the event is not all-day and updates recurrence", () => {

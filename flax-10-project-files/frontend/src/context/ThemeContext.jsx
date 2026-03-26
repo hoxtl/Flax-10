@@ -62,6 +62,11 @@ function usePersistedAttribute(attribute, storageKey, value) {
   useEffect(() => {
     document.documentElement.setAttribute(attribute, value);
     localStorage.setItem(storageKey, value);
+    // Explicitly declare color-scheme so the browser never applies automatic
+    // dark-mode inversion (e.g. Chrome "Auto Dark Mode for Web Contents").
+    if (attribute === "data-mode") {
+      document.documentElement.style.colorScheme = value;
+    }
   }, [attribute, storageKey, value]);
 }
 

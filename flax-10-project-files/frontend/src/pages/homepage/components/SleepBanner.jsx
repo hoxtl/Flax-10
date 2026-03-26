@@ -5,7 +5,7 @@
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useState, useEffect } from 'react';
 import { getUserSettings } from '../../../api/userApi';
-import { isDuringSleepWindow } from '../../../components/settings/hooks/useSleepWarning';
+import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
 import styles from './SleepBanner.module.css';
 
 const MESSAGES = [

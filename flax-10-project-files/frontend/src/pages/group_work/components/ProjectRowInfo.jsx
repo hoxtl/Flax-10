@@ -2,10 +2,9 @@
  * GroupWork project row info section.
  */
 
-import { Link } from "react-router-dom";
-import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
+import GroupWorkProjectModuleBadge from "./ProjectModuleBadge";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
@@ -57,14 +56,13 @@ function ProjectTeacherAvatar({ project }) {
 }
 
 export function ProjectModuleBadge({ project }) {
-  if (!project.course_code && !project.module_name) return null;
   return (
-    <Link to={`/modules?code=${encodeURIComponent(project.course_code || "")}`} className={styles.projectModuleLink} aria-label={`Open ${project.module_name || project.course_code} module`}>
-      <Badge className={styles.projectModuleBadge}>
-        {project.course_code ? <span className={styles.projectModuleCode}>{project.course_code}</span> : null}
-        <span>{project.module_name || project.course_code}</span>
-      </Badge>
-    </Link>
+    <GroupWorkProjectModuleBadge
+      project={project}
+      linkClassName={styles.projectModuleLink}
+      badgeClassName={styles.projectModuleBadge}
+      codeClassName={styles.projectModuleCode}
+    />
   );
 }
 

@@ -12,7 +12,7 @@ import {
   getLeaveByInfo,
   getNextEvent,
   hasCampusCommute,
-} from "../components/rightNowUtils";
+} from "../components/RightNowUtils";
 import { useCountdown } from "./useCountdown";
 import { formatTime } from "../utils/dateFormatUtils";
 

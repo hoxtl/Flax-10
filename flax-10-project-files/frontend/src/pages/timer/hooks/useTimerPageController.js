@@ -4,7 +4,7 @@
 
 import { useCallback } from 'react';
 import useBreakpoint from '../../../hooks/useBreakpoint';
-import { useNotificationPermission } from '../../../components/timer/utils/timerUtils';
+import { useNotificationPermission } from '../../../components/Timer/utils/timerUtils';
 import { useTimerPageFlags } from './useTimerPageFlags';
 import {
   useFocusAccent,

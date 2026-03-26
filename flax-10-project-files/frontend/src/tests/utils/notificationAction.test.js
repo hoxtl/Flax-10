@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
     createNotificationAction, createEventPopupAction, parseNotificationAction,
     hasNotificationAction, executeNotificationAction
-} from '../../components/notifications/utils/notificationAction';
+} from '../../components/Notifications/utils/notificationAction';
 
 describe('notificationAction', () => {
     describe('createNotificationAction', () => {

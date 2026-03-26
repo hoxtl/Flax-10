@@ -1,7 +1,7 @@
 /* Tests for TaskFeedToolbar component sort and filter controls */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import TaskFeedToolbar from "../../../../pages/tasks/components/TaskFeedToolbar";
+import TaskFeedToolbar from "../../../../pages/Tasks/components/TaskFeedToolbar";
 import { createFnMap } from "../../../utils/testBuilderUtils";
 
 vi.mock("../../../../components/common/animated_dropdown", () => ({
@@ -10,7 +10,7 @@ vi.mock("../../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/tasks/components/TaskFilterPanel", () => ({
+vi.mock("../../../../pages/Tasks/components/TaskFilterPanel", () => ({
   default: () => <div data-testid="task-filter-panel" />,
 }));
 

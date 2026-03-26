@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/society/society_detail/tabs/AboutTab', () => ({
+vi.mock('../../../components/Society/society_detail/tabs/AboutTab', () => ({
     default: ({ about, onUpdate }) => (
         <div data-testid="about-tab">
             {about || 'About'}
@@ -10,7 +10,7 @@ vi.mock('../../../components/society/society_detail/tabs/AboutTab', () => ({
     ),
 }));
 
-vi.mock('../../../components/society/society_detail/tabs/calendar_tab/CalendarTab', () => ({
+vi.mock('../../../components/Society/society_detail/tabs/calendar_tab/CalendarTab', () => ({
     default: ({ onViewAnnouncement }) => (
         <div data-testid="calendar-tab">
             <button data-testid="view-ann" onClick={() => onViewAnnouncement?.(5)}>View Ann</button>
@@ -18,11 +18,11 @@ vi.mock('../../../components/society/society_detail/tabs/calendar_tab/CalendarTa
     ),
 }));
 
-vi.mock('../../../components/society/society_detail/tabs/announcement_tab/AnnouncementsTab', () => ({
+vi.mock('../../../components/Society/society_detail/tabs/announcement_tab/AnnouncementsTab', () => ({
     default: () => <div data-testid="announcements-tab" />,
 }));
 
-import SocietyTabs from '../../../components/society/society_detail/tabs/SocietyTabs';
+import SocietyTabs from '../../../components/Society/society_detail/tabs/SocietyTabs';
 
 const baseSociety = {
     id: 1,

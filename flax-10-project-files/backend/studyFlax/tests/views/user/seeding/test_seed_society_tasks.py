@@ -21,6 +21,7 @@ from studyFlax.tests.helpers.test_model_builders import (
 
 class SeedSocietyTasksTests(TestCase):
     """Tests seed society tasks."""
+
     def test_seeds_society_lists_and_tasks_for_admin_memberships(self):
         user = make_user("soc_admin_seed", "soc_admin_seed@example.com")
         society = make_society("Chess Society")

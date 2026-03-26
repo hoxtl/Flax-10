@@ -5,7 +5,7 @@ import {
     isRoutineOrEventTask,
     calculateSeedsByCategory,
     isAutoPassedTask,
-} from '../../pages/homepage/utils/taskUtils';
+} from '../../pages/Homepage/utils/taskUtils';
 
 describe('taskDurationMins', () => {
     it('returns estimated_blocks * 25', () => {

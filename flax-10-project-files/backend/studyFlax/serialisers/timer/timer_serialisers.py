@@ -8,8 +8,10 @@ from studyFlax.models.timer.session_model import StudySession
 
 class StudySessionSerializer(serializers.ModelSerializer):
     """Serialiser for study session."""
+
     class Meta:
         """Metadata for study session serialiser."""
+
         model = StudySession
         fields = [
             'id', 'start_time', 'end_time', 'duration',

@@ -19,6 +19,7 @@ class CalendarShareUserSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for calendar share user serialiser."""
+
         model = User
         fields = (
             "id",
@@ -44,6 +45,7 @@ class CalendarShareSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for calendar share serialiser."""
+
         model = CalendarShare
         fields = ("id", "owner", "shared_with", "created_at")
         read_only_fields = ("owner",)

@@ -3,7 +3,7 @@
  */
 
 import AppPage from "../../components/common/app_page/AppPage";
-import { BackToTop } from "../../components/pagination/Pagination";
+import { BackToTop } from "../../components/Pagination/Pagination";
 import AttendancePageBody from "./components/AttendancePageBody";
 import AttendancePageStatus from "./components/AttendancePageStatus";
 import { useAttendancePageModel } from "./hooks/useAttendancePageModel";

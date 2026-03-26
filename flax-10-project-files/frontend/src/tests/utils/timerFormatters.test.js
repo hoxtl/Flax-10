@@ -6,7 +6,7 @@ import {
     taskDueText,
     extractTime,
     isToday,
-} from '../../components/timer/utils/timerFormatters';
+} from '../../components/Timer/utils/timerFormatters';
 
 describe('fmtDuration', () => {
     it('returns "0m" for 0 seconds', () => {

@@ -74,7 +74,6 @@ vi.mock("../../../lib/routes", () => ({
   ],
 }));
 
-// Dependency mocks
 vi.mock("../../../components/dashboard/ProfileDropdown", () => ({
   default: () => <div data-testid="profile-dropdown" />,
 }));
@@ -139,7 +138,6 @@ vi.mock("../../../components/common", () => ({
   ),
 }));
 
-// Import the real TopBar component
 import TopBar from "../../../components/dashboard/Topbar";
 
 
@@ -156,8 +154,6 @@ function renderTopBar(props = {}) {
   return render(<TopBar {...defaults} />);
 }
 
-// BrandLogo
-
 describe("BrandLogo", () => {
   it("calls onNavChange with 'home' when clicked", () => {
     const onNavChange = vi.fn();
@@ -172,8 +168,6 @@ describe("BrandLogo", () => {
     expect(screen.getByText("StudyFlax")).toBeInTheDocument();
   });
 });
-
-// NavDropdownTrigger – hasActive
 
 describe("NavDropdownTrigger via rendered TopBar", () => {
   it("renders nav group buttons", () => {
@@ -192,8 +186,6 @@ describe("NavDropdownTrigger via rendered TopBar", () => {
     expect(screen.getByText("Teaching")).toBeInTheDocument();
   });
 });
-
-// isRouteVisible
 
 describe("isRouteVisible through TopBarNav rendered output", () => {
   it("hides adminOnly routes from non-admin users (no Admin option)", () => {
@@ -216,12 +208,9 @@ describe("isRouteVisible through TopBarNav rendered output", () => {
       user: { role: "teacher", isAdmin: false },
     });
     // Explore still visible but societies / group-work filtered out
-    // Confirm that the Study label changes to Teaching for teachers.
     expect(screen.getByText("Teaching")).toBeInTheDocument();
   });
 });
-
-// handleNavSelection – modules:show-all event
 
 describe("handleNavSelection dispatches modules:show-all for modules", () => {
   let handler;
@@ -267,7 +256,6 @@ describe("handleNavSelection dispatches modules:show-all for modules", () => {
   });
 });
 
-// parseRouteOption – teacher label
 // The AnimatedDropdown mock renders option VALUES (route ids) as button text.
 // The label content (JSX) passed to the dropdown option is rendered inside the
 // dropdown container but only becomes visible once we inspect the options prop.
@@ -287,8 +275,6 @@ describe("parseRouteOption teacher vs student labels via section titles", () => 
     expect(screen.queryByText("Teaching")).not.toBeInTheDocument();
   });
 });
-
-// ToolsPill – teacher vs student options
 
 describe("ToolsPill options", () => {
   it("uses student options when user.role is student", () => {

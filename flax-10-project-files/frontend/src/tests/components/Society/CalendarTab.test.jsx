@@ -21,11 +21,11 @@ vi.mock('../../../context/ConfirmContext', () => ({
     useConfirm: () => vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../../components/society/society_detail/tabs/calendar_tab/SyncButton', () => ({
+vi.mock('../../../components/Society/society_detail/tabs/calendar_tab/SyncButton', () => ({
     default: () => <div data-testid="sync-button" />,
 }));
 
-vi.mock('../../../components/calendar/month_view/MonthView', () => ({
+vi.mock('../../../components/Calendar/month_view/MonthView', () => ({
     MonthView: ({ events, onEventClick, onMoreClick }) => (
         <div data-testid="month-view">
             {events?.map(e => (
@@ -38,7 +38,7 @@ vi.mock('../../../components/calendar/month_view/MonthView', () => ({
     ),
 }));
 
-vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
+vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({
     EventPopover: ({ event, actions }) => (
         <div data-testid="event-popover">
             <span>{event.title}</span>
@@ -47,19 +47,19 @@ vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
     ),
 }));
 
-vi.mock('../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
+vi.mock('../../../components/Calendar/events_summary_modal/EventsSummaryModal', () => ({
     EventsSummaryModal: ({ isOpen }) => isOpen ? <div data-testid="summary-modal" /> : null,
 }));
 
-vi.mock('../../../components/society/society_detail/tags/TagFilterBar', () => ({
+vi.mock('../../../components/Society/society_detail/tags/TagFilterBar', () => ({
     default: () => <div data-testid="filter-bar" />,
 }));
 
-vi.mock('../../../components/society/society_detail/tags/TagManager', () => ({
+vi.mock('../../../components/Society/society_detail/tags/TagManager', () => ({
     default: () => <div data-testid="tag-manager" />,
 }));
 
-vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
+vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({
     EventModal: ({ onSubmit, onDelete }) => (
         <div data-testid="event-modal">
             <button onClick={() => onSubmit({ title: 'New' })}>submit</button>
@@ -68,7 +68,7 @@ vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
     ),
 }));
 
-import CalendarTab from '../../../components/society/society_detail/tabs/calendar_tab/CalendarTab';
+import CalendarTab from '../../../components/Society/society_detail/tabs/calendar_tab/CalendarTab';
 
 describe('CalendarTab', () => {
     beforeEach(() => {

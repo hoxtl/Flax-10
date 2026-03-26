@@ -25,19 +25,19 @@ vi.mock("../../../../context/CalendarContext", () => ({
   useCalendarDispatch: () => vi.fn(),
 }));
 
-vi.mock("../../../../components/calendar/hooks/useSwipeNavigation", () => ({
+vi.mock("../../../../components/Calendar/hooks/useSwipeNavigation", () => ({
   useSwipeNavigation: vi.fn(),
 }));
 
-vi.mock("../../../../components/calendar/month_view/WeekdayHeader", () => ({
+vi.mock("../../../../components/Calendar/month_view/WeekdayHeader", () => ({
   WeekdayHeader: () => <div>weekday-header</div>,
 }));
 
-vi.mock("../../../../components/calendar/month_view/WeekRow", () => ({
+vi.mock("../../../../components/Calendar/month_view/WeekRow", () => ({
   WeekRow: () => <div>week-row</div>,
 }));
 
-import { SwipeMonthView } from "../../../../components/calendar/month_view/SwipeMonthView";
+import { SwipeMonthView } from "../../../../components/Calendar/month_view/SwipeMonthView";
 
 describe("SwipeMonthView null ref branch", () => {
   it("skips the scroll reset when the ref never resolves to a DOM node", () => {

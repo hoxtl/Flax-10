@@ -20,6 +20,7 @@ User = get_user_model()
 
 class SocietyListViewTest(TestCase):
     """Tests society list view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="testuser", email="test@example.com", password="pass")
@@ -46,6 +47,7 @@ class SocietyListViewTest(TestCase):
 
 class SocietyDetailViewTest(TestCase):
     """Tests society detail view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="admin", email="admin@example.com", password="pass")

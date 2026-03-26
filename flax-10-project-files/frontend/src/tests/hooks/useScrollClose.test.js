@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useScrollClose } from '../../components/calendar/event_detail_popup/useScrollClose';
+import { useScrollClose } from '../../components/Calendar/event_detail_popup/useScrollClose';
 
 describe('useScrollClose', () => {
   const addSpy = vi.spyOn(window, 'addEventListener');

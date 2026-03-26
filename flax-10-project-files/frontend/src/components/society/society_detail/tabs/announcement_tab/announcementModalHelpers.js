@@ -3,7 +3,7 @@
  * validation, and image processing.
  */
 
-import { validateEventTimes } from '../../../../calendar/utils/dateValidation';
+import { validateEventTimes } from '../../../../Calendar/utils/dateValidation';
 
 export const MAX_IMAGES = 5;
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { getDateRangeForView } from '../../../../components/calendar/hooks/calendarHelpers';
+import { getDateRangeForView } from '../../../../components/Calendar/hooks/calendarHelpers';
 
 describe('calendarHelpers', () => {
     describe('getDateRangeForView', () => {

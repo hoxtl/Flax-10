@@ -5,13 +5,13 @@
 import { render as rtlRender, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { EventPopover } from '../../../../components/calendar/event_popover/EventPopover';
+import { EventPopover } from '../../../../components/Calendar/event_popover/EventPopover';
 import { createMockEvent, createMockTag } from '../mocks/calendarMocks';
 
 const mockCalculatePopoverPosition = vi.fn(() => ({ top: 100, left: 200, placement: 'right' }));
 const mockCalculateArrowPosition = vi.fn(() => 50);
 
-vi.mock('../../../../components/calendar/event_popover/popoverUtils', () => ({
+vi.mock('../../../../components/Calendar/event_popover/popoverUtils', () => ({
     calculatePopoverPosition: (...args) => mockCalculatePopoverPosition(...args),
     calculateArrowPosition: (...args) => mockCalculateArrowPosition(...args),
 }));
@@ -32,6 +32,17 @@ describe('EventPopover', () => {
     const onClose = vi.fn();
     const tag = createMockTag();
 
+    function renderPopover(props = {}) {
+        return render(
+            <EventPopover
+                event={createMockEvent()}
+                anchorRect={anchor}
+                onClose={onClose}
+                {...props}
+            />
+        );
+    }
+
     beforeEach(() => {
         vi.clearAllMocks();
         mockCalculatePopoverPosition.mockReturnValue({ top: 100, left: 200, placement: 'right' });
@@ -50,64 +61,57 @@ describe('EventPopover', () => {
     });
 
     it('renders event title', () => {
-        const event = createMockEvent({ title: 'My Event' });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} tag={tag} />);
+        renderPopover({ event: createMockEvent({ title: 'My Event' }), tag });
         expect(screen.getByText('My Event')).toBeInTheDocument();
     });
 
     it('renders tag badge when tag provided', () => {
-        const event = createMockEvent();
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} tag={tag} />);
+        renderPopover({ tag });
         expect(screen.getByText('Work')).toBeInTheDocument();
     });
 
     it('renders location when provided', () => {
-        const event = createMockEvent({ location: 'Room 101' });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ location: 'Room 101' }) });
         expect(screen.getByText('Room 101')).toBeInTheDocument();
     });
 
     it('renders description when provided', () => {
-        const event = createMockEvent({ description: 'Event details' });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ description: 'Event details' }) });
         expect(screen.getByText('Event details')).toBeInTheDocument();
     });
 
     it('toggles description expansion on click', () => {
-        const event = createMockEvent({ description: 'A long description text' });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ description: 'A long description text' }) });
         fireEvent.click(screen.getByText('A long description text'));
     });
 
     it('renders module badge for module events', () => {
-        const event = createMockEvent({ module_name: 'CS101' });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ module_name: 'CS101' }) });
         expect(screen.getByText('CS101')).toBeInTheDocument();
     });
 
     it('renders society badge for society events', () => {
-        const event = createMockEvent({ society_name: 'Chess Club' });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ society_name: 'Chess Club' }) });
         expect(screen.getByText('Chess Club')).toBeInTheDocument();
     });
 
     it('renders action buttons when not readOnly', () => {
         const actions = [{ label: 'Edit', onClick: vi.fn() }, { label: 'Delete', onClick: vi.fn(), variant: 'danger' }];
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} actions={actions} />);
+        renderPopover({ actions });
         expect(screen.getByTitle('Edit')).toBeInTheDocument();
         expect(screen.getByTitle('Delete')).toBeInTheDocument();
     });
 
     it('does not render actions when readOnly', () => {
         const actions = [{ label: 'Edit', onClick: vi.fn() }];
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} actions={actions} readOnly />);
+        renderPopover({ actions, readOnly: true });
         expect(screen.queryByTitle('Edit')).not.toBeInTheDocument();
     });
 
     it('calls onClose and action.onClick when action button clicked', () => {
         const actionClick = vi.fn();
         const actions = [{ label: 'Edit', onClick: actionClick }];
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} actions={actions} />);
+        renderPopover({ actions });
         fireEvent.click(screen.getByTitle('Edit'));
         expect(onClose).toHaveBeenCalled();
         expect(actionClick).toHaveBeenCalled();
@@ -115,69 +119,61 @@ describe('EventPopover', () => {
 
     it('renders the raw label for unknown action types', () => {
         const actionClick = vi.fn();
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} actions={[{ label: 'Share', onClick: actionClick }]} />);
+        renderPopover({ actions: [{ label: 'Share', onClick: actionClick }] });
         fireEvent.click(screen.getByTitle('Share'));
         expect(screen.getByTitle('Share')).toHaveTextContent('Share');
         expect(actionClick).toHaveBeenCalled();
     });
 
     it('calls onClose on Escape key', () => {
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        renderPopover();
         fireEvent.keyDown(document, { key: 'Escape' });
         expect(onClose).toHaveBeenCalled();
     });
 
     it('calls onClose on overlay click', () => {
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        renderPopover();
         const overlay = document.querySelector('[class*="popoverOverlay"]');
         fireEvent.mouseDown(overlay);
         expect(onClose).toHaveBeenCalled();
     });
 
     it('applies pixel-based custom properties for popover positioning', () => {
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        renderPopover();
         const popover = document.querySelector('[class*="popoverContainer"]');
         expect(popover.style.getPropertyValue('--popover-top')).toBe('100px');
         expect(popover.style.getPropertyValue('--popover-left')).toBe('200px');
     });
 
-    it('renders top arrow placement with a left style', () => {
-        mockCalculatePopoverPosition.mockReturnValue({ top: 80, left: 180, placement: 'top' });
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+    it.each([
+        [{ top: 80, left: 180, placement: 'top' }, 'popoverArrowTop', 'left', '50px'],
+        [{ top: 80, left: 20, placement: 'left' }, 'popoverArrowLeft', 'top', '50px'],
+    ])('renders %s arrow placement', (position, arrowClass, styleProp, styleValue) => {
+        mockCalculatePopoverPosition.mockReturnValue(position);
+        renderPopover();
         const arrow = document.querySelector('[class*="popoverArrow"]');
-        expect(arrow.className).toContain('popoverArrowTop');
-        expect(arrow.style.left).toBe('50px');
-    });
-
-    it('renders left arrow placement with a top style', () => {
-        mockCalculatePopoverPosition.mockReturnValue({ top: 80, left: 20, placement: 'left' });
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
-        const arrow = document.querySelector('[class*="popoverArrow"]');
-        expect(arrow.className).toContain('popoverArrowLeft');
-        expect(arrow.style.top).toBe('50px');
+        expect(arrow.className).toContain(arrowClass);
+        expect(arrow.style[styleProp]).toBe(styleValue);
     });
 
     it('falls back to the none arrow class for unrecognised placements', () => {
         mockCalculatePopoverPosition.mockReturnValue({ top: 80, left: 20, placement: 'diagonal' });
-        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        renderPopover();
         expect(document.querySelector('[class*="popoverArrow"]').className).toContain('popoverArrowNone');
     });
 
     it('renders moduleCode fallback for module events', () => {
-        const event = createMockEvent({ moduleCode: 'COMP101' });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ moduleCode: 'COMP101' }) });
         expect(screen.getByText('COMP101')).toBeInTheDocument();
     });
 
     it('renders module number fallback', () => {
-        const event = createMockEvent({ module: 5 });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ module: 5 }) });
         expect(screen.getByText('Module 5')).toBeInTheDocument();
     });
 
     it('renders society fallback text', () => {
-        const event = createMockEvent({ society_id: 3 });
-        render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);
+        renderPopover({ event: createMockEvent({ society_id: 3 }) });
         expect(screen.getByText('Society Event')).toBeInTheDocument();
     });
 });

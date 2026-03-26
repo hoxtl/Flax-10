@@ -4,15 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { usePopoverDismiss } from "./mini_timeline/usePopoverDismiss";
 import { useSleepWindow } from "./mini_timeline/useSleepWindow";
 
-function useConflictPopover() {
-  const [rowId, setRowId] = useState(null);
-  const ref = useRef(null);
-  const close = useCallback(() => setRowId(null), []);
-  usePopoverDismiss(rowId, ref, close);
-  return { rowId, setRowId, ref };
-}
-
-function useSlotPopover() {
+function useRowPopoverState() {
   const [rowId, setRowId] = useState(null);
   const ref = useRef(null);
   const close = useCallback(() => setRowId(null), []);
@@ -21,8 +13,8 @@ function useSlotPopover() {
 }
 
 export function useMiniTimelineState() {
-  const conflict = useConflictPopover();
-  const slot = useSlotPopover();
+  const conflict = useRowPopoverState();
+  const slot = useRowPopoverState();
   const [eventCtxMenu, setEventCtxMenu] = useState(null);
   const nowRowElementRef = useRef(null);
   const attachNowRow = useCallback((el) => { nowRowElementRef.current = el; }, []);

@@ -22,6 +22,7 @@ admin.site.register(SocietyEvent)
 
 class SocietyReportInline(admin.TabularInline):
     """Inline admin for society report."""
+
     model = SocietyReport
     extra = 0
     readonly_fields = ('reporter', 'reason', 'created_at')
@@ -29,14 +30,17 @@ class SocietyReportInline(admin.TabularInline):
 
 class ReportedSociety(Society):
     """Proxy model for societies with active reports."""
+
     class Meta:
         """Metadata for reported society."""
+
         proxy = True
         verbose_name = 'Society Report'
         verbose_name_plural = 'Society Reports'
 
 class ReportedSocietyAdmin(admin.ModelAdmin):
     """Admin for reported society."""
+
     inlines = [SocietyReportInline]
     list_display = ('name', 'is_ratified', 'report_count')
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateEventLayout } from '../../components/calendar/week_view/components/allDayRowHelpers';
+import { calculateEventLayout } from '../../components/Calendar/week_view/components/allDayRowHelpers';
 
 // Tests for weekViewRowHelpers — covers calculateEventLayout including row assignment, column clamping, overlap handling, and sort order for all-day events
 

@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { getEventTheme } from '../../../../components/calendar/utils/eventStyleUtils';
+import { getEventTheme } from '../../../../components/Calendar/utils/eventStyleUtils';
 
-vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
     getEffectiveTagName: vi.fn((event) => {
         if (event._tagName !== undefined) return event._tagName;
         return 'other';

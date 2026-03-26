@@ -1,51 +1,63 @@
 import { describe, it, expect, vi } from 'vitest';
-import { handleDateOnlyPickerChange, handleDatePickerChange, getDisplayValue, handleToggle } from '../../../../../components/calendar/event_modal/components/timeRowHelpers';
+import { handleDateOnlyPickerChange, handleDatePickerChange, getDisplayValue, handleToggle } from '../../../../../components/Calendar/event_modal/components/timeRowHelpers';
+
+function createUpdateHandler() {
+    const innerHandler = vi.fn();
+    const update = vi.fn().mockReturnValue(innerHandler);
+    return { innerHandler, update };
+}
+
+function expectUpdatedValue(innerHandler, value) {
+    expect(innerHandler).toHaveBeenCalledWith({ target: { value } });
+}
+
+function toggleAllDay(checked) {
+    const setForm = vi.fn();
+    const handler = handleToggle(setForm, {});
+    handler({ target: { checked } });
+    return setForm.mock.calls[0][0];
+}
 
 describe('TimeRowHelpers', () => {
     describe('handleDatePickerChange', () => {
         it('should return a function that dispatches the correct value', () => {
-            const innerHandler = vi.fn();
-            const update = vi.fn().mockReturnValue(innerHandler);
+            const { innerHandler, update } = createUpdateHandler();
             const field = 'start_time';
             const handler = handleDatePickerChange(field, update);
 
             handler('2025-01-01T10:00');
 
             expect(update).toHaveBeenCalledWith(field);
-            expect(innerHandler).toHaveBeenCalledWith({ target: { value: '2025-01-01T10:00' } });
+            expectUpdatedValue(innerHandler, '2025-01-01T10:00');
         });
     });
 
     describe('handleDateOnlyPickerChange', () => {
         it('should adjust start_time correctly', () => {
-            const innerHandler = vi.fn();
-            const update = vi.fn().mockReturnValue(innerHandler);
+            const { innerHandler, update } = createUpdateHandler();
             const handler = handleDateOnlyPickerChange('start_time', update);
 
             handler('2025-01-01');
 
-            expect(innerHandler).toHaveBeenCalledWith({ target: { value: '2025-01-01T00:00' } });
+            expectUpdatedValue(innerHandler, '2025-01-01T00:00');
         });
 
         it('should adjust end_time correctly (+1 day)', () => {
-            const innerHandler = vi.fn();
-            const update = vi.fn().mockReturnValue(innerHandler);
+            const { innerHandler, update } = createUpdateHandler();
             const handler = handleDateOnlyPickerChange('end_time', update);
 
             handler('2025-01-01');
 
-            // 2025-01-01 -> 2025-01-02
-            expect(innerHandler).toHaveBeenCalledWith({ target: { value: '2025-01-02T00:00' } });
+            expectUpdatedValue(innerHandler, '2025-01-02T00:00');
         });
 
         it('should handle empty value', () => {
-            const innerHandler = vi.fn();
-            const update = vi.fn().mockReturnValue(innerHandler);
+            const { innerHandler, update } = createUpdateHandler();
             const handler = handleDateOnlyPickerChange('start_time', update);
 
             handler('');
 
-            expect(innerHandler).toHaveBeenCalledWith({ target: { value: '' } });
+            expectUpdatedValue(innerHandler, '');
         });
     });
 
@@ -69,12 +81,7 @@ describe('TimeRowHelpers', () => {
 
     describe('handleToggle', () => {
         it('should toggle all_day state and adjust times', () => {
-            const setForm = vi.fn();
-            const handler = handleToggle(setForm, {});
-
-            handler({ target: { checked: true } });
-
-            const updateFn = setForm.mock.calls[0][0];
+            const updateFn = toggleAllDay(true);
             const prev = {
                 all_day: false,
                 start_time: '2025-01-01T10:00',
@@ -88,12 +95,7 @@ describe('TimeRowHelpers', () => {
         });
 
         it('should toggle all_day off', () => {
-            const setForm = vi.fn();
-            const handler = handleToggle(setForm, {});
-
-            handler({ target: { checked: false } });
-
-            const updateFn = setForm.mock.calls[0][0];
+            const updateFn = toggleAllDay(false);
             const prev = { all_day: true, start_time: '2025-01-01T00:00', end_time: '2025-01-02T00:00' };
             const result = updateFn(prev);
 
@@ -104,12 +106,7 @@ describe('TimeRowHelpers', () => {
         });
 
         it('preserves empty start/end values when toggling all_day on', () => {
-            const setForm = vi.fn();
-            const handler = handleToggle(setForm, {});
-
-            handler({ target: { checked: true } });
-
-            const updateFn = setForm.mock.calls[0][0];
+            const updateFn = toggleAllDay(true);
             const result = updateFn({ all_day: false, start_time: '', end_time: '' });
 
             expect(result).toEqual({ all_day: true, start_time: '', end_time: '' });

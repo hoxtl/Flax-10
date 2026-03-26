@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import WelcomeLanding from "../../pages/welcome/WelcomeLanding";
+import WelcomeLanding from "../../pages/Welcome/WelcomeLanding";
 
 let mockQuote = "A calm start goes a long way";
 
@@ -15,7 +15,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../components/welcome/WelcomeBackgroundPaths", () => ({
+vi.mock("../../components/Welcome/WelcomeBackgroundPaths", () => ({
   default: () => <div data-testid="bg-paths" />,
 }));
 
@@ -23,7 +23,7 @@ vi.mock("../../lib/quotes", () => ({
   pickWelcomeQuoteByKey: () => mockQuote,
 }));
 
-vi.mock("../../components/calendar/utils/dateUtils", () => ({
+vi.mock("../../components/Calendar/utils/dateUtils", () => ({
   getGreeting: () => "Good morning",
 }));
 

@@ -183,6 +183,7 @@ class ReportedSocietyAdminTest(TestCase):
 
 class ScheduleModelStringTests(TestCase):
     """Tests schedule model string."""
+
     def setUp(self):
         from studyFlax.models.calendar.schedule_model import Schedule, ScheduleEventAllocation
         from studyFlax.models.calendar.calendar_event_model import CalendarEvent

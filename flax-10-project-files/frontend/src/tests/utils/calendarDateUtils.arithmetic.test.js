@@ -17,7 +17,7 @@ import {
   startOfDay,
   isToday,
   parseDateInput,
-} from '../../components/calendar/utils/dateUtils';
+} from '../../components/Calendar/utils/dateUtils';
 
 // Date arithmetic utility tests
 

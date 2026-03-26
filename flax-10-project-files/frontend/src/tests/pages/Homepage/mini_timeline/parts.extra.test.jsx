@@ -27,10 +27,10 @@ import {
   ConflictPopover,
   EventDuration,
   EventTagSlot,
-} from "../../../../pages/homepage/components/mini_timeline/parts/PlanEventRowParts";
-import { ConflictActions, ConflictCard } from "../../../../pages/homepage/components/mini_timeline/parts/ConflictPairParts";
-import { PlanFreeRowContent } from "../../../../pages/homepage/components/mini_timeline/parts/PlanFreeRowContent";
-import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "../../../../pages/homepage/components/mini_timeline/parts/TimelineRowLayout";
+} from "../../../../pages/Homepage/components/mini_timeline/parts/PlanEventRowParts";
+import { ConflictActions, ConflictCard } from "../../../../pages/Homepage/components/mini_timeline/parts/ConflictPairParts";
+import { PlanFreeRowContent } from "../../../../pages/Homepage/components/mini_timeline/parts/PlanFreeRowContent";
+import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "../../../../pages/Homepage/components/mini_timeline/parts/TimelineRowLayout";
 
 const conflictActionItems = [
   { id: "a", item: { title: "🔥 Lecture", tag: "x" }, isReadOnly: false },

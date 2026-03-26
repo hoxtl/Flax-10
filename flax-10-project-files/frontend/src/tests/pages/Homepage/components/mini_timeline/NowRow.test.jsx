@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { NowRow } from '../../../../../pages/homepage/components/mini_timeline/NowRow';
+import { NowRow } from '../../../../../pages/Homepage/components/mini_timeline/NowRow';
 
 const styles = {
   planTimelineRow: 'row',

@@ -247,6 +247,7 @@ class ProfileSummaryHelpersTest(TestCase):
 
 class AddSessionToTotalsTest(TestCase):
     """Tests add session to totals."""
+
     def test_returns_early_when_session_has_no_end_time(self):
         from studyFlax.views.user.profile_summary_payload import add_session_to_totals
         from unittest.mock import MagicMock

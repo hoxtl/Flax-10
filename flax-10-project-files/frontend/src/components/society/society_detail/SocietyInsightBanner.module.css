@@ -11,13 +11,13 @@
 }
 
 .warning {
-  background: color-mix(in srgb, #f59e0b 12%, white);
-  border-color: color-mix(in srgb, #f59e0b 24%, transparent);
+  background: color-mix(in srgb, var(--color-amber) 12%, white);
+  border-color: color-mix(in srgb, var(--color-amber) 24%, transparent);
 }
 
 .positive {
-  background: color-mix(in srgb, #10b981 11%, white);
-  border-color: color-mix(in srgb, #10b981 24%, transparent);
+  background: color-mix(in srgb, var(--color-teal) 11%, white);
+  border-color: color-mix(in srgb, var(--color-teal) 24%, transparent);
 }
 
 .info {

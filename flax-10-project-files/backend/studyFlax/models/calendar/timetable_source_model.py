@@ -8,6 +8,7 @@ from ..auth.user_model import User
 
 class TimetableSource(models.Model):
     """Timetable feed tracked for a user."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     source_url = models.URLField()
     last_synced = models.DateTimeField(null=True, blank=True)
@@ -16,4 +17,5 @@ class TimetableSource(models.Model):
 
     class Meta:
         """Metadata for timetable source."""
+
         unique_together = ('user', 'source_url')

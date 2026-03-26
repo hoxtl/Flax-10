@@ -1,4 +1,4 @@
-import styles from './LocationAutocomplete.module.css';
+import styles from './LocationAutoComplete.module.css';
 import { useLocationAutocomplete } from "./useLocationAutocomplete";
 function SuggestionItem({ suggestion, onClick }) {
     return (

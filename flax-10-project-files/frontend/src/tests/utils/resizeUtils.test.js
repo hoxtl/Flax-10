@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { calculateNewHeight, commitResize, createResizeSession } from '../../components/calendar/utils/resizeUtils';
+import { calculateNewHeight, commitResize, createResizeSession } from '../../components/Calendar/utils/resizeUtils';
 
 // Mock calendarConstants
-vi.mock('../../components/calendar/calendarConstants', () => ({
+vi.mock('../../components/Calendar/calendarConstants', () => ({
     SLOT_HEIGHT: 60,
     SNAP_INTERVAL: 15,
     pixelsToMinutes: (px) => (px / 60) * 60, // 1px = 1min for simplicity

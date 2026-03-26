@@ -8,18 +8,18 @@ vi.mock('../../../lib/focusPlanner', () => ({
   rankTasksForFocus: vi.fn((tasks) => tasks),
 }));
 
-vi.mock('../../../components/timer/utils/presetUtils', () => ({
+vi.mock('../../../components/Timer/utils/presetUtils', () => ({
   applyTaskToTimer: vi.fn(),
 }));
 
 import { fetchTasks } from '../../../api/taskApi';
 import { rankTasksForFocus } from '../../../lib/focusPlanner';
-import { applyTaskToTimer } from '../../../components/timer/utils/presetUtils';
+import { applyTaskToTimer } from '../../../components/Timer/utils/presetUtils';
 import {
   clearManualTask,
   startManualTask,
   startSuggestedTask,
-} from '../../../components/timer/utils/timerTaskActions';
+} from '../../../components/Timer/utils/timerTaskActions';
 
 beforeEach(() => {
   vi.clearAllMocks();

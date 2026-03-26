@@ -67,6 +67,7 @@ class ScheduleEventAllocation(models.Model):
 
     class Meta:
         """Metadata for schedule event allocation."""
+
         unique_together = ('schedule', 'event')
 
     def __str__(self):

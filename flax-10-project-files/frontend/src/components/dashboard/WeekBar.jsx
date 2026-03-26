@@ -1,7 +1,7 @@
 // src/components/WeekBar.jsx
 import styles from "./WeekBar.module.css";
 import { loadTermConfig } from "../../lib/termConfig";
-import { buildWeekLabels, getWeekIndexForDate } from "../calendar/utils/weekUtils";
+import { buildWeekLabels, getWeekIndexForDate } from "../Calendar/utils/weekUtils";
 
 // Badge component that shows the current week or reading week status, and the total number of weeks in the term
 function WeekBadge({ label, totalWeeks, isReadingWeek }) {

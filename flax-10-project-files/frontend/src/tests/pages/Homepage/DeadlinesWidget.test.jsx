@@ -31,7 +31,7 @@ vi.mock('lucide-react', () => ({
     Clock: () => <svg />,
 }));
 
-import { DeadlinesWidget } from '../../../pages/homepage/components/DeadlinesWidget';
+import { DeadlinesWidget } from '../../../pages/Homepage/components/DeadlinesWidget';
 
 // Use hour-based offsets to avoid floor() edge cases with days.
 const tomorrow = new Date(Date.now() + 25 * 60 * 60 * 1000);    // 25 hours from now resolves to "Tomorrow".

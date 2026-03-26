@@ -19,11 +19,7 @@ export function getModuleColor(code) {
 
 export function formatDueDate(dueDate) {
   if (!dueDate) return null;
-  const due = new Date(dueDate);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
-  const diffDays = Math.round((dueDay - today) / 86400000);
+  const { diffDays, due } = getDueDayDiff(dueDate);
   if (diffDays < 0) return { label: "Overdue", status: "overdue" };
   if (diffDays === 0) return { label: "Today", status: "today" };
   if (diffDays === 1) return { label: "Tomorrow", status: "tomorrow" };
@@ -33,14 +29,21 @@ export function formatDueDate(dueDate) {
 
 export function getCompletedDueLabel(dueDate) {
   if (!dueDate) return "Completed";
-  const due = new Date(dueDate);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
-  const diffDays = Math.round((dueDay - today) / 86400000);
+  const { diffDays, due } = getDueDayDiff(dueDate);
   if (diffDays === 0) return "Completed today";
   if (diffDays === -1) return "Completed yesterday";
   return `Completed ${due.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+}
+
+function getDueDayDiff(dueDate) {
+  const due = new Date(dueDate);
+  const today = toCalendarDay(new Date());
+  const dueDay = toCalendarDay(due);
+  return { diffDays: Math.round((dueDay - today) / 86400000), due };
+}
+
+function toCalendarDay(value) {
+  return new Date(value.getFullYear(), value.getMonth(), value.getDate());
 }
 
 export function splitEstimatedBlocks(blocks) {

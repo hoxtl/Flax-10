@@ -4,15 +4,11 @@ import {
   doesEventOverlapSleepWindow,
 } from "../../../../components/settings/sleep/sleepWarningUtils";
 
-// Helpers
-
 function makeDate(hours, minutes = 0) {
   const d = new Date(2024, 0, 15); // fixed calendar date
   d.setHours(hours, minutes, 0, 0);
   return d;
 }
-
-// isDuringSleepWindow
 
 describe("isDuringSleepWindow", () => {
   // Normal window: sleep 22:00, wake 07:00 (overnight)
@@ -108,7 +104,6 @@ describe("doesEventOverlapSleepWindow", () => {
   });
 
   it("falls back to isDuringSleepWindow when end <= start", () => {
-    // The start time is during the sleep window and the end time matches it.
     const start = "2024-01-15T23:30:00";
     const end = "2024-01-15T23:30:00"; // equal
     expect(doesEventOverlapSleepWindow(SLEEP, WAKE, start, end)).toBe(true);
@@ -142,12 +137,10 @@ describe("doesEventOverlapSleepWindow", () => {
   });
 
   it("uses a default 25-minute window when endDate is not provided", () => {
-    // Without an end time, the helper checks a 22:10 to 22:35 window in sleep time.
     expect(doesEventOverlapSleepWindow(SLEEP, WAKE, "2024-01-15T22:10:00", null)).toBe(true);
   });
 
   it("returns false for a short event well outside sleep window (no end date)", () => {
-    // Without an end time, the helper checks 14:00 to 14:25 outside sleep time.
     expect(doesEventOverlapSleepWindow(SLEEP, WAKE, "2024-01-15T14:00:00", null)).toBe(false);
   });
 });

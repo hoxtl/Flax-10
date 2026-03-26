@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AuthPage from '../../pages/auth/AuthPage';
+import AuthPage from '../../pages/Auth/AuthPage';
 
 vi.mock('../../components/Auth/AuthComponents', () => ({
   Container: ({ children }) => <div>{children}</div>,

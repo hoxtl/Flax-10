@@ -43,7 +43,6 @@ vi.stubGlobal('cancelAnimationFrame', vi.fn());
 import TimerCircle, { TimerRing } from '../../../components/timer/TimerCircle';
 import FocusAnimation from '../../../components/timer/FocusAnimation';
 
-// Helper timer state
 const timerActionNames = ['setIsActive', 'togglePause', 'resetTimer', 'setModal'];
 const baseTimerProps = {
   mode: 'work', workTime: 25, breakTime: 5, timeLeft: 1500, progress: 50,
@@ -56,8 +55,6 @@ const makeT = (overrides = {}) => ({
   ...createFnMap(timerActionNames),
   ...overrides,
 });
-
-// TimerCircle
 
 describe('TimerCircle', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -193,8 +190,6 @@ describe('TimerCircle', () => {
   });
 });
 
-// TimerRing
-
 describe('TimerRing', () => {
   it('renders SVG ring', () => {
     const { container } = render(<TimerRing t={makeT()} />);
@@ -223,8 +218,6 @@ describe('TimerRing', () => {
   });
 });
 
-// FocusAnimation – showPicker=false branch
-
 describe('FocusAnimation – showPicker=false', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -242,7 +235,6 @@ describe('FocusAnimation – showPicker=false', () => {
     const { container } = render(
       <FocusAnimation progress={0.5} mode="work" isActive={false} showPicker={false} />,
     );
-    // The outer focusAnimWrapper div should always be present
     expect(container.firstChild).not.toBeNull();
   });
 });

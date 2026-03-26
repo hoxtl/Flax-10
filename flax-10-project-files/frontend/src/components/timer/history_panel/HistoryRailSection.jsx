@@ -2,7 +2,7 @@
  * Right rail history sections.
  */
 
-import styles from '../../../pages/timer/TimerPage.module.css';
+import styles from '../../../pages/Timer/TimerPage.module.css';
 import { formatDuration, formatTimeRange } from '../utils/historyFormatter';
 import { getModuleLabel } from './historyPanelUtils';
 

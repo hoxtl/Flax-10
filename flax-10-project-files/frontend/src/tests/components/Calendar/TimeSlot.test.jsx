@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
-vi.mock('../../../components/calendar/hooks/useTimeSlotDrop', () => ({
+vi.mock('../../../components/Calendar/hooks/useTimeSlotDrop', () => ({
     useTimeSlotDrop: vi.fn(() => ({
         mergedProps: {},
         isOver: false,
@@ -13,11 +13,11 @@ vi.mock('../../../context/ResizeHighlightContext', () => ({
     useResizeHighlight: vi.fn(() => ({ resizeHighlight: null })),
 }));
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
     isSameDay: vi.fn(() => false),
 }));
 
-import { TimeSlot } from '../../../components/calendar/day_view/TimeSlot';
+import { TimeSlot } from '../../../components/Calendar/day_view/TimeSlot';
 
 const date = new Date('2024-03-04');
 

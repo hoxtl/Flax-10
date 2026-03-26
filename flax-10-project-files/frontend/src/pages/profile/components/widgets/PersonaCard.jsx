@@ -16,6 +16,8 @@ function buildPeakLabel(peakHour) {
   return `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak`;
 }
 
+export { buildPeakLabel };
+
 export function PersonaCard({ persona, peakHour }) {
   if (!persona) return null;
   return (

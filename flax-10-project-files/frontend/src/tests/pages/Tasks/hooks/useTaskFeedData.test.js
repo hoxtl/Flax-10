@@ -1,81 +1,40 @@
 /* Tests for useTaskFeedData hook filtering, sorting, and navigation logic */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { act, waitFor } from "@testing-library/react";
+import {
+  getTaskFeedDataMocks,
+  renderTaskFeedData,
+  resetTaskFeedDataUtils,
+} from "./taskFeedDataTestSetup";
+import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
 
-const navigateMock = vi.hoisted(() => vi.fn());
-const getModulesMock = vi.hoisted(() => vi.fn());
+const { getModulesMock } = getTaskFeedDataMocks();
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
-  return { ...actual, useNavigate: () => navigateMock };
-});
+function appendFocusableElements() {
+  const focus = vi.fn();
+  const blur = vi.fn();
+  const input = document.createElement("input");
+  input.setAttribute("aria-label", "Task name");
+  input.focus = focus;
+  document.body.appendChild(input);
 
-vi.mock("../../../../api/moduleApi", () => ({
-  getModules: (...args) => getModulesMock(...args),
-}));
+  const textarea = document.createElement("textarea");
+  textarea.blur = blur;
+  document.body.appendChild(textarea);
 
-vi.mock("../../../../components/timer/task_input/taskInputUtils", () => ({
-  buildListItems: (lists = []) => lists.map((list) => ({ value: list.id, label: list.name })),
-  filterListItems: (items) => items,
-  groupModuleItems: (items) => ({ All: items }),
-}));
-
-vi.mock("../../../../lib/allTasksCompleteMessages", () => ({
-  getClearMessage: () => "Great job",
-}));
-
-vi.mock("../../../../pages/tasks/utils/taskFeedUtils", () => ({
-  getHeaderTitle: () => "Header",
-}));
-
-vi.mock("../../../../pages/tasks/utils/taskFeedDataUtils", () => ({
-  buildDateBounds: vi.fn(() => ({
-    now: new Date("2026-03-08T10:00:00Z"),
-    dayStart: new Date("2026-03-08T00:00:00Z"),
-    todayEnd: new Date("2026-03-08T23:59:59Z"),
-    weekEnd: new Date("2026-03-15T23:59:59Z"),
-  })),
-  filterBySearch: vi.fn((arr) => arr),
-  getOverdue: vi.fn(() => [{ id: 1 }]),
-  getToday: vi.fn(() => [{ id: 2 }]),
-  getThisWeek: vi.fn(() => [{ id: 3 }]),
-  getLater: vi.fn(() => [{ id: 4 }]),
-  getCompletedTodayCount: vi.fn(() => 1),
-  getCompletedWeekCount: vi.fn(() => 2),
-  getCompletedLaterCount: vi.fn(() => 3),
-  getFilterHandlers: vi.fn(() => ({
-    toggleListFilter: vi.fn(),
-    toggleModuleFilter: vi.fn(),
-    clearAllFilters: vi.fn(),
-  })),
-}));
-
-import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
-import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
+  return { focus, blur, input, textarea };
+}
 
 describe("useTaskFeedData", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(taskFeedDataUtils.filterBySearch).mockImplementation((arr) => arr);
-    vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([{ id: 1 }]);
-    vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([{ id: 2 }]);
-    vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([{ id: 3 }]);
-    vi.mocked(taskFeedDataUtils.getLater).mockReturnValue([{ id: 4 }]);
-    vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(1);
-    vi.mocked(taskFeedDataUtils.getCompletedWeekCount).mockReturnValue(2);
-    vi.mocked(taskFeedDataUtils.getCompletedLaterCount).mockReturnValue(3);
-    vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation(() => ({
-      toggleListFilter: vi.fn(),
-      toggleModuleFilter: vi.fn(),
-      clearAllFilters: vi.fn(),
-    }));
-    getModulesMock.mockResolvedValue([]);
+    resetTaskFeedDataUtils();
   });
 
-  it("builds sections and header", () => {
+  it("builds sections and header", async () => {
     const tasks = [{ id: 1, completed: false }, { id: 2, completed: true }];
     const lists = [{ id: 9, name: "Inbox" }];
-    const { result } = renderHook(() => useTaskFeedData({ tasks, lists, activeFilter: "all", activeListId: null, filterListIds: [] }));
+    const { result } = renderTaskFeedData({ tasks, lists });
+    await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([]));
     expect(result.current.headerTitle).toBe("Header");
     expect(result.current.overdue.length).toBe(1);
     expect(result.current.today.length).toBe(1);
@@ -97,7 +56,7 @@ describe("useTaskFeedData", () => {
       { id: 2, completed: false, module_code: "MA202", module_name: "" },
     ];
 
-    const { result } = renderHook(() => useTaskFeedData({ tasks, lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }));
+    const { result } = renderTaskFeedData({ tasks });
 
     await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([
       { value: "CS101", label: "CS101 — Computer Science" },
@@ -111,14 +70,12 @@ describe("useTaskFeedData", () => {
       { id: 2, completed: false, task_list: 10, module_code: "MA202" },
       { id: 3, completed: true, task_list: 9, module_code: "CS101" },
     ];
-    const { result } = renderHook(() => useTaskFeedData({
+    const { result } = renderTaskFeedData({
       tasks,
       allTasks: tasks,
       lists: [{ id: 9, name: "Inbox" }],
-      activeFilter: "all",
-      activeListId: null,
       filterListIds: [9],
-    }));
+    });
 
     act(() => {
       result.current.setSearch("report");
@@ -132,7 +89,7 @@ describe("useTaskFeedData", () => {
 
   it("toggles module filter codes", async () => {
     vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation((_l, _o, set) => ({ toggleModuleFilter: (c) => set((p) => (p.includes(c) ? [] : [c])) }));
-    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", filterListIds: [] }));
+    const { result } = renderTaskFeedData();
     act(() => { result.current.toggleModuleFilter("CS1"); });
     await waitFor(() => expect(result.current.filterModuleCodes).toEqual(["CS1"]));
   });
@@ -145,7 +102,7 @@ describe("useTaskFeedData", () => {
     }));
 
     const tasks = [{ id: 1, module_code: "CS1" }, { id: 2, module_code: "MA2" }];
-    const { result } = renderHook(() => useTaskFeedData({ tasks, allTasks: tasks, lists: [], activeFilter: "all", filterListIds: [] }));
+    const { result } = renderTaskFeedData({ tasks, allTasks: tasks });
     act(() => { result.current.toggleModuleFilter("CS1"); });
     await waitFor(() => expect(result.current.pending).toEqual([{ id: 1, module_code: "CS1" }]));
   });
@@ -159,10 +116,9 @@ describe("useTaskFeedData", () => {
       }),
     );
 
-    const { result } = renderHook(() =>
-      useTaskFeedData({ tasks: [], allTasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
-    );
+    const { result } = renderTaskFeedData({ allTasks: [] });
 
+    await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([]));
     act(() => { result.current.clearAllFilters(); });
     expect(result.current.filterModuleCodes).toEqual([]);
   });
@@ -177,9 +133,7 @@ describe("useTaskFeedData", () => {
       { id: 3, title: "Completed overdue", completed: true, due_date: overdueDate },
     ];
 
-    const { result } = renderHook(() =>
-      useTaskFeedData({ tasks, allTasks, lists: [], activeFilter: "overdue", activeListId: null, filterListIds: [] }),
-    );
+    const { result } = renderTaskFeedData({ tasks, allTasks, activeFilter: "overdue" });
 
     act(() => {
       result.current.setSearch("over");
@@ -198,9 +152,7 @@ describe("useTaskFeedData", () => {
       { id: 2, title: "Other task", completed: true, task_list: 2 },
     ];
 
-    const { result } = renderHook(() =>
-      useTaskFeedData({ tasks, allTasks, lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
-    );
+    const { result } = renderTaskFeedData({ tasks, allTasks });
 
     act(() => {
       result.current.setSearch("task");
@@ -215,23 +167,15 @@ describe("useTaskFeedData", () => {
 
 
 
+  it("focuses the task input for the n shortcut and blurs editable targets on escape", async () => {
+    const { blur, focus, input, textarea } = appendFocusableElements();
+    const { result } = renderTaskFeedData();
+    await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([]));
 
-  it("focuses the task input for the n shortcut and blurs editable targets on escape", () => {
-    const focus = vi.fn();
-    const blur = vi.fn();
-    const input = document.createElement("input");
-    input.setAttribute("aria-label", "Task name");
-    input.focus = focus;
-    document.body.appendChild(input);
-
-    const textarea = document.createElement("textarea");
-    textarea.blur = blur;
-    document.body.appendChild(textarea);
-
-    renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }));
-
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "n", bubbles: true }));
-    textarea.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "n", bubbles: true }));
+      textarea.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    });
 
     expect(focus).toHaveBeenCalled();
     expect(blur).toHaveBeenCalled();
@@ -241,10 +185,11 @@ describe("useTaskFeedData", () => {
   });
 
   describe("filter popup auto-close", () => {
-    it("keeps the filter open when clicking inside the filter ref", () => {
-      const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }));
+    it("keeps the filter open when clicking inside the filter ref", async () => {
+      const { result } = renderTaskFeedData();
       const inside = document.createElement("div");
       document.body.appendChild(inside);
+      await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([]));
       act(() => {
         result.current.filterRef.current = { contains: (node) => node === inside };
         result.current.setIsFilterOpen(true);
@@ -255,7 +200,7 @@ describe("useTaskFeedData", () => {
     });
 
     it("closes the filter when clicking outside the filter ref", async () => {
-      const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }));
+      const { result } = renderTaskFeedData();
       const outside = document.createElement("button");
       document.body.appendChild(outside);
       act(() => {
@@ -273,9 +218,7 @@ describe("useTaskFeedData", () => {
   it("handles missing tasks, lists, and module metadata defaults", async () => {
     getModulesMock.mockResolvedValueOnce(undefined);
 
-    const { result } = renderHook(() =>
-      useTaskFeedData({ tasks: [], lists: [], activeFilter: "all" }),
-    );
+    const { result } = renderTaskFeedData();
 
     await waitFor(() => expect(result.current.visibleListItems).toEqual([]));
     expect(result.current.groupedVisibleModuleItems.All).toEqual([]);
@@ -284,9 +227,7 @@ describe("useTaskFeedData", () => {
   });
 
   it("uses default task and list collections when the hook props omit them", async () => {
-    const { result } = renderHook(() =>
-      useTaskFeedData({ activeFilter: "all", activeListId: 999 }),
-    );
+    const { result } = renderTaskFeedData({ activeListId: 999 });
 
     await waitFor(() => expect(result.current.listMap).toEqual({}));
     expect(result.current.pending).toEqual([]);
@@ -301,9 +242,7 @@ describe("useTaskFeedData", () => {
       }),
     );
 
-    const { unmount } = renderHook(() =>
-      useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null }),
-    );
+    const { unmount } = renderTaskFeedData();
 
     unmount();
 
@@ -321,9 +260,7 @@ describe("useTaskFeedData", () => {
       }),
     );
 
-    const { unmount } = renderHook(() =>
-      useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null }),
-    );
+    const { unmount } = renderTaskFeedData();
 
     unmount();
 
@@ -339,7 +276,7 @@ describe("useTaskFeedData", () => {
         clearAllFilters: vi.fn(),
     }));
     const tasks = [{ id: 1, completed: false, module_code: null }, { id: 2, completed: false, module_code: "CS101" }];
-    const { result } = renderHook(() => useTaskFeedData({ tasks, allTasks: tasks, lists: [], activeFilter: "all" }));
+    const { result } = renderTaskFeedData({ tasks, allTasks: tasks });
 
     act(() => { result.current.toggleModuleFilter(""); });
     await waitFor(() => {
@@ -357,9 +294,7 @@ describe("useTaskFeedData", () => {
       { id: 1, completed: false, module_code: "PH101", module_name: "" },
     ];
 
-    const { result } = renderHook(() =>
-      useTaskFeedData({ tasks, lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
-    );
+    const { result } = renderTaskFeedData({ tasks });
 
     await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([
       { value: "PH101", label: "PH101" },

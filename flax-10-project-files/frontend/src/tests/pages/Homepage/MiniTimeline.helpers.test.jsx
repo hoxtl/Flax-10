@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { getEventAccentColor } from "../../../pages/homepage/components/mini_timeline/helpers/eventAccent";
-import { buildDeadlineTask } from "../../../pages/homepage/components/mini_timeline/helpers/deadlineTask";
-import { getConflictTimeLabel } from "../../../pages/homepage/components/mini_timeline/helpers/conflictRowUtils";
+import { getEventAccentColor } from "../../../pages/Homepage/components/mini_timeline/helpers/eventAccent";
+import { buildDeadlineTask } from "../../../pages/Homepage/components/mini_timeline/helpers/deadlineTask";
+import { getConflictTimeLabel } from "../../../pages/Homepage/components/mini_timeline/helpers/conflictRowUtils";
 import {
   formatGapDuration,
   getGapMinHeight,
@@ -11,13 +11,13 @@ import {
   getGapTimeLabel,
   getTinyGapTimeLabel,
   getGapRecommendationTitle,
-} from "../../../pages/homepage/components/mini_timeline/helpers/gapRowUtils";
-import { NowStrip } from "../../../pages/homepage/components/mini_timeline/NowStrip";
-import { MiniTimelineRowRenderer } from "../../../pages/homepage/components/mini_timeline/MiniTimelineRowRenderer";
-import { TimelineRowLayout, TimelineGutter, TimelineSpineCell } from "../../../pages/homepage/components/mini_timeline/parts/TimelineRowLayout";
-import { PlanFreeRowContent } from "../../../pages/homepage/components/mini_timeline/parts/PlanFreeRowContent";
-import { ConflictCard, ConflictActions } from "../../../pages/homepage/components/mini_timeline/parts/ConflictPairParts";
-import { EventTagSlot, EventDuration, ConflictPopover } from "../../../pages/homepage/components/mini_timeline/parts/PlanEventRowParts";
+} from "../../../pages/Homepage/components/mini_timeline/helpers/gapRowUtils";
+import { NowStrip } from "../../../pages/Homepage/components/mini_timeline/NowStrip";
+import { MiniTimelineRowRenderer } from "../../../pages/Homepage/components/mini_timeline/MiniTimelineRowRenderer";
+import { TimelineRowLayout, TimelineGutter, TimelineSpineCell } from "../../../pages/Homepage/components/mini_timeline/parts/TimelineRowLayout";
+import { PlanFreeRowContent } from "../../../pages/Homepage/components/mini_timeline/parts/PlanFreeRowContent";
+import { ConflictCard, ConflictActions } from "../../../pages/Homepage/components/mini_timeline/parts/ConflictPairParts";
+import { EventTagSlot, EventDuration, ConflictPopover } from "../../../pages/Homepage/components/mini_timeline/parts/PlanEventRowParts";
 
 vi.mock("react-router-dom", () => ({
   Link: ({ children, to, ...props }) => <a href={to} {...props}>{children}</a>,
@@ -32,23 +32,23 @@ vi.mock("../../../components/common/Badge/Badge", () => ({
   default: ({ children }) => <span>{children}</span>,
 }));
 
-vi.mock("../../../pages/homepage/components/mini_timeline/ConflictPairRow", () => ({
+vi.mock("../../../pages/Homepage/components/mini_timeline/ConflictPairRow", () => ({
   ConflictPairRow: ({ row }) => <div>Conflict pair {row.id}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/mini_timeline/HourMarkRow", () => ({
+vi.mock("../../../pages/Homepage/components/mini_timeline/HourMarkRow", () => ({
   HourMarkRow: ({ row }) => <div>Hour mark {row.id}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/mini_timeline/NowRow", () => ({
+vi.mock("../../../pages/Homepage/components/mini_timeline/NowRow", () => ({
   NowRow: ({ row }) => <div>Now row {row.id}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/mini_timeline/PlanEventRow", () => ({
+vi.mock("../../../pages/Homepage/components/mini_timeline/PlanEventRow", () => ({
   PlanEventRow: ({ row }) => <div>Plan event {row.id}</div>,
 }));
 
-vi.mock("../../../pages/homepage/components/mini_timeline/PlanFreeRow", () => ({
+vi.mock("../../../pages/Homepage/components/mini_timeline/PlanFreeRow", () => ({
   PlanFreeRow: ({ row, deadlineSuggestions = [], assignedTask, nextAssignedTask, onSkipTask }) => (
     <div>
       <div>Plan free {row.id}</div>
@@ -60,7 +60,7 @@ vi.mock("../../../pages/homepage/components/mini_timeline/PlanFreeRow", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/mini_timeline/TinyGapRow", () => ({
+vi.mock("../../../pages/Homepage/components/mini_timeline/TinyGapRow", () => ({
   TinyGapRow: ({ row }) => <div>Tiny gap {row.id}</div>,
 }));
 const styles = new Proxy({}, { get: (_, key) => key });

@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TaskPickItem } from '../../../components/timer/task_input/TaskPickItem';
+import { TaskPickItem } from '../../../components/Timer/task_input/TaskPickItem';
 
-vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
 
-vi.mock('../../../components/timer/task_input/taskInputUtils', () => ({
+vi.mock('../../../components/Timer/task_input/taskInputUtils', () => ({
   getTaskDurationLabel: (task) => `${task.estimated_blocks ?? 0} blocks`,
   getTaskUrgencyTone: (task) => task._urgency ?? 'cool',
 }));

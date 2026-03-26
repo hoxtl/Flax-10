@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useClickOutside } from '../../components/calendar/event_detail_popup/useClickOutside';
+import { useClickOutside } from '../../components/Calendar/event_detail_popup/useClickOutside';
 
 describe('useClickOutside', () => {
     it('calls onClose when clicking outside the ref element', () => {

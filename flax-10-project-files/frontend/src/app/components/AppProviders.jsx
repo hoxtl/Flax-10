@@ -5,8 +5,8 @@ import { CalendarProvider } from "../../context/CalendarContext";
 import { TagProvider } from "../../context/TagContext";
 import { TimerProvider } from "../../context/TimerContext";
 import { TaskCompletionProvider } from "../../context/TaskCompletionContext";
-import { NotificationToast } from "../../components/notifications";
-import AttendancePrompt from "../../components/attendance/AttendancePrompt";
+import { NotificationToast } from "../../components/Notifications";
+import AttendancePrompt from "../../components/Attendance/AttendancePrompt";
 
 const providers = [
   NotificationProvider,

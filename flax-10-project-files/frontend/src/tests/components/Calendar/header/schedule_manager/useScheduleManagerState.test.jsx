@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
-import { buildScheduleManagerHandlers, useScheduleManagerState } from "../../../../../components/calendar/header/schedule_manager/useScheduleManagerState";
+import { buildScheduleManagerHandlers, useScheduleManagerState } from "../../../../../components/Calendar/header/schedule_manager/useScheduleManagerState";
 
 const getSchedules = vi.fn();
 const renameSchedule = vi.fn();
@@ -23,6 +23,32 @@ function deferred() {
   return { promise, resolve, reject };
 }
 
+function renderOpenStateHook(showToast = vi.fn()) {
+  return renderHook(({ open }) => useScheduleManagerState(open, showToast), {
+    initialProps: { open: true },
+  });
+}
+
+async function resolveAfterUnmount(pending, settle) {
+  await act(async () => {
+    settle();
+    await pending.promise.catch(() => undefined);
+  });
+}
+
+async function expectNoLateToastAfterUnmount(settle) {
+  const pending = deferred();
+  const showToast = vi.fn();
+  getSchedules.mockReturnValueOnce(pending.promise);
+
+  const { unmount } = renderOpenStateHook(showToast);
+  unmount();
+
+  await resolveAfterUnmount(pending, () => settle(pending));
+
+  expect(showToast).not.toHaveBeenCalled();
+}
+
 describe("useScheduleManagerState", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -31,9 +57,7 @@ describe("useScheduleManagerState", () => {
   it("resets edit state when the dialog closes", async () => {
     getSchedules.mockResolvedValue([{ id: 1, title: "Spring plan" }]);
     const showToast = vi.fn();
-    const { result, rerender } = renderHook(({ open }) => useScheduleManagerState(open, showToast), {
-      initialProps: { open: true },
-    });
+    const { result, rerender } = renderOpenStateHook(showToast);
 
     await waitFor(() => expect(result.current.schedules).toEqual([{ id: 1, title: "Spring plan" }]));
 
@@ -54,36 +78,11 @@ describe("useScheduleManagerState", () => {
     expect(result.current.isDeleting).toBe(false);
   });
 
-  it("ignores late schedule responses after the dialog closes", async () => {
-    const pending = deferred();
-    const showToast = vi.fn();
-    getSchedules.mockReturnValueOnce(pending.promise);
-
-    const { unmount } = renderHook(() => useScheduleManagerState(true, showToast));
-    unmount();
-
-    await act(async () => {
-      pending.resolve([{ id: 1, title: "Late result" }]);
-      await pending.promise;
-    });
-
-    expect(showToast).not.toHaveBeenCalled();
-  });
-
-  it("ignores late schedule errors after the dialog closes", async () => {
-    const pending = deferred();
-    const showToast = vi.fn();
-    getSchedules.mockReturnValueOnce(pending.promise);
-
-    const { unmount } = renderHook(() => useScheduleManagerState(true, showToast));
-    unmount();
-
-    await act(async () => {
-      pending.reject(new Error("late failure"));
-      await pending.promise.catch(() => undefined);
-    });
-
-    expect(showToast).not.toHaveBeenCalled();
+  it.each([
+    ["responses", (pending) => pending.resolve([{ id: 1, title: "Late result" }])],
+    ["errors", (pending) => pending.reject(new Error("late failure"))],
+  ])("ignores late schedule %s after the dialog closes", async (_label, settle) => {
+    await expectNoLateToastAfterUnmount(settle);
   });
 });
 

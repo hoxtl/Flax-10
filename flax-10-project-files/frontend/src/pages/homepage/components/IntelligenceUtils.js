@@ -2,7 +2,7 @@
  * Homepage intelligence display helpers.
  */
 
-import { doesEventOverlapSleepWindow } from "../../../components/settings/hooks/useSleepWarning";
+import { doesEventOverlapSleepWindow } from "../../../components/Settings/hooks/useSleepWarning";
 
 export function getGreeting(name, isTeacher = false) {
   const h = new Date().getHours();

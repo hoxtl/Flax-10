@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 class ResetPasswordSerialiser(serializers.Serializer):
     """Serialiser for reset password."""
+
     email = serializers.EmailField()
 
     def normalise_lowercase_email(self, email_value):
@@ -14,6 +15,7 @@ class ResetPasswordSerialiser(serializers.Serializer):
 
 class ResetPasswordConfirmSerialiser(serializers.Serializer):
     """Serialiser for reset password confirm."""
+
     token = serializers.CharField(max_length=100)
     new_password = serializers.CharField(min_length=8, write_only=True)
     confirm_password = serializers.CharField(min_length=8, write_only=True)

@@ -20,7 +20,7 @@ import { renderHook, act } from '@testing-library/react';
 vi.mock('../../../components/modules/modules/ModuleCourseFilter.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
-vi.mock('../../../components/common/Card/CardGrid.module.css', () => ({
+vi.mock('../../../components/common/card/CardGrid.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
@@ -135,8 +135,6 @@ describe('useModuleCourseFilterState', () => {
   });
 });
 
-// ModuleCourseFilter – additional branch coverage
-
 describe('ModuleCourseFilter – branch coverage', () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -178,7 +176,6 @@ describe('ModuleCourseFilter – branch coverage', () => {
     render(<ModuleCourseFilter selectedCourses={[]} onToggleCourse={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: /filter/i }));
 
-    // Engineering has 6 courses, so the collapsed view shows a +1 more button.
     const expandBtn = screen.getByRole('button', { name: /\+ 1 more/i });
     expect(expandBtn).toBeInTheDocument();
 
@@ -259,8 +256,6 @@ describe('ModuleCourseFilter – branch coverage', () => {
     expect(screen.getByText('Fine Art')).toBeInTheDocument();
   });
 });
-
-// ModuleGrid
 
 describe('ModuleGrid', () => {
   const baseProps = {

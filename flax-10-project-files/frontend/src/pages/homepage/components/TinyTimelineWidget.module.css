@@ -5,55 +5,6 @@
   gap: 0;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.headerIconWrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid var(--widget-border);
-  background: var(--widget-icon-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.headerIcon {
-  color: var(--widget-text-secondary);
-}
-
-.headerTitleBlock {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  min-width: 0;
-}
-
-.headerTitle {
-  margin: 0;
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--widget-text-primary);
-}
-
 .timeline {
   display: flex;
   flex-direction: column;
