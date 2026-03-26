@@ -64,7 +64,9 @@ function useTaskContextMenuState(task) {
 
 function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
   useEffect(() => {
-    const handler = () => { onClose(); };
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) onClose();
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [menuRef, onClose]);

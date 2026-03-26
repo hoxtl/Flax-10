@@ -17,8 +17,11 @@ import {
 import styles from "./ProjectRow.module.css";
 
 function useIsOwner(project) {
-  const currentUserId = useContext(AuthContext)?.user?.id;
-  return (project.members || []).some((m) => m.role === "owner" && m.user === currentUserId);
+  const auth = useContext(AuthContext);
+  const currentUserId = auth?.profile?.id ?? auth?.user?.id;
+  return (project.members || []).some(
+    (m) => m.role === "owner" && String(m.user) === String(currentUserId),
+  );
 }
 
 function ProjectMetaArea({ project, date }) {

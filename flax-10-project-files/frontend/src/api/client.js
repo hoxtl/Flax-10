@@ -13,7 +13,11 @@ export async function fetchApi(endpoint, options = {}) {
 
 function buildRequestConfig(options) {
   const token = localStorage.getItem('token');
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  // Do not set Content-Type for FormData — the browser sets it automatically
+  // with the correct multipart boundary.
+  const isFormData = options.body instanceof FormData;
+  const defaultHeaders = isFormData ? {} : { 'Content-Type': 'application/json' };
+  const headers = { ...defaultHeaders, ...options.headers };
   if (token) headers['Authorization'] = `Token ${token}`;
   return { ...options, headers };
 }

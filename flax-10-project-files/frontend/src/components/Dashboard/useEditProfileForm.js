@@ -50,7 +50,7 @@ async function submitProfileUpdate(formData, onSave, setError, onSaved) {
     await onSave?.();
     onSaved?.();
   } catch (error) {
-    setError(error.response?.data?.error || "Failed to update profile");
+    setError(error.message || "Failed to update profile");
   }
 }
 
