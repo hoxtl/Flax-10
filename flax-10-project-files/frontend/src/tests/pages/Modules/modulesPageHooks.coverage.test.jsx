@@ -190,6 +190,26 @@ describe("modulesPageHooks coverage", () => {
     expect(useModuleSortingMock).toHaveBeenCalledWith(hook.modules);
   });
 
+  const setupTestState = (current) => act(() => {
+    current.setShowForm(true);
+    current.setEditingModule({ id: 2 });
+    current.setViewingModule({ id: 1 });
+    current.setDeadlineModule({ id: 1 });
+    current.setReadingModule({ id: 1 });
+    current.setSearchQuery("AA200");
+    current.setFilterMode("enrolled");
+  });
+
+  const verifyResetState = (current) => {
+    expect(current.showForm).toBeNull();
+    expect(current.editingModule).toBeNull();
+    expect(current.viewingModule).toBeNull();
+    expect(current.deadlineModule).toBeNull();
+    expect(current.readingModule).toBeNull();
+    expect(current.searchQuery).toBe("");
+    expect(current.filterMode).toBe("all");
+  };
+
   it("resets module page state when the show-all event fires", async () => {
     localStorage.setItem("user", JSON.stringify({ role: "teacher" }));
     const { result } = renderHook(() => useModulesPageState("", false), {
