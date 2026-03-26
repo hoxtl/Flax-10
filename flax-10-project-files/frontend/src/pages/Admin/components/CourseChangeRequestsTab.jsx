@@ -9,8 +9,7 @@ import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncList } from "../hooks/useAsyncList";
 import { usePaginatedItems } from "../hooks/usePaginatedItems";
 import { navigateToProfile } from "../utils/adminNavigation";
-import { AnimatedList, ListActions, ListInfo, ListRow } from "./AdminList";
-import AdminDecisionButtons from "./AdminDecisionButtons";
+import { AnimatedList, DecisionListRow } from "./AdminList";
 import AdminPagination from "./AdminPagination";
 import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
 
@@ -23,12 +22,17 @@ function getCourseCursor(request) {
 }
 
 function CourseChangeRow({ busy, onDecide, onNavigate, request }) {
-  const stopAndDecide = (event, decision) => { event.stopPropagation(); onDecide(request.id, decision); };
   return (
-      <ListRow onClick={() => navigateToProfile(onNavigate, request.user_id)} style={{ cursor: getCourseCursor(request) }}>
-      <ListInfo name={`${request.first_name} ${request.last_name}`} meta={`@${request.username} · ${request.email}`} extraMeta={getCourseMeta(request)} />
-      <ListActions><AdminDecisionButtons busy={busy === request.id} onApprove={(event) => stopAndDecide(event, "approve")} onReject={(event) => stopAndDecide(event, "reject")} /></ListActions>
-    </ListRow>
+    <DecisionListRow
+      busy={busy}
+      cursor={getCourseCursor(request)}
+      extraMeta={getCourseMeta(request)}
+      id={request.id}
+      meta={`@${request.username} · ${request.email}`}
+      name={`${request.first_name} ${request.last_name}`}
+      navigate={() => navigateToProfile(onNavigate, request.user_id)}
+      onDecide={onDecide}
+    />
   );
 }
 

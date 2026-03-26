@@ -1,16 +1,8 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import AnimatedDropdown from '../../../common/AnimatedDropdown';
 import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
+import { FREQUENCY_OPTIONS } from './recurrenceOptions';
 import './TimeRow.css';
-
-const FREQUENCY_OPTIONS = [
-    { value: 'none', label: 'None' },
-    { value: 'daily', label: 'Daily' },
-    { value: 'weekly', label: 'Weekly' },
-    { value: 'biweekly', label: 'Biweekly' },
-    { value: 'monthly', label: 'Monthly' },
-    { value: 'yearly', label: 'Yearly' },
-];
 
 export function TimeRow({ form, update, setForm, recurrenceValue, onRecurrenceChange }) {
     return (

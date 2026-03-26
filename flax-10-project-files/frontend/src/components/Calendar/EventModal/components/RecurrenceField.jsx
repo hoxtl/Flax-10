@@ -1,15 +1,7 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import AnimatedDropdown from '../../../common/AnimatedDropdown';
+import { FREQUENCY_OPTIONS } from './recurrenceOptions';
 import './RecurrenceField.css';
-
-const FREQUENCY_OPTIONS = [
-    { value: 'none', label: 'None' },
-    { value: 'daily', label: 'Daily' },
-    { value: 'weekly', label: 'Weekly' },
-    { value: 'biweekly', label: 'Biweekly' },
-    { value: 'monthly', label: 'Monthly' },
-    { value: 'yearly', label: 'Yearly' },
-];
 
 const END_TYPE_OPTIONS = [
     { value: 'never', label: 'Never' },

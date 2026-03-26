@@ -9,8 +9,7 @@ import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncList } from "../hooks/useAsyncList";
 import { usePaginatedItems } from "../hooks/usePaginatedItems";
 import { navigateToSociety } from "../utils/adminNavigation";
-import { ListActions, AnimatedList, ListInfo, ListRow } from "./AdminList";
-import AdminDecisionButtons from "./AdminDecisionButtons";
+import { AnimatedList, DecisionListRow } from "./AdminList";
 import AdminPagination from "./AdminPagination";
 import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
 
@@ -23,12 +22,16 @@ function resolveRatification(id, action) {
 }
 
 function RatificationRow({ busy, item, onDecide }) {
-  const stopAndDecide = (event, action) => { event.stopPropagation(); onDecide(item.id, action); };
   return (
-      <ListRow onClick={() => navigateToSociety(item.society_id ?? item.id)} style={{ cursor: "pointer" }}>
-      <ListInfo name={item.name} meta={getRatificationMeta(item)} />
-      <ListActions><AdminDecisionButtons busy={busy === item.id} onApprove={(event) => stopAndDecide(event, "approve")} onReject={(event) => stopAndDecide(event, "reject")} /></ListActions>
-    </ListRow>
+    <DecisionListRow
+      busy={busy}
+      cursor="pointer"
+      id={item.id}
+      meta={getRatificationMeta(item)}
+      name={item.name}
+      navigate={() => navigateToSociety(item.society_id ?? item.id)}
+      onDecide={onDecide}
+    />
   );
 }
 

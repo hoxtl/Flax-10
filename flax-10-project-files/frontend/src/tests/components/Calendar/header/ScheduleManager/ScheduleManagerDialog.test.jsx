@@ -59,6 +59,27 @@ describe('ScheduleManagerDialog', () => {
         useToast.mockReturnValue(mockToast);
     });
 
+    function renderOpenDialog(props = {}) {
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} {...props} />);
+    }
+
+    async function clickFirstAction(label) {
+        await waitFor(() => fireEvent.click(screen.getAllByText(label)[0]));
+    }
+
+    async function enterRenameMode() {
+        await clickFirstAction('Rename');
+    }
+
+    function saveRename(value) {
+        fireEvent.change(screen.getByTestId('input'), { target: { value } });
+        fireEvent.click(screen.getByText('Save'));
+    }
+
+    async function openDeleteConfirm() {
+        await clickFirstAction('Remove');
+    }
+
     it('renders nothing when closed', () => {
         const { container } = render(<ScheduleManagerDialog open={false} onClose={vi.fn()} />);
         expect(container.firstChild).toBeNull();
@@ -66,7 +87,7 @@ describe('ScheduleManagerDialog', () => {
 
     it('shows loading state then schedules', async () => {
         getSchedules.mockResolvedValue(mockSchedules);
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
         
         expect(screen.getByText('Loading schedules…')).toBeTruthy();
         
@@ -78,7 +99,7 @@ describe('ScheduleManagerDialog', () => {
 
     it('shows empty state with Auto Schedule button', async () => {
         getSchedules.mockResolvedValue([]);
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
         await waitFor(() => {
             expect(screen.getByText('⚙️ Auto Schedule')).toBeTruthy();
@@ -87,7 +108,7 @@ describe('ScheduleManagerDialog', () => {
 
     it('handles fetch error', async () => {
         getSchedules.mockRejectedValue(new Error('Fetch failed'));
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
         await waitFor(() => {
             expect(mockToast).toHaveBeenCalledWith('Fetch failed', { variant: 'error' });
@@ -100,7 +121,7 @@ describe('ScheduleManagerDialog', () => {
         const listener = vi.fn();
         window.addEventListener('quick-add:open', listener);
 
-        render(<ScheduleManagerDialog open={true} onClose={onClose} />);
+        renderOpenDialog({ onClose });
 
         await waitFor(() => fireEvent.click(screen.getByText('⚙️ Auto Schedule')));
 
@@ -111,9 +132,9 @@ describe('ScheduleManagerDialog', () => {
 
     it('enters and exits rename mode', async () => {
         getSchedules.mockResolvedValue(mockSchedules);
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
-        await waitFor(() => fireEvent.click(screen.getAllByText('Rename')[0]));
+        await enterRenameMode();
         expect(screen.getByTestId('input')).toHaveValue('Schedule 1');
 
         fireEvent.click(screen.getByText('Cancel'));
@@ -123,18 +144,16 @@ describe('ScheduleManagerDialog', () => {
     it('validates and saves rename', async () => {
         getSchedules.mockResolvedValue(mockSchedules);
         renameSchedule.mockResolvedValue({ event_allocations: [] });
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
-        await waitFor(() => fireEvent.click(screen.getAllByText('Rename')[0]));
+        await enterRenameMode();
         
         // Empty name
-        fireEvent.change(screen.getByTestId('input'), { target: { value: '   ' } });
-        fireEvent.click(screen.getByText('Save'));
+        saveRename('   ');
         expect(mockToast).toHaveBeenCalledWith('Enter a name.', { variant: 'error' });
 
         // Valid name
-        fireEvent.change(screen.getByTestId('input'), { target: { value: 'New Name' } });
-        fireEvent.click(screen.getByText('Save'));
+        saveRename('New Name');
 
         await waitFor(() => {
             expect(renameSchedule).toHaveBeenCalledWith(1, 'New Name');
@@ -145,11 +164,10 @@ describe('ScheduleManagerDialog', () => {
     it('handles rename error', async () => {
         getSchedules.mockResolvedValue(mockSchedules);
         renameSchedule.mockRejectedValue(new Error('Rename failed'));
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
-        await waitFor(() => fireEvent.click(screen.getAllByText('Rename')[0]));
-        fireEvent.change(screen.getByTestId('input'), { target: { value: 'New' } });
-        fireEvent.click(screen.getByText('Save'));
+        await enterRenameMode();
+        saveRename('New');
 
         await waitFor(() => {
             expect(mockToast).toHaveBeenCalledWith('Rename failed', { variant: 'error' });
@@ -158,9 +176,9 @@ describe('ScheduleManagerDialog', () => {
 
     it('shows and cancels delete confirmation', async () => {
         getSchedules.mockResolvedValue(mockSchedules);
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
-        await waitFor(() => fireEvent.click(screen.getAllByText('Remove')[0]));
+        await openDeleteConfirm();
         expect(screen.getByTestId('confirm-modal')).toBeTruthy();
 
         fireEvent.click(screen.getByTestId('cancel'));
@@ -170,9 +188,9 @@ describe('ScheduleManagerDialog', () => {
     it('confirms and deletes schedule', async () => {
         getSchedules.mockResolvedValue(mockSchedules);
         deleteSchedule.mockResolvedValue({});
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
-        await waitFor(() => fireEvent.click(screen.getAllByText('Remove')[0]));
+        await openDeleteConfirm();
         fireEvent.click(screen.getByTestId('confirm'));
 
         await waitFor(() => {
@@ -185,9 +203,9 @@ describe('ScheduleManagerDialog', () => {
     it('handles delete error', async () => {
         getSchedules.mockResolvedValue(mockSchedules);
         deleteSchedule.mockRejectedValue(new Error('Delete failed'));
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
-        await waitFor(() => fireEvent.click(screen.getAllByText('Remove')[0]));
+        await openDeleteConfirm();
         fireEvent.click(screen.getByTestId('confirm'));
 
         await waitFor(() => {
@@ -197,7 +215,7 @@ describe('ScheduleManagerDialog', () => {
 
     it('handles non-array API response', async () => {
         getSchedules.mockResolvedValue(null);
-        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        renderOpenDialog();
 
         await waitFor(() => {
             expect(screen.getByText('⚙️ Auto Schedule')).toBeTruthy();

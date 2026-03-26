@@ -23,6 +23,19 @@ function deferred() {
   return { promise, resolve, reject };
 }
 
+function renderOpenStateHook(showToast = vi.fn()) {
+  return renderHook(({ open }) => useScheduleManagerState(open, showToast), {
+    initialProps: { open: true },
+  });
+}
+
+async function resolveAfterUnmount(pending, settle) {
+  await act(async () => {
+    settle();
+    await pending.promise.catch(() => undefined);
+  });
+}
+
 describe("useScheduleManagerState", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -31,9 +44,7 @@ describe("useScheduleManagerState", () => {
   it("resets edit state when the dialog closes", async () => {
     getSchedules.mockResolvedValue([{ id: 1, title: "Spring plan" }]);
     const showToast = vi.fn();
-    const { result, rerender } = renderHook(({ open }) => useScheduleManagerState(open, showToast), {
-      initialProps: { open: true },
-    });
+    const { result, rerender } = renderOpenStateHook(showToast);
 
     await waitFor(() => expect(result.current.schedules).toEqual([{ id: 1, title: "Spring plan" }]));
 
@@ -59,13 +70,10 @@ describe("useScheduleManagerState", () => {
     const showToast = vi.fn();
     getSchedules.mockReturnValueOnce(pending.promise);
 
-    const { unmount } = renderHook(() => useScheduleManagerState(true, showToast));
+    const { unmount } = renderOpenStateHook(showToast);
     unmount();
 
-    await act(async () => {
-      pending.resolve([{ id: 1, title: "Late result" }]);
-      await pending.promise;
-    });
+    await resolveAfterUnmount(pending, () => pending.resolve([{ id: 1, title: "Late result" }]));
 
     expect(showToast).not.toHaveBeenCalled();
   });
@@ -75,13 +83,10 @@ describe("useScheduleManagerState", () => {
     const showToast = vi.fn();
     getSchedules.mockReturnValueOnce(pending.promise);
 
-    const { unmount } = renderHook(() => useScheduleManagerState(true, showToast));
+    const { unmount } = renderOpenStateHook(showToast);
     unmount();
 
-    await act(async () => {
-      pending.reject(new Error("late failure"));
-      await pending.promise.catch(() => undefined);
-    });
+    await resolveAfterUnmount(pending, () => pending.reject(new Error("late failure")));
 
     expect(showToast).not.toHaveBeenCalled();
   });

@@ -27,108 +27,113 @@ describe('DateTimeCell', () => {
         vi.clearAllMocks();
     });
 
+    function renderCell(props = {}) {
+        return render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} {...props} />);
+    }
+
+    function openEditor(label = /Mar 15/) {
+        fireEvent.click(screen.getByText(label));
+        return screen.getAllByTestId('datetime-picker');
+    }
+
+    function setInvalidRange() {
+        const pickers = openEditor();
+        fireEvent.change(pickers[0], { target: { value: '2026-03-15T14:00' } });
+        fireEvent.change(pickers[1], { target: { value: '2026-03-15T10:00' } });
+        fireEvent.click(screen.getByText('Save'));
+    }
+
     it('renders time range display', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
+        renderCell();
         expect(screen.getByText(/Mar 15/)).toBeInTheDocument();
     });
 
     it('renders All day for all-day events', () => {
-        render(<DateTimeCell event={createMockEvent({ all_day: true })} isReadOnly={false} onSave={vi.fn()} />);
+        renderCell({ event: createMockEvent({ all_day: true }) });
         expect(screen.getByText('All day')).toBeInTheDocument();
     });
 
     it('shows edit form when clicked', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
+        renderCell();
+        openEditor();
         expect(screen.getAllByTestId('datetime-picker')).toHaveLength(2);
     });
 
     it('does not show edit form when read-only clicked', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={true} onSave={vi.fn()} />);
+        renderCell({ isReadOnly: true });
         fireEvent.click(screen.getByText(/Mar 15/));
         expect(screen.queryByTestId('datetime-picker')).not.toBeInTheDocument();
     });
 
     it('shows Save and Cancel buttons when editing', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
+        renderCell();
+        openEditor();
         expect(screen.getByText('Save')).toBeInTheDocument();
         expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
 
     it('calls onSave with new times when Save clicked', () => {
         const onSave = vi.fn();
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={onSave} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
+        renderCell({ onSave });
+        openEditor();
         fireEvent.click(screen.getByText('Save'));
         expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ start_time: expect.any(String), end_time: expect.any(String) }));
     });
 
     it('closes edit form when Cancel clicked', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
+        renderCell();
+        openEditor();
         expect(screen.getByText('Save')).toBeInTheDocument();
         fireEvent.click(screen.getByText('Cancel'));
         expect(screen.queryByText('Save')).not.toBeInTheDocument();
     });
 
     it('shows error when end time before start time', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
-        const pickers = screen.getAllByTestId('datetime-picker');
-        fireEvent.change(pickers[0], { target: { value: '2026-03-15T14:00' } });
-        fireEvent.change(pickers[1], { target: { value: '2026-03-15T10:00' } });
-        fireEvent.click(screen.getByText('Save'));
+        renderCell();
+        setInvalidRange();
         expect(screen.getByText('End time must be after start time')).toBeInTheDocument();
     });
 
     it('does not call onSave when validation fails', () => {
         const onSave = vi.fn();
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={onSave} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
-        const pickers = screen.getAllByTestId('datetime-picker');
-        fireEvent.change(pickers[0], { target: { value: '2026-03-15T14:00' } });
-        fireEvent.change(pickers[1], { target: { value: '2026-03-15T10:00' } });
-        fireEvent.click(screen.getByText('Save'));
+        renderCell({ onSave });
+        setInvalidRange();
         expect(onSave).not.toHaveBeenCalled();
     });
 
     it('hides edit icon when read-only', () => {
-        const { container } = render(<DateTimeCell event={createMockEvent()} isReadOnly={true} onSave={vi.fn()} />);
+        const { container } = renderCell({ isReadOnly: true });
         expect(container.querySelector('svg')).not.toBeInTheDocument();
     });
 
     it('shows edit icon when not read-only', () => {
-        const { container } = render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
+        const { container } = renderCell();
         expect(container.querySelector('svg')).toBeInTheDocument();
     });
 
     it('updates start value when picker changes', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
-        const pickers = screen.getAllByTestId('datetime-picker');
+        renderCell();
+        const pickers = openEditor();
         fireEvent.change(pickers[0], { target: { value: '2026-03-16T09:00' } });
         expect(pickers[0]).toHaveValue('2026-03-16T09:00');
     });
 
     it('updates end value when picker changes', () => {
-        render(<DateTimeCell event={createMockEvent()} isReadOnly={false} onSave={vi.fn()} />);
-        fireEvent.click(screen.getByText(/Mar 15/));
-        const pickers = screen.getAllByTestId('datetime-picker');
+        renderCell();
+        const pickers = openEditor();
         fireEvent.change(pickers[1], { target: { value: '2026-03-16T18:00' } });
         expect(pickers[1]).toHaveValue('2026-03-16T18:00');
     });
 
     it('resets missing event times to empty inputs when editing', () => {
-        render(<DateTimeCell event={createMockEvent({ start_time: null, end_time: null })} isReadOnly={false} onSave={vi.fn()} />);
-        fireEvent.click(screen.getByText(/Jan 1/));
-        const pickers = screen.getAllByTestId('datetime-picker');
+        renderCell({ event: createMockEvent({ start_time: null, end_time: null }) });
+        const pickers = openEditor(/Jan 1/);
         expect(pickers[0]).toHaveValue('');
         expect(pickers[1]).toHaveValue('');
     });
 
     it('applies the hovered edit-icon class when the row is hovered', () => {
-        const { container } = render(<DateTimeCell event={createMockEvent()} isReadOnly={false} isRowHovered={true} onSave={vi.fn()} />);
+        const { container } = renderCell({ isRowHovered: true });
         const svg = container.querySelector('svg');
         expect(svg?.getAttribute('class')).toContain('editIconVisible');
     });
