@@ -10,7 +10,11 @@ function resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting) 
 
 function isPastProjectDeadline(value) {
   if (!value) return false;
-  return new Date(value).getTime() < Date.now();
+  const deadline = new Date(value);
+  const now = new Date();
+  deadline.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+  return deadline.getTime() < now.getTime();
 }
 
 function addMemberToForm(prev, user) {
@@ -98,8 +102,14 @@ function createSubmitHandler({ form, setForm, setErrors, setErrorMessage, setIsS
     }
 
     setIsSubmitting(true);
-    const created = await createGroupProject(buildProjectPayload(form));
-    handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage });
+    setErrorMessage("");
+    try {
+      const created = await createGroupProject(buildProjectPayload(form));
+      handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage });
+    } catch (err) {
+      setIsSubmitting(false);
+      setErrorMessage(err.message || "We couldn't create that project. Please try again.");
+    }
   };
 }
 

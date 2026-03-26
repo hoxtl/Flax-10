@@ -100,19 +100,7 @@ class GroupworkViewServiceCoverageTest(TestCase):
     def setUp(self):
         self.user = make_user('gws_user', 'gws_user@e.com')
 
-    def test_validate_users_within_project_limit_over_limit(self):
-        from studyFlax.views.groupwork.groupwork_view_service import validate_users_within_project_limit
-        with patch('studyFlax.views.groupwork.groupwork_view_service.MAX_GROUP_PROJECTS_PER_USER', 0):
-            result = validate_users_within_project_limit([self.user.id])
-        self.assertIsNotNone(result)
-        self.assertEqual(result.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_validate_project_create_input_returns_error_when_over_limit(self):
-        from studyFlax.views.groupwork.groupwork_view_service import validate_project_create_input
-        with patch('studyFlax.views.groupwork.groupwork_view_service.MAX_GROUP_PROJECTS_PER_USER', 0):
-            member_ids, errors, status_code = validate_project_create_input({'member_ids': [self.user.id]})
-        self.assertIsNone(member_ids)
-        self.assertEqual(status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_serialised_project_accepts_request_as_context(self):
         from studyFlax.views.groupwork.groupwork_view_service import serialised_project

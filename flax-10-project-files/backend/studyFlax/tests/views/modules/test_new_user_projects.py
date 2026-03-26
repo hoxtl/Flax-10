@@ -31,11 +31,7 @@ class SeedNewUserProjectsTest(TestCase):
         self.user = make_user('np_user', 'np_user@e.com')
         self.now = timezone.now()
 
-    def test_returns_zero_when_no_remaining_slots(self):
-        from studyFlax.views.modules.new_user_projects import seed_new_user_projects
-        with patch('studyFlax.views.modules.new_user_projects.MAX_GROUP_PROJECTS_PER_USER', 0):
-            result = seed_new_user_projects(self.user, now=self.now)
-        self.assertEqual(result, 0)
+
 
     def test_returns_zero_when_no_enrolled_modules(self):
         from studyFlax.views.modules.new_user_projects import seed_new_user_projects
@@ -103,22 +99,4 @@ class SeedNewUserProjectsTest(TestCase):
             result = _seed_project_for_module(module, self.user, self.now, [])
         self.assertFalse(result)
 
-    def test_stops_when_remaining_slots_reached(self):
-        from studyFlax.views.modules.new_user_projects import seed_new_user_projects
-        module1 = _make_module(self.user, code='NP05', name='Module One')
-        module2 = _make_module(self.user, code='NP06', name='Module Two')
-        Enrollment.objects.create(student=self.user, module=module1)
-        Enrollment.objects.create(student=self.user, module=module2)
-        spec1 = {'name': 'Project One', 'module': module1, 'source_deadline': None}
-        spec2 = {'name': 'Project Two', 'module': module2, 'source_deadline': None}
 
-        def fake_specs(module, now):
-            return [spec1] if module == module1 else [spec2]
-
-        with (
-            patch('studyFlax.views.modules.new_user_projects.MAX_GROUP_PROJECTS_PER_USER', 1),
-            patch('studyFlax.views.modules.new_user_projects._get_demo_users', return_value=[]),
-            patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', side_effect=fake_specs),
-        ):
-            result = seed_new_user_projects(self.user, now=self.now)
-        self.assertEqual(result, 1)

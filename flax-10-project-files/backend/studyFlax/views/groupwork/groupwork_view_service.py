@@ -13,10 +13,7 @@ from rest_framework.response import Response
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.models.modules.module_model import Module
 from studyFlax.serialisers.tasks.groupwork_serialisers import GroupMembershipSerialiser, GroupProjectSerialiser
-from studyFlax.views.groupwork.groupwork_limits import (
-    MAX_GROUP_PROJECTS_PER_USER,
-    group_project_limit_message,
-)
+
 
 
 User = get_user_model()
@@ -65,38 +62,6 @@ def validate_member_ids(member_ids):
         return missing_members_response(missing_ids)
     return None
 
-def users_over_project_limit(user_ids):
-    """Return users who have reached the project limit."""
-    return (
-        User.objects.filter(id__in=user_ids)
-        .annotate(project_total=Count("group_memberships"))
-        .filter(project_total__gte=MAX_GROUP_PROJECTS_PER_USER)
-        .order_by("username")
-    )
-
-def over_limit_member_names(users):
-    """Return usernames for over-limit members."""
-    return ", ".join(user.username for user in users)
-
-def member_limit_response(names):
-    message = f"{group_project_limit_message()} Over limit: {names}."
-    return member_ids_response(message)
-
-def validate_users_within_project_limit(user_ids):
-    """Validate that selected users can join another project."""
-    if not user_ids:
-        return None
-    over_limit = users_over_project_limit(user_ids)
-    if not over_limit.exists():
-        return None
-    return member_limit_response(over_limit_member_names(over_limit))
-
-def validate_user_within_project_limit(user):
-    """Validate that a single user can join another project."""
-    if GroupMembership.objects.filter(user=user).count() < MAX_GROUP_PROJECTS_PER_USER:
-        return None
-    return Response({"detail": group_project_limit_message()}, status=status.HTTP_400_BAD_REQUEST)
-
 def validate_project_create_input(data):
     member_ids = normalise_member_ids(data.get("member_ids", []))
     if member_ids is None:
@@ -104,9 +69,6 @@ def validate_project_create_input(data):
     member_error = validate_member_ids(member_ids) if member_ids else None
     if member_error:
         return None, member_error.data, member_error.status_code
-    limit_error = validate_users_within_project_limit(member_ids)
-    if limit_error:
-        return None, limit_error.data, limit_error.status_code
     return member_ids, None, None
 
 def project_create_payload(data):
@@ -167,16 +129,13 @@ def with_project_metrics(project):
     return project_metrics_queryset().filter(id=project.id).first()
 
 def project_list_response(request):
-    queryset = project_metrics_queryset().filter(memberships__user=request.user).order_by("-created_at")[:MAX_GROUP_PROJECTS_PER_USER]
+    queryset = project_metrics_queryset().filter(memberships__user=request.user).order_by("-created_at")
     return Response(GroupProjectSerialiser(queryset, many=True, context=serialiser_context(request)).data)
 
 def create_project_result(data, user, context):
     member_ids, member_error, member_status = validate_project_create_input(data)
     if member_error:
         return None, member_error, member_status
-    owner_limit_error = validate_user_within_project_limit(user)
-    if owner_limit_error:
-        return None, owner_limit_error.data, owner_limit_error.status_code
     serialiser = GroupProjectSerialiser(data=project_create_payload(data), context=context)
     if not serialiser.is_valid():
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
@@ -218,12 +177,6 @@ def membership_error_response(serialiser):
     """Return serialiser errors for membership creation."""
     return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def member_add_limit_error(project, target_user):
-    is_existing_member = GroupMembership.objects.filter(project=project, user=target_user).exists()
-    if is_existing_member:
-        return None
-    return validate_user_within_project_limit(target_user)
-
 def created_membership_response(membership, request):
     payload = GroupMembershipSerialiser(membership, context=serialiser_context(request)).data
     return Response(payload, status=status.HTTP_201_CREATED)
@@ -236,10 +189,6 @@ def add_member_to_project_response(project, request):
     serialiser = membership_serialiser(request)
     if not serialiser.is_valid():
         return membership_error_response(serialiser)
-    target_user = serialiser.validated_data["user"]
-    limit_error = member_add_limit_error(project, target_user)
-    if limit_error:
-        return limit_error
     membership = save_project_member(project, serialiser.validated_data)
     return created_membership_response(membership, request)
 
