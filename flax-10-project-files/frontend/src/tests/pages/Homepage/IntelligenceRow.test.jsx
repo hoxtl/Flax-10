@@ -53,7 +53,7 @@ vi.mock("../../../pages/homepage/components/IntelligenceGrid", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/intelligenceWidgetRenderer", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceWidgetRenderer", () => ({
   renderIntelligenceWidget: (...args) => state.renderIntelligenceWidget(...args),
 }));
 
