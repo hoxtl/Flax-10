@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { OvertimePopup } from '../../../components/Timer/TimerPopups';
+import { OvertimePopup, BreakStartedPopup } from '../../../components/Timer/TimerPopups';
 
 const testWorkMode = () => {
     const onAction = vi.fn();
@@ -27,6 +27,15 @@ describe('OvertimePopup', () => {
         render(<OvertimePopup mode="work" time={65} onAction={onAction} isLastSession={true} />);
         expect(screen.getByText("Finish Goal")).toBeInTheDocument();
         fireEvent.click(screen.getByText("Finish Goal"));
+        expect(onAction).toHaveBeenCalled();
+    });
+
+    it('renders the break-started popup', () => {
+        const onAction = vi.fn();
+        render(<BreakStartedPopup time={180} onAction={onAction} />);
+        expect(screen.getByText('Break started')).toBeInTheDocument();
+        expect(screen.getByText('Skip Break')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Skip Break'));
         expect(onAction).toHaveBeenCalled();
     });
 });

@@ -57,6 +57,33 @@ describe("GroupWork task component - Board", () => {
     expect(adding.setAddingToCol).toHaveBeenCalledWith("todo");
   });
 
+  it("renders the add card editor and accepts drops", () => {
+    const adding = {
+      addingToCol: "todo",
+      setAddingToCol: vi.fn(),
+      newCardTitle: "Draft",
+      setNewCardTitle: vi.fn(),
+      onSubmit: vi.fn(),
+      onKeyDown: vi.fn(),
+    };
+
+    render(
+      <TaskBoardColumn
+        column={{ id: "todo", title: "To do", tasks: [{ id: 1, title: "Card A" }], className: "col", dotClass: "dot", textClass: "text" }}
+        members={[]}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        adding={adding}
+      />,
+    );
+
+    expect(screen.getByDisplayValue("Draft")).toBeInTheDocument();
+    fireEvent.blur(screen.getByDisplayValue("Draft"));
+    expect(adding.onSubmit).toHaveBeenCalled();
+
+    fireEvent.dragOver(screen.getByText("Card A").closest("div").parentElement);
+  });
+
   it("renders TaskBoardView correctly", () => {
     const tasks = [{ id: 1, title: "Card A", status: "todo" }, { id: 2, title: "Card B", status: "done" }];
     render(

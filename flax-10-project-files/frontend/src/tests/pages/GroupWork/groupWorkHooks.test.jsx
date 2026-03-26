@@ -15,6 +15,7 @@ import {
   useProjectActions,
   useProjectDetail,
 } from "../../../pages/GroupWork/hooks/groupWorkHooks";
+import { renderHook } from "@testing-library/react";
 
 const locationState = { search: "?project=12&tab=availability" };
 const fetchGroupProjectsMock = vi.fn();
@@ -115,6 +116,23 @@ describe("groupWorkHooks", () => {
     expect(screen.getByTestId("detail-task-stats").textContent).toContain('"percent":0');
   });
 
+  it("handles empty fetch responses and unmatched project IDs", async () => {
+    fetchGroupProjectsMock.mockResolvedValueOnce(null);
+    fetchProjectMembersMock.mockResolvedValueOnce(null);
+
+    const projectsHook = renderHook(() => useGroupProjects());
+    await waitFor(() => expect(projectsHook.result.current.loading).toBe(false));
+    expect(projectsHook.result.current.projects).toEqual([]);
+
+    const projectHook = renderHook(() => useProject(999));
+    await waitFor(() => expect(projectHook.result.current.loading).toBe(false));
+    expect(projectHook.result.current.project).toBeNull();
+
+    const membersHook = renderHook(() => useProjectMembers(999));
+    await waitFor(() => expect(membersHook.result.current.members).toEqual([]));
+    expect(fetchProjectMembersMock).toHaveBeenCalledWith(999);
+  });
+
   it("updates sort state and project actions", async () => {
     const onUpdate = vi.fn();
     const onDelete = vi.fn();
@@ -133,6 +151,38 @@ describe("groupWorkHooks", () => {
 
     fireEvent.click(screen.getByText("delete project"));
     await waitFor(() => expect(onDelete).toHaveBeenCalledWith(12));
+  });
+
+  it("skips state updates when project patch or member removal fails, and falls back to onBack on delete", async () => {
+    patchGroupProjectMock.mockResolvedValueOnce(null);
+    deleteProjectMemberMock.mockResolvedValueOnce({ ok: false });
+    deleteGroupProjectMock.mockResolvedValueOnce({ ok: false });
+
+    const onBack = vi.fn();
+    const onUpdate = vi.fn();
+    const setProject = vi.fn();
+    const setMembers = vi.fn();
+    const { result } = renderHook(() => useProjectActions(12, setProject, setMembers, onBack, null, onUpdate));
+
+    await result.current.patchProject({ title: "Ignored" });
+    await result.current.handleRemoveMember(3);
+    const deleted = await result.current.handleDeleteProject();
+
+    expect(setProject).not.toHaveBeenCalled();
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(setMembers).not.toHaveBeenCalled();
+    expect(deleted).toBe(false);
+    expect(onBack).not.toHaveBeenCalled();
+  });
+
+  it("deletes a project through onBack when no delete callback is provided", async () => {
+    deleteGroupProjectMock.mockResolvedValueOnce({ ok: true });
+    const onBack = vi.fn();
+    const { result } = renderHook(() => useProjectActions(12, vi.fn(), vi.fn(), onBack, null, vi.fn()));
+
+    await result.current.handleDeleteProject();
+
+    expect(onBack).toHaveBeenCalled();
   });
 
   it("falls back to the default tab and supports adding members without duplicates", async () => {

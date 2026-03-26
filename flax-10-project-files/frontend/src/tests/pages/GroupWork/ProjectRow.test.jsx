@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import ProjectRow from '../../../pages/GroupWork/components/ProjectRow';
@@ -60,5 +60,21 @@ describe('ProjectRow', () => {
     expect(screen.getByRole('button', { name: 'Open Ava Reed profile' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Open Noah Lee profile' })).toBeTruthy();
     expect(container.firstChild.className).toContain('projectRowContainerUrgent');
+  });
+
+  it('handles keyboard activation and overdue styling for past projects', () => {
+    const onClick = vi.fn();
+    render(
+      <MemoryRouter>
+        <ProjectRow
+          project={buildProject({ deadline: '2000-01-01T00:00:00Z', members: [{ id: 11, user: 11, user_name: 'janedoe' }] })}
+          onClick={onClick}
+        />
+      </MemoryRouter>
+    );
+
+    fireEvent.keyDown(screen.getByRole('button', { name: /Open Systems Design Sprint project details/ }), { key: 'Enter' });
+    expect(onClick).toHaveBeenCalled();
+    expect(document.querySelector('article').className).toContain('projectRowContainerOverdue');
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import StatStrip from "../../../components/common/StatStrip/StatStrip";
 
@@ -42,5 +42,28 @@ describe("StatStrip", () => {
     expect(screen.getByText("~")).toBeInTheDocument();
     expect(screen.getByText("m")).toBeInTheDocument();
     expect(screen.getByText("Upcoming project deadline")).toBeInTheDocument();
+  });
+
+  it("renders interactive items as links and buttons with tones", () => {
+    const onClick = vi.fn();
+    render(
+      <StatStrip
+        items={[
+          { key: "1", label: "Focus", value: "12", tone: "success", ariaLabel: "Focus stat", to: "/focus" },
+          { key: "2", label: "Break", value: "3", tone: "warning", onClick, valueRef: vi.fn() },
+        ]}
+        compact
+        bare
+        nowrap
+      />
+    );
+
+    expect(screen.getByRole("link", { name: "Focus stat" })).toHaveTextContent("Focus");
+    expect(screen.getByRole("button", { name: "Break" })).toHaveClass("itemButton");
+    fireEvent.click(screen.getByRole("button", { name: "Break" }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(document.querySelector(".stripCompact")).toBeTruthy();
+    expect(document.querySelector(".stripBare")).toBeTruthy();
+    expect(document.querySelector(".stripNoWrap")).toBeTruthy();
   });
 });

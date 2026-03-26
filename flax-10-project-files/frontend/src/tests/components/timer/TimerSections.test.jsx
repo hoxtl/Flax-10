@@ -174,7 +174,8 @@ describe("Timer sections", () => {
     const onOpenHistory = vi.fn();
     const onOpenFocus = vi.fn();
     render(<MainSection t={t} onOpenHistory={onOpenHistory} onOpenFocus={onOpenFocus} isMobile={true} />);
-    
+
+    fireEvent.click(screen.getByText("Clear task"));
     fireEvent.click(screen.getByText("Open focus"));
     fireEvent.click(screen.getByText("Pause timer"));
     fireEvent.click(screen.getByText("Reset timer"));
@@ -196,5 +197,13 @@ describe("Timer sections", () => {
     fireEvent.click(screen.getByText("Toggle timer"));
     expect(startManualTask).toHaveBeenCalledWith(t);
     expect(screen.queryByText("View History 📜")).not.toBeInTheDocument();
+  });
+
+  it("cancels the end-early modal from PopupSection", () => {
+    const setModal = vi.fn();
+    render(<PopupSection t={{ ...t, modal: "endEarly", setModal }} showHistory={false} onCloseHistory={vi.fn()} />);
+
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(setModal).toHaveBeenCalledWith(null);
   });
 });

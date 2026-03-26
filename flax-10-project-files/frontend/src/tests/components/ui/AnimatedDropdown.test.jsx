@@ -139,4 +139,38 @@ describe('AnimatedDropdown', () => {
     expect(screen.getByText('Missing')).toBeInTheDocument();
     expect(container.querySelector('[class*="alignRight"]')).not.toBeNull();
   });
+
+  it('shows searchable empty state and focuses the search box', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Search"
+        options={OPTIONS}
+        searchable
+        isOpen={true}
+      />,
+    );
+
+    const input = screen.getByPlaceholderText('Search...');
+    expect(input).toHaveFocus();
+
+    fireEvent.change(input, { target: { value: 'zzz' } });
+    expect(screen.getByText('Nothing found')).toBeInTheDocument();
+    expect(screen.getByText('Try a different search term')).toBeInTheDocument();
+  });
+
+  it('renders grouped options with the current item checked', () => {
+    const grouped = [
+      { label: 'Letters', options: [{ value: 'a1', label: 'Alpha' }, { value: 'a2', label: 'Beta' }] },
+      { label: 'Numbers', options: [{ value: 'n1', label: 'One' }] },
+    ];
+
+    render(<AnimatedDropdown value="a2" onChange={vi.fn()} placeholder="Grouped" options={grouped} grouped isOpen={true} />);
+
+    expect(screen.getByText('Letters')).toBeInTheDocument();
+    expect(screen.getByText('Alpha')).toBeInTheDocument();
+    expect(screen.getByText('Beta')).toBeInTheDocument();
+    expect(screen.getByText('Beta').closest('button')).toHaveClass(expect.stringContaining('dropdownItemActive'));
+  });
 });

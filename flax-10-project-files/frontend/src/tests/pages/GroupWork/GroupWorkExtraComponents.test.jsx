@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 
 import GroupProjectDetail from "../../../pages/GroupWork/GroupWorkDetail";
 import MemberAvatar from "../../../pages/GroupWork/components/MemberAvatar";
@@ -146,6 +146,15 @@ describe("GroupWork extra components", () => {
       expect(emptyMessage).toBeInTheDocument();
       fireEvent.mouseLeave(wrapper);
       expect(emptyMessage).not.toBeVisible();
+    });
+
+    it("opens from the filter button and closes on mouse leave", () => {
+      render(<MemberFilter members={[]} selectedUsers={[]} onToggle={vi.fn()} />);
+      const button = screen.getByRole("button", { name: /Filter/ });
+      fireEvent.click(button);
+      expect(screen.getByText("No members")).toBeInTheDocument();
+      fireEvent.mouseLeave(button.closest("div"));
+      return waitForElementToBeRemoved(() => screen.getByText("No members"));
     });
   });
 

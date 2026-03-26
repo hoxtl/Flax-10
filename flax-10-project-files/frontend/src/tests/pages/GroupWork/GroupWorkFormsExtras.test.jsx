@@ -155,6 +155,11 @@ describe("GroupWork forms extras", () => {
     expect(screen.getAllByText("Ava").length).toBeGreaterThan(0);
   });
 
+  it("hides the assignee field when AddTaskModal has no members", () => {
+    render(<AddTaskModal members={[]} onAdd={vi.fn()} onClose={vi.fn()} />);
+    expect(screen.queryByText("Assign to")).toBeNull();
+  });
+
   it("prevents submission of AddTaskModal without required fields", async () => {
     const onAdd = vi.fn();
     render(<AddTaskModal members={[]} onAdd={onAdd} onClose={vi.fn()} />);
@@ -173,6 +178,19 @@ describe("GroupWork forms extras", () => {
 
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ title: "Draft slides", due_date: "2026-03-28" })));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("removes an assignee when the same member is toggled twice", async () => {
+    const onAdd = vi.fn().mockResolvedValue(true);
+    render(<AddTaskModal members={[{ id: 10, name: "Ava" }]} onAdd={onAdd} onClose={vi.fn()} />);
+
+    const [checkbox] = screen.getAllByRole("checkbox");
+    fireEvent.click(checkbox);
+    fireEvent.click(checkbox);
+    fireEvent.change(screen.getByPlaceholderText("What needs to be done?"), { target: { value: "Draft slides" } });
+    fireEvent.click(screen.getByText("Add task"));
+
+    await waitFor(() => expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ assigned_to: [] })));
   });
 
   it("renders CreateProjectInputs and forwards field changes", () => {
@@ -219,6 +237,14 @@ describe("GroupWork forms extras", () => {
       }),
     );
     expect(onCreated).toHaveBeenCalledWith({ id: 9, name: "Systems Sprint" });
+  });
+
+  it("closes and resets CreateProjectForm when cancel is pressed", () => {
+    render(<CreateProjectForm onCreated={vi.fn()} />);
+    fireEvent.click(screen.getByText("+ Create project"));
+    fireEvent.click(screen.getByText("close-modal"));
+    fireEvent.click(screen.getByText("+ Create project"));
+    expect(screen.getByText("Create project")).toBeInTheDocument();
   });
 });
 

@@ -50,8 +50,15 @@ vi.mock('../../../components/common/AnimatedDropdown', () => ({
   ),
 }));
 
-vi.mock('../../../pages/Tasks/components/TaskFeedFilterPanel', () => ({
-  default: () => <div data-testid="filter-panel" />,
+vi.mock('../../../pages/Tasks/components/TaskFeedToolbarFilter', () => ({
+  default: ({ panelProps, activeFilterCount }) => (
+    <div data-testid="filter-panel" data-active-count={activeFilterCount}>
+      <button onClick={() => panelProps.onQueryChange('maths')}>Query</button>
+      <button onClick={() => panelProps.onToggleList('1')}>Toggle list</button>
+      <button onClick={() => panelProps.onToggleModule('CS101')}>Toggle module</button>
+      <button onClick={panelProps.onClearAll}>Clear all</button>
+    </div>
+  ),
 }));
 
 vi.mock('../../../components/Timer/taskInput/TaskPickItem', () => ({
@@ -142,6 +149,28 @@ describe('TaskPickerModal – when open', () => {
     expect(screen.getByTestId('sort-dropdown')).toBeTruthy();
   });
 
+  it('wires the filter panel actions', () => {
+    const state = makeState({
+      visibleListItems: [{ value: '1', label: 'Work' }],
+      groupedModuleItems: { CS: [{ value: 'CS101', label: 'CS101 — Intro CS' }] },
+    });
+
+    render(<TaskPickerModal state={state} filterWrapRef={{ current: null }} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
+
+    fireEvent.click(screen.getByText('Query'));
+    fireEvent.click(screen.getByText('Toggle list'));
+    fireEvent.click(screen.getByText('Toggle module'));
+    fireEvent.click(screen.getByText('Clear all'));
+
+    expect(state.setFilterQuery).toHaveBeenCalledWith('maths');
+    expect(state.setFilterListIds).toHaveBeenCalled();
+    expect(state.setFilterModuleCodes).toHaveBeenCalled();
+    expect(state.setFilterListIds).toHaveBeenCalledWith([]);
+    expect(state.setFilterModuleCodes).toHaveBeenCalledWith([]);
+    expect(state.setFilterQuery).toHaveBeenCalledWith('');
+    expect(screen.getByTestId('filter-panel')).toHaveAttribute('data-active-count', '0');
+  });
+
   it('calls loadTasks when sort changes', () => {
     const state = makeState();
     render(<TaskPickerModal state={state} filterWrapRef={{ current: null }} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
@@ -186,11 +215,8 @@ describe('TaskPickerModal – filter panel', () => {
     const filterWrapRef = { current: document.createElement('div') };
     const state = makeState({ isFilterOpen: true, setIsFilterOpen });
     render(<TaskPickerModal state={state} filterWrapRef={filterWrapRef} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
-    // Simulate mousedown on the shell (not inside filterWrapRef)
     const shell = document.querySelector('[data-testid="standard-modal"]');
     if (shell) fireEvent.mouseDown(shell);
-    // setIsFilterOpen may be called
-    // We just assert no crash occurs
-    expect(setIsFilterOpen).toBeDefined();
+    expect(setIsFilterOpen).toHaveBeenCalledWith(false);
   });
 });

@@ -355,5 +355,17 @@ describe("GroupWork pages and header extras", () => {
       fireEvent.click(screen.getByText("cancel-hold"));
       await waitFor(() => expect(screen.queryByText("cancel-hold")).not.toBeInTheDocument());
     });
+
+    it("hides module and deadline metadata when project data is incomplete", () => {
+      getProjectDate.mockReturnValueOnce(null);
+      renderProjectHeaderWith({
+        project: { ...baseProject, course_code: "", module_name: "", deadline: null },
+        teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }],
+      });
+
+      expect(screen.queryByLabelText(/Open .* module/i)).toBeNull();
+      expect(screen.queryByText(/day left|days left|Due today|overdue/i)).toBeNull();
+      expect(screen.queryByLabelText(/Open .* module/i)).toBeNull();
+    });
   });
 });
