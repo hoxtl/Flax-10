@@ -223,6 +223,18 @@ describe('Profile', () => {
     expect(screen.queryByText(/edit profile/i)).toBeNull();
   });
 
+  it('falls back to the current user object when profileData is missing', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: null,
+      viewedUserId: 1,
+    }));
+    useProfileVisibility.mockReturnValue(defaultVisibility);
+
+    renderProfile({ user: defaultUser, viewedUserId: 1 });
+
+    expect((await screen.findAllByText('alice')).length).toBeGreaterThan(0);
+  });
+
   it('falls back to onNavChange when onNavigate is missing', async () => {
     const onNavChange = vi.fn();
     useProfileState.mockReturnValue(makeProfileState({
@@ -287,6 +299,32 @@ describe('Profile', () => {
     renderProfile({ user: defaultUser, viewedUserId: 2 });
 
     expect(await screen.findByText('Common Ground')).toBeInTheDocument();
+  });
+
+  it('renders the compatibility-only branch when there is no common ground', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, role: 'student' },
+      viewedUserId: 2,
+    }));
+    useProfileBodyData.mockReturnValue({
+      modules: [],
+      upcomingEventCount: 0,
+      filteredEvents: [],
+    });
+    useProfileVisibility.mockReturnValue({
+      ...defaultVisibility,
+      isSelf: false,
+      canEditProfile: false,
+      canViewAnalytics: false,
+      canViewCalendar: false,
+      canViewSharedWith: false,
+      canViewModules: true,
+    });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+
+    expect(await screen.findByText('Similar study times')).toBeInTheDocument();
+    expect(screen.queryByText('Common Ground')).toBeNull();
   });
 
   it('renders compatibility score when there is no shared ground', async () => {
