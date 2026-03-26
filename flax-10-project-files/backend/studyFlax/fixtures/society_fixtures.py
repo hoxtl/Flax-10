@@ -187,7 +187,6 @@ SOCIETY_DATA = [
     # Religious (4)
     ('Islamic Society', 'Faith and community.', 'Prayer and events.', 'religious', ['Lecture', 'Social', 'Community']),
     ('Christian Union', 'Faith and fellowship.', 'Meetings and outreach.', 'religious', ['Meeting', 'Study', 'Social']),
-    ('Jewish Society', 'Jewish life at KCL.', 'Cultural and religious events.', 'religious', ['Cultural', 'Social', 'Festival']),
     ('Hindu Society', 'Hindu traditions.', 'Festivals and gatherings.', 'religious', ['Cultural', 'Festival', 'Social']),
 
     # Social (10)
