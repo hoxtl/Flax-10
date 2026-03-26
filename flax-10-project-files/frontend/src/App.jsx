@@ -7,15 +7,15 @@ import { useAppState } from "./app/hooks/useAppState";
 import { resolveScreen } from "./app/navigation/helpers";
 import "./app.css";
 
+// Constants
+const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
+const ACTIVE_NAV_KEY = "flax_active_nav";
+
 function AppContent() {
   const state = useAppState();
   if (state.isLoadingTheme) return null;
   const screen = resolveScreen(state.authed, state.user, state.showWelcome);
   return (
-
-// Constants
-const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
-const ACTIVE_NAV_KEY = "flax_active_nav";
 
 const ROOT_STYLE = {
   position: "relative",
