@@ -55,4 +55,14 @@ describe("LocationLink", () => {
     fireEvent.click(link);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it("uses the default icon size and icon class trimming when no custom props are passed", () => {
+    renderLink({ location: "Maughan Library" });
+
+    const link = screen.getByRole("link", { name: "Open UniMap for Maughan Library" });
+    const icon = link.querySelector("svg");
+
+    expect(icon).toHaveAttribute("width", "14");
+    expect(icon?.getAttribute("class") || "").not.toContain("undefined");
+  });
 });

@@ -89,4 +89,44 @@ describe("Homepage UI hooks", () => {
     expect(result.current.fallbackToast).toBeNull();
     vi.useRealTimers();
   });
+
+  it("normalizes a fallback toast without an action handler and clears on unmount", () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+    const { result, unmount } = renderHook(() => useHomepageToast(null));
+
+    act(() => {
+      result.current.showToast("Draft saved", { actionLabel: "Undo", onAction: "not-a-function" });
+    });
+
+    expect(result.current.fallbackToast).toEqual({
+      message: "Draft saved",
+      actionLabel: "Undo",
+      onAction: null,
+    });
+
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it("uses the default fallback duration when durationMs is not finite", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useHomepageToast(null));
+
+    act(() => {
+      result.current.showToast("Queued", { durationMs: Number.NaN });
+    });
+
+    expect(result.current.fallbackToast?.message).toBe("Queued");
+    act(() => {
+      vi.advanceTimersByTime(3199);
+    });
+    expect(result.current.fallbackToast?.message).toBe("Queued");
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(result.current.fallbackToast).toBeNull();
+    vi.useRealTimers();
+  });
 });

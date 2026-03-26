@@ -165,6 +165,25 @@ describe("profile hook extras", () => {
       expect(closed.current).toEqual({});
     });
 
+    it("supports raw module arrays and preserves missing module names", async () => {
+      getModules.mockResolvedValueOnce([
+        { module_code: "CS1" },
+        { module_code: "CS2", module_name: "Intro to AI" },
+      ]);
+
+      const { result } = renderHook(() => useModuleNameMap(true));
+
+      await waitFor(() => expect(result.current).toEqual({ CS1: undefined, CS2: "Intro to AI" }));
+    });
+
+    it("swallows module fetch failures without changing the map", async () => {
+      getModules.mockRejectedValueOnce(new Error("module fetch failed"));
+
+      const { result } = renderHook(() => useModuleNameMap(true));
+
+      await waitFor(() => expect(result.current).toEqual({}));
+    });
+
     it("filters incomplete tasks for the tasks modal", async () => {
       fetchTasks.mockResolvedValueOnce({
         results: [
@@ -176,6 +195,44 @@ describe("profile hook extras", () => {
       const { result } = renderHook(() => useTasksModalData(true));
       await waitFor(() => expect(result.current.loading).toBe(false));
       expect(result.current.tasks.map((task) => task.id)).toEqual([1, 2]);
+    });
+
+    it("sorts raw task arrays and places undated items last", async () => {
+      fetchTasks.mockResolvedValueOnce([
+        { id: 2, completed: false, due_date: null },
+        { id: 1, completed: false, due_date: "2026-03-24T10:00:00" },
+      ]);
+
+      const { result } = renderHook(() => useTasksModalData(true));
+
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(result.current.tasks.map((task) => task.id)).toEqual([1, 2]);
+    });
+
+    it("sorts when the due-dated task appears first in the raw array", async () => {
+      fetchTasks.mockResolvedValueOnce([
+        { id: 1, completed: false, due_date: "2026-03-24T10:00:00" },
+        { id: 2, completed: false, due_date: null },
+      ]);
+
+      const { result } = renderHook(() => useTasksModalData(true));
+
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(result.current.tasks.map((task) => task.id)).toEqual([1, 2]);
+    });
+
+    it("clears tasks again when the modal closes after loading", async () => {
+      fetchTasks.mockResolvedValueOnce([{ id: 1, completed: false, due_date: "2026-03-24T10:00:00" }]);
+
+      const { result, rerender } = renderHook(({ open }) => useTasksModalData(open), {
+        initialProps: { open: true },
+      });
+
+      await waitFor(() => expect(result.current.tasks).toHaveLength(1));
+
+      rerender({ open: false });
+
+      expect(result.current).toEqual({ loading: false, tasks: [] });
     });
 
     it("returns empty modal data when closed", () => {
@@ -193,6 +250,13 @@ describe("profile hook extras", () => {
       await waitFor(() => expect(result.current).toEqual([]));
       rerender({ isOpen: false, userId: 6 });
       expect(result.current).toEqual([]);
+    });
+
+    it("supports raw arrays from the social users fetcher", async () => {
+      const fetchFn = vi.fn().mockResolvedValueOnce([{ id: 7, username: "zoe" }]);
+      const { result } = renderHook(() => useSocialUsers(true, 5, fetchFn));
+
+      await waitFor(() => expect(result.current).toEqual([{ id: 7, username: "zoe" }]));
     });
 
     it("exposes social data fetcher helpers", () => {
