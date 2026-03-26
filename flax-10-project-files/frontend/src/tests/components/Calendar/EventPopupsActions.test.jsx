@@ -386,3 +386,43 @@ describe('EventPopups extra coverage', () => {
     });
 
     // -----------------------------------------------------------------------
+    // Recurring delete and hold-confirm branches
+    // -----------------------------------------------------------------------
+
+    it('sends recurring personal deletes through the alternate delete branch', async () => {
+        setupModalClosed();
+        mockConfirm.mockResolvedValueOnce('ALTERNATE');
+        const evt = { id: 19, title: 'Weekly Study', source: 'personal', tag: null };
+        setupPopupEvent(evt);
+        getEventType.mockReturnValue('personal');
+        hasRecurrence.mockReturnValue(true);
+        render(<EventPopups />);
+        fireEvent.click(screen.getByText('Delete'));
+        await waitFor(() => {
+            expect(mockOpenDelete).toHaveBeenCalledWith(evt, 'occurrence');
+        });
+    });
+
+    it('shows the hold delete modal and runs the recurring occurrence delete flow', async () => {
+        const evt = { id: 20, title: 'Recurring Event', source: 'personal', tag: null };
+        setupModalClosed();
+        useEventDelete.mockReturnValue({
+            openDelete: mockOpenDelete,
+            isDeleteOpen: true,
+            deleteEvent: evt,
+            deleteType: 'occurrence',
+            closeDelete: mockCloseDelete,
+        });
+        render(<EventPopups />);
+        expect(screen.getByTestId('hold-confirm-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('hold-warning')).toHaveTextContent('Confirm deletion.');
+        fireEvent.click(screen.getByText('Confirm Hold'));
+        await waitFor(() => {
+            expect(deleteRecurrenceOccurrence).toHaveBeenCalledWith(evt, {
+                removeEvent: mockRemoveEvent,
+                addException: mockAddException,
+            });
+            expect(mockToast).toHaveBeenCalledWith('"Recurring Event" deleted.');
+        });
+    });
+});

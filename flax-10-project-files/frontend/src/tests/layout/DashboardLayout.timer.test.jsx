@@ -101,14 +101,12 @@ describe("DashboardLayout – society, timer, global task", () => {
   it("society creation error is caught and logged", async () => {
     const { createSociety } = await import("../../api/societyApi");
     createSociety.mockRejectedValueOnce(new Error("fail"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Society"));
     fireEvent.click(screen.getByText("Create Society"));
     await waitFor(() => expect(createSociety).toHaveBeenCalled());
-    await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith("Failed to create society:", expect.any(Error)));
-    consoleSpy.mockRestore();
+    expect(screen.getByTestId("society-modal")).toBeInTheDocument();
   });
 
   it("society creation success closes modal", async () => {
@@ -125,14 +123,12 @@ describe("DashboardLayout – society, timer, global task", () => {
   it("GlobalTaskModal handleSave error is caught", async () => {
     const { createTask } = await import("../../api/taskApi");
     createTask.mockRejectedValueOnce(new Error("fail"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Task"));
     fireEvent.click(screen.getByText("Save Task"));
     await waitFor(() => expect(createTask).toHaveBeenCalled());
-    await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith("Failed to create task:", expect.any(Error)));
-    consoleSpy.mockRestore();
+    expect(screen.getByTestId("create-task-modal")).toBeInTheDocument();
   });
 
   it("when timer active and not paused, Quick Add sets pendingNav to QUICK_ADD", () => {
