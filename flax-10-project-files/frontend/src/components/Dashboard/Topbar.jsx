@@ -26,7 +26,7 @@ import { useState, useRef } from "react";
 
 function BrandLogo({ onNavChange }) {
   return (
-    <div className={styles.brandContainer} onClick={() => onNavChange?.("home")} style={{ cursor: "pointer" }}>
+    <div data-tour="home" className={styles.brandContainer} onClick={() => onNavChange?.("home")} style={{ cursor: "pointer" }}>
       <Motion.div className={styles.logoMark} whileHover={{ rotate: 8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
       <span className={styles.brandName}>StudyFlax</span>
     </div>
@@ -89,10 +89,10 @@ function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChan
 }
 
 const NAV_SECTIONS = [
-  { title: "Plan", ids: ["calendar", "tasks"] },
-  { title: "Study", ids: ["modules", "group-work", "timer"] },
-  { title: "Explore", ids: ["map", "societies", "users"] },
-  { title: "My Insights", ids: ["analytics", "attendance"] },
+  { title: "Plan", ids: ["calendar", "tasks"], tourIds: ["calendar"] },
+  { title: "Study", ids: ["modules", "group-work", "timer"], tourIds: ["timer"] },
+  { title: "Explore", ids: ["map", "societies", "users"], tourIds: ["societies"] },
+  { title: "My Insights", ids: ["analytics", "attendance"], tourIds: ["analytics", "attendance"] },
   { title: "Admin", ids: ["admin"] }
 ];
 
@@ -105,7 +105,7 @@ function useTopBarHover() {
   return { activeMenu, onEnter, onLeave, onOpenChange };
 }
 
-function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu, onEnter, onOpenChange, user }) {
+function NavSectionItem({ title, ids, tourIds = [], routes, activeNav, onNavChange, activeMenu, onEnter, onOpenChange, user }) {
   const isTeacher = user?.role === "teacher";
   const displayTitle = isTeacher && title === "Study" ? "Teaching" : title;
   const sub = ids
@@ -114,7 +114,10 @@ function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu
   if (sub.length === 0) return null;
   const change = (v) => onOpenChange(title, v);
   return (
-    <div onMouseEnter={() => onEnter(title)}>
+    <div data-tour={tourIds[0] || undefined} style={{ position: "relative" }} onMouseEnter={() => onEnter(title)}>
+      {tourIds.slice(1).map((tid) => (
+        <span key={tid} data-tour={tid} aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
+      ))}
       <NavDropdown title={displayTitle} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
         isOpen={activeMenu === title} onOpenChange={change} usePortal={true} user={user} />
     </div>

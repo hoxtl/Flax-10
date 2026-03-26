@@ -119,6 +119,12 @@ function getCardPosition(rect, placement) {
     return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
   }
   const { x, y, width, height } = rect;
+  // Topbar items (near the top) — drop card below the element
+  if (y < 120) {
+    const left = Math.max(PAD, Math.min(x, window.innerWidth - CARD_W - PAD));
+    return { top: y + height + PAD + 6, left };
+  }
+  // Sidebar items — position card to the right
   return {
     top: Math.max(PAD, y + height / 2 - 80),
     left: x + width + PAD + 8,
