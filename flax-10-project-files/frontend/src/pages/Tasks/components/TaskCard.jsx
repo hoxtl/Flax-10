@@ -129,7 +129,7 @@ export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists = []
   const menuRef = useRef(null);
   const state = useTaskContextMenuState(task);
   useTaskContextMenuEffects(menuRef, onClose, state.setSleepSettings);
-  const menuPos = { '--ctx-top': pos.y, '--ctx-left': pos.x };
+  const menuPos = { '--ctx-top': `${pos.y}px`, '--ctx-left': `${pos.x}px` };
   const menu = (
     <>
       <div ref={menuRef} className={styles.ctxMenu} style={menuPos} onMouseDown={(e) => e.stopPropagation()}>

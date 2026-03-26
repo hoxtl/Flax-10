@@ -1,11 +1,34 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from studyFlax.fixtures.society_fixtures import _join_tags, _normalise_phrase
 from studyFlax.management.commands.seed_societies import _ensure_seed_membership
 from studyFlax.models.society import SocietyCalendarSync, SocietyMembership
 from studyFlax.tests.helpers.factories import make_society
 
 User = get_user_model()
+
+
+class NormalisePhraseBranchTest(TestCase):
+    def test_empty_string_returns_empty(self):
+        self.assertEqual(_normalise_phrase(""), "")
+
+    def test_none_returns_empty(self):
+        self.assertEqual(_normalise_phrase(None), "")
+
+    def test_whitespace_only_returns_empty(self):
+        self.assertEqual(_normalise_phrase("   "), "")
+
+
+class JoinTagsBranchTest(TestCase):
+    def test_empty_list_returns_empty(self):
+        self.assertEqual(_join_tags([]), "")
+
+    def test_none_returns_empty(self):
+        self.assertEqual(_join_tags(None), "")
+
+    def test_two_tags_joined_with_and(self):
+        self.assertEqual(_join_tags(["chess", "puzzles"]), "chess and puzzles")
 
 
 class SeedSocietyMembershipDefaultsTest(TestCase):

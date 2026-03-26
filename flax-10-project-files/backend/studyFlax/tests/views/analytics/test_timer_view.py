@@ -85,6 +85,20 @@ class StudySessionViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
+    def test_list_sessions_ordered_by_start_time_desc(self):
+        now = timezone.now()
+        StudySession.objects.create(
+            user=self.user, duration=25, study_block_id=1,
+            start_time=now - timedelta(hours=2), end_time=now - timedelta(hours=1),
+        )
+        StudySession.objects.create(
+            user=self.user, duration=50, study_block_id=2,
+            start_time=now - timedelta(minutes=30), end_time=now,
+        )
+        response = self.client.get("/api/timer/history/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['duration'], 50)
+
     def test_list_sessions_only_own(self):
         other = make_user("other_timer", "other_timer@example.com")
         make_session(other)
