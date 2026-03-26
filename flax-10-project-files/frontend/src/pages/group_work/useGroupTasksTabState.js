@@ -2,7 +2,7 @@
  * Group work tasks tab state hooks.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getAuthHeaders } from "./hooks/groupWorkHooks";
 import { calcCompletionSegments } from "./utils/taskStatsUtils";
 import { sortTasks } from "./utils/taskUtils";
@@ -23,7 +23,40 @@ function useFetchTasks(projectId) {
   return { tasks, setTasks, loading };
 }
 
+function executeStartDelete(taskId, tasks, { pending, setTasks }) {
+  const task = tasks.find((t) => t.id === taskId);
+  if (!task) return;
+  setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  if (pending.current[taskId]) {
+    clearTimeout(pending.current[taskId].timer);
+  }
+  const timer = setTimeout(async () => {
+    await fetch(`/api/tasks/${taskId}/`, { method: "DELETE", headers: getAuthHeaders() });
+    delete pending.current[taskId];
+  }, 3200);
+  pending.current[taskId] = { task, timer };
+}
+
+function executeUndoDelete(taskId, { pending, setTasks }) {
+  const item = pending.current[taskId];
+  if (!item) return;
+  clearTimeout(item.timer);
+  const task = item.task;
+  setTasks((prev) => [...prev, task]);
+  delete pending.current[taskId];
+}
+
+function usePendingDeletes(setTasks) {
+  const pending = useRef({});
+  const ctx = { pending, setTasks };
+  return {
+    startDelete: (taskId, tasks) => executeStartDelete(taskId, tasks, ctx),
+    undoDelete: (taskId) => executeUndoDelete(taskId, ctx),
+  };
+}
+
 function useTaskActions(setTasks) {
+  const { startDelete, undoDelete } = usePendingDeletes(setTasks);
   const updateTask = async (taskId, patchData) => {
     const response = await fetch(`/api/tasks/${taskId}/`, {
       method: "PATCH",
@@ -36,12 +69,7 @@ function useTaskActions(setTasks) {
     }
   };
 
-  const deleteTask = async (taskId) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    await fetch(`/api/tasks/${taskId}/`, { method: "DELETE", headers: getAuthHeaders() });
-  };
-
-  return { updateTask, deleteTask };
+  return { updateTask, deleteTask: startDelete, undoDelete };
 }
 
 function buildTaskBody(title, projectId, options) {
@@ -64,10 +92,12 @@ async function createTask(title, projectId, options, setTasks) {
 
 function useTasks(projectId, members, onStatsUpdate) {
   const { tasks, setTasks, loading } = useFetchTasks(projectId);
-  const { updateTask, deleteTask } = useTaskActions(setTasks);
+  const { updateTask, deleteTask, undoDelete } = useTaskActions(setTasks);
   useEffect(() => { onStatsUpdate?.(calcCompletionSegments(tasks, members)); }, [tasks, members, onStatsUpdate]);
   const addTask = (title, options = {}) => createTask(title, projectId, options, setTasks);
-  return { tasks, loading, addTask, updateTask, deleteTask };
+  const handleDelete = (id) => deleteTask(id, tasks);
+  const handleUndo = (id) => undoDelete(id);
+  return { tasks, loading, addTask, updateTask, deleteTask: handleDelete, undoDelete: handleUndo };
 }
 
 function useFilteredTasks(tasks, filterUsers) {

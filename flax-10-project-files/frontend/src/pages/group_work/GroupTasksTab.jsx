@@ -36,9 +36,14 @@ function useGroupTaskHandlers(showToast, taskActions, setFilterUsers) {
         await taskActions.updateTask(id, { completed });
         if (completed) showToast("Task completed!", { icon: "🎉", variant: "success" });
     };
-    const handleDelete = async (id) => {
-        await taskActions.deleteTask(id);
-        showToast("Task deleted", { variant: "error", icon: "🗑️" });
+    const handleDelete = (id) => {
+        taskActions.deleteTask(id);
+        showToast("Task deleted", {
+            variant: "error",
+            icon: "🗑️",
+            actionLabel: "Undo",
+            onAction: () => taskActions.undoDelete(id),
+        });
     };
     const handleAdd = async ({ title, due_date, assigned_to }) => taskActions.addTask(title, { due_date, assigned_to });
     const toggleFilter = (userId) => setFilterUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
