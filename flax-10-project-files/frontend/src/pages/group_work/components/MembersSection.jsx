@@ -9,23 +9,19 @@ import styles from "./MembersSection.module.css";
 
 function MemberPill({ member, onRemove, canRemove, allowOwnerRemove }) {
   const displayName = getDisplayName(member);
-  const removeAllowed = canRemove && (member.role !== "owner" || allowOwnerRemove);
-  const removeLabel = member.role === "owner" ? "Leave project" : "Remove";
+  const isOwner = member.role === "owner";
+  const removeAllowed = canRemove && (!isOwner || allowOwnerRemove);
+  const removeLabel = isOwner ? "Leave project" : "Remove";
+
   return (
     <div className={styles.memberPill}>
-      <MemberAvatarButton member={member} displayName={displayName} />
-      <span className={styles.memberName}>{displayName}</span>
-      {member.role === "owner" && <span className={styles.ownerLabel}>Owner</span>}
+      <button type="button" className={styles.memberProfileBtn} title={`Open ${displayName} profile`} onClick={(e) => openMemberProfile(e, member)}>
+        <MemberAvatar member={member} size={24} />
+        <span className={styles.memberName}>{displayName}</span>
+      </button>
+      {isOwner && <span className={styles.ownerLabel}>Owner</span>}
       {removeAllowed && <button type="button" onClick={() => onRemove(member.id)} className={styles.removeBtn}>{removeLabel}</button>}
     </div>
-  );
-}
-
-function MemberAvatarButton({ member, displayName }) {
-  return (
-    <button type="button" className={styles.memberAvatarButton} title={displayName} aria-label={`Open ${displayName} profile`} onClick={(e) => openMemberProfile(e, member)}>
-      <MemberAvatar member={member} size={24} />
-    </button>
   );
 }
 
