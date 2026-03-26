@@ -32,7 +32,7 @@ vi.mock("../../../../components/schedules/auto/autoScheduleActions", () => ({
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefsMock(...args),
 }));
 
-vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => ({
+vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => ({
   applyConflictResolutionPlan: vi.fn(),
   buildConflictResolutionPlan: vi.fn(() => ({ operations: [], unresolved: [] })),
   buildConflictResolutionToastMessage: vi.fn(() => "No conflicts."),

@@ -39,7 +39,6 @@ export default function AllSocieties({ onBack, onSelect, societies = [], onRepor
 function BrowseControls({ filterState, societies, activeCount }) {
     return (
         <div className={styles.browseControls}>
-            <RatificationPills filterState={filterState} societies={societies} />
             {activeCount > 0 && (
                 <button type="button" className={styles.clearFiltersBtn} onClick={filterState.clearFilters}>
                     Clear
@@ -70,21 +69,6 @@ function BrowseHeader({ onBack, filterState, societies }) {
     );
 }
 
-function RatificationPills({ filterState, societies }) {
-    return (
-        <div className={styles.ratificationOptions}>
-            {RATIFICATION_FILTERS.map((filter) => (
-                <RatificationPill
-                    key={filter.id}
-                    filter={filter}
-                    currentValue={filterState.filters.ratified}
-                    count={countForFilter(societies, filter.id)}
-                    onSelect={() => filterState.toggleFilter("ratified", filter.id)}
-                />
-            ))}
-        </div>
-    );
-}
 
 function SortDropdown({ value, onChange }) {
     return <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" align="right" />;

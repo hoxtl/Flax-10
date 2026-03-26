@@ -57,7 +57,7 @@ vi.mock("../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../context/themeConstants", () => ({
+vi.mock("../../../context/ThemeConstants", () => ({
   THEME_GROUPS: [
     {
       label: "Classic",

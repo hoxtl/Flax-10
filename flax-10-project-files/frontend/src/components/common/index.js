@@ -1,7 +1,7 @@
 export { default as AppPage } from "./app_page/AppPage";
 export { default as BackToTop } from "./back_to_top/BackToTop";
-export { default as Badge } from "./badge/Badge";
-export { default as Card } from "./card/Card";
+export { default as Badge } from "./Badge/Badge";
+export { default as Card } from "./Card/Card";
 export { default as ConfirmModal } from "./confirm_modal/ConfirmModal";
 export { default as EmptyState } from "./empty_state/EmptyState";
 export { default as FormField } from "./form_field/FormField";
@@ -17,7 +17,7 @@ export { default as SearchEmptyState } from "./search_empty_state/SearchEmptySta
 export { default as SectionHeader } from "./section_header/SectionHeader";
 export { SleepWarningModal } from "./sleep_warning_modal/SleepWarningModal";
 export { default as StandardModal } from "./standard_modal/StandardModal";
-export { default as Tabs } from "./tabs/Tabs";
+export { default as Tabs } from "./Tabs/Tabs";
 export { default as TextInput } from "./text_input/TextInput";
 export { default as UserAvatar } from "./user_avatar/UserAvatar";
 export * from "./motion/transitions";

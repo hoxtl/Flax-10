@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Card from "../../../../components/common/card/Card";
+import Card from "../../../../components/common/Card/Card";
 import PrimaryButton from "../../../../components/common/primary_button/PrimaryButton";
 import widgetStyles from "./ProfileWidgets.module.css";
 import weekStyles from "./ProfileWeekGoal.module.css";

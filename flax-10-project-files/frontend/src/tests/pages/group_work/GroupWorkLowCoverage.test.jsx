@@ -46,11 +46,11 @@ vi.mock("../../../pages/group_work/utils/projectRowUtils", () => ({
   getVisibleMembers: vi.fn((members) => members),
 }));
 
-vi.mock("../../../components/common/badge/Badge", () => ({
+vi.mock("../../../components/common/Badge/Badge", () => ({
   default: ({ children, ...props }) => <span {...props}>{children}</span>,
 }));
 
-vi.mock("../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children, content }) => <span title={content}>{children}</span>,
 }));
 

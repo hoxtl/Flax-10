@@ -5,7 +5,7 @@
 import { Link } from "react-router-dom";
 import { AlertTriangle, Pencil, RotateCw } from "lucide-react";
 import { fmtDurationShort } from "../../../utils/dateFormatUtils";
-import Badge from "../../../../../components/common/badge/Badge";
+import Badge from "../../../../../components/common/Badge/Badge";
 
 function ListPill({ taskLists, taskListId }) {
   const label = (taskLists || []).find((list) => String(list.id) === String(taskListId))?.name || "List";
