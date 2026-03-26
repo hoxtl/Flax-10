@@ -3,6 +3,7 @@
  */
 
 import { motion } from 'framer-motion';
+import Tooltip from '../common/Tooltip/Tooltip';
 import styles from './InsightCards.module.css';
 
 const MotionCircle = motion.circle;
@@ -88,10 +89,14 @@ export function ConsistencyScore({ data }) {
   const color = getColor(score);
   const explanation = getExplanation(totalDays, maxDays, streak, score);
   return (
-    <div className={styles.scoreCard} data-tooltip={explanation}>
-      <p className={styles.cardLabel} title={SCORE_TITLE}>Consistency</p>
-      <ScoreRing score={score} color={color} />
-      <span className={styles.scoreLabel} style={{ color }}>{getLabel(score)}</span>
-    </div>
+    <Tooltip content={explanation} position="top">
+      <div className={styles.scoreCard}>
+        <Tooltip content={SCORE_TITLE} position="bottom">
+          <p className={styles.cardLabel}>Consistency ⓘ</p>
+        </Tooltip>
+        <ScoreRing score={score} color={color} />
+        <span className={styles.scoreLabel} style={{ color }}>{getLabel(score)}</span>
+      </div>
+    </Tooltip>
   );
 }

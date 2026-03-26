@@ -105,11 +105,9 @@
     gap: 0.55rem;
 }
 
-@media (prefers-color-scheme: dark) {
-    .configInsetPanel {
-        background: color-mix(in srgb, var(--surface-card) 94%, #17130f);
-        border-color: color-mix(in srgb, var(--border) 84%, #3a342d);
-    }
+:global([data-mode="dark"]) .configInsetPanel {
+    background: color-mix(in srgb, var(--surface-card) 94%, #17130f);
+    border-color: color-mix(in srgb, var(--border) 84%, #3a342d);
 }
 
 .settings {

@@ -4,6 +4,7 @@
 
 import styles from './Charts.module.css';
 import { useTheme } from '../../context/ThemeContext';
+import Tooltip from '../common/Tooltip/Tooltip';
 import heatmapColors from './utils/heatmapColorConstants.json';
 
 const LEGEND_INTENSITIES = [0, 0.25, 0.5, 0.75, 1];
@@ -37,14 +38,16 @@ function HourLabels({ displayHours }) {
 
 function HeatmapCell({ value, maxValue, day, hour, theme }) {
   const color = getHeatmapColor(value, maxValue, theme);
+  const label = value > 0 ? `${day} ${formatHour(hour)}: ${value} min` : `${day} ${formatHour(hour)}: no study`;
   return (
-    <div
-      className={styles.gridCell}
-      style={{ backgroundColor: color }}
-      title={`${day} ${hour}:00 - ${value} minutes`}
-    >
-      {value > 0 && value > maxValue * 0.3 && <span className={styles.cellValue}>{value}</span>}
-    </div>
+    <Tooltip content={label} position="top">
+      <div
+        className={styles.gridCell}
+        style={{ backgroundColor: color }}
+      >
+        {value > 0 && value > maxValue * 0.3 && <span className={styles.cellValue}>{value}</span>}
+      </div>
+    </Tooltip>
   );
 }
 

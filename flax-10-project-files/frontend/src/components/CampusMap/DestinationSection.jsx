@@ -6,19 +6,39 @@ import baseStyles from "../../pages/CampusMap/CampusMap.module.css";
 import sidebarStyles from "../../pages/CampusMap/sidebar.module.css";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
 import { LocationChip } from "./LocationChip";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 
 const styles = { ...baseStyles, ...sidebarStyles };
 
+const CAMPUS_OPTIONS = KCL_CAMPUSES.map((c) => ({
+  value: c.id,
+  label: c.shortName,
+  icon: <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color, display: "inline-block", flexShrink: 0 }} />,
+}));
+
 function CampusList({ onSelectCampus, selectedCampus }) {
+  const handleChange = (campusId) => {
+    const campus = KCL_CAMPUSES.find((c) => c.id === campusId);
+    if (campus) onSelectCampus(campus);
+  };
   return (
-    <div className={styles.campusList}>
-      {KCL_CAMPUSES.map((campus) => (
-        <button key={campus.id} className={`${styles.campusBtn} ${selectedCampus?.id === campus.id ? styles.campusBtnActive : ""}`} onClick={() => onSelectCampus(campus)}>
-          <span className={styles.campusDot} style={{ background: campus.color }} />
-          <span>{campus.shortName}</span>
+    <AnimatedDropdown
+      value={selectedCampus?.id ?? ""}
+      options={CAMPUS_OPTIONS}
+      onChange={handleChange}
+      customTrigger={
+        <button type="button" className={styles.campusDropdownTrigger}>
+          {selectedCampus
+            ? <><span style={{ width: 10, height: 10, borderRadius: "50%", background: selectedCampus.color, display: "inline-block" }} /> {selectedCampus.shortName}</>
+            : "Select campus…"
+          }
+          <span className={styles.campusDropdownChevron}>▾</span>
         </button>
-      ))}
-    </div>
+      }
+      hideCheckmark={false}
+      menuMaxHeight={220}
+      usePortal
+    />
   );
 }
 
