@@ -4,9 +4,7 @@ import {
   doesEventOverlapSleepWindow,
 } from "../../../../components/settings/sleep/sleepWarningUtils";
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 
 function makeDate(hours, minutes = 0) {
   const d = new Date(2024, 0, 15); // fixed calendar date
@@ -14,9 +12,7 @@ function makeDate(hours, minutes = 0) {
   return d;
 }
 
-// ---------------------------------------------------------------------------
 // isDuringSleepWindow
-// ---------------------------------------------------------------------------
 
 describe("isDuringSleepWindow", () => {
   // Normal window: sleep 22:00, wake 07:00 (overnight)
@@ -89,9 +85,7 @@ describe("isDuringSleepWindow", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // doesEventOverlapSleepWindow
-// ---------------------------------------------------------------------------
 
 describe("doesEventOverlapSleepWindow", () => {
   const SLEEP = "22:00";
@@ -114,7 +108,7 @@ describe("doesEventOverlapSleepWindow", () => {
   });
 
   it("falls back to isDuringSleepWindow when end <= start", () => {
-    // start is during sleep window; end equals start → should return true
+    // The start time is during the sleep window and the end time matches it.
     const start = "2024-01-15T23:30:00";
     const end = "2024-01-15T23:30:00"; // equal
     expect(doesEventOverlapSleepWindow(SLEEP, WAKE, start, end)).toBe(true);
@@ -148,12 +142,12 @@ describe("doesEventOverlapSleepWindow", () => {
   });
 
   it("uses a default 25-minute window when endDate is not provided", () => {
-    // 22:10 start, no end → window is 22:10–22:35 which is in sleep window
+    // Without an end time, the helper checks a 22:10 to 22:35 window in sleep time.
     expect(doesEventOverlapSleepWindow(SLEEP, WAKE, "2024-01-15T22:10:00", null)).toBe(true);
   });
 
   it("returns false for a short event well outside sleep window (no end date)", () => {
-    // 14:00 start, no end → 14:00–14:25, outside sleep window
+    // Without an end time, the helper checks 14:00 to 14:25 outside sleep time.
     expect(doesEventOverlapSleepWindow(SLEEP, WAKE, "2024-01-15T14:00:00", null)).toBe(false);
   });
 });

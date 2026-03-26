@@ -15,9 +15,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { renderHook, act } from '@testing-library/react';
 
-// ---------------------------------------------------------------------------
 // CSS module mocks
-// ---------------------------------------------------------------------------
 
 vi.mock('../../../components/modules/modules/ModuleCourseFilter.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
@@ -26,9 +24,7 @@ vi.mock('../../../components/common/card/CardGrid.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-// ---------------------------------------------------------------------------
 // Framer-motion mock
-// ---------------------------------------------------------------------------
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
   motion: new Proxy(
@@ -47,9 +43,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 
-// ---------------------------------------------------------------------------
 // Common mocks required by ModuleCourseFilter
-// ---------------------------------------------------------------------------
 vi.mock('../../../components/common/search_bar/SearchBar', () => ({
   default: ({ value, onChange, placeholder }) => (
     <input
@@ -77,25 +71,19 @@ vi.mock('../../../lib/kclCourses', () => ({
   },
 }));
 
-// ---------------------------------------------------------------------------
 // ModuleGrid dependency: ModulesCard mock
-// ---------------------------------------------------------------------------
 vi.mock('../../../components/modules/modules/ModulesCard.jsx', () => ({
   default: ({ module }) => <div data-testid="modules-card">{module.module_name}</div>,
 }));
 
-// ---------------------------------------------------------------------------
 // Imports under test
-// ---------------------------------------------------------------------------
 
 import { useModuleCourseFilterState } from '../../../components/modules/modules/useModuleCourseFilterState';
 import ModuleCourseFilter from '../../../components/modules/modules/ModuleCourseFilter';
 import ModuleGrid from '../../../components/modules/modules/ModuleGrid';
 
 
-// ---------------------------------------------------------------------------
 // useModuleCourseFilterState
-// ---------------------------------------------------------------------------
 
 describe('useModuleCourseFilterState', () => {
   it('starts closed with empty query and empty expanded map', () => {
@@ -147,9 +135,7 @@ describe('useModuleCourseFilterState', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // ModuleCourseFilter – additional branch coverage
-// ---------------------------------------------------------------------------
 
 describe('ModuleCourseFilter – branch coverage', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -192,7 +178,7 @@ describe('ModuleCourseFilter – branch coverage', () => {
     render(<ModuleCourseFilter selectedCourses={[]} onToggleCourse={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: /filter/i }));
 
-    // Engineering has 6 courses → only 5 visible, "+ 1 more" button appears
+    // Engineering has 6 courses, so the collapsed view shows a +1 more button.
     const expandBtn = screen.getByRole('button', { name: /\+ 1 more/i });
     expect(expandBtn).toBeInTheDocument();
 
@@ -274,9 +260,7 @@ describe('ModuleCourseFilter – branch coverage', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // ModuleGrid
-// ---------------------------------------------------------------------------
 
 describe('ModuleGrid', () => {
   const baseProps = {

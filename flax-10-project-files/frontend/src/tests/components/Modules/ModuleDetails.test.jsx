@@ -204,4 +204,148 @@ describe('ModuleDetails', () => {
         expect(screen.getByText('Passed')).toBeInTheDocument();
         vi.useRealTimers();
     });
+
+    it('shows "Not available" when created_by_email is missing', () => {
+        renderDetails({ module: { ...module, created_by_email: undefined }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('Not available')).toBeInTheDocument();
+    });
+
+    it('shows "No class time set" when start_time is null', () => {
+        renderDetails({ module: { ...module, start_time: null, end_time: null }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getAllByText('No class time set')[0]).toBeInTheDocument();
+    });
+
+    it('shows "To be announced" when location is null', () => {
+        renderDetails({ module: { ...module, location: null }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('To be announced')).toBeInTheDocument();
+    });
+
+    it('hides Email tutor button when created_by_email is null', () => {
+        renderDetails({ module: { ...module, created_by_email: null }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.queryByText('Email tutor')).not.toBeInTheDocument();
+    });
+
+    it('shows "No deadlines yet" side column text when no deadlines', () => {
+        renderDetails({ module: { ...module, deadlines: [] }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('No deadlines yet')).toBeInTheDocument();
+    });
+
+    it('shows progress message when single or zero deadlines', () => {
+        renderDetails({ module: { ...module, deadlines: [{ id: 1, title: 'CW1', deadline_type: 'coursework', start_due_date: '2026-04-01' }] }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('Progress will appear when more deadlines are set')).toBeInTheDocument();
+    });
+
+    it('shows "Assignment timeline hasn\'t started yet" when progress is 0', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2020-01-01T00:00:00Z'));
+        const modWithDeadlines = {
+            ...module,
+            deadlines: [
+                { id: 1, title: 'CW1', deadline_type: 'coursework', start_due_date: '2027-01-01' },
+                { id: 2, title: 'CW2', deadline_type: 'coursework', start_due_date: '2028-01-01' },
+            ],
+        };
+        renderDetails({ module: modWithDeadlines, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText("Assignment timeline hasn't started yet")).toBeInTheDocument();
+        vi.useRealTimers();
+    });
+
+    it('renders reading with no pages info when both start_page/end_page and page_count are null', () => {
+        const modWithReading = {
+            ...module,
+            readings: [{
+                id: 3,
+                title: 'Bare Reading',
+                module_name: null,
+                start_page: null,
+                end_page: null,
+                page_count: null,
+                deadline: '2026-04-20T00:00:00',
+            }],
+        };
+        renderDetails({ module: modWithReading, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('Bare Reading')).toBeInTheDocument();
+    });
+
+    it('strips prefix when title starts with module_name followed by colon', () => {
+        const modWithReading = {
+            ...module,
+            readings: [{
+                id: 4,
+                title: 'Software Engineering: Deep Dive',
+                module_name: 'Software Engineering',
+                start_page: 1,
+                end_page: 10,
+                deadline: '2026-05-01T00:00:00',
+            }],
+        };
+        renderDetails({ module: modWithReading, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('Deep Dive')).toBeInTheDocument();
+    });
+
+    it('does not strip prefix when title does not start with module_name', () => {
+        const modWithReading = {
+            ...module,
+            readings: [{
+                id: 5,
+                title: 'Unrelated Title',
+                module_name: 'Software Engineering',
+                start_page: 1,
+                end_page: 10,
+                deadline: '2026-05-02T00:00:00',
+            }],
+        };
+        renderDetails({ module: modWithReading, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('Unrelated Title')).toBeInTheDocument();
+    });
+
+    it('renders projects section when projects are fetched', async () => {
+        const projectsData = [{ id: 10, name: 'Team Alpha', course_code: '5CCS2SEG', member_count: 3 }];
+        vi.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(projectsData) });
+        const { findByText } = renderDetails({ module, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(await findByText('Study Projects')).toBeInTheDocument();
+        expect(await findByText('Team Alpha')).toBeInTheDocument();
+        expect(await findByText('3 members')).toBeInTheDocument();
+        global.fetch.mockRestore();
+    });
+
+    it('renders project with 1 member singular', async () => {
+        const projectsData = [{ id: 11, name: 'Solo', course_code: '5CCS2SEG', member_count: 1 }];
+        vi.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(projectsData) });
+        const { findByText } = renderDetails({ module, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(await findByText('1 member')).toBeInTheDocument();
+        global.fetch.mockRestore();
+    });
+
+    it('renders project with null member_count as 0 members', async () => {
+        const projectsData = [{ id: 12, name: 'NoMembers', course_code: '5CCS2SEG' }];
+        vi.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(projectsData) });
+        const { findByText } = renderDetails({ module, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(await findByText('0 members')).toBeInTheDocument();
+        global.fetch.mockRestore();
+    });
+
+    it('hides projects section when fetch returns non-ok', async () => {
+        vi.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: false });
+        renderDetails({ module, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        await vi.waitFor(() => {});
+        expect(screen.queryByText('Study Projects')).not.toBeInTheDocument();
+        global.fetch.mockRestore();
+    });
+
+    it('does not render course badge when module_code has no course', () => {
+        renderDetails({ module: { ...module, module_code: 'UNKNOWN' }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        // Should still render without crashing
+        expect(screen.getByText('UNKNOWN')).toBeInTheDocument();
+    });
+
+    it('renders tutor link when created_by is present', () => {
+        renderDetails({ module: { ...module, created_by: 42, created_by_name: 'Dr Smith' }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('Dr Smith')).toBeInTheDocument();
+    });
+
+    it('renders tutor fallback initials when no photo is available', () => {
+        renderDetails({ module: { ...module, created_by_name: 'Dr John' }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+        expect(screen.getByText('DJ')).toBeInTheDocument();
+    });
 });

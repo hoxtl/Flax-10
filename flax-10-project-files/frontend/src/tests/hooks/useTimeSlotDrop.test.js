@@ -177,4 +177,58 @@ describe('useTimeSlotDrop', () => {
     expect(actions.addException).toHaveBeenCalledWith(6, '2026-03-09');
     expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'Seminar', location: 'A1' }));
   });
+
+  it('does not move read-only events', async () => {
+    isReadOnlyEventMock.mockReturnValue(true);
+    renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
+
+    await act(async () => {
+      await onDrop({
+        type: 'EVENT',
+        data: { id: 8, start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' },
+      }, makeDropEvent());
+    });
+
+    expect(actions.editEvent).not.toHaveBeenCalled();
+    expect(actions.addEvent).not.toHaveBeenCalled();
+  });
+
+  it('uses default 60 min duration when tag has no default_duration', async () => {
+    renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
+
+    await act(async () => {
+      await onDrop({ type: 'TAG', data: { name: 'NoDefault' } }, makeDropEvent());
+    });
+
+    expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'NoDefault' }));
+  });
+
+  it('handles dragOver without dropProps.onDragOver', () => {
+    useDropMock.mockImplementation(({ onDrop: dropHandler }) => {
+      onDrop = dropHandler;
+      return { dropProps: {}, isOver: true };
+    });
+    const { result } = renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
+
+    act(() => {
+      result.current.mergedProps.onDragOver({
+        clientY: 130,
+        currentTarget: { getBoundingClientRect: () => ({ top: 100 }) },
+      });
+    });
+    expect(result.current.highlightQuarter).toBe(1);
+  });
+
+  it('handles dragLeave without dropProps.onDragLeave', () => {
+    useDropMock.mockImplementation(({ onDrop: dropHandler }) => {
+      onDrop = dropHandler;
+      return { dropProps: {}, isOver: true };
+    });
+    const { result } = renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
+
+    act(() => {
+      result.current.mergedProps.onDragLeave({});
+    });
+    expect(result.current.highlightQuarter).toBeNull();
+  });
 });

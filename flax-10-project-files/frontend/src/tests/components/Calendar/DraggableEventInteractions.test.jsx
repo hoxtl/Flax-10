@@ -7,9 +7,7 @@ import * as useEventResizeModule from '../../../components/calendar/hooks/useEve
 import * as ConfirmContextModule from '../../../context/ConfirmContext';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 
-// ---------------------------------------------------------------------------
 // Hoisted mocks
-// ---------------------------------------------------------------------------
 
 const { mockOpenPopup, mockOpenModal, mockOpenDelete, mockConfirm } = vi.hoisted(() => ({
     mockOpenPopup: vi.fn(),
@@ -89,9 +87,7 @@ vi.mock('../../../pages/tasks/components/TaskCardContextMenu.module.css', () => 
     },
 }));
 
-// ---------------------------------------------------------------------------
 // Test fixtures
-// ---------------------------------------------------------------------------
 
 import { getEventType, hasRecurrence } from '../../../components/calendar/utils/eventUtils';
 
@@ -113,9 +109,7 @@ const recurringEvent = {
     rrule: 'FREQ=DAILY',
 };
 
-// ---------------------------------------------------------------------------
 // Tests
-// ---------------------------------------------------------------------------
 
 describe('DraggableEvent Interactions Coverage', () => {
     beforeEach(() => {
@@ -130,9 +124,7 @@ describe('DraggableEvent Interactions Coverage', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: false });
     });
 
-    // -----------------------------------------------------------------------
     // Context menu rendering
-    // -----------------------------------------------------------------------
 
     it('shows context menu with Edit and Delete buttons on right-click', () => {
         const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
@@ -180,9 +172,7 @@ describe('DraggableEvent Interactions Coverage', () => {
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // Recurring event delete flow
-    // -----------------------------------------------------------------------
 
     it('recurring delete with choice=true calls openDelete(event, "all")', async () => {
         hasRecurrence.mockReturnValue(true);
@@ -212,9 +202,7 @@ describe('DraggableEvent Interactions Coverage', () => {
         expect(mockOpenDelete).not.toHaveBeenCalled();
     });
 
-    // -----------------------------------------------------------------------
     // resizeEnded.current logic – click is swallowed after resize
-    // -----------------------------------------------------------------------
 
     it('click after resize is swallowed (resizeEnded flag prevents openPopup)', () => {
         let capturedResizeEnded;
@@ -228,9 +216,7 @@ describe('DraggableEvent Interactions Coverage', () => {
         expect(mockOpenPopup).not.toHaveBeenCalled();
     });
 
-    // -----------------------------------------------------------------------
     // Resize handle fires handleResizeStart
-    // -----------------------------------------------------------------------
 
     it('mousedown on resize handle calls handleResizeStart', () => {
         const mockHandleResizeStart = vi.fn();

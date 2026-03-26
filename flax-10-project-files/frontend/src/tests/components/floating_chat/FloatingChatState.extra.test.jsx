@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-// ---------------------------------------------------------------------------
 // Shared mocks (must be declared before the dynamic imports below)
-// ---------------------------------------------------------------------------
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -39,9 +37,7 @@ vi.mock("../../../components/FloatingChat.module.css", () => ({ default: {} }));
 
 import { useFloatingChatState } from "../../../components/floating_chat/useFloatingChatState";
 
-// ---------------------------------------------------------------------------
 // Wrapper factories
-// ---------------------------------------------------------------------------
 
 function makeWrapper(path = "/", search = "") {
   return function Wrapper({ children }) {
@@ -49,9 +45,7 @@ function makeWrapper(path = "/", search = "") {
   };
 }
 
-// ---------------------------------------------------------------------------
 // toggleFab behaviour
-// ---------------------------------------------------------------------------
 
 describe("toggleFab", () => {
   it("sets minimized to false (without toggling open) when currently minimized", () => {
@@ -114,9 +108,7 @@ describe("toggleFab", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // Route prompts
-// ---------------------------------------------------------------------------
 
 describe("route prompts", () => {
   it("returns the tasks prompt on /tasks", () => {
@@ -172,7 +164,7 @@ describe("route prompts", () => {
     const { result } = renderHook(() => useFloatingChatState(), {
       wrapper: makeWrapper("/calendar"),
     });
-    // No user_id → no prompt
+    // Without user_id, the shared-calendar prompt stays hidden.
     expect(result.current.showPrompt).toBe(false);
   });
 
@@ -192,9 +184,7 @@ describe("route prompts", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // useRoutePromptReset — clears initialMessage when route changes
-// ---------------------------------------------------------------------------
 
 describe("useRoutePromptReset", () => {
   it("clears initialMessage when the chat is closed and the route changes", () => {
@@ -235,9 +225,7 @@ describe("useRoutePromptReset", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // useFirstPromptVisit — sets minimized=false on first visit, not on second
-// ---------------------------------------------------------------------------
 
 describe("useFirstPromptVisit", () => {
   it("sets minimized to false on the first visit to a prompt route", () => {
@@ -257,15 +245,13 @@ describe("useFirstPromptVisit", () => {
     act(() => result.current.minimizePrompt());
     expect(result.current.minimized).toBe(true);
 
-    // Re-render on the same route — seenPromptRoutes already has "tasks" → no second setMinimized(false)
+    // Re-rendering on the same route should not reopen the prompt.
     rerender();
     expect(result.current.minimized).toBe(true); // unchanged
   });
 });
 
-// ---------------------------------------------------------------------------
 // showPrompt visibility logic
-// ---------------------------------------------------------------------------
 
 describe("showPrompt visibility", () => {
   it("hides prompt when chat is open", () => {

@@ -13,8 +13,14 @@ vi.mock('../../../../context/CalendarContext', () => ({
     useCalendarDispatch: () => mockDispatch,
 }));
 
+const mockGeocodeAddress = vi.fn();
+
 vi.mock('../../../../api/eventApi', () => ({
     updateEvent: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock('../../../../api/geocodeApi', () => ({
+    geocodeAddress: (...args) => mockGeocodeAddress(...args),
 }));
 
 describe('useTableEdit', () => {
@@ -111,5 +117,55 @@ describe('useTableEdit', () => {
         const { result } = renderHook(() => useTableEdit(events, mockTags));
         act(() => result.current.startEdit(1, 'location', null));
         expect(result.current.cellValue).toBe('');
+    });
+
+    it('clears location coordinates when location value is empty', async () => {
+        const { result } = renderHook(() => useTableEdit(events, mockTags));
+        act(() => result.current.startEdit(1, 'location', 'Old Place'));
+        await act(async () => result.current.saveWithValue(''));
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'UPDATE_EVENT',
+            payload: expect.objectContaining({
+                location: '',
+                location_latitude: null,
+                location_longitude: null,
+                location_validated: false,
+            }),
+        });
+    });
+
+    it('sets location_validated to false when geocode fails', async () => {
+        mockGeocodeAddress.mockRejectedValueOnce(new Error('geocode error'));
+        const { result } = renderHook(() => useTableEdit(events, mockTags));
+        act(() => result.current.startEdit(1, 'location', 'Old Place'));
+        await act(async () => result.current.saveWithValue('Unknown Location'));
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'UPDATE_EVENT',
+            payload: expect.objectContaining({
+                location: 'Unknown Location',
+                location_validated: false,
+            }),
+        });
+    });
+
+    it('sets location coordinates when geocode succeeds', async () => {
+        mockGeocodeAddress.mockResolvedValueOnce({ latitude: 51.5, longitude: -0.12 });
+        const { result } = renderHook(() => useTableEdit(events, mockTags));
+        act(() => result.current.startEdit(1, 'location', 'Old Place'));
+        await act(async () => result.current.saveWithValue('London'));
+        expect(mockDispatch).toHaveBeenCalledWith({
+            type: 'UPDATE_EVENT',
+            payload: expect.objectContaining({
+                location: 'London',
+                location_latitude: 51.5,
+                location_longitude: -0.12,
+                location_validated: true,
+            }),
+        });
+    });
+
+    it('defaults to empty tags array when tags not provided', () => {
+        const { result } = renderHook(() => useTableEdit(events));
+        expect(result.current.editingCell).toBeNull();
     });
 });

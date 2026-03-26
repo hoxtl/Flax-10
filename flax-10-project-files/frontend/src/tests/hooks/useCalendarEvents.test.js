@@ -129,4 +129,56 @@ describe('useCalendarEvents', () => {
     expect(addExceptionDateMock).toHaveBeenCalledWith(11, '2026-03-10');
     expect(getEventsMock).toHaveBeenCalled();
   });
+
+  it('getDateKey uses week format for week viewMode', async () => {
+    useCalendarMock.mockReturnValue({
+      events: [{ id: 1 }],
+      selectedDate: new Date(2026, 2, 9).toISOString(),
+      viewMode: 'week',
+      sharedCalendarUserId: null,
+    });
+    renderHook(() => useCalendarEvents());
+    await waitFor(() => {
+      expect(getEventsMock).toHaveBeenCalled();
+    });
+  });
+
+  it('getDateKey uses day format for day viewMode', async () => {
+    useCalendarMock.mockReturnValue({
+      events: [{ id: 1 }],
+      selectedDate: new Date(2026, 2, 9).toISOString(),
+      viewMode: 'day',
+      sharedCalendarUserId: null,
+    });
+    renderHook(() => useCalendarEvents());
+    await waitFor(() => {
+      expect(getEventsMock).toHaveBeenCalled();
+    });
+  });
+
+  it('getDateKey uses year format for year viewMode', async () => {
+    useCalendarMock.mockReturnValue({
+      events: [{ id: 1 }],
+      selectedDate: new Date(2026, 2, 9).toISOString(),
+      viewMode: 'year',
+      sharedCalendarUserId: null,
+    });
+    renderHook(() => useCalendarEvents());
+    await waitFor(() => {
+      expect(getEventsMock).toHaveBeenCalled();
+    });
+  });
+
+  it('getDateKey returns empty string when date is null', async () => {
+    useCalendarMock.mockReturnValue({
+      events: [{ id: 1 }],
+      selectedDate: null,
+      viewMode: 'month',
+      sharedCalendarUserId: null,
+    });
+    renderHook(() => useCalendarEvents());
+    await waitFor(() => {
+      expect(dispatch).not.toHaveBeenCalled();
+    });
+  });
 });

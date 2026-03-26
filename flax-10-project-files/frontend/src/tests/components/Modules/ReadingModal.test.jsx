@@ -100,4 +100,24 @@ describe('ReadingModal', () => {
         fireEvent.click(screen.getByText('Close'));
         expect(onClose).toHaveBeenCalled();
     });
+
+    it('should call modal.close when form cancel is clicked', () => {
+        const close = vi.fn();
+        mockModal({ showForm: true, close });
+        render(<ReadingModal module={module} onClose={vi.fn()} />);
+        fireEvent.click(screen.getByText('Cancel'));
+        expect(close).toHaveBeenCalled();
+    });
+
+    it('renders multiple readings in the list', () => {
+        mockModal({
+            readings: [
+                { id: 1, title: 'Handbook' },
+                { id: 2, title: 'Chapter 5' },
+            ],
+        });
+        render(<ReadingModal module={module} onClose={vi.fn()} />);
+        expect(screen.getByText('Handbook')).toBeInTheDocument();
+        expect(screen.getByText('Chapter 5')).toBeInTheDocument();
+    });
 });

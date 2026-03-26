@@ -7,7 +7,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-// ── framer-motion mock ───────────────────────────────────────────────────────
+// framer-motion mock
 vi.mock("framer-motion", () => ({
   motion: new Proxy(
     {},
@@ -30,12 +30,12 @@ vi.mock("framer-motion", () => ({
     React.createElement(React.Fragment, null, children),
 }));
 
-// ── CSS module mock ──────────────────────────────────────────────────────────
+// CSS module mock
 vi.mock("*.module.css", () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-// ── lucide-react mock ────────────────────────────────────────────────────────
+// lucide-react mock
 vi.mock("lucide-react", () => ({
   Bell: () => <span data-testid="icon-bell" />,
   BookOpen: () => <span data-testid="icon-book" />,
@@ -47,7 +47,7 @@ vi.mock("lucide-react", () => ({
   ClipboardCheck: () => <span data-testid="icon-clipboard" />,
 }));
 
-// ── APP_ROUTES mock ──────────────────────────────────────────────────────────
+// APP_ROUTES mock
 vi.mock("../../../lib/routes", () => ({
   APP_ROUTES: [
     { id: "calendar", label: "Calendar", icon: "🗓️" },
@@ -74,7 +74,7 @@ vi.mock("../../../lib/routes", () => ({
   ],
 }));
 
-// ── Dependency mocks ─────────────────────────────────────────────────────────
+// Dependency mocks
 vi.mock("../../../components/dashboard/ProfileDropdown", () => ({
   default: () => <div data-testid="profile-dropdown" />,
 }));
@@ -139,10 +139,9 @@ vi.mock("../../../components/common", () => ({
   ),
 }));
 
-// ── Import the real TopBar component ─────────────────────────────────────────
+// Import the real TopBar component
 import TopBar from "../../../components/dashboard/Topbar";
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 function renderTopBar(props = {}) {
   const defaults = {
@@ -157,7 +156,7 @@ function renderTopBar(props = {}) {
   return render(<TopBar {...defaults} />);
 }
 
-// ── BrandLogo ─────────────────────────────────────────────────────────────────
+// BrandLogo
 
 describe("BrandLogo", () => {
   it("calls onNavChange with 'home' when clicked", () => {
@@ -174,7 +173,7 @@ describe("BrandLogo", () => {
   });
 });
 
-// ── NavDropdownTrigger – hasActive ────────────────────────────────────────────
+// NavDropdownTrigger – hasActive
 
 describe("NavDropdownTrigger via rendered TopBar", () => {
   it("renders nav group buttons", () => {
@@ -194,7 +193,7 @@ describe("NavDropdownTrigger via rendered TopBar", () => {
   });
 });
 
-// ── isRouteVisible ────────────────────────────────────────────────────────────
+// isRouteVisible
 
 describe("isRouteVisible through TopBarNav rendered output", () => {
   it("hides adminOnly routes from non-admin users (no Admin option)", () => {
@@ -217,12 +216,12 @@ describe("isRouteVisible through TopBarNav rendered output", () => {
       user: { role: "teacher", isAdmin: false },
     });
     // Explore still visible but societies / group-work filtered out
-    // Just confirm Study→Teaching conversion happened (teachers see Teaching label)
+    // Confirm that the Study label changes to Teaching for teachers.
     expect(screen.getByText("Teaching")).toBeInTheDocument();
   });
 });
 
-// ── handleNavSelection – modules:show-all event ───────────────────────────────
+// handleNavSelection – modules:show-all event
 
 describe("handleNavSelection dispatches modules:show-all for modules", () => {
   let handler;
@@ -268,7 +267,7 @@ describe("handleNavSelection dispatches modules:show-all for modules", () => {
   });
 });
 
-// ── parseRouteOption – teacher label ─────────────────────────────────────────
+// parseRouteOption – teacher label
 // The AnimatedDropdown mock renders option VALUES (route ids) as button text.
 // The label content (JSX) passed to the dropdown option is rendered inside the
 // dropdown container but only becomes visible once we inspect the options prop.
@@ -289,7 +288,7 @@ describe("parseRouteOption teacher vs student labels via section titles", () => 
   });
 });
 
-// ── ToolsPill – teacher vs student options ────────────────────────────────────
+// ToolsPill – teacher vs student options
 
 describe("ToolsPill options", () => {
   it("uses student options when user.role is student", () => {

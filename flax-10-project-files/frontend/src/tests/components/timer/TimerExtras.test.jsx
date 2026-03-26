@@ -9,9 +9,7 @@ import { render, screen } from '@testing-library/react';
 
 import SessionDots, { LiveStatsRow, ProgressStrip } from '../../../components/timer/SessionDots';
 
-// ---------------------------------------------------------------------------
 // SessionDots
-// ---------------------------------------------------------------------------
 
 describe('SessionDots', () => {
   it('renders correct number of dots', () => {
@@ -72,9 +70,7 @@ describe('SessionDots', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // LiveStatsRow
-// ---------------------------------------------------------------------------
 
 describe('LiveStatsRow', () => {
   it('renders nothing when session has never started', () => {
@@ -138,9 +134,7 @@ describe('LiveStatsRow', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // ProgressStrip
-// ---------------------------------------------------------------------------
 
 describe('ProgressStrip', () => {
   it('renders a progress fill element', () => {

@@ -90,4 +90,61 @@ describe('useSwipeNavigation', () => {
         renderHook(() => useSwipeNavigation({ containerRef: { current: null }, onPrev, onNext }));
         expect(container.addEventListener).not.toHaveBeenCalled();
     });
+
+    it('does not trigger touchstart when disabled', () => {
+        renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext, enabled: false }));
+        listeners.touchstart?.({ touches: [{ clientY: 200 }] });
+        listeners.touchend?.({ changedTouches: [{ clientY: 50 }] });
+        expect(onNext).not.toHaveBeenCalled();
+        expect(onPrev).not.toHaveBeenCalled();
+    });
+
+    it('does not trigger touchend when disabled', () => {
+        renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext, enabled: false }));
+        listeners.touchend?.({ changedTouches: [{ clientY: 50 }] });
+        expect(onNext).not.toHaveBeenCalled();
+    });
+
+    it('calls onPrev on touch swipe up at scroll boundary', () => {
+        container.scrollTop = 0;
+        renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext }));
+        listeners.touchstart?.({ touches: [{ clientY: 50 }] });
+        vi.advanceTimersByTime(100);
+        listeners.touchend?.({ changedTouches: [{ clientY: 200 }] });
+        expect(onPrev).toHaveBeenCalled();
+    });
+
+    it('does not trigger touchend when touchStartRef is null', () => {
+        container.scrollTop = container.scrollHeight - container.clientHeight;
+        renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext }));
+        listeners.touchend?.({ changedTouches: [{ clientY: 50 }] });
+        expect(onNext).not.toHaveBeenCalled();
+    });
+
+    it('does not trigger when not at scroll boundary', () => {
+        container.scrollTop = 100;
+        container.scrollHeight = 1000;
+        renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext }));
+        listeners.wheel?.({ deltaY: -100, preventDefault: vi.fn() });
+        expect(onPrev).not.toHaveBeenCalled();
+    });
+
+    it('does not trigger touch when velocity is too low', () => {
+        container.scrollTop = container.scrollHeight - container.clientHeight;
+        renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext }));
+        listeners.touchstart?.({ touches: [{ clientY: 200 }] });
+        vi.advanceTimersByTime(5000);
+        listeners.touchend?.({ changedTouches: [{ clientY: 100 }] });
+        expect(onNext).not.toHaveBeenCalled();
+    });
+
+    it('does not trigger touch when not at scroll boundary', () => {
+        container.scrollTop = 100;
+        container.scrollHeight = 1000;
+        renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext }));
+        listeners.touchstart?.({ touches: [{ clientY: 200 }] });
+        vi.advanceTimersByTime(100);
+        listeners.touchend?.({ changedTouches: [{ clientY: 50 }] });
+        expect(onNext).not.toHaveBeenCalled();
+    });
 });

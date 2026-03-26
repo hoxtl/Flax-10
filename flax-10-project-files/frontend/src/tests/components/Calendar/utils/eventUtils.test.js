@@ -21,7 +21,7 @@ vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
     }),
 }));
 
-// ─── extractBaseEventId ──────────────────────────────────────────────────────
+// extractBaseEventId
 
 describe('extractBaseEventId', () => {
     it('returns event._baseId if present', () => {
@@ -62,7 +62,7 @@ describe('extractBaseEventId', () => {
     });
 });
 
-// ─── hasRecurrence ───────────────────────────────────────────────────────────
+// hasRecurrence
 
 describe('hasRecurrence', () => {
     it('returns false for null event', () => {
@@ -98,7 +98,7 @@ describe('hasRecurrence', () => {
     });
 });
 
-// ─── getEventType ─────────────────────────────────────────────────────────────
+// getEventType
 
 describe('getEventType', () => {
     it('returns "personal" for null event', () => {
@@ -178,7 +178,7 @@ describe('getEventType', () => {
     });
 });
 
-// ─── isReadOnlyEvent ─────────────────────────────────────────────────────────
+// isReadOnlyEvent
 
 describe('isReadOnlyEvent', () => {
     it('returns false for personal event', () => {
@@ -198,7 +198,7 @@ describe('isReadOnlyEvent', () => {
     });
 });
 
-// ─── getEffectiveTagName ─────────────────────────────────────────────────────
+// getEffectiveTagName
 
 describe('getEffectiveTagName', () => {
     it('returns "other" for null event', () => {
@@ -242,7 +242,7 @@ describe('getEffectiveTagName', () => {
     });
 });
 
-// ─── sortByStartTime ─────────────────────────────────────────────────────────
+// sortByStartTime
 
 describe('sortByStartTime', () => {
     it('sorts events ascending by start_time', () => {
@@ -277,7 +277,7 @@ describe('sortByStartTime', () => {
     });
 });
 
-// ─── isAllDay ────────────────────────────────────────────────────────────────
+// isAllDay
 
 describe('isAllDay', () => {
     it('returns true when all_day flag is set', () => {
@@ -324,7 +324,7 @@ describe('isAllDay', () => {
     });
 });
 
-// ─── getVisibleEventsInView ───────────────────────────────────────────────────
+// getVisibleEventsInView
 
 describe('getVisibleEventsInView', () => {
     it('returns empty array for null events', () => {

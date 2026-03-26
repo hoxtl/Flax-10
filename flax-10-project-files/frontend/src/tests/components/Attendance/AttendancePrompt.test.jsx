@@ -171,7 +171,7 @@ describe("Attendance prompt", () => {
 
   it("dismisses with null event (no session id stored)", () => {
     const setEvent = vi.fn();
-    // null event → if (event) is false → no setSessionDismissedId call
+    // A null event clears the prompt without storing a session id.
     dismissAttendancePrompt(null, setEvent);
     expect(setEvent).toHaveBeenCalledWith(null);
     // No id stored since event was null
@@ -182,8 +182,8 @@ describe("Attendance prompt", () => {
     const setEvent = vi.fn();
     const setSubmitting = vi.fn();
     recordAttendanceMock.mockResolvedValue({});
-    // Don't provide closeDelayMs in options (undefined) → default 250ms branch used
-    // closeDelayMs > 0 → wait(closeDelayMs) is called
+    // Leaving closeDelayMs undefined uses the default 250 ms delay.
+    // A positive delay waits before the prompt closes.
     const afterSuccess = vi.fn().mockResolvedValue(undefined);
     // Use vi.runAllTimersAsync to handle async timers
     const promise = submitAttendancePromptAnswer({ id: 99 }, true, false, setEvent, setSubmitting, { afterSuccess });
@@ -200,7 +200,7 @@ describe("Attendance prompt", () => {
     const yesButton = screen.getByText("Yes");
     // First click sets answeredWith = true
     await act(async () => { fireEvent.click(yesButton); });
-    // Second click should hit the guard (answeredWith !== null → return)
+    // The second click hits the guard because answeredWith is already set.
     await act(async () => { fireEvent.click(yesButton); });
 
     act(() => { vi.advanceTimersByTime(1200); });

@@ -131,4 +131,32 @@ describe('ModuleForm', () => {
         fireEvent.click(checkbox);
         expect(checkbox.checked).toBe(!initialChecked);
     });
+
+    it('renders description and location fields and allows changes', () => {
+        render(<ModuleForm module={null} onSuccess={vi.fn()} onCancel={vi.fn()} />);
+        const textarea = document.querySelector('textarea');
+        expect(textarea).toBeTruthy();
+        fireEvent.change(textarea, { target: { value: 'Module overview' } });
+        expect(textarea.value).toBe('Module overview');
+
+        const inputs = document.querySelectorAll('input[type="text"]');
+        const locationInput = Array.from(inputs).find(i => i.placeholder && i.placeholder.includes('Bush House'));
+        if (locationInput) {
+            fireEvent.change(locationInput, { target: { value: 'Room 101' } });
+            expect(locationInput.value).toBe('Room 101');
+        }
+    });
+
+    it('renders time fields with DateTimePicker placeholders', () => {
+        render(<ModuleForm module={null} onSuccess={vi.fn()} onCancel={vi.fn()} />);
+        expect(screen.getByText(/start date/i) || screen.getByText(/lecture/i)).toBeTruthy();
+    });
+
+    it('calls onSuccess with isNew=false when updating', async () => {
+        const onSuccess = vi.fn();
+        render(<ModuleForm module={defaultModule} onSuccess={onSuccess} onCancel={vi.fn()} />);
+        const form = document.querySelector('form');
+        fireEvent.submit(form);
+        await waitFor(() => expect(onSuccess).toHaveBeenCalledWith({ id: 1 }, false));
+    });
 });
