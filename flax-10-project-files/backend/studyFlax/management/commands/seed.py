@@ -18,30 +18,30 @@ from studyFlax.models.groupwork.groupwork_model import GroupProject
 from studyFlax.models.calendar.event_attendance_model import EventAttendance
 from studyFlax.fixtures.planning.data_fixtures import MODULE_PILL_COLORS
 from studyFlax.fixtures.users.user_fixtures import category_fixtures, recurrence_fixtures, tag_fixtures
-from .seed_support.users.users import (
+from .seed_helpers.users.users import (
     FIXTURE_USERS, ROLE_LABELS,
     create_admin_user, create_fixture_users, create_random_users,
 )
-from .seed_support.users.calendar_shares import (
+from .seed_helpers.users.calendar_shares import (
     build_calendar_share_pairs,
     create_calendar_shares,
     seed_shares_with_fixtures,
 )
-from .seed_support.events.events import create_events_for_users
-from .seed_support.content.modules import create_modules, create_deadlines, create_enrollments
-from .seed_support.content.tasks import create_tasks, create_society_tasks
-from .seed_support.groups.groups import (
+from .seed_helpers.calendar.events import create_events_for_users
+from .seed_helpers.academics.modules import create_modules, create_deadlines, create_enrollments
+from .seed_helpers.tasks.tasks import create_tasks, create_society_tasks
+from .seed_helpers.groupwork.groups import (
     create_group_projects, create_group_memberships, create_group_tasks, seed_group_availability,
 )
-from .seed_support.sessions.sessions import create_study_sessions
-from .seed_support.content.societies import (
+from .seed_helpers.timer.sessions import create_study_sessions
+from .seed_helpers.societies.societies import (
     create_societies, create_society_memberships,
     create_society_events, create_society_images,
 )
-from .seed_support.readings.readings import create_readings
-from .seed_support.events.attendance import seed_attendance
-from .seed_support.users.admin import seed_course_change_requests, seed_society_reports
-from .seed_support.core.usersettings import ensure_usersettings_seed_compatibility
+from .seed_helpers.academics.readings import create_readings
+from .seed_helpers.calendar.attendance import seed_attendance
+from .seed_helpers.users.admin import seed_course_change_requests, seed_society_reports
+from .seed_helpers.users.usersettings import ensure_usersettings_seed_compatibility
 
 User = get_user_model()
 SOFT_TAG_COLORS = {

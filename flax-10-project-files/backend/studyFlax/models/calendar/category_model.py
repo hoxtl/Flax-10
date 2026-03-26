@@ -4,7 +4,7 @@ Model for event categories with colour coding and default flag.
 
 from django.db import models
 
-from ..auth.user_model import User
+from ..authentication.user_model import User
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

@@ -5,7 +5,7 @@ Models for saved schedules and allocated events.
 from django.db import models
 
 from .calendar_event_model import CalendarEvent
-from ..auth.user_model import User
+from ..authentication.user_model import User
 from ..modules.deadline_model import Deadline
 
 WORKTIME_PREFERENCE_CHOICES = [

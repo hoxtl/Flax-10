@@ -4,7 +4,7 @@ Models for calendar events and their metadata.
 
 from django.db import models
 
-from ..auth.user_model import User
+from ..authentication.user_model import User
 from ..constants import PRIORITY_CHOICES
 from .recurrence_rule_model import RecurrenceRule
 from .tag_model import Tag

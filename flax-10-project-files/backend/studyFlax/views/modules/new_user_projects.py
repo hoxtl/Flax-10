@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.models.modules.enrollment_model import Enrollment
-from studyFlax.management.commands.seed_support.groups.projects import (
+from studyFlax.management.commands.seed_helpers.groupwork.projects import (
     _build_module_project_specs,
 )
 from studyFlax.views.groupwork.groupwork_limits import MAX_GROUP_PROJECTS_PER_USER

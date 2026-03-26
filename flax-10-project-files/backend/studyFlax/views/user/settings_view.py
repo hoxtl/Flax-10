@@ -10,7 +10,7 @@ from studyFlax.models.authentication.user_settings_model import UserSettings
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from django.utils import timezone
 from studyFlax.views.modules.enrollment_logic import enroll_user_in_modules, get_modules_for_major
-from studyFlax.management.commands.seed_support.content.tasks import seed_new_user_tasks
+from studyFlax.management.commands.seed_helpers.tasks.tasks import seed_new_user_tasks
 from studyFlax.views.modules.new_user_projects import seed_new_user_projects
 
 DEFAULT_HOMEPAGE_WIDGETS = ["hero", "deadlines", "todayTasks", "bigTimeline"]

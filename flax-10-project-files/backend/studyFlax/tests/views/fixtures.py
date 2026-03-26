@@ -1,3 +1,3 @@
 """Re-export fixtures for convenience."""
 
-from ..helpers.fixtures import *
+from ..shared.helpers.fixtures import *

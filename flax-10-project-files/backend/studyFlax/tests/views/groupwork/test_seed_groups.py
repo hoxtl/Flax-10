@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 from django.test import SimpleTestCase
 
-from studyFlax.management.commands.seed_support.groups.tasks import _build_completed_task_assignments
+from studyFlax.management.commands.seed_helpers.groupwork.tasks import _build_completed_task_assignments
 
 
 class SeedGroupTaskAssignmentsTest(SimpleTestCase):

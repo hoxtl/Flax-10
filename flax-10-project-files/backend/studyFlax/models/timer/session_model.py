@@ -3,7 +3,7 @@ Model for recording individual study sessions with duration and pause tracking.
 """
 
 from django.db import models
-from ..auth.user_model import User
+from ..authentication.user_model import User
 
 class StudySession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='study_sessions')

@@ -9,7 +9,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from studyFlax.models import CalendarEvent, Deadline, Enrollment
-from ...events.event_helpers import build_deadlines_for_module
+from ...calendar.event_helpers import build_deadlines_for_module
 from ..module_event_builders import collect_all_enrollments_and_events
 
 User = get_user_model()

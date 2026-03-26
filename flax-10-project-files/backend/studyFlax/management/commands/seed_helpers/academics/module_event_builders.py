@@ -6,15 +6,15 @@ from collections import defaultdict
 
 from studyFlax.models import CalendarEvent, Enrollment
 
-from ..events.event_helpers import build_deadline_event, get_user_modules
-from ..events.overlap_utils import (
+from ..calendar.event_helpers import build_deadline_event, get_user_modules
+from ..calendar.overlap_utils import (
     candidate_slots,
     event_day,
     event_duration,
     event_sort_key,
     fits_overlap_cap,
 )
-from ..events.session_events import build_module_sessions, build_session_event, session_tag
+from ..calendar.session_events import build_module_sessions, build_session_event, session_tag
 
 MAX_FIXED_EVENT_OVERLAPS = 2
 FIXED_EVENT_DAY_START_HOUR = 8

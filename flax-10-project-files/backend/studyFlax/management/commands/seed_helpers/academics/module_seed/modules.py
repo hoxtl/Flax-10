@@ -5,7 +5,7 @@ Module seeding orchestration.
 from collections import defaultdict
 
 from studyFlax.models import Module
-from ...events.event_helpers import build_module_event
+from ...calendar.event_helpers import build_module_event
 from .enrolments import create_deadlines, create_enrollments
 from .metadata import build_module_specs, group_specs_by_department
 from .teachers import (

@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from studyFlax.management.commands.seed_support.helpers import CORE_WIDGETS, _select_widgets
+from studyFlax.management.commands.seed_helpers.shared.helpers import CORE_WIDGETS, _select_widgets
 
 
 class SeedHomepageWidgetsTests(SimpleTestCase):

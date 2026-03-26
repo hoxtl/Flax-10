@@ -3,7 +3,7 @@ Model representing a university module with schedule and recurrence details.
 """
 
 from django.db import models
-from ..auth.user_model import User
+from ..authentication.user_model import User
 from ..calendar.recurrence_rule_model import RecurrenceRule
 
 class Module(models.Model):

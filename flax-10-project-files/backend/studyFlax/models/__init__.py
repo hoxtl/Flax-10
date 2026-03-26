@@ -1,8 +1,8 @@
-# Auth
-from .auth.user_model import *
-from .auth.user_settings_model import *
-from .auth.reset_password_token_model import ResetPasswordToken
-from .auth.course_change_request_model import CourseChangeRequest
+# Authentication
+from .authentication.user_model import *
+from .authentication.user_settings_model import *
+from .authentication.reset_password_token_model import ResetPasswordToken
+from .authentication.course_change_request_model import CourseChangeRequest
 
 # Calendar
 from .calendar.calendar_event_model import *

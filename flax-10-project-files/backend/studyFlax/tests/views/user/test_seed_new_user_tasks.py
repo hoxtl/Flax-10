@@ -3,7 +3,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.utils import timezone
 
-from studyFlax.management.commands.seed_support.content.tasks import (
+from studyFlax.management.commands.seed_helpers.tasks.tasks import (
     SEEDED_TASK_DUE_HOUR,
     SEEDED_TASK_DUE_MINUTE,
     seed_new_user_tasks,

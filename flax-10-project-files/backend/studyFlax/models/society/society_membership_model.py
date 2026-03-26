@@ -4,7 +4,7 @@ Model representing a user's membership in a society with role and subscription.
 
 from django.db import models
 
-from ..auth.user_model import User
+from ..authentication.user_model import User
 from .society_model import Society
 
 ROLE_CHOICES = [

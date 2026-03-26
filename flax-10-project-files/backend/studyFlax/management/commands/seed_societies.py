@@ -4,7 +4,7 @@ Management command entry point for society seeding.
 
 from django.core.management.base import BaseCommand
 
-from studyFlax.management.commands.seed_support.content.societies import (
+from studyFlax.management.commands.seed_helpers.societies.societies import (
     create_societies,
     create_society_events,
     create_society_images,

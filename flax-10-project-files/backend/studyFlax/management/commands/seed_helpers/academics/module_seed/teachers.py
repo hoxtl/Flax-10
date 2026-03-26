@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 
 from studyFlax.fixtures.users.user_fixtures import module_prefix_to_department
 from studyFlax.models import Module, RecurrenceRule, UserSettings
-from ...helpers import PRIOR_UNIVERSITIES, PHD_UNIVERSITIES, build_settings_for_new_users, build_users_list
+from ...shared.helpers import PRIOR_UNIVERSITIES, PHD_UNIVERSITIES, build_settings_for_new_users, build_users_list
 
 User = get_user_model()
 

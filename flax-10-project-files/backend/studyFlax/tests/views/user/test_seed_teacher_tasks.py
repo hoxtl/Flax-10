@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from studyFlax.management.commands.seed_support.content.tasks import _seed_tasks_for_user
+from studyFlax.management.commands.seed_helpers.tasks.tasks import _seed_tasks_for_user
 from studyFlax.models.tasks.task_model import Task
 from studyFlax.tests.helpers.factories import make_user
 
