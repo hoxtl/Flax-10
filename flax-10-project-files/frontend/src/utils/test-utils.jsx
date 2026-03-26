@@ -21,7 +21,7 @@ function AppTestProviders({ children }) {
         refreshProfile: async () => storedUser,
         setAuthenticated: () => {},
     };
-    return <AuthContext.Provider value={authValue}>{children}</AuthenticationContext.Provider>;
+    return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
 }
 
 function composeWrapper(ExtraWrapper) {

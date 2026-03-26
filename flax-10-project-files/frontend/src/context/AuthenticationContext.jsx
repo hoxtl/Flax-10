@@ -96,7 +96,7 @@ export function AuthProvider({ children }) {
     refreshProfile();
   }, [refreshProfile]);
   useAuthChangeListener(state.setAuthenticated, state.setProfile, state.setUser);
-  return <AuthContext.Provider value={getContextValue(state, refreshProfile)}>{children}</AuthenticationContext.Provider>;
+  return <AuthContext.Provider value={getContextValue(state, refreshProfile)}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
