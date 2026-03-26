@@ -17,7 +17,7 @@ import { clearUserData } from "../../components/Auth/utils/authHelpers";
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
 
-vi.mock("../../components/dashboard/sidebar", async () => {
+vi.mock("../../components/dashboard/Sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });

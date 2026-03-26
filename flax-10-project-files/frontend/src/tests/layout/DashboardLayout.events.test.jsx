@@ -14,7 +14,7 @@ vi.mock("../../context/CalendarContext", () => ({
 import DashboardLayout from "../../layout/DashboardLayout";
 import { useEventModal } from "../../context/CalendarContext";
 
-vi.mock("../../components/dashboard/sidebar", async () => {
+vi.mock("../../components/dashboard/Sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });
