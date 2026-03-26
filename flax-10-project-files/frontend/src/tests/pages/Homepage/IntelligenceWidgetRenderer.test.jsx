@@ -182,12 +182,23 @@ describe("IntelligenceWidgetRenderer", () => {
     expect(screen.getByTestId("right-now").textContent).toContain('"tflDelays":[{"id":"delay-1"}]');
   });
 
+  it("renders the populated insights widget", () => {
+    renderWidget("analyticsInsights", baseProps, { row: 2 });
+    expect(screen.getByTestId("consistency")).toBeInTheDocument();
+    expect(screen.getByTestId("peak-hours")).toBeInTheDocument();
+  });
+
   it("clones task and deadline slots with the requested row size", () => {
     const { rerender } = render(<>{renderIntelligenceWidget("todayTasks", baseProps, { row: 1 })}</>);
     expect(screen.getByTestId("slot1-base")).toHaveAttribute("row", "1");
 
     rerender(<>{renderIntelligenceWidget("deadlines", baseProps, { row: 3 })}</>);
     expect(screen.getByTestId("slot3-base")).toHaveAttribute("row", "3");
+  });
+
+  it("returns the original slot when it is not a valid React element", () => {
+    const { container } = render(<>{renderIntelligenceWidget("todayTasks", { ...baseProps, slot1TodayTasks: null }, { row: 1 })}</>);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it("renders timeline props as a widget and falls back to cloning slot6 when needed", () => {

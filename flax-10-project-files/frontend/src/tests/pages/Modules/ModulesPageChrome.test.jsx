@@ -58,6 +58,17 @@ vi.mock("../../../components/Modules/Readings/ReadingModal.jsx", () => ({
   ),
 }));
 
+vi.mock("../../../components/common/StandardModal/StandardModal.jsx", () => ({
+  default: ({ title, subtitle, onClose, children }) => (
+    <div>
+      <h2>{title}</h2>
+      <p>{subtitle}</p>
+      <button onClick={onClose}>Close modal</button>
+      {children}
+    </div>
+  ),
+}));
+
 import {
   AnimatedContent,
   DetailsView,
@@ -197,5 +208,31 @@ describe("ModulesPageChrome", () => {
     expect(state.hook.handleModuleCreated).toHaveBeenCalledWith({ id: 9, module_code: "CS9" });
     expect(state.setShowForm).toHaveBeenCalledWith(false);
     expect(state.setEditingModule).toHaveBeenCalledWith(null);
+  });
+
+  it("renders the animated detail and list panes when not editing", () => {
+    const detailsState = buildState({ showForm: false, viewingModule: { id: 5, module_code: "CS5" } });
+    const MainView = ({ state }) => <div>{state.viewingModule ? "details" : "list"}</div>;
+
+    const { rerender } = render(<AnimatedContent state={detailsState} viewKey="details" MainView={MainView} />);
+    expect(screen.getByText("CS5")).toBeInTheDocument();
+
+    const listState = buildState({ showForm: false, viewingModule: null, deadlineModule: null });
+    rerender(<AnimatedContent state={listState} viewKey="list" MainView={MainView} />);
+    expect(screen.getByText("list")).toBeInTheDocument();
+  });
+
+  it("closes edit and create modals through StandardModal", () => {
+    const editState = buildState({ showForm: true, viewingModule: null, editingModule: { id: 4 } });
+    const { rerender } = render(<AnimatedContent state={editState} viewKey="edit" MainView={() => null} />);
+    fireEvent.click(screen.getByText("Close modal"));
+    expect(editState.setShowForm).toHaveBeenCalledWith(false);
+    expect(editState.setEditingModule).toHaveBeenCalledWith(null);
+
+    const createState = buildState({ showForm: true, viewingModule: null, editingModule: null });
+    rerender(<AnimatedContent state={createState} viewKey="create" MainView={() => null} />);
+    fireEvent.click(screen.getByText("Close modal"));
+    expect(createState.setShowForm).toHaveBeenCalledWith(false);
+    expect(createState.setEditingModule).toHaveBeenCalledWith(null);
   });
 });

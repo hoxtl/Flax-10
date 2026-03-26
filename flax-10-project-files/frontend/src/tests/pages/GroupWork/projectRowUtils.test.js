@@ -145,6 +145,19 @@ describe('projectRowUtils – getProjectTeacherPhoto', () => {
     getProjectTeacherPhoto({ module_tutor_id: 1, module_tutor_username: 'a', module_tutor_name: 'b' });
     expect(getResolvedUserPhoto).toHaveBeenCalled();
   });
+
+  it('passes the profile photo url through to the resolver', () => {
+    getProjectTeacherPhoto({
+      module_tutor_id: 1,
+      module_tutor_username: 'a',
+      module_tutor_name: 'b',
+      module_tutor_profile_photo_url: 'https://example.com/t.jpg',
+    });
+    expect(getResolvedUserPhoto).toHaveBeenCalledWith(
+      expect.objectContaining({ profile_photo_url: 'https://example.com/t.jpg' }),
+      expect.objectContaining({ allowGeneric: true }),
+    );
+  });
 });
 
 describe('projectRowUtils – openTeacherProfile', () => {

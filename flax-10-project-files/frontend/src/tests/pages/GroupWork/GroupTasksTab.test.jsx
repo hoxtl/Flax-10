@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import React from "react";
 import GroupTasksTab from "../../../pages/GroupWork/GroupTasksTab";
 
@@ -128,6 +128,10 @@ describe("GroupTasksTab", () => {
     useGroupTasksTabStateMock.mockReturnValue(buildDefaultState());
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("renders loading state initially", () => {
     useGroupTasksTabStateMock.mockReturnValueOnce(buildDefaultState({
       taskActions: {
@@ -169,7 +173,7 @@ describe("GroupTasksTab", () => {
     expect(state.setShowAddModal).toHaveBeenCalledWith(true);
   });
 
-  it("wires task actions from list, board, and filter controls", () => {
+  it("wires task actions from list, board, and filter controls", async () => {
     const state = buildDefaultState();
     useGroupTasksTabStateMock.mockReturnValue(state);
     renderComponent();
@@ -183,8 +187,10 @@ describe("GroupTasksTab", () => {
     expect(state.taskActions.updateTask).toHaveBeenCalledWith(1, { status: "done" });
     expect(state.taskActions.deleteTask).toHaveBeenCalledWith(1);
     expect(state.setFilterUsers).toHaveBeenCalled();
-    expect(toastMock).toHaveBeenCalledWith("Task completed!", { icon: "🎉", variant: "success" });
-    expect(toastMock).toHaveBeenCalledWith("Task deleted", { variant: "error", icon: "🗑️" });
+    await waitFor(() => {
+      expect(toastMock).toHaveBeenCalledWith("Task completed!", { icon: "🎉", variant: "success" });
+      expect(toastMock).toHaveBeenCalledWith("Task deleted", { variant: "error", icon: "🗑️" });
+    });
   });
 
   it("adds a task from the modal and from the board view", () => {
@@ -201,5 +207,25 @@ describe("GroupTasksTab", () => {
     expect(state.taskActions.addTask).toHaveBeenCalledWith("Board task", { status: "done" });
     expect(state.taskActions.addTask).toHaveBeenCalledWith("New Seed Task", { due_date: undefined, assigned_to: undefined });
     expect(state.setShowAddModal).toHaveBeenCalledWith(false);
+  });
+
+  it("returns null for unsupported task views", () => {
+    useGroupTasksTabStateMock.mockReturnValue(buildDefaultState({
+      taskView: "unknown",
+    }));
+
+    const { container } = renderComponent();
+    expect(container.querySelector('[data-testid="task-list-view"]')).toBeNull();
+    expect(container.querySelector('[data-testid="task-timeline-view"]')).toBeNull();
+    expect(container.querySelector('[data-testid="task-board-view"]')).toBeNull();
+  });
+
+  it("renders the timeline view directly from state", () => {
+    useGroupTasksTabStateMock.mockReturnValue(buildDefaultState({
+      taskView: "timeline",
+    }));
+
+    renderComponent();
+    expect(screen.getByTestId("task-timeline-view")).toBeInTheDocument();
   });
 });

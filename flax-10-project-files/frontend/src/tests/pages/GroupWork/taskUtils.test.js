@@ -80,6 +80,10 @@ describe('taskUtils – getDeadlineLabel', () => {
   it('returns "Past due" for past dates', () => {
     expect(getDeadlineLabel('2000-01-01')).toBe('Past due');
   });
+
+  it('returns a locale date string for far future deadlines', () => {
+    expect(getDeadlineLabel('2099-01-01')).toMatch(/\d{1,2}\/\d{1,2}\/\d{4}/);
+  });
 });
 
 describe('taskUtils – sortTasks', () => {
@@ -99,5 +103,14 @@ describe('taskUtils – sortTasks', () => {
     ];
     const sorted = sortTasks(tasks);
     expect(sorted[0].priority).toBe('urgent');
+  });
+
+  it('uses created_at as a final tie breaker', () => {
+    const tasks = [
+      { completed: false, priority: 'medium', created_at: '2026-01-02' },
+      { completed: false, priority: 'medium', created_at: '2026-01-01' },
+    ];
+    const sorted = sortTasks(tasks);
+    expect(sorted[0].created_at).toBe('2026-01-01');
   });
 });

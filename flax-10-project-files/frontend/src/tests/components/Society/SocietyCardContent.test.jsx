@@ -58,10 +58,8 @@ describe("SocietyCardContent", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "" })).toHaveAttribute("href", "/societies?id=5");
+    expect(screen.getByRole("link", { name: /1 task/ })).toHaveAttribute("href", "/tasks?society=");
     expect(screen.getByText(/1 event/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "" })).toHaveAttribute("href", "/societies?id=5");
-    expect(screen.getByRole("link", { name: "" }).nextSibling).toBeTruthy();
   });
 
   it("hides related links when counts are non-positive or missing", () => {
@@ -89,5 +87,18 @@ describe("SocietyCardContent", () => {
 
     expect(screen.queryByText(/event/)).not.toBeInTheDocument();
     expect(screen.getByText(/1 task/)).toBeInTheDocument();
+  });
+
+  it("falls back to a missing task count when no task totals are provided", () => {
+    render(
+      <SocietyCardContent
+        society={{ ...society, upcoming_events_count: 2, related_tasks_count: null, tasks_count: undefined }}
+        hasImage
+        RatifiedBadge={null}
+      />,
+    );
+
+    expect(screen.getByText(/2 events/)).toBeInTheDocument();
+    expect(screen.queryByText(/task/)).not.toBeInTheDocument();
   });
 });
