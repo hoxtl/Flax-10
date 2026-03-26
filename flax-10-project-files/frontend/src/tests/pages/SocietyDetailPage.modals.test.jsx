@@ -1,13 +1,11 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createSocietyDetailPageData, createSocietyDetailPageInteractiveOverrides, renderSocietyDetailPage } from "./societyDetailPageTestUtils.jsx";
-
-const useSocietyPageDataMock = vi.fn();
-
-vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
-  useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
-  useSocietyInit: vi.fn(),
-}));
+import {
+  createSocietyDetailPageData,
+  createSocietyDetailPageInteractiveOverrides,
+  renderSocietyDetailPage,
+  societyDetailPageStateMocks,
+} from "./societyDetailPageTestUtils.jsx";
 
 import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
@@ -18,9 +16,24 @@ function renderInteractivePage(overrides = {}, props = {}) {
     modals: { ...baseOverrides.modals, ...overrides.modals },
     society: { ...baseOverrides.society, ...overrides.society },
   });
-  useSocietyPageDataMock.mockReturnValue(data);
+  societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(data);
   renderSocietyDetailPage(<SocietyDetailPage societyId={1} {...props} />);
   return data;
+}
+
+function buildEditModeData({ editMode, publishChanges }) {
+  return createSocietyDetailPageData({
+    modals: {
+      editMode,
+      setEditMode: vi.fn(),
+    },
+    tracker: {
+      hasChanges: vi.fn(() => true),
+      getChangeSummary: vi.fn(() => ["updated-announcement"]),
+      resetChanges: vi.fn(),
+    },
+    publishChanges,
+  });
 }
 
 function clickByText(text) {
@@ -97,19 +110,8 @@ describe("SocietyDetailPage Modals", () => {
   });
 
   it("publishes tracked changes before leaving edit mode", async () => {
-    const data = createSocietyDetailPageData({
-      modals: {
-        editMode: true,
-        setEditMode: vi.fn(),
-      },
-      tracker: {
-        hasChanges: vi.fn(() => true),
-        getChangeSummary: vi.fn(() => ["updated-announcement"]),
-        resetChanges: vi.fn(),
-      },
-      publishChanges: vi.fn().mockResolvedValue({}),
-    });
-    useSocietyPageDataMock.mockReturnValue(data);
+    const data = buildEditModeData({ editMode: true, publishChanges: vi.fn().mockResolvedValue({}) });
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(data);
 
     renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
 
@@ -121,19 +123,8 @@ describe("SocietyDetailPage Modals", () => {
   });
 
   it("toggles edit mode without publishing when it is not already editing", () => {
-    const data = createSocietyDetailPageData({
-      modals: {
-        editMode: false,
-        setEditMode: vi.fn(),
-      },
-      tracker: {
-        hasChanges: vi.fn(() => true),
-        getChangeSummary: vi.fn(() => ["updated-announcement"]),
-        resetChanges: vi.fn(),
-      },
-      publishChanges: vi.fn(),
-    });
-    useSocietyPageDataMock.mockReturnValue(data);
+    const data = buildEditModeData({ editMode: false, publishChanges: vi.fn() });
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(data);
 
     renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
     fireEvent.click(screen.getByText("toggle-edit-mode"));

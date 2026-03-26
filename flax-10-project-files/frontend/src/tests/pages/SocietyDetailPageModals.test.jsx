@@ -1,13 +1,10 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createSocietyDetailPageData, renderSocietyDetailPage } from "./societyDetailPageTestUtils.jsx";
-
-const useSocietyPageDataMock = vi.fn();
-
-vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
-  useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
-  useSocietyInit: vi.fn(),
-}));
+import {
+  createSocietyDetailPageData,
+  renderSocietyDetailPage,
+  societyDetailPageStateMocks,
+} from "./societyDetailPageTestUtils.jsx";
 
 import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
@@ -67,7 +64,7 @@ describe("SocietyDetailPage modal props", () => {
   });
 
   it("passes the expected image, member, and announcement data into open modals", () => {
-    useSocietyPageDataMock.mockReturnValue(buildData());
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(buildData());
     renderSocietyDetailPage(<SocietyDetailPage societyId={55} onBack={vi.fn()} />);
 
     expect(screen.getByTestId("settings-modal")).toHaveTextContent("2");
@@ -83,7 +80,7 @@ describe("SocietyDetailPage modal props", () => {
   });
 
   it("marks member directory as non-admin when the society role is not elevated", () => {
-    useSocietyPageDataMock.mockReturnValue(buildData({
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(buildData({
       society: { role: "member", is_admin: false },
     }));
 

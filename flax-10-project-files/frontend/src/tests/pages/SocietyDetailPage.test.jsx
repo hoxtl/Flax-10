@@ -1,14 +1,10 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createSocietyDetailPageData, renderSocietyDetailPage } from "./societyDetailPageTestUtils.jsx";
-
-const useSocietyPageDataMock = vi.fn();
-const useSocietyInitMock = vi.fn();
-
-vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
-  useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
-  useSocietyInit: (...args) => useSocietyInitMock(...args),
-}));
+import {
+  createSocietyDetailPageData,
+  renderSocietyDetailPage,
+  societyDetailPageStateMocks,
+} from "./societyDetailPageTestUtils.jsx";
 
 import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
@@ -25,15 +21,15 @@ describe("SocietyDetailPage", () => {
     const data = createSocietyDetailPageData({
       page: { focusAnnouncementId: "42" },
     });
-    useSocietyPageDataMock.mockReturnValue(data);
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(data);
 
     renderSocietyDetailPage(
       <SocietyDetailPage societyId={1} initialTab="about" onMembershipChange={vi.fn()} />,
       { routeState: { activeTab: "members" } },
     );
 
-    expect(useSocietyPageDataMock).toHaveBeenCalledWith(1, "about", expect.any(Function));
-    expect(useSocietyInitMock).toHaveBeenCalledWith("members");
+    expect(societyDetailPageStateMocks.useSocietyPageDataMock).toHaveBeenCalledWith(1, "about", expect.any(Function));
+    expect(societyDetailPageStateMocks.useSocietyInitMock).toHaveBeenCalledWith("members");
     expect(screen.getByTestId("hero")).toHaveTextContent("Robotics Society");
     expect(screen.getByTestId("info")).toBeInTheDocument();
     expect(screen.getByTestId("tabs")).toHaveTextContent("42");
@@ -41,7 +37,7 @@ describe("SocietyDetailPage", () => {
   });
 
   it("renders loading and not-found states", () => {
-    useSocietyPageDataMock.mockReturnValueOnce(createSocietyDetailPageData({ loading: true }));
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValueOnce(createSocietyDetailPageData({ loading: true }));
     const { unmount } = renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
 
@@ -49,7 +45,7 @@ describe("SocietyDetailPage", () => {
     unmount();
     const notFoundData = createSocietyDetailPageData();
     notFoundData.society = null;
-    useSocietyPageDataMock.mockReturnValue(notFoundData);
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(notFoundData);
     renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={onBack} />);
 
     expect(screen.getByText("Society not found.")).toBeInTheDocument();
@@ -59,7 +55,7 @@ describe("SocietyDetailPage", () => {
 
   it("opens the report and settings flows for admins", () => {
     const adminData = createSocietyDetailPageData();
-    useSocietyPageDataMock.mockReturnValue(adminData);
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(adminData);
     renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
 
     fireEvent.click(screen.getByTitle("Report Society"));
@@ -72,7 +68,7 @@ describe("SocietyDetailPage", () => {
     const memberData = createSocietyDetailPageData({
       society: { role: "member", is_admin: false, has_reported: true },
     });
-    useSocietyPageDataMock.mockReturnValue(memberData);
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(memberData);
     renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
 
     expect(screen.queryByTitle("Settings")).not.toBeInTheDocument();

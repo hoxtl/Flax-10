@@ -2,6 +2,13 @@ import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 
+const societyDetailPageStateMocks = vi.hoisted(() => ({
+  useSocietyPageDataMock: vi.fn(),
+  useSocietyInitMock: vi.fn(),
+}));
+
+export { societyDetailPageStateMocks };
+
 const createSocietyDefaults = (overrides = {}) => ({
   id: 1,
   name: "Robotics Society",
@@ -187,6 +194,11 @@ export function BackButtonMock({ onClick, label }) {
 export function SocietySkeletonMock() {
   return <div>Loading...</div>;
 }
+
+vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
+  useSocietyPageData: (...args) => societyDetailPageStateMocks.useSocietyPageDataMock(...args),
+  useSocietyInit: (...args) => societyDetailPageStateMocks.useSocietyInitMock(...args),
+}));
 
 vi.mock("../../components/Society/SocietyDetail/SocietyHero", () => ({ default: SocietyHeroMock }));
 vi.mock("../../components/Society/SocietyDetail/SocietyInfo", () => ({ default: SocietyInfoMock }));
