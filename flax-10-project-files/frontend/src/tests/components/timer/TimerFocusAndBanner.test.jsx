@@ -1,5 +1,8 @@
-import React from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+/**
+ * Covers Timer focus animation and TodayBanner support hooks.
+ */
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
 import * as todayBannerDataModule from "../../../components/Timer/todayBanner/useTodayBannerData";
 import * as focusCanvasModule from "../../../components/Timer/focusAnimation/useFocusCanvasAnimation";
@@ -7,7 +10,6 @@ import * as focusCanvasModule from "../../../components/Timer/focusAnimation/use
 const getSummary = vi.fn();
 const getNearestMilestone = vi.fn();
 const listenToTimerHistoryEvents = vi.fn();
-const useFocusCanvasAnimation = vi.fn();
 
 vi.mock("../../../api/analyticsApi", () => ({
   default: { getSummary: (...args) => getSummary(...args) },
@@ -49,27 +51,20 @@ import { useTodayBannerData } from "../../../components/Timer/todayBanner/useTod
 import TodayBanner from "../../../components/Timer/TodayBanner";
 import FocusAnimation from "../../../components/Timer/FocusAnimation";
 
+const canvasMethodNames = ["clearRect", "fillRect", "beginPath", "arc", "fill", "save", "restore", "translate", "rotate", "moveTo", "lineTo", "stroke"];
+
+const createCanvasContext = () => ({
+  ...Object.fromEntries(canvasMethodNames.map((name) => [name, vi.fn()])),
+  createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+  globalCompositeOperation: "",
+  globalAlpha: 1,
+  lineWidth: 1,
+  fillStyle: "",
+  strokeStyle: "",
+});
+
 const stubCanvasContext = () => {
-  const context = {
-    clearRect: vi.fn(),
-    fillRect: vi.fn(),
-    beginPath: vi.fn(),
-    arc: vi.fn(),
-    fill: vi.fn(),
-    save: vi.fn(),
-    restore: vi.fn(),
-    translate: vi.fn(),
-    rotate: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    stroke: vi.fn(),
-    createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
-    globalCompositeOperation: "",
-    globalAlpha: 1,
-    lineWidth: 1,
-    fillStyle: "",
-    strokeStyle: "",
-  };
+  const context = createCanvasContext();
   HTMLCanvasElement.prototype.getContext = vi.fn(() => context);
   return context;
 };

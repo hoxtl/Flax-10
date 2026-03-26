@@ -1,3 +1,7 @@
+/**
+ * Covers ReadingsPanel empty, modal, and urgency branches.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
@@ -123,6 +127,12 @@ const readings = [
   },
 ];
 
+const edgeReadings = [
+  { id: 9, title: null, module_name: "Philosophy" },
+  { id: 10, title: "History: Intro", module_name: "History" },
+  { id: 11, title: "No due date" },
+];
+
 describe("ReadingsPanel coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -136,23 +146,6 @@ describe("ReadingsPanel coverage", () => {
   });
 
   it("handles undefined readings and falls back for missing metadata", async () => {
-    const edgeReadings = [
-      {
-        id: 9,
-        title: null,
-        module_name: "Philosophy",
-      },
-      {
-        id: 10,
-        title: "History: Intro",
-        module_name: "History",
-      },
-      {
-        id: 11,
-        title: "No due date",
-      },
-    ];
-
     const { rerender } = render(<ReadingsPanel readings={undefined} onReadingAdded={vi.fn()} />);
     expect(screen.getByText("No readings assigned")).toBeInTheDocument();
 

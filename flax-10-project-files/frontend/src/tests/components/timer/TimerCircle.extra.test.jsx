@@ -1,6 +1,11 @@
+/**
+ * Covers TimerCircle controls, styling, and TimerRing rendering.
+ */
+
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { createFnMap } from '../../utils/factoryUtils';
 
 // ---------------------------------------------------------------------------
 // CSS module mocks
@@ -49,25 +54,16 @@ import FocusAnimation from '../../../components/Timer/FocusAnimation';
 // ---------------------------------------------------------------------------
 // Helper timer state
 // ---------------------------------------------------------------------------
+const timerActionNames = ['setIsActive', 'togglePause', 'resetTimer', 'setModal'];
+const baseTimerProps = {
+  mode: 'work', workTime: 25, breakTime: 5, timeLeft: 1500, progress: 50,
+  isActive: false, isPaused: false, isOvertime: false, isBreakOvertime: false,
+  completedSessions: 0, targetSessions: 4, blockTotalWork: 0, blockTotalBreak: 0, totalPaused: 0,
+};
+
 const makeT = (overrides = {}) => ({
-  mode: 'work',
-  workTime: 25,
-  breakTime: 5,
-  timeLeft: 1500,
-  progress: 50,
-  isActive: false,
-  isPaused: false,
-  isOvertime: false,
-  isBreakOvertime: false,
-  completedSessions: 0,
-  targetSessions: 4,
-  blockTotalWork: 0,
-  blockTotalBreak: 0,
-  totalPaused: 0,
-  setIsActive: vi.fn(),
-  togglePause: vi.fn(),
-  resetTimer: vi.fn(),
-  setModal: vi.fn(),
+  ...baseTimerProps,
+  ...createFnMap(timerActionNames),
   ...overrides,
 });
 

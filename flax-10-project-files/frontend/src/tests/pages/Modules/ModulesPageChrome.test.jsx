@@ -1,6 +1,12 @@
+/**
+ * Covers ModulesPageChrome view switching and modal wiring.
+ */
+
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+
+import { createFnMap } from "../utils/factoryUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -62,28 +68,23 @@ import {
   TestModeContent,
 } from "../../../pages/Modules/ModulesPageChrome";
 
+const buildHookState = (overrides = {}) => ({
+  enrollments: [],
+  ...createFnMap(["handleModuleCreated", "handleModuleUpdated", "handleEnrollment", "handleDisenrol"]),
+  ...overrides,
+});
+
 function buildState(overrides = {}) {
+  const { hook, ...rest } = overrides;
   return {
-    hook: {
-      handleModuleCreated: vi.fn(),
-      handleModuleUpdated: vi.fn(),
-      handleEnrollment: vi.fn(),
-      handleDisenrol: vi.fn(),
-      enrollments: [],
-      ...overrides.hook,
-    },
+    hook: buildHookState(hook),
     editingModule: null,
     viewingModule: { id: 1, module_code: "CS101", module_name: "Intro" },
     showForm: false,
-    setShowForm: vi.fn(),
-    setEditingModule: vi.fn(),
-    setViewingModule: vi.fn(),
-    setSearchQuery: vi.fn(),
     deadlineModule: null,
-    setDeadlineModule: vi.fn(),
     readingModule: null,
-    setReadingModule: vi.fn(),
-    ...overrides,
+    ...createFnMap(["setShowForm", "setEditingModule", "setViewingModule", "setSearchQuery", "setDeadlineModule", "setReadingModule"]),
+    ...rest,
   };
 }
 

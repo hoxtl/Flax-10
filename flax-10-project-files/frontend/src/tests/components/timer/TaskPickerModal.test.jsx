@@ -1,6 +1,12 @@
+/**
+ * Covers TaskPickerModal open, loading, and filter states.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '../../../utils/test-utils';
 import { TaskPickerModal } from '../../../components/Timer/taskInput/TaskPickerModal';
+
+import { createFnMap } from '../../utils/factoryUtils';
 
 vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
 
@@ -63,34 +69,33 @@ vi.mock('../../../components/Timer/taskInput/taskInputConstants', () => ({
   ],
 }));
 
-const makeState = (overrides = {}) => ({
+const taskPickerActionNames = ['setSearch', 'setSortBy', 'setIsFilterOpen', 'setActiveFilterTab', 'setFilterQuery', 'setFilterListIds', 'setFilterModuleCodes', 'loadTasks', 'setOpen'];
+const defaultFilteredTasks = [
+  { id: 1, title: 'Task One' },
+  { id: 2, title: 'Task Two' },
+];
+
+const baseTaskPickerState = {
   open: true,
   loading: false,
   search: '',
-  setSearch: vi.fn(),
   sortBy: 'urgency',
-  setSortBy: vi.fn(),
   isFilterOpen: false,
-  setIsFilterOpen: vi.fn(),
   activeFilterTab: 'lists',
-  setActiveFilterTab: vi.fn(),
   filterQuery: '',
-  setFilterQuery: vi.fn(),
   visibleListItems: [],
   filterListIds: [],
-  setFilterListIds: vi.fn(),
   groupedModuleItems: {},
   moduleGroupKeys: [],
   filterModuleCodes: [],
-  setFilterModuleCodes: vi.fn(),
-  filteredTasks: [
-    { id: 1, title: 'Task One' },
-    { id: 2, title: 'Task Two' },
-  ],
+  filteredTasks: defaultFilteredTasks,
   selectedTaskId: null,
   recommendedTaskId: null,
-  loadTasks: vi.fn(),
-  setOpen: vi.fn(),
+};
+
+const makeState = (overrides = {}) => ({
+  ...baseTaskPickerState,
+  ...createFnMap(taskPickerActionNames),
   ...overrides,
 });
 
