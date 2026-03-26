@@ -1,8 +1,10 @@
+"""Tests for society seed helper behaviour."""
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from studyFlax.fixtures.society_fixtures import _join_tags, _normalise_phrase
-from studyFlax.management.commands.seed_societies import _ensure_seed_membership
+from studyFlax.fixtures.societies.society_fixtures import _join_tags, _normalise_phrase
+from studyFlax.management.commands.seed_support.content.societies import _ensure_seed_membership
 from studyFlax.models.society import SocietyCalendarSync, SocietyMembership
 from studyFlax.tests.helpers.factories import make_society
 
