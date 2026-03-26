@@ -9,6 +9,8 @@ import Profile from '../../../pages/Profile/Profile';
 
 import { createFnMap } from '../../utils/testBuilderUtils';
 
+const useAuthMock = vi.fn();
+
 // Mock hooks
 vi.mock('../../../pages/Profile/hooks/useProfile', () => ({
   useProfileState: vi.fn(),
@@ -26,13 +28,7 @@ vi.mock('../../../pages/Profile/hooks/useProfileVisibility', () => ({
 
 // ProfileHome uses AuthContext's useAuth().
 vi.mock('../../../context/AuthContext', () => ({
-  useAuth: () => ({
-    profile: { modules: [] },
-    loading: false,
-    authenticated: true,
-    user: { role: 'student' },
-    refreshProfile: vi.fn(),
-  }),
+  useAuth: () => useAuthMock(),
 }));
 
 // StudyHeatmap + other analytics widgets depend on ThemeProvider via useTheme().
@@ -142,6 +138,13 @@ const makeHeatmap = () => ({
 describe('Profile', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    useAuthMock.mockReturnValue({
+      profile: { modules: [] },
+      loading: false,
+      authenticated: true,
+      user: { role: 'student' },
+      refreshProfile: vi.fn(),
+    });
 
     // Set up default mock implementations
     useProfileState.mockReturnValue(makeProfileState());
@@ -233,6 +236,40 @@ describe('Profile', () => {
     renderProfile({ user: defaultUser, viewedUserId: 1 });
 
     expect((await screen.findAllByText('alice')).length).toBeGreaterThan(0);
+  });
+
+  it('falls back to empty auth modules and empty shared events when they are missing', async () => {
+    useAuthMock.mockReturnValue({
+      profile: null,
+      loading: false,
+      authenticated: true,
+      user: { role: 'student' },
+      refreshProfile: vi.fn(),
+    });
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, is_shared_with_me: true },
+      viewedUserId: 2,
+      filteredEvents: undefined,
+    }));
+    useProfileBodyData.mockReturnValue({
+      modules: undefined,
+      upcomingEventCount: 0,
+      filteredEvents: undefined,
+    });
+    useProfileVisibility.mockReturnValue({
+      ...defaultVisibility,
+      isSelf: false,
+      canEditProfile: false,
+      canViewCalendar: true,
+      canViewAnalytics: false,
+      canViewModules: true,
+      canViewSharedWith: false,
+    });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+
+    expect(await screen.findByText('SHARED CALENDAR')).toBeInTheDocument();
+    expect(screen.getByTestId('profile-calendar')).toBeTruthy();
   });
 
   it('falls back to onNavChange when onNavigate is missing', async () => {

@@ -214,6 +214,22 @@ describe('ProfileModals', () => {
         expect(setShowModules).toHaveBeenCalledWith(false);
     });
 
+    it('modules modal still closes when navigation is unavailable', () => {
+        const setShowModules = vi.fn();
+        render(
+            <ProfileModals
+                user={defaultUser}
+                state={makeState({ showModules: true, setShowModules })}
+                modules={defaultModules}
+                filteredEvents={defaultEvents}
+                visibility={defaultVisibility}
+                onNavChange={undefined}
+            />
+        );
+        fireEvent.click(screen.getByText('CS101'));
+        expect(setShowModules).toHaveBeenCalledWith(false);
+    });
+
     it('renders Shared By modal when showSharedBy is true', async () => {
         const { getSharedWithMe } = await import('../../../api/socialApi');
         getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol' }]);
@@ -318,6 +334,17 @@ describe('ProfileModals', () => {
         expect(onNavChange).toHaveBeenCalledWith('/calendar?user_id=3&shared_name=Shared+user');
     });
 
+    it('uses the username when the shared calendar owner has no names', async () => {
+        const onNavChange = vi.fn();
+        const { getSharedWithMe } = await import('../../../api/socialApi');
+        getSharedWithMe.mockResolvedValue([{ id: 3, username: 'anonymous' }]);
+
+        renderModals({ state: { showSharedBy: true }, onNavChange });
+        await waitFor(() => expect(screen.getByRole('button', { name: /view calendar/i })).toBeInTheDocument());
+        fireEvent.click(screen.getByRole('button', { name: /view calendar/i }));
+        expect(onNavChange).toHaveBeenCalledWith('/calendar?user_id=3&shared_name=anonymous');
+    });
+
     it('falls back to the plain calendar route when a shared user has no id', async () => {
         const onNavChange = vi.fn();
         const { getSharedWithMe } = await import('../../../api/socialApi');
@@ -342,7 +369,7 @@ describe('ProfileModals', () => {
             loading: false,
             tasks: [
                 { id: 1, title: 'Essay draft', due_date: '2026-03-25T10:00:00Z', task_list_name: 'Seminar prep' },
-                { id: 2, title: 'Reading notes', due_date: null, module_code: 'CS101' },
+                { title: 'Reading notes', due_date: null, list_name: 'Reading list' },
             ],
         });
 
@@ -352,7 +379,28 @@ describe('ProfileModals', () => {
         expect(screen.getByText('Reading notes')).toBeTruthy();
         expect(screen.getAllByText(/Seminar prep/).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/No due date/).length).toBeGreaterThan(0);
-        expect(screen.getAllByText(/CS101/).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Reading list/).length).toBeGreaterThan(0);
+    });
+
+    it('uses the current user id when shared lists open without profileData', async () => {
+        const onNavChange = vi.fn();
+        const { getSharingWith } = await import('../../../api/socialApi');
+        getSharingWith.mockResolvedValue([{ id: 2, username: 'bob' }]);
+
+        render(
+            <ProfileModals
+                user={{ id: 9, username: 'alice' }}
+                state={makeState({ profileData: null, showSharedWith: true })}
+                modules={defaultModules}
+                filteredEvents={defaultEvents}
+                visibility={defaultVisibility}
+                onNavChange={onNavChange}
+            />
+        );
+
+        await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
+        fireEvent.click(screen.getByText('bob'));
+        expect(onNavChange).toHaveBeenCalledWith('profile_2');
     });
 
     it('renders SocietiesModal items and navigates to profiles and society pages', () => {

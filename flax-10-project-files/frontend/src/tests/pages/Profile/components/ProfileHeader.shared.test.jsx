@@ -187,6 +187,20 @@ describe("ProfileHeader shared-profile extras", () => {
     expect(screen.getAllByText("Department: Teaching staff").length).toBeGreaterThan(0);
   });
 
+  it("uses the teaching staff fallback when a teacher has no major at all", () => {
+    render(
+      <ProfileHeader
+        user={{ role: "teacher" }}
+        profileData={{ name: "Dr. Ada Lovelace" }}
+        handlers={handlers}
+        visibility={{ canEditProfile: true }}
+      />
+    );
+
+    expect(screen.getAllByText("Professor").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Department: Teaching staff").length).toBeGreaterThan(0);
+  });
+
   it("hides the shared-calendar pill when the shared profile has no navigation target", () => {
     render(
       <ProfileHeader
