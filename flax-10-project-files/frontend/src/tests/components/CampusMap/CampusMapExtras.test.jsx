@@ -59,6 +59,21 @@ describe("DestinationSection & LocationChip", () => {
     expect(screen.getAllByText("Strand").length).toBeGreaterThan(0);
   });
 
+  it("marks the selected campus button as active", () => {
+    const { rerender } = render(<DestinationSection {...base} />);
+    const inactiveClassName = screen.getByRole("button", { name: /Strand/i }).className;
+
+    rerender(
+      <DestinationSection
+        {...base}
+        selectedCampus={{ id: "strand", name: "Strand Campus", address: "Strand", color: "#e63f3f" }}
+      />
+    );
+
+    const activeClassName = screen.getByRole("button", { name: /Strand/i }).className;
+    expect(activeClassName).not.toBe(inactiveClassName);
+  });
+
   it("renders custom destinations and upcoming events with fallback labels", () => {
     const onSelectEvent = vi.fn();
     const onClearCustomDest = vi.fn();
@@ -82,6 +97,17 @@ describe("DestinationSection & LocationChip", () => {
     expect(onClearCustomDest).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Library")).toBeTruthy();
     expect(screen.getByText("1 King’s Way")).toBeTruthy();
+  });
+
+  it("uses stable event ids when rendering upcoming events", () => {
+    render(
+      <DestinationSection
+        {...base}
+        upcomingEvents={[{ id: "event-1", title: "Open Day", location: "Bush House", start_time: "2026-03-26T10:15:00Z" }]}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: /Open Day/i })).toBeTruthy();
   });
 
   it("does not require an onSelectEvent handler", () => {

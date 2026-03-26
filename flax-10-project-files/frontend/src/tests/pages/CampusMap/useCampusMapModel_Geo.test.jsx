@@ -65,6 +65,18 @@ describe("useCampusMapModel - Geolocation", () => {
     expect(mockState.form.manualStart).toBe("Student Union");
   });
 
+  it("falls back to coordinate text when start reverse geocoding returns nothing", async () => {
+    let successCb;
+    global.navigator.geolocation.getCurrentPosition.mockImplementation((s) => { successCb = s; });
+    reverseGeocodeMock.mockResolvedValue(null);
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper });
+
+    act(() => { result.current.handleGeolocateStart(); });
+    await act(async () => { await successCb({ coords: { latitude: 51.53, longitude: -0.14 } }); });
+
+    expect(mockState.form.manualStart).toBe("51.53000, -0.14000");
+  });
+
   it("geolocates custom destination with coordinate fallback", async () => {
     let successCb;
     global.navigator.geolocation.getCurrentPosition.mockImplementation((s) => { successCb = s; });

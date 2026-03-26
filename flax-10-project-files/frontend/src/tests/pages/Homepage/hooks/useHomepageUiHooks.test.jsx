@@ -44,6 +44,40 @@ describe("Homepage UI hooks", () => {
     expect(third.result.current).toBeNull();
   });
 
+  it("returns null when there is no stored user or no usable name fields", () => {
+    const noneStored = renderHook(() => useHomepageDisplayName());
+    expect(noneStored.result.current).toBeNull();
+
+    localStorage.setItem("user", JSON.stringify({ first_name: "   ", username: "   " }));
+    const blankStored = renderHook(() => useHomepageDisplayName());
+    expect(blankStored.result.current).toBeNull();
+  });
+
+  it("replaces an existing fallback timer when a new toast is shown", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useHomepageToast(null));
+
+    act(() => {
+      result.current.showToast("First", { durationMs: 25 });
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(20);
+      result.current.showToast("Second", { durationMs: 25 });
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(10);
+    });
+    expect(result.current.fallbackToast?.message).toBe("Second");
+
+    act(() => {
+      vi.advanceTimersByTime(15);
+    });
+    expect(result.current.fallbackToast).toBeNull();
+    vi.useRealTimers();
+  });
+
   it("uses the provided toast function directly when available", () => {
     const toastFn = vi.fn();
     const { result } = renderHook(() => useHomepageToast(toastFn));

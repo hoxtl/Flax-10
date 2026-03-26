@@ -86,6 +86,19 @@ describe("useCampusMapModel - Initialisation", () => {
     expect(secondMarker.togglePopup).toHaveBeenCalled();
   });
 
+  it("toggles the clicked marker once when its popup is already open", () => {
+    mockRefs.map.current = null;
+    renderHook(() => useCampusMapModel(), { wrapper });
+    const handleCampusSelect = handleMapLoadMock.mock.calls[0][1];
+    const clickedMarker = { getPopup: vi.fn(() => ({ isOpen: vi.fn(() => true) })), togglePopup: vi.fn() };
+
+    act(() => {
+      handleCampusSelect({ id: "waterloo" }, [clickedMarker], clickedMarker);
+    });
+
+    expect(clickedMarker.togglePopup).toHaveBeenCalledTimes(1);
+  });
+
   it("updates selection and form state via handlers", () => {
     const campus = { name: "Strand", coords: [0, 0] };
     const { result } = renderHook(() => useCampusMapModel(), { wrapper });

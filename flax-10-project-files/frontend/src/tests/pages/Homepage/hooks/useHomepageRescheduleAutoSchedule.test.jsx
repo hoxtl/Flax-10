@@ -177,4 +177,74 @@ describe("useHomepageReschedule auto-schedule branches", () => {
     expect(props.refetchTasks).toHaveBeenCalled();
     expect(result.current.autoScheduleLoading).toBe(false);
   });
+
+  it("clears loading when auto schedule submission fails after validation passes", async () => {
+    submitAutoScheduleWithPrefsMock.mockRejectedValueOnce(new Error("nope"));
+    const props = buildProps({
+      sortedEvents: [
+        {
+          id: "class",
+          start_time: "2026-03-24T10:00:00.000Z",
+          end_time: "2026-03-24T11:00:00.000Z",
+        },
+      ],
+    });
+
+    const { result } = renderHook(() => useHomepageReschedule(props));
+
+    await expect(act(async () => {
+      await result.current.handleAutoSchedule();
+    })).rejects.toThrow("nope");
+
+    expect(result.current.autoScheduleLoading).toBe(false);
+  });
+
+  it("allows auto schedule to proceed when deadline prefs are empty or zero", async () => {
+    buildScheduleAutoFormMock.mockReturnValue({
+      deadline_preferences: [{ ideal_minutes_per_day: 0 }, {}],
+    });
+    const props = buildProps({
+      sortedEvents: [
+        {
+          id: "class",
+          start_time: "2026-03-24T10:00:00.000Z",
+          end_time: "2026-03-24T11:00:00.000Z",
+        },
+      ],
+    });
+
+    const { result } = renderHook(() => useHomepageReschedule(props));
+
+    await act(async () => {
+      await result.current.handleAutoSchedule();
+    });
+
+    expect(loadScheduleSettingsMock).toHaveBeenCalled();
+    expect(submitAutoScheduleWithPrefsMock).toHaveBeenCalled();
+    expect(result.current.autoScheduleLoading).toBe(false);
+  });
+
+  it("allows a positive study block to fit into an available window", async () => {
+    buildScheduleAutoFormMock.mockReturnValue({
+      deadline_preferences: [{ ideal_minutes_per_day: 30 }],
+    });
+    const props = buildProps({
+      sortedEvents: [
+        {
+          id: "class",
+          start_time: "2026-03-24T10:00:00.000Z",
+          end_time: "2026-03-24T11:00:00.000Z",
+        },
+      ],
+    });
+
+    const { result } = renderHook(() => useHomepageReschedule(props));
+
+    await act(async () => {
+      await result.current.handleAutoSchedule();
+    });
+
+    expect(loadScheduleSettingsMock).toHaveBeenCalled();
+    expect(submitAutoScheduleWithPrefsMock).toHaveBeenCalled();
+  });
 });

@@ -76,6 +76,16 @@ describe("CampusMap hooks", () => {
     expect(result.current.ui.mobileInitialOpen).toBe(true);
   });
 
+  it("useCampusMapState marks narrow viewports as mobile", async () => {
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 700 });
+    vi.resetModules();
+
+    const { useCampusMapState: useCampusMapStateFresh } = await import("../../../pages/CampusMap/hooks/useCampusMapState");
+    const { result } = renderHook(() => useCampusMapStateFresh());
+
+    expect(result.current.ui.isMobile).toBe(true);
+  });
+
   it("useDisruptions loads initial disruption data", async () => {
     tflService.getTfLDelays.mockResolvedValueOnce([{ id: 1, name: "C" }]);
     const { result } = renderHook(() => useDisruptions());

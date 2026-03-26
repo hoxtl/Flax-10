@@ -152,12 +152,13 @@ describe("useCampusMapModel - extras", () => {
     const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
 
     act(() => {
+      result.current.handleSelectUpcomingEvent({ title: "Missing location" });
       result.current.handleSelectUpcomingEvent({ location: "   ", title: "Ignore me" });
     });
     expect(geocodeAddressMock).not.toHaveBeenCalled();
 
     act(() => {
-      result.current.handleSelectUpcomingEvent({ location: "Waterloo Campus", title: "Revision Session" });
+      result.current.handleSelectUpcomingEvent({ location: "Waterloo Campus" });
     });
 
     await flushEffects();
@@ -167,8 +168,27 @@ describe("useCampusMapModel - extras", () => {
       address: "Waterloo Campus",
       lat: 51.49,
       lng: -0.09,
-      name: "Revision Session",
+      name: "Waterloo Campus",
     });
+  });
+
+  it("drops late upcoming-event results after unmount", async () => {
+    let resolveEvents;
+    getEventsMock.mockReturnValueOnce(new Promise((resolve) => {
+      resolveEvents = resolve;
+    }));
+
+    const { unmount } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
+
+    unmount();
+
+    await act(async () => {
+      resolveEvents([{ id: "late", location: "A", start_time: "2026-03-26T09:05:00.000Z" }]);
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(geocodeAddressMock).not.toHaveBeenCalled();
   });
 
   it("resets route info and shows the initial skeleton while the map is still booting", async () => {
@@ -215,7 +235,7 @@ describe("useCampusMapModel - extras", () => {
     expect(mockState.routes.tflRouteInfo).toBeNull();
   });
 
-  it("clears start and campus selections, manual fields, and marker artifacts", () => {
+  it("clears start and campus selections, manual fields, and marker artifacts", async () => {
     mockState = createMutableState({
       selection: {
         customDestination: { address: "Library", lat: 51.5, lng: -0.1 },
@@ -236,7 +256,7 @@ describe("useCampusMapModel - extras", () => {
     const startPopup = mockRefs.startPopup.current;
     const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
 
-    act(() => {
+    await act(async () => {
       result.current.handleClearStart();
       result.current.handleClearCampus();
     });
@@ -254,7 +274,7 @@ describe("useCampusMapModel - extras", () => {
     expect(mockState.routes.tflRouteInfo).toBeNull();
   });
 
-  it("preserves the selected-campus destination during journey calculation", () => {
+  it("preserves the selected-campus destination during journey calculation", async () => {
     mockState = createMutableState({
       selection: {
         customDestination: { address: "Strand Campus", lat: 51.511, lng: -0.117, name: "Strand Campus" },
@@ -267,7 +287,7 @@ describe("useCampusMapModel - extras", () => {
 
     const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
 
-    act(() => {
+    await act(async () => {
       result.current.handleUserJourneyCalculate(
         { latitude: 51.5, longitude: -0.1 },
         { latitude: 51.52, longitude: -0.13 }
@@ -295,6 +315,7 @@ describe("useCampusMapModel - extras", () => {
       { id: "soon-3", location: "F", start_time: "2026-03-26T09:20:00.000Z" },
       { id: "soon-4", location: "G", start_time: "2026-03-26T09:40:00.000Z" },
       { id: "too-far", location: "H", start_time: "2026-03-26T12:30:00.000Z" },
+      { id: "past-no-end", location: "J", start_time: "2026-03-26T07:00:00.000Z" },
       { id: "past-ended", location: "I", start_time: "2026-03-26T07:00:00.000Z", end_time: "2026-03-26T08:00:00.000Z" },
     ]);
 
@@ -309,6 +330,15 @@ describe("useCampusMapModel - extras", () => {
       "soon-3",
       "soon-4",
     ]);
+  });
+
+  it("treats a null upcoming-events response as an empty list", async () => {
+    getEventsMock.mockResolvedValueOnce(null);
+
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
+
+    await flushEffects();
+    expect(result.current.upcomingEvents).toEqual([]);
   });
 
   it("refreshes upcoming events when the tab becomes visible again", async () => {

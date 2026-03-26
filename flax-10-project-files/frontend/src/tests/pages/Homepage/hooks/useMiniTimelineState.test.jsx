@@ -57,4 +57,24 @@ describe("useMiniTimelineState", () => {
     expect(result.current.conflictPopoverRowId).toBe("row-a");
     expect(result.current.slotPopoverRowId).toBe("row-b");
   });
+
+  it("exposes dismiss callbacks to the popover hooks and clears each row when invoked", () => {
+    const { result } = renderHook(() => useMiniTimelineState());
+
+    act(() => {
+      result.current.setConflictPopoverRowId("row-a");
+      result.current.setSlotPopoverRowId("row-b");
+    });
+
+    const [, , closeConflict] = usePopoverDismissMock.mock.calls[0];
+    const [, , closeSlot] = usePopoverDismissMock.mock.calls[1];
+
+    act(() => {
+      closeConflict();
+      closeSlot();
+    });
+
+    expect(result.current.conflictPopoverRowId).toBeNull();
+    expect(result.current.slotPopoverRowId).toBeNull();
+  });
 });

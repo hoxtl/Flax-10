@@ -105,6 +105,70 @@ describe("UserJourneySection", () => {
     expect(onClearAll).toHaveBeenCalledTimes(1);
   });
 
+  it("renders the destination geolocate control and invokes it", () => {
+    const onGeolocateDestination = vi.fn();
+
+    render(<JourneyHarness onGeolocateDestination={onGeolocateDestination} />);
+
+    expect(screen.getByRole("button", { name: /set start to current location/i })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: /set destination to current location/i }));
+    expect(onGeolocateDestination).toHaveBeenCalled();
+  });
+
+  it("omits the destination geolocate control when the handler is undefined", () => {
+    render(
+      <UserJourneySection
+        manualStart=""
+        setManualStart={vi.fn()}
+        manualDestination=""
+        setManualDestination={vi.fn()}
+        onCalculate={vi.fn()}
+        onClearAll={vi.fn()}
+        onGeolocateStart={vi.fn()}
+        onGeolocateDestination={undefined}
+        locating={false}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: /set start to current location/i })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: /set destination to current location/i })).toBeNull();
+  });
+
+  it("omits the destination geolocate control when no handler is provided", () => {
+    render(<JourneyHarness onGeolocateDestination={null} />);
+
+    expect(screen.getByRole("button", { name: /set start to current location/i })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: /set destination to current location/i })).toBeNull();
+  });
+
+  it("cleans up geocode effects when the section unmounts", async () => {
+    geocodeAddressMock.mockResolvedValueOnce({ latitude: 51.502, longitude: -0.118 }).mockResolvedValueOnce({ latitude: 51.508, longitude: -0.135 });
+
+    const { unmount } = render(<JourneyHarness initialStart="Bush House" initialDestination="Waterloo" />);
+    await waitFor(() => expect(geocodeAddressMock).toHaveBeenCalledTimes(2));
+
+    unmount();
+  });
+
+  it("ignores stale geocode results after the input changes", async () => {
+    let resolveStart;
+    geocodeAddressMock.mockReturnValueOnce(new Promise((resolve) => {
+      resolveStart = resolve;
+    }));
+
+    render(<JourneyHarness initialStart="Bush House" />);
+
+    await waitFor(() => expect(geocodeAddressMock).toHaveBeenCalledWith("Bush House"));
+    fireEvent.change(screen.getByLabelText("Enter a starting location"), { target: { value: "Library" } });
+
+    await act(async () => {
+      resolveStart({ latitude: 51.5, longitude: -0.1 });
+      await Promise.resolve();
+    });
+
+    expect(screen.getByRole("button", { name: /enter both locations/i })).toBeDisabled();
+  });
+
   it("geocodes text input and keeps calculate disabled until both locations resolve", async () => {
     geocodeAddressMock
       .mockResolvedValueOnce({ latitude: 51.502, longitude: -0.118 })
