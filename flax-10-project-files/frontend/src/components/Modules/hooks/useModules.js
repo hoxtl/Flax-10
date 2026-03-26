@@ -70,7 +70,7 @@ function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule,
 
 async function safeRefreshTags(refreshTags) {
   if (!refreshTags) return;
-  await refreshTags().catch(() => {});
+  await refreshTags().catch(() => { });
 }
 
 async function handleEnrollment(module, setEnrollments, notify, refreshTags) {
@@ -142,14 +142,7 @@ export default function useModules() {
   const { refreshTags } = useTags();
   useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, [notify]);
   return useModuleActions(
-    modules,
-    enrollments,
-    loading,
-    setModules,
-    setEnrollments,
-    notify,
-    confirmFn,
-    taskCountsByModule,
-    refreshTags
+    modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn,
+    taskCountsByModule, refreshTags
   );
 }
