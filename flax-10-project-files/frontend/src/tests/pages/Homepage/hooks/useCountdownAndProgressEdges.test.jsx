@@ -68,6 +68,12 @@ describe("useCountdown branches", () => {
     renderHook(() => useCountdown(target));
     act(() => { vi.advanceTimersByTime(5000); });
   });
+
+  it("returns empty text and relaxed urgency once a target is already in the past", () => {
+    const target = new Date(Date.now() - 60000);
+    const { result } = renderHook(() => useCountdown(target));
+    expect(result.current).toEqual({ text: "", urgency: "relaxed" });
+  });
 });
 
 describe("getSemesterProgress branches", () => {

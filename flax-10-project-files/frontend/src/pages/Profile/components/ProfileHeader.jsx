@@ -257,6 +257,7 @@ function HeaderMeta({ user, profileData, handlers, visibility, societies, onSoci
     <>
       <HeaderTitleRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} isShared={isShared} />
       {description && <div className={styles.headerSubline}>{description}</div>}
+      <ContactEmail email={profileData?.email} />
       {!visibility.canEditProfile && <SharedPlanningTip />}
       {isShared && <SharedCalendarActions user={user} route={route} onNavigate={onNavigate} />}
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
@@ -267,7 +268,12 @@ function HeaderMeta({ user, profileData, handlers, visibility, societies, onSoci
 
 function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, visibility }) {
   if (!badges?.length && !persona) return null;
-  return <div className={styles.headerBadgesPersonaRow}>{badges?.length > 0 && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}{persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}</div>;
+  return (
+    <div className={styles.headerBadgesPersonaRow}>
+      <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />
+      <PersonaInlineChip persona={persona} peakHour={peakHour} />
+    </div>
+  );
 }
 
 function DesktopHeader(props) {

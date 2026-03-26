@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProfileCalendar } from '../../../pages/profile/ProfileCalendar';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
+import { isSameMonth } from '../../../components/calendar/utils/dateUtils';
 
 vi.mock('../../../context/CalendarContext', () => ({
     CalendarProvider: ({ children }) => <div data-testid="calendar-provider">{children}</div>,
@@ -28,20 +29,20 @@ vi.mock('../../../components/calendar/EventPopups', () => ({
 }));
 
 vi.mock('../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
-    EventsSummaryModal: ({ isOpen }) => isOpen ? <div data-testid="summary-modal" /> : null,
+    EventsSummaryModal: ({ isOpen, onClose }) => isOpen ? <div data-testid="summary-modal"><button type="button" onClick={onClose}>Close Summary</button></div> : null,
 }));
 
 vi.mock('../../../components/calendar/header/NavigationButtons', () => ({
     NavigationButtons: () => <div data-testid="nav-buttons" />,
 }));
 
-vi.mock('../../../components/calendar/header/calendarHeaderUtils', () => ({
-    CalendarNav: ({ onPrev, onNext, onToday, title }) => (
+vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
+    CalendarNav: ({ onPrev, onNext, onToday, showToday, title }) => (
         <div data-testid="nav-buttons">
             <span>{title}</span>
             <button type="button" onClick={() => onPrev?.()}>Prev</button>
             <button type="button" onClick={() => onNext?.()}>Next</button>
-            <button type="button" onClick={() => onToday?.()}>Today</button>
+            {showToday && <button type="button" onClick={() => onToday?.()}>Today</button>}
         </div>
     ),
 }));
@@ -101,5 +102,26 @@ describe('ProfileCalendar', () => {
         expect(dispatch).toHaveBeenCalled();
         fireEvent.click(screen.getByText('Today'));
         expect(dispatch).toHaveBeenCalled();
+    });
+
+    it('hides the Today shortcut when the selected month already matches today', () => {
+        isSameMonth.mockReturnValueOnce(true);
+
+        render(<ProfileCalendar allEvents={[]} />);
+        expect(screen.queryByText('Today')).toBeNull();
+    });
+
+    it('skips the calendar dispatch effect when the dispatcher is missing', () => {
+        vi.mocked(useCalendarDispatch).mockReturnValueOnce(null);
+
+        render(<ProfileCalendar allEvents={[]} />);
+        expect(screen.getByText('March 2024')).toBeTruthy();
+    });
+
+    it('closes the summary modal when requested', () => {
+        render(<ProfileCalendar allEvents={[]} />);
+        fireEvent.click(screen.getByText('Open day summary'));
+        fireEvent.click(screen.getByText('Close Summary'));
+        expect(screen.queryByTestId('summary-modal')).toBeNull();
     });
 });

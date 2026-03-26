@@ -44,6 +44,40 @@ describe("Homepage UI hooks", () => {
     expect(third.result.current).toBeNull();
   });
 
+  it("returns null when there is no stored user or no usable name fields", () => {
+    const noneStored = renderHook(() => useHomepageDisplayName());
+    expect(noneStored.result.current).toBeNull();
+
+    localStorage.setItem("user", JSON.stringify({ first_name: "   ", username: "   " }));
+    const blankStored = renderHook(() => useHomepageDisplayName());
+    expect(blankStored.result.current).toBeNull();
+  });
+
+  it("replaces an existing fallback timer when a new toast is shown", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useHomepageToast(null));
+
+    act(() => {
+      result.current.showToast("First", { durationMs: 25 });
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(20);
+      result.current.showToast("Second", { durationMs: 25 });
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(10);
+    });
+    expect(result.current.fallbackToast?.message).toBe("Second");
+
+    act(() => {
+      vi.advanceTimersByTime(15);
+    });
+    expect(result.current.fallbackToast).toBeNull();
+    vi.useRealTimers();
+  });
+
   it("uses the provided toast function directly when available", () => {
     const toastFn = vi.fn();
     const { result } = renderHook(() => useHomepageToast(toastFn));
@@ -86,6 +120,46 @@ describe("Homepage UI hooks", () => {
       vi.advanceTimersByTime(25);
     });
 
+    expect(result.current.fallbackToast).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it("normalizes a fallback toast without an action handler and clears on unmount", () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+    const { result, unmount } = renderHook(() => useHomepageToast(null));
+
+    act(() => {
+      result.current.showToast("Draft saved", { actionLabel: "Undo", onAction: "not-a-function" });
+    });
+
+    expect(result.current.fallbackToast).toEqual({
+      message: "Draft saved",
+      actionLabel: "Undo",
+      onAction: null,
+    });
+
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it("uses the default fallback duration when durationMs is not finite", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useHomepageToast(null));
+
+    act(() => {
+      result.current.showToast("Queued", { durationMs: Number.NaN });
+    });
+
+    expect(result.current.fallbackToast?.message).toBe("Queued");
+    act(() => {
+      vi.advanceTimersByTime(3199);
+    });
+    expect(result.current.fallbackToast?.message).toBe("Queued");
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
     expect(result.current.fallbackToast).toBeNull();
     vi.useRealTimers();
   });

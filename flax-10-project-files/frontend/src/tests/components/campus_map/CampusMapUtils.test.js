@@ -57,6 +57,9 @@ describe("mapUtils – getLegLabel", () => {
   it("returns bus with route name for bus mode", () => {
     expect(getLegLabel({ mode: "bus", routeOptions: [{ name: "42" }] })).toBe("Bus 42");
   });
+  it("falls back to an empty bus suffix when no route name is available", () => {
+    expect(getLegLabel({ mode: "bus", routeOptions: [] })).toBe("Bus ");
+  });
   it("falls back to route option name/mode", () => {
     expect(getLegLabel({ mode: "tube", routeOptions: [{ name: "Jubilee" }] })).toBe("Jubilee");
     expect(getLegLabel({ mode: "dlr", routeOptions: [] })).toBe("dlr");

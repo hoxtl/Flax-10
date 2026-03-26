@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const useNavigateMock = vi.fn();
@@ -198,5 +198,23 @@ describe("useHomepageController", () => {
       taskLists: [{ id: 3 }], upcomingDeadlines: [{ id: 4 }], breakTime: 5, hasTimerSession: true,
       timerMode: "work", timerTask: "Essay", workTime: 25,
     }));
+  });
+
+  it("falls back to calendar events when allEvents is empty and allows completed-event updates", () => {
+    useCalendarMock.mockReturnValue({
+      selectedDate: new Date("2026-03-25T00:00:00Z"),
+      events: [{ id: "fallback-event" }],
+      allEvents: [],
+    });
+
+    const { result } = renderHook(() => useHomepageController(true, { id: "read-1" }));
+
+    expect(result.current.calendarEvents).toEqual([{ id: "fallback-event" }]);
+
+    act(() => {
+      result.current.setCompletedEventIds(new Set(["event-1"]));
+    });
+
+    expect(result.current.completedEventIds.has("event-1")).toBe(true);
   });
 });

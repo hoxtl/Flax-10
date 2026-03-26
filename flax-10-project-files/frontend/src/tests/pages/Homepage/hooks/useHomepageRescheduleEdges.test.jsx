@@ -260,6 +260,57 @@ describe("useHomepageReschedule extra branches", () => {
     );
   });
 
+  it("handleConflictPushTomorrow undo action restores the original event window", async () => {
+    const props = buildRescheduleProps();
+    const { result } = renderHook(() => useHomepageReschedule(props));
+
+    await act(async () => {
+      await result.current.handleConflictPushTomorrow({
+        id: "e3",
+        title: "Study group",
+        start_time: "2026-03-24T14:00:00.000Z",
+        end_time: "2026-03-24T15:00:00.000Z",
+      });
+    });
+
+    const undoOptions = props.showToast.mock.calls.at(-1)[1];
+
+    await act(async () => {
+      await undoOptions.onAction();
+    });
+
+    expect(props.editEvent).toHaveBeenLastCalledWith("e3", {
+      start_time: "2026-03-24T14:00:00.000Z",
+      end_time: "2026-03-24T15:00:00.000Z",
+    });
+    expect(props.showToast).toHaveBeenCalledWith("Undid move.");
+  });
+
+  it("handleConflictPushTomorrow shows an undo failure toast when restore fails", async () => {
+    const props = buildRescheduleProps();
+    props.editEvent
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("undo failed"));
+    const { result } = renderHook(() => useHomepageReschedule(props));
+
+    await act(async () => {
+      await result.current.handleConflictPushTomorrow({
+        id: "e3",
+        title: "Study group",
+        start_time: "2026-03-24T14:00:00.000Z",
+        end_time: "2026-03-24T15:00:00.000Z",
+      });
+    });
+
+    const undoOptions = props.showToast.mock.calls.at(-1)[1];
+
+    await act(async () => {
+      await undoOptions.onAction();
+    });
+
+    expect(props.showToast).toHaveBeenCalledWith("Undo failed.");
+  });
+
   it("handleConflictPushTomorrow is a no-op when start_time is absent", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
@@ -332,6 +383,18 @@ describe("useHomepageReschedule extra branches", () => {
     expect(props.showToast).toHaveBeenCalledWith("Couldn't delete item.");
   });
 
+  it("handleTimelineDelete accepts a raw event id and falls back to a generic label", async () => {
+    const props = buildRescheduleProps();
+    const { result } = renderHook(() => useHomepageReschedule(props));
+
+    await act(async () => {
+      await result.current.handleTimelineDelete("e9");
+    });
+
+    expect(props.removeEvent).toHaveBeenCalledWith("e9");
+    expect(props.showToast).toHaveBeenCalledWith('"Event" deleted.');
+  });
+
   it("resolveConflictsLoading starts false and is set true then false during conflict resolution", async () => {
     let resolveConflicts;
     conflictMocks.applyConflictResolutionPlan.mockImplementationOnce(
@@ -356,5 +419,21 @@ describe("useHomepageReschedule extra branches", () => {
     });
 
     expect(result.current.resolveConflictsLoading).toBe(false);
+  });
+
+  it("shows the read-only conflicts message when every move fails", async () => {
+    conflictMocks.applyConflictResolutionPlan.mockResolvedValueOnce({
+      failures: [{ id: 1 }],
+    });
+    const props = buildRescheduleProps();
+    const { result } = renderHook(() => useHomepageReschedule(props));
+
+    await act(async () => {
+      await result.current.handleResolveTimelineConflicts();
+    });
+
+    expect(props.showToast).toHaveBeenCalledWith(
+      "Couldn't reschedule your events. Some conflicts are read-only."
+    );
   });
 });
