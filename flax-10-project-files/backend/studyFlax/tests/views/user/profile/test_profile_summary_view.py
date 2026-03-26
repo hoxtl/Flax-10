@@ -18,7 +18,8 @@ from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.social.share_model import CalendarShare
 from studyFlax.models.timer.session_model import StudySession
-from studyFlax.tests.helpers.factories import make_session
+from studyFlax.tests.helpers.test_model_builders import make_session
+
 
 User = get_user_model()
 
