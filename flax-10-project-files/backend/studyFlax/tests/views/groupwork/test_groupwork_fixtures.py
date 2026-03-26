@@ -1,4 +1,4 @@
-from studyFlax.fixtures.groupwork_fixtures import (
+from studyFlax.fixtures.groupwork.groupwork_fixtures import (
     GROUP_PROJECT_FIXTURES,
     GROUP_TASK_TEMPLATES,
 )
