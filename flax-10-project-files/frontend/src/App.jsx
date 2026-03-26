@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
@@ -13,43 +12,6 @@ function AppContent() {
   if (state.isLoadingTheme) return null;
   const screen = resolveScreen(state.authed, state.user, state.showWelcome);
   return (
-=======
-import { useState, useEffect, useCallback } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
-
-import { APP_ROUTES } from "./lib/routes";
-import { getUserSettings, getUserProfile } from "./api/userApi";
-import { CalendarProvider } from "./context/CalendarContext";
-import { TagProvider } from "./context/TagContext";
-import { NotificationProvider } from "./context/NotificationContext";
-import { TimerProvider } from "./context/TimerContext";
-import { ThemeProvider } from "./context/ThemeContext";
-import { ConfirmProvider } from "./context/ConfirmContext";
-import { TaskCompletionProvider } from "./context/TaskCompletionContext";
-import { ToastProvider } from "./context/ToastContext";
-import { NotificationToast } from "./components/Notifications";
-import AttendancePrompt from "./components/Attendance/AttendancePrompt";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-
-import OnboardingModal from "./components/Onboarding/OnboardingModal";
-import DashboardLayout from "./layout/DashboardLayout";
-import WelcomeLanding from "./pages/Welcome/WelcomeLanding";
-import AuthPage from "./pages/Auth/AuthPage";
-import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
-import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
-import Settings from "./pages/Settings/Settings";
-import Profile from "./pages/Profile/Profile";
-import SocietyDetailPage from "./pages/Societies/SocietyDetailPage";
-import BannedPage from "./pages/Banned/BannedPage";
-
-import "./App.css";
 
 // Constants
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
