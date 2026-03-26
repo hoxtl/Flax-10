@@ -519,7 +519,7 @@ def js_nesting(lines: list[str]) -> int:
     depth = peak = 0
     for line in lines:
         s = line.strip()
-        if re.search(r"\b(if|for|while|switch)\b.*\{", s) or re.search(r"\b(catch|else\s*\{)", s):
+        if re.search(r"\b(if|for|while|switch)\b.*(?<!\$)\{", s) or re.search(r"\b(catch|else\s*(?<!\$)\{)", s):
             depth += 1; peak = max(peak, depth)
         elif s in ("}", "};", "},"):
             depth = max(0, depth - 1)

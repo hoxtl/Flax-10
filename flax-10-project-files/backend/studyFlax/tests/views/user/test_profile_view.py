@@ -187,7 +187,7 @@ class ProfileViewHelpersTest(TestCase):
 
     def test_update_username_rejects_taken_name(self):
         User.objects.create_user(username='claimed', email='claimed@example.com', password='pass')
-        from studyFlax.views.user.profile_view import update_username
+        from studyFlax.views.user.profile_helpers import update_username
 
         response = update_username(self.user, {'username': 'claimed'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
