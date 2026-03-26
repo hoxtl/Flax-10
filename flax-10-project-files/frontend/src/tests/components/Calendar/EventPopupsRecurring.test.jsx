@@ -6,19 +6,19 @@ vi.mock('../../../context/CalendarContext', () => ({
   useEventModal: vi.fn(() => ({ isModalOpen: false })), useEventPopup: vi.fn(), useCalendarDispatch: vi.fn(), useCalendar: vi.fn(() => ({})),
   useEventDelete: vi.fn()
 }));
-vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: vi.fn(() => ({ loadEvents: vi.fn() })),
   useEventActions: vi.fn(() => ({ removeEvent: vi.fn(), addException: vi.fn() }))
 }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => mockConfirm }));
 vi.mock('../../../context/ToastContext', () => ({ useToast: () => mockToast }));
 vi.mock('../../../context/TagContext', () => ({ useTags: () => ({ refreshTags: vi.fn(), getTag: vi.fn() }) }));
-vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({ EventModal: () => <div data-testid="event-modal-mock" /> }));
-vi.mock('../../../components/Calendar/utils/formUtils', () => ({ deleteRecurrenceOccurrence: delOccur }));
+vi.mock('../../../components/calendar/event_modal/EventModal', () => ({ EventModal: () => <div data-testid="event-modal-mock" /> }));
+vi.mock('../../../components/calendar/utils/formUtils', () => ({ deleteRecurrenceOccurrence: delOccur }));
 vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({ default: ({ title, onConfirm }) => (<div><span>{title}</span><button onClick={onConfirm}>Confirm Hold</button></div>) }));
-vi.mock('../../../components/Calendar/utils/eventUtils', () => ({ getEventType: vi.fn(() => 'personal'), hasRecurrence: vi.fn(() => true) }));
-vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({ EventPopover: ({ event, actions }) => (<div><span>{event?.title}</span>{actions?.map((a, i) => (<button key={i} onClick={a.onClick}>{a.label}</button>))}</div>) }));
-import { EventPopups } from '../../../components/Calendar/EventPopups';
+vi.mock('../../../components/calendar/utils/eventUtils', () => ({ getEventType: vi.fn(() => 'personal'), hasRecurrence: vi.fn(() => true) }));
+vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({ EventPopover: ({ event, actions }) => (<div><span>{event?.title}</span>{actions?.map((a, i) => (<button key={i} onClick={a.onClick}>{a.label}</button>))}</div>) }));
+import { EventPopups } from '../../../components/calendar/EventPopups';
 import { useEventPopup, useEventDelete } from '../../../context/CalendarContext';
 const setupPopup = (evt) => useEventPopup.mockReturnValue({ popupEvent: evt, popupAnchorRect: { top: 0, left: 0, width: 100, height: 30 }, closePopup: vi.fn(), readOnly: false });
 describe('EventPopups Recurring', () => {

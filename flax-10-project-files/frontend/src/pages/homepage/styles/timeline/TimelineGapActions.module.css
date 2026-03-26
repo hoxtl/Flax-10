@@ -1,0 +1,289 @@
+/*
+ * Timeline styles chunk 09.
+ */
+
+/* ── Deadline revision suggestion ── */
+.planTimelineGapDeadlineRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--home-timeline-danger-soft);
+  border: 1px solid var(--home-timeline-danger-border);
+  border-left: 3px solid var(--home-timeline-danger);
+}
+.planTimelineGapDeadlineInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+.planTimelineGapDeadlineChip {
+  display: inline-block;
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--home-timeline-danger);
+  background: var(--home-timeline-danger-soft);
+  padding: 1px 6px;
+  border-radius: 99px;
+  width: fit-content;
+}
+.planTimelineGapDeadlineTitle {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--home-timeline-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.planTimelineGapDeadlineMeta {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.57rem;
+  color: var(--home-timeline-muted);
+  letter-spacing: 0.02em;
+}
+.planTimelineGapDeadlineBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--home-timeline-danger-border);
+  background: var(--home-timeline-danger-soft);
+  color: var(--home-timeline-danger-strong);
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.planTimelineGapDeadlineBtn:hover {
+  background: color-mix(in srgb, var(--home-timeline-danger-soft) 120%, transparent);
+  border-color: var(--home-timeline-danger-border);
+}
+
+/* ── Start buttons ── */
+.planTimelineGapStartBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--home-timeline-gap-action-border);
+  background: var(--home-timeline-gap-action-bg);
+  color: var(--home-timeline-gap-action-ink);
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  box-shadow: var(--home-timeline-gap-action-shadow);
+}
+.planTimelineGapStartBtn:hover {
+  background: var(--home-timeline-gap-action-bg-hover);
+  border-color: var(--home-timeline-gap-action-border);
+  color: var(--home-timeline-gap-action-ink);
+}
+
+.planTimelineGapStartBtnSm {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  border: 1px solid var(--home-timeline-gap-action-border);
+  background: var(--home-timeline-gap-action-bg);
+  color: var(--home-timeline-gap-action-ink);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-left: auto;
+  box-shadow: var(--home-timeline-gap-action-shadow);
+}
+.planTimelineGapStartBtnSm:hover {
+  background: var(--home-timeline-gap-action-bg-hover);
+  border-color: var(--home-timeline-gap-action-border);
+  color: var(--home-timeline-gap-action-ink);
+}
+
+.planTimelineGapSkipBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--home-timeline-gap-skip-border);
+  background: var(--home-timeline-gap-skip-bg);
+  color: var(--home-timeline-gap-skip-ink);
+  font-size: 0.62rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+  flex-shrink: 0;
+  line-height: 1;
+  box-shadow: var(--home-timeline-gap-action-shadow);
+}
+
+.planTimelineGapSkipBtn:hover {
+  border-color: var(--home-timeline-gap-skip-border);
+  background: var(--home-timeline-gap-skip-bg-hover);
+  color: var(--home-timeline-gap-skip-ink);
+  transform: translateY(-1px);
+}
+
+.planTimelineGapUrgencyChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  border: 1px solid var(--home-timeline-warning-border);
+  background: var(--home-timeline-warning-soft);
+  color: var(--home-timeline-warning);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* ── Now / Timer Strip (MiniTimeline top bar) ─────────────────────────────── */
+.planTimelineNowStrip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 0 2px 10px;
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-timeline-success-surface-strong) 100%, white 0%),
+      color-mix(in srgb, var(--home-timeline-success-surface) 86%, white 14%)
+    ) !important;
+  border: 1px solid var(--home-timeline-success-surface-border);
+  border-left: 3px solid color-mix(in srgb, var(--home-timeline-success) 72%, white 28%);
+  overflow: hidden;
+  width: calc(100% - 4px);
+  box-sizing: border-box;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 34%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
+    0 12px 20px var(--home-timeline-success-surface-shadow);
+}
+
+.planTimelineNowStripDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--home-timeline-success);
+  flex-shrink: 0;
+  animation: nowDotPulse 2s ease-in-out infinite;
+}
+
+.planTimelineNowStripLabel {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--home-timeline-success-strong);
+  flex-shrink: 0;
+}
+
+.planTimelineNowStripTask {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--home-timeline-ink);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.planTimelineNowStripTimer {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--home-timeline-muted);
+  flex-shrink: 0;
+  opacity: 1;
+}
+
+/* Dark Mode Overrides for MiniTimeline */
+[data-mode="dark"] .timelineBox {
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-bg) 100%
+  );
+  border-color: var(--home-widget-frame-border);
+}
+
+[data-mode="dark"] .planTimelineStatusBar {
+  background: color-mix(in srgb, var(--color-highlight) 12%, transparent);
+  color: var(--text);
+}
+
+[data-mode="dark"] .planTimelineCard {
+  background: var(
+    --home-timeline-card-surface,
+    color-mix(in srgb, var(--color-card) 60%, transparent)
+  );
+  border-color: var(--home-timeline-card-border);
+  box-shadow: var(--home-timeline-card-shadow);
+}
+
+[data-mode="dark"] .planTimelineCard:hover {
+  background: var(
+    --home-timeline-card-surface,
+    color-mix(in srgb, var(--color-card) 80%, transparent)
+  );
+  border-color: var(--home-timeline-card-hover-border, var(--color-primary));
+  box-shadow: var(--home-timeline-card-shadow-hover);
+}
+
+[data-mode="dark"] .planTimelineRowGap .planTimelineTinyGapLine {
+  background: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-highlight) 25%, transparent) 0,
+    color-mix(in srgb, var(--color-highlight) 25%, transparent) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}

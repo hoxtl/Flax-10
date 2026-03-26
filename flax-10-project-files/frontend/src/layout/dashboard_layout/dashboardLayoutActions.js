@@ -3,7 +3,7 @@
  */
 
 import { authService } from "../../api/authApi";
-import { clearUserData } from "../../components/auth/utils/authHelpers";
+import { clearUserData } from "../../components/Auth/utils/authHelpers";
 
 export async function handleLogoutClick() {
   try {

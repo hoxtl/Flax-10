@@ -29,6 +29,10 @@ async function handleResponse(response) {
 }
 
 async function handleError(response) {
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    window.dispatchEvent(new Event('auth-changed'));
+  }
   const error = await response.json().catch(() => ({}));
   const message =
     error.detail ||

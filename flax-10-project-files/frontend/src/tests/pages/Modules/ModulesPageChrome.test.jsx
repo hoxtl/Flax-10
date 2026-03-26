@@ -59,7 +59,7 @@ vi.mock("../../../components/modules/readings/ReadingModal.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/StandardModal/StandardModal.jsx", () => ({
+vi.mock("../../../components/common/standard_modal/StandardModal.jsx", () => ({
   default: ({ title, subtitle, onClose, children }) => (
     <div>
       <h2>{title}</h2>
@@ -240,13 +240,13 @@ describe("ModulesPageChrome", () => {
     expect(editState.setEditingModule).toHaveBeenCalledWith(null);
 
     rerender(<AnimatedContent state={editState} viewKey="edit" MainView={() => null} />);
-    fireEvent.click(screen.getByText("Close modal"));
+    fireEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(editState.setShowForm).toHaveBeenCalledWith(false);
     expect(editState.setEditingModule).toHaveBeenCalledWith(null);
 
     const createState = buildState({ showForm: true, viewingModule: null, editingModule: null });
     rerender(<AnimatedContent state={createState} viewKey="create" MainView={() => null} />);
-    fireEvent.click(screen.getByText("Close modal"));
+    fireEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(createState.setShowForm).toHaveBeenCalledWith(false);
     expect(createState.setEditingModule).toHaveBeenCalledWith(null);
   });

@@ -1,0 +1,156 @@
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/Profile/components/widgets/FocusHeatmap.jsx
+<<<<<<< HEAD
+import Card from "../../../../components/common/card/Card";
+=======
+import Card from "../../../../components/common/Card/Card";
+>>>>>>> main:flax-10-project-files/frontend/src/pages/profile/components/widgets/FocusHeatmap.jsx
+import StudyHeatmap from "../../../../components/analytics/StudyHeatmap";
+=======
+import Card from "../../../../components/common/Card/Card";
+import StudyHeatmap from "../../../../components/Analytics/StudyHeatmap";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+import widgetStyles from "./ProfileWidgets.module.css";
+import attendanceStyles from "./ProfileAttendance.module.css";
+import { buildButtonActionProps, buildNavigateAction } from "./widgetActionProps";
+
+const styles = { ...widgetStyles, ...attendanceStyles };
+
+const DEFAULT_HEATMAP_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const DEFAULT_HEATMAP_HOURS = Array.from({ length: 24 }, (_, h) => h);
+
+function normalizeHeatmapData(heatmap) {
+  const data = Array.isArray(heatmap?.data) ? heatmap.data : [];
+  if (!data.length) return null;
+  const days = Array.isArray(heatmap?.days) && heatmap.days.length === data.length
+    ? heatmap.days
+    : DEFAULT_HEATMAP_DAYS.slice(0, data.length);
+  return {
+    data,
+<<<<<<< HEAD
+    days,
+=======
+    days: days.length ? days : DEFAULT_HEATMAP_DAYS,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+    hours: Array.isArray(heatmap?.hours) && heatmap.hours.length ? heatmap.hours : DEFAULT_HEATMAP_HOURS,
+  };
+}
+
+function getContributionColor(val, maxVal) {
+  if (val == null) return "transparent";
+  if (val === 0) return "color-mix(in srgb, var(--border) 60%, transparent)";
+  const t = val / maxVal;
+<<<<<<< HEAD
+  if (t < 0.25) return "var(--heatmap-low)";
+  if (t < 0.5) return "var(--heatmap-mid)";
+  if (t < 0.75) return "var(--heatmap-high)";
+  return "var(--heatmap-full)";
+=======
+  if (t < 0.25) return "color-mix(in srgb, #5D4037 25%, var(--panel))";
+  if (t < 0.5) return "#8D6E63";
+  if (t < 0.75) return "#6D4C41";
+  return "#5D4037";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+}
+
+function buildContributionWeeks(dailyTotals) {
+  const SHOW = Math.min(70, dailyTotals.length);
+  const slice = dailyTotals.slice(-SHOW);
+  const pad = (7 - (slice.length % 7)) % 7;
+  const padded = [...Array(pad).fill(null), ...slice];
+  const weeks = [];
+  for (let w = 0; w < Math.ceil(padded.length / 7); w++) {
+    weeks.push(padded.slice(w * 7, (w + 1) * 7));
+  }
+  return weeks;
+}
+
+<<<<<<< HEAD
+function ContributionCell({ val, maxVal }) {
+  const cellStyle = { background: getContributionColor(val, maxVal) };
+  return <div className={styles.contributionCell} style={cellStyle} title={val != null ? `${Math.round(val / 60 * 10) / 10}h` : ""} />;
+}
+
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+function ContributionGrid({ weeks, maxVal }) {
+  return (
+    <div className={styles.contributionGrid}>
+      {weeks.map((week, wi) => (
+        <div key={wi} className={styles.contributionWeek}>
+<<<<<<< HEAD
+          {week.map((val, di) => <ContributionCell key={di} val={val} maxVal={maxVal} />)}
+=======
+          {week.map((val, di) => (
+            <div
+              key={di}
+              className={styles.contributionCell}
+              style={{ background: getContributionColor(val, maxVal) }}
+              title={val != null ? `${Math.round(val / 60 * 10) / 10}h` : ""}
+            />
+          ))}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FocusHeatmapHeader({ isInteractive, onNavigate }) {
+  return (
+    <div className={styles.heatmapHeader}>
+      <div className={styles.cardLabel}>FOCUS HEATMAP</div>
+      {isInteractive
+        ? <button type="button" className={`${styles.heatmapLinkBtn} ${styles.compactAttAnalysisBtn}`} onClick={e => { e.stopPropagation(); onNavigate(); }}>View full analytics</button>
+        : <div className={styles.heatmapLinkBtn}>View full analytics</div>}
+    </div>
+  );
+}
+
+function buildInteractiveProps(onNavigate) {
+  const isInteractive = typeof onNavigate === "function";
+  const handleNavigate = buildNavigateAction(onNavigate, "analytics");
+  return { isInteractive, actionProps: buildButtonActionProps(isInteractive, handleNavigate), handleNavigate };
+}
+
+export function FocusHeatmapWidget({ heatmap, onNavigate }) {
+  const normalizedHeatmap = normalizeHeatmapData(heatmap);
+  if (!normalizedHeatmap) return null;
+  const { isInteractive, actionProps, handleNavigate } = buildInteractiveProps(onNavigate);
+  return (
+    <Card
+      className={`${styles.glassCard} ${styles.focusHeatmapCard} ${isInteractive ? styles.focusHeatmapCardInteractive : ""}`}
+      variant="glass"
+      {...actionProps}
+    >
+      <FocusHeatmapHeader isInteractive={isInteractive} onNavigate={handleNavigate} />
+      <StudyHeatmap heatmapData={normalizedHeatmap} />
+    </Card>
+  );
+}
+
+function buildContributionData(heatmap) {
+  const dailyTotals = heatmap.data.map((row) => (Array.isArray(row) ? row.reduce((sum, value) => sum + value, 0) : 0));
+  return {
+    dailyTotals,
+    maxVal: Math.max(...dailyTotals, 1),
+    weeks: buildContributionWeeks(dailyTotals),
+  };
+}
+
+export function ContributionHeatmap({ heatmap, onNavigate }) {
+  if (!heatmap?.data?.length) return null;
+  const { maxVal, weeks } = buildContributionData(heatmap);
+  return (
+    <Card
+      className={`${styles.glassCard} ${styles.contributionCard}`}
+      variant="glass"
+      {...buildButtonActionProps(true, buildNavigateAction(onNavigate, "analytics"))}
+    >
+      <div className={styles.heatmapHeader}>
+        <div className={styles.cardLabel}>FOCUS ACTIVITY</div>
+        <div className={styles.heatmapLinkBtn}>View full analytics</div>
+      </div>
+      <ContributionGrid weeks={weeks} maxVal={maxVal} />
+    </Card>
+  );
+}
