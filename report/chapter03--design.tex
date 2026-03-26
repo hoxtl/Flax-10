@@ -185,6 +185,10 @@ Rather than a static homepage layout, the dashboard was implemented as a modular
 
 The auto-scheduler feature generates study events based on a student's module deadlines, daily study time preferences set in settings, and sleep schedule (no events are scheduled during the user's configured sleep hours). Rather than implementing the scheduler as a standalone module with its own event model, a wrapper class was used to reference and manage the generated schedule events. This keeps the scheduler coupled to the existing calendar infrastructure, meaning future changes to calendar functionality automatically apply to scheduled events without requiring parallel updates to a separate module. Schedules are named and managed through a dedicated auto-scheduler page, where students can rename or delete a schedule (which removes all associated events). A replan button on the homepage mini-timeline also triggers the auto-scheduler to update the current schedule based on the latest deadlines and preferences.
 
+\subsection{Static-serving + Backend Server Deployment Paradigm}
+
+We once discussed about the practice of deployment between frontend server + backend server and frontend asset + backend server. It is later we agree on keeping the repository uniform and thus chose the method of single server, static frontend asset serving approach.
+
 \section{External Integrations}
 \label{sect:integrations}
 
