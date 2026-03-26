@@ -2,7 +2,7 @@
  * Circular timer views.
  */
 
-import styles from '../../pages/Timer/TimerPage.module.css';
+import styles from '../../pages/timer/TimerPage.module.css';
 import FocusAnimation from './FocusAnimation';
 import { TimerDisplay } from './TimerComponents';
 

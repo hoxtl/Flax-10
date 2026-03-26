@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { eventsOverlap, findOverlappingEvents, checkOverlapWithConfirm, calculateEventColumns, getEventKey } from '../../../../components/Calendar/utils/overlapUtils';
+import { eventsOverlap, findOverlappingEvents, checkOverlapWithConfirm, calculateEventColumns, getEventKey } from '../../../../components/calendar/utils/overlapUtils';
 
 const makeEvent = (id, start, end) => ({ id, start_time: start, end_time: end, title: `Event ${id}` });
 

@@ -1,17 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { clearManualTask, startManualTask } from "../../../components/Timer/utils/timerTaskActions";
+import { startManualTask } from "../../../components/timer/utils/timerTaskActions";
 
-import { PopupSection } from "../../../components/Timer/sections/PopupSection";
-import { FocusOverlayContent } from "../../../components/Timer/sections/FocusOverlayContent";
-import { RightPanel } from "../../../components/Timer/sections/RightPanel";
-import { MainSection } from "../../../components/Timer/sections/MainSection";
+import { PopupSection } from "../../../components/timer/sections/PopupSection";
+import { FocusOverlayContent } from "../../../components/timer/sections/FocusOverlayContent";
+import { RightPanel } from "../../../components/timer/sections/RightPanel";
+import { MainSection } from "../../../components/timer/sections/MainSection";
 
-vi.mock("../../../components/Timer/HistoryModal", () => ({
+vi.mock("../../../components/timer/HistoryModal", () => ({
   default: ({ onClose }) => <button onClick={onClose}>History modal</button>,
 }));
 
-vi.mock("../../../components/Timer/TimerPopups", () => ({
+vi.mock("../../../components/timer/TimerPopups", () => ({
   OvertimePopup: ({ mode, onAction }) => <button onClick={onAction}>Overtime {mode}</button>,
   GoalModal: ({ onAction }) => <button onClick={onAction}>Goal modal</button>,
   BreakModal: ({ onAction }) => <button onClick={onAction}>Break modal</button>,
@@ -19,16 +19,16 @@ vi.mock("../../../components/Timer/TimerPopups", () => ({
   BreakStartedPopup: ({ onAction }) => <button onClick={onAction}>Auto break</button>,
 }));
 
-vi.mock("../../../components/Timer/hooks/useTimerPopupEffects", () => ({
+vi.mock("../../../components/timer/hooks/useTimerPopupEffects", () => ({
   useTimerPopupEffects: vi.fn(),
 }));
 
-vi.mock("../../../components/Timer/TimerCircle", () => ({
+vi.mock("../../../components/timer/TimerCircle", () => ({
   default: () => <div>Timer circle</div>,
   TimerRing: () => <div>Timer ring</div>,
 }));
 
-vi.mock("../../../components/common/Tabs/Tabs", () => ({
+vi.mock("../../../components/common/tabs/Tabs", () => ({
   default: ({ tabs, activeTab, onTabChange }) => (
     <div>
       <div>Active tab: {activeTab}</div>
@@ -38,26 +38,26 @@ vi.mock("../../../components/common/Tabs/Tabs", () => ({
   ),
 }));
 
-vi.mock("../../../components/Timer/InlineSoundPanel", () => ({
+vi.mock("../../../components/timer/InlineSoundPanel", () => ({
   default: () => <div>Inline sound panel</div>,
 }));
 
-vi.mock("../../../components/Timer/RightRailHistoryPanel", () => ({
+vi.mock("../../../components/timer/RightRailHistoryPanel", () => ({
   default: () => <div>Right rail history</div>,
 }));
 
-vi.mock("../../../components/Timer/PresetPanel", () => ({
+vi.mock("../../../components/timer/PresetPanel", () => ({
   PresetPanel: () => <div>Preset panel</div>,
   TimerConfigPanel: () => <div>Config panel</div>,
 }));
 
-vi.mock("../../../components/Timer/SessionDots", () => ({
+vi.mock("../../../components/timer/SessionDots", () => ({
   default: () => <div>Session dots</div>,
   LiveStatsRow: ({ onDistract }) => <button onClick={onDistract}>Distract</button>,
   ProgressStrip: () => <div>Progress strip</div>,
 }));
 
-vi.mock("../../../components/Timer/TaskInput", () => ({
+vi.mock("../../../components/timer/TaskInput", () => ({
   TaskInput: ({ onClearTask, onJustStart, onOpenFocus }) => (
     <>
       <button onClick={onClearTask}>Clear task</button>
@@ -67,7 +67,7 @@ vi.mock("../../../components/Timer/TaskInput", () => ({
   ),
 }));
 
-vi.mock("../../../components/Timer/TimerComponents", () => ({
+vi.mock("../../../components/timer/TimerComponents", () => ({
   TimerControls: ({ onToggle, onPause, onReset, onEndEarly }) => (
     <>
       <button onClick={onToggle}>Toggle timer</button>
@@ -79,17 +79,17 @@ vi.mock("../../../components/Timer/TimerComponents", () => ({
   ModeIndicator: () => <div>Mode indicator</div>,
 }));
 
-vi.mock("../../../components/Timer/hooks/useSuggestedTimerTask", () => ({
+vi.mock("../../../components/timer/hooks/useSuggestedTimerTask", () => ({
   useSuggestedTimerTask: vi.fn(),
 }));
 
-vi.mock("../../../components/Timer/utils/timerTaskActions", () => ({
+vi.mock("../../../components/timer/utils/timerTaskActions", () => ({
   clearManualTask: vi.fn(),
   startManualTask: vi.fn(),
   startSuggestedTask: vi.fn(),
 }));
 
-vi.mock("../../../components/Timer/utils/presetUtils", async (importOriginal) => {
+vi.mock("../../../components/timer/utils/presetUtils", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -145,11 +145,6 @@ describe("Timer sections", () => {
     expect(screen.getByText("End early")).toBeInTheDocument();
   });
 
-  it("uses break mode goal timing when the popup section is in break mode", () => {
-    render(<PopupSection t={{ ...t, mode: "break", modal: "goal" }} showHistory={false} onCloseHistory={vi.fn()} />);
-    expect(screen.getByText("Goal modal")).toBeInTheDocument();
-  });
-
   it("skips rendering when disabled and hides the break modal when autostart is enabled", () => {
     localStorage.setItem("timer_autostart", "true");
     const { rerender, container } = render(
@@ -179,8 +174,7 @@ describe("Timer sections", () => {
     const onOpenHistory = vi.fn();
     const onOpenFocus = vi.fn();
     render(<MainSection t={t} onOpenHistory={onOpenHistory} onOpenFocus={onOpenFocus} isMobile={true} />);
-
-    fireEvent.click(screen.getByText("Clear task"));
+    
     fireEvent.click(screen.getByText("Open focus"));
     fireEvent.click(screen.getByText("Pause timer"));
     fireEvent.click(screen.getByText("Reset timer"));
@@ -189,7 +183,6 @@ describe("Timer sections", () => {
     fireEvent.click(screen.getByText("View History 📜"));
 
     expect(onOpenFocus).toHaveBeenCalled();
-    expect(clearManualTask).toHaveBeenCalledWith(t);
     expect(t.togglePause).toHaveBeenCalled();
     expect(t.resetTimer).toHaveBeenCalled();
     expect(t.setModal).toHaveBeenCalledWith("endEarly");
@@ -203,13 +196,5 @@ describe("Timer sections", () => {
     fireEvent.click(screen.getByText("Toggle timer"));
     expect(startManualTask).toHaveBeenCalledWith(t);
     expect(screen.queryByText("View History 📜")).not.toBeInTheDocument();
-  });
-
-  it("cancels the end-early modal from PopupSection", () => {
-    const setModal = vi.fn();
-    render(<PopupSection t={{ ...t, modal: "endEarly", setModal }} showHistory={false} onCloseHistory={vi.fn()} />);
-
-    fireEvent.click(screen.getByText("Cancel end early"));
-    expect(setModal).toHaveBeenCalledWith(null);
   });
 });

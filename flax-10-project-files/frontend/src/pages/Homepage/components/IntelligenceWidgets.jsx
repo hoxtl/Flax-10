@@ -6,12 +6,12 @@ import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-moti
 import { BookOpen, Calendar } from "lucide-react";
 import { createElement } from "react";
 import { useNavigate } from "react-router-dom";
-import StatStrip from "../../../components/common/StatStrip/StatStrip";
-import WelcomeBackgroundPaths from "../../../components/Welcome/WelcomeBackgroundPaths";
+import StatStrip from "../../../components/common/stat_strip/StatStrip";
+import WelcomeBackgroundPaths from "../../../components/welcome/WelcomeBackgroundPaths";
 import { useCountUp } from "../../../hooks/useCountUp";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceHeader.module.css";
-import { getGreeting, getTodayLabel } from "./IntelligenceUtils";
+import { getGreeting, getTodayLabel } from "./intelligenceUtils";
 
 const HERO_STAT_ROUTES = { societies: "/societies", tasks: "/tasks?filter=today" };
 

@@ -3,7 +3,7 @@
  */
 
 import { useMemo } from "react";
-import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
+import { isEnrolledIn } from "../../../components/modules/utils/moduleUtils";
 import {
   getDeadlineSuggestions,
   getEnrolledModules,

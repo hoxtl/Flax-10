@@ -8,7 +8,7 @@ const getDepartmentMock = vi.fn(() => "Law");
 const getCourseMock = vi.fn(() => "LLB");
 const normaliseModuleCodeMock = vi.fn((code) => String(code || "").toUpperCase());
 
-vi.mock("../../../components/Modules/utils/moduleUtils.js", () => ({
+vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   isEnrolledIn: (...args) => isEnrolledInMock(...args),
   formatDuration: (...args) => formatDurationMock(...args),
   formatTime: (...args) => formatTimeMock(...args),
@@ -17,18 +17,18 @@ vi.mock("../../../components/Modules/utils/moduleUtils.js", () => ({
   normaliseModuleCode: (...args) => normaliseModuleCodeMock(...args),
 }));
 
-vi.mock("../../../components/Auth/utils/userUtils.js", () => ({
+vi.mock("../../../components/auth/utils/userUtils.js", () => ({
   getInitials: (name) => (name ? name.split(" ").map((part) => part[0]).join("") : "T"),
 }));
 
-vi.mock("../../../components/Modules/Modules/moduleTutorUtils", () => ({
+vi.mock("../../../components/modules/modules/moduleTutorUtils", () => ({
   getModuleTutorPhoto: () => "https://example.com/tutor.jpg",
   hideBrokenTutorImage: (event) => {
     event.currentTarget.style.display = "none";
   },
 }));
 
-vi.mock("../../../components/common/Card/GridCard", () => ({
+vi.mock("../../../components/common/card/GridCard", () => ({
   default: ({ children, onClick, className, style }) => (
     <div role="button" tabIndex={0} onClick={onClick} className={className} style={style}>
       {children}
@@ -36,19 +36,19 @@ vi.mock("../../../components/common/Card/GridCard", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../components/common/EntityLinkChip/EntityLinkChip.jsx", () => ({
+vi.mock("../../../components/common/entity_link_chip/EntityLinkChip.jsx", () => ({
   default: ({ children, to }) => <a href={to}>{children}</a>,
 }));
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   formatDate: () => "13 Apr 2026",
 }));
 
-vi.mock("../../../components/Modules/shared/moduleCardActions", () => ({
+vi.mock("../../../components/modules/shared/moduleCardActions", () => ({
   ModuleItemCardActions: ({ onEdit, onDelete }) => (
     <div>
       <button onClick={onEdit}>Edit reading</button>
@@ -63,11 +63,11 @@ vi.mock("../../../components/Modules/shared/moduleCardActions", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Modules/ModulesCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
-vi.mock("../../../components/Modules/Deadlines/DeadlineCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
+vi.mock("../../../components/modules/modules/ModulesCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
+vi.mock("../../../components/modules/deadlines/DeadlineCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
 
-import ModulesCard from "../../../components/Modules/Modules/ModulesCard";
-import ReadingCard from "../../../components/Modules/Readings/ReadingCard";
+import ModulesCard from "../../../components/modules/modules/ModulesCard";
+import ReadingCard from "../../../components/modules/readings/ReadingCard";
 
 describe("module card branch coverage", () => {
   beforeEach(() => {

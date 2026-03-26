@@ -2,7 +2,7 @@
  * Home address settings form.
  */
 
-import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import SectionSkeleton from "../common/loading_state/SectionSkeleton";
 import HomeAddressFormLayout from "./HomeAddressFormLayout";
 import useHomeAddressForm from "./home/useHomeAddressForm";
 

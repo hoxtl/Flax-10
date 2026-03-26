@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { buildTasksPageHandlers, buildTasksPageViewProps } from "../../../pages/Tasks/utils/tasksPageUtils";
+import { buildTasksPageHandlers, buildTasksPageViewProps } from "../../../pages/tasks/utils/tasksPageUtils";
 
 function buildTasksState(overrides = {}) {
   return {

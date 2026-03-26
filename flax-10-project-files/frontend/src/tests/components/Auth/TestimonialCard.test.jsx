@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { TestimonialCard } from '../../../components/Auth/TestimonialCard';
+import { TestimonialCard } from '../../../components/auth/TestimonialCard';
 
 const author = { name: 'Alice', handle: '@alice', avatar: 'https://example.com/img.jpg' };
 

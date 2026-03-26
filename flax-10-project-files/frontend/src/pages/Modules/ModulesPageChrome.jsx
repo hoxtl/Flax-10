@@ -3,15 +3,15 @@
  */
 
 import { AnimatePresence } from "framer-motion";
-import { BackToTop } from "../../components/Pagination/Pagination.jsx";
-import ModuleForm from "../../components/Modules/Modules/ModuleForm.jsx";
-import ModuleDetails from "../../components/Modules/Modules/ModuleDetails.jsx";
-import StandardModal from "../../components/common/StandardModal/StandardModal.jsx";
-import DeadlineModal from "../../components/Modules/Deadlines/DeadlineModal.jsx";
-import ReadingModal from "../../components/Modules/Readings/ReadingModal.jsx";
-import PageTransition from "../../components/common/PageTransition/PageTransition.jsx";
-import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils.js";
+import { BackToTop } from "../../components/pagination/Pagination.jsx";
+import ModuleForm from "../../components/modules/modules/ModuleForm.jsx";
+import ModuleDetails from "../../components/modules/modules/ModuleDetails.jsx";
+import StandardModal from "../../components/common/standard_modal/StandardModal.jsx";
+import DeadlineModal from "../../components/modules/deadlines/DeadlineModal.jsx";
+import ReadingModal from "../../components/modules/readings/ReadingModal.jsx";
+import PageTransition from "../../components/common/page_transition/PageTransition.jsx";
+import SkeletonBlock from "../../components/common/loading_state/SkeletonBlock";
+import { isEnrolledIn } from "../../components/modules/utils/moduleUtils.js";
 import styles from "./ModulesPage.module.css";
 
 function SkeletonHeader() {

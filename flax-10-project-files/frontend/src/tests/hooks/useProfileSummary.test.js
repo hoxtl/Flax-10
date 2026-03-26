@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useProfileSummary } from '../../pages/Profile/hooks/useProfileSummary';
+import { useProfileSummary } from '../../pages/profile/hooks/useProfileSummary';
 
 vi.mock('../../api/client', () => ({
     fetchApi: vi.fn(),

@@ -27,10 +27,10 @@ import {
   SearchButton,
   ScheduleManagerButton,
   FilterDropdownButton,
-} from "./header/CalendarHeaderUtils";
+} from "./header/calendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import "./CalendarHeader.css";
+import "./calendar-header.css";
 
 const VIEW_MODES = [
   { value: "day", label: "Day" },

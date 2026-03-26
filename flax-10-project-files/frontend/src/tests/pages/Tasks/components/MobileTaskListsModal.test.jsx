@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import MobileTaskListsModal from "../../../../pages/Tasks/components/MobileTaskListsModal";
+import MobileTaskListsModal from "../../../../pages/tasks/components/MobileTaskListsModal";
 
-vi.mock("../../../../components/common/StandardModal/StandardModal", () => ({
+vi.mock("../../../../components/common/standard_modal/StandardModal", () => ({
   default: ({ title, subtitle, children, onClose }) => (
     <section>
       <h1>{title}</h1>

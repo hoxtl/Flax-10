@@ -4,10 +4,10 @@
 
 import { useState } from "react";
 import { ArrowUpRight, KeyRound, Shield } from "lucide-react";
-import { BackToTop } from "../../components/Pagination/Pagination";
-import Tooltip from "../../components/common/Tooltip/Tooltip";
-import Tabs from "../../components/common/Tabs/Tabs";
-import AppPage from "../../components/common/AppPage/AppPage";
+import { BackToTop } from "../../components/pagination/Pagination";
+import Tooltip from "../../components/common/tooltip/Tooltip";
+import Tabs from "../../components/common/tabs/Tabs";
+import AppPage from "../../components/common/app_page/AppPage";
 import styles from "./styles";
 import { buildAdminTabs } from "./adminTabs.jsx";
 

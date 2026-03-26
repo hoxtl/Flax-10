@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import EstimatedDurationControl from "../../../components/common/EstimatedDurationControl/EstimatedDurationControl.jsx";
+import EstimatedDurationControl from "../../../components/common/estimated_duration_control/EstimatedDurationControl.jsx";
 
 describe("EstimatedDurationControl", () => {
   it("renders presets and identifies the active one", () => {

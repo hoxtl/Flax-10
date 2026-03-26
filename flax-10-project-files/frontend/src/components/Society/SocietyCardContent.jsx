@@ -3,7 +3,7 @@
  */
 
 import styles from './SocietyCard.module.css';
-import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip';
+import EntityLinkChip from '../common/entity_link_chip/EntityLinkChip';
 
 export function SocietyCardContent({ society, hasImage, RatifiedBadge }) {
     const content = <CardInfo society={society} RatifiedBadge={RatifiedBadge} />;

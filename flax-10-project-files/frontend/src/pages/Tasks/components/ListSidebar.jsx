@@ -3,8 +3,8 @@
  */
 
 import { getListColor } from "../utils/listColorUtils";
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
-import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
+import EmptyState from "../../../components/common/empty_state/EmptyState";
+import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
 import {
   getSocietyDisplayName,
   getTeachingListDisplayName,

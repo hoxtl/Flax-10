@@ -1,20 +1,20 @@
 /* Tests for CreateTaskBar component rendering and user interactions */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import CreateTaskBar from "../../../../pages/Tasks/components/CreateTaskBar";
+import CreateTaskBar from "../../../../pages/tasks/components/CreateTaskBar";
 import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const hookMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../../pages/Tasks/hooks/useCreateTaskBar", () => ({
+vi.mock("../../../../pages/tasks/hooks/useCreateTaskBar", () => ({
   default: hookMock,
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options, placeholder }) => (
     <select aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)}>
       {options.map((option) => (

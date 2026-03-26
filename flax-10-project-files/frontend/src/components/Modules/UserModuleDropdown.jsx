@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
+import AnimatedDropdown from "../common/animated_dropdown/AnimatedDropdown";
 import useModules from "./hooks/useModules";
 
 function getModuleOptions(enrollments) {

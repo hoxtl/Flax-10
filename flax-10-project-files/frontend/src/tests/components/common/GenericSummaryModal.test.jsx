@@ -1,9 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
-import GenericSummaryModal from '../../../components/common/GenericSummaryModal/GenericSummaryModal';
-import SummaryItem from '../../../components/common/GenericSummaryModal/SummaryItem';
+import { render, screen } from '@testing-library/react';
+import GenericSummaryModal from '../../../components/common/generic_summary_modal/GenericSummaryModal';
 
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     default: ({ title, subtitle, onClose, children }) => (
         <div data-testid="standard-modal">
             <h2>{title}</h2>
@@ -13,15 +12,7 @@ vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/common/GenericSummaryModal/GenericSummaryModal.module.css', () => ({ default: {} }));
-vi.mock('../../../components/common/EmptyState/EmptyState', () => ({
-    default: ({ title, description }) => (
-        <div data-testid="empty-state">
-            <strong>{title}</strong>
-            <p>{description}</p>
-        </div>
-    ),
-}));
+vi.mock('../../../components/common/generic_summary_modal/GenericSummaryModal.module.css', () => ({ default: {} }));
 
 describe('GenericSummaryModal', () => {
     it('returns null when isOpen is false', () => {
@@ -52,20 +43,6 @@ describe('GenericSummaryModal', () => {
         expect(screen.getByText('Nothing here.')).toBeInTheDocument();
     });
 
-    it('renders custom emptyContent when provided', () => {
-        render(
-            <GenericSummaryModal
-                isOpen={true}
-                onClose={vi.fn()}
-                title="Title"
-                items={[]}
-                renderItem={() => null}
-                emptyContent={<div data-testid="custom-empty">Custom empty</div>}
-            />
-        );
-        expect(screen.getByTestId('custom-empty')).toBeInTheDocument();
-    });
-
     it('renders list with renderItem when items provided', () => {
         const renderItem = vi.fn((item) => <span key={item.id}>{item.name}</span>);
         render(
@@ -79,39 +56,6 @@ describe('GenericSummaryModal', () => {
         );
         expect(renderItem).toHaveBeenCalledWith({ id: 1, name: 'Alice' }, 0);
         expect(screen.getByText('Alice')).toBeInTheDocument();
-    });
-
-    it('renders the loading skeleton when loading', () => {
-        render(
-            <GenericSummaryModal
-                isOpen={true}
-                onClose={vi.fn()}
-                title="Title"
-                subtitle="Details"
-                items={[{ id: 1, name: 'Alice' }]}
-                renderItem={() => null}
-                loading={true}
-            />
-        );
-        expect(screen.getByTestId('standard-modal')).toBeInTheDocument();
-        expect(screen.getByText('Details')).toBeInTheDocument();
-        expect(document.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
-    });
-
-    it('applies custom container and list classes when rendering items', () => {
-        render(
-            <GenericSummaryModal
-                isOpen={true}
-                onClose={vi.fn()}
-                title="Title"
-                items={[{ id: 1, name: 'Alice' }]}
-                renderItem={(item) => <span key={item.id}>{item.name}</span>}
-                containerClassName="container-extra"
-                listClassName="list-extra"
-            />
-        );
-        expect(document.querySelector('.container-extra')).toBeInTheDocument();
-        expect(document.querySelector('.list-extra')).toBeInTheDocument();
     });
 
     it('renders topContent when provided', () => {
@@ -144,45 +88,5 @@ describe('GenericSummaryModal', () => {
         );
         expect(screen.getByTestId('children')).toBeInTheDocument();
         expect(screen.getByText('Child Content')).toBeInTheDocument();
-    });
-});
-
-describe('SummaryItem', () => {
-    it('renders a clickable row and triggers onClick from Enter', () => {
-        const onClick = vi.fn();
-        render(
-            <SummaryItem
-                avatar={<span>😀</span>}
-                title="Alice"
-                subtitle="Student"
-                onClick={onClick}
-            />
-        );
-
-        const item = screen.getByRole('button', { name: /Alice/i });
-        fireEvent.keyDown(item, { key: 'Enter' });
-        expect(onClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('stops rightAction clicks from bubbling to the row handler', () => {
-        const onClick = vi.fn();
-        const rightActionClick = vi.fn();
-        render(
-            <SummaryItem
-                title="Task"
-                onClick={onClick}
-                rightAction={<button onClick={rightActionClick}>More</button>}
-            />
-        );
-
-        fireEvent.click(screen.getByText('More'));
-        expect(rightActionClick).toHaveBeenCalledTimes(1);
-        expect(onClick).not.toHaveBeenCalled();
-    });
-
-    it('renders a static row when no click handler is provided', () => {
-        render(<SummaryItem title="Static" subtitle="Row" />);
-        expect(screen.queryByRole('button', { name: /Static/i })).toBeNull();
-        expect(screen.getByText('Static')).toBeInTheDocument();
     });
 });

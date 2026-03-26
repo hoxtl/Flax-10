@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { TagsSelector } from "../../../components/common/TagsSelector/TagsSelector";
+import { TagsSelector } from "../../../components/common/tags_selector/TagsSelector";
 
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, {

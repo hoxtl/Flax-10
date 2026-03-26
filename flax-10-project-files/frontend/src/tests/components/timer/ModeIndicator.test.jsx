@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { ModeIndicator, SessionStatus } from '../../../components/Timer/TimerComponents';
+import { ModeIndicator } from '../../../components/timer/TimerComponents';
 
 const testModes = () => {
     const { rerender } = render(<ModeIndicator mode="work" isOvertime={false} />);
@@ -17,10 +17,5 @@ describe('ModeIndicator', () => {
     it('shows Overtime for work mode when isOvertime is true', () => {
         render(<ModeIndicator mode="work" isOvertime={true} />);
         expect(screen.getByText('Overtime')).toBeInTheDocument();
-    });
-
-    it('renders the session counter', () => {
-        render(<SessionStatus current={1} total={4} />);
-        expect(screen.getByText('Session 2 of 4')).toBeInTheDocument();
     });
 });

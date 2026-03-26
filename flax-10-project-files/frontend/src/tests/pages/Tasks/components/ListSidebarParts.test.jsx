@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { ListContextMenu, RenameInput } from "../../../../pages/Tasks/components/listSidebarParts";
+import { ListContextMenu, RenameInput } from "../../../../pages/tasks/components/listSidebarParts";
 
 afterEach(() => {
   vi.restoreAllMocks();

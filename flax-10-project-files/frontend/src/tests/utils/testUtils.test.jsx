@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { act } from "@testing-library/react";
 
-import { render, renderHook, screen } from "../../utils/test-utils";
+import { render, renderHook, screen } from "../../utils/testUtils";
 import { useAuth } from "../../context/AuthContext";
 
 function ExtraWrapper({ children }) {

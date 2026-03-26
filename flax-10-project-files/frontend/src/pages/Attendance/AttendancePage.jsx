@@ -2,8 +2,8 @@
  * Attendance page entry.
  */
 
-import AppPage from "../../components/common/AppPage/AppPage";
-import { BackToTop } from "../../components/Pagination/Pagination";
+import AppPage from "../../components/common/app_page/AppPage";
+import { BackToTop } from "../../components/pagination/Pagination";
 import AttendancePageBody from "./components/AttendancePageBody";
 import AttendancePageStatus from "./components/AttendancePageStatus";
 import { useAttendancePageModel } from "./hooks/useAttendancePageModel";

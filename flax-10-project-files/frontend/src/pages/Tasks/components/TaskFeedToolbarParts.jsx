@@ -4,8 +4,8 @@
 
 import { X } from "lucide-react";
 
-import SearchBar from "../../../components/common/SearchBar";
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import SearchBar from "../../../components/common/search_bar";
+import AnimatedDropdown from "../../../components/common/animated_dropdown";
 
 import { TASK_SORT_OPTIONS as SORT_OPTIONS } from "../../../lib/taskSortOptions";
 import styles from "./TaskFeedToolbar.module.css";

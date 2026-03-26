@@ -3,10 +3,10 @@
  */
 
 import { useState } from "react";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import styles from "./CreateListModal.module.css";
 import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import StandardModal from "../../../components/common/standard_modal/StandardModal";
 
 function CreateListModalBody({ name, setName, color, setColor, onEnter }) {
   return (

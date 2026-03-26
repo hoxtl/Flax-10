@@ -14,7 +14,7 @@ vi.mock("../../../api/userApi", () => ({
   getUserSettings: (...args) => getUserSettings(...args),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options = [], placeholder }) => (
     <select
       aria-label={placeholder}
@@ -31,13 +31,13 @@ vi.mock("../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-import useSchedulingState from "../../../components/Settings/scheduling/useSchedulingState";
+import useSchedulingState from "../../../components/settings/scheduling/useSchedulingState";
 import {
   SchedulingPanel,
   StudyTimeSection,
   WeekPreferenceSection,
   WorktimePreferenceSection,
-} from "../../../components/Settings/scheduling/SchedulingSection";
+} from "../../../components/settings/scheduling/SchedulingSection";
 
 describe("useSchedulingState", () => {
   beforeEach(() => {

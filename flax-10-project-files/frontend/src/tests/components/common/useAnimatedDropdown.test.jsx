@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { buildMenuStyle, getFilteredDropdownOptions, useAnimatedDropdownState } from "../../../components/common/AnimatedDropdown/useAnimatedDropdown";
+import { buildMenuStyle, getFilteredDropdownOptions, useAnimatedDropdownState } from "../../../components/common/animated_dropdown/useAnimatedDropdown";
 
 const baseOptions = ["Alpha", { value: "beta", label: "Beta" }];
 

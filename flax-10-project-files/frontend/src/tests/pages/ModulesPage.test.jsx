@@ -5,7 +5,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import ModulesPage from '../../pages/Modules/ModulesPage';
+import ModulesPage from '../../pages/modules/ModulesPage';
 
 const mockHook = {
     loading: false,
@@ -19,15 +19,15 @@ const mockHook = {
     toggleEnrollment: vi.fn(),
 };
 
-vi.mock('../../components/Modules/hooks/useModules', () => ({ default: () => mockHook }));
-vi.mock('../../components/Modules/utils/moduleUtils', () => ({
+vi.mock('../../components/modules/hooks/useModules', () => ({ default: () => mockHook }));
+vi.mock('../../components/modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     filterModules: vi.fn((modules) => modules),
     applyFiltersAndSort: vi.fn((modules) => modules),
     getDepartments: vi.fn(() => []),
     normaliseModuleCode: vi.fn((code) => String(code || '').toUpperCase().replace(/\s+/g, '')),
 }));
-vi.mock('../../components/Modules/Modules/ModuleGrid', () => ({
+vi.mock('../../components/modules/modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (
         <div>
             <span>ModuleGrid</span>
@@ -36,7 +36,7 @@ vi.mock('../../components/Modules/Modules/ModuleGrid', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/Modules/Modules/ModuleForm', () => ({
+vi.mock('../../components/modules/modules/ModuleForm', () => ({
     default: ({ onCancel, onSuccess }) => (
         <div>
             <span>ModuleForm</span>
@@ -46,18 +46,18 @@ vi.mock('../../components/Modules/Modules/ModuleForm', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/Modules/Modules/ModuleDetails', () => ({
+vi.mock('../../components/modules/modules/ModuleDetails', () => ({
     default: ({ onBack }) => <div><button onClick={onBack}>Back</button></div>,
 }));
-vi.mock('../../components/Modules/Deadlines/DeadlineModal', () => ({
+vi.mock('../../components/modules/deadlines/DeadlineModal', () => ({
     default: ({ onClose }) => <div><button onClick={onClose}>CloseModal</button></div>,
 }));
-vi.mock('../../pages/Modules/ModulesPage.module.css', () => ({ default: {} }));
-vi.mock('../../pages/Modules/MyModulesDashboard', () => ({
+vi.mock('../../pages/modules/ModulesPage.module.css', () => ({ default: {} }));
+vi.mock('../../pages/modules/MyModulesDashboard', () => ({
     default: () => <div>Upcoming assignment deadlines</div>,
 }));
 
-vi.mock('../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, className }) => (
         <select
             data-testid={className || 'animated-dd'}
@@ -71,7 +71,7 @@ vi.mock('../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
-vi.mock('../../components/Modules/hooks/useModuleSorting', () => ({
+vi.mock('../../components/modules/hooks/useModuleSorting', () => ({
     default: (modules) => ({
         results: modules || [],
         pageModules: (modules || []).slice(0, 9),

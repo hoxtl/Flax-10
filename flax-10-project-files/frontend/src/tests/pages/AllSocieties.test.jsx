@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import AllSocieties from '../../pages/Societies/AllSocieties';
+import AllSocieties from '../../pages/societies/AllSocieties';
 
-vi.mock('../../components/Society/SocietyCard', () => ({
+vi.mock('../../components/society/SocietyCard', () => ({
     default: ({ society, onClick }) => (
         <div data-testid={`society-card-${society.id}`} onClick={onClick}>
             {society.name}
@@ -10,19 +10,19 @@ vi.mock('../../components/Society/SocietyCard', () => ({
     ),
 }));
 
-vi.mock('../../components/Tags/BasePill', () => ({
+vi.mock('../../components/tags/BasePill', () => ({
     default: ({ label, isActive, onClick }) => (
         <button className={isActive ? 'active' : ''} onClick={onClick}>{label}</button>
     ),
 }));
 
-vi.mock('../../components/common/SearchBar', () => ({
+vi.mock('../../components/common/search_bar', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
 
-vi.mock('../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}
@@ -48,7 +48,7 @@ vi.mock('framer-motion', () => {
     };
 });
 
-vi.mock('../../components/Pagination/Pagination', () => ({
+vi.mock('../../components/pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages, onPageChange }) => (
         <div data-testid="pagination">
             <span>Page {currentPage} of {totalPages}</span>

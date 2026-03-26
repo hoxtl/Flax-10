@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import * as api from "../api/notificationApi";
-import { requestPermission, sendBrowserNotification } from "../components/Notifications/utils/browserNotification";
-import { playNotificationSound } from "../components/Notifications/utils/notificationSound";
-import { parseNotificationAction } from "../components/Notifications/utils/notificationAction";
+import { requestPermission, sendBrowserNotification } from "../components/notifications/utils/browserNotification";
+import { playNotificationSound } from "../components/notifications/utils/notificationSound";
+import { parseNotificationAction } from "../components/notifications/utils/notificationAction";
 
 const POLL_INTERVAL = 30000;
 

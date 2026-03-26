@@ -9,7 +9,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ children, title, action }) => (
     <div>
       <h1>{title}</h1>
@@ -19,7 +19,7 @@ vi.mock("../../../components/common/AppPage/AppPage", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description, action }) => (
     <div>
       <div>{title}</div>
@@ -29,7 +29,7 @@ vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
+vi.mock("../../../components/common/page_toolbar/PageToolbar", () => ({
   default: ({ searchSlot, controlsSlot }) => (
     <div>
       <div data-testid="toolbar-search">{searchSlot}</div>
@@ -39,21 +39,21 @@ vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
   ToolbarSortControl: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
 }));
 
-vi.mock("../../../components/common/PageTransition/PageTransition.jsx", () => ({
+vi.mock("../../../components/common/page_transition/PageTransition.jsx", () => ({
   default: ({ children }) => <div data-testid="page-transition">{children}</div>,
 }));
 
-vi.mock("../../../components/common/SearchBar/SearchBar.jsx", () => ({
+vi.mock("../../../components/common/search_bar/SearchBar.jsx", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} />
   ),
 }));
 
-vi.mock("../../../components/common/Tabs/Tabs", () => ({
+vi.mock("../../../components/common/tabs/Tabs", () => ({
   default: ({ tabs, activeTab, onTabChange }) => (
     <div>
       {tabs.map((tab) => (
@@ -66,7 +66,7 @@ vi.mock("../../../components/common/Tabs/Tabs", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/SegmentedControl/SegmentedControl", () => ({
+vi.mock("../../../components/common/segmented_control/SegmentedControl", () => ({
   SegmentedControl: ({ options, value, onChange }) => (
     <div>
       <div data-testid="segment-value">{value}</div>
@@ -79,7 +79,7 @@ vi.mock("../../../components/common/SegmentedControl/SegmentedControl", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState.jsx", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState.jsx", () => ({
   default: ({ title, hint, onClear, clearLabel }) => (
     <div>
       <div>{title || "search-empty"}</div>
@@ -89,7 +89,7 @@ vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState.jsx", () =
   ),
 }));
 
-vi.mock("../../../components/Pagination/Pagination.jsx", () => ({
+vi.mock("../../../components/pagination/Pagination.jsx", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) => (
     <div>
       <div>{`Page ${currentPage} / ${totalPages}`}</div>
@@ -99,11 +99,11 @@ vi.mock("../../../components/Pagination/Pagination.jsx", () => ({
   BackToTop: () => <div>BackToTop</div>,
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleCourseFilter", () => ({
+vi.mock("../../../components/modules/modules/ModuleCourseFilter", () => ({
   default: () => <div>CourseFilter</div>,
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleGrid.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleGrid.jsx", () => ({
   default: ({ modules, onDelete, onEdit, onViewModule }) => (
     <div data-testid="module-grid">
       {modules.map((module) => (
@@ -118,25 +118,25 @@ vi.mock("../../../components/Modules/Modules/ModuleGrid.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/hooks/useModuleSorting.js", () => ({
+vi.mock("../../../components/modules/hooks/useModuleSorting.js", () => ({
   default: function UseModuleSortingMock(...args) {
     return useModuleSortingMock(...args);
   },
 }));
 
-vi.mock("../../../components/Modules/utils/moduleUtils.js", () => ({
+vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-vi.mock("../../../pages/Modules/MyModulesDashboard.jsx", () => ({
+vi.mock("../../../pages/modules/MyModulesDashboard.jsx", () => ({
   default: () => <div>MyModulesDashboard</div>,
 }));
 
-vi.mock("../../../pages/Modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
   useMainModuleView: (...args) => useMainModuleViewMock(...args),
 }));
 
-import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/Modules/ModulesPageResults.jsx";
+import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/modules/ModulesPageResults.jsx";
 
 function buildSorting(overrides = {}) {
   return {

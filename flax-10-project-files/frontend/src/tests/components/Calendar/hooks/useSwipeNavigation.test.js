@@ -4,7 +4,7 @@
 
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useSwipeNavigation } from '../../../../components/Calendar/hooks/useSwipeNavigation';
+import { useSwipeNavigation } from '../../../../components/calendar/hooks/useSwipeNavigation';
 
 describe('useSwipeNavigation', () => {
     let container, onPrev, onNext, listeners;

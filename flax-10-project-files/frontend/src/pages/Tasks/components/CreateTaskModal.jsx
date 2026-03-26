@@ -3,13 +3,13 @@
  */
 
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import AnimatedDropdown from "../../../components/common/animated_dropdown";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
+import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import { Trash2, X } from "lucide-react";
-import TextInput from "../../../components/common/TextInput/TextInput";
-import EstimatedDurationControl from "../../../components/common/EstimatedDurationControl/EstimatedDurationControl";
+import TextInput from "../../../components/common/text_input/TextInput";
+import EstimatedDurationControl from "../../../components/common/estimated_duration_control/EstimatedDurationControl";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
 import { POMODORO_BLOCK_MINUTES, minutesToEstimateBlocks } from "../utils/createTaskBarUtils";

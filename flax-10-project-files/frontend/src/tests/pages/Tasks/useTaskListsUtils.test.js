@@ -8,7 +8,7 @@ import {
   removeListImpl,
   restoreListImpl,
   permanentlyDeleteListImpl,
-} from "../../../pages/Tasks/utils/useTaskListsUtils";
+} from "../../../pages/tasks/utils/useTaskListsUtils";
 
 vi.mock("../../../api/taskApi", () => ({
   createTaskList: vi.fn(),

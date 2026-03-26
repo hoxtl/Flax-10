@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { formatFullDateTime } from '../utils/moduleUtils';
 import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
 import { ModuleItemCardActions, ModuleItemDeleteDialog } from '../shared/moduleCardActions';
-import LocationLink from '../../common/LocationLink/LocationLink';
+import LocationLink from '../../common/location_link/LocationLink';
 import styles from './DeadlineCard.module.css';
 
 export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete }) {

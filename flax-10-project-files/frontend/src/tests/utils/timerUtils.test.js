@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { getProgress, useCompletionCheck, useNotificationPermission } from '../../components/Timer/utils/timerUtils';
+import { getProgress, useCompletionCheck, useNotificationPermission } from '../../components/timer/utils/timerUtils';
 
 const testProgressBreak = () => {
     expect(getProgress({ mode: 'break' })).toBe(100);

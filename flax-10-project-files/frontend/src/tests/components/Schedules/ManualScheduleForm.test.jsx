@@ -1,27 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ManualScheduleForm } from '../../../components/Schedules/manual/ManualScheduleForm';
+import { ManualScheduleForm } from '../../../components/schedules/manual/ManualScheduleForm';
 
 const submitManualScheduleMock = vi.fn();
 const useManualScheduleFormMock = vi.fn();
 
-vi.mock('../../../components/Schedules/manual/submitManualSchedule', () => ({
+vi.mock('../../../components/schedules/manual/submitManualSchedule', () => ({
     submitManualSchedule: (...args) => submitManualScheduleMock(...args),
 }));
 
-vi.mock('../../../components/Schedules/manual/useManualScheduleForm', () => ({
+vi.mock('../../../components/schedules/manual/useManualScheduleForm', () => ({
     useManualScheduleForm: () => useManualScheduleFormMock(),
 }));
 
-vi.mock('../../../components/Schedules/manual/ManualScheduleFields', () => ({
+vi.mock('../../../components/schedules/manual/ManualScheduleFields', () => ({
     ManualScheduleFields: ({ title }) => <div data-testid="fields">Fields:{title}</div>,
 }));
 
-vi.mock('../../../components/Schedules/manual/ManualScheduleEventList', () => ({
+vi.mock('../../../components/schedules/manual/ManualScheduleEventList', () => ({
     ManualScheduleEventList: () => <div data-testid="event-list">EventList</div>,
 }));
 
-vi.mock('../../../components/Schedules/shared/scheduleFormStyles', () => ({
+vi.mock('../../../components/schedules/shared/scheduleFormStyles', () => ({
     default: { formWrap: 'formWrap', primaryBtn: 'primaryBtn' },
 }));
 

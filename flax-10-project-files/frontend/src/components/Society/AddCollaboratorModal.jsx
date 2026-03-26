@@ -3,11 +3,11 @@
  */
 
 import { useState } from "react";
-import UserSearch from "../Social/UserSearch";
-import Badge from "../common/Badge/Badge";
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
-import SearchEmptyState from "../common/SearchEmptyState/SearchEmptyState";
-import StandardModal from "../common/StandardModal/StandardModal";
+import UserSearch from "../social/UserSearch";
+import Badge from "../common/badge/Badge";
+import PrimaryButton from "../common/primary_button/PrimaryButton";
+import SearchEmptyState from "../common/search_empty_state/SearchEmptyState";
+import StandardModal from "../common/standard_modal/StandardModal";
 import styles from "./AddCollaboratorModal.module.css";
 
 function useCollaboratorSelection(existingUsernames, onAdd, onClose) {

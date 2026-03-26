@@ -1,17 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AuthPage from '../../pages/Auth/AuthPage';
+import AuthPage from '../../pages/auth/AuthPage';
 
-vi.mock('../../components/Auth/AuthComponents', () => ({
+vi.mock('../../components/auth/AuthComponents', () => ({
   Container: ({ children }) => <div>{children}</div>,
 }));
-vi.mock('../../components/Auth/SignUpForm', () => ({
+vi.mock('../../components/auth/SignUpForm', () => ({
   SignUpForm: ({ onSubmit }) => <button onClick={onSubmit}>signup</button>,
 }));
-vi.mock('../../components/Auth/SignInForm', () => ({
+vi.mock('../../components/auth/SignInForm', () => ({
   SignInForm: ({ onSubmit }) => <button onClick={onSubmit}>signin</button>,
 }));
-vi.mock('../../components/Auth/Overlay', () => ({
+vi.mock('../../components/auth/Overlay', () => ({
   AuthOverlay: ({ onToggle }) => (
     <div>
       <button onClick={() => onToggle(true)}>to-signin</button>
@@ -19,12 +19,12 @@ vi.mock('../../components/Auth/Overlay', () => ({
     </div>
   ),
 }));
-vi.mock('../../components/Auth/ErrorMessage', () => ({
+vi.mock('../../components/auth/ErrorMessage', () => ({
   ErrorMessage: ({ error }) => error ? <div data-testid="error">{error}</div> : null,
 }));
-vi.mock('../../components/Auth/AuthHeroGeometric', () => ({ default: () => <div /> }));
-vi.mock('../../components/Auth/TestimonialsMarquee', () => ({ TestimonialsMarquee: () => <div /> }));
-vi.mock('../../components/Auth/AuthBranding', () => ({
+vi.mock('../../components/auth/AuthHeroGeometric', () => ({ default: () => <div /> }));
+vi.mock('../../components/auth/TestimonialsMarquee', () => ({ TestimonialsMarquee: () => <div /> }));
+vi.mock('../../components/auth/AuthBranding', () => ({
   AuthBrand: () => <div />, AuthFooter: () => <div />,
 }));
 
@@ -32,14 +32,14 @@ const { mockAuthService } = vi.hoisted(() => ({
     mockAuthService: { register: vi.fn(), login: vi.fn() },
 }));
 vi.mock('../../api/authApi', () => ({ authService: mockAuthService }));
-vi.mock('../../components/Auth/utils/authHelpers', () => ({
+vi.mock('../../components/auth/utils/authHelpers', () => ({
   validatePasswords: vi.fn(() => null),
   getErrorMessage: vi.fn(() => 'error'),
   saveUserData: vi.fn(),
   clearUserData: vi.fn(),
 }));
 
-import { validatePasswords, saveUserData } from '../../components/Auth/utils/authHelpers';
+import { validatePasswords, saveUserData } from '../../components/auth/utils/authHelpers';
 
 describe('AuthPage', () => {
   it('renders without crashing', () => {

@@ -3,9 +3,9 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
-import styles from '../../../pages/Timer/TimerPage.module.css';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
-import StandardModal from '../../common/StandardModal/StandardModal';
+import styles from '../../../pages/timer/TimerPage.module.css';
+import PrimaryButton from '../../common/primary_button/PrimaryButton';
+import StandardModal from '../../common/standard_modal/StandardModal';
 
 function buildLeaveState(timeLeftSeconds, sessionTotalSeconds) {
   const safeTotal = Math.max(1, Number(sessionTotalSeconds || 0));

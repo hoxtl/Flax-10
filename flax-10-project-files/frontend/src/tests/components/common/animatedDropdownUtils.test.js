@@ -6,7 +6,7 @@ import {
   filterFlat,
   filterGrouped,
   makeOutsideClickListener,
-} from '../../../components/common/AnimatedDropdown/animatedDropdownUtils';
+} from '../../../components/common/animated_dropdown/animatedDropdownUtils';
 
 describe('animatedDropdownUtils', () => {
   it('filters grouped options case-insensitively and preserves the original list for blank queries', () => {

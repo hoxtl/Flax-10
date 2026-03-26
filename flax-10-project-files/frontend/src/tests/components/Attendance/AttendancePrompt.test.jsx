@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { act, render, screen, fireEvent, waitFor, renderHook } from "../../../utils/test-utils";
+import { act, render, screen, fireEvent, waitFor, renderHook } from "../../../utils/testUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -25,22 +25,22 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-import AttendancePrompt from "../../../components/Attendance/AttendancePrompt";
-import AttendancePromptModal from "../../../components/Attendance/AttendancePromptModal";
+import AttendancePrompt from "../../../components/attendance/AttendancePrompt";
+import AttendancePromptModal from "../../../components/attendance/AttendancePromptModal";
 import {
   dismissAttendancePrompt,
   submitAttendancePromptAnswer,
-} from "../../../components/Attendance/attendancePromptActions";
+} from "../../../components/attendance/attendancePromptActions";
 import {
   isInPromptWindow,
   getDateRangeForPrompt,
   findCandidateEvent,
-} from "../../../components/Attendance/attendancePromptUtils";
+} from "../../../components/attendance/attendancePromptUtils";
 import {
   getPromptedIds,
   getSessionDismissedIds,
   setPromptedId,
-} from "../../../components/Attendance/attendancePromptStorage";
+} from "../../../components/attendance/attendancePromptStorage";
 
 const attendanceStatsState = { overall: { attended: 0, missed: 0 } };
 
@@ -57,15 +57,15 @@ vi.mock("../../../api/eventApi", () => ({
   getEvents: (...args) => getEventsMock(...args),
 }));
 
-vi.mock("../../../components/Attendance/hooks/useCandidateEvent", () => ({
+vi.mock("../../../components/attendance/hooks/useCandidateEvent", () => ({
   useCandidateEvent: vi.fn(() => [candidateState.value, candidateState.setValue]),
 }));
 
-vi.mock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({
+vi.mock("../../../pages/attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: () => ({ refetch: vi.fn(), stats: attendanceStatsState }),
 }));
 
-vi.mock("../../../components/common/ConfirmModal/ConfirmModal", () => ({
+vi.mock("../../../components/common/confirm_modal/ConfirmModal", () => ({
   default: ({ title, message, onConfirm, onAlternate, onCancel, confirmText, alternateText, cancelText }) => (
     <div>
       <div>{title}</div>
@@ -80,7 +80,6 @@ vi.mock("../../../components/common/ConfirmModal/ConfirmModal", () => ({
 describe("Attendance prompt", () => {
   beforeEach(() => {
     localStorage.clear();
-    sessionStorage.clear();
     candidateState.value = null;
     candidateState.setValue = vi.fn();
     recordAttendanceMock.mockReset();
@@ -261,10 +260,10 @@ describe("Attendance prompt", () => {
     const candidate = {
       id: 11,
       title: "Lecture",
+      source: "timetable",
+      external_id: "evt-11",
       start_time: "2026-03-01T10:00:00Z",
       end_time: "2026-03-01T11:00:00Z",
-      source: "timetable",
-      external_id: "abc-11",
     };
     expect(isInPromptWindow(candidate)).toBe(true);
     expect(getDateRangeForPrompt().start).toBeDefined();
@@ -273,15 +272,24 @@ describe("Attendance prompt", () => {
   });
 
   it("handles candidate polling hook", async () => {
-    vi.useRealTimers();
-    sessionStorage.clear();
-    getEventsMock.mockResolvedValue([]);
-    const { useCandidateEvent } = await vi.importActual("../../../components/Attendance/hooks/useCandidateEvent");
+    const candidate = {
+      id: 11,
+      title: "Timetable Lecture",
+      source: "timetable",
+      external_id: "evt-11",
+      start_time: "2026-03-01T10:00:00Z",
+      end_time: "2026-03-01T11:00:00Z",
+    };
+    getEventsMock.mockResolvedValue([candidate]);
+    const { useCandidateEvent } = await vi.importActual("../../../components/attendance/hooks/useCandidateEvent");
 
-    renderHook(() => useCandidateEvent());
-    await act(async () => { await Promise.resolve(); });
-    await waitFor(() => expect(getEventsMock).toHaveBeenCalled());
-    expect(getEventsMock.mock.calls[0][0]).toEqual(expect.objectContaining({ start: expect.any(String), end: expect.any(String) }));
+    const { result } = renderHook(() => useCandidateEvent());
+    await act(async () => {
+      await Promise.resolve();
+      vi.runOnlyPendingTimers();
+      await Promise.resolve();
+    });
+    expect(result.current[0]?.title).toBe("Timetable Lecture");
   });
 
   it("stores prompted ids safely even when storage is bad", () => {

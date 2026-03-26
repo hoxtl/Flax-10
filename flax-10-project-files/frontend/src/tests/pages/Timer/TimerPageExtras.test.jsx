@@ -21,15 +21,15 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
   default: (...args) => useBreakpoint(...args),
 }));
 
-vi.mock("../../../components/Timer/utils/timerUtils", () => ({
+vi.mock("../../../components/timer/utils/timerUtils", () => ({
   useNotificationPermission: (...args) => useNotificationPermission(...args),
 }));
 
-vi.mock("../../../pages/Timer/hooks/useTimerPageFlags", () => ({
+vi.mock("../../../pages/timer/hooks/useTimerPageFlags", () => ({
   useTimerPageFlags: (...args) => useTimerPageFlags(...args),
 }));
 
-vi.mock("../../../pages/Timer/hooks/useTimerPageEffects", () => ({
+vi.mock("../../../pages/timer/hooks/useTimerPageEffects", () => ({
   useFocusAccent: (...args) => useFocusAccent(...args),
   useTimerDocumentTitle: (...args) => useTimerDocumentTitle(...args),
   useTimerShortcuts: (...args) => useTimerShortcuts(...args),
@@ -41,27 +41,27 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => useNavigate,
 }));
 
-vi.mock("../../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ title, children, className }) => <div data-class={className}><h1>{title}</h1>{children}</div>,
 }));
 
-vi.mock("../../../components/common/BackButton/BackButton.jsx", () => ({
+vi.mock("../../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label, className }) => <button type="button" className={className} onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../components/common/PageTransition/PageTransition", () => ({
+vi.mock("../../../components/common/page_transition/PageTransition", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock("../../../components/common/ScrollToTop/ScrollToTop", () => ({
+vi.mock("../../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>scroll-top</div>,
 }));
 
-vi.mock("../../../components/Timer/TodayBanner", () => ({
+vi.mock("../../../components/timer/TodayBanner", () => ({
   default: ({ onStreakData, isStudying }) => <button type="button" onClick={() => onStreakData?.({ current_streak_days: 3 })}>today-banner-{String(isStudying)}</button>,
 }));
 
-vi.mock("../../../components/Timer/WrapperComponents", () => ({
+vi.mock("../../../components/timer/WrapperComponents", () => ({
   MainSection: ({ onOpenHistory, onOpenFocus }) => (
     <div>
       <button type="button" onClick={onOpenHistory}>open-history</button>
@@ -78,19 +78,19 @@ vi.mock("../../../components/Timer/WrapperComponents", () => ({
   FocusOverlayContent: ({ onExitFocus }) => <button type="button" onClick={onExitFocus}>exit-focus</button>,
 }));
 
-vi.mock("../../../components/ui/word-loader", () => ({
+vi.mock("../../../components/ui/WordLoader", () => ({
   default: ({ words }) => <div>{words.join(",")}</div>,
 }));
 
-vi.mock("../../../pages/Timer/components/FocusPageSkeleton", () => ({
+vi.mock("../../../pages/timer/components/FocusPageSkeleton", () => ({
   FocusPageSkeleton: () => <div>focus-skeleton</div>,
 }));
 
-vi.mock("../../../pages/Timer/components/NotificationPrompt", () => ({
+vi.mock("../../../pages/timer/components/NotificationPrompt", () => ({
   NotificationPrompt: ({ permission }) => <div>notify:{permission}</div>,
 }));
 
-vi.mock("../../../pages/Timer/components/ShortcutsModal", () => ({
+vi.mock("../../../pages/timer/components/ShortcutsModal", () => ({
   ShortcutsModal: ({ onClose }) => <button type="button" onClick={onClose}>shortcuts</button>,
 }));
 
@@ -98,8 +98,8 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-import { useTimerPageController } from "../../../pages/Timer/hooks/useTimerPageController";
-import { TimerPageContent } from "../../../pages/Timer/components/TimerPageContent";
+import { useTimerPageController } from "../../../pages/timer/hooks/useTimerPageController";
+import { TimerPageContent } from "../../../pages/timer/components/TimerPageContent";
 
 const buildTimerFlags = () => ({
   setFocusMode: vi.fn(),
@@ -151,8 +151,8 @@ const buildTimerState = (overrides = {}) => ({
   ...overrides,
 });
 
-const loadTimerEffects = () => vi.importActual("../../../pages/Timer/hooks/useTimerPageEffects");
-const loadShortcutsModal = () => vi.importActual("../../../pages/Timer/components/ShortcutsModal");
+const loadTimerEffects = () => vi.importActual("../../../pages/timer/hooks/useTimerPageEffects");
+const loadShortcutsModal = () => vi.importActual("../../../pages/timer/components/ShortcutsModal");
 
 describe("Timer page extras", () => {
   beforeEach(() => {
@@ -261,19 +261,22 @@ describe("Timer page extras", () => {
     it("handles overlay interactions (history, shortcuts, streak)", () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date("2026-03-24T20:00:00.000Z"));
-      const state = buildTimerState({ focusMode: false, showPageSkeleton: false });
-      render(<TimerPageContent state={state} />);
-      fireEvent.click(screen.getByText("open-history"));
-      expect(state.setShowHistory).toHaveBeenCalledWith(true);
-      fireEvent.click(screen.getByText("open-focus"));
-      expect(state.openFocusMode).toHaveBeenCalled();
-      fireEvent.click(screen.getByText("✕"));
-      expect(state.setDismissedWarning).toHaveBeenCalledWith(true);
-      fireEvent.click(screen.getByText("shortcuts"));
-      expect(state.setShowShortcuts).toHaveBeenCalledWith(false);
-      fireEvent.click(screen.getByText("close-history"));
-      expect(state.setShowHistory).toHaveBeenCalledWith(false);
-      vi.useRealTimers();
+      try {
+        const state = buildTimerState({ focusMode: false, showPageSkeleton: false });
+        render(<TimerPageContent state={state} />);
+        fireEvent.click(screen.getByText("open-history"));
+        expect(state.setShowHistory).toHaveBeenCalledWith(true);
+        fireEvent.click(screen.getByText("open-focus"));
+        expect(state.openFocusMode).toHaveBeenCalled();
+        fireEvent.click(screen.getByText("✕"));
+        expect(state.setDismissedWarning).toHaveBeenCalledWith(true);
+        fireEvent.click(screen.getByText("shortcuts"));
+        expect(state.setShowShortcuts).toHaveBeenCalledWith(false);
+        fireEvent.click(screen.getByText("close-history"));
+        expect(state.setShowHistory).toHaveBeenCalledWith(false);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("renders back button and skeleton in non-focus mode", () => {

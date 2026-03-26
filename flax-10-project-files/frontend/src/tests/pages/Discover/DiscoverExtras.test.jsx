@@ -53,14 +53,14 @@ const useSearchInitMock = vi.fn();
 const useFilterStateMock = vi.fn();
 const useClickOutsideMock = vi.fn();
 
-vi.mock("../../../components/Social/UserSearch", () => ({
+vi.mock("../../../components/social/UserSearch", () => ({
   FilterSection: () => <div data-testid="filter-section" />,
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),
   useClickOutside: (...args) => useClickOutsideMock(...args),
 }));
 
-vi.mock("../../../components/Pagination/Pagination", () => ({
+vi.mock("../../../components/pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages }) => (
     <div data-testid="pagination">
       {currentPage}/{totalPages}
@@ -73,11 +73,11 @@ vi.mock("../../../utils/tutorPhotoFallback", () => ({
   getResolvedUserPhoto: () => null,
 }));
 
-vi.mock("../../../components/common/ErrorBoundary/ErrorBoundary", () => ({
+vi.mock("../../../components/common/error_boundary/ErrorBoundary", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ children, title }) => (
     <div>
       <h1>{title}</h1>
@@ -86,11 +86,11 @@ vi.mock("../../../components/common/AppPage/AppPage", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/UserAvatar/UserAvatar", () => ({
+vi.mock("../../../components/common/user_avatar/UserAvatar", () => ({
   default: () => <div data-testid="user-avatar" />,
 }));
 
-vi.mock("../../../components/common/Card/GridCard", () => ({
+vi.mock("../../../components/common/card/GridCard", () => ({
   default: ({ children, onClick }) => (
     <div data-testid="grid-card" onClick={onClick}>
       {children}
@@ -98,19 +98,19 @@ vi.mock("../../../components/common/Card/GridCard", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/EntityLinkChip/EntityLinkChip", () => ({
+vi.mock("../../../components/common/entity_link_chip/EntityLinkChip", () => ({
   default: ({ children }) => <span>{children}</span>,
 }));
 
-vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ query }) => <div>{`No users match "${query}"`}</div>,
 }));
 
-vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
+vi.mock("../../../components/common/page_toolbar/PageToolbar", () => ({
   default: ({ searchSlot, controlsSlot }) => (
     <div data-testid="page-toolbar">
       {searchSlot}
@@ -122,7 +122,7 @@ vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../../components/common/search_bar/SearchBar", () => ({
   default: ({ placeholder, value, onChange }) => (
     <input
       placeholder={placeholder}
@@ -146,13 +146,13 @@ vi.mock("../../../components/common", () => ({
 }));
 
 // ── Imports (after mocks) ────────────────────────────────────────────────────
-import Discover from "../../../pages/Discover/Discover";
+import Discover from "../../../pages/discover/Discover";
 import {
   DiscoverSkeleton,
   DiscoverToolbar,
   UsersGrid,
-} from "../../../pages/Discover/DiscoverComponents";
-import { useDiscoverFetch } from "../../../pages/Discover/discoverHooks";
+} from "../../../pages/discover/DiscoverComponents";
+import { useDiscoverFetch } from "../../../pages/discover/discoverHooks";
 
 // ── Helpers for filter state mock ────────────────────────────────────────────
 function makeFilterState(overrides = {}) {

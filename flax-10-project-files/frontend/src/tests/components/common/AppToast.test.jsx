@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AppToast from '../../../components/common/AppToast/AppToast';
+import AppToast from '../../../components/common/app_toast/AppToast';
 
 vi.mock('framer-motion', () => ({
   motion: {

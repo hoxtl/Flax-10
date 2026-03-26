@@ -7,7 +7,7 @@ vi.mock("../../../../hooks/useCountUp", () => ({
   useCountUp: (...args) => mockUseCountUp(...args),
 }));
 
-vi.mock("../../../../components/common/StatStrip/StatStrip", () => ({
+vi.mock("../../../../components/common/stat_strip/StatStrip", () => ({
   default: ({ items }) => (
     <div data-testid="stat-strip">
       {items.map((item) => `${item.label}:${item.value}${item.suffix || ""}`).join("|")}
@@ -15,13 +15,13 @@ vi.mock("../../../../components/common/StatStrip/StatStrip", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/Card/Card", () => ({
+vi.mock("../../../../components/common/card/Card", () => ({
   default: ({ children, className }) => <div data-testid="card" className={className}>{children}</div>,
 }));
 
-import { QuickStatsRail } from "../../../../pages/Profile/components/widgets/QuickStatsRail";
-import { StudyDNA } from "../../../../pages/Profile/components/widgets/StudyDNA";
-import { PersonaCard } from "../../../../pages/Profile/components/widgets/PersonaCard";
+import { QuickStatsRail } from "../../../../pages/profile/components/widgets/QuickStatsRail";
+import { StudyDNA } from "../../../../pages/profile/components/widgets/StudyDNA";
+import { PersonaCard } from "../../../../pages/profile/components/widgets/PersonaCard";
 
 describe("Profile low-coverage widgets", () => {
   beforeEach(() => {

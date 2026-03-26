@@ -12,11 +12,11 @@ const loadState = {
   setArchivedLists: vi.fn(),
 };
 
-vi.mock("../../../../pages/Tasks/hooks/useTaskListsLoad", () => ({
+vi.mock("../../../../pages/tasks/hooks/useTaskListsLoad", () => ({
   default: vi.fn(() => loadState),
 }));
 
-vi.mock("../../../../pages/Tasks/utils/useTaskListsUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/useTaskListsUtils", () => ({
   addListImpl: vi.fn(() => ({ id: 3 })),
   renameListImpl: vi.fn(),
   removeListImpl: vi.fn(),
@@ -24,14 +24,14 @@ vi.mock("../../../../pages/Tasks/utils/useTaskListsUtils", () => ({
   permanentlyDeleteListImpl: vi.fn(),
 }));
 
-import useTaskLists from "../../../../pages/Tasks/hooks/useTaskLists";
+import useTaskLists from "../../../../pages/tasks/hooks/useTaskLists";
 import {
   addListImpl,
   renameListImpl,
   removeListImpl,
   restoreListImpl,
   permanentlyDeleteListImpl,
-} from "../../../../pages/Tasks/utils/useTaskListsUtils";
+} from "../../../../pages/tasks/utils/useTaskListsUtils";
 
 describe("useTaskLists", () => {
   beforeEach(() => {

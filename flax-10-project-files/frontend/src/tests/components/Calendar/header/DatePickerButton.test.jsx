@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { DatePickerButton } from '../../../../components/Calendar/header/DatePickerButton';
+import { DatePickerButton } from '../../../../components/calendar/header/DatePickerButton';
 
 vi.mock('../../../../components/common/inputs/DateTimePicker', () => ({
     default: ({ value, onChange, customTrigger }) => (

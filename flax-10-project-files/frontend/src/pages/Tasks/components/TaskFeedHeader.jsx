@@ -2,9 +2,9 @@
  * Page header block for the task feed.
  */
 
-import PageHeader from "../../../components/common/PageHeader/PageHeader";
+import PageHeader from "../../../components/common/page_header/PageHeader";
 
-import { taskFeedHintStyle } from "./TaskFeedConstants";
+import { taskFeedHintStyle } from "./taskFeedConstants";
 
 export default function TaskFeedHeader({ title, subtitle, isReadingList }) {
   const hint = isReadingList

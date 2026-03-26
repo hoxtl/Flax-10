@@ -4,10 +4,10 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { GoalEditor } from '../../../components/Timer/presets/DailyGoalWidget';
-import { MusicEmbed } from '../../../components/Timer/soundPanel/MusicEmbed';
+import { GoalEditor } from '../../../components/timer/presets/DailyGoalWidget';
+import { MusicEmbed } from '../../../components/timer/sound_panel/MusicEmbed';
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: {
     todayGoalInput: 'todayGoalInput', todayGoalEditBtn: 'todayGoalEditBtn',
     musicEmbedWrap: 'musicEmbedWrap', musicEmbedHeader: 'musicEmbedHeader',
@@ -17,7 +17,7 @@ vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
   },
 }));
 
-vi.mock('../../../components/Timer/soundPanel/SoundIcons', () => ({
+vi.mock('../../../components/timer/sound_panel/SoundIcons', () => ({
   ProviderIcon: ({ provider }) => <span data-provider={provider} />,
 }));
 

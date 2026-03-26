@@ -2,5 +2,5 @@
  * Homepage components barrel export.
  */
 
-export { MiniTimeline } from "./MiniTimeline";
+export { MiniTimeline } from "./mini_timeline";
 export { HomepageTimelineSection } from "./HomepageTimelineSection";

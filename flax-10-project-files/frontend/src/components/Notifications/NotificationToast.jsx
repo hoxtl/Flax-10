@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useNotifications } from "../../context/NotificationContext";
-import AppToast from "../common/AppToast/AppToast";
+import AppToast from "../common/app_toast/AppToast";
 import { executeNotificationAction, hasNotificationAction, parseNotificationAction } from "./utils/notificationAction";
 import { playNotificationSound } from "./utils/notificationSound";
 

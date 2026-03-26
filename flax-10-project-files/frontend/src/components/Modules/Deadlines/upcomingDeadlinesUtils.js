@@ -8,4 +8,4 @@ export {
   getTierPriority,
   getUrgencyTier,
   isUrgentTier,
-} from "../../common/DeadlineCountdown/deadlineCountdownUtils";
+} from "../../common/deadline_countdown/deadlineCountdownUtils";

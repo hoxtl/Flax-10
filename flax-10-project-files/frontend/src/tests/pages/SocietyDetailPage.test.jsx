@@ -12,12 +12,12 @@ import { buildPageData } from "./societyDetailPageTestUtils";
 const useSocietyPageDataMock = vi.fn();
 const useSocietyInitMock = vi.fn();
 
-vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
+vi.mock("../../pages/societies/useSocietyDetailPageState", () => ({
   useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
   useSocietyInit: (...args) => useSocietyInitMock(...args),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SocietyHero", () => ({
+vi.mock("../../components/society/society_detail/SocietyHero", () => ({
   default: ({ society, onUpdateName, onImageClick, onEditImages }) => (
     <div data-testid="hero">
       <span>{society.name}</span>
@@ -28,7 +28,7 @@ vi.mock("../../components/Society/SocietyDetail/SocietyHero", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SocietyInfo", () => ({
+vi.mock("../../components/society/society_detail/SocietyInfo", () => ({
   default: ({ onViewMembers, onToggleEditMode }) => (
     <div data-testid="info">
       <button type="button" onClick={onViewMembers}>view-members</button>
@@ -37,7 +37,7 @@ vi.mock("../../components/Society/SocietyDetail/SocietyInfo", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/tabs/SocietyTabs", () => ({
+vi.mock("../../components/society/society_detail/tabs/SocietyTabs", () => ({
   default: ({ focusAnnouncementId, onEditAnnouncement }) => (
     <div data-testid="tabs">
       <span>{focusAnnouncementId || "no-focus"}</span>
@@ -46,11 +46,11 @@ vi.mock("../../components/Society/SocietyDetail/tabs/SocietyTabs", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SocietySidebar", () => ({
+vi.mock("../../components/society/society_detail/SocietySidebar", () => ({
   default: () => <div data-testid="sidebar">sidebar</div>,
 }));
 
-vi.mock("../../components/Society/SocietyDetail/imageHandlers/CoverImageModal", () => ({
+vi.mock("../../components/society/society_detail/image_handlers/CoverImageModal", () => ({
   default: ({ onClose, onUpdate }) => (
     <div data-testid="cover-modal">
       <button type="button" onClick={onClose}>close-cover</button>
@@ -60,7 +60,7 @@ vi.mock("../../components/Society/SocietyDetail/imageHandlers/CoverImageModal", 
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal", () => ({
+vi.mock("../../components/society/society_detail/image_handlers/ImageGalleryModal", () => ({
   default: ({ initialIndex, onClose }) => (
     <div data-testid="gallery-modal">
       <span>{initialIndex}</span>
@@ -69,7 +69,7 @@ vi.mock("../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal"
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SettingsModal", () => ({
+vi.mock("../../components/society/society_detail/SettingsModal", () => ({
   default: ({ onClose, onDelete }) => (
     <div data-testid="settings-modal">
       <button type="button" onClick={onClose}>close-settings</button>
@@ -78,7 +78,7 @@ vi.mock("../../components/Society/SocietyDetail/SettingsModal", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal", () => ({
+vi.mock("../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal", () => ({
   default: ({ onClose, onSubmit, onDelete }) => (
     <div data-testid="announcement-modal">
       <button type="button" onClick={onClose}>close-announcement</button>
@@ -90,7 +90,7 @@ vi.mock("../../components/Society/SocietyDetail/tabs/announcementTab/Announcemen
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({
+vi.mock("../../components/society/society_detail/ReportSocietyModal", () => ({
   default: ({ onClose, onReportSuccess }) => (
     <div data-testid="report-modal">
       <button type="button" onClick={onClose}>close-report</button>
@@ -99,7 +99,7 @@ vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({
+vi.mock("../../components/society/society_detail/MemberDirectoryModal", () => ({
   default: ({ onClose }) => (
     <div data-testid="members-modal">
       <button type="button" onClick={onClose}>close-members</button>
@@ -107,15 +107,15 @@ vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({
   ),
 }));
 
-vi.mock("../../components/common/BackButton/BackButton.jsx", () => ({
+vi.mock("../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label }) => <button type="button" onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../pages/Societies/SocietySkeletons", () => ({
+vi.mock("../../pages/societies/SocietySkeletons", () => ({
   SocietyDetailSkeleton: () => <div>Loading...</div>,
 }));
 
-import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
+import SocietyDetailPage from "../../pages/societies/SocietyDetailPage";
 
 function renderPage(ui, { routeState } = {}) {
   const initialEntries = routeState ? [{ pathname: "/societies/1", state: routeState }] : ["/societies/1"];

@@ -4,7 +4,7 @@
 
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import AppToast from "../components/common/AppToast/AppToast";
+import AppToast from "../components/common/app_toast/AppToast";
 
 const ToastContext = createContext(null);
 

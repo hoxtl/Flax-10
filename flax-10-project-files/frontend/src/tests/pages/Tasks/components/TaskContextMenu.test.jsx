@@ -2,17 +2,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { TaskContextMenu } from "../../../../pages/Tasks/components/TaskCard";
+import { TaskContextMenu } from "../../../../pages/tasks/components/TaskCard";
 
 const sleepWarningHookMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
-vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({ useSleepWarning: sleepWarningHookMock }));
-vi.mock("../../../../components/common/SleepWarningModal", () => ({ SleepWarningModal: () => <div data-testid="sleep-warning" /> }));
+vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({ useSleepWarning: sleepWarningHookMock }));
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({ SleepWarningModal: () => <div data-testid="sleep-warning" /> }));
 vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
   default: ({ onChange }) => (<div><button onClick={() => onChange("2026-03-10T10:00")}>Set date</button><button onClick={() => onChange("")}>Clear date</button></div>)
 }));
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ options = [], onChange }) => (<div><button onClick={() => onChange("__missing__")}>invalid option</button>{options.map((o) => (<button key={String(o.value)} onClick={() => onChange(o.value)}>{o.label}</button>))}</div>)
 }));
 

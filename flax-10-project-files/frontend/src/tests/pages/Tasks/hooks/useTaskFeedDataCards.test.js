@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import useTaskFeedData from "../../../../pages/Tasks/hooks/useTaskFeedData";
-import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
+import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
+import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 vi.mock("react-router-dom", async () => {
@@ -9,11 +9,11 @@ vi.mock("react-router-dom", async () => {
   return { ...actual, useNavigate: () => navigateMock };
 });
 vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn().mockResolvedValue([]) }));
-vi.mock("../../../../components/Timer/taskInput/taskInputUtils", () => ({ buildListItems: () => [], filterListItems: (arr) => arr, groupModuleItems: (arr) => ({ All: arr }) }));
+vi.mock("../../../../components/timer/task_input/taskInputUtils", () => ({ buildListItems: () => [], filterListItems: (arr) => arr, groupModuleItems: (arr) => ({ All: arr }) }));
 vi.mock("../../../../lib/allTasksCompleteMessages", () => ({ getClearMessage: () => "Great job" }));
-vi.mock("../../../../pages/Tasks/utils/taskFeedUtils", () => ({ getHeaderTitle: () => "Header" }));
+vi.mock("../../../../pages/tasks/utils/taskFeedUtils", () => ({ getHeaderTitle: () => "Header" }));
 
-vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/taskFeedDataUtils", () => ({
   buildDateBounds: vi.fn(() => ({ now: new Date(), dayStart: new Date(), todayEnd: new Date(), weekEnd: new Date() })),
   filterBySearch: vi.fn((arr) => arr), getOverdue: vi.fn(() => []), getToday: vi.fn(() => []),
   getThisWeek: vi.fn(() => []), getLater: vi.fn(() => []), getCompletedTodayCount: vi.fn(),

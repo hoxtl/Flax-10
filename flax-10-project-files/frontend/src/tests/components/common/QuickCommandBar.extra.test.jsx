@@ -17,7 +17,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ query, itemLabel, onClear }) => (
     <div>
       <div>{`No ${itemLabel} for ${query}`}</div>
@@ -44,8 +44,8 @@ vi.mock("lucide-react", async () => {
   };
 });
 
-import QuickCommandBar from "../../../components/common/QuickCommandBar/QuickCommandBar";
-import { buildActionDefs, matchesQuery } from "../../../components/common/QuickCommandBar/commandBarActions";
+import QuickCommandBar from "../../../components/common/quick_command_bar/QuickCommandBar";
+import { buildActionDefs, matchesQuery } from "../../../components/common/quick_command_bar/commandBarActions";
 
 describe("quick command bar extra branches", () => {
   beforeEach(() => {

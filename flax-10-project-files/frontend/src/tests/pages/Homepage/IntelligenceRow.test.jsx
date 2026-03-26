@@ -37,7 +37,7 @@ vi.mock("../../../components/common", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceGrid", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceGrid", () => ({
   default: (props) => (
     <div data-testid="intelligence-grid">
       <div data-testid="grid-props">{JSON.stringify({
@@ -53,18 +53,18 @@ vi.mock("../../../pages/Homepage/components/IntelligenceGrid", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceWidgetRenderer", () => ({
+vi.mock("../../../pages/homepage/components/intelligenceWidgetRenderer", () => ({
   renderIntelligenceWidget: (...args) => state.renderIntelligenceWidget(...args),
 }));
 
-vi.mock("../../../pages/Homepage/hooks/useIntelligenceDashboard", () => ({
+vi.mock("../../../pages/homepage/hooks/useIntelligenceDashboard", () => ({
   CATALOGUE: ["hero", "rightNow", "todayTasks"],
   DEFAULT_LAYOUT: ["hero", "deadlines", "todayTasks", "bigTimeline"],
   getSemesterProgress: vi.fn(),
   useIntelligenceDashboard: () => state.dashboard,
 }));
 
-import IntelligenceRow from "../../../pages/Homepage/components/IntelligenceRow";
+import IntelligenceRow from "../../../pages/homepage/components/IntelligenceRow";
 
 describe("IntelligenceRow", () => {
   beforeEach(() => {

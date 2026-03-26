@@ -1,9 +1,9 @@
 /* Tests for TaskSection component rendering, collapsing, and empty state */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import TaskSection from "../../../../pages/Tasks/components/TaskSection";
+import TaskSection from "../../../../pages/tasks/components/TaskSection";
 
-vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
+vi.mock("../../../../pages/tasks/components/TaskCard", () => ({
   default: ({ task, onEdit }) => (
     <div data-testid="task-card">
       <span>{task.title}</span>
@@ -15,7 +15,7 @@ vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
     </div>
   ),
 }));
-vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
+vi.mock("../../../../pages/tasks/components/AllTasksCompleteCard", () => ({
   default: ({ message }) => <div data-testid="all-complete">{message}</div>,
 }));
 

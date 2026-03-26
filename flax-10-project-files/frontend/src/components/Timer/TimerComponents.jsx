@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
-import styles from '../../pages/Timer/TimerPage.module.css';
+import PrimaryButton from '../common/primary_button/PrimaryButton';
+import styles from '../../pages/timer/TimerPage.module.css';
 
 // TaskInput lives in its own file; re-export for any existing imports
 export { TaskInput } from './TaskInput';

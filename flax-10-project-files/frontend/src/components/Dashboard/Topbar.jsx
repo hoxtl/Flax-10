@@ -5,10 +5,10 @@
 import styles from "./Topbar.module.css";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../../context/NotificationContext";
-import { NotificationPanel } from "../Notifications/NotificationPanel";
+import { NotificationPanel } from "../notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
-import MiniTimer from "../Timer/MiniTimer";
+import MiniTimer from "../timer/MiniTimer";
 import {
   Bell,
   BookOpen,
@@ -18,7 +18,7 @@ import {
   ClipboardCheck,
 } from "lucide-react";
 import { SegmentedControl } from "../common";
-import AnimatedDropdown from "../common/AnimatedDropdown";
+import AnimatedDropdown from "../common/animated_dropdown";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion as Motion } from "framer-motion";
 import { useState, useRef } from "react";

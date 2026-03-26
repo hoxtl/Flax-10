@@ -15,7 +15,7 @@ vi.mock("../../../../api/readingApi", () => ({
   convertReadingToTask: vi.fn(),
 }));
 
-vi.mock("../../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => (
     <div>
       <span>{title}</span>
@@ -24,7 +24,7 @@ vi.mock("../../../../components/common/EmptyState/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, disabled, onClick, pill, variant, size, ...props }) => (
     <button {...props} data-disabled={String(Boolean(disabled))} onClick={onClick}>
       {children}
@@ -32,7 +32,7 @@ vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
+vi.mock("../../../../pages/tasks/components/AllTasksCompleteCard", () => ({
   default: ({ message, sub }) => (
     <div>
       <span>{message}</span>
@@ -41,7 +41,7 @@ vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedSections.module.css", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedSections.module.css", () => ({
   default: {
     sectionStatsChip: "sectionStatsChip",
     sectionCountWrap: "sectionCountWrap",
@@ -54,7 +54,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedSections.module.css", () => 
   },
 }));
 
-vi.mock("../../../../pages/Tasks/components/SuggestedReadingsSection.module.css", () => ({
+vi.mock("../../../../pages/tasks/components/SuggestedReadingsSection.module.css", () => ({
   default: {
     row: "row",
     rowAdded: "rowAdded",
@@ -75,7 +75,7 @@ import {
   SuggestedReadingsHeader,
   SuggestedReadingsBody,
   SuggestedReadingsCollapse,
-} from "../../../../pages/Tasks/components/SuggestedReadingsSectionParts";
+} from "../../../../pages/tasks/components/SuggestedReadingsSectionParts";
 
 describe("SuggestedReadingsSectionParts", () => {
   beforeEach(() => {

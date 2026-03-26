@@ -15,7 +15,7 @@ import {
   getViewportCenter,
   lerp,
   parsePercent,
-} from "../../../components/ui/landing-page/landingPageUtils";
+} from "../../../components/ui/landing_page/landingPageUtils";
 
 describe("landingPageUtils", () => {
   it("covers the basic numeric helpers", () => {

@@ -4,7 +4,7 @@
 
 import { useMemo } from "react";
 import { CalendarDays } from "lucide-react";
-import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
+import SharedWidgetHeader from "../../../components/common/widget_header/WidgetHeader";
 import styles from "../styles/SemesterOverview.module.css";
 import { useSemesterData, useSemesterRange } from "./useSemesterOverviewData";
 

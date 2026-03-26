@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { saveTag, deleteTagWithConfirmation } from '../../../components/Tags/tagManager/tagManagerActions';
+import { saveTag, deleteTagWithConfirmation } from '../../../components/tags/tag_manager/tagManagerActions';
 
 const tags = [
   { id: 1, label: 'Work', color: '#ff0000' },

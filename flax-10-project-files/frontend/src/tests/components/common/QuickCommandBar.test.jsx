@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import QuickCommandBar from "../../../components/common/QuickCommandBar/QuickCommandBar";
-import { buildActionDefs, matchesQuery } from "../../../components/common/QuickCommandBar/commandBarActions";
+import QuickCommandBar from "../../../components/common/quick_command_bar/QuickCommandBar";
+import { buildActionDefs, matchesQuery } from "../../../components/common/quick_command_bar/commandBarActions";
 
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, {
@@ -20,7 +20,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ query, onClear }) => (
     <div>
       <span>No actions for {query}</span>

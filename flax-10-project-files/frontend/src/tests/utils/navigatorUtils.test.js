@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
     getOverlappingPairs,
     getNavigatorContext,
-} from '../../pages/Homepage/utils/navigatorUtils';
+} from '../../pages/homepage/utils/navigatorUtils';
 
 const makeEvent = (id, start, end) => ({
     id,

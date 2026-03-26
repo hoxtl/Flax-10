@@ -11,7 +11,7 @@ vi.mock("lucide-react", () => ({
   Plus: () => <span>plus-icon</span>,
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options = [] }) => (
     <select aria-label="mobile-view-dropdown" value={value} onChange={(event) => onChange(event.target.value)}>
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
@@ -19,19 +19,19 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../../pages/Tasks/components/CreateTaskBar", () => ({
+vi.mock("../../../../pages/tasks/components/CreateTaskBar", () => ({
   default: (props) => <div data-testid="create-task-bar">{props.defaultListId}</div>,
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedToolbar", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedToolbar", () => ({
   default: (props) => <div data-testid="task-feed-toolbar">{props.search}</div>,
 }));
 
-import TaskFeedSubHeader from "../../../../pages/Tasks/components/TaskFeedSubHeader";
+import TaskFeedSubHeader from "../../../../pages/tasks/components/TaskFeedSubHeader";
 
 const dataActionNames = [
   "setSearch",

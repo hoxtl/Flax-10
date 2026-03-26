@@ -2,7 +2,7 @@
  * Homepage loading skeleton.
  */
 
-import SkeletonBlock from "../../../components/common/LoadingState/SkeletonBlock";
+import SkeletonBlock from "../../../components/common/loading_state/SkeletonBlock";
 import styles from "../Homepage.module.css";
 
 export function HomepageSkeleton() {

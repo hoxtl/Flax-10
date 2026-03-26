@@ -41,7 +41,7 @@ vi.mock(
   }),
 );
 
-vi.mock('../../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../../components/common/animated_dropdown', () => ({
   default: ({ value, onChange, options, placeholder }) => (
     <select
       data-testid={`dd-${placeholder}`}

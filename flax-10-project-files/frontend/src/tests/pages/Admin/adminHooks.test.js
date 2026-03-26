@@ -13,10 +13,10 @@ vi.mock('../../../api/adminApi', () => ({
   fetchAdminUsers,
 }));
 
-import { useAsyncAction } from '../../../pages/Admin/hooks/useAsyncAction';
-import { useAsyncList } from '../../../pages/Admin/hooks/useAsyncList';
-import { usePaginatedItems } from '../../../pages/Admin/hooks/usePaginatedItems';
-import { useUsersTabState } from '../../../pages/Admin/hooks/useUsersTabState';
+import { useAsyncAction } from '../../../pages/admin/hooks/useAsyncAction';
+import { useAsyncList } from '../../../pages/admin/hooks/useAsyncList';
+import { usePaginatedItems } from '../../../pages/admin/hooks/usePaginatedItems';
+import { useUsersTabState } from '../../../pages/admin/hooks/useUsersTabState';
 
 beforeEach(() => {
   vi.clearAllMocks();

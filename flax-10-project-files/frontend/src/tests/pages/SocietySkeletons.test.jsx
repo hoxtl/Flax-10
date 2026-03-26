@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { SocietiesSkeleton, SocietyDetailSkeleton } from '../../pages/Societies/SocietySkeletons';
+import { SocietiesSkeleton, SocietyDetailSkeleton } from '../../pages/societies/SocietySkeletons';
 
 describe('SocietiesSkeleton', () => {
     it('renders the page skeleton with 8 card placeholders', () => {

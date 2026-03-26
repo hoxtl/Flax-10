@@ -4,8 +4,8 @@
 
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import AnnouncementModal from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal';
-import styles from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal.module.css';
+import AnnouncementModal from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal';
+import styles from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal.module.css';
 
 const fetchSocietyEventMock = vi.fn();
 const confirmMock = vi.fn();
@@ -16,7 +16,7 @@ const existingPinnedAnnouncement = { id: 1, title: 'Pinned Existing', pinned: tr
 vi.mock('../../../api/societyApi', () => ({ fetchSocietyEvent: (...args) => fetchSocietyEventMock(...args) }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => confirmMock }));
 
-vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModalHelpers', () => ({
+vi.mock('../../../components/society/society_detail/tabs/announcement_tab/announcementModalHelpers', () => ({
   MAX_IMAGES: 2,
   getInitialForm: (a) => ({
     id: a?.id, title: a?.title || '', content: a?.content || '', tag: a?.tag || '', images: a?.images || [],
@@ -26,7 +26,7 @@ vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/Announce
   handleFileSelect: (...args) => handleFileSelectMock(...args),
 }));
 
-vi.mock('../../../components/Calendar/EventModal/components/TimeRow', () => ({
+vi.mock('../../../components/calendar/event_modal/components/TimeRow', () => ({
   TimeRow: ({ update }) => (
     <div>
       <div>time-row</div>
@@ -35,21 +35,21 @@ vi.mock('../../../components/Calendar/EventModal/components/TimeRow', () => ({
     </div>
   ),
 }));
-vi.mock('../../../components/Calendar/EventModal/components/RecurrenceField', () => ({
+vi.mock('../../../components/calendar/event_modal/components/RecurrenceField', () => ({
   RecurrenceField: ({ onChange }) => <button onClick={() => onChange('weekly')}>set-weekly</button>,
 }));
-vi.mock('../../../components/Calendar/EventModal/components/FormField', () => ({
+vi.mock('../../../components/calendar/event_modal/components/FormField', () => ({
   FormField: ({ label, value, onChange, type }) => type === 'textarea'
     ? <textarea aria-label={label} value={value} onChange={onChange} />
     : <input aria-label={label} value={value} onChange={onChange} />,
 }));
-vi.mock('../../../components/Calendar/EventModal/components/TagField', () => ({
+vi.mock('../../../components/calendar/event_modal/components/TagField', () => ({
   TagField: ({ value, onChange }) => <input aria-label="Tag" value={value} onChange={onChange} />,
 }));
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
   default: ({ title, children, onClose }) => <div><h2>{title}</h2><button onClick={onClose}>close-modal</button>{children}</div>,
 }));
-vi.mock('../../../components/common/ConfirmModal/ConfirmModal', () => ({
+vi.mock('../../../components/common/confirm_modal/ConfirmModal', () => ({
   default: ({ title, message, onConfirm, onCancel }) => (
     <div><h3>{title}</h3><p>{message}</p><button onClick={onConfirm}>confirm-delete</button><button onClick={() => onCancel?.()}>cancel-delete</button></div>
   ),

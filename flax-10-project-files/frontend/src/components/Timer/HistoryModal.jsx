@@ -8,7 +8,7 @@ import * as historyUtils from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useToast } from '../../context/ToastContext';
-import StandardModal from '../common/StandardModal/StandardModal';
+import StandardModal from '../common/standard_modal/StandardModal';
 
 const StatsRow = ({ block }) => {
     const completedCount = block.sessions.filter(s => s.status !== 'Incomplete').length;

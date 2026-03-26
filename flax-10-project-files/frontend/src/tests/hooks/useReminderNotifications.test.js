@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useReminderNotifications } from '../../components/Notifications/hooks/useReminderNotifications';
+import { useReminderNotifications } from '../../components/notifications/hooks/useReminderNotifications';
 
 const mockAddNotification = vi.fn();
 const mockEvents = [];

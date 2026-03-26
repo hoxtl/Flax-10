@@ -2,7 +2,7 @@
  * Timer presets and configuration panels.
  */
 
-import styles from '../../pages/Timer/TimerPage.module.css';
+import styles from '../../pages/timer/TimerPage.module.css';
 import { TimerSettings } from './TimerComponents';
 import { AutoStartToggle } from './presets/AutoStartToggle';
 import { PresetCard } from './presets/PresetCard';

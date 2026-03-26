@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-vi.mock("../../components/common/Card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
+vi.mock("../../components/common/card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
 
-vi.mock("../../components/Society/SocietyCard", () => ({
+vi.mock("../../components/society/SocietyCard", () => ({
   default: ({ society, onClick, onReport, onUnreport }) => (
     <div>
       <button onClick={() => onClick?.(society.id)}>{society.name}</button>
@@ -13,7 +13,7 @@ vi.mock("../../components/Society/SocietyCard", () => ({
   ),
 }));
 
-vi.mock("../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => (
     <div>
       <span>{title}</span>
@@ -22,7 +22,7 @@ vi.mock("../../components/common/EmptyState/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../components/common/SearchEmptyState/SearchEmptyState", () => ({
+vi.mock("../../components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ query, itemLabel, onClear }) => (
     <div>
       <span>
@@ -33,7 +33,7 @@ vi.mock("../../components/common/SearchEmptyState/SearchEmptyState", () => ({
   ),
 }));
 
-vi.mock("../../components/Pagination/Pagination", () => ({
+vi.mock("../../components/pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) => (
     <div data-testid="pagination">
       <span>
@@ -50,7 +50,7 @@ vi.mock("../../hooks/usePagination", () => ({
   usePagination: (...args) => paginationMock(...args),
 }));
 
-import { SocietyBrowseResults } from "../../pages/Societies/SocietyBrowseResults";
+import { SocietyBrowseResults } from "../../pages/societies/SocietyBrowseResults";
 
 describe("SocietyBrowseResults", () => {
   beforeEach(() => {

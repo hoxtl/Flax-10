@@ -2,7 +2,7 @@
  * Analytics page tabs content.
  */
 
-import AIInsightsTab from "../../../components/Analytics/AIInsightsTab";
+import AIInsightsTab from "../../../components/analytics/AIInsightsTab";
 
 import AnalyticsOverview from "./AnalyticsOverview";
 import { TABS } from "../pageConfig";
