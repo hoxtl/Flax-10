@@ -1,70 +1,14 @@
 /* Tests for useTaskFeedData hook filtering, sorting, and navigation logic */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
-
-const navigateMock = vi.hoisted(() => vi.fn());
-const getModulesMock = vi.hoisted(() => vi.fn());
-
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
-  return { ...actual, useNavigate: () => navigateMock };
-});
-
-vi.mock("../../../../api/moduleApi", () => ({
-  getModules: (...args) => getModulesMock(...args),
-}));
-
-vi.mock("../../../../components/Timer/taskInput/taskInputUtils", () => ({
-  buildListItems: (lists = []) => lists.map((list) => ({ value: list.id, label: list.name })),
-  filterListItems: (items) => items,
-  groupModuleItems: (items) => ({ All: items }),
-}));
-
-vi.mock("../../../../lib/allTasksCompleteMessages", () => ({
-  getClearMessage: () => "Great job",
-}));
-
-vi.mock("../../../../pages/Tasks/utils/taskFeedUtils", () => ({
-  getHeaderTitle: () => "Header",
-}));
-
-vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
-  buildDateBounds: vi.fn(() => ({
-    now: new Date("2026-03-08T10:00:00Z"),
-    dayStart: new Date("2026-03-08T00:00:00Z"),
-    todayEnd: new Date("2026-03-08T23:59:59Z"),
-    weekEnd: new Date("2026-03-15T23:59:59Z"),
-  })),
-  filterBySearch: vi.fn((arr) => arr),
-  getOverdue: vi.fn(() => [{ id: 1 }]),
-  getToday: vi.fn(() => [{ id: 2 }]),
-  getThisWeek: vi.fn(() => [{ id: 3 }]),
-  getLater: vi.fn(() => [{ id: 4 }]),
-  getCompletedTodayCount: vi.fn(() => 1),
-  getCompletedWeekCount: vi.fn(() => 2),
-  getCompletedLaterCount: vi.fn(() => 3),
-  getFilterHandlers: vi.fn(() => ({
-    toggleListFilter: vi.fn(),
-    toggleModuleFilter: vi.fn(),
-    clearAllFilters: vi.fn(),
-  })),
-}));
-
-import useTaskFeedData from "../../../../pages/Tasks/hooks/useTaskFeedData";
+import { act, waitFor } from "@testing-library/react";
+import {
+  getTaskFeedDataMocks,
+  renderTaskFeedData,
+  resetTaskFeedDataUtils,
+} from "./taskFeedDataTestSetup";
 import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
 
-function renderTaskFeedData(props = {}) {
-  return renderHook(() =>
-    useTaskFeedData({
-      tasks: [],
-      lists: [],
-      activeFilter: "all",
-      activeListId: null,
-      filterListIds: [],
-      ...props,
-    }),
-  );
-}
+const { getModulesMock } = getTaskFeedDataMocks();
 
 function appendFocusableElements() {
   const focus = vi.fn();
@@ -83,21 +27,7 @@ function appendFocusableElements() {
 
 describe("useTaskFeedData", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(taskFeedDataUtils.filterBySearch).mockImplementation((arr) => arr);
-    vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([{ id: 1 }]);
-    vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([{ id: 2 }]);
-    vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([{ id: 3 }]);
-    vi.mocked(taskFeedDataUtils.getLater).mockReturnValue([{ id: 4 }]);
-    vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(1);
-    vi.mocked(taskFeedDataUtils.getCompletedWeekCount).mockReturnValue(2);
-    vi.mocked(taskFeedDataUtils.getCompletedLaterCount).mockReturnValue(3);
-    vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation(() => ({
-      toggleListFilter: vi.fn(),
-      toggleModuleFilter: vi.fn(),
-      clearAllFilters: vi.fn(),
-    }));
-    getModulesMock.mockResolvedValue([]);
+    resetTaskFeedDataUtils();
   });
 
   it("builds sections and header", async () => {
