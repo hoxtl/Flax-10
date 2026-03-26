@@ -15,7 +15,7 @@ vi.mock("../../../api/analyticsApi", () => ({
   default: { getSummary: (...args) => getSummary(...args) },
 }));
 
-vi.mock("../../../components/Timer/utils/milestoneUtils", () => ({
+vi.mock("../../../components/timer/utils/milestoneUtils", () => ({
   getNearestMilestone: (...args) => getNearestMilestone(...args),
 }));
 
