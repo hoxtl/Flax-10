@@ -11,11 +11,6 @@ import "./app.css";
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
 const ACTIVE_NAV_KEY = "flax_active_nav";
 
-function AppContent() {
-  const state = useAppState();
-  if (state.isLoadingTheme) return null;
-  const screen = resolveScreen(state.authed, state.user, state.showWelcome);
-  return (
 
 const ROOT_STYLE = {
   position: "relative",
@@ -51,6 +46,13 @@ const AUTH_MOTION = {
   style: MOTION_ABSOLUTE,
 };
 
+
+function AppContent() {
+  const state = useAppState();
+  if (state.isLoadingTheme) return null;
+  const screen = resolveScreen(state.authed, state.user, state.showWelcome);
+  return (
+    
 // Pure helpers
 function readUser() {
   const s = localStorage.getItem("user");
