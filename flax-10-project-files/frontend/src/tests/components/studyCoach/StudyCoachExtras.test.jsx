@@ -16,7 +16,7 @@ vi.mock("../../../context/CalendarContext", () => ({
   useCalendarDispatch: (...args) => useCalendarDispatch(...args),
 }));
 
-vi.mock("../../../context/AuthContext", async (importOriginal) => {
+vi.mock("../../../context/AuthenticationContext", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,

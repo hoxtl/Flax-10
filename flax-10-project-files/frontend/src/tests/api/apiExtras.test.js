@@ -6,7 +6,7 @@ vi.mock("../../api/client", () => ({
 
 import { fetchApi } from "../../api/client";
 import { cancelCourseChangeRequest } from "../../api/adminApi";
-import { authService } from "../../api/authApi";
+import { authService } from "../../api/authenticationApi";
 import { getCalendarEvents } from "../../api/calendarApi";
 import { createSchedule, deleteSchedule, renameSchedule } from "../../api/scheduleApi";
 import { getUserSettings, searchUsers } from "../../api/userApi";

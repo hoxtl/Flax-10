@@ -5,8 +5,8 @@ View for confirming a token-based password reset.
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from studyFlax.models.auth.reset_password_token_model import ResetPasswordToken
-from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordConfirmSerialiser
+from studyFlax.models.authentication.reset_password_token_model import ResetPasswordToken
+from studyFlax.serialisers.authentication.reset_password_serialisers import ResetPasswordConfirmSerialiser
 from django.db import DatabaseError
 import logging
 

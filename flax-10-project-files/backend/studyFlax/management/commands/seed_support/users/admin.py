@@ -8,7 +8,7 @@ import random
 
 from django.contrib.auth import get_user_model
 
-from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
+from studyFlax.models.authentication.course_change_request_model import CourseChangeRequest
 from studyFlax.models.society.society_report_model import SocietyReport
 from studyFlax.models.society.society_model import Society
 

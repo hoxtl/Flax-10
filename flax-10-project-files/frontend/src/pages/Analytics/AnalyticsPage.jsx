@@ -4,7 +4,7 @@
 
 import AppPage from '../../components/common/AppPage/AppPage';
 import { SegmentedControl, Tabs } from '../../components/common';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthenticationContext';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import getAnalyticsTabs from './components/AnalyticsPageTabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';

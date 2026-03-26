@@ -2,9 +2,9 @@
  * Sign-up form for the authentication page.
  */
 
-import * as Components from "./AuthComponents";
+import * as Components from "./AuthenticationComponents";
 import PasswordStrength from "../common/PasswordStrength";
-import { AuthInputField } from "./AuthInputField";
+import { AuthInputField } from "./AuthenticationInputField";
 
 function NameRow({ formData, updateField, loading }) {
   return (

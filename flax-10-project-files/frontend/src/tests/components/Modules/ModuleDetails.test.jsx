@@ -18,7 +18,7 @@ vi.mock('../../../components/Modules/Modules/ModuleDetails.module.css', () => ({
 vi.mock('../../../components/Modules/styles/ModuleHero.module.css', () => ({ default: {} }));
 vi.mock('../../../components/Modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
 vi.mock('../../../components/Modules/styles/ModuleDeadlines.module.css', () => ({ default: {} }));
-vi.mock('../../../context/AuthContext.jsx', () => ({
+vi.mock('../../../context/AuthenticationContext.jsx', () => ({
     useAuth: useAuthMock,
 }));
 

@@ -3,7 +3,7 @@ Model for user notifications with type, action URL, and read status.
 """
 
 from django.db import models
-from studyFlax.models.auth.user_model import User
+from studyFlax.models.authentication.user_model import User
 
 NOTIFICATION_TYPES = [
     ('general', 'General'),

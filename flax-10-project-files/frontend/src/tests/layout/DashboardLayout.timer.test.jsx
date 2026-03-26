@@ -51,8 +51,8 @@ vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
 vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
-vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
-vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
+vi.mock("../../api/authenticationApi", () => ({ authService: { logout: vi.fn() } }));
+vi.mock("../../components/Authentication/utils/authenticationHelpers", () => ({ clearUserData: vi.fn() }));
 vi.mock("react-router-dom", () => ({
   useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
 }));

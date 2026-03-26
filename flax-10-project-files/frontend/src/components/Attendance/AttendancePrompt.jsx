@@ -7,7 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import AttendancePromptModal from "./AttendancePromptModal";
 import { dismissAttendancePrompt, submitAttendancePromptAnswer } from "./attendancePromptActions";
 import { useCandidateEvent } from "./hooks/useCandidateEvent";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthenticationContext";
 
 export default function AttendancePrompt() {
   const { profile } = useAuth();

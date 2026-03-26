@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { act } from "@testing-library/react";
 
 import { render, renderHook, screen } from "../../utils/test-utils";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthenticationContext";
 
 function ExtraWrapper({ children }) {
   return <section data-testid="extra-wrapper">{children}</section>;

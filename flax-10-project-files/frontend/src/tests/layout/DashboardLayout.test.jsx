@@ -12,8 +12,8 @@ vi.mock("../../context/CalendarContext", () => ({
 }));
 
 import DashboardLayout from "../../layout/DashboardLayout";
-import { authService } from "../../api/authApi";
-import { clearUserData } from "../../components/Authentication/utils/authHelpers";
+import { authService } from "../../api/authenticationApi";
+import { clearUserData } from "../../components/Authentication/utils/authenticationHelpers";
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
 
@@ -57,8 +57,8 @@ vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
 vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
-vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
-vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
+vi.mock("../../api/authenticationApi", () => ({ authService: { logout: vi.fn() } }));
+vi.mock("../../components/Authentication/utils/authenticationHelpers", () => ({ clearUserData: vi.fn() }));
 vi.mock("react-router-dom", () => ({
   useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
 }));
@@ -290,7 +290,7 @@ describe("DashboardLayout", () => {
   });
 
   it("handleLogoutClick clears user data even when logout throws", async () => {
-    const { authService } = await import("../../api/authApi");
+    const { authService } = await import("../../api/authenticationApi");
     authService.logout.mockRejectedValueOnce(new Error("network error"));
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Logout"));

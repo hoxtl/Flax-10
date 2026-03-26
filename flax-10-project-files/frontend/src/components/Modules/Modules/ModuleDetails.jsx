@@ -8,7 +8,7 @@ import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/m
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
-import { useAuth } from '../../../context/AuthContext.jsx';
+import { useAuth } from '../../../context/AuthenticationContext.jsx';
 import Badge from '../../common/Badge/Badge.jsx';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';

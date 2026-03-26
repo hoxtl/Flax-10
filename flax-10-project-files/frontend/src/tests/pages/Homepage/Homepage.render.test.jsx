@@ -42,7 +42,7 @@ vi.mock('../../../pages/Homepage/hooks/useHomeData', () => ({
     removePendingTask: vi.fn(), refetchTasks: mockRefetchTasks, loading: false }),
 }));
 vi.mock('../../../context/TagContext', () => ({ useTags: () => ({ getTag: mockGetTag, tags: [{ id: 1, label: 'Routine' }] }) }));
-vi.mock('../../../context/AuthContext', () => ({
+vi.mock('../../../context/AuthenticationContext', () => ({
   useAuth: () => ({ profile: { id: 1, role: 'student', settings: {} }, loading: false, authenticated: true, user: { role: 'student' }, refreshProfile: vi.fn() }),
 }));
 vi.mock('../../../context/TimerContext', () => ({

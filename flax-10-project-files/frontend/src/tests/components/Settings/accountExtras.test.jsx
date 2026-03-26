@@ -10,7 +10,7 @@ vi.mock("../../../api/adminApi", () => ({
   cancelCourseChangeRequest: (...args) => cancelCourseChangeRequest(...args),
 }));
 
-vi.mock("../../../context/AuthContext", () => ({
+vi.mock("../../../context/AuthenticationContext", () => ({
   useAuth: (...args) => useAuth(...args),
 }));
 

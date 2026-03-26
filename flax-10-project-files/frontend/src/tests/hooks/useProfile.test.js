@@ -5,7 +5,7 @@ import { useProfileState, useProfileBodyData, useProfileContent } from '../../pa
 const refreshProfileMock = vi.fn();
 const useAuthMock = vi.fn();
 
-vi.mock('../../context/AuthContext', () => ({
+vi.mock('../../context/AuthenticationContext', () => ({
   useAuth: () => useAuthMock(),
 }));
 

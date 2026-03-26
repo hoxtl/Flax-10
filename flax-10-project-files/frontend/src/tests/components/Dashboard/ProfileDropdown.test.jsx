@@ -8,7 +8,7 @@ let mockProfileData = {
     profile_photo_url: null,
 };
 
-vi.mock('../../../context/AuthContext', () => ({
+vi.mock('../../../context/AuthenticationContext', () => ({
     useAuth: () => ({
         profile: mockProfileData,
         refreshProfile: mockRefreshProfile,

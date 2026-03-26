@@ -4,7 +4,7 @@ Backend tests for session model.
 
 from django.test import TestCase
 from django.utils import timezone
-from studyFlax.models.auth.user_model import User
+from studyFlax.models.authentication.user_model import User
 from studyFlax.models.timer.session_model import StudySession
 
 class StudySessionModelTest(TestCase):

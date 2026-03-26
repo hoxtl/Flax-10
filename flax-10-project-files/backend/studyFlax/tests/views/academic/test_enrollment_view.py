@@ -11,7 +11,7 @@ from rest_framework import status
 
 from ..base import BaseTestCase
 from studyFlax.models import Module, Enrollment, CalendarEvent, Deadline, User
-from studyFlax.models.auth.user_settings_model import UserSettings
+from studyFlax.models.authentication.user_settings_model import UserSettings
 
 class EnrollmentViewTests(BaseTestCase):
     """Tests for enrollment views."""

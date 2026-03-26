@@ -16,7 +16,7 @@ import {
 import styles from "./ListSidebar.module.css";
 import { ListContextMenu, RenameInput } from "./listSidebarParts";
 import { useListSidebarState } from "./useListSidebarState";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthenticationContext";
 
 function ListSidebarViews({ smartFilters, activeListId, activeFilter, onSelectList, onSelectFilter }) {
   return (

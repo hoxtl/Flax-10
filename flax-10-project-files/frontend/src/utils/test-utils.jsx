@@ -1,5 +1,5 @@
 import { render as rtlRender, renderHook as rtlRenderHook } from '@testing-library/react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthenticationContext';
 
 function readStoredUser() {
     const storedUser = localStorage.getItem('user');
@@ -21,7 +21,7 @@ function AppTestProviders({ children }) {
         refreshProfile: async () => storedUser,
         setAuthenticated: () => {},
     };
-    return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={authValue}>{children}</AuthenticationContext.Provider>;
 }
 
 function composeWrapper(ExtraWrapper) {

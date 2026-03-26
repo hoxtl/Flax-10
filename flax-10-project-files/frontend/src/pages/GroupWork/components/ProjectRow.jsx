@@ -6,7 +6,7 @@ import { useCallback, useContext, useMemo } from "react";
 import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
 import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../context/AuthenticationContext";
 import {
   getDaysLeft,
   getProjectDate,

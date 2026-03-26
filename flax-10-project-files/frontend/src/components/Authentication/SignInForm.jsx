@@ -2,8 +2,8 @@
  * Sign-in form for the authentication page.
  */
 
-import * as Components from "./AuthComponents";
-import { AuthInputField } from "./AuthInputField";
+import * as Components from "./AuthenticationComponents";
+import { AuthInputField } from "./AuthenticationInputField";
 
 function SignInFields({ formData, updateField, loading }) {
   return (

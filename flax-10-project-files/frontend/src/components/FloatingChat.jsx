@@ -5,7 +5,7 @@
 import ChatPromptBubble from "./floatingChat/ChatPromptBubble";
 import FloatingChatFab from "./floatingChat/FloatingChatFab";
 import { useFloatingChatState } from "./floatingChat/useFloatingChatState.jsx";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthenticationContext";
 import styles from "./FloatingChat.module.css";
 
 export default function FloatingChat() {

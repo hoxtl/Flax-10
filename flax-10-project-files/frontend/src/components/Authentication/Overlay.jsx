@@ -3,7 +3,7 @@
  */
 
 import styled from "styled-components";
-import * as Components from "./AuthComponents";
+import * as Components from "./AuthenticationComponents";
 
 const OverlayTitle = styled.h2`
   font-size: 22px;

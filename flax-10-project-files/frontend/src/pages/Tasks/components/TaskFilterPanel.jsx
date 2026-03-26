@@ -5,7 +5,7 @@
 import { Search } from "lucide-react";
 
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthenticationContext";
 import styles from "./TaskFeedToolbar.module.css";
 
 function FilterCheckboxItem({ label, checked, onChange }) {

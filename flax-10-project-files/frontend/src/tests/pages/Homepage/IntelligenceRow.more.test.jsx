@@ -20,7 +20,7 @@ const dashboardState = vi.hoisted(() => ({
   renderIntelligenceWidget: vi.fn(() => <div data-testid="rendered-widget">widget</div>),
 }));
 
-vi.mock("../../../context/AuthContext", () => ({
+vi.mock("../../../context/AuthenticationContext", () => ({
   useAuth: () => ({ user: { id: 10 }, profile: { role: "student" } }),
 }));
 

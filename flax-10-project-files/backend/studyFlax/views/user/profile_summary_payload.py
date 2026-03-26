@@ -8,7 +8,7 @@ from datetime import timedelta
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from studyFlax.models.auth.user_model import User
+from studyFlax.models.authentication.user_model import User
 from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.social.share_model import CalendarShare
