@@ -12,6 +12,9 @@ From the `scripts/` directory:
 # Check Python backend
 python check_all.py
 
+# Check backend naming and docstring rules
+python check_backend_conventions.py
+
 # Check JavaScript frontend
 node check_all.js
 ```
