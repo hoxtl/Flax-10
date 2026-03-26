@@ -9,8 +9,9 @@ from django.db import IntegrityError
 from studyFlax.models.authentication.user_model import User
 from studyFlax.models.modules.module_model import Module
 
+
 class ModuleModelTests(TestCase):
-    """ Test suite for Module model."""
+    """Test suite for Module model."""
 
     def setUp(self):
         self.teacher = User.objects.create_user(

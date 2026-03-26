@@ -1,4 +1,6 @@
-"""Backend tests for groupwork models."""
+"""
+Tests for groupwork models.
+"""
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -6,9 +8,11 @@ from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMember
 from django.utils import timezone
 from datetime import timedelta
 
+
 User = get_user_model()
 
 class GroupWorkModelTest(TestCase):
+    """Tests group work model."""
     def setUp(self):
         self.user1 = User.objects.create_user(username="u1", email="u1@e.com", password="p")
         self.user2 = User.objects.create_user(username="u2", email="u2@e.com", password="p")

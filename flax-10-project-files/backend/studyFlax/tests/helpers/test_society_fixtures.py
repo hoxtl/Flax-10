@@ -6,6 +6,7 @@ from datetime import date
 
 from django.test import TestCase
 
+
 class SocietyFixturesTest(TestCase):
     """Tests for society fixtures."""
 

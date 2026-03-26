@@ -13,7 +13,6 @@ def get_datetime_str(hours_offset=0, days_offset=0):
     return dt.isoformat().replace("+00:00", "Z")
 
 def create_simple_event(title="Test Event", duration_hours=1):
-    """Create simple event."""
     return {
         "title": title,
         "description": "Test description",
@@ -23,7 +22,6 @@ def create_simple_event(title="Test Event", duration_hours=1):
     }
 
 def create_minimal_event(title="Minimal Event"):
-    """Create minimal event."""
     return {
         "title": title,
         "start_time": get_datetime_str(),
@@ -31,7 +29,6 @@ def create_minimal_event(title="Minimal Event"):
     }
 
 def create_recurring_event(frequency="daily", count=5):
-    """Create recurring event."""
     import json
 
     return {
@@ -42,7 +39,6 @@ def create_recurring_event(frequency="daily", count=5):
     }
 
 def create_recurrence_with_end_date(frequency="weekly", days=14):
-    """Create recurrence with end date."""
     import json
 
     return json.dumps(
@@ -54,12 +50,10 @@ def create_recurrence_with_end_date(frequency="weekly", days=14):
     )
 
 def create_tag_data(name="study"):
-    """Create tag data."""
     return {"name": name, "color": "#34D399", "default_duration": 60}
 SAMPLE_TAGS = ["study", "class", "travel", "task", "other"]
 
 def get_sample_tags():
-    """Return sample tags."""
     colors = ["#34D399", "#A78BFA", "#60A5FA", "#FBBF24", "#94A3B8"]
     return [
         {"name": name, "color": color, "default_duration": 60}

@@ -13,14 +13,12 @@ from rest_framework.test import APIClient
 User = get_user_model()
 
 def make_user(username='testuser', email=None, password='pass', is_active=True):
-    """Make user."""
     email = email or f'{username}@example.com'
     return User.objects.create_user(
         username=username, email=email, password=password, is_active=is_active,
     )
 
 def make_superuser(username='admin', email=None, password='adminpass'):
-    """Make superuser."""
     email = email or f'{username}@example.com'
     return User.objects.create_superuser(
         username=username, email=email, password=password,
@@ -28,28 +26,23 @@ def make_superuser(username='admin', email=None, password='adminpass'):
     )
 
 def authed_client(user):
-    """Authed client."""
     client = APIClient()
     client.force_authenticate(user=user)
     return client
 
 def make_society(name='Test Society'):
-    """Make society."""
     from studyFlax.models.society import Society
     return Society.objects.create(name=name, bio='Test', admin_emails='admin@test.com')
 
 def make_society_admin(user, society):
-    """Make society admin."""
     from studyFlax.models.society import SocietyMembership
     return SocietyMembership.objects.create(user=user, society=society, role='admin')
 
 def make_society_member(user, society):
-    """Make society member."""
     from studyFlax.models.society import SocietyMembership
     return SocietyMembership.objects.create(user=user, society=society, role='member')
 
 def make_society_event(society, title='Test Event', recurrence='none'):
-    """Make society event."""
     from studyFlax.models.society import SocietyEvent
     return SocietyEvent.objects.create(
         society=society, title=title, recurrence=recurrence,
@@ -58,12 +51,10 @@ def make_society_event(society, title='Test Event', recurrence='none'):
     )
 
 def make_announcement(society, title='Announcement', content='Content'):
-    """Make announcement."""
     from studyFlax.models.society import SocietyAnnouncement
     return SocietyAnnouncement.objects.create(society=society, title=title, content=content)
 
 def make_session(user, duration=60, break_duration=10, pause_duration=0, status_val='Completed', hours_ago=1):
-    """Make session."""
     from studyFlax.models.timer.session_model import StudySession
     end = timezone.now() - timedelta(hours=hours_ago)
     start = end - timedelta(minutes=duration)
@@ -75,13 +66,11 @@ def make_session(user, duration=60, break_duration=10, pause_duration=0, status_
     )
 
 def make_task_list(user, name='My List', category='personal', archived=False):
-    """Make task list."""
     from studyFlax.models.tasks.task_model import TaskList
     return TaskList.objects.create(user=user, name=name, category=category, archived=archived)
 
 def make_task(user, title='Test Task', task_list=None, priority='medium',
               completed=False, due_date=None, estimated_blocks=None):
-    """Make task."""
     from studyFlax.models.tasks.task_model import Task
     return Task.objects.create(
         user=user, title=title, task_list=task_list,
@@ -90,7 +79,6 @@ def make_task(user, title='Test Task', task_list=None, priority='medium',
     )
 
 def make_module(module_code, module_name, creator):
-    """Make module."""
     from studyFlax.models.modules.module_model import Module
     now = timezone.now()
     return Module.objects.create(

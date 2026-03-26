@@ -14,7 +14,6 @@ class BaseTestCase(TestCase):
     """Base test case with common setup."""
 
     def setUp(self):
-        """Set up the test case."""
         from studyFlax.models import User
 
         self.user = User.objects.create(
@@ -28,28 +27,23 @@ class BaseTestCase(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def create_sample_tags(self):
-        """Create sample tags."""
         for tag_data in get_sample_tags():
             Tag.objects.create(**tag_data, is_default=True)
 
     def get_tag_by_name(self, name):
-        """Return tag by name."""
         return Tag.objects.get(name=name)
 
 class BaseEventTestCase(BaseTestCase):
     """Base test case for event tests."""
 
     def setUp(self):
-        """Set up the test case."""
         super().setUp()
         self.url = "/api/events/"
 
     def assert_event_response(self, response, expected_status):
-        """Assert event response."""
         self.assertEqual(response.status_code, expected_status)
 
     def assert_event_data(self, event, expected):
-        """Assert event data."""
         self.assertEqual(event["title"], expected["title"])
         if "description" in expected:
             self.assertEqual(event["description"], expected["description"])
@@ -69,26 +63,22 @@ class BaseEventTestCase(BaseTestCase):
         return event
 
     def _create_recurrence(self, data):
-        """Create recurrence."""
         if not data:
             return None
         recurrence_data = parse_recurrence_data(data)
         return RecurrenceRule.objects.create(**recurrence_data)
 
     def _parse_event_dates(self, data):
-        """Parse event dates."""
         for field, value in get_datetime_fields(data):
             data[field] = parse_iso_datetime(value)
 
 
 def parse_recurrence_data(data):
-    """Parse recurrence data."""
     if not isinstance(data, str):
         return data
     return load_recurrence_json(data)
 
 def load_recurrence_json(data):
-    """Load recurrence JSON."""
     import json
 
     try:
@@ -97,12 +87,10 @@ def load_recurrence_json(data):
         return data
 
 def parse_iso_datetime(value):
-    """Parse iso datetime."""
     from datetime import datetime
 
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 def get_datetime_fields(data):
-    """Return datetime fields."""
     fields = ["start_time", "end_time"]
     return [(field, data.get(field)) for field in fields if isinstance(data.get(field), str)]
