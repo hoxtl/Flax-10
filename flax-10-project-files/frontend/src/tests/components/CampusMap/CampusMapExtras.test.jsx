@@ -36,12 +36,17 @@ describe("TflStatusSection", () => {
     expect(screen.getByText("Good Service!")).toBeTruthy();
   });
 
-  it("renders and expands disruptions lists", () => {
+  it("renders and expands disruptions lists with last-updated text", () => {
     const d = [{ lineName: "A", severityDescription: "Minor", reason: "R", color: "#000" }, { lineName: "B", severityDescription: "S", reason: "R" }, { lineName: "C", severityDescription: "M", reason: "R" }];
     render(<TflStatusSection disruptions={d} loading={false} />);
+    expect(screen.getByText(/Last Updated:/)).toBeTruthy();
+    expect(screen.queryByText(/- C/)).toBeNull();
     expect(screen.getByRole("button", { name: /Show 1 More/i })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Show 1 More/i }));
     expect(screen.getByText(/Show Less/)).toBeTruthy();
+    expect(screen.getByText(/- C/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Show Less/i }));
+    expect(screen.getByRole("button", { name: /Show 1 More/i })).toBeTruthy();
   });
 });
 
@@ -52,6 +57,44 @@ describe("DestinationSection & LocationChip", () => {
     expect(screen.getByText(/Select a campus or event/)).toBeTruthy();
     rerender(<DestinationSection {...base} selectedCampus={{ name: "Strand" }} />);
     expect(screen.getAllByText("Strand").length).toBeGreaterThan(0);
+  });
+
+  it("renders custom destinations and upcoming events with fallback labels", () => {
+    const onSelectEvent = vi.fn();
+    const onClearCustomDest = vi.fn();
+    render(
+      <DestinationSection
+        {...base}
+        customDestination={{ name: "Library", address: "1 King’s Way" }}
+        upcomingEvents={[
+          { title: "Open Day", location: "Bush House", start_time: "2026-03-26T10:15:00Z" },
+          { location: "Unknown Hall", start_time: "", title: "" },
+        ]}
+        onClearCustomDest={onClearCustomDest}
+        onSelectEvent={onSelectEvent}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /Open Day/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Upcoming event/i }));
+    fireEvent.click(screen.getByTitle("Clear"));
+    expect(onSelectEvent).toHaveBeenCalledTimes(2);
+    expect(onClearCustomDest).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Library")).toBeTruthy();
+    expect(screen.getByText("1 King’s Way")).toBeTruthy();
+  });
+
+  it("does not require an onSelectEvent handler", () => {
+    render(
+      <DestinationSection
+        {...base}
+        upcomingEvents={[{ title: "Open Day", location: "Bush House", start_time: "2026-03-26T10:15:00Z" }]}
+        onSelectEvent={undefined}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /Open Day/i }));
+    expect(screen.getByRole("button", { name: /Open Day/i })).toBeTruthy();
   });
 
   it("LocationChip triggers clear", () => {

@@ -1,0 +1,130 @@
+import { renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const computePlanTimelineRowsMock = vi.fn();
+const deriveBestFreeRowIdMock = vi.fn();
+const deriveAssignedGapTasksMock = vi.fn();
+const deriveGapDeadlineFallbacksMock = vi.fn();
+const isTodayMock = vi.fn();
+const isNowMock = vi.fn();
+
+vi.mock("../../../../pages/Homepage/utils/planTimelineRows", () => ({
+  computePlanTimelineRows: (...args) => computePlanTimelineRowsMock(...args),
+}));
+
+vi.mock("../../../../pages/Homepage/hooks/miniTimeline/assignmentUtils", () => ({
+  deriveAssignedGapTasks: (...args) => deriveAssignedGapTasksMock(...args),
+  deriveBestFreeRowId: (...args) => deriveBestFreeRowIdMock(...args),
+  deriveGapDeadlineFallbacks: (...args) => deriveGapDeadlineFallbacksMock(...args),
+}));
+
+vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
+  isToday: (...args) => isTodayMock(...args),
+}));
+
+vi.mock("../../../../pages/Homepage/utils/eventUtils", () => ({
+  isNow: (...args) => isNowMock(...args),
+}));
+
+import { useMiniTimelineData } from "../../../../pages/Homepage/hooks/useMiniTimelineData";
+import { DAY_END_HOUR, DAY_START_HOUR } from "../../../../pages/Homepage/utils/timelineUtils";
+
+describe("useMiniTimelineData", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    isTodayMock.mockReturnValue(true);
+    isNowMock.mockReturnValue(false);
+    computePlanTimelineRowsMock.mockReturnValue([{ id: "row-1" }]);
+    deriveBestFreeRowIdMock.mockReturnValue("free-row");
+    deriveAssignedGapTasksMock.mockReturnValue({ map: { "free-row": { id: 1 } }, nextMap: { "free-row": null } });
+    deriveGapDeadlineFallbacksMock.mockReturnValue({ "free-row": { title: "Fallback" } });
+  });
+
+  it("builds rows from day bounds and derives timeline helpers", () => {
+    const selectedDate = new Date("2026-03-24T12:34:00Z");
+    const now = new Date("2026-03-24T09:00:00Z");
+    const props = {
+      selectedDate,
+      now,
+      sortedEvents: [{ id: 1 }],
+      dayTasks: [{ id: 2 }],
+      tasksDueToday: [{ id: 3 }],
+      suggestableTasks: [{ id: 4 }],
+      skippedGapTasks: {},
+      slottedTaskIds: new Set(),
+      slottedTitles: new Set(),
+      deadlineSuggestions: [{ id: 5 }],
+      hasTimerSession: false,
+    };
+
+    const { result } = renderHook(() => useMiniTimelineData(props));
+
+    expect(computePlanTimelineRowsMock).toHaveBeenCalledWith(
+      props.sortedEvents,
+      selectedDate,
+      expect.any(Date),
+      expect.any(Date),
+      now,
+      props.dayTasks,
+      props.tasksDueToday,
+      expect.any(Function),
+    );
+    expect(result.current.rows).toEqual([{ id: "row-1" }]);
+    expect(result.current.bestFreeRowId).toBe("free-row");
+    expect(result.current.assignedGapTasks).toEqual({ map: { "free-row": { id: 1 } }, nextMap: { "free-row": null } });
+    expect(result.current.gapDeadlineFallbacks).toEqual({ "free-row": { title: "Fallback" } });
+    expect(result.current.currentBlock).toBeNull();
+
+    const [, , start, end, , , , isTodayArg] = computePlanTimelineRowsMock.mock.calls[0];
+    expect(start.getHours()).toBe(DAY_START_HOUR);
+    expect(end.getHours()).toBe(DAY_END_HOUR);
+    expect(isTodayArg.name).toBe("isToday");
+  });
+
+  it("returns the active event only when today and timer is off", () => {
+    isNowMock.mockImplementation((start, end) => start === "start" && end === "end");
+
+    const { result } = renderHook(() =>
+      useMiniTimelineData({
+        selectedDate: new Date("2026-03-24T00:00:00Z"),
+        now: new Date("2026-03-24T09:00:00Z"),
+        sortedEvents: [
+          { id: "ignored" },
+          { id: "active", start_time: "start", end_time: "end" },
+        ],
+        dayTasks: [],
+        tasksDueToday: [],
+        suggestableTasks: [],
+        skippedGapTasks: {},
+        slottedTaskIds: new Set(),
+        slottedTitles: new Set(),
+        deadlineSuggestions: [],
+        hasTimerSession: false,
+      })
+    );
+
+    expect(result.current.currentBlock).toEqual({ id: "active", start_time: "start", end_time: "end" });
+  });
+
+  it("returns no current block when timer session is active or the date is not today", () => {
+    const baseProps = {
+      selectedDate: new Date("2026-03-24T00:00:00Z"),
+      now: new Date("2026-03-24T09:00:00Z"),
+      sortedEvents: [{ id: "active", start_time: "start", end_time: "end" }],
+      dayTasks: [],
+      tasksDueToday: [],
+      suggestableTasks: [],
+      skippedGapTasks: {},
+      slottedTaskIds: new Set(),
+      slottedTitles: new Set(),
+      deadlineSuggestions: [],
+    };
+
+    const withTimer = renderHook(() => useMiniTimelineData({ ...baseProps, hasTimerSession: true }));
+    expect(withTimer.result.current.currentBlock).toBeNull();
+
+    isTodayMock.mockReturnValue(false);
+    const notToday = renderHook(() => useMiniTimelineData({ ...baseProps, hasTimerSession: false }));
+    expect(notToday.result.current.currentBlock).toBeNull();
+  });
+});

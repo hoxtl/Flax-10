@@ -61,6 +61,23 @@ describe("Homepage hooks", () => {
     expect(result.current.taskLists).toEqual([{ id: 5, name: "Custom" }]);
   });
 
+  it("recovers task lists from a failed refresh and normalizes non-arrays on refresh", async () => {
+    const { result } = renderHook(() => useHomepageResources());
+    await waitFor(() => expect(result.current.taskLists).toEqual([{ id: 3, name: "Inbox" }]));
+
+    fetchTaskListsMock.mockRejectedValueOnce(new Error("refresh failed"));
+    await act(async () => {
+      await result.current.refreshTaskLists();
+    });
+    expect(result.current.taskLists).toEqual([]);
+
+    fetchTaskListsMock.mockResolvedValueOnce("bad-refresh");
+    await act(async () => {
+      await result.current.refreshTaskLists();
+    });
+    expect(result.current.taskLists).toEqual([]);
+  });
+
   it("normalizes failed or non-array homepage resources to empty lists", async () => {
     getModulesMock.mockResolvedValueOnce(null);
     getEnrollmentsMock.mockRejectedValueOnce(new Error("down"));
@@ -79,9 +96,10 @@ describe("Homepage hooks", () => {
 
   it("updates the current time on an interval", () => {
     vi.useFakeTimers();
+    const clearIntervalSpy = vi.spyOn(global, "clearInterval");
     vi.setSystemTime(new Date("2026-03-24T10:00:00Z"));
 
-    const { result } = renderHook(() => useHomepageNow());
+    const { result, unmount } = renderHook(() => useHomepageNow());
     const firstTime = result.current.getTime();
 
     vi.setSystemTime(new Date("2026-03-24T10:00:10Z"));
@@ -90,6 +108,8 @@ describe("Homepage hooks", () => {
     });
 
     expect(result.current.getTime()).not.toBe(firstTime);
+    unmount();
+    expect(clearIntervalSpy).toHaveBeenCalled();
     vi.useRealTimers();
   });
 
@@ -115,9 +135,10 @@ describe("Homepage hooks", () => {
 
   it("skips calendar bootstrap when events already exist", () => {
     vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
     const loadEvents = vi.fn();
 
-    renderHook(() =>
+    const { unmount } = renderHook(() =>
       useHomepageEventBootstrap([{ id: 1, title: "Lecture" }], loadEvents, new Date("2026-03-24T00:00:00Z"))
     );
 
@@ -125,6 +146,23 @@ describe("Homepage hooks", () => {
       vi.advanceTimersByTime(220);
     });
 
+    expect(loadEvents).not.toHaveBeenCalled();
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it("does not load empty calendars after unmount", () => {
+    vi.useFakeTimers();
+    const loadEvents = vi.fn();
+    const { unmount } = renderHook(() =>
+      useHomepageEventBootstrap([], loadEvents, new Date("2026-03-24T00:00:00Z"))
+    );
+
+    unmount();
+    act(() => {
+      vi.advanceTimersByTime(220);
+    });
     expect(loadEvents).not.toHaveBeenCalled();
     vi.useRealTimers();
   });
@@ -143,6 +181,20 @@ describe("Homepage hooks", () => {
 
     playCompletionChimeMock.mockClear();
     rerender({ hasTimerSession: true, timeLeft: 30, timerMode: "break" });
+    rerender({ hasTimerSession: true, timeLeft: 0, timerMode: "break" });
+    expect(playCompletionChimeMock).not.toHaveBeenCalled();
+  });
+
+  it("does not play the chime when there is no prior active countdown or when the timer is off", () => {
+    const { rerender } = renderHook(
+      ({ hasTimerSession, timeLeft, timerMode }) =>
+        useTimerCompletionSound(hasTimerSession, timeLeft, timerMode),
+      {
+        initialProps: { hasTimerSession: false, timeLeft: 0, timerMode: "work" },
+      }
+    );
+
+    rerender({ hasTimerSession: false, timeLeft: 0, timerMode: "work" });
     rerender({ hasTimerSession: true, timeLeft: 0, timerMode: "break" });
     expect(playCompletionChimeMock).not.toHaveBeenCalled();
   });

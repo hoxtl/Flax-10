@@ -164,6 +164,45 @@ describe("CampusMap hooks", () => {
     await act(async () => {});
   });
 
+  it("useResponsiveCampusMap schedules and cancels mobile open state updates", () => {
+    const raf = vi.fn((cb) => {
+      cb();
+      return 42;
+    });
+    const cancelRaf = vi.fn();
+    Object.defineProperty(window, "requestAnimationFrame", { configurable: true, writable: true, value: raf });
+    Object.defineProperty(window, "cancelAnimationFrame", { configurable: true, writable: true, value: cancelRaf });
+
+    const setUi = vi.fn((updater) => updater({
+      isMobile: true,
+      minSkeletonElapsed: false,
+      mobileInitialOpen: true,
+    }));
+
+    const { unmount } = renderHook(() => useResponsiveCampusMap(setUi, true));
+
+    expect(raf).toHaveBeenCalled();
+    expect(setUi).toHaveBeenCalledWith(expect.any(Function));
+
+    unmount();
+
+    expect(cancelRaf).toHaveBeenCalledWith(42);
+  });
+
+  it("useResponsiveCampusMap clears the skeleton timeout on unmount", () => {
+    const clearTimeoutSpy = vi.spyOn(window, "clearTimeout");
+    const setUi = vi.fn((updater) => updater({
+      isMobile: false,
+      minSkeletonElapsed: false,
+      mobileInitialOpen: true,
+    }));
+
+    const { unmount } = renderHook(() => useResponsiveCampusMap(setUi, false));
+    unmount();
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+  });
+
   it("removes resize listeners and initialises mobileInitialOpen for desktop layouts", async () => {
     vi.useFakeTimers();
     const setUi = vi.fn((updater) => updater({
