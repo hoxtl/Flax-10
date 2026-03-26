@@ -8,7 +8,7 @@ import {
 const mockIsToday = vi.fn();
 const mockOverlapsDay = vi.fn();
 
-vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/calendar/utils/dateUtils', () => ({
   isToday: (d) => mockIsToday(d),
   overlapsDay: (start, end, day) => mockOverlapsDay(start, end, day),
 }));

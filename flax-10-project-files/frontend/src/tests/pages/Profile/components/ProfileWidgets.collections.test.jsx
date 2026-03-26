@@ -28,7 +28,7 @@ vi.mock("../../../../pages/Attendance/components/SegmentDetailPanel", () => ({
   default: () => <div data-testid="segment-detail-panel" />,
 }));
 
-import { BadgesSection, expect, fireEvent, ModulesSection, render, screen, SocietiesSection, waitFor } from "./ProfileWidgets.shared";
+import { BadgesSection, expect, fireEvent, ModulesSection, render, screen, SocietiesSection, waitFor } from "./ProfileWidgets.shared.jsx";
 
 describe("BadgesSection", () => {
   it("renders badge count and grid", () => {

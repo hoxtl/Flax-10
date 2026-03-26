@@ -210,6 +210,7 @@
   --sage: #8C9A86;
   --accent: var(--color-primary);
   --danger: #C05A3E;
+  --danger-hover: color-mix(in srgb, var(--danger) 92%, black);
   --danger-bg: rgba(192, 90, 62, 0.12);
   --danger-border: rgba(192, 90, 62, 0.4);
 

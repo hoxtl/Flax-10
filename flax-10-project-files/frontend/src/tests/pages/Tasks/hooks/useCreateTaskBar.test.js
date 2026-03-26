@@ -86,6 +86,27 @@ describe("useCreateTaskBar", () => {
     expect(result.current.taskListId).toBe(2);
   });
 
+  it("marks the list field invalid when submitting without a selected list", async () => {
+    const { result } = renderHook(() =>
+      useCreateTaskBar({
+        lists: [],
+        onAddTask: vi.fn(),
+      }),
+    );
+
+    act(() => {
+      result.current.setTitle("Read chapter");
+      result.current.setTaskListId("");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({ preventDefault: vi.fn() });
+    });
+
+    expect(result.current.listError).toBe(true);
+    expect(runQuickAdd).not.toHaveBeenCalled();
+  });
+
   it("closes on outside clicks", () => {
     const { result } = renderHook(() => useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], onAddTask: vi.fn() }));
     const insideNode = document.createElement("div");

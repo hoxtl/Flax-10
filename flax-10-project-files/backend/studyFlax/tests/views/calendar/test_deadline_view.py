@@ -139,6 +139,13 @@ class DeadlineViewTests(BaseTestCase):
         return dict(title='New Deadline', deadline_type='coursework',
             start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
 
+    def test_update_deadline_to_exam_type_uses_exam_tag(self):
+        start = timezone.now() + timedelta(days=10)
+        payload = {'deadline_type': 'exam', 'start_due_date': start.isoformat()}
+        response = self.client.put(self.detail_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['deadline_type'], 'exam')
+
     def test_update_deadline_invalid_non_teacher(self):
         deadline = Deadline.objects.create(
             module=self.module, title='D1',

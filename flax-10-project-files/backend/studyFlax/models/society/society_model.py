@@ -29,6 +29,7 @@ class Society(models.Model):
     ratification_status = models.CharField(max_length=20, choices=RATIFICATION_STATUS, default='none')
     location = models.CharField(max_length=300, blank=True, default="")
     admin_emails = models.TextField(blank=True, default="")
+    location = models.CharField(max_length=255, blank=True, default="")
     date_created = models.DateField(auto_now_add=True)
 
     class Meta:

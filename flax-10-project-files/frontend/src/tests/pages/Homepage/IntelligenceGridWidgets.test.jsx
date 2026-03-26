@@ -72,39 +72,22 @@ describe("IntelligenceGridWidgets", () => {
     expect(setWidgetSize).toHaveBeenCalled();
   });
 
-  it("calls drag handlers and applies drag state classes", () => {
-    const onDragStart = vi.fn();
-    const onDragOver = vi.fn();
-    const onDragEnd = vi.fn();
-    const onDrop = vi.fn();
-    render(
-      <GridWidgetList
-        catalogue={catalogue}
-        edit
-        layout={["timeline"]}
-        setLayout={vi.fn()}
-        widgetRenderer={(id) => <div>{id}</div>}
-        widgetSizes={{ timeline: { col: 1, row: 2 } }}
-        setWidgetSize={vi.fn()}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-        onDragStart={onDragStart}
-        onDrop={onDrop}
-        dragOver={"timeline"}
-        dragging={"timeline"}
-      />,
-    );
-
+  it("calls drag handlers", () => {
+    const onDragStart = vi.fn(), onDragOver = vi.fn(), onDragEnd = vi.fn(), onDrop = vi.fn();
+    render(<GridWidgetList catalogue={catalogue} edit layout={["timeline"]} setLayout={vi.fn()} widgetRenderer={id => <div>{id}</div>} widgetSizes={{}} setWidgetSize={vi.fn()} onDragEnd={onDragEnd} onDragOver={onDragOver} onDragStart={onDragStart} onDrop={onDrop} dragOver={null} dragging={null} />);
     const widget = screen.getByText("timeline").closest("[data-widget-id='timeline']");
     fireEvent.dragStart(widget, { dataTransfer: { setData: vi.fn() } });
     fireEvent.dragOver(widget, { dataTransfer: { setData: vi.fn() } });
     fireEvent.drop(widget, { dataTransfer: { getData: vi.fn(() => "timeline") } });
     fireEvent.dragEnd(widget);
-
     expect(onDragStart).toHaveBeenCalled();
     expect(onDragOver).toHaveBeenCalled();
     expect(onDrop).toHaveBeenCalled();
     expect(onDragEnd).toHaveBeenCalled();
+  });
+  it("applies drag state classes", () => {
+    render(<GridWidgetList catalogue={catalogue} edit layout={["timeline"]} setLayout={vi.fn()} widgetRenderer={id => <div>{id}</div>} widgetSizes={{}} setWidgetSize={vi.fn()} onDragEnd={vi.fn()} onDragOver={vi.fn()} onDragStart={vi.fn()} onDrop={vi.fn()} dragOver="timeline" dragging="timeline" />);
+    const widget = screen.getByText("timeline").closest("[data-widget-id='timeline']");
     expect(widget.className).toContain("dragging");
     expect(widget.className).toContain("dragOver");
   });

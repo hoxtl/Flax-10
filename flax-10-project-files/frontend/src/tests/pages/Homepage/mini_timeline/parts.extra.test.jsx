@@ -12,12 +12,12 @@ vi.mock("lucide-react", () => ({
   RotateCw: () => <svg data-testid="rotate-icon" />,
 }));
 
-vi.mock("../../../pages/Homepage/utils/dateFormatUtils", () => ({
+vi.mock("../../../pages/homepage/utils/dateFormatUtils", () => ({
   fmtDurationShort: (value) => `${value}m`,
   formatTime: (value) => (value ? value.slice(11, 16) : ""),
 }));
 
-vi.mock("../../../pages/Homepage/utils/eventUtils", () => ({
+vi.mock("../../../pages/homepage/utils/eventUtils", () => ({
   stripEmojiFromTitle: (title) => String(title || "").replace("🔥 ", ""),
 }));
 

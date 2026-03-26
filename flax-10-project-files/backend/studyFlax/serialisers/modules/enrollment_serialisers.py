@@ -17,7 +17,7 @@ class EnrollmentSerialiser(serializers.ModelSerializer):
         """Metadata for enrollment serialiser."""
 
         model = Enrollment
-        fields = ['id', 'student', 'student_name', 'module', 'module_name', 'module_code', 'enrolled_at']
+        fields = ['id', 'student', 'student_name', 'module', 'module_name', 'module_code', 'enrolled_at', 'is_core']
         read_only_fields = ['student']
 
     def validate(self, validated_data):
