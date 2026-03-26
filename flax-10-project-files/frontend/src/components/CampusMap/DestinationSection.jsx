@@ -10,31 +10,37 @@ import AnimatedDropdown from "../common/AnimatedDropdown";
 
 const styles = { ...baseStyles, ...sidebarStyles };
 
-const CAMPUS_OPTIONS = KCL_CAMPUSES.map((c) => ({
-  value: c.id,
-  label: c.shortName,
-  icon: <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color, display: "inline-block", flexShrink: 0 }} />,
-}));
+function CampusDot({ color }) {
+  return <span className={styles.campusDot} style={{ background: color }} />;
+}
+
+function buildCampusOption(campus) {
+  return { value: campus.id, label: campus.shortName, icon: <CampusDot color={campus.color} /> };
+}
+
+function selectCampus(onSelectCampus, campusId) {
+  const campus = KCL_CAMPUSES.find((candidate) => candidate.id === campusId);
+  if (campus) onSelectCampus(campus);
+}
+
+function CampusTrigger({ selectedCampus, className, ...triggerProps }) {
+  return (
+    <button type="button" className={`${styles.campusDropdownTrigger} ${className ?? ""}`.trim()} {...triggerProps}>
+      {selectedCampus ? <><CampusDot color={selectedCampus.color} /> {selectedCampus.shortName}</> : "Select campus…"}
+      <span className={styles.campusDropdownChevron}>▾</span>
+    </button>
+  );
+}
+
+const CAMPUS_OPTIONS = KCL_CAMPUSES.map(buildCampusOption);
 
 function CampusList({ onSelectCampus, selectedCampus }) {
-  const handleChange = (campusId) => {
-    const campus = KCL_CAMPUSES.find((c) => c.id === campusId);
-    if (campus) onSelectCampus(campus);
-  };
   return (
     <AnimatedDropdown
       value={selectedCampus?.id ?? ""}
       options={CAMPUS_OPTIONS}
-      onChange={handleChange}
-      customTrigger={
-        <button type="button" className={styles.campusDropdownTrigger}>
-          {selectedCampus
-            ? <><span style={{ width: 10, height: 10, borderRadius: "50%", background: selectedCampus.color, display: "inline-block" }} /> {selectedCampus.shortName}</>
-            : "Select campus…"
-          }
-          <span className={styles.campusDropdownChevron}>▾</span>
-        </button>
-      }
+      onChange={(campusId) => selectCampus(onSelectCampus, campusId)}
+      customTrigger={<CampusTrigger selectedCampus={selectedCampus} />}
       hideCheckmark={false}
       menuMaxHeight={220}
       usePortal
@@ -60,25 +66,17 @@ function formatUpcomingTime(startTime) {
 }
 
 function UpcomingEventsList({ upcomingEvents, onSelectEvent }) {
-  if (!hasUpcomingEvents(upcomingEvents)) return null;
+  if (!Array.isArray(upcomingEvents) || upcomingEvents.length === 0) return null;
   return (
     <div className={styles.upcomingSection}>
       <div className={styles.subsectionLabel}>Upcoming events</div>
       <div className={styles.upcomingList}>
         {upcomingEvents.map((event) => (
-          <UpcomingEventButton key={getUpcomingEventKey(event)} event={event} onSelectEvent={onSelectEvent} />
+          <UpcomingEventButton key={event.id || `${event.title}-${event.start_time}`} event={event} onSelectEvent={onSelectEvent} />
         ))}
       </div>
     </div>
   );
-}
-
-function hasUpcomingEvents(events) {
-  return Array.isArray(events) && events.length > 0;
-}
-
-function getUpcomingEventKey(event) {
-  return event.id || `${event.title}-${event.start_time}`;
 }
 
 function UpcomingEventButton({ event, onSelectEvent }) {

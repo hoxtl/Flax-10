@@ -79,24 +79,34 @@ function ScoreRing({ score, color }) {
   );
 }
 
-export function ConsistencyScore({ data }) {
-  if (!data?.summary) return null;
-  const { summary } = data;
-  const streak = summary.current_streak_days || 0;
-  const totalDays = summary.active_days ?? (data.daily_breakdown?.filter(d => d.sessions > 0).length || 0);
+function getConsistencyViewModel(data) {
+  const streak = data.summary.current_streak_days || 0;
+  const totalDays = data.summary.active_days ?? (data.daily_breakdown?.filter((day) => day.sessions > 0).length || 0);
   const maxDays = Math.max(data.period_days || 30, 1);
   const score = calcScore(totalDays, maxDays, streak);
-  const color = getColor(score);
-  const explanation = getExplanation(totalDays, maxDays, streak, score);
+  return { color: getColor(score), explanation: getExplanation(totalDays, maxDays, streak, score), label: getLabel(score), score };
+}
+
+function ScoreCard({ color, explanation, label, score }) {
   return (
-    <Tooltip content={explanation} position="top">
-      <div className={styles.scoreCard}>
-        <Tooltip content={SCORE_TITLE} position="bottom">
-          <p className={styles.cardLabel}>Consistency ⓘ</p>
-        </Tooltip>
-        <ScoreRing score={score} color={color} />
-        <span className={styles.scoreLabel} style={{ color }}>{getLabel(score)}</span>
-      </div>
-    </Tooltip>
+    <div data-tooltip={explanation}>
+      <Tooltip content={explanation} position="top">
+        <div className={styles.scoreCard}>
+          <Tooltip content={SCORE_TITLE} position="bottom">
+            <p className={styles.cardLabel} title={SCORE_TITLE}>
+              <span title={SCORE_TITLE}>Consistency</span>
+              <span aria-hidden="true"> ⓘ</span>
+            </p>
+          </Tooltip>
+          <ScoreRing score={score} color={color} />
+          <span className={styles.scoreLabel} style={{ color }}>{label}</span>
+        </div>
+      </Tooltip>
+    </div>
   );
+}
+
+export function ConsistencyScore({ data }) {
+  if (!data?.summary) return null;
+  return <ScoreCard {...getConsistencyViewModel(data)} />;
 }

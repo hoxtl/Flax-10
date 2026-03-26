@@ -1,28 +1,29 @@
 import { vi } from "vitest";
 
-export function createMutableState(overrides = {}) {
-  const state = {
-    selection: {
-      customDestination: null,
-      selectedCampus: null,
-      startLocation: null,
-      ...overrides.selection,
-    },
-    routes: {
+const createSection = (defaults, overrides = {}) => ({ ...defaults, ...overrides });
+
+const createSelectionState = (overrides = {}) =>
+  createSection({ customDestination: null, selectedCampus: null, startLocation: null }, overrides);
+
+const createRoutesState = (overrides = {}) =>
+  createSection(
+    {
       loadingRoute: false,
       loadingTflRoute: false,
       routeError: "",
       routeInfo: null,
       tflRouteError: "",
       tflRouteInfo: null,
-      ...overrides.routes,
     },
-    form: {
-      manualDestination: "",
-      manualStart: "",
-      ...overrides.form,
-    },
-    ui: {
+    overrides,
+  );
+
+const createFormState = (overrides = {}) =>
+  createSection({ manualDestination: "", manualStart: "" }, overrides);
+
+const createUiState = (overrides = {}) =>
+  createSection(
+    {
       isMobile: false,
       locating: false,
       mapLoaded: true,
@@ -30,26 +31,38 @@ export function createMutableState(overrides = {}) {
       mobileInitialOpen: true,
       tflInstructions: false,
       walkingInstructions: false,
-      ...overrides.ui,
     },
+    overrides,
+  );
+
+const createSetter = (state) => (key) =>
+  vi.fn((updater) => {
+    state[key] = typeof updater === "function" ? updater(state[key]) : updater;
+    return state[key];
+  });
+
+const createAccessors = (state) => ({
+  selection: { get: () => state.selection },
+  routes: { get: () => state.routes },
+  form: { get: () => state.form },
+  ui: { get: () => state.ui },
+});
+
+export function createMutableState(overrides = {}) {
+  const state = {
+    selection: createSelectionState(overrides.selection),
+    routes: createRoutesState(overrides.routes),
+    form: createFormState(overrides.form),
+    ui: createUiState(overrides.ui),
   };
-  const wrapSetter = (key) =>
-    vi.fn((updater) => {
-      state[key] = typeof updater === "function" ? updater(state[key]) : updater;
-      return state[key];
-    });
+  const wrapSetter = createSetter(state);
   const api = {
     setSelection: wrapSetter("selection"),
     setRoutes: wrapSetter("routes"),
     setForm: wrapSetter("form"),
     setUi: wrapSetter("ui"),
   };
-  Object.defineProperties(api, {
-    selection: { get: () => state.selection },
-    routes: { get: () => state.routes },
-    form: { get: () => state.form },
-    ui: { get: () => state.ui },
-  });
+  Object.defineProperties(api, createAccessors(state));
   return api;
 }
 

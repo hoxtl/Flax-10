@@ -19,6 +19,7 @@
 
 .card {
   position: fixed;
+  width: 280px;
   background: var(--surface-card, #fff);
   border: var(--card-border, 1px solid #e5e7eb);
   border-radius: var(--card-radius-token, 12px);
@@ -26,6 +27,15 @@
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
   pointer-events: all;
   z-index: 9001;
+}
+
+.cardCentered {
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cardPositioned {
+  transform: none;
 }
 
 .cardHeader {
