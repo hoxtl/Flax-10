@@ -1,5 +1,11 @@
+/**
+ * Verifies TaskFeedContent wiring across its child sections.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createFnMap } from "../../../utils/factoryUtils";
 
 vi.mock("../../../../pages/Tasks/components/TaskFeedHeader", () => ({
   default: ({ title, subtitle, isReadingList }) => (
@@ -46,41 +52,40 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedMobileLists", () => ({
 
 import TaskFeedContent from "../../../../pages/Tasks/components/TaskFeedContent";
 
-function buildProps(overrides = {}) {
+const taskActionNames = ["onAddTask", "onCreateTask", "onToggleComplete", "onDeleteTask", "onEditTask", "onReloadTasks"];
+
+function buildTaskFeedProps(overrides = {}) {
   return {
-    props: {
-      lists: [{ id: 1, name: "Inbox" }],
-      activeListId: "1",
-      activeFilter: "all",
-      defaultDueDateForNewTask: "2026-03-25",
-      onAddTask: vi.fn(),
-      onCreateTask: vi.fn(),
-      onToggleComplete: vi.fn(),
-      onDeleteTask: vi.fn(),
-      onEditTask: vi.fn(),
-      onReloadTasks: vi.fn(),
-      tasks: [{ id: 1 }, { id: 2 }],
-      ...overrides.props,
-    },
-    vm: {
-      data: { headerTitle: "Tasks" },
-      taskFeedSubtitle: "Everything due soon",
-      readingList: true,
-      activeList: { id: 1, name: "Inbox" },
-      isMobile: true,
-      showMobileLists: true,
-      setShowMobileLists: vi.fn(),
-      modalLists: [{ id: 1 }],
-      modalTasks: [{ id: 1 }],
-      sidebarProps: {
-        onSelectFilter: vi.fn(),
-        onSelectList: vi.fn(),
-        onNewList: vi.fn(),
-      },
-      sectionPropsWithHandlers: { sections: [] },
-      ...overrides.vm,
-    },
+    lists: [{ id: 1, name: "Inbox" }],
+    activeListId: "1",
+    activeFilter: "all",
+    defaultDueDateForNewTask: "2026-03-25",
+    tasks: [{ id: 1 }, { id: 2 }],
+    ...createFnMap(taskActionNames),
+    ...overrides,
   };
+}
+
+function buildVm(overrides = {}) {
+  const { data, sidebarProps, sectionPropsWithHandlers, ...rest } = overrides;
+  return {
+    data: { headerTitle: "Tasks", ...(data || {}) },
+    taskFeedSubtitle: "Everything due soon",
+    readingList: true,
+    activeList: { id: 1, name: "Inbox" },
+    isMobile: true,
+    showMobileLists: true,
+    setShowMobileLists: vi.fn(),
+    modalLists: [{ id: 1 }],
+    modalTasks: [{ id: 1 }],
+    sidebarProps: { ...createFnMap(["onSelectFilter", "onSelectList", "onNewList"]), ...sidebarProps },
+    sectionPropsWithHandlers: { sections: [], ...sectionPropsWithHandlers },
+    ...rest,
+  };
+}
+
+function buildProps(overrides = {}) {
+  return { props: buildTaskFeedProps(overrides.props), vm: buildVm(overrides.vm) };
 }
 
 describe("TaskFeedContent", () => {

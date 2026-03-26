@@ -2,6 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
+import { createFnMap } from '../../utils/factoryUtils';
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
 }));
@@ -79,27 +80,20 @@ const baseTasks = [
     { id: 4, title: 'Completed Task', completed: true, due_date: yesterday.toISOString(), priority: 'low', task_list: 1 },
 ];
 const baseLists = [{ id: 1, name: 'Work', color: '#3b82f6' }];
+const taskFeedActionNames = ['onPlanTomorrow', 'onToggleComplete', 'onDeleteTask', 'onEditTask', 'onCreateTask', 'onAddTask', 'onFilterByList'];
+const baseFeedProps = {
+    tasks: baseTasks,
+    allTasks: baseTasks,
+    lists: baseLists,
+    activeFilter: 'all',
+    activeListId: null,
+    activeModuleCode: null,
+    defaultDueDateForNewTask: null,
+    filterListIds: [],
+};
+
 function renderFeed(props = {}) {
-    return render(
-        <TaskFeed
-            tasks={baseTasks}
-            allTasks={baseTasks}
-            lists={baseLists}
-            activeFilter="all"
-            activeListId={null}
-            activeModuleCode={null}
-            defaultDueDateForNewTask={null}
-            onPlanTomorrow={vi.fn()}
-            onToggleComplete={vi.fn()}
-            onDeleteTask={vi.fn()}
-            onEditTask={vi.fn()}
-            onCreateTask={vi.fn()}
-            onAddTask={vi.fn()}
-            filterListIds={[]}
-            onFilterByList={vi.fn()}
-            {...props}
-        />
-    );
+    return render(<TaskFeed {...baseFeedProps} {...createFnMap(taskFeedActionNames)} {...props} />);
 }
 describe('TaskFeed', () => {
     beforeEach(() => {

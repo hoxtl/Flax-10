@@ -1,3 +1,7 @@
+/**
+ * Covers TaskCard rendering, menu, and modal behaviours.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -107,38 +111,41 @@ import { isRoutineTask } from "../../../../lib/completionMessages";
 import { getUserSettings } from "../../../../api/userApi";
 import { formatDueDate } from "../../../../pages/Tasks/utils/taskCardUtils";
 
+import { createFnMap } from "../../../utils/factoryUtils";
+
 function renderWithRouter(ui) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
 }
 
+const baseTask = {
+  id: 1,
+  title: "Read book",
+  completed: false,
+  task_list: 1,
+  module_code: "KCL1",
+  module_id: 11,
+  due_date: "2026-03-09T09:00",
+  priority: "urgent",
+  estimated_blocks: 2,
+  group_project_name: "Capstone",
+};
+
 function buildProps(overrides = {}) {
+  const { task, ...rest } = overrides;
   return {
-    task: {
-      id: 1,
-      title: "Read book",
-      completed: false,
-      task_list: 1,
-      module_code: "KCL1",
-      module_id: 11,
-      due_date: "2026-03-09T09:00",
-      priority: "urgent",
-      estimated_blocks: 2,
-      group_project_name: "Capstone",
-    },
+    task: { ...baseTask, ...task },
     listName: "Inbox",
     listColor: "#ccc",
     lists: [
       { id: 1, name: "Inbox", color: "#ccc" },
       { id: 2, name: "Work", color: "#eee" },
     ],
-    onToggle: vi.fn(),
-    onDelete: vi.fn(),
-    onEdit: vi.fn(),
     hideDueBadge: false,
     hideListBadge: false,
     isOverdue: false,
     searchQuery: "",
-    ...overrides,
+    ...createFnMap(["onToggle", "onDelete", "onEdit"]),
+    ...rest,
   };
 }
 

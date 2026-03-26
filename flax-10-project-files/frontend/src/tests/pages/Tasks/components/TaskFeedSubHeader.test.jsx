@@ -1,5 +1,11 @@
+/**
+ * Covers TaskFeedSubHeader mobile and desktop controls.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createFnMap } from "../../../utils/factoryUtils";
 
 vi.mock("lucide-react", () => ({
   Plus: () => <span>plus-icon</span>,
@@ -27,7 +33,39 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedToolbar", () => ({
 
 import TaskFeedSubHeader from "../../../../pages/Tasks/components/TaskFeedSubHeader";
 
+const dataActionNames = [
+  "setSearch",
+  "setSortBy",
+  "setIsFilterOpen",
+  "setActiveFilterTab",
+  "setFilterQuery",
+  "toggleListFilter",
+  "toggleModuleFilter",
+  "clearAllFilters",
+];
+
+function buildData(overrides = {}) {
+  return {
+    search: "abc",
+    searchInputRef: { current: null },
+    sortBy: "priority",
+    filterRef: { current: null },
+    isFilterOpen: false,
+    activeFilterCount: 0,
+    activeFilterTab: "lists",
+    filterQuery: "",
+    visibleListItems: [],
+    filterListIds: [],
+    moduleGroupKeys: [],
+    groupedVisibleModuleItems: {},
+    filterModuleCodes: [],
+    ...createFnMap(dataActionNames),
+    ...overrides,
+  };
+}
+
 function buildProps(overrides = {}) {
+  const { data, ...rest } = overrides;
   return {
     isMobile: true,
     activeFilter: "all",
@@ -39,30 +77,8 @@ function buildProps(overrides = {}) {
     onAddTask: vi.fn(),
     onCreateTask: vi.fn(),
     onOpenLists: vi.fn(),
-    data: {
-      search: "abc",
-      setSearch: vi.fn(),
-      searchInputRef: { current: null },
-      sortBy: "priority",
-      setSortBy: vi.fn(),
-      filterRef: { current: null },
-      isFilterOpen: false,
-      setIsFilterOpen: vi.fn(),
-      activeFilterCount: 0,
-      activeFilterTab: "lists",
-      setActiveFilterTab: vi.fn(),
-      filterQuery: "",
-      setFilterQuery: vi.fn(),
-      visibleListItems: [],
-      filterListIds: [],
-      toggleListFilter: vi.fn(),
-      moduleGroupKeys: [],
-      groupedVisibleModuleItems: {},
-      filterModuleCodes: [],
-      toggleModuleFilter: vi.fn(),
-      clearAllFilters: vi.fn(),
-    },
-    ...overrides,
+    data: buildData(data),
+    ...rest,
   };
 }
 

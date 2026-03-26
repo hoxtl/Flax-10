@@ -2,6 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import CreateTaskBar from "../../../../pages/Tasks/components/CreateTaskBar";
+import { createFnMap } from "../../../utils/factoryUtils";
 
 const hookMock = vi.hoisted(() => vi.fn());
 
@@ -23,29 +24,37 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
+const taskBarActionNames = [
+  "setTitle",
+  "setInputFocused",
+  "handleInputBlur",
+  "handleInputKeyDown",
+  "setEstimatedMinutes",
+  "setModuleId",
+  "setTaskListId",
+];
+
+const baseTaskBarState = {
+  cardRef: { current: null },
+  title: "",
+  saving: false,
+  inputRef: { current: null },
+  showOptions: true,
+  estimatedMinutes: 25,
+  moduleId: "",
+  taskListId: "",
+  sortedLists: [{ id: 1, name: "Inbox" }],
+  moduleOptions: [{ value: "", label: "None" }],
+  listOptions: [{ value: "1", label: "Inbox" }],
+  sleepWarning: false,
+  sleepWarningProps: {},
+};
+
 function state(overrides = {}) {
   return {
+    ...baseTaskBarState,
+    ...createFnMap(taskBarActionNames),
     handleSubmit: vi.fn((e) => e?.preventDefault?.()),
-    cardRef: { current: null },
-    title: "",
-    setTitle: vi.fn(),
-    saving: false,
-    inputRef: { current: null },
-    setInputFocused: vi.fn(),
-    handleInputBlur: vi.fn(),
-    handleInputKeyDown: vi.fn(),
-    showOptions: true,
-  estimatedMinutes: 25,
-  setEstimatedMinutes: vi.fn(),
-    moduleId: "",
-    setModuleId: vi.fn(),
-    taskListId: "",
-    setTaskListId: vi.fn(),
-    sortedLists: [{ id: 1, name: "Inbox" }],
-    moduleOptions: [{ value: "", label: "None" }],
-    listOptions: [{ value: "1", label: "Inbox" }],
-    sleepWarning: false,
-    sleepWarningProps: {},
     ...overrides,
   };
 }
