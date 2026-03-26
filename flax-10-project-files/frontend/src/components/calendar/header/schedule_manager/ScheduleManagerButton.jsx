@@ -8,7 +8,7 @@ import { Clock, Sparkles } from "lucide-react";
 import { useCalendar } from "../../../../context/CalendarContext";
 import { useToast } from "../../../../context/ToastContext";
 import ConfirmModal from "../../../common/confirm_modal/ConfirmModal";
-import Tooltip from "../../../common/tooltip/Tooltip";
+import Tooltip from "../../../common/Tooltip/Tooltip";
 import { useCalendarEvents, useEventActions } from "../../hooks/useCalendarEvents";
 import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../common/reschedule_events/rescheduleEventConflicts";
 import { loadScheduleSettings, loadUpcomingDeadlineItems, submitAutoScheduleWithPrefs } from "../../../schedules/auto/autoScheduleActions";

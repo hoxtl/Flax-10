@@ -14,7 +14,7 @@ import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/deadline_countdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/back_button/BackButton.jsx';
 import PrimaryButton from '../../common/primary_button/PrimaryButton.jsx';
-import Tooltip from '../../common/tooltip/Tooltip.jsx';
+import Tooltip from '../../common/Tooltip/Tooltip.jsx';
 import LocationLink from '../../common/location_link/LocationLink.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';

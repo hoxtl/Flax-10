@@ -40,7 +40,7 @@ vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => 
   default: ({ title, hint }) => <div>{title} {hint}</div>,
 }));
 
-vi.mock("../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 

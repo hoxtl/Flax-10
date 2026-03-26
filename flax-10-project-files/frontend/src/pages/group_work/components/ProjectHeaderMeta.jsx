@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
-import Tooltip from "../../../components/common/tooltip/Tooltip";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
 import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import AddMemberForm from "./AddMemberForm";

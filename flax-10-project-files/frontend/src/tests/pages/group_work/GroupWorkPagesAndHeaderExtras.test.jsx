@@ -213,7 +213,7 @@ vi.mock("../../../components/common/Badge/Badge", () => ({
   default: ({ children }) => <span>{children}</span>,
 }));
 
-vi.mock("../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
