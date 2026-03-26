@@ -1,3 +1,7 @@
+"""
+Tests for schedule views.
+"""
+
 from datetime import timedelta
 from django.utils import timezone
 from rest_framework import status
@@ -11,11 +15,13 @@ from studyFlax.models import (
     Tag,
     UserSettings,
 )
-from ..base import BaseTestCase
+from ..helpers.test_case_support import BaseTestCase
 
 
 class ScheduleViewsTests(BaseTestCase):
+    """Tests schedule views."""
     def setUp(self):
+        """Set up the test case."""
         super().setUp()
         self.url = '/api/schedules/'
 
@@ -39,6 +45,7 @@ class ScheduleViewsTests(BaseTestCase):
         )
 
     def test_create_auto_schedule(self):
+        """Test create auto schedule."""
         payload = {
             'title': 'My auto plan',
             'worktime_preference': 'day',
@@ -57,6 +64,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(schedule.event_allocations.count(), 3)
 
     def test_delete_schedule_cascades_allocated_events(self):
+        """Test delete schedule cascades allocated events."""
         payload = {
             'title': 'Delete me',
             'deadline_preferences': [
@@ -75,6 +83,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(CalendarEvent.objects.filter(source='auto_scheduler').count(), 0)
 
     def _create_tagged_event(self, title, tag, start_offset_hours=0):
+        """Create tagged event."""
         start = timezone.now() + timedelta(days=1, hours=start_offset_hours)
         return CalendarEvent.objects.create(
             user=self.user, title=title, tag=tag,
@@ -82,6 +91,7 @@ class ScheduleViewsTests(BaseTestCase):
         )
 
     def test_create_manual_schedule_from_existing_schedule_tagged_events(self):
+        """Test create manual schedule from existing schedule tagged events."""
         tag = Tag.objects.create(name='schedule', is_default=True)
         event_1 = self._create_tagged_event('Session A', tag)
         event_2 = self._create_tagged_event('Session B', tag, start_offset_hours=2)
@@ -97,6 +107,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(len(response.data['event_allocations']), 2)
 
     def test_create_manual_schedule_requires_title(self):
+        """Test create manual schedule requires title."""
         event = self._build_schedule_event('Untitled Session')
 
         response = self.client.post(self.url, {
@@ -108,6 +119,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(response.data['detail'], 'title is required for manual schedules.')
 
     def test_manual_schedule_same_name_overwrites_previous_and_creates_notification(self):
+        """Test manual schedule same name overwrites previous and creates notification."""
         first_event = self._build_schedule_event('Manual Session A')
         second_event = self._build_schedule_event('Manual Session B', start_offset_hours=2)
 
@@ -129,6 +141,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertTrue(Notification.objects.filter(user=self.user, title='Schedule overwritten').exists())
 
     def test_schedule_list_get_returns_user_schedules(self):
+        """Test schedule list get returns user schedules."""
         event = self._build_schedule_event('Listed session')
         create_response = self.client.post(self.url, {
             'mode': 'manual',
@@ -143,6 +156,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(list_response.data[0]['title'], 'Listable Schedule')
 
     def _create_manual_schedule(self, title, event):
+        """Create manual schedule."""
         response = self.client.post(self.url, {
             'mode': 'manual', 'title': title, 'event_ids': [event.id],
         }, format='json')
@@ -150,6 +164,7 @@ class ScheduleViewsTests(BaseTestCase):
         return response.data['id']
 
     def test_schedule_detail_get_returns_schedule(self):
+        """Test schedule detail get returns schedule."""
         event = self._build_schedule_event('Get Session')
         schedule_id = self._create_manual_schedule('Get Target', event)
 
@@ -158,6 +173,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(response.data['title'], 'Get Target')
 
     def test_schedule_patch_overwrites_existing_same_name(self):
+        """Test schedule patch overwrites existing same name."""
         first_event = self._build_schedule_event('Patch Session A')
         second_event = self._build_schedule_event('Patch Session B', start_offset_hours=2)
         self._create_manual_schedule('Existing Name', first_event)
@@ -169,6 +185,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(Schedule.objects.filter(user=self.user, title='Existing Name').count(), 1)
 
     def test_schedule_patch_rejects_blank_title(self):
+        """Test schedule patch rejects blank title."""
         event = self._build_schedule_event('Blank Title Session')
         schedule_id = self._create_manual_schedule('Valid Name', event)
 
@@ -177,6 +194,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(response.data['detail'], 'title is required.')
 
     def _create_second_deadline(self):
+        """Create second deadline."""
         return Deadline.objects.create(
             module=self.module, title='Coursework 2', deadline_type='coursework',
             start_due_date=timezone.now() + timedelta(days=2),
@@ -184,11 +202,13 @@ class ScheduleViewsTests(BaseTestCase):
         )
 
     def _set_daily_budget(self, minutes):
+        """Set daily budget."""
         settings, _ = UserSettings.objects.get_or_create(user=self.user)
         settings.preferred_study_minutes_per_day = minutes
         settings.save(update_fields=['preferred_study_minutes_per_day'])
 
     def test_preferred_daily_budget_limits_allocations_per_day(self):
+        """Test preferred daily budget limits allocations per day."""
         second_deadline = self._create_second_deadline()
         self._set_daily_budget(60)
 
@@ -206,6 +226,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(total_allocated, 180)
 
     def test_create_auto_schedule_tags_generated_events_as_schedule(self):
+        """Test create auto schedule tags generated events as schedule."""
         payload = {
             'title': 'Tagged auto plan',
             'worktime_preference': 'day',
@@ -222,6 +243,7 @@ class ScheduleViewsTests(BaseTestCase):
             self.assertEqual(allocation['event']['tag_name'], 'Schedule')
 
     def test_create_manual_schedule_accepts_lowercase_schedule_tag(self):
+        """Test create manual schedule accepts lowercase schedule tag."""
         lower_schedule_tag = Tag.objects.create(name='schedule', user=self.user)
         start = timezone.now() + timedelta(days=1)
         event = CalendarEvent.objects.create(
@@ -242,6 +264,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(len(response.data['event_allocations']), 1)
 
     def _build_schedule_event(self, title, start_offset_days=1, start_offset_hours=0):
+        """Build schedule event."""
         schedule_tag, _ = Tag.objects.get_or_create(name='Schedule', defaults={'is_default': True})
         start = timezone.now() + timedelta(days=start_offset_days, hours=start_offset_hours)
         return CalendarEvent.objects.create(
@@ -253,6 +276,7 @@ class ScheduleViewsTests(BaseTestCase):
         )
 
     def test_manual_schedule_rejects_empty_event_ids(self):
+        """Test manual schedule rejects empty event IDs."""
         response = self.client.post(self.url, {
             'mode': 'manual', 'title': 'Test', 'event_ids': [],
         }, format='json')
@@ -260,6 +284,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertIn('event_ids', response.data['detail'])
 
     def test_manual_schedule_rejects_untagged_events(self):
+        """Test manual schedule rejects untagged events."""
         start = timezone.now() + timedelta(days=1)
         untagged_event = CalendarEvent.objects.create(
             user=self.user, title='No tag',
@@ -272,10 +297,12 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertIn('invalid', response.data['detail'])
 
     def test_auto_schedule_rejects_invalid_serialiser_data(self):
+        """Test auto schedule rejects invalid serialiser data."""
         response = self.client.post(self.url, {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_auto_schedule_rejects_nonexistent_deadline(self):
+        """Test auto schedule rejects nonexistent deadline."""
         payload = {
             'title': 'Bad deadline',
             'deadline_preferences': [{'deadline_id': 99999, 'ideal_minutes_per_day': 30}],
@@ -285,6 +312,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertIn('Invalid deadlines', response.data['detail'])
 
     def test_auto_schedule_with_clear_existing_deletes_old_schedules(self):
+        """Test auto schedule with clear existing deletes old schedules."""
         first_payload = {
             'title': 'First plan',
             'deadline_preferences': [{'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30}],
@@ -301,6 +329,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(Schedule.objects.filter(user=self.user).count(), 1)
 
     def test_auto_schedule_rejects_duplicate_deadline_ids(self):
+        """Test auto schedule rejects duplicate deadline IDs."""
         payload = {
             'title': 'Dup deadlines',
             'deadline_preferences': [

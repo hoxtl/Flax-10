@@ -1,4 +1,6 @@
-"""Backend tests for reading endpoints and helper utilities."""
+"""
+Tests for reading views.
+"""
 
 from datetime import timedelta
 
@@ -6,12 +8,13 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import status
 
-from ..base import BaseTestCase
+from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Module, Enrollment, Reading, Task
 from studyFlax.views.modules.reading_task_service import (
     create_description,
     task_payload,
 )
+
 
 User = get_user_model()
 
@@ -20,6 +23,7 @@ class ReadingViewsTests(BaseTestCase):
     """Validate module reading CRUD and task conversion flows."""
 
     def setUp(self):
+        """Set up the test case."""
         super().setUp()
         self.teacher = self.user
         self.teacher.role = 'teacher'
@@ -38,11 +42,13 @@ class ReadingViewsTests(BaseTestCase):
         )
 
     def test_get_readings_empty(self):
+        """Test get readings empty."""
         response = self.client.get(f'/api/modules/{self.module.id}/readings/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), [])
 
     def test_create_reading(self):
+        """Test create reading."""
         response = self.client.post(
             f'/api/modules/{self.module.id}/readings/',
             {
@@ -58,6 +64,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertEqual(Reading.objects.filter(module=self.module).count(), 1)
 
     def test_reading_detail_and_update(self):
+        """Test reading detail and update."""
         reading = Reading.objects.create(
             module=self.module,
             title='Original',
@@ -78,6 +85,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertEqual(reading.title, 'Updated')
 
     def test_delete_reading(self):
+        """Test delete reading."""
         reading = Reading.objects.create(
             module=self.module,
             title='To Delete',
@@ -90,6 +98,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertFalse(Reading.objects.filter(id=reading.id).exists())
 
     def test_load_task_creates_task(self):
+        """Test load task creates task."""
         reading = Reading.objects.create(
             module=self.module,
             title='To Task',
@@ -105,6 +114,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertEqual(payload['estimated_blocks'], task_payload(created_task)['estimated_blocks'])
 
     def test_suggested_readings(self):
+        """Test suggested readings."""
         self.client.force_authenticate(user=self.student)
         Enrollment.objects.create(student=self.student, module=self.module)
         reading = Reading.objects.create(
@@ -121,6 +131,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertIn(reading.id, ids)
 
     def test_reading_speed_default_time(self):
+        """Test reading speed default time."""
         self.client.force_authenticate(user=self.student)
         response = self.client.get('/api/readings/speed/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -128,6 +139,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertEqual(data['avg_min_per_page'], 2.0)
 
     def test_create_description(self):
+        """Test create description."""
         reading = Reading.objects.create(
             module=self.module,
             title='Reading',
@@ -139,6 +151,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertEqual(create_description(reading), 'Reading, Unit, pages. 5-9')
 
     def test_get_reading_list_without_module_calls_generic_search(self):
+        """Test get reading list without module calls generic search."""
         from studyFlax.models.tasks.task_model import TaskList
         from studyFlax.views.modules.reading_task_lists import get_reading_list
         TaskList.objects.create(user=self.teacher, name='My reading notes', archived=False)
@@ -147,6 +160,7 @@ class ReadingViewsTests(BaseTestCase):
         self.assertEqual(result.name, 'My reading notes')
 
     def test_task_payload_format(self):
+        """Test task payload format."""
         reading = Reading.objects.create(
             module=self.module,
             title='Payload',
@@ -165,6 +179,7 @@ class ReadingViewsTests(BaseTestCase):
         )
 
     def test_update_reading_invalid_data(self):
+        """Test update reading invalid data."""
         reading = Reading.objects.create(
             module=self.module,
             title='Original',

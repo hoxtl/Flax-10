@@ -5,7 +5,8 @@ Backend tests for shared calendar event visibility.
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
-from ..base import BaseEventTestCase
+from ...helpers.test_case_support import BaseEventTestCase
+
 
 User = get_user_model()
 
@@ -14,6 +15,7 @@ class EventSharedCalendarTests(BaseEventTestCase):
     """Tests for shared calendar behaviour."""
 
     def setUp(self):
+        """Set up the test case."""
         super().setUp()
         self.owner = self.user
         self.viewer = User.objects.create_user(
@@ -24,6 +26,7 @@ class EventSharedCalendarTests(BaseEventTestCase):
         self.client.force_authenticate(user=self.viewer)
 
     def _make_event(self, user, title='Event', is_private=False):
+        """Make event."""
         from django.utils import timezone
         from datetime import timedelta
         from studyFlax.models import CalendarEvent
@@ -37,6 +40,7 @@ class EventSharedCalendarTests(BaseEventTestCase):
         )
 
     def test_get_shared_calendar_events(self):
+        """Test get shared calendar events."""
         from studyFlax.models.social.share_model import CalendarShare
 
         CalendarShare.objects.create(owner=self.owner, shared_with=self.viewer)
@@ -46,6 +50,7 @@ class EventSharedCalendarTests(BaseEventTestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_private_events_masked_for_viewer(self):
+        """Test private events masked for viewer."""
         from studyFlax.models.social.share_model import CalendarShare
 
         CalendarShare.objects.create(owner=self.owner, shared_with=self.viewer)
@@ -56,17 +61,20 @@ class EventSharedCalendarTests(BaseEventTestCase):
         self.assertEqual(response.data[0]['title'], 'Busy')
 
     def test_unshared_calendar_returns_empty(self):
+        """Test unshared calendar returns empty."""
         self._make_event(self.owner, 'Hidden Event')
         response = self.client.get(f'{self.url}?user_id={self.owner.id}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
 
     def test_nonexistent_user_returns_empty(self):
+        """Test nonexistent user returns empty."""
         response = self.client.get(f'{self.url}?user_id=99999')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
 
     def test_own_events_not_masked(self):
+        """Test own events not masked."""
         self.client.force_authenticate(user=self.owner)
         self._make_event(self.owner, 'My Secret', is_private=True)
         response = self.client.get(self.url)
