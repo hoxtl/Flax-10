@@ -13,7 +13,7 @@ vi.mock("../../components/Society/SocietyCard", () => ({
   ),
 }));
 
-vi.mock("../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => (
     <div>
       <span>{title}</span>
@@ -22,7 +22,7 @@ vi.mock("../../components/common/EmptyState/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../components/common/SearchEmptyState/SearchEmptyState", () => ({
+vi.mock("../../components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ query, itemLabel, onClear }) => (
     <div>
       <span>

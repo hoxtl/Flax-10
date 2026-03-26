@@ -5,7 +5,10 @@ Model tracking which UI theme a user was using during a timed session.
 from django.db import models
 from ..auth.user_model import User
 
+
 class ThemeSession(models.Model):
+    """Recorded theme usage session for a user."""
+
     THEME_CHOICES = [('light', 'Light'), ('dark', 'Dark')]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='theme_sessions')
@@ -15,6 +18,8 @@ class ThemeSession(models.Model):
     duration_minutes = models.IntegerField()
 
     class Meta:
+        """Metadata for theme session."""
+
         ordering = ['-started_at']
 
     def __str__(self):

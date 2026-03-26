@@ -12,7 +12,7 @@ vi.mock('../../../context/CalendarContext', () => ({
 }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => mockConfirm }));
 
-vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
+vi.mock('../../../components/Calendar/month_view/MonthView', () => ({
   MonthView: ({ onEventClick, onMoreClick, readOnly, events }) => (
     <div>
       <div>readOnly:{String(!!readOnly)}</div>
@@ -40,25 +40,25 @@ vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
 vi.mock('../../../components/Calendar/utils/recurrenceUtils', () => ({ expandRecurringEvents: (events) => events }));
 vi.mock('../../../components/Calendar/utils/eventUtils', () => ({ hasRecurrence: (e) => !!e?.recurrence_rule, extractBaseEventId: (id) => String(id).split('-')[0] }));
 
-vi.mock('../../../components/Society/SocietyDetail/tags/TagFilterBar', () => ({
+vi.mock('../../../components/Society/society_detail/tags/TagFilterBar', () => ({
   default: ({ onFilterChange }) => (<div>TagFilterBar<button type="button" onClick={() => onFilterChange([1])}>filter-tag-1</button><button type="button" onClick={() => onFilterChange([])}>clear-filter</button></div>),
 }));
-vi.mock('../../../components/Society/SocietyDetail/tags/TagManager', () => ({ default: () => <div>TagManager</div> }));
-vi.mock('../../../components/Society/SocietyDetail/tabs/calendarTab/SyncButton', () => ({ default: () => <div>SyncButton</div> }));
+vi.mock('../../../components/Society/society_detail/tags/TagManager', () => ({ default: () => <div>TagManager</div> }));
+vi.mock('../../../components/Society/society_detail/tabs/calendar_tab/SyncButton', () => ({ default: () => <div>SyncButton</div> }));
 
-vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
+vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({
   EventModal: ({ onDelete, onSubmit }) => (<div data-testid="event-modal"><button type="button" onClick={() => onSubmit?.({ title: 'Updated' })}>submit</button>{onDelete != null && <button type="button" onClick={() => onDelete?.()}>delete</button>}</div>),
 }));
 
-vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({
   EventPopover: ({ actions, onClose }) => (<div data-testid="detail-popup"><button type="button" onClick={onClose}>close-popup</button>{actions?.map((a) => (<button key={a.label} type="button" onClick={a.onClick}>{a.label}</button>))}</div>),
 }));
 
-vi.mock('../../../components/Calendar/EventsSummaryModal/EventsSummaryModal', () => ({
+vi.mock('../../../components/Calendar/events_summary_modal/EventsSummaryModal', () => ({
   EventsSummaryModal: ({ isOpen, onClose }) => (isOpen ? <div data-testid="summary-modal">Summary<button type="button" onClick={onClose}>close-summary</button></div> : null),
 }));
 
-import CalendarTab from '../../../components/Society/SocietyDetail/tabs/calendarTab/CalendarTab';
+import CalendarTab from '../../../components/Society/society_detail/tabs/calendar_tab/CalendarTab';
 import * as dateUtils from '../../../components/Calendar/utils/dateUtils';
 
 const defaultProps = { events: [], editMode: false, societyId: 1, isMember: true, societyName: 'Chess' };
@@ -182,11 +182,9 @@ describe('Society detail CalendarTab', () => {
     mockIsModalOpen = true;
     mockModalEvent = { id: 1, title: 'E', start_time: '2026-03-09T10:00:00Z' };
     mockConfirm.mockRejectedValueOnce(new Error('cancel'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     renderTab({ editMode: true, eventHandlers: { onDelete: vi.fn() }, tags: [] });
     fireEvent.click(screen.getByText('delete'));
-    await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
-    consoleSpy.mockRestore();
+    await waitFor(() => expect(mockCloseModal).toHaveBeenCalled());
   });
 
   it('recurring delete with choice true calls onDelete', async () => {

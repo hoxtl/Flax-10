@@ -23,11 +23,9 @@ def reading_list(request, module_id):
         return get_readings(request, module)
     return create_reading(request, module)
 
-
 def get_readings(request, module):
     readings = Reading.objects.filter(module=module)
     return Response(ReadingSerialiser(readings, many=True, context={'request': request}).data)
-
 
 def create_reading(request, module):
     serialiser = ReadingSerialiser(data=request.data, context={'request': request})
@@ -35,7 +33,6 @@ def create_reading(request, module):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     reading = serialiser.save(module=module)
     return Response(ReadingSerialiser(reading, context={'request': request}).data, status=status.HTTP_201_CREATED)
-
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -47,18 +44,15 @@ def reading_detail(request, module_id, reading_id):
         return update_reading(request, reading)
     return delete_reading(reading)
 
-
 def update_reading(request, reading):
     serialiser = ReadingSerialiser(reading, data=request.data, partial=True, context={'request': request})
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(ReadingSerialiser(serialiser.save(), context={'request': request}).data)
 
-
 def delete_reading(reading):
     reading.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -66,13 +60,11 @@ def load_task(request, reading_id):
     reading = get_object_or_404(Reading, id=reading_id)
     return create_reading_task(request.user, reading)
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def suggested_readings(request):
     readings = get_suggested_readings(request.user)
     return Response(ReadingSerialiser(readings, many=True, context={'request': request}).data)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

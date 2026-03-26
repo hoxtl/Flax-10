@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import BackToTop from "../../../components/common/BackToTop/BackToTop";
+import BackToTop from "../../../components/common/back_to_top/BackToTop";
 
 vi.mock("lucide-react", () => ({
   ArrowUp: () => <svg data-testid="arrow-up" />,

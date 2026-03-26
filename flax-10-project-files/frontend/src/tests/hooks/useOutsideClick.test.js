@@ -1,3 +1,7 @@
+/**
+ * Covers outside click handling for task menus and panels.
+ */
+
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
@@ -6,30 +10,31 @@ function makeRef(el) { return { current: el }; }
 
 let lastUnmount = null;
 
+function appendDiv() {
+  const node = document.createElement('div');
+  document.body.appendChild(node);
+  return node;
+}
+
+function createElements() {
+  return { el: appendDiv(), menuEl: appendDiv(), taskMenuEl: appendDiv(), fabEl: appendDiv() };
+}
+
+function buildHookState({ el, menuEl, taskMenuEl, fabEl }) {
+  return {
+    panelRef: makeRef(el), menuRef: makeRef(menuEl), taskMenuRef: makeRef(taskMenuEl), fabRef: makeRef(fabEl),
+    onClose: vi.fn(), setMenuOpen: vi.fn(), setTaskMenuId: vi.fn(),
+  };
+}
+
 function setup(open = true) {
-  const el = document.createElement('div');
-  const menuEl = document.createElement('div');
-  const taskMenuEl = document.createElement('div');
-  const fabEl = document.createElement('div');
-  document.body.appendChild(el);
-  document.body.appendChild(menuEl);
-  document.body.appendChild(taskMenuEl);
-  document.body.appendChild(fabEl);
-
-  const panelRef = makeRef(el);
-  const menuRef = makeRef(menuEl);
-  const taskMenuRef = makeRef(taskMenuEl);
-  const fabRef = makeRef(fabEl);
-  const onClose = vi.fn();
-  const setMenuOpen = vi.fn();
-  const setTaskMenuId = vi.fn();
-
-  const { rerender, unmount } = renderHook(() =>
-    useOutsideClick(open, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId)
+  const elements = createElements();
+  const state = buildHookState(elements);
+  const hook = renderHook(() =>
+    useOutsideClick(open, state.panelRef, state.menuRef, state.taskMenuRef, state.fabRef, state.onClose, state.setMenuOpen, state.setTaskMenuId),
   );
-
-  lastUnmount = unmount;
-  return { el, menuEl, taskMenuEl, fabEl, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId, rerender, unmount };
+  lastUnmount = hook.unmount;
+  return { ...elements, ...state, ...hook };
 }
 
 afterEach(() => {

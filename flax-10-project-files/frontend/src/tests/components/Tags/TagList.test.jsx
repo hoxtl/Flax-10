@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TagList from '../../../components/Tags/tagManager/TagList';
+import TagList from '../../../components/Tags/tag_manager/TagList';
 
-vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: ({ children, onClick, pill, variant, className, ...rest }) => (
     <button onClick={onClick} className={className} {...rest}>{children}</button>
   ),

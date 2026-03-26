@@ -2,13 +2,13 @@ import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import AppPage from "../../../components/common/AppPage/AppPage";
+import AppPage from "../../../components/common/app_page/AppPage";
 
-vi.mock("../../../components/common/BackButton/BackButton.jsx", () => ({
+vi.mock("../../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label }) => <button type="button" onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../components/common/PageHeader/PageHeader", () => ({
+vi.mock("../../../components/common/page_header/PageHeader", () => ({
   default: ({ title, subtitle, action, onBack }) => (
     <div data-testid="page-header">
       <div>{title}</div>

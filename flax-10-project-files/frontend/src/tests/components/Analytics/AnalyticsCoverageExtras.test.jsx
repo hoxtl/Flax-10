@@ -59,7 +59,7 @@ vi.mock('../../../api/attendanceApi', () => ({
   getAttendanceStats: (...args) => getAttendanceStatsMock(...args),
 }));
 
-vi.mock('../../../components/common/EmptyState/EmptyState', () => ({
+vi.mock('../../../components/common/empty_state/EmptyState', () => ({
   default: (...args) => emptyStateMock(...args),
 }));
 

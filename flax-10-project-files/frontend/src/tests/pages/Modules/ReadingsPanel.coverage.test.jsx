@@ -1,3 +1,7 @@
+/**
+ * Covers ReadingsPanel empty, modal, and urgency branches.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
@@ -21,11 +25,11 @@ vi.mock("lucide-react", () => ({
   BookOpen: () => <span>book-open</span>,
 }));
 
-vi.mock("../../../components/common/DeadlineCountdown/DeadlineCountdown", () => ({
+vi.mock("../../../components/common/deadline_countdown/DeadlineCountdown", () => ({
   default: ({ dueDate, tier }) => <div data-testid={`countdown-${tier}`}>{dueDate}</div>,
 }));
 
-vi.mock("../../../components/common/UrgentGlow/UrgentGlow.module.css", () => ({
+vi.mock("../../../components/common/urgent_glow/UrgentGlow.module.css", () => ({
   default: {
     urgentGlow: "urgent-glow",
   },
@@ -123,6 +127,12 @@ const readings = [
   },
 ];
 
+const edgeReadings = [
+  { id: 9, title: null, module_name: "Philosophy" },
+  { id: 10, title: "History: Intro", module_name: "History" },
+  { id: 11, title: "No due date" },
+];
+
 describe("ReadingsPanel coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -135,8 +145,8 @@ describe("ReadingsPanel coverage", () => {
     expect(screen.getByText("Your reading list will appear here when tutors add materials.")).toBeInTheDocument();
   });
 
-  it("handles undefined readings", () => {
-    render(<ReadingsPanel readings={undefined} onReadingAdded={vi.fn()} />);
+  it("handles undefined readings and falls back for missing metadata", async () => {
+    const { rerender } = render(<ReadingsPanel readings={undefined} onReadingAdded={vi.fn()} />);
     expect(screen.getByText("No readings assigned")).toBeInTheDocument();
   });
 

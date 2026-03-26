@@ -1,3 +1,7 @@
+"""
+Serialisers for schedule planning requests and allocations.
+"""
+
 from rest_framework import serializers
 
 from studyFlax.models import Deadline, Schedule, ScheduleEventAllocation
@@ -5,20 +9,28 @@ from studyFlax.serialisers.calendar.event_serialisers import CalendarEventSerial
 
 
 class ScheduleEventAllocationSerialiser(serializers.ModelSerializer):
+    """Serialiser for schedule event allocation."""
+
     event = CalendarEventSerialiser(read_only=True)
     deadline_title = serializers.CharField(source='deadline.title', read_only=True)
 
     class Meta:
+        """Metadata for schedule event allocation serialiser."""
+
         model = ScheduleEventAllocation
         fields = ['id', 'event', 'deadline', 'deadline_title', 'allocated_minutes']
 
 
 class ScheduleSerialiser(serializers.ModelSerializer):
+    """Serialiser for schedule."""
+
     id = serializers.IntegerField(read_only=True)
     event_allocations = ScheduleEventAllocationSerialiser(many=True, read_only=True)
     deadline = serializers.PrimaryKeyRelatedField(queryset=Deadline.objects.all(), many=True)
 
     class Meta:
+        """Metadata for schedule serialiser."""
+
         model = Schedule
         fields = [
             'id',
@@ -38,11 +50,15 @@ class ScheduleSerialiser(serializers.ModelSerializer):
 
 
 class DeadlinePlanningPreferenceSerialiser(serializers.Serializer):
+    """Serialiser for deadline planning preference."""
+
     deadline_id = serializers.IntegerField()
     ideal_minutes_per_day = serializers.IntegerField(min_value=1)
 
 
 class AutoScheduleRequestSerialiser(serializers.Serializer):
+    """Serialiser for auto schedule request."""
+
     title = serializers.CharField(max_length=100, required=False, default='Auto schedule')
     wake_time = serializers.TimeField(required=False, allow_null=True)
     sleep_time = serializers.TimeField(required=False, allow_null=True)

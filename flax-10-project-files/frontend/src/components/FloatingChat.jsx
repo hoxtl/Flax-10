@@ -2,9 +2,9 @@
  * Floating launcher for the study coach.
  */
 
-import ChatPromptBubble from "./floatingChat/ChatPromptBubble";
-import FloatingChatFab from "./floatingChat/FloatingChatFab";
-import { useFloatingChatState } from "./floatingChat/useFloatingChatState.jsx";
+import ChatPromptBubble from "./floating_chat/ChatPromptBubble";
+import FloatingChatFab from "./floating_chat/FloatingChatFab";
+import { useFloatingChatState } from "./floating_chat/useFloatingChatState.jsx";
 import { useAuth } from "../context/AuthContext";
 import styles from "./FloatingChat.module.css";
 

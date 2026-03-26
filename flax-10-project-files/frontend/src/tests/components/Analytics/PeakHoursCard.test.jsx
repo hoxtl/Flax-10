@@ -10,7 +10,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => (
     <div data-testid="empty-state">
       <span>{title}</span>

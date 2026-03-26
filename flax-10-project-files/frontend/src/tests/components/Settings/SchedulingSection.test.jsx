@@ -1,13 +1,20 @@
+/**
+ * Covers scheduling settings hooks and panel rendering.
+ */
+
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, fireEvent, render, screen, waitFor, renderHook } from "@testing-library/react";
 
+import { createFnMap } from "../../utils/testBuilderUtils";
+
 const getUserSettings = vi.fn();
+const preventDefault = (event) => event.preventDefault();
 
 vi.mock("../../../api/userApi", () => ({
   getUserSettings: (...args) => getUserSettings(...args),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options = [], placeholder }) => (
     <select
       aria-label={placeholder}
@@ -154,48 +161,25 @@ describe("SchedulingSection components", () => {
     isSaving: false,
     hasUnsaved: true,
     saveSignal: 1,
-    onSubmit: vi.fn((event) => event.preventDefault()),
+    onSubmit: vi.fn(preventDefault),
   };
 
+  const createPanelHandlers = () => ({
+    ...createFnMap(["onMinutesChange", "onWeekPreferenceChange", "onWorktimePreferenceChange"]),
+    onStudySubmit: vi.fn(preventDefault),
+    onWeekSubmit: vi.fn(preventDefault),
+    onWorktimeSubmit: vi.fn(preventDefault),
+  });
+
+  const buildPanelProps = (handlers) => ({
+    studyTimeProps: { minutesPerDay: "120", onMinutesChange: handlers.onMinutesChange, onSubmit: handlers.onStudySubmit, isSaving: false, hasUnsaved: true, saveSignal: 0 },
+    weekPreferenceProps: { weekPreference: "both", onWeekPreferenceChange: handlers.onWeekPreferenceChange, onSubmit: handlers.onWeekSubmit, isSaving: false, hasUnsaved: true, saveSignal: 0 },
+    worktimeProps: { worktimePreference: "night", onWorktimePreferenceChange: handlers.onWorktimePreferenceChange, onSubmit: handlers.onWorktimeSubmit, isSaving: false, hasUnsaved: true, saveSignal: 0 },
+  });
+
   const renderSchedulingPanel = () => {
-    const handlers = {
-      onMinutesChange: vi.fn(),
-      onWeekPreferenceChange: vi.fn(),
-      onWorktimePreferenceChange: vi.fn(),
-      onStudySubmit: vi.fn((event) => event.preventDefault()),
-      onWeekSubmit: vi.fn((event) => event.preventDefault()),
-      onWorktimeSubmit: vi.fn((event) => event.preventDefault()),
-    };
-
-    render(
-      <SchedulingPanel
-        studyTimeProps={{
-          minutesPerDay: "120",
-          onMinutesChange: handlers.onMinutesChange,
-          onSubmit: handlers.onStudySubmit,
-          isSaving: false,
-          hasUnsaved: true,
-          saveSignal: 0,
-        }}
-        weekPreferenceProps={{
-          weekPreference: "both",
-          onWeekPreferenceChange: handlers.onWeekPreferenceChange,
-          onSubmit: handlers.onWeekSubmit,
-          isSaving: false,
-          hasUnsaved: true,
-          saveSignal: 0,
-        }}
-        worktimeProps={{
-          worktimePreference: "night",
-          onWorktimePreferenceChange: handlers.onWorktimePreferenceChange,
-          onSubmit: handlers.onWorktimeSubmit,
-          isSaving: false,
-          hasUnsaved: true,
-          saveSignal: 0,
-        }}
-      />,
-    );
-
+    const handlers = createPanelHandlers();
+    render(<SchedulingPanel {...buildPanelProps(handlers)} />);
     return handlers;
   };
 

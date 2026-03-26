@@ -24,7 +24,7 @@ vi.mock("../../../../components/Pagination/Pagination", () => ({
   BackToTop: () => <div data-testid="back-to-top" />,
 }));
 
-vi.mock("../../../../components/common/AppToast/AppToast", () => ({
+vi.mock("../../../../components/common/app_toast/AppToast", () => ({
   default: ({ message, actionLabel, onAction, onClose, variant }) => (
     <div data-testid={`toast-${variant}`}>
       <span>{message}</span>

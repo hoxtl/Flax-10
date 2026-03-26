@@ -44,10 +44,10 @@ vi.mock("../../../components/Calendar/hooks/useSwipeNavigation", () => ({
   useSwipeNavigation: (...args) => useSwipeNavigation(...args),
 }));
 
-import { DayCell } from "../../../components/Calendar/MonthView/DayCell";
-import { EventDot, MoreEvents } from "../../../components/Calendar/MonthView/EventDot";
-import { WeekRow } from "../../../components/Calendar/MonthView/WeekRow";
-import { SwipeMonthView } from "../../../components/Calendar/MonthView/SwipeMonthView";
+import { DayCell } from "../../../components/Calendar/month_view/DayCell";
+import { EventDot, MoreEvents } from "../../../components/Calendar/month_view/EventDot";
+import { WeekRow } from "../../../components/Calendar/month_view/WeekRow";
+import { SwipeMonthView } from "../../../components/Calendar/month_view/SwipeMonthView";
 
 describe("MonthView parts", () => {
   beforeEach(() => {

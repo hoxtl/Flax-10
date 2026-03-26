@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { buildMenuStyle, getFilteredDropdownOptions, useAnimatedDropdownState } from "../../../components/common/AnimatedDropdown/useAnimatedDropdown";
+import { buildMenuStyle, getFilteredDropdownOptions, useAnimatedDropdownState } from "../../../components/common/animated_dropdown/useAnimatedDropdown";
 
 const baseOptions = ["Alpha", { value: "beta", label: "Beta" }];
 
@@ -120,6 +120,23 @@ describe("useAnimatedDropdownState", () => {
   });
 
   describe("grouped dropdown", () => {
+      it("does nothing while open but no container is mounted yet", () => {
+        const add = vi.spyOn(window, "addEventListener");
+        renderHook(() => useAnimatedDropdownState({
+          options: groupedOptions,
+          grouped: true,
+          placeholder: "Choose",
+          value: "missing",
+          onChange: vi.fn(),
+          openOnHover: true,
+          isOpen: true,
+          onOpenChange: vi.fn(),
+          menuMaxHeight: 260,
+          allowFlipUpward: true,
+        }));
+        expect(add).not.toHaveBeenCalledWith("scroll", expect.any(Function), true);
+      });
+
       it("opens on hover when enabled", () => {
         vi.useFakeTimers();
         const onOpen = vi.fn();

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TagForm from '../../../components/Tags/tagManager/TagForm';
+import TagForm from '../../../components/Tags/tag_manager/TagForm';
 
-vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: ({ children, onClick, type, variant, ...rest }) => (
     <button type={type} onClick={onClick} data-variant={variant} {...rest}>{children}</button>
   ),

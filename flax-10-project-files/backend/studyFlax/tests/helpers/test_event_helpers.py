@@ -3,8 +3,8 @@ Backend tests for event helpers.
 """
 
 from datetime import datetime, timedelta, timezone
-from ..base import BaseEventTestCase
-from ..fixtures import create_simple_event, create_recurring_event, get_datetime_str
+from .test_case_support import BaseEventTestCase
+from .test_fixture_builders import create_simple_event, create_recurring_event, get_datetime_str
 from studyFlax.views.calendar.event_helpers import (
     filter_events_by_date_range, parse_date_param,
     expand_recurring_events, generate_instances,
@@ -14,6 +14,7 @@ from studyFlax.views.calendar.event_helpers import (
 )
 from studyFlax.models import CalendarEvent, RecurrenceRule
 
+
 class DateRangeFilterTests(BaseEventTestCase):
     """Tests for filtering events by date range."""
     
@@ -22,21 +23,21 @@ class DateRangeFilterTests(BaseEventTestCase):
         queryset = CalendarEvent.objects.all()
         result = filter_events_by_date_range(queryset, {})
         self.assertEqual(result.count(), 1)
-    
+
     def test_filter_by_start_date(self):
         self.create_event_in_db(create_simple_event())
         queryset = CalendarEvent.objects.all()
         params = {'start': get_datetime_str(days_offset=-1)}
         result = filter_events_by_date_range(queryset, params)
         self.assertGreater(result.count(), 0)
-    
+
     def test_filter_by_end_date(self):
         self.create_event_in_db(create_simple_event())
         queryset = CalendarEvent.objects.all()
         params = {'end': get_datetime_str(days_offset=1)}
         result = filter_events_by_date_range(queryset, params)
         self.assertGreater(result.count(), 0)
-    
+
     def test_filter_by_date_range(self):
         self.create_event_in_db(create_simple_event())
         queryset = CalendarEvent.objects.all()
@@ -46,7 +47,7 @@ class DateRangeFilterTests(BaseEventTestCase):
         }
         result = filter_events_by_date_range(queryset, params)
         self.assertGreater(result.count(), 0)
-    
+
     def test_filter_recurring_events(self):
         event_data = create_recurring_event()
         response = self.client.post(self.url, event_data, format='json')
@@ -65,11 +66,11 @@ class DateParsingTests(BaseEventTestCase):
         date_str = "2026-02-10T14:00:00Z"
         result = parse_date_param(date_str)
         self.assertIsInstance(result, datetime)
-    
+
     def test_parse_none(self):
         result = parse_date_param(None)
         self.assertIsNone(result)
-    
+
     def test_parse_empty_string(self):
         result = parse_date_param("")
         self.assertIsNone(result)
@@ -81,14 +82,14 @@ class RecurringExpansionTests(BaseEventTestCase):
         event = self.create_event_in_db(create_simple_event())
         result = expand_recurring_events([event], None, None)
         self.assertEqual(len(result), 1)
-    
+
     def test_expand_recurring_without_dates(self):
         event_data = create_recurring_event()
         response = self.client.post(self.url, event_data, format='json')
         event = CalendarEvent.objects.get(id=response.data['id'])
         result = expand_recurring_events([event], None, None)
         self.assertEqual(len(result), 1)
-    
+
     def test_expand_recurring_with_dates(self):
         event_data = create_recurring_event(count=5)
         response = self.client.post(self.url, event_data, format='json')
@@ -109,7 +110,7 @@ class InstanceGenerationTests(BaseEventTestCase):
         end = datetime.now(timezone.utc) + timedelta(days=5)
         result = generate_instances(event, start, end)
         self.assertGreater(len(result), 1)
-    
+
     def test_generate_weekly_instances(self):
         event_data = create_recurring_event("weekly", count=3)
         response = self.client.post(self.url, event_data, format='json')
@@ -118,7 +119,7 @@ class InstanceGenerationTests(BaseEventTestCase):
         end = datetime.now(timezone.utc) + timedelta(days=30)
         result = generate_instances(event, start, end)
         self.assertGreater(len(result), 1)
-    
+
     def test_generate_with_exception_dates(self):
         event_data = create_recurring_event("daily", count=5)
         response = self.client.post(self.url, event_data, format='json')
@@ -130,7 +131,7 @@ class InstanceGenerationTests(BaseEventTestCase):
         end = datetime.now(timezone.utc) + timedelta(days=10)
         result = generate_instances(event, start, end)
         self.assertIsNotNone(result)
-        
+
     def test_generate_instances_break_loop(self):
         event_data = create_simple_event()
         event_data['start_time'] = datetime(2024, 1, 1, 10, 0, tzinfo=timezone.utc)
@@ -154,23 +155,23 @@ class OccurrenceCalculationTests(BaseEventTestCase):
         result = get_next_occurrence(start, 'daily', 1, 1)
         expected = start + timedelta(days=1)
         self.assertEqual(result.date(), expected.date())
-    
+
     def test_weekly_occurrence(self):
         start = datetime.now(timezone.utc)
         result = get_next_occurrence(start, 'weekly', 1, 1)
         expected = start + timedelta(weeks=1)
         self.assertEqual(result.date(), expected.date())
-    
+
     def test_monthly_occurrence(self):
         start = datetime(2026, 1, 15, tzinfo=timezone.utc)
         result = get_next_occurrence(start, 'monthly', 1, 1)
         self.assertEqual(result.month, 2)
-    
+
     def test_yearly_occurrence(self):
         start = datetime(2026, 2, 10, tzinfo=timezone.utc)
         result = get_next_occurrence(start, 'yearly', 1, 1)
         self.assertEqual(result.year, 2027)
-    
+
     def test_invalid_frequency(self):
         start = datetime.now(timezone.utc)
         result = get_next_occurrence(start, 'invalid', 1, 1)
@@ -184,13 +185,13 @@ class DateMathTests(BaseEventTestCase):
         result = add_months(dt, 2)
         self.assertEqual(result.month, 3)
         self.assertEqual(result.year, 2026)
-    
+
     def test_add_months_year_rollover(self):
         dt = datetime(2026, 11, 15, tzinfo=timezone.utc)
         result = add_months(dt, 3)
         self.assertEqual(result.month, 2)
         self.assertEqual(result.year, 2027)
-    
+
     def test_add_years(self):
         dt = datetime(2026, 2, 10, tzinfo=timezone.utc)
         result = add_years(dt, 2)
@@ -209,7 +210,7 @@ class ExceptionDateHelperTests(BaseEventTestCase):
         rule.save()
         result = is_exception_date(test_date, rule)
         self.assertTrue(result)
-    
+
     def test_is_exception_date_false(self):
         event_data = create_recurring_event()
         response = self.client.post(self.url, event_data, format='json')
@@ -279,9 +280,9 @@ class HelperCoverageTests(BaseEventTestCase):
         end_date = current + timedelta(days=10)
         rule = RecurrenceRule(frequency="daily", end_date=(current - timedelta(days=1)).date())
         self.assertTrue(should_stop_generating(current, end_date, rule))
-        
+
     def test_create_recurrence_with_end_date_fixture(self):
-        from ..fixtures import create_recurrence_with_end_date
+        from .test_fixture_builders import create_recurrence_with_end_date
         import json
         
         rule_json = create_recurrence_with_end_date("weekly", 10)

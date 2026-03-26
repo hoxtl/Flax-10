@@ -7,9 +7,7 @@ import * as useEventResizeModule from '../../../components/Calendar/hooks/useEve
 import * as ConfirmContextModule from '../../../context/ConfirmContext';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 
-// ---------------------------------------------------------------------------
 // Hoisted mocks
-// ---------------------------------------------------------------------------
 
 const { mockOpenPopup, mockOpenModal, mockOpenDelete, mockConfirm } = vi.hoisted(() => ({
     mockOpenPopup: vi.fn(),
@@ -89,9 +87,7 @@ vi.mock('../../../pages/Tasks/components/TaskCardContextMenu.module.css', () => 
     },
 }));
 
-// ---------------------------------------------------------------------------
 // Test fixtures
-// ---------------------------------------------------------------------------
 
 import { getEventType, hasRecurrence } from '../../../components/Calendar/utils/eventUtils';
 
@@ -129,9 +125,7 @@ const moduleEvent = {
     source: 'module',
 };
 
-// ---------------------------------------------------------------------------
 // Tests
-// ---------------------------------------------------------------------------
 
 describe('DraggableEvent Styles Coverage', () => {
     beforeEach(() => {
@@ -146,9 +140,7 @@ describe('DraggableEvent Styles Coverage', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: false });
     });
 
-    // -----------------------------------------------------------------------
     // parseWidth – different formats
-    // -----------------------------------------------------------------------
 
     it('renders correctly with percentage width string', () => {
         render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '75%' }} />);
@@ -170,9 +162,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(screen.queryByText(/\d{2}:\d{2}/)).toBeNull();
     });
 
-    // -----------------------------------------------------------------------
     // getReadOnlyClassName – module and timetable
-    // -----------------------------------------------------------------------
 
     it('applies timetable-event class for module type', () => {
         getEventType.mockReturnValue('module');
@@ -200,9 +190,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(el.classList.contains('timetable-event')).toBe(false);
     });
 
-    // -----------------------------------------------------------------------
     // EventContent isCompact branch
-    // -----------------------------------------------------------------------
 
     it('adds compact class to event-content when height < 28', () => {
         const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '20px', width: '100%' }} />);
@@ -215,9 +203,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(container.querySelector('.event-content.compact')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // EventCard resizePreview overrides height
-    // -----------------------------------------------------------------------
 
     it('uses resizePreview for event height when set', () => {
         vi.mocked(useEventResizeModule.useEventResize).mockReturnValue({ handleResizeStart: vi.fn(), isResizing: true, resizePreview: 120 });
@@ -236,9 +222,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(container.querySelector('.resizing')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // Society name shown only when showDetails is true
-    // -----------------------------------------------------------------------
 
     it('shows society name when height >= 30 and width is sufficient', () => {
         getEventType.mockReturnValue('society');
@@ -252,9 +236,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(screen.queryByText('Chess Club')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // readOnly prop forces ReadOnlyEvent even for personal events
-    // -----------------------------------------------------------------------
 
     it('ReadOnlyEvent has no resize-handle even for personal events when readOnly', () => {
         const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} readOnly={true} />);
@@ -268,9 +250,7 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(mockOpenPopup).toHaveBeenCalledWith(societyEvent, expect.anything(), true);
     });
 
-    // -----------------------------------------------------------------------
     // dragging class applied while isDragging
-    // -----------------------------------------------------------------------
 
     it('applies dragging class when isDragging is true', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: true });

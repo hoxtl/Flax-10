@@ -24,13 +24,13 @@ vi.mock("../../../components/Calendar/utils/overlapUtils", () => ({
   getEventKey: (...args) => mockGetEventKey(...args),
 }));
 
-import { TimeSlot } from "../../../components/Calendar/DayView/TimeSlot";
+import { TimeSlot } from "../../../components/Calendar/day_view/TimeSlot";
 import {
   calculateEventStyle,
   calculateNewEndTime,
   formatHour,
   getHoursOfDay,
-} from "../../../components/Calendar/DayView/dayViewHelpers";
+} from "../../../components/Calendar/day_view/dayViewHelpers";
 
 describe("DayView helpers", () => {
   it("returns the full set of day hours and formats hour labels", () => {

@@ -16,10 +16,8 @@ from .study_session_suggestions import create_study_suggestion, get_target_user,
 def _study_suggestion_success_response():
     return Response({'message': 'Study session suggestion sent'}, status=status.HTTP_201_CREATED)
 
-
 def _missing_target_user_response():
     return Response({'error': 'target_user_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
@@ -31,7 +29,6 @@ def profile_view(request):
         return error
     return Response(build_profile_response(request.user, request))
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def another_user_profile_view(request, user_id):
@@ -41,7 +38,6 @@ def another_user_profile_view(request, user_id):
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     return Response(build_profile_response(user, request))
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def suggest_study_session_view(request):
@@ -50,19 +46,16 @@ def suggest_study_session_view(request):
         return _missing_target_user_response()
     return _suggest_study_session_response(request, target_user_id)
 
-
 def _suggest_study_session_response(request, target_user_id):
     target_user, error = _study_suggestion_target(request, target_user_id)
     if error:
         return error
     return _study_suggestion_success(request, target_user)
 
-
 def _study_suggestion_target(request, target_user_id):
     target_user = get_target_user(target_user_id)
     error = validate_target_user(target_user, request.user)
     return target_user, error
-
 
 def _study_suggestion_success(request, target_user):
     create_study_suggestion(target_user, request.user, request.data)

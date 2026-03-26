@@ -1,13 +1,13 @@
 /* Tests for ListSidebar component rendering, selection, and list management */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '../../../utils/test-utils';
+import { render, screen, fireEvent } from '../../../utils/testUtils';
 import ListSidebar from '../../../pages/Tasks/components/ListSidebar';
 
 vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#ff0000', '#00ff00', '#0000ff'],
 }));
 
-vi.mock('../../../components/common/HoldConfirmModal/HoldConfirmModal', () => ({
+vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({
     default: ({ holdLabel = 'Hold to Delete', onConfirm, onCancel }) => (
         <div>
             <button type="button" onMouseDown={onConfirm}>

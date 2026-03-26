@@ -1,13 +1,19 @@
+"""
+Tests for groupwork signals.
+"""
+
 from studyFlax.models.groupwork.groupwork_model import (
     GroupMembership,
     GroupProject,
 )
 from studyFlax.models.notifications.notification_model import Notification
-from studyFlax.tests.helpers.base import BaseTestCase
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
+from studyFlax.tests.helpers.test_model_builders import make_user
 
 
 class GroupworkSignalTests(BaseTestCase):
+    """Tests groupwork signal."""
+
     def test_member_added_creates_notification(self):
         project = GroupProject.objects.create(name="Signals", owner=self.user)
         GroupMembership.objects.create(project=project, user=self.user, role="owner")

@@ -57,7 +57,7 @@ vi.mock('../../pages/Modules/MyModulesDashboard', () => ({
     default: () => <div>Upcoming assignment deadlines</div>,
 }));
 
-vi.mock('../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, className }) => (
         <select
             data-testid={className || 'animated-dd'}

@@ -11,7 +11,7 @@ vi.mock('../../../api/analyticsApi', () => ({
   },
 }));
 
-vi.mock('../../../components/common/StatStrip/StatStrip', () => ({
+vi.mock('../../../components/common/stat_strip/StatStrip', () => ({
   default: (props) => {
     statStripSpy(props);
     return <div data-testid="stat-strip" />;

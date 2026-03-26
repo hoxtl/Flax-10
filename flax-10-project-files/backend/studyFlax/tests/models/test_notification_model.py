@@ -5,6 +5,7 @@ Backend tests for notification model.
 from django.test import TestCase
 from studyFlax.models import Notification
 
+
 class NotificationModelTest(TestCase):
     """Test suite for Notification model."""
 

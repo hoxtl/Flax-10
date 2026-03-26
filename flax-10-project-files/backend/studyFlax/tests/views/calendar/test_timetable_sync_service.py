@@ -12,6 +12,7 @@ from unittest.mock import patch
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models.calendar.timetable_source_model import TimetableSource
 
+
 User = get_user_model()
 
 SAMPLE_ICS = """BEGIN:VCALENDAR

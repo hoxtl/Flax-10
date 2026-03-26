@@ -17,7 +17,7 @@ vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
     isSameDay: vi.fn(() => false),
 }));
 
-import { TimeSlot } from '../../../components/Calendar/DayView/TimeSlot';
+import { TimeSlot } from '../../../components/Calendar/day_view/TimeSlot';
 
 const date = new Date('2024-03-04');
 

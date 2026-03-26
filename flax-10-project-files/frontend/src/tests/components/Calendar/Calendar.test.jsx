@@ -16,23 +16,23 @@ vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
     useCalendarEvents: vi.fn(),
 }));
 
-vi.mock('../../../components/Calendar/DayView/DayView', () => ({
+vi.mock('../../../components/Calendar/day_view/DayView', () => ({
     DayView: ({ readOnly }) => <div data-testid="day-view">{`Day View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/Calendar/WeekView/WeekView', () => ({
+vi.mock('../../../components/Calendar/week_view/WeekView', () => ({
     WeekView: ({ readOnly }) => <div data-testid="week-view">{`Week View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/Calendar/MonthView/SwipeMonthView', () => ({
+vi.mock('../../../components/Calendar/month_view/SwipeMonthView', () => ({
     SwipeMonthView: ({ readOnly }) => <div data-testid="month-view">{`Month View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/Calendar/ListView/ListView', () => ({
+vi.mock('../../../components/Calendar/list_view/ListView', () => ({
     ListView: ({ readOnly }) => <div data-testid="list-view">{`List View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/Calendar/TableView/TableView', () => ({
+vi.mock('../../../components/Calendar/table_view/TableView', () => ({
     TableView: ({ readOnly }) => <div data-testid="table-view">{`Table View ${String(readOnly)}`}</div>,
 }));
 

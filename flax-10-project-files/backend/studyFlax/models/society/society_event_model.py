@@ -8,6 +8,7 @@ from .society_model import Society
 from .society_tag_model import SocietyTag
 from .society_announcement_model import SocietyAnnouncement
 
+
 RECURRENCE_CHOICES = [
     ('none', 'None'),
     ('daily', 'Daily'),
@@ -18,6 +19,8 @@ RECURRENCE_CHOICES = [
 ]
 
 class SocietyEvent(models.Model):
+    """Event organised by a society."""
+
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='events')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
@@ -35,6 +38,8 @@ class SocietyEvent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """Metadata for society event."""
+
         ordering = ['start_time']
 
     def __str__(self):

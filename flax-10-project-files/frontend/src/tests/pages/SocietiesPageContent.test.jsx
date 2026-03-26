@@ -1,6 +1,12 @@
+/**
+ * Covers SocietiesPageContent loading, tabs, and modal flows.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+
+import { createFnMap } from "../utils/testBuilderUtils";
 
 vi.mock("../../pages/Societies/SocietiesPage.module.css", () => ({ default: { container: "container", smallSearch: "smallSearch" } }));
 vi.mock("../../pages/Societies/SocietiesPageExtras.module.css", () => ({ default: {} }));
@@ -9,7 +15,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../components/common/app_page/AppPage", () => ({
   default: ({ title, children }) => (
     <div>
       <h1>{title}</h1>
@@ -18,7 +24,7 @@ vi.mock("../../components/common/AppPage/AppPage", () => ({
   ),
 }));
 
-vi.mock("../../components/common/PageTransition/PageTransition", () => ({
+vi.mock("../../components/common/page_transition/PageTransition", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
@@ -36,7 +42,7 @@ vi.mock("../../components/common/Tabs/Tabs", () => ({
   ),
 }));
 
-vi.mock("../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input
       aria-label={placeholder}
@@ -69,7 +75,7 @@ vi.mock("../../components/Society/CreateSocietyModal", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({
+vi.mock("../../components/Society/society_detail/ReportSocietyModal", () => ({
   default: ({ society, onClose, onReportSuccess }) => (
     <div data-testid="report-modal">
       <span>{society.name}</span>
@@ -126,27 +132,20 @@ function renderPage(ui, initialEntries = ["/"]) {
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 }
 
+const societies = [
+  { id: 1, name: "Photography Club", is_member: true, is_admin: false },
+  { id: 2, name: "Debate Society", is_member: true, is_admin: true },
+];
+
 function buildState(overrides = {}) {
   return {
     loading: false,
     selectedSocietyId: null,
     view: "my",
-    societies: [
-      { id: 1, name: "Photography Club", is_member: true, is_admin: false },
-      { id: 2, name: "Debate Society", is_member: true, is_admin: true },
-    ],
-    refresh: vi.fn(),
-    removeSociety: vi.fn(),
-    setView: vi.fn(),
-    clearSelection: vi.fn(),
-    selectSociety: vi.fn(),
-    setReportingSociety: vi.fn(),
-    handleUnreport: vi.fn(),
+    societies,
     showCreateModal: false,
-    setShowCreateModal: vi.fn(),
-    onCreate: vi.fn(),
     reportingSociety: null,
-    onReportSuccess: vi.fn(),
+    ...createFnMap(["refresh", "removeSociety", "setView", "clearSelection", "selectSociety", "setReportingSociety", "handleUnreport", "setShowCreateModal", "onCreate", "onReportSuccess"]),
     ...overrides,
   };
 }

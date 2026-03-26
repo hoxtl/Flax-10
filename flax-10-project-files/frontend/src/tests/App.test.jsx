@@ -123,7 +123,7 @@ vi.mock('../lib/routes', () => {
     };
 });
 
-import App from '../App';
+import App from '../app';
 
 function renderApp(initialRoute = '/login') {
     return render(

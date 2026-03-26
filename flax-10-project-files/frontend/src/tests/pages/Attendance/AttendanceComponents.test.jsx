@@ -22,7 +22,7 @@ vi.mock("../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendanceMock(...args),
 }));
 
-vi.mock("../../../components/common/LoadingState/SkeletonBlock", () => ({
+vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: ({ className }) => <div data-testid="skeleton" className={className} />,
 }));
 
@@ -48,7 +48,7 @@ vi.mock("../../../components/common", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, className }) => (
     <button className={className} onClick={onClick}>{children}</button>
   ),

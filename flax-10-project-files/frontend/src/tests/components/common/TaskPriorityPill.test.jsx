@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import TaskPriorityPill from "../../../components/common/TaskPriorityPill/TaskPriorityPill";
+import TaskPriorityPill from "../../../components/common/task_priority_pill/TaskPriorityPill";
 
 describe("TaskPriorityPill", () => {
   it("renders the urgent label and marks", () => {

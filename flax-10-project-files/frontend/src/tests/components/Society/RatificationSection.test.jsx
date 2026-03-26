@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { RatificationSection, RatificationToggle } from '../../../components/Society/SocietyDetail/RatificationSection';
+import { RatificationSection, RatificationToggle } from '../../../components/Society/society_detail/RatificationSection';
 
-vi.mock('../../../components/Society/SocietyDetail/RatificationSection.module.css', () => ({
+vi.mock('../../../components/Society/society_detail/RatificationSection.module.css', () => ({
     default: {
         section: 'section',
         title: 'title',

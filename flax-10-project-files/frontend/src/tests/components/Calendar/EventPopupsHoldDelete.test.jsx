@@ -2,9 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-// ---------------------------------------------------------------------------
 // Hoisted mocks
-// ---------------------------------------------------------------------------
 
 const {
     mockRefreshTags,
@@ -88,7 +86,7 @@ vi.mock('../../../context/ToastContext', () => ({
     useToast: () => mockToast,
 }));
 
-vi.mock('../../../components/common/HoldConfirmModal/HoldConfirmModal', () => ({
+vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({
     default: ({ title, warningText, onConfirm, onCancel }) => (
         <div data-testid="hold-confirm-modal">
             <span data-testid="hold-title">{title}</span>

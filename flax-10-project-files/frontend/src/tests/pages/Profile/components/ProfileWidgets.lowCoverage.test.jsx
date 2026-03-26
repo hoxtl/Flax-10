@@ -7,7 +7,7 @@ vi.mock("../../../../hooks/useCountUp", () => ({
   useCountUp: (...args) => mockUseCountUp(...args),
 }));
 
-vi.mock("../../../../components/common/StatStrip/StatStrip", () => ({
+vi.mock("../../../../components/common/stat_strip/StatStrip", () => ({
   default: ({ items }) => (
     <div data-testid="stat-strip">
       {items.map((item) => `${item.label}:${item.value}${item.suffix || ""}`).join("|")}

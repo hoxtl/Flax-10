@@ -11,16 +11,16 @@ vi.mock("../../../components/Modules/Modules/ModuleCourseFilter", () => ({
   default: () => <div>CourseFilter</div>,
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState.jsx", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState.jsx", () => ({
   default: ({ itemLabel, title }) => <div>{title || `No ${itemLabel} found`}</div>,
 }));
 
-vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
+vi.mock("../../../components/common/page_toolbar/PageToolbar", () => ({
   default: ({ searchSlot, controlsSlot }) => <div>{searchSlot}{controlsSlot}</div>,
   ToolbarSortControl: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock("../../../components/common/SearchBar/SearchBar.jsx", () => ({
+vi.mock("../../../components/common/search_bar/SearchBar.jsx", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
   ),

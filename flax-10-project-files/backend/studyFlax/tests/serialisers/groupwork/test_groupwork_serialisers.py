@@ -9,7 +9,7 @@ from studyFlax.serialisers.tasks.groupwork_serialisers import (
     GroupMembershipSerialiser,
     GroupProjectSerialiser,
 )
-from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -19,6 +19,8 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 
 class GroupMembershipSerialiserTests(BaseTestCase):
+    """Tests group membership serialiser."""
+
     def test_profile_photo_url_none_when_no_photo(self):
         project = _make_project(self.user)
         membership = GroupMembership.objects.get(project=project, user=self.user)
@@ -27,6 +29,7 @@ class GroupMembershipSerialiserTests(BaseTestCase):
 
 
 class GroupProjectSerialiserPhotoTests(BaseTestCase):
+    """Tests group project serialiser photo."""
 
     def test_tutor_photo_url_returns_http_url_unchanged(self):
         project = _make_project(self.user)
@@ -60,6 +63,8 @@ class GroupProjectSerialiserPhotoTests(BaseTestCase):
 
     def test_tutor_photo_url_returns_none_for_blank_path_string(self):
         class _BlankPhoto:
+            """Blank photo stub."""
+
             def __str__(self):
                 return '   '
         project = _make_project(self.user)

@@ -27,7 +27,7 @@ vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
   default: ({ value, onChange, placeholder }) => <input data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />,
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown', () => ({
   default: ({ value, onChange, options = [], placeholder = 'dropdown' }) => (
     <select data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)}>
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}

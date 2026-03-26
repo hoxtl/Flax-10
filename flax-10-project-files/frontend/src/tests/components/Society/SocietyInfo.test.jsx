@@ -11,11 +11,11 @@ vi.mock('../../../components/Society/CategorySelector', () => ({
     ),
 }));
 
-vi.mock('../../../components/Society/SocietyDetail/SocietyInsightBanner', () => ({
+vi.mock('../../../components/Society/society_detail/SocietyInsightBanner', () => ({
     default: ({ society }) => <div data-testid="society-insight-banner">{society.name}</div>,
 }));
 
-import SocietyInfo from '../../../components/Society/SocietyDetail/SocietyInfo';
+import SocietyInfo from '../../../components/Society/society_detail/SocietyInfo';
 
 const baseSociety = {
     id: 1,

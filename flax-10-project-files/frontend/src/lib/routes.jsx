@@ -6,12 +6,12 @@ import Homepage from "../pages/Homepage/Homepage";
 import CalendarPage from "../pages/Calendar/CalendarPage";
 import SocietiesPage from "../pages/Societies/SocietiesPage";
 import ModulesPage from "../pages/Modules/ModulesPage";
-import CampusMap from "../pages/CampusMap/CampusMap";
+import CampusMap from "../pages/campus_map/CampusMap";
 import TimerPage from "../pages/Timer/TimerPage";
 import AnalyticsPage from "../pages/Analytics/AnalyticsPage";
 import AdminPage from "../pages/Admin/AdminPage";
 import TasksPage from "../pages/Tasks/TasksPage";
-import GroupWorkIndexPage from "../pages/GroupWork/GroupWorkIndexPage";
+import GroupWorkIndexPage from "../pages/group_work/GroupWorkIndexPage";
 import Discover from "../pages/Discover/Discover";
 import AttendancePage from "../pages/Attendance/AttendancePage";
 

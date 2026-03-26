@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AboutTab from '../../../components/Society/SocietyDetail/tabs/AboutTab';
+import AboutTab from '../../../components/Society/society_detail/tabs/AboutTab';
 
 describe('AboutTab display', () => {
     it('shows "No about information yet" when empty', () => {

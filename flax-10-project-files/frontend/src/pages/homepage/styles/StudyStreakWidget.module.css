@@ -1,0 +1,79 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 2px 0 4px;
+}
+
+/* ── Streak number ───────────────────────────────────────────── */
+
+.streakRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.streakNum {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  line-height: 1;
+}
+
+.streakUnit {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--widget-text-secondary);
+}
+
+.hint {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  color: var(--widget-text-tertiary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Day bars ─────────────────────────────────────────────────── */
+
+.bars {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--widget-border);
+  border: 1px solid var(--widget-border);
+  transition: background 0.2s;
+}
+
+.barActive {
+  background: var(--color-primary);
+  border-color: var(--widget-text-tertiary);
+}
+
+.barLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--widget-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

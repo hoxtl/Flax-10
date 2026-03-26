@@ -73,11 +73,11 @@ vi.mock("../../../utils/tutorPhotoFallback", () => ({
   getResolvedUserPhoto: () => null,
 }));
 
-vi.mock("../../../components/common/ErrorBoundary/ErrorBoundary", () => ({
+vi.mock("../../../components/common/error_boundary/ErrorBoundary", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ children, title }) => (
     <div>
       <h1>{title}</h1>
@@ -86,7 +86,7 @@ vi.mock("../../../components/common/AppPage/AppPage", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/UserAvatar/UserAvatar", () => ({
+vi.mock("../../../components/common/user_avatar/UserAvatar", () => ({
   default: () => <div data-testid="user-avatar" />,
 }));
 
@@ -98,19 +98,19 @@ vi.mock("../../../components/common/Card/GridCard", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/EntityLinkChip/EntityLinkChip", () => ({
+vi.mock("../../../components/common/entity_link_chip/EntityLinkChip", () => ({
   default: ({ children }) => <span>{children}</span>,
 }));
 
-vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ query }) => <div>{`No users match "${query}"`}</div>,
 }));
 
-vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
+vi.mock("../../../components/common/page_toolbar/PageToolbar", () => ({
   default: ({ searchSlot, controlsSlot }) => (
     <div data-testid="page-toolbar">
       {searchSlot}
@@ -122,7 +122,7 @@ vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../../components/common/search_bar/SearchBar", () => ({
   default: ({ placeholder, value, onChange }) => (
     <input
       placeholder={placeholder}

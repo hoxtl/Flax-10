@@ -11,7 +11,7 @@ vi.mock('../../../components/Timer/TimerCircle', () => ({
   },
 }));
 
-vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: (props) => {
     const safeProps = { ...props };
     delete safeProps.pill;

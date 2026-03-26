@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../components/Timer/soundPanel/MusicStations", () => ({
+vi.mock("../../../components/Timer/sound_panel/MusicStations", () => ({
   MusicStations: ({ activeStation, closeStation, toggleStation }) => (
     <div>
       <div>Music & Streams</div>

@@ -27,7 +27,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, onBlur, placeholder }) => (
     <input
       aria-label={placeholder}

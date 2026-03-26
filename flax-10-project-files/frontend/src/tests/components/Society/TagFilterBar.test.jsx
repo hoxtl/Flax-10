@@ -13,7 +13,7 @@ vi.mock('../../../components/Tags/BasePill', () => ({
     ),
 }));
 
-import TagFilterBar from '../../../components/Society/SocietyDetail/tags/TagFilterBar';
+import TagFilterBar from '../../../components/Society/society_detail/tags/TagFilterBar';
 
 const mockTags = [
     { id: 1, label: 'Sports', color: '#ff0000' },

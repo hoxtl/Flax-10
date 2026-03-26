@@ -102,7 +102,7 @@ vi.mock("../../../components/Timer/MiniTimer", () => ({
   default: () => <div data-testid="mini-timer" />,
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ customTrigger, options, onChange, value }) => (
     <div data-testid="animated-dropdown">
       {customTrigger}
@@ -142,7 +142,6 @@ vi.mock("../../../components/common", () => ({
 // ── Import the real TopBar component ─────────────────────────────────────────
 import TopBar from "../../../components/Dashboard/Topbar";
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 function renderTopBar(props = {}) {
   const defaults = {
@@ -217,7 +216,7 @@ describe("isRouteVisible through TopBarNav rendered output", () => {
       user: { role: "teacher", isAdmin: false },
     });
     // Explore still visible but societies / group-work filtered out
-    // Just confirm Study→Teaching conversion happened (teachers see Teaching label)
+    // Just confirm Study - Teaching conversion happened (teachers see Teaching label)
     expect(screen.getByText("Teaching")).toBeInTheDocument();
   });
 });

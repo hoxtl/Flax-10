@@ -9,6 +9,7 @@ from studyFlax.models.auth.user_model import User
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.modules.deadline_model import Deadline
 
+
 class DeadlineModelTests(TestCase):
     """Test suite for Deadline model."""
 
@@ -50,7 +51,7 @@ class DeadlineModelTests(TestCase):
         for t in ['exam', 'coursework', 'quiz', 'presentation']:
             self.create_deadline(deadline_type=t)
         self.assertEqual(Deadline.objects.count(), 4)
-    
+
     def test_deadline_deleted_with_module(self):
         self.create_deadline()
         self.module.delete()

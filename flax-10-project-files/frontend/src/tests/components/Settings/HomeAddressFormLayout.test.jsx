@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../components/Calendar/EventModal/components/LocationAutoComplete", () => ({
+vi.mock("../../../components/Calendar/event_modal/components/LocationAutoComplete", () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input
       aria-label="Address"
@@ -12,7 +12,7 @@ vi.mock("../../../components/Calendar/EventModal/components/LocationAutoComplete
   ),
 }));
 
-vi.mock("../../../components/common/InlineAlert/InlineAlert", () => ({
+vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message, variant }) => <div>{variant}:{message}</div>,
 }));
 

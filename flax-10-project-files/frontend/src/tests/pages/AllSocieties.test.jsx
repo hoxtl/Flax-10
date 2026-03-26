@@ -16,13 +16,13 @@ vi.mock('../../components/Tags/BasePill', () => ({
     ),
 }));
 
-vi.mock('../../components/common/SearchBar', () => ({
+vi.mock('../../components/common/search_bar', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
 
-vi.mock('../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}
@@ -145,7 +145,9 @@ describe('AllSocieties', () => {
 
     it('shows clear filter button when filter is active', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
-        // Click a ratification filter to activate it
+        // Open filter popup
+        fireEvent.click(screen.getByRole('button', { name: /Filter societies/i }));
+        // Click a ratification filter to activate it (inside the popup)
         const ratifiedBtn = screen.getAllByRole('button').find(b => b.textContent.includes('Ratified'));
         if (ratifiedBtn) fireEvent.click(ratifiedBtn);
         expect(screen.queryByText(/Clear/)).toBeTruthy();
@@ -169,14 +171,18 @@ describe('AllSocieties', () => {
 
     it('filters by ratification unratified and shows only unratified', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        // Open filter popup
+        fireEvent.click(screen.getByRole('button', { name: /Filter societies/i }));
         const unratifiedBtn = screen.getAllByRole('button').find(b => b.textContent.includes('Unratified'));
         if (unratifiedBtn) fireEvent.click(unratifiedBtn);
         expect(screen.getByText('Art Society')).toBeTruthy();
         expect(screen.queryByText('Chess Club')).toBeNull();
     });
 
-    it('filters by category when category pill is clicked', () => {
+    it('filters by category when category is selected in popup', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        // Open filter popup
+        fireEvent.click(screen.getByRole('button', { name: /Filter societies/i }));
         const artsBtn = screen.getAllByRole('button').find(b => b.textContent === 'Arts');
         if (artsBtn) fireEvent.click(artsBtn);
         expect(screen.getByText('Art Society')).toBeTruthy();
@@ -198,6 +204,8 @@ describe('AllSocieties', () => {
 
     it('clears filters when clear button is clicked', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        // Open filter popup
+        fireEvent.click(screen.getByRole('button', { name: /Filter societies/i }));
         const ratifiedBtn = screen.getAllByRole('button').find(b => b.textContent?.includes('Ratified'));
         if (ratifiedBtn) fireEvent.click(ratifiedBtn);
         expect(screen.queryByText(/Clear/)).toBeTruthy();
@@ -218,6 +226,8 @@ describe('AllSocieties', () => {
 
     it('toggling same filter deactivates it', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+        // Open filter popup
+        fireEvent.click(screen.getByRole('button', { name: /Filter societies/i }));
         const ratifiedBtn = screen.getAllByRole('button').find(b => b.textContent?.includes('Ratified'));
         if (ratifiedBtn) {
             fireEvent.click(ratifiedBtn);

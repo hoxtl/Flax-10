@@ -6,6 +6,7 @@ from django.test import TestCase
 from unittest.mock import patch
 from studyFlax.views.calendar.event_view import safe_sync_timetable
 
+
 class EventSyncTests(TestCase):
     """Test suite for event synchronization logic."""
 

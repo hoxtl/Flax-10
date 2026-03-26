@@ -4,7 +4,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MobileDateStrip } from "../../../../components/Calendar/header/MobileDateStrip";
 import { SearchButton } from "../../../../components/Calendar/header/SearchButton";
 import { ViewModeButton } from "../../../../components/Calendar/header/ViewModeButton";
-import { ScheduleManagerButton } from "../../../../components/Calendar/header/ScheduleManager/ScheduleManagerButton";
+import { ScheduleManagerButton } from "../../../../components/Calendar/header/schedule_manager/ScheduleManagerButton";
 
 const mockToast = vi.fn();
 const mockEditEvent = vi.fn();
@@ -38,7 +38,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, onBlur, placeholder }) => (
     <input
       aria-label={placeholder}
@@ -49,7 +49,7 @@ vi.mock("../../../../components/common/SearchBar/SearchBar", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ customTrigger, options = [], onChange, value, openOnHover }) => (
     <div data-testid="dropdown" data-open-on-hover={String(openOnHover)} data-value={value}>
       {customTrigger}
@@ -62,7 +62,7 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/Calendar/header/ScheduleManager/ScheduleManagerDialog", () => ({
+vi.mock("../../../../components/Calendar/header/schedule_manager/ScheduleManagerDialog", () => ({
   ScheduleManagerDialog: ({ open, onClose }) => (
     <div>
       <span>{open ? "dialog-open" : "dialog-closed"}</span>
@@ -87,14 +87,14 @@ vi.mock("../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => ({ loadEvents: vi.fn() }),
 }));
 
-vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => ({
+vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => ({
   buildConflictResolutionPlan: (...args) => mockBuildPlan(...args),
   applyConflictResolutionPlan: (...args) => mockApplyPlan(...args),
   buildConflictResolutionToastMessage: (...args) => mockToastMessage(...args),
   undoConflictResolutionPlan: vi.fn(),
 }));
 
-vi.mock("../../../../components/common/ConfirmModal/ConfirmModal", () => ({
+vi.mock("../../../../components/common/confirm_modal/ConfirmModal", () => ({
   default: ({ title, onConfirm, onCancel, confirmText, cancelText, message }) => (
     <div>
       <div>{title}</div>

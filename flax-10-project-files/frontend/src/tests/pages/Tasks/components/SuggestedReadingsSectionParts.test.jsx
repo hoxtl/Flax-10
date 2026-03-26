@@ -15,7 +15,7 @@ vi.mock("../../../../api/readingApi", () => ({
   convertReadingToTask: vi.fn(),
 }));
 
-vi.mock("../../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => (
     <div>
       <span>{title}</span>
@@ -24,7 +24,7 @@ vi.mock("../../../../components/common/EmptyState/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, disabled, onClick, pill, variant, size, ...props }) => (
     <button {...props} data-disabled={String(Boolean(disabled))} onClick={onClick}>
       {children}

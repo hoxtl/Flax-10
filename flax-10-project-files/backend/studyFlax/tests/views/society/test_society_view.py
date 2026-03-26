@@ -1,4 +1,6 @@
-"""Tests for society list and detail endpoints."""
+"""
+Tests for society views.
+"""
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -7,15 +9,18 @@ from rest_framework.test import APIClient
 
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
-from studyFlax.tests.helpers.factories import (
+from studyFlax.tests.helpers.test_model_builders import (
     make_society,
     make_society_admin,
 )
+
 
 User = get_user_model()
 
 
 class SocietyListViewTest(TestCase):
+    """Tests society list view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="testuser", email="test@example.com", password="pass")
@@ -41,6 +46,8 @@ class SocietyListViewTest(TestCase):
 
 
 class SocietyDetailViewTest(TestCase):
+    """Tests society detail view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="admin", email="admin@example.com", password="pass")

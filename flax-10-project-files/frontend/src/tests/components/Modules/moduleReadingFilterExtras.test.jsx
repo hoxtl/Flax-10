@@ -39,7 +39,7 @@ vi.mock("../../../components/Modules/shared/moduleFormParts", () => ({
   ModuleFormField: ({ label, children }) => <label>{label}{children}</label>,
 }));
 
-vi.mock("../../../components/common/StandardModal/StandardModal", () => ({
+vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
   default: ({ title, children, onClose }) => (
     <div>
       <div>{title}</div>
@@ -63,13 +63,13 @@ vi.mock("../../../components/Modules/Readings/ReadingCard", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
   ),
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ query, itemLabel }) => <div>{query}-{itemLabel}</div>,
 }));
 

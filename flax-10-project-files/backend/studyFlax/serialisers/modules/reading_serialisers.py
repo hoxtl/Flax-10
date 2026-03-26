@@ -10,12 +10,13 @@ from studyFlax.utils.reading_utils import estimated_time_reading
 def _page_count(obj):
     return obj.page_count()
 
-
 def _duration_minutes(obj, request):
     return estimated_time_reading(obj, request.user)
 
 
 class ReadingSerialiser(serializers.ModelSerializer):
+    """Serialiser for reading."""
+
     module_code = serializers.CharField(source='module.module_code', read_only=True)
     module_name = serializers.CharField(source='module.module_name', read_only=True)
     estimated_minutes = serializers.IntegerField(required=False, allow_null=True)
@@ -23,6 +24,8 @@ class ReadingSerialiser(serializers.ModelSerializer):
     page_count = serializers.SerializerMethodField()
 
     class Meta:
+        """Metadata for reading serialiser."""
+
         model = Reading
         fields = [
             'id', 'module_code', 'module_name', 'title',
@@ -47,14 +50,18 @@ class ReadingSerialiser(serializers.ModelSerializer):
 
     def _get_page_count(self, obj):
         return _page_count(obj)
-    
+
     def _get_duration_minutes(self, obj):
         return _duration_minutes(obj, self.context['request'])
 
 class ReadingSummarySerialiser(serializers.ModelSerializer):
+    """Serialiser for reading summary."""
+
     page_count = serializers.SerializerMethodField()
 
     class Meta:
+        """Metadata for reading summary serialiser."""
+
         model = Reading
         fields = ['id', 'title', 'chapter', 'start_page', 'end_page', 'page_count', 'deadline']
 

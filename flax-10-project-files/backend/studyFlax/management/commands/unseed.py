@@ -14,6 +14,7 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError, connection
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
 
 TABLES = [
@@ -37,13 +38,13 @@ SUPERUSER_RESTORE_FIELDS = {'username', 'email', 'first_name', 'last_name', 'is_
 
 def get_superuser_data():
     """Return serialised superuser records, excluding auth-only and audit fields."""
-
     return [
         {k: v for k, v in u.items() if k in SUPERUSER_RESTORE_FIELDS}
         for u in User.objects.filter(is_superuser=True).values()
     ]
 
 def truncate_tables(cursor, tables, stdout):
+    """Truncate the supplied tables and echo each cleared table name."""
     # Truncate in a single statement so PostgreSQL acquires the table locks
     # in one consistent pass instead of deadlocking halfway through.
     quoted_tables = ', '.join(f'"{table}"' for table in tables)
@@ -70,6 +71,8 @@ def _attempt_restore(payload):
         return (payload.get("username", "?"), str(exc))
 
 def restore_superusers(superusers_data, stdout):
+    """Restore preserved superusers after the database wipe completes."""
+    del stdout
     if not superusers_data:
         return []
     results = [_attempt_restore(_build_superuser_payload(d)) for d in superusers_data]
@@ -103,12 +106,12 @@ def _print_success_footer(stdout, style):
     stdout.write("")
 
 def confirm_truncate(stdout):
+    """Prompt for confirmation before wiping the seeded tables."""
     for line in _confirm_truncate_lines():
         stdout.write(line)
     answer = input("  Type 'yes' to confirm: ")
     stdout.write("")
     return answer == 'yes'
-
 
 def _confirm_truncate_lines():
     div = "─" * 40

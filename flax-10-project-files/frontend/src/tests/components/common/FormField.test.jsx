@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import FormField from "../../../components/common/FormField/FormField";
+import FormField from "../../../components/common/form_field/FormField";
 
 describe("FormField", () => {
   it("renders label, hint, and custom classes", () => {

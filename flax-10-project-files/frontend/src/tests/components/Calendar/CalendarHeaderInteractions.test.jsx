@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
+import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
 import * as CalendarContextModule from '../../../context/CalendarContext';
@@ -118,9 +118,7 @@ describe('CalendarHeader extra coverage', () => {
         vi.mocked(useBreakpoint).mockReturnValue(false);
     });
 
-    // -----------------------------------------------------------------------
     // getDayDelta / navigateDate in day view
-    // -----------------------------------------------------------------------
 
     it('navigates forward by 1 day in day view', () => {
         setup({ viewMode: 'day' });
@@ -170,9 +168,7 @@ describe('CalendarHeader extra coverage', () => {
         expect(call.payload.getMonth()).toBe(0); // January
     });
 
-    // -----------------------------------------------------------------------
     // isTodayVisible for day view
-    // -----------------------------------------------------------------------
 
     it('hides Today button when day view shows today', () => {
         const today = new Date();
@@ -185,9 +181,7 @@ describe('CalendarHeader extra coverage', () => {
         expect(screen.getByText('Today')).toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // isTodayVisible for week view
-    // -----------------------------------------------------------------------
 
     it('hides Today button when week view contains today', () => {
         // Use today's date so the week definitely includes today
@@ -201,9 +195,7 @@ describe('CalendarHeader extra coverage', () => {
         expect(screen.getByText('Today')).toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // title in day view uses formatDate
-    // -----------------------------------------------------------------------
 
     it('renders title string for day view (desktop, title passed to CalendarNav)', () => {
         vi.mocked(useBreakpoint).mockReturnValue(false);
@@ -215,9 +207,7 @@ describe('CalendarHeader extra coverage', () => {
     });
 
 
-    // -----------------------------------------------------------------------
     // ScheduleActions – hidden when sharedCalendar, shown otherwise
-    // -----------------------------------------------------------------------
 
     it('shows ScheduleManagerButton and ActionMenu when not shared calendar', () => {
         setup({ viewMode: 'month' });
@@ -232,9 +222,7 @@ describe('CalendarHeader extra coverage', () => {
         expect(screen.queryByText('+')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // openForView – day view passes selectedDate to openModal
-    // -----------------------------------------------------------------------
 
     it('calls openModal with (null, null, selectedDate) in day view', () => {
         setup({ viewMode: 'day', selectedDate: defaultDate });
@@ -248,9 +236,7 @@ describe('CalendarHeader extra coverage', () => {
         expect(mockOpenModal).toHaveBeenCalledWith();
     });
 
-    // -----------------------------------------------------------------------
     // reloadEvents – dispatches SET_EVENTS after importTimetable
-    // -----------------------------------------------------------------------
 
     it('dispatches SET_EVENTS after successful import', async () => {
         const events = [{ id: 1, title: 'Imported' }];
@@ -269,9 +255,7 @@ describe('CalendarHeader extra coverage', () => {
         });
     });
 
-    // -----------------------------------------------------------------------
     // ImportModal visibility – opens and closes
-    // -----------------------------------------------------------------------
 
     it('shows ImportModal after clicking Import timetable button', async () => {
         setup();
@@ -287,11 +271,8 @@ describe('CalendarHeader extra coverage', () => {
         fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
-    });
 
-    // -----------------------------------------------------------------------
     // onDatePick (pick button in CalendarNav) dispatches SET_SELECTED_DATE
-    // -----------------------------------------------------------------------
 
     it('dispatches SET_SELECTED_DATE when date picker pick button is clicked', () => {
         setup({ viewMode: 'month' });
@@ -302,9 +283,7 @@ describe('CalendarHeader extra coverage', () => {
         });
     });
 
-    // -----------------------------------------------------------------------
     // Search and filter dispatch
-    // -----------------------------------------------------------------------
 
     it('dispatches SET_SEARCH_QUERY when search input changes', () => {
         setup();

@@ -8,7 +8,7 @@ import {
     formatHour,
     calculateEventStyle,
     calculateNewEndTime,
-} from '../../../components/Calendar/DayView/dayViewHelpers';
+} from '../../../components/Calendar/day_view/dayViewHelpers';
 
 vi.mock('../../../components/Calendar/utils/overlapUtils', () => ({
     getEventKey: vi.fn((event) => `${event.id}-${new Date(event.start_time).getTime()}-${new Date(event.end_time).getTime()}`),

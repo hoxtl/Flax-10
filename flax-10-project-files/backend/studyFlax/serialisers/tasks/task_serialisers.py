@@ -7,9 +7,9 @@ from django.utils import timezone
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.utils.reading_utils import update_reading_estimates
 
+
 def _sync_status_and_completed(validated_data, instance):
     """Synchronise the status and completed fields in validated_data."""
-
     if 'completed' in validated_data and 'status' not in validated_data:
         validated_data['status'] = 'done' if validated_data['completed'] else 'todo'
         return validated_data.get('completed', instance.completed)
@@ -19,57 +19,46 @@ def _sync_status_and_completed(validated_data, instance):
 
 def _update_completed_at(validated_data, completed, instance):
     """Set or clear completed_at based on the completed state."""
-
     if completed is True and not instance.completed_at:
         validated_data['completed_at'] = timezone.now()
         return
     if completed is False:
         validated_data['completed_at'] = None
 
-
 def _module_attr(obj, field):
     module = getattr(obj, "module", None)
     return getattr(module, field, None)
-
 
 def _task_list_name(obj):
     task_list = getattr(obj, "task_list", None)
     return getattr(task_list, "name", None)
 
-
 def _task_list_society(obj):
     task_list = getattr(obj, "task_list", None)
     return getattr(task_list, "society", None)
-
 
 def _task_list_society_id(obj):
     society = _task_list_society(obj)
     return getattr(society, "id", None)
 
-
 def _task_list_society_name(obj):
     society = _task_list_society(obj)
     return getattr(society, "name", None)
-
 
 def _society_attr(obj, field):
     society = getattr(obj, "society", None)
     return getattr(society, field, None)
 
-
 def _reading(obj):
     return getattr(obj, "reading", None) if obj.reading_id else None
-
 
 def _reading_attr(obj, field):
     reading = _reading(obj)
     return getattr(reading, field, None)
 
-
 def _reading_page_count(obj):
     reading = _reading(obj)
     return reading.page_count() if reading else None
-
 
 def _group_project_name(obj):
     group_project = getattr(obj, "group_project", None)
@@ -83,6 +72,8 @@ class TaskListSerialiser(serializers.ModelSerializer):
     society_name = serializers.SerializerMethodField()
 
     class Meta:
+        """Metadata for task list serialiser."""
+
         model = TaskList
         fields = ['id', 'name', 'category', 'archived', 'task_count', 'created_at', 'society_id', 'society_name']
 
@@ -112,6 +103,8 @@ class TaskSerialiser(serializers.ModelSerializer):
     assignees_info = serializers.SerializerMethodField()
 
     class Meta:
+        """Metadata for task serialiser."""
+
         model = Task
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code', 'module_name',
@@ -165,7 +158,6 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def _create(self, validated_data):
         """Create a task, deriving the completed state from the status."""
-
         status_val = validated_data.get('status', 'todo')
         validated_data['status'] = status_val
         validated_data['completed'] = (status_val == 'done')
@@ -175,7 +167,6 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def _update(self, instance, validated_data):
         """Update a task, keeping status, completed, and timestamps in sync."""
-
         completed = _sync_status_and_completed(validated_data, instance)
         _update_completed_at(validated_data, completed, instance)
         updated = super().update(instance, validated_data)

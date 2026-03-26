@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, renderHook, act } from "@testing-library/react";
 
-import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
+import InlineTitleField, { useInlineEdit } from "../../../components/common/inline_title_field/InlineTitleField";
 
 function HookHarness({ initialValue = "Original", onSave = vi.fn() }) {
   const edit = useInlineEdit(initialValue, onSave);

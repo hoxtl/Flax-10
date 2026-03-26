@@ -16,7 +16,7 @@ vi.mock('../../../components/common/Card/Card', () => ({
   ),
 }));
 
-vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: ({ children, onClick, disabled, className }) => (
     <button onClick={onClick} disabled={disabled} className={className}>{children}</button>
   ),

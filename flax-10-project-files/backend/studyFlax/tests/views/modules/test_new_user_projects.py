@@ -12,7 +12,7 @@ from django.utils import timezone
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.models.modules.module_model import Module
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.test_model_builders import make_user
 
 
 def _make_module(user, code='NP01', name='New Projects Module'):
@@ -26,6 +26,7 @@ def _make_module(user, code='NP01', name='New Projects Module'):
 
 
 class SeedNewUserProjectsTest(TestCase):
+    """Tests seed new user projects."""
 
     def setUp(self):
         self.user = make_user('np_user', 'np_user@e.com')
@@ -77,7 +78,6 @@ class SeedNewUserProjectsTest(TestCase):
         module = _make_module(self.user, code='NP07')
         project = GroupProject.objects.create(name='No Candidates Project', owner=self.user, course_code='NP07')
         GroupMembership.objects.create(project=project, user=self.user, role='owner')
-        # Pass only the owner as demo_user — candidates list will be empty
         _add_demo_members(project, self.user, [self.user])
         self.assertEqual(GroupMembership.objects.filter(project=project).count(), 1)
 

@@ -8,7 +8,10 @@ from django.db import models
 
 from .user_model import User
 
+
 class UserSettings(models.Model):
+    """Saved preferences and onboarding choices for a user."""
+
     WEEK_PREFERENCE_CHOICES = [
         ('weekdays', 'Weekdays'),
         ('weekends', 'Weekends'),

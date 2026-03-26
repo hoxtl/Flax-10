@@ -4,6 +4,7 @@ Helpers for managing and retrieving system-level calendar tags.
 
 from studyFlax.models import Tag, CalendarEvent
 
+
 SYSTEM_TAG_CONFIG = {
     'Lecture': {'color': '#4A90D9', 'duration': 120, 'icon': '📚'},
     'Deadline': {'color': '#E74C3C', 'duration': 60, 'icon': '📝'},
@@ -83,7 +84,6 @@ def get_societies_tag():
 
 def get_schedule_tag():
     return get_system_tag('Schedule')
-
 
 def fix_untagged_deadline_events():
     deadline_tag = get_deadline_tag()

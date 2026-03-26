@@ -15,7 +15,7 @@ vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
     ),
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}
@@ -27,11 +27,11 @@ vi.mock('../../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
-vi.mock('../../../components/ui/EstTimeHelpBanner', () => ({
+vi.mock('../../../components/ui/est_time_help_banner', () => ({
     default: () => <div data-testid="est-time-help" />,
 }));
 
-vi.mock('../../../components/common/SleepWarningModal', () => ({
+vi.mock('../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 

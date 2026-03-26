@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
+import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
 import { TaskInput } from '../../../components/Timer/TimerComponents';
 
 // Keep dropdowns testable (native controls)
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown', () => ({
   default: ({ value, onChange, options }) => (
     <select
       role="combobox"

@@ -21,7 +21,6 @@ vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
     }),
 }));
 
-// ─── extractBaseEventId ──────────────────────────────────────────────────────
 
 describe('extractBaseEventId', () => {
     it('returns event._baseId if present', () => {
@@ -62,7 +61,6 @@ describe('extractBaseEventId', () => {
     });
 });
 
-// ─── hasRecurrence ───────────────────────────────────────────────────────────
 
 describe('hasRecurrence', () => {
     it('returns false for null event', () => {
@@ -98,7 +96,6 @@ describe('hasRecurrence', () => {
     });
 });
 
-// ─── getEventType ─────────────────────────────────────────────────────────────
 
 describe('getEventType', () => {
     it('returns "personal" for null event', () => {
@@ -178,7 +175,6 @@ describe('getEventType', () => {
     });
 });
 
-// ─── isReadOnlyEvent ─────────────────────────────────────────────────────────
 
 describe('isReadOnlyEvent', () => {
     it('returns false for personal event', () => {
@@ -198,7 +194,6 @@ describe('isReadOnlyEvent', () => {
     });
 });
 
-// ─── getEffectiveTagName ─────────────────────────────────────────────────────
 
 describe('getEffectiveTagName', () => {
     it('returns "other" for null event', () => {
@@ -242,7 +237,6 @@ describe('getEffectiveTagName', () => {
     });
 });
 
-// ─── sortByStartTime ─────────────────────────────────────────────────────────
 
 describe('sortByStartTime', () => {
     it('sorts events ascending by start_time', () => {
@@ -277,7 +271,6 @@ describe('sortByStartTime', () => {
     });
 });
 
-// ─── isAllDay ────────────────────────────────────────────────────────────────
 
 describe('isAllDay', () => {
     it('returns true when all_day flag is set', () => {
@@ -324,7 +317,6 @@ describe('isAllDay', () => {
     });
 });
 
-// ─── getVisibleEventsInView ───────────────────────────────────────────────────
 
 describe('getVisibleEventsInView', () => {
     it('returns empty array for null events', () => {

@@ -30,7 +30,7 @@ vi.mock('../../../lib/kclCourses', () => ({
     },
 }));
 
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     default: ({ value, onChange, placeholder, onFocus }) => (
         <input
             value={value}

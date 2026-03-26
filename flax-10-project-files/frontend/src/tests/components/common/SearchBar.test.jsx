@@ -2,10 +2,10 @@ import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
-import SearchBar from "../../../components/common/SearchBar/SearchBar";
-import { registerTarget, unregisterTarget } from "../../../components/common/SearchBar/slashShortcutRegistry";
+import SearchBar from "../../../components/common/search_bar/SearchBar";
+import { registerTarget, unregisterTarget } from "../../../components/common/search_bar/slashShortcutRegistry";
 
-vi.mock("../../../components/common/TextInput/TextInput", () => ({
+vi.mock("../../../components/common/text_input/TextInput", () => ({
   default: React.forwardRef(function MockTextInput({ leading, inputClassName, className, ...props }, ref) {
     return (
       <div data-testid="text-input-shell" className={className}>

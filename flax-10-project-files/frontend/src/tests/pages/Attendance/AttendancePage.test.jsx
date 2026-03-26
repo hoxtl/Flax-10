@@ -9,7 +9,7 @@ vi.mock("../../../pages/Attendance/hooks/useAttendancePageModel", () => ({
   useAttendancePageModel: () => useAttendancePageModelMock(),
 }));
 
-vi.mock("../../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ title, subtitle, children }) => (
     <div>
       <h1>{title}</h1>

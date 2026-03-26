@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, render, screen, fireEvent } from "@testing-library/react";
 
-import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
+import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
 
-vi.mock("../../../components/common/StandardModal/StandardModal", () => ({
+vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
   default: ({ title, onClose, children }) => (
     <div data-testid="modal-shell">
       <h2>{title}</h2>

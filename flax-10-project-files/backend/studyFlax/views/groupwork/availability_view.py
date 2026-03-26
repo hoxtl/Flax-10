@@ -15,13 +15,13 @@ from studyFlax.models.groupwork.groupwork_model import GroupProject
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.views.calendar.event_helpers import expand_recurring_events
 
+
 SLOT_HOURS = range(9, 19)
 SLOT_LIMIT = 10
 
 
 def _get_user_events(members, start, end):
     """Return a dict mapping user_id to their expanded events in the given window."""
-
     events = {}
     for user in members:
         qs = CalendarEvent.objects.filter(user=user, start_time__lte=end, end_time__gte=start)
@@ -30,12 +30,10 @@ def _get_user_events(members, start, end):
 
 def _check_slot_free(user_id, user_events, slot_start, slot_end):
     """Return True if the user has no events overlapping the given time slot."""
-
     return not any(ev.start_time < slot_end and ev.end_time > slot_start for ev in user_events[user_id])
 
 def _get_profile_photo_url(user):
     """Safely get the user's profile photo URL."""
-
     try:
         return user.profile_photo.url if user.profile_photo else None
     except Exception:
@@ -43,14 +41,12 @@ def _get_profile_photo_url(user):
 
 def _build_initials(user):
     """Build a short avatar label for a user."""
-
     if user.first_name and user.last_name:
         return f"{user.first_name[:1]}{user.last_name[:1]}".upper()
     return user.username[:2].upper()
 
 def _build_member_payload(user):
     """Serialise shared member data for slots and meeting cards."""
-
     return {
         "id": user.id,
         "name": user.username,
@@ -61,7 +57,6 @@ def _build_member_payload(user):
 
 def _build_member_entry(m, user_events, slot_start, slot_end):
     """Build a single member availability entry dict for a time slot."""
-
     is_free = _check_slot_free(m.user.id, user_events, slot_start, slot_end)
     return {
         **_build_member_payload(m.user),
@@ -71,14 +66,12 @@ def _build_member_entry(m, user_events, slot_start, slot_end):
 
 def _build_slot_members(memberships, user_events, slot_start, slot_end):
     """Build member availability list and free count for a time slot."""
-
     members = [_build_member_entry(m, user_events, slot_start, slot_end) for m in memberships]
     free_count = sum(1 for m in members if m["is_free"])
     return members, free_count
 
 def _build_slot_entry(start, memberships, user_events):
     """Build a single time slot availability entry dict."""
-
     end = start + timedelta(hours=1)
     mems, free = _build_slot_members(memberships, user_events, start, end)
     return {
@@ -91,7 +84,6 @@ def _build_slot_entry(start, memberships, user_events):
 
 def _get_day_suggestions(day, now, memberships, user_events):
     """Return available time slots for a single day, skipping past hours."""
-
     return [
         _build_slot_entry(day.replace(hour=hour), memberships, user_events)
         for hour in SLOT_HOURS
@@ -100,12 +92,10 @@ def _get_day_suggestions(day, now, memberships, user_events):
 
 def _serialize_responses(responses):
     """Serialise meeting responses into a list of dicts."""
-
     return [{"user_id": r.user.id, "username": r.user.username, "status": r.status} for r in responses]
 
 def _build_member_statuses(suggestion, memberships):
     """Return per-member meeting response status for a suggestion."""
-
     responses_by_user = {response.user_id: response.status for response in suggestion.responses.all()}
     member_statuses = []
     for membership in memberships:
@@ -121,7 +111,6 @@ def _build_member_statuses(suggestion, memberships):
 
 def _serialise_active_suggestion(suggestion, memberships):
     """Serialise a suggestion with counts and per-member response states."""
-
     member_statuses = _build_member_statuses(suggestion, memberships)
     accepted_count, rejected_count, pending_count = _count_member_statuses(member_statuses)
     team_size = len(member_statuses)
@@ -147,7 +136,6 @@ def _count_member_statuses(member_statuses):
 
 def _get_active_suggestions(project, memberships):
     """Return upcoming meeting suggestions with their responses."""
-
     qs = (
         project.suggestions
         .filter(start_time__gte=timezone.now())
@@ -162,19 +150,16 @@ def _get_active_suggestions(project, memberships):
 
 def _pick_one_per_day(grouped, ordered_days, layer):
     """Return slots for one round-robin layer (one per day at this layer depth)."""
-
     return [grouped[day][layer] for day in ordered_days if layer < len(grouped[day])]
 
 def _layered_slots(grouped, ordered_days):
     """Generate slots layer by layer (one per day per layer)."""
-
     batches = (_pick_one_per_day(grouped, ordered_days, l) for l in itertools.count())
     for batch in itertools.takewhile(bool, batches):
         yield from batch
 
 def _select_diverse_slots(slots, limit=SLOT_LIMIT):
     """Spread recommended slots across the week instead of clustering on one day."""
-
     grouped = _group_slots_by_day(slots)
     ordered_days = sorted(grouped.keys())
     selected = list(itertools.islice(_layered_slots(grouped, ordered_days), limit))
@@ -205,14 +190,11 @@ def _build_project_slots(start, now, memberships, user_events):
     return slots
 
 def _build_availability_response(project, current_user):
-    """Build the availability response for all project members over 7 days."""
-
     memberships = _project_memberships(project)
     now, start, end = _build_availability_window()
     user_events = _get_user_events([m.user for m in memberships], start, end)
     slots = _build_project_slots(start, now, memberships, user_events)
     return _availability_payload(project, current_user, memberships, slots)
-
 
 def _availability_payload(project, current_user, memberships, slots):
     return {
@@ -227,6 +209,5 @@ def _availability_payload(project, current_user, memberships, slots):
 @permission_classes([IsAuthenticated])
 def group_availability(request, project_id):
     """Return available meeting slots and active suggestions for a project."""
-
     project = get_object_or_404(GroupProject.objects.filter(memberships__user=request.user), id=project_id)
     return Response(_build_availability_response(project, request.user))

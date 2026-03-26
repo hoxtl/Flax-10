@@ -22,7 +22,7 @@ vi.mock('../../../context/CalendarContext', () => ({
     useEventDelete: vi.fn(() => ({ openDelete: mockOpenDelete, isDeleteOpen: false, deleteEvent: null, deleteType: null, closeDelete: vi.fn() })),
 }));
 
-vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
+vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({
     EventModal: ({ event, onClose }) => (
         <div data-testid="event-modal">
             <span>{event?.title || 'New Event'}</span>
@@ -31,7 +31,7 @@ vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
     ),
 }));
 
-vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({
     EventPopover: ({ event, onClose, actions }) => (
         <div data-testid="event-popup">
             <span>{event?.title}</span>

@@ -10,6 +10,7 @@ from django.utils import timezone
 
 
 class AutoSchedulerWindowsTest(TestCase):
+    """Tests auto scheduler windows."""
 
     def test_night_preference_returns_bounded_night_window(self):
         from studyFlax.views.calendar.auto_scheduler_windows import _apply_worktime_pref
@@ -42,6 +43,7 @@ class AutoSchedulerWindowsTest(TestCase):
 
 
 class GapBeforeBusySlotTest(TestCase):
+    """Tests gap before busy slot."""
 
     def test_returns_none_when_busy_slot_already_past(self):
         from studyFlax.views.calendar.auto_scheduler_allocations import _gap_before_busy_slot
@@ -61,6 +63,7 @@ class GapBeforeBusySlotTest(TestCase):
 
 
 class FindGapInSlotsTest(TestCase):
+    """Tests find gap in slots."""
 
     def test_returns_gap_before_first_busy_slot(self):
         from studyFlax.views.calendar.auto_scheduler_allocations import _find_gap_in_slots
@@ -73,6 +76,7 @@ class FindGapInSlotsTest(TestCase):
 
 
 class WindowBudgetTest(TestCase):
+    """Tests window budget."""
 
     def test_returns_zero_when_window_end_before_start(self):
         from studyFlax.views.calendar.auto_scheduler_allocations import _window_budget
@@ -84,6 +88,7 @@ class WindowBudgetTest(TestCase):
 
 
 class AllocateForDeadlineTest(TestCase):
+    """Tests allocate for deadline."""
 
     def test_returns_zero_when_minutes_is_zero(self):
         from studyFlax.views.calendar.auto_scheduler_allocations import _allocate_for_deadline
@@ -108,6 +113,7 @@ class AllocateForDeadlineTest(TestCase):
 
 
 class ProcessDayAllocationTest(TestCase):
+    """Tests process day allocation."""
 
     def test_returns_early_for_disallowed_day(self):
         from studyFlax.views.calendar.auto_scheduler_allocations import _process_day_allocation

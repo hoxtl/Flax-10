@@ -17,7 +17,7 @@ vi.mock("framer-motion", () => ({
   }),
 }));
 
-import { TabBar, TabContent } from "../../../components/common/TabBar/TabBar";
+import { TabBar, TabContent } from "../../../components/common/tab_bar/TabBar";
 
 describe("TabBar", () => {
   it("renders tabs, applies variant classes, and changes tabs on click", () => {

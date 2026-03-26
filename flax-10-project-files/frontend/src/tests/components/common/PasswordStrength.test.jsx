@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import PasswordStrength from "../../../components/common/PasswordStrength/PasswordStrength";
+import PasswordStrength from "../../../components/common/password_strength/PasswordStrength";
 
 describe("PasswordStrength", () => {
   it("stays hidden until typing by default", () => {

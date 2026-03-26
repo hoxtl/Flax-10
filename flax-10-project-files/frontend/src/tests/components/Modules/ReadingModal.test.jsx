@@ -26,7 +26,7 @@ vi.mock('../../../components/Modules/Readings/ReadingCard', () => ({
     ),
 }));
 
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     default: ({title, children, onClose}) => (
         <div> 
             <span>{title}</span>

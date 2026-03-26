@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { CheckBurst } from '../../components/TaskCelebration/CheckBurst';
+import { CheckBurst } from '../../components/task_celebration/CheckBurst';
 
 describe('CheckBurst', () => {
     it('renders children', () => {

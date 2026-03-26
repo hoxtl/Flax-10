@@ -10,19 +10,19 @@ vi.mock("../../../api/adminApi", () => ({
   getMyCourseChangeRequest: (...args) => getMyCourseChangeRequest(...args),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown/AnimatedDropdown", () => ({
   default: ({ onChange, placeholder }) => <button type="button" onClick={() => onChange("Physics")}>{placeholder}</button>,
 }));
 
-vi.mock("../../../components/common/InlineAlert/InlineAlert", () => ({
+vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message }) => message ? <div>{message}</div> : null,
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, pill: _pill, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../components/common/StandardModal/StandardModal", () => ({
+vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
   default: ({ title, children, onClose }) => (
     <div>
       <div>{title}</div>
@@ -36,7 +36,7 @@ vi.mock("../../../components/Settings/ui/RequestDecisionNotice", () => ({
   default: () => <div>request-notice</div>,
 }));
 
-vi.mock("../../../components/common/RequestStatusCard/RequestStatusCard", () => ({
+vi.mock("../../../components/common/request_status_card/RequestStatusCard", () => ({
   default: ({ title, subtitle, onCancel, successMessage }) => (
     <div>
       <div>{title}</div>

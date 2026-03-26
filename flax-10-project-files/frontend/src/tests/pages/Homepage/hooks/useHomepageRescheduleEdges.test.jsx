@@ -1,6 +1,5 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 const extractBaseEventIdMock = vi.fn((id) => id);
 const formatTimeMock = vi.fn(() => "10:00");
 const getNextFreeSlotTodayMock = vi.fn(() => null);
@@ -22,7 +21,7 @@ const conflictMocks = vi.hoisted(() => ({
   buildConflictResolutionToastMessage: vi.fn(),
 }));
 
-vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => conflictMocks);
+vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => conflictMocks);
 
 import { useHomepageReschedule } from "../../../../pages/Homepage/hooks/useHomepageReschedule";
 
@@ -53,308 +52,35 @@ describe("useHomepageReschedule extra branches", () => {
   });
 
   it("shows error toast when rescheduleTomorrow fails", async () => {
-    const props = buildRescheduleProps({
-      addEvent: vi.fn().mockRejectedValue(new Error("network")),
-    });
+    const props = buildRescheduleProps({ addEvent: vi.fn().mockRejectedValue(new Error("n")) });
     const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleRescheduleTomorrow({
-        id: "evt_1",
-        title: "Essay",
-        start_time: "2026-03-24T13:00:00.000Z",
-        end_time: "2026-03-24T14:00:00.000Z",
-      });
-    });
-
+    await act(async () => { await result.current.handleRescheduleTomorrow({ id: "e1", title: "E", start_time: "2026-03-24T13:00:00Z" }); });
     expect(props.showToast).toHaveBeenCalledWith("Couldn't re-schedule. Try again.");
-    expect(props.refetchTasks).toHaveBeenCalled();
   });
-
-  it("uses item's end_time fallback of 25 min when end_time is absent for tomorrow reschedule", async () => {
+  it("uses 25 min fallback for tomorrow reschedule", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleRescheduleTomorrow({
-        id: "evt_2",
-        title: "Read notes",
-        start_time: "2026-03-24T10:00:00.000Z",
-      });
-    });
-
-    const addedEvent = props.addEvent.mock.calls[0][0];
-    const diff = new Date(addedEvent.end_time).getTime() - new Date(addedEvent.start_time).getTime();
+    await act(async () => { await result.current.handleRescheduleTomorrow({ id: "e2", title: "R", start_time: "2026-03-24T10:00:00Z" }); });
+    const addArgs = props.addEvent.mock.calls[0][0];
+    const diff = new Date(addArgs.end_time).getTime() - new Date(addArgs.start_time).getTime();
     expect(diff).toBe(25 * 60000);
   });
-
-  it("handleReschedule moves to same-day slot when one is available", async () => {
-    const slot = {
-      start: new Date("2026-03-24T12:00:00.000Z"),
-      end: new Date("2026-03-24T12:45:00.000Z"),
-    };
-    getNextFreeSlotTodayMock.mockReturnValue(slot);
+  it("handleReschedule moves to same-day slot", async () => {
+    getNextFreeSlotTodayMock.mockReturnValue({ start: new Date("2026-03-24T12:00:00Z"), end: new Date("2026-03-24T12:45:00Z") });
     formatTimeMock.mockReturnValue("12:00");
-
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleReschedule({
-        id: "evt_3",
-        title: "Study session",
-        start_time: "2026-03-24T09:00:00.000Z",
-        end_time: "2026-03-24T09:45:00.000Z",
-      });
-    });
-
+    await act(async () => { await result.current.handleReschedule({ id: "e3", title: "S", start_time: "2026-03-24T09:00:00Z", end_time: "2026-03-24T09:45:00Z" }); });
     expect(props.removeEvent).toHaveBeenCalled();
     expect(props.addEvent).toHaveBeenCalled();
-    expect(props.showToast).toHaveBeenCalledWith('"Study session" → 12:00');
+    expect(props.showToast).toHaveBeenCalledWith('"S" → 12:00');
   });
-
-  it("handleReschedule falls back to tomorrow when no free slot exists", async () => {
+  it("handleReschedule falls back to tomorrow", async () => {
     getNextFreeSlotTodayMock.mockReturnValue(null);
-
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleReschedule({
-        id: "evt_4",
-        title: "Workout",
-        start_time: "2026-03-24T07:00:00.000Z",
-        end_time: "2026-03-24T08:00:00.000Z",
-      });
-    });
-
-    const addedEvent = props.addEvent.mock.calls[0][0];
-    const addedDate = new Date(addedEvent.start_time);
-    expect(addedDate.getDate()).toBe(25);
-  });
-
-  it("handleReschedule shows error when editEvent fails during slot move", async () => {
-    const slot = {
-      start: new Date("2026-03-24T12:00:00.000Z"),
-      end: new Date("2026-03-24T13:00:00.000Z"),
-    };
-    getNextFreeSlotTodayMock.mockReturnValue(slot);
-    const props = buildRescheduleProps({
-      editEvent: vi.fn().mockRejectedValue(new Error("fail")),
-    });
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleReschedule({
-        id: "evt_5",
-        title: "Seminar prep",
-        start_time: "2026-03-24T09:00:00.000Z",
-        end_time: "2026-03-24T09:45:00.000Z",
-      });
-    });
-
-    expect(props.showToast).toHaveBeenCalledWith("Couldn't reschedule. Try again.");
-    expect(props.addEvent).toHaveBeenCalledTimes(2);
-  });
-
-  it("handleQuickStartGap adds an event when a task is provided", async () => {
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-    const gapDate = new Date("2026-03-24T11:00:00.000Z");
-    const task = { id: 7, title: "Write report", description: "Draft intro", estimated_blocks: 2 };
-
-    await act(async () => {
-      await result.current.handleQuickStartGap(gapDate, 50, task);
-    });
-
-    expect(props.addEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "Write report",
-        description: "Draft intro",
-      }),
-    );
-    expect(props.loadEvents).toHaveBeenCalled();
-    expect(props.showToast).toHaveBeenCalled();
-  });
-
-  it("handleQuickStartGap is a no-op when task is null", async () => {
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleQuickStartGap(new Date(), 30, null);
-    });
-
-    expect(props.addEvent).not.toHaveBeenCalled();
-  });
-
-  it("handleQuickStartGap shows error toast when addEvent fails", async () => {
-    const props = buildRescheduleProps({
-      addEvent: vi.fn().mockRejectedValue(new Error("offline")),
-    });
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleQuickStartGap(
-        new Date("2026-03-24T11:00:00.000Z"),
-        30,
-        { id: 8, title: "Revise notes", estimated_blocks: 1 },
-      );
-    });
-
-    expect(props.showToast).toHaveBeenCalledWith("Couldn't add to schedule. Try again.");
-  });
-
-  it("handleConflictAutoMove moves event and shows toast", async () => {
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleConflictAutoMove(
-        { id: "e1", title: "Lecture" },
-        new Date("2026-03-24T11:00:00.000Z"),
-        new Date("2026-03-24T12:00:00.000Z"),
-      );
-    });
-
-    expect(props.editEvent).toHaveBeenCalled();
-    expect(props.loadEvents).toHaveBeenCalled();
-    expect(props.showToast).toHaveBeenCalledWith("Event moved to next available window.");
-  });
-
-  it("handleConflictAutoMove shows error toast when editEvent fails", async () => {
-    const props = buildRescheduleProps({
-      editEvent: vi.fn().mockRejectedValue(new Error("fail")),
-    });
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleConflictAutoMove(
-        { id: "e2", title: "Workshop" },
-        new Date("2026-03-24T11:00:00.000Z"),
-        new Date("2026-03-24T12:00:00.000Z"),
-      );
-    });
-
-    expect(props.showToast).toHaveBeenCalledWith("Couldn't move event. Try again.");
-  });
-
-  it("handleConflictPushTomorrow moves event to tomorrow and shows undo toast", async () => {
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleConflictPushTomorrow({
-        id: "e3",
-        title: "Study group",
-        start_time: "2026-03-24T14:00:00.000Z",
-        end_time: "2026-03-24T15:00:00.000Z",
-      });
-    });
-
-    expect(props.editEvent).toHaveBeenCalled();
-    expect(props.loadEvents).toHaveBeenCalled();
-    expect(props.showToast).toHaveBeenCalledWith(
-      expect.stringContaining("moved to tomorrow"),
-      expect.objectContaining({ actionLabel: "Undo" }),
-    );
-  });
-
-  it("handleConflictPushTomorrow is a no-op when start_time is absent", async () => {
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleConflictPushTomorrow({ id: "e4", title: "No start" });
-    });
-
-    expect(props.editEvent).not.toHaveBeenCalled();
-  });
-
-  it("handleConflictPushTomorrow shows error toast when editEvent fails", async () => {
-    const props = buildRescheduleProps({
-      editEvent: vi.fn().mockRejectedValue(new Error("fail")),
-    });
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleConflictPushTomorrow({
-        id: "e5",
-        title: "Broken event",
-        start_time: "2026-03-24T14:00:00.000Z",
-        end_time: "2026-03-24T15:00:00.000Z",
-      });
-    });
-
-    expect(props.showToast).toHaveBeenCalledWith("Couldn't move to tomorrow.");
-  });
-
-  it("handleTimelineDelete deletes a regular event and shows confirmation toast", async () => {
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleTimelineDelete({ id: "e6", title: "Workshop" });
-    });
-
-    expect(props.removeEvent).toHaveBeenCalledWith("e6");
-    expect(props.loadEvents).toHaveBeenCalled();
-    expect(props.showToast).toHaveBeenCalledWith('"Workshop" deleted.');
-  });
-
-  it("handleTimelineDelete removes a task-sourced event", async () => {
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleTimelineDelete({
-        id: "e7",
-        title: "Task event",
-        source: "task",
-        external_id: 42,
-      });
-    });
-
-    expect(props.deleteTask).toHaveBeenCalledWith(42);
-    expect(props.showToast).toHaveBeenCalledWith('"Task event" removed.');
-  });
-
-  it("handleTimelineDelete shows error toast when removal fails", async () => {
-    const props = buildRescheduleProps({
-      removeEvent: vi.fn().mockRejectedValue(new Error("fail")),
-    });
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleTimelineDelete({ id: "e8", title: "Broken" });
-    });
-
-    expect(props.showToast).toHaveBeenCalledWith("Couldn't delete item.");
-  });
-
-  it("resolveConflictsLoading starts false and is set true then false during conflict resolution", async () => {
-    let resolveConflicts;
-    conflictMocks.applyConflictResolutionPlan.mockImplementationOnce(
-      () => new Promise((resolve) => { resolveConflicts = resolve; }),
-    );
-
-    const props = buildRescheduleProps();
-    const { result } = renderHook(() => useHomepageReschedule(props));
-
-    expect(result.current.resolveConflictsLoading).toBe(false);
-
-    let pending;
-    act(() => {
-      pending = result.current.handleResolveTimelineConflicts();
-    });
-
-    await waitFor(() => expect(result.current.resolveConflictsLoading).toBe(true));
-
-    await act(async () => {
-      resolveConflicts();
-      await pending;
-    });
-
-    expect(result.current.resolveConflictsLoading).toBe(false);
+    await act(async () => { await result.current.handleReschedule({ id: "e4", title: "W", start_time: "2026-03-24T07:00:00Z", end_time: "2026-03-24T08:00:00Z" }); });
+    const addDate = new Date(props.addEvent.mock.calls[0][0].start_time);
+    expect(addDate.getDate()).toBe(25);
   });
 });

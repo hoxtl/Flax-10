@@ -119,4 +119,19 @@ describe("useRightNowData", () => {
     expect(result.current.isEndOfDay).toBe(true);
     expect(journeyPlannerMock).not.toHaveBeenCalled();
   });
+
+  it("skips commute data for off-campus events", async () => {
+    hasCampusCommuteMock.mockReturnValue(false);
+    resolveCampusFromTextMock.mockReturnValue(null);
+    const ne = { id: "n", title: "L", location: "Off", start_time: "2026-03-25T11:00:00Z" };
+    getNextEventMock.mockReturnValue(ne);
+    const { result } = renderHook(() => useRightNowData({
+      isToday: true, now: new Date("2026-03-25T09:30:00Z"), sortedEvents: [ne],
+      navigatorContext: { state: "now" }, taskWidgetItemsOnly: [], tflDelays: [],
+    }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.leaveByInfo).toBeNull();
+    expect(result.current.showTfl).toBe(false);
+    expect(journeyPlannerMock).not.toHaveBeenCalled();
+  });
 });

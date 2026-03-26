@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import WidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
+import WidgetHeader from "../../../components/common/widget_header/WidgetHeader";
 
 function TestIcon(props) {
   return <svg data-testid="widget-icon" {...props} />;

@@ -20,7 +20,7 @@ vi.mock("../../../pages/Homepage/components/HomepageDashboard", () => ({
   },
 }));
 
-vi.mock("../../../components/common/AppToast/AppToast", () => ({
+vi.mock("../../../components/common/app_toast/AppToast", () => ({
   default: (props) => {
     appToastMock(props);
     return <button onClick={props.onClose}>close toast</button>;

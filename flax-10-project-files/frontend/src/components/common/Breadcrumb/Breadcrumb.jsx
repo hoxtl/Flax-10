@@ -10,26 +10,22 @@ function navigate(navKey) {
   window.dispatchEvent(new CustomEvent("navigate", { detail: navKey }));
 }
 
-export default function Breadcrumb({ crumbs }) {
-  if (!crumbs || crumbs.length === 0) return null;
+function BreadcrumbItem({ crumb, isFirst }) {
   return (
-    <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-      {crumbs.map((crumb, i) => (
-        <span key={crumb.label} className={styles.crumbItem}>
-          {i > 0 && <span className={styles.separator} aria-hidden="true">/</span>}
-          {crumb.navKey ? (
-            <button
-              type="button"
-              className={styles.crumbLink}
-              onClick={() => navigate(crumb.navKey)}
-            >
-              {crumb.label}
-            </button>
-          ) : (
-            <span className={styles.crumbCurrent} aria-current="page">{crumb.label}</span>
-          )}
-        </span>
-      ))}
-    </nav>
+    <span className={styles.crumbItem}>
+      {!isFirst && <span className={styles.separator} aria-hidden="true">/</span>}
+      {crumb.navKey ? (
+        <button type="button" className={styles.crumbLink} onClick={() => navigate(crumb.navKey)}>
+          {crumb.label}
+        </button>
+      ) : (
+        <span className={styles.crumbCurrent} aria-current="page">{crumb.label}</span>
+      )}
+    </span>
   );
+}
+
+export default function Breadcrumb({ crumbs }) {
+  if (!crumbs?.length) return null;
+  return <nav className={styles.breadcrumb} aria-label="Breadcrumb">{crumbs.map((crumb, index) => <BreadcrumbItem key={crumb.label} crumb={crumb} isFirst={index === 0} />)}</nav>;
 }

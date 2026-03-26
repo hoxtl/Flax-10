@@ -6,10 +6,11 @@ from rest_framework import status
 from django.utils import timezone
 from studyFlax.models import Deadline, Module, CalendarEvent, Enrollment
 from datetime import timedelta
-from ..base import BaseTestCase
+from ...helpers.test_case_support import BaseTestCase
+
 
 class DeadlineViewTests(BaseTestCase):
-    """ Tests for Deadline views"""
+    """Tests for Deadline views."""
 
     def setUp(self):
         super().setUp()
@@ -30,8 +31,6 @@ class DeadlineViewTests(BaseTestCase):
         self.detail_url = f'/api/modules/{self.module.id}/deadlines/{self.deadline.id}/'
 
     def create_teacher(self, username):
-        """Create a teacher for deadline tests."""
-
         return self.user.__class__.objects.create_user(
             username=username,
             email=f'{username}@example.com',
@@ -43,7 +42,6 @@ class DeadlineViewTests(BaseTestCase):
 
     def create_module_deadline(self, teacher, code):
         """Create a module and one future deadline for a teacher."""
-
         module = Module.objects.create(
             module_code=code,
             module_name='Engineering Mathematics',
@@ -136,12 +134,17 @@ class DeadlineViewTests(BaseTestCase):
         self.assertTrue(CalendarEvent.objects.filter(
             user=self.user, source='module_deadline'
         ).exists())
-    
-    def deadline_payload(self):
-        """Build a deadline payload for requests."""
 
+    def deadline_payload(self):
         return dict(title='New Deadline', deadline_type='coursework',
             start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
+
+    def test_update_deadline_to_exam_type_uses_exam_tag(self):
+        start = timezone.now() + timedelta(days=10)
+        payload = {'deadline_type': 'exam', 'start_due_date': start.isoformat()}
+        response = self.client.put(self.detail_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['deadline_type'], 'exam')
 
     def test_update_deadline_invalid_non_teacher(self):
         deadline = Deadline.objects.create(

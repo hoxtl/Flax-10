@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { validatePasswords, getErrorMessage, saveUserData, clearUserData } from '../../components/Authentication/utils/authHelpers';
+import { validatePasswords, getErrorMessage, saveUserData, clearUserData } from '../../components/Auth/utils/authHelpers';
 
 const WELCOME_KEY = 'flax_welcome_seen_v1';
 

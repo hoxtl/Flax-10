@@ -45,7 +45,7 @@ vi.mock("../../app/navigation/useNavHandler", () => ({
   useNavHandler: (...args) => useNavHandlerMock(...args),
 }));
 
-vi.mock("../../components/common/ScrollToTop/ScrollToTop", () => ({
+vi.mock("../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>ScrollToTop</div>,
 }));
 

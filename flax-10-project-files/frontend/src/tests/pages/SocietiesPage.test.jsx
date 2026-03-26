@@ -87,7 +87,7 @@ vi.mock('../../components/Society/CreateSocietyModal', () => ({
     ),
 }));
 
-vi.mock('../../components/Society/SocietyDetail/ReportSocietyModal', () => ({
+vi.mock('../../components/Society/society_detail/ReportSocietyModal', () => ({
     default: ({ society, onClose, onReportSuccess }) => (
         <div data-testid="report-modal">
             <span>Report: {society?.name}</span>

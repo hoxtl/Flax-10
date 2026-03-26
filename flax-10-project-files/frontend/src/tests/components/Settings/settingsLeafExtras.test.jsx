@@ -33,15 +33,15 @@ vi.mock("../../../api/adminApi", () => ({
   getMyCourseChangeRequest: (...args) => getMyCourseChangeRequest(...args),
 }));
 
-vi.mock("../../../components/common/InlineAlert/InlineAlert", () => ({
+vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message, variant }) => message ? <div>{variant}:{message}</div> : null,
 }));
 
-vi.mock("../../../components/common/TextInput/TextInput", () => ({
+vi.mock("../../../components/common/text_input/TextInput", () => ({
   default: (props) => <input {...props} />,
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
@@ -49,7 +49,7 @@ vi.mock("../../../components/common/hooks/useTransientSavedState", () => ({
   useTransientSavedState: vi.fn((signal) => signal > 0),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ onChange, placeholder, searchable, usePortal }) => (
     <button type="button" data-searchable={String(searchable)} data-portal={String(usePortal)} onClick={() => onChange("dark")}>
       {placeholder}

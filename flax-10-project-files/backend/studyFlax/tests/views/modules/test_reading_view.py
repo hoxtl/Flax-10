@@ -1,4 +1,6 @@
-"""Backend tests for reading endpoints and helper utilities."""
+"""
+Tests for reading views.
+"""
 
 from datetime import timedelta
 
@@ -6,12 +8,13 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import status
 
-from ..base import BaseTestCase
+from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Module, Enrollment, Reading, Task
 from studyFlax.views.modules.reading_task_service import (
     create_description,
     task_payload,
 )
+
 
 User = get_user_model()
 

@@ -16,7 +16,7 @@ vi.mock("../../../components/Modules/hooks/useModules", () => ({
   },
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown/AnimatedDropdown", () => ({
   default: ({ options, placeholder, onChange, value }) => (
     <div>
       <div>{placeholder}</div>

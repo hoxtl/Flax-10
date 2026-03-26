@@ -4,6 +4,7 @@ Schedule view helpers.
 
 from studyFlax.models import Notification, Schedule
 
+
 def _schedule_queryset(user):
     return Schedule.objects.filter(user=user).prefetch_related("event_allocations__event", "deadline")
 
@@ -15,10 +16,8 @@ def _notify_schedule_overwrite(user, title):
         notification_type="general",
     )
 
-
 def _existing_schedules(user, title):
     return list(Schedule.objects.filter(user=user, title=title))
-
 
 def _delete_schedules(schedules):
     for schedule in schedules:

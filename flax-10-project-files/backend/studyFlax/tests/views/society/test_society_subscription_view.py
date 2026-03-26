@@ -1,16 +1,21 @@
-"""Tests for society subscription endpoints."""
+"""
+Tests for society subscription views.
+"""
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.tests.helpers.factories import make_society, make_society_member
+from studyFlax.tests.helpers.test_model_builders import make_society, make_society_member
+
 
 User = get_user_model()
 
 
 class ToggleSubscriptionViewTest(TestCase):
+    """Tests toggle subscription view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="subuser", email="sub@test.com", password="pass")

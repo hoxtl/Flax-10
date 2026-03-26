@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SummaryItem from '../../../components/common/GenericSummaryModal/SummaryItem';
+import SummaryItem from '../../../components/common/generic_summary_modal/SummaryItem';
 
-vi.mock('../../../components/common/GenericSummaryModal/GenericSummaryModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/common/generic_summary_modal/GenericSummaryModal.module.css', () => ({ default: {} }));
 
 describe('SummaryItem', () => {
     it('renders title and optional subtitle', () => {

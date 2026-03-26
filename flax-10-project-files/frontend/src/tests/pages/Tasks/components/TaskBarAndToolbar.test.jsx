@@ -1,6 +1,12 @@
+/**
+ * Covers Task bar and toolbar rendering paths.
+ */
+
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { renderHook, act } from "@testing-library/react";
+
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const taskBarHookMock = vi.hoisted(() => vi.fn());
 
@@ -8,15 +14,15 @@ vi.mock("../../../../pages/Tasks/hooks/useCreateTaskBar", () => ({
   default: taskBarHookMock,
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, pill, variant, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options = [], placeholder }) => (
     <select aria-label={placeholder} value={value ?? ""} onChange={(event) => onChange(event.target.value)}>
       <option value="">empty</option>
@@ -29,7 +35,7 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/SearchBar", () => ({
+vi.mock("../../../../components/common/search_bar", () => ({
   default: ({ value, onChange, onKeyDown, inputClassName, ...props }) => (
     <input
       {...props}
@@ -47,39 +53,36 @@ import {
 } from "../../../../pages/Tasks/components/TaskFeedToolbarParts";
 import useTaskFeedResponsive from "../../../../pages/Tasks/components/useTaskFeedResponsive";
 
+const taskBarDefaults = {
+  title: "",
+  saving: false,
+  showOptions: true,
+  estimatedMinutes: 25,
+  moduleId: "",
+  taskListId: "",
+  sortedLists: [{ id: "1", name: "Inbox" }],
+  moduleOptions: [{ value: "", label: "None" }],
+  listOptions: [{ value: "1", label: "Inbox" }],
+  sleepWarning: false,
+  sleepWarningProps: {},
+};
+
 function buildTaskBarState(overrides = {}) {
   return {
-    cardRef: { current: null },
     handleSubmit: vi.fn((event) => event.preventDefault()),
-    handleInputBlur: vi.fn(),
-    handleInputKeyDown: vi.fn(),
+    cardRef: { current: null },
     inputRef: { current: null },
-    sleepWarning: true,
-    sleepWarningProps: {},
-    title: "Read chapter",
-    setTitle: vi.fn(),
-    saving: false,
-    setInputFocused: vi.fn(),
-    showOptions: true,
-    estimatedBlocks: 1,
-    setEstimatedBlocks: vi.fn(),
-    moduleId: "11",
-    setModuleId: vi.fn(),
-    taskListId: "2",
-    setTaskListId: vi.fn(),
-    sortedLists: [{ id: "1", name: "Inbox" }],
-    moduleOptions: [{ value: "11", label: "KCL1" }],
-    listOptions: [{ value: "2", label: "Coursework" }],
-    isReadingList: true,
+    isReadingList: false,
     pageCount: 12,
-    setPageCount: vi.fn(),
+    ...taskBarDefaults,
+    ...createFnMap(["handleInputBlur", "handleInputKeyDown", "setTitle", "setInputFocused", "setEstimatedMinutes", "setModuleId", "setTaskListId", "setPageCount"]),
     ...overrides,
   };
 }
 
 describe("Task bar and toolbar coverage", () => {
   it("covers reading-list fields, dropdown fallbacks, and sleep warnings", () => {
-    const state = buildTaskBarState(); taskBarHookMock.mockReturnValue(state);
+    const state = buildTaskBarState({ isReadingList: true, sleepWarning: true }); taskBarHookMock.mockReturnValue(state);
     const externalInputRef = { current: null };
     render(<CreateTaskBar inputRef={externalInputRef} />);
 
@@ -102,6 +105,7 @@ describe("Task bar and toolbar coverage", () => {
 
   it("renders blank page counts and keeps selected module values when they are present", () => {
     const state = buildTaskBarState({
+      isReadingList: true,
       pageCount: null,
       moduleId: "",
       moduleOptions: [

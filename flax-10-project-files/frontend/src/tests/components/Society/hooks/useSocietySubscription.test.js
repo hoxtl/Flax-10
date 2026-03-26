@@ -84,24 +84,24 @@ describe('useSocietySubscription', () => {
     });
 
     it('handles toggle errors gracefully', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        apiToggle.mockRejectedValue(new Error('fail'));
+        apiToggle.mockRejectedValueOnce(new Error('fail'));
         
         // Subscribe failure
         const { result: resSub } = renderHook(() =>
             useSocietySubscription(1, { is_subscribed: false }, updateLocalSociety)
         );
         await act(async () => { await resSub.current.toggleSubscription(); });
-        expect(spy).toHaveBeenCalledWith('Subscription failed:', expect.any(Error));
+        expect(apiToggle).toHaveBeenCalledWith(1, true);
+        expect(updateLocalSociety).not.toHaveBeenCalled();
 
         // Unsubscribe failure
-        spy.mockClear();
+        updateLocalSociety.mockClear();
         const { result: resUnsub } = renderHook(() =>
             useSocietySubscription(1, { is_subscribed: true }, updateLocalSociety)
         );
+        apiToggle.mockRejectedValueOnce(new Error('fail'));
         await act(async () => { await resUnsub.current.toggleSubscription(); });
-        expect(spy).toHaveBeenCalledWith('Unsubscription failed:', expect.any(Error));
-        
-        spy.mockRestore();
+        expect(apiToggle).toHaveBeenCalledWith(1, false);
+        expect(updateLocalSociety).not.toHaveBeenCalled();
     });
 });

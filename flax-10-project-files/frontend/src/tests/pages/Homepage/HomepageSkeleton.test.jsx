@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-vi.mock("../../../components/common/LoadingState/SkeletonBlock", () => ({
+vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: ({ className }) => <div data-testid="skeleton-block" className={className} />,
 }));
 

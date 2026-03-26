@@ -3,13 +3,13 @@
  */
 
 import styles from "./DashboardLayout.module.css";
-import QuickCommandBar from "../components/common/QuickCommandBar/QuickCommandBar";
+import QuickCommandBar from "../components/common/quick_command_bar/QuickCommandBar";
 import FloatingChat from "../components/FloatingChat";
 import { BackToTop } from "../components/Pagination/Pagination";
-import { handleLogoutClick, shouldBlockTimerNavigation, shouldShowBackToTop } from "./dashboardLayout/dashboardLayoutActions";
-import { useDashboardState } from "./dashboardLayout/dashboardLayoutHooks";
-import { DashboardModals, LeaveTimerActions } from "./dashboardLayout/dashboardLayoutModals";
-import { DashboardSidebars, MainArea } from "./dashboardLayout/dashboardLayoutSections";
+import { handleLogoutClick, shouldBlockTimerNavigation, shouldShowBackToTop } from "./dashboard_layout/dashboardLayoutActions";
+import { useDashboardState } from "./dashboard_layout/dashboardLayoutHooks";
+import { DashboardModals, LeaveTimerActions } from "./dashboard_layout/dashboardLayoutModals";
+import { DashboardSidebars, MainArea } from "./dashboard_layout/dashboardLayoutSections";
 
 function DashboardMain({ state, onNavChange, children }) {
   return (

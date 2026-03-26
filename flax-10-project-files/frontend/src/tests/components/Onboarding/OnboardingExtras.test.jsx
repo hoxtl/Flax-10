@@ -39,7 +39,7 @@ vi.mock(
   })
 );
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, disabled }) => (
     <button onClick={onClick} disabled={disabled}>
       {children}
@@ -47,7 +47,7 @@ vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/FilterCheckbox/FilterCheckbox", () => ({
+vi.mock("../../../components/common/filter_checkbox/FilterCheckbox", () => ({
   default: ({ checked, onChange }) => (
     <input
       type="checkbox"
@@ -58,7 +58,7 @@ vi.mock("../../../components/common/FilterCheckbox/FilterCheckbox", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ placeholder, onChange, onOpenChange }) => (
     <div>
       <button onClick={() => onChange("changed")}>{placeholder}</button>
@@ -85,7 +85,6 @@ import SuccessScreen from "../../../components/Onboarding/SuccessScreen";
 import WarningBox from "../../../components/Onboarding/WarningBox";
 import OnboardingForm from "../../../components/Onboarding/OnboardingForm";
 
-// ─── SuccessScreen ────────────────────────────────────────────────────────────
 
 describe("SuccessScreen", () => {
   it("renders the celebration emoji", () => {
@@ -116,7 +115,6 @@ describe("SuccessScreen", () => {
   });
 });
 
-// ─── WarningBox ───────────────────────────────────────────────────────────────
 // WarningBox is mocked above so that OnboardingForm can use it.
 // The mock faithfully replicates the public API so we test via the mock import.
 
@@ -163,7 +161,6 @@ describe("WarningBox (via mock – tests public interface contract)", () => {
   });
 });
 
-// ─── OnboardingForm ───────────────────────────────────────────────────────────
 
 describe("OnboardingForm – submit button state", () => {
   const base = {
@@ -238,7 +235,6 @@ describe("OnboardingForm – submit button state", () => {
   });
 });
 
-// ─── WarningSection visibility ────────────────────────────────────────────────
 
 describe("WarningSection inside OnboardingForm", () => {
   const base = {

@@ -1,3 +1,7 @@
+/**
+ * Covers CalendarContext fallback and override branches.
+ */
+
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -15,32 +19,60 @@ vi.mock("../../components/Notifications/hooks/useReminderNotifications", () => (
   useReminderNotifications: () => {},
 }));
 
+const providerOverrides = {
+  selectedDate: "override-date",
+  events: [{ id: "override", title: "Override Event" }],
+  viewMode: "day",
+  displayMode: "list",
+};
+
+const providerEvents = [
+  { id: 1, title: "Essay Draft", description: "Library session", location: "Guy's", tag_name: "study" },
+  { id: 2, title: "Gym", description: "Leg day", location: "Campus", tag_name: "health" },
+];
+
+const sparseProviderEvents = [{ id: 3, title: null, description: null, location: null, tag_name: "study" }];
+
+const joinTitles = (events) => events.map((event) => event.title).join(",");
+
+const renderEntries = (entries) =>
+  entries.map(({ testId, value }) => <span key={testId} data-testid={testId}>{value}</span>);
+
+const renderButtons = (buttons) =>
+  buttons.map(({ label, onClick }) => <button key={label} onClick={onClick}>{label}</button>);
+
+function snapshotEntries(calendar, data, modal, popup, deletion) {
+  return [
+    { testId: "events", value: joinTitles(calendar.events) },
+    { testId: "all-events", value: joinTitles(calendar.allEvents) },
+    { testId: "selected-date-type", value: Object.prototype.toString.call(data.selectedDate) },
+    { testId: "view-mode", value: data.viewMode },
+    { testId: "display-mode", value: data.displayMode },
+    { testId: "modal-open", value: String(modal.isModalOpen) },
+    { testId: "popup-open", value: String(Boolean(popup.popupEvent)) },
+    { testId: "popup-read-only", value: String(popup.readOnly) },
+    { testId: "delete-open", value: String(deletion.isDeleteOpen) },
+  ];
+}
+
+function snapshotButtons(modal, popup, deletion) {
+  return [
+    { label: "open modal", onClick: () => modal.openModal(null, "create", "2026-03-24") },
+    { label: "open popup", onClick: () => popup.openPopup({ id: 9 }, { top: 1 }, null, "day") },
+    { label: "open delete", onClick: () => deletion.openDelete({ id: 4 }, "occurrence") },
+    { label: "close modal", onClick: modal.closeModal },
+    { label: "close popup", onClick: popup.closePopup },
+    { label: "close delete", onClick: deletion.closeDelete },
+  ];
+}
+
 function ContextSnapshot() {
   const calendar = useCalendar();
   const data = useCalendarData();
   const modal = useEventModal();
   const popup = useEventPopup();
   const deletion = useEventDelete();
-
-  return (
-    <div>
-      <span data-testid="events">{calendar.events.map((event) => event.title).join(",")}</span>
-      <span data-testid="all-events">{calendar.allEvents.map((event) => event.title).join(",")}</span>
-      <span data-testid="selected-date-type">{Object.prototype.toString.call(data.selectedDate)}</span>
-      <span data-testid="view-mode">{data.viewMode}</span>
-      <span data-testid="display-mode">{data.displayMode}</span>
-      <span data-testid="modal-open">{String(modal.isModalOpen)}</span>
-      <span data-testid="popup-open">{String(Boolean(popup.popupEvent))}</span>
-      <span data-testid="popup-read-only">{String(popup.readOnly)}</span>
-      <span data-testid="delete-open">{String(deletion.isDeleteOpen)}</span>
-      <button onClick={() => modal.openModal(null, "create", "2026-03-24")}>open modal</button>
-      <button onClick={() => popup.openPopup({ id: 9 }, { top: 1 }, null, "day")}>open popup</button>
-      <button onClick={() => deletion.openDelete({ id: 4 }, "occurrence")}>open delete</button>
-      <button onClick={modal.closeModal}>close modal</button>
-      <button onClick={popup.closePopup}>close popup</button>
-      <button onClick={deletion.closeDelete}>close delete</button>
-    </div>
-  );
+  return <div>{renderEntries(snapshotEntries(calendar, data, modal, popup, deletion))}{renderButtons(snapshotButtons(modal, popup, deletion))}</div>;
 }
 
 function ProviderHarness() {
@@ -51,87 +83,71 @@ function ProviderHarness() {
   );
 }
 
+function providerEntries(calendar, data, modal, popup, deletion) {
+  return [
+    { testId: "provider-events", value: joinTitles(calendar.events) },
+    { testId: "provider-all-events", value: joinTitles(calendar.allEvents) },
+    { testId: "provider-data-events", value: joinTitles(data.events) },
+    { testId: "provider-data-selected-date", value: data.selectedDate },
+    { testId: "provider-data-view-mode", value: data.viewMode },
+    { testId: "provider-data-display-mode", value: data.displayMode },
+    { testId: "provider-modal-type", value: modal.modalType ?? "" },
+    { testId: "provider-popup-view-mode", value: popup.viewMode ?? "" },
+    { testId: "provider-popup-read-only", value: String(popup.readOnly) },
+    { testId: "provider-delete-type", value: deletion.deleteType ?? "" },
+  ];
+}
+
+function providerButtons(modal, popup, deletion) {
+  return [
+    { label: "provider modal", onClick: () => modal.openModal({ id: 2 }, "edit", "2026-04-01") },
+    { label: "provider modal defaults", onClick: () => modal.openModal() },
+    { label: "provider popup explicit", onClick: () => popup.openPopup({ id: 3 }, { left: 2 }, true, "list") },
+    { label: "provider popup defaults", onClick: () => popup.openPopup({ id: 6 }, { left: 4 }) },
+    { label: "provider delete", onClick: () => deletion.openDelete({ id: 7 }, "all") },
+    { label: "provider delete default", onClick: () => deletion.openDelete({ id: 8 }) },
+    { label: "provider popup close", onClick: popup.closePopup },
+    { label: "provider delete close", onClick: deletion.closeDelete },
+  ];
+}
+
 function ProviderScenario() {
   const calendar = useCalendar();
-  const data = useCalendarData({
-    selectedDate: "override-date",
-    events: [{ id: "override", title: "Override Event" }],
-    viewMode: "day",
-    displayMode: "list",
-  });
+  const data = useCalendarData(providerOverrides);
   const modal = useEventModal();
   const popup = useEventPopup();
   const deletion = useEventDelete();
+  return <div>{renderEntries(providerEntries(calendar, data, modal, popup, deletion))}{renderButtons(providerButtons(modal, popup, deletion))}</div>;
+}
 
-  return (
-    <div>
-      <span data-testid="provider-events">{calendar.events.map((event) => event.title).join(",")}</span>
-      <span data-testid="provider-all-events">{calendar.allEvents.map((event) => event.title).join(",")}</span>
-      <span data-testid="provider-data-events">{data.events.map((event) => event.title).join(",")}</span>
-      <span data-testid="provider-data-selected-date">{data.selectedDate}</span>
-      <span data-testid="provider-data-view-mode">{data.viewMode}</span>
-      <span data-testid="provider-data-display-mode">{data.displayMode}</span>
-      <span data-testid="provider-modal-type">{modal.modalType ?? ""}</span>
-      <span data-testid="provider-popup-view-mode">{popup.viewMode ?? ""}</span>
-      <span data-testid="provider-popup-read-only">{String(popup.readOnly)}</span>
-      <span data-testid="provider-delete-type">{deletion.deleteType ?? ""}</span>
-      <button onClick={() => modal.openModal({ id: 2 }, "edit", "2026-04-01")}>provider modal</button>
-      <button onClick={() => modal.openModal()}>provider modal defaults</button>
-      <button onClick={() => popup.openPopup({ id: 3 }, { left: 2 }, true, "list")}>provider popup explicit</button>
-      <button onClick={() => popup.openPopup({ id: 6 }, { left: 4 })}>provider popup defaults</button>
-      <button onClick={() => deletion.openDelete({ id: 7 }, "all")}>provider delete</button>
-      <button onClick={() => deletion.openDelete({ id: 8 })}>provider delete default</button>
-      <button onClick={popup.closePopup}>provider popup close</button>
-      <button onClick={deletion.closeDelete}>provider delete close</button>
-    </div>
-  );
+function providerStateEntries(calendar, popup) {
+  return [
+    { testId: "filtered-events", value: joinTitles(calendar.events) },
+    { testId: "all-provider-events", value: joinTitles(calendar.allEvents) },
+    { testId: "provider-state-popup-read-only", value: String(popup.readOnly) },
+  ];
+}
+
+function providerStateButtons(dispatch) {
+  return [
+    { label: "set events", onClick: () => dispatch({ type: "SET_EVENTS", payload: providerEvents }) },
+    { label: "set sparse events", onClick: () => dispatch({ type: "SET_EVENTS", payload: sparseProviderEvents }) },
+    { label: "filter nested", onClick: () => dispatch({ type: "SET_FILTER", payload: [["study"], "__manage__", " "] }) },
+    { label: "search description", onClick: () => dispatch({ type: "SET_SEARCH_QUERY", payload: "library" }) },
+    { label: "search location", onClick: () => dispatch({ type: "SET_SEARCH_QUERY", payload: "guy" }) },
+    { label: "search title", onClick: () => dispatch({ type: "SET_SEARCH_QUERY", payload: "essay" }) },
+    { label: "search sparse", onClick: () => dispatch({ type: "SET_SEARCH_QUERY", payload: "missing" }) },
+    { label: "clear search", onClick: () => dispatch({ type: "SET_SEARCH_QUERY", payload: "   " }) },
+    { label: "read only", onClick: () => dispatch({ type: "SET_READ_ONLY", payload: true }) },
+    { label: "popup from state", onClick: () => dispatch({ type: "OPEN_POPUP", payload: { event: { id: 5 }, anchorRect: { x: 1 }, readOnly: false, viewModeOverride: null } }) },
+  ];
 }
 
 function ProviderWithState() {
   const calendar = useCalendar();
   const dispatch = useCalendarDispatch();
   const popup = useEventPopup();
-
-  return (
-    <div>
-      <span data-testid="filtered-events">{calendar.events.map((event) => event.title).join(",")}</span>
-      <span data-testid="all-provider-events">{calendar.allEvents.map((event) => event.title).join(",")}</span>
-      <span data-testid="provider-state-popup-read-only">{String(popup.readOnly)}</span>
-      <button
-        onClick={() =>
-          dispatch({
-            type: "SET_EVENTS",
-            payload: [
-              { id: 1, title: "Essay Draft", description: "Library session", location: "Guy's", tag_name: "study" },
-              { id: 2, title: "Gym", description: "Leg day", location: "Campus", tag_name: "health" },
-            ],
-          })
-        }
-      >
-        set events
-      </button>
-      <button
-        onClick={() =>
-          dispatch({
-            type: "SET_EVENTS",
-            payload: [
-              { id: 3, title: null, description: null, location: null, tag_name: "study" },
-            ],
-          })
-        }
-      >
-        set sparse events
-      </button>
-      <button onClick={() => dispatch({ type: "SET_FILTER", payload: [["study"], "__manage__", " "] })}>filter nested</button>
-      <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "library" })}>search description</button>
-      <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "guy" })}>search location</button>
-      <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "essay" })}>search title</button>
-      <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "missing" })}>search sparse</button>
-      <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "   " })}>clear search</button>
-      <button onClick={() => dispatch({ type: "SET_READ_ONLY", payload: true })}>read only</button>
-      <button onClick={() => dispatch({ type: "OPEN_POPUP", payload: { event: { id: 5 }, anchorRect: { x: 1 }, readOnly: false, viewModeOverride: null } })}>popup from state</button>
-    </div>
-  );
+  return <div>{renderEntries(providerStateEntries(calendar, popup))}{renderButtons(providerStateButtons(dispatch))}</div>;
 }
 
 function ProviderWithFallbackData() {

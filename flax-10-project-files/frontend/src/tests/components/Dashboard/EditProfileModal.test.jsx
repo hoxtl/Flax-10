@@ -8,7 +8,7 @@ vi.mock('../../../api/userApi', () => ({
   updateUserProfile: (...args) => updateUserProfileMock(...args),
 }));
 
-vi.mock('../../../components/Authentication/utils/userUtils', () => ({
+vi.mock('../../../components/Auth/utils/userUtils', () => ({
   getInitials: () => 'AB',
 }));
 

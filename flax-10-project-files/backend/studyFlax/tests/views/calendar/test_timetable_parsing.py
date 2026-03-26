@@ -1,9 +1,12 @@
-"""Tests for timetable ICS parsing and URL resolution helpers."""
+"""
+Tests for timetable parsing.
+"""
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timezone as dt_timezone
+
 
 User = get_user_model()
 
@@ -29,6 +32,7 @@ END:VEVENT
 END:VCALENDAR"""
 
 class TimetableParsingTest(TestCase):
+    """Tests timetable parsing."""
 
     def setUp(self):
         self.user = User.objects.create_user(

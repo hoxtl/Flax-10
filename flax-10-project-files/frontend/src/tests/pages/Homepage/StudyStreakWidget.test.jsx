@@ -9,7 +9,7 @@ vi.mock("../../../api/client", () => ({
   fetchApi: (...args) => fetchApiMock(...args),
 }));
 
-vi.mock("../../../components/Common/WidgetHeader/WidgetHeader", () => ({
+vi.mock("../../../components/common/widget_header/WidgetHeader", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 

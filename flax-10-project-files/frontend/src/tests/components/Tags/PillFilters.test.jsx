@@ -33,7 +33,7 @@ vi.mock('../../../components/Tags/utils/pillUtils', () => ({
 }));
 
 // Mock pillFilterOptions helpers so labels are plain (no counts)
-vi.mock('../../../components/Tags/pillFilters/pillFilterOptions', () => ({
+vi.mock('../../../components/Tags/pill_filters/pillFilterOptions', () => ({
     createPillFilterOptions: (tags, counts) => [
         { value: 'all', label: 'All' },
         ...(tags || []).map(t => ({ value: t.label.toLowerCase(), label: t.label })),
@@ -48,7 +48,7 @@ vi.mock('../../../components/Tags/pillFilters/pillFilterOptions', () => ({
 }));
 
 // Mock AnimatedDropdown to render options as individual pill buttons
-vi.mock('../../../components/common/AnimatedDropdown/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, className }) => (
         <div>
             {(options || []).map(o => {

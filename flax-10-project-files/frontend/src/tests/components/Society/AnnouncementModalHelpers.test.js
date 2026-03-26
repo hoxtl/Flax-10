@@ -9,7 +9,7 @@ import {
   validateForm,
   handleFileSelect,
   MAX_IMAGES,
-} from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModalHelpers';
+} from '../../../components/Society/society_detail/tabs/announcement_tab/announcementModalHelpers';
 
 const validateEventTimesMock = vi.fn();
 vi.mock('../../../components/Calendar/utils/dateValidation', () => ({

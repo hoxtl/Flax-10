@@ -5,12 +5,12 @@ import {
   getUniqueTags,
   createPillFilterOptions,
   getActiveFilterLabel,
-} from "../../../components/Tags/pillFilters/pillFilterOptions";
+} from "../../../components/Tags/pill_filters/pillFilterOptions";
 import {
   FilterTriggerButton,
   ManageTagsButton,
-} from "../../../components/Tags/pillFilters/PillFilterControls";
-import { usePillFilterOptions } from "../../../components/Tags/pillFilters/usePillFilterOptions";
+} from "../../../components/Tags/pill_filters/PillFilterControls";
+import { usePillFilterOptions } from "../../../components/Tags/pill_filters/usePillFilterOptions";
 
 vi.mock("../../../context/TagContext", () => ({
   useTags: vi.fn(() => ({

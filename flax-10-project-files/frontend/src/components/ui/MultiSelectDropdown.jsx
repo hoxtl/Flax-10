@@ -2,8 +2,8 @@
  * Multi-select dropdown component.
  */
 
-import { MultiSelectDropdownView } from "./multi-select-dropdown/MultiSelectDropdownView";
-import { useMultiSelectDropdown } from "./multi-select-dropdown/useMultiSelectDropdown";
+import { MultiSelectDropdownView } from "./multi_select_dropdown/MultiSelectDropdownView";
+import { useMultiSelectDropdown } from "./multi_select_dropdown/useMultiSelectDropdown";
 
 export default function MultiSelectDropdown(props) {
   const normalizedProps = getDefaultProps(props);

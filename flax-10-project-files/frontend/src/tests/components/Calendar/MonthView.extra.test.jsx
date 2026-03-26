@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { SwipeMonthView } from "../../../components/Calendar/MonthView/SwipeMonthView";
+import { SwipeMonthView } from "../../../components/Calendar/month_view/SwipeMonthView";
 
 const dispatchMock = vi.fn();
 const openPopupMock = vi.fn();

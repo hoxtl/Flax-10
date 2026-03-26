@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '../../../utils/test-utils';
+import { render, screen, fireEvent } from '../../../utils/testUtils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
 import * as CalendarContextModule from '../../../context/CalendarContext';
@@ -86,9 +86,7 @@ describe('CalendarHeaderMobile', () => {
         vi.mocked(useBreakpoint).mockReturnValue(true);
     });
 
-    // -----------------------------------------------------------------------
     // Mobile mode (isMobile = true)
-    // -----------------------------------------------------------------------
 
     it('renders MobileTitle when isMobile is true', () => {
         setup({ viewMode: 'month' });
@@ -114,9 +112,7 @@ describe('CalendarHeaderMobile', () => {
         expect(screen.getByTestId('mobile-view-mode')).toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // Mobile mode – week option is filtered out
-    // -----------------------------------------------------------------------
 
     it('does not include week option in mobile view mode selector', () => {
         setup({ viewMode: 'day' });
@@ -127,9 +123,7 @@ describe('CalendarHeaderMobile', () => {
         expect(options).toContain('month');
     });
 
-    // -----------------------------------------------------------------------
     // setViewModeWithGuard – mobile blocks week mode
-    // -----------------------------------------------------------------------
 
     it('does not dispatch SET_VIEW_MODE for week when isMobile', () => {
         setup({ viewMode: 'day' });
@@ -147,9 +141,7 @@ describe('CalendarHeaderMobile', () => {
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
     });
 
-    // -----------------------------------------------------------------------
     // CalendarNav title is undefined on mobile (not passed)
-    // -----------------------------------------------------------------------
 
     it('does not pass title to CalendarNav on mobile', () => {
         setup({ viewMode: 'month' });
@@ -158,9 +150,7 @@ describe('CalendarHeaderMobile', () => {
         expect(navH2).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // DateCard rendering in MobileDateStrip
-    // -----------------------------------------------------------------------
 
     it('renders date cards for each week day in mobile mode', () => {
         setup({ viewMode: 'day', selectedDate: defaultDate });

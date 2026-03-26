@@ -4,8 +4,9 @@ Backend tests for tag views.
 
 import json
 from rest_framework import status
-from ..base import BaseTestCase
+from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Tag
+
 
 class TagDetailTests(BaseTestCase):
     """Tests for tag detail operations (GET, PATCH, DELETE)."""

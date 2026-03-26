@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { calculateEventLayout } from '../../../components/Calendar/WeekView/components/allDayRowHelpers';
+import { calculateEventLayout } from '../../../components/Calendar/week_view/components/allDayRowHelpers';
 
 // Mock dependencies
 vi.mock('../../../components/Calendar/utils/dateUtils', () => ({

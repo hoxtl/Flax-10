@@ -1,0 +1,3 @@
+"""
+Group-work fixture modules.
+"""

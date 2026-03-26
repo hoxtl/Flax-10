@@ -41,7 +41,7 @@ vi.mock(
   }),
 );
 
-vi.mock('../../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../../components/common/animated_dropdown', () => ({
   default: ({ value, onChange, options, placeholder }) => (
     <select
       data-testid={`dd-${placeholder}`}
@@ -84,11 +84,31 @@ describe('DateTimePicker parts', () => {
     const trigger = document.querySelector('[role="button"]');
     fireEvent.keyDown(trigger, { key: 'Enter' });
     fireEvent.keyDown(trigger, { key: ' ' });
+    fireEvent.keyDown(trigger, { key: 'Tab' });
     fireEvent.click(screen.getByLabelText('Clear date'));
     
     expect(setOpen).toHaveBeenCalled();
     expect(setSelDate).toHaveBeenCalledWith(null);
     expect(onChange).toHaveBeenCalledWith('');
+  });
+
+  it('renders the trigger icon and date-only formatting when not hidden', () => {
+    render(
+      <TriggerButton
+        open={true}
+        setOpen={vi.fn()}
+        selDate={new Date('2026-03-12T09:05:00')}
+        timeOnly={false}
+        dateOnly={true}
+        placeholder="Pick"
+        setSelDate={vi.fn()}
+        onChange={vi.fn()}
+        hideIcon={false}
+      />,
+    );
+
+    expect(screen.getByText('📅')).toBeInTheDocument();
+    expect(screen.getByText('12 / 03 / 2026')).toBeInTheDocument();
   });
 
   it('renders calendar section and handles navigation', () => {

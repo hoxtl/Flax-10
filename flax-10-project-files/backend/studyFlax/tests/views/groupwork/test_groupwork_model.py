@@ -1,3 +1,7 @@
+"""
+Tests for groupwork model strings.
+"""
+
 from datetime import timedelta
 
 from django.utils import timezone
@@ -7,10 +11,12 @@ from studyFlax.models.groupwork.groupwork_model import (
     MeetingResponse,
     MeetingSuggestion,
 )
-from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
 
 
 class GroupworkModelStrTests(BaseTestCase):
+    """Tests groupwork model str."""
+
     def test_group_project_str(self):
         project = GroupProject.objects.create(name="My Project", owner=self.user)
         self.assertEqual(str(project), "My Project")

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import ImageGalleryModal from '../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal';
+import ImageGalleryModal from '../../../components/Society/society_detail/image_handlers/ImageGalleryModal';
 
 vi.mock(
-  '../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal.module.css',
+  '../../../components/Society/society_detail/image_handlers/ImageGalleryModal.module.css',
   () => ({
     default: {
       overlay: 'overlay',

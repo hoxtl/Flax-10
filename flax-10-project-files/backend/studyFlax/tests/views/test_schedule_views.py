@@ -1,3 +1,7 @@
+"""
+Tests for schedule views.
+"""
+
 from datetime import timedelta
 from django.utils import timezone
 from rest_framework import status
@@ -11,10 +15,12 @@ from studyFlax.models import (
     Tag,
     UserSettings,
 )
-from ..base import BaseTestCase
+from ..helpers.test_case_support import BaseTestCase
 
 
 class ScheduleViewsTests(BaseTestCase):
+    """Tests schedule views."""
+
     def setUp(self):
         super().setUp()
         self.url = '/api/schedules/'

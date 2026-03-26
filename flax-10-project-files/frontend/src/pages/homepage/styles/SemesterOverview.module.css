@@ -1,0 +1,188 @@
+/* SemesterOverviewWidget — academic term at-a-glance */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
+}
+
+/* ── Legend ───────────────────────────────────────────────────────────────── */
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--widget-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.dotLecture  { background: var(--sage); }
+.dotDeadline { background: var(--home-urgency-warning); }
+.dotExam     { background: #9b8ec4; }
+
+/* ── Week grid ────────────────────────────────────────────────────────────── */
+
+.grid {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.grid::-webkit-scrollbar { display: none; }
+
+.weekCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 40px;
+  padding: 4px 3px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+
+.weekCol:hover {
+  background: rgba(139, 115, 85, 0.05);
+}
+
+.currentCol {
+  background: var(--surface-inner);
+  border: 1.5px solid var(--widget-border);
+}
+
+.pastCol .weekNum,
+.pastCol .dateLabel {
+  opacity: 0.45;
+}
+
+.pastCol .bar {
+  opacity: 0.35;
+}
+
+.readingCol .weekNum,
+.readingCol .dateLabel {
+  color: var(--color-primary);
+}
+
+.currentCol .weekNum,
+.currentCol .dateLabel {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.weekNum {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--widget-text-primary);
+  line-height: 1;
+}
+
+/* ── Bars ─────────────────────────────────────────────────────────────────── */
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  min-height: 52px;
+  width: 100%;
+  transition: min-height 0.3s ease;
+}
+
+.h2 .bars {
+  min-height: 110px;
+}
+
+.h2 .grid {
+  gap: 8px;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 5px;
+  transition: height 0.3s ease, opacity 0.3s;
+}
+
+.barLecture  { background: var(--sage); opacity: 0.8; }
+.barDeadline { background: var(--home-urgency-warning); opacity: 0.8; }
+.barExam     { background: #9b8ec4; opacity: 0.9; }
+.barReading  { background: var(--color-primary); opacity: 0.35; }
+
+/* ── Date label ───────────────────────────────────────────────────────────── */
+
+.dateLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+/* ── Cluster warning ──────────────────────────────────────────────────────── */
+
+.clusterWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--home-urgency-danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--home-urgency-danger) 18%, transparent);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 10px;
+  color: var(--widget-text-secondary);
+  line-height: 1.45;
+}
+
+.clusterIcon {
+  flex-shrink: 0;
+  font-size: 12px;
+  margin-top: 1px;
+}
+
+.clusterHighlight {
+  color: var(--home-urgency-danger);
+  font-weight: 700;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .legend { display: none; }
+  .grid { gap: 4px; }
+  .weekCol { min-width: 32px; }
+  .weekNum,
+  .dateLabel { font-size: 7.5px; }
+}

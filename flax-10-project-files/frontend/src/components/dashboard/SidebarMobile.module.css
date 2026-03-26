@@ -1,0 +1,7 @@
+/*
+ * Aggregated sidebar mobile styles.
+ */
+
+@import "./sidebar_mobile_parts/layout.module.css";
+@import "./sidebar_mobile_parts/mobile-shell.module.css";
+@import "./sidebar_mobile_parts/mobile-nav.module.css";

@@ -190,12 +190,12 @@ vi.mock("../../../components/Calendar/EventPopups", () => ({
   EventPopups: () => <div data-testid="event-popups" />,
 }));
 
-vi.mock("../../../components/common/BackToTop/BackToTop", () => ({
+vi.mock("../../../components/common/back_to_top/BackToTop", () => ({
   __esModule: true,
   default: () => <div data-testid="back-to-top" />,
 }));
 
-vi.mock("../../../components/Tags/PillFilters", () => ({
+vi.mock("../../../components/Tags/pill_filters", () => ({
   __esModule: true,
   default: () => <div data-testid="pill-filters" />,
 }));

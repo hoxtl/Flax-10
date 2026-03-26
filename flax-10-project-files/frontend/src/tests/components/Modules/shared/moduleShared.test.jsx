@@ -44,7 +44,7 @@ vi.mock("../../../../context/ToastContext", () => ({
   useToast: () => useToastMock,
 }));
 
-vi.mock("../../../../components/common/ConfirmModal/ConfirmModal", () => ({
+vi.mock("../../../../components/common/confirm_modal/ConfirmModal", () => ({
   default: ({ title, message, onConfirm, onCancel, confirmText }) => (
     <div>
       <div>{title}</div>
@@ -55,7 +55,7 @@ vi.mock("../../../../components/common/ConfirmModal/ConfirmModal", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, disabled, className }) => (
     <button onClick={onClick} disabled={disabled} className={className}>{children}</button>
   ),

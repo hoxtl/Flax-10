@@ -20,7 +20,7 @@ vi.mock('../../../api/moduleApi', () => ({
     ]),
 }));
 
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     default: ({ title, subtitle, onClose, children }) => (
         <div data-testid="standard-modal">
             <h2>{title}</h2>

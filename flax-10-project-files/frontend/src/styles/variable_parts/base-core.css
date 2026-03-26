@@ -1,0 +1,258 @@
+/*
+ * Core shared design tokens.
+ */
+
+:root {
+  /* Dynamic Theme Variables */
+  --color-bg: #F8F5F2;
+  --color-card: #FFFCFA;
+  --color-sidebar: #EEEAE4;
+  --color-border-base: rgba(74, 52, 33, 0.12);
+
+  --color-primary: #7B6751;
+  --color-primary-strong: #5c4d3e;
+  --color-highlight: #c4a35a;
+  --color-highlight-soft: #e8dcc8;
+
+  /* Global Design Language: 24px card radius, no black/grey borders */
+  --radius: 12px;
+  --radius-pill: 9999px;
+  --card-radius: 24px;
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+
+  /* Typography: Inter for all text; JetBrains Mono for numbers/timestamps */
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: "Lexend", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+
+  /* Weight rules: titles 700, task names/pills 500, subtext/captions 400 */
+  --font-weight-title: 700;
+  --font-weight-task: 500;
+  --font-weight-caption: 400;
+  --font-sans: var(--font-body);
+
+  /* Core shared scales */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-lg);
+  --card-radius: var(--radius-2xl);
+  --radius-control: var(--radius-md);
+
+  --text-2xs: 0.6rem;
+  --text-xs: 0.7rem;
+  --text-sm: 0.8rem;
+  --text-base: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --shadow-sm: 0 1px 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --shadow-md: 0 4px 16px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --shadow-lg: 0 8px 32px color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --shadow-xl: 0 20px 60px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --shadow-card: 0 8px 30px color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --shadow-popover: 0 12px 30px rgba(44, 24, 16, 0.12);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.25);
+
+  --card-padding: var(--space-5);
+  --card-padding-lg: var(--space-6);
+  --card-radius-token: var(--radius-2xl);
+  --card-border: 1px solid var(--border);
+  --card-shadow: var(--shadow-card);
+  --card-shadow-rest: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-shadow-strong: var(--shadow-lg);
+  --card-hover-transform: translateY(-2px);
+  --card-hover-transform-strong: translateY(-4px);
+  --card-icon-surface: var(--surface);
+  --card-icon-radius: var(--radius-md);
+
+  --stroke-soft: 1px solid var(--border);
+  --stroke-strong: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  --focus-ring-strong: 0 0 0 3px color-mix(in srgb, var(--color-primary) 30%, transparent);
+
+  --control-height: 36px;
+  --control-height-sm: 30px;
+  --control-radius: var(--radius-control);
+  --control-padding-y: var(--space-2);
+  --control-padding-x: var(--space-3);
+  --control-border: 1px solid var(--border);
+  --input-height: var(--control-height);
+  --input-height-sm: var(--control-height-sm);
+  --input-padding: var(--control-padding-y) var(--control-padding-x);
+  --input-radius: var(--control-radius);
+  --input-border: var(--control-border);
+  --input-focus-ring: var(--focus-ring);
+
+  --btn-height: var(--control-height);
+  --btn-height-sm: var(--control-height-sm);
+  --btn-radius: var(--control-radius);
+  --btn-padding: var(--space-2) var(--space-4);
+  --btn-padding-sm: var(--space-1) var(--space-3);
+  --btn-font-size: var(--text-base);
+  --btn-font-weight: 600;
+
+  --dropdown-radius: var(--radius-lg);
+  --dropdown-shadow: var(--shadow-popover);
+  --dropdown-border: var(--stroke-soft);
+  --dropdown-padding: var(--space-1);
+  --dropdown-item-padding: var(--space-2) var(--space-3);
+  --dropdown-item-radius: var(--radius-md);
+  --filter-dropdown-width: 360px;
+  --filter-dropdown-width-sm: 300px;
+  --filter-dropdown-max-width: min(90vw, var(--filter-dropdown-width));
+  --user-filter-dropdown-width: 360px;
+  --user-filter-dropdown-max-width: min(94vw, var(--user-filter-dropdown-width));
+
+  --modal-radius: var(--radius-xl);
+  --modal-padding: var(--space-6);
+  --modal-shadow: var(--shadow-modal);
+
+  --chip-radius: var(--radius-md);
+  --chip-padding: var(--space-1) var(--space-2);
+  --chip-font-size: var(--text-xs);
+  --chip-font-weight: 600;
+
+  --segmented-bg: rgba(255, 255, 255, 0.6);
+  --segmented-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
+  --segmented-button-fg: var(--muted);
+  --segmented-button-hover-bg: var(--hover);
+  --segmented-button-hover-fg: var(--text);
+  --segmented-active-bg: var(--active);
+  --segmented-active-fg: var(--primary-strong);
+  --segmented-solid-bg: rgba(255, 255, 255, 0.5);
+  --segmented-solid-border: rgba(74, 52, 33, 0.25);
+  --segmented-solid-shadow: none;
+  --segmented-solid-button-fg: var(--text);
+  --segmented-solid-button-hover-bg: rgba(74, 52, 33, 0.08);
+  --segmented-solid-button-hover-fg: var(--text);
+  --segmented-solid-active-bg: rgba(74, 52, 33, 0.88);
+  --segmented-solid-active-fg: #FAF9F6;
+
+  /* Semantic text colors for typography — Warm-Classy */
+  --text-charcoal: var(--color-primary);
+  --text-muted-sage: #5a635a;
+
+  /* Theme-driven palette mappings */
+  --flax-brown: var(--color-primary);
+  --flax-brown-strong: var(--color-primary-strong);
+  --flax-gold: var(--color-highlight);
+  --flax-gold-soft: var(--color-highlight-soft);
+  --color-flax-light: #f5f0e8;
+  --flax-charcoal: var(--color-primary);
+  --flax-navy: #0f172a;
+
+  --home-urgency-danger: #C05A3E;
+  --home-urgency-warning: #E3B285;
+
+  --c-white: #ffffff;
+  --c-greige: #B4A490;
+  --c-taupe: #AA9A94;
+  --c-caramel: #9E7E5D;
+  --c-olive: #81725B;
+  --c-cocoa: #4A3421;
+  --c-brown: #2B1E14;
+  --c-red: #FF0000;
+  --c-green: #2A7A3A;
+  --c-grey: #2B1E14;
+
+  /* Semantic colors for task/schedule accents — Warm-Classy status */
+  --urgent: #C05A3E;
+  --study: #52796f;
+  --personal: #8B5CF6;
+  --health: #22C897;
+  --neutral: #6B7280;
+
+  --bg: var(--color-bg);
+  --panel: var(--color-card);
+  --sidebar: var(--color-sidebar);
+  --border: var(--color-border-base);
+  --paper: var(--color-bg);
+  --paper-strong: var(--color-card);
+  --surface-inner: color-mix(in srgb, var(--color-card) 30%, var(--color-bg));
+  --glass: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  --color-primary-solid: var(--color-primary);
+  --color-on-primary: #ffffff;
+  --glass-border: var(--color-border-base);
+  --kcl-accent: #9d2235;
+
+  /* Semantic text & surfaces (light) */
+  --text: #1A1A1A;
+  --text-primary: var(--primary);
+  --text-secondary: #64748b;
+  --text-dark: #1e1b2e;
+  --muted: #9CA3AF;
+
+  --primary: var(--color-primary);
+  --primary-light: color-mix(in srgb, var(--primary) 12%, transparent);
+  --primary-strong: var(--color-primary-strong);
+  --sage: #8C9A86;
+  --accent: var(--color-primary);
+  --danger: #C05A3E;
+  --danger-hover: color-mix(in srgb, var(--danger) 92%, black);
+  --danger-bg: rgba(192, 90, 62, 0.12);
+  --danger-border: rgba(192, 90, 62, 0.4);
+
+  --hover: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  --hover-light: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  --active: color-mix(in srgb, var(--color-primary) 14%, transparent);
+
+  --pill-bg: color-mix(in srgb, var(--color-primary) 8%, var(--color-card));
+  --pill-hover: color-mix(in srgb, var(--color-primary) 14%, var(--color-card));
+
+  --calendar-bg: var(--bg);
+  --weekbar-bg: var(--bg);
+  --search-bg: #fafaf9;
+  --btn-black: #3a3a3a;
+  --btn-black-hover: #2a2a2a;
+  --event-card-bg: white;
+  --nav-btn-bg: #000000;
+  --nav-btn-hover: #333333;
+  --sidebar-active: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  --user-details-text: #1e1b2e;
+
+  --card-bg: var(--color-card);
+  --bento-card-bg: var(--color-card);
+  --surface: var(--color-bg);
+  --soft-paper: var(--color-card);
+  --surface-paper: var(--color-card);
+  --surface-panel: var(--color-card);
+  --surface-card: var(--color-card);
+  --surface-card-muted: var(--color-bg);
+  --surface-page: var(--color-bg);
+  --surface-search: var(--color-bg);
+  --surface-raised: var(--color-card);
+}
+
+/* Teacher UI theme — warm pastel rose */
+[data-role="teacher"] {
+  --color-bg: #FDF5F5;
+  --color-card: #FFF8F8;
+  --color-sidebar: #F5ECEC;
+  --color-border-base: rgba(139, 62, 62, 0.10);
+  --color-primary: #8B4A4A;
+  --color-primary-strong: #6B3535;
+  --color-highlight: #C48A8A;
+  --color-highlight-soft: #F0D8D8;
+}

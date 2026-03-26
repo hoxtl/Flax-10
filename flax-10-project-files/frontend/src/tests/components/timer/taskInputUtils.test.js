@@ -25,7 +25,7 @@ vi.mock('../../../lib/focusPlanner', () => ({
     getTaskDurationMinutes: vi.fn((task) => (task.estimated_blocks || 1) * 25),
 }));
 
-vi.mock('../../../components/Timer/taskInput/taskInputConstants', () => ({
+vi.mock('../../../components/Timer/task_input/taskInputConstants', () => ({
     SORT_ALPHA: 'alpha',
     SORT_ALPHA_DESC: 'alpha_desc',
     SORT_DATE_ADDED: 'date_added',
@@ -47,7 +47,7 @@ import {
     getRecommendedTask,
     mapEnrolledModules,
     getTaskDurationLabel,
-} from '../../../components/Timer/taskInput/taskInputUtils';
+} from '../../../components/Timer/task_input/taskInputUtils';
 
 describe('getTaskUrgencyTone', () => {
     it('returns "cool" when no due date', () => {

@@ -43,7 +43,7 @@ vi.mock("../../../components/Settings/account/AccountFormLayout", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown/AnimatedDropdown", () => ({
   default: ({ value, onChange, options = [], placeholder }) => (
     <select aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)}>
       <option value="">Select</option>
@@ -54,15 +54,15 @@ vi.mock("../../../components/common/AnimatedDropdown/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/InlineAlert/InlineAlert", () => ({
+vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message }) => message ? <div>{message}</div> : null,
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, pill: _pill, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../components/common/StandardModal/StandardModal", () => ({
+vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
   default: ({ title, children, onClose }) => (
     <div>
       <h2>{title}</h2>
@@ -76,7 +76,7 @@ vi.mock("../../../components/Settings/ui/RequestDecisionNotice", () => ({
   default: () => <div>Decision notice</div>,
 }));
 
-vi.mock("../../../components/common/RequestStatusCard/RequestStatusCard", () => ({
+vi.mock("../../../components/common/request_status_card/RequestStatusCard", () => ({
   default: ({ title, subtitle, onCancel, successMessage }) => (
     <div>
       <div>{title}</div>

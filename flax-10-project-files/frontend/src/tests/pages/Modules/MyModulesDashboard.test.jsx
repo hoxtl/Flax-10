@@ -149,6 +149,49 @@ describe("MyModulesDashboard", () => {
     expect(readingTitle).toBeInTheDocument();
   });
 
+  it("removes a reading after it is added to tasks", async () => {
+    getUpcomingDeadlines.mockResolvedValue([]);
+    getSuggestedReadings.mockResolvedValue([
+      { id: 7, title: "Intro: Chapter 4", module_name: "Intro", module_code: "CS101", deadline: "2026-04-10T00:00:00Z", start_page: 21, end_page: 40 },
+    ]);
+    renderDashboard();
+
+    expect(await screen.findByText("Chapter 4")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /\+ add to tasks/i }));
+
+    await waitFor(() => {
+      expect(convertReadingToTask).toHaveBeenCalledWith(7);
+      expect(toastMock).toHaveBeenCalledWith("Reading added to tasks!");
+    });
+    await waitFor(() => expect(screen.queryByText("Chapter 4")).not.toBeInTheDocument());
+  });
+
+  it("falls back cleanly when the dashboard APIs reject", async () => {
+    getUpcomingDeadlines.mockRejectedValue(new Error("deadlines failed"));
+    getSuggestedReadings.mockRejectedValue(new Error("readings failed"));
+
+    renderDashboard();
+
+    await waitFor(() => {
+      expect(screen.getByText(/No readings assigned/i)).toBeInTheDocument();
+    });
+  });
+
+  it("handles missing module and enrollment inputs", async () => {
+    getUpcomingDeadlines.mockResolvedValue([]);
+    getSuggestedReadings.mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <MyModulesDashboard modules={null} enrollments={null} />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/No readings assigned/i)).toBeInTheDocument();
+    });
+  });
+
   it("MyModulesDashboard shows enrolled module count in stats", async () => {
     getUpcomingDeadlines.mockResolvedValue([{ id: 1, assessment_title: "Quiz", module_code: "MA1", start_due_date: "2026-03-30T10:00:00Z" }]);
     getSuggestedReadings.mockResolvedValue([]);

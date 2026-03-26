@@ -21,7 +21,7 @@ vi.mock("../../../pages/Modules/ModulesPageChrome.jsx", () => ({
   TestModeContent: () => <div data-testid="test-mode">test mode</div>,
 }));
 
-vi.mock("../../../components/common/HoldConfirmModal/HoldConfirmModal.jsx", () => ({
+vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal.jsx", () => ({
   default: ({ onConfirm, onCancel, warningText }) => (
     <div>
       <div>{warningText}</div>

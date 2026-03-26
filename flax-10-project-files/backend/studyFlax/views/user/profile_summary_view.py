@@ -1,4 +1,6 @@
-"""Profile summary API view."""
+"""
+View for user profile summaries.
+"""
 
 from datetime import timedelta
 
@@ -16,12 +18,10 @@ def _recent_sessions(sessions_all):
     cutoff = timezone.now() - timedelta(days=90)
     return [session for session in sessions_all if session.end_time >= cutoff]
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile_summary_view(request):
     return Response(_profile_summary_payload(request))
-
 
 def _profile_summary_payload(request):
     user = resolve_user(request)

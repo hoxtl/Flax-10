@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '../../../utils/test-utils';
+import { render, screen, fireEvent } from '../../../utils/testUtils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MonthView } from '../../../components/Calendar/MonthView/MonthView';
+import { MonthView } from '../../../components/Calendar/month_view/MonthView';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 import { TagProvider } from '../../../context/TagContext';
 

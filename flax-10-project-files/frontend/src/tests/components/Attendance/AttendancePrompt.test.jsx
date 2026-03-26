@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { act, render, screen, fireEvent, waitFor, renderHook } from "../../../utils/test-utils";
+import { act, render, screen, fireEvent, waitFor, renderHook } from "../../../utils/testUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -65,7 +65,7 @@ vi.mock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: () => ({ refetch: vi.fn(), stats: attendanceStatsState }),
 }));
 
-vi.mock("../../../components/common/ConfirmModal/ConfirmModal", () => ({
+vi.mock("../../../components/common/confirm_modal/ConfirmModal", () => ({
   default: ({ title, message, onConfirm, onAlternate, onCancel, confirmText, alternateText, cancelText }) => (
     <div>
       <div>{title}</div>
@@ -171,7 +171,7 @@ describe("Attendance prompt", () => {
 
   it("dismisses with null event (no session id stored)", () => {
     const setEvent = vi.fn();
-    // null event → if (event) is false → no setSessionDismissedId call
+    // null event  -  if (event) is false  -  no setSessionDismissedId call
     dismissAttendancePrompt(null, setEvent);
     expect(setEvent).toHaveBeenCalledWith(null);
     // No id stored since event was null
@@ -182,8 +182,8 @@ describe("Attendance prompt", () => {
     const setEvent = vi.fn();
     const setSubmitting = vi.fn();
     recordAttendanceMock.mockResolvedValue({});
-    // Don't provide closeDelayMs in options (undefined) → default 250ms branch used
-    // closeDelayMs > 0 → wait(closeDelayMs) is called
+    // Don't provide closeDelayMs in options (undefined)  -  default 250ms branch used
+    // closeDelayMs > 0  -  wait(closeDelayMs) is called
     const afterSuccess = vi.fn().mockResolvedValue(undefined);
     // Use vi.runAllTimersAsync to handle async timers
     const promise = submitAttendancePromptAnswer({ id: 99 }, true, false, setEvent, setSubmitting, { afterSuccess });
@@ -200,7 +200,7 @@ describe("Attendance prompt", () => {
     const yesButton = screen.getByText("Yes");
     // First click sets answeredWith = true
     await act(async () => { fireEvent.click(yesButton); });
-    // Second click should hit the guard (answeredWith !== null → return)
+    // Second click should hit the guard (answeredWith !== null  -  return)
     await act(async () => { fireEvent.click(yesButton); });
 
     act(() => { vi.advanceTimersByTime(1200); });
@@ -260,6 +260,8 @@ describe("Attendance prompt", () => {
     const candidate = {
       id: 11,
       title: "Lecture",
+      source: "timetable",
+      external_id: "evt-11",
       start_time: "2026-03-01T10:00:00Z",
       end_time: "2026-03-01T11:00:00Z",
     };
@@ -270,7 +272,14 @@ describe("Attendance prompt", () => {
   });
 
   it("handles candidate polling hook", async () => {
-    const candidate = { id: 11, title: "Timetable Lecture" };
+    const candidate = {
+      id: 11,
+      title: "Timetable Lecture",
+      source: "timetable",
+      external_id: "evt-11",
+      start_time: "2026-03-01T10:00:00Z",
+      end_time: "2026-03-01T11:00:00Z",
+    };
     getEventsMock.mockResolvedValue([candidate]);
     const { useCandidateEvent } = await vi.importActual("../../../components/Attendance/hooks/useCandidateEvent");
 

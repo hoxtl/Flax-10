@@ -5,7 +5,10 @@ Model for tracking user requests to change their enrolled course.
 from django.db import models
 from .user_model import User
 
+
 class CourseChangeRequest(models.Model):
+    """Requested change to a user's recorded course."""
+
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
@@ -26,6 +29,8 @@ class CourseChangeRequest(models.Model):
     resolved_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        """Metadata for course change request."""
+
         ordering = ['-created_at']
 
     def __str__(self):

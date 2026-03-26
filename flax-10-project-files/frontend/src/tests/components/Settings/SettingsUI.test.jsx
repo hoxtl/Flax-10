@@ -12,7 +12,7 @@ import {
   ThemeSelector,
 } from "../../../components/Settings/SettingsUI";
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options, placeholder, grouped }) => {
     const opts = grouped
       ? (options || []).flatMap((g) => g.options || [])

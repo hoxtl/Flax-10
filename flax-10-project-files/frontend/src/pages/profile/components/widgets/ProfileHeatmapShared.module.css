@@ -1,0 +1,23 @@
+/* Shared heatmap link button used across ProfileWidgets and ProfileAttendance */
+.heatmapLinkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--color-border-base) 82%);
+  border-radius: 999px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.heatmapLinkBtn:hover {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  color: var(--text);
+}

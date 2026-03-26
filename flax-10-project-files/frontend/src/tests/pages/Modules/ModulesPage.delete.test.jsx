@@ -19,7 +19,7 @@ vi.mock("../../../pages/Modules/ModulesPageChrome.jsx", () => ({
   getViewKey: () => "modules-list",
 }));
 
-vi.mock("../../../components/common/HoldConfirmModal/HoldConfirmModal.jsx", () => ({
+vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal.jsx", () => ({
   default: ({ title, onConfirm, onCancel }) => (
     <div>
       <span>{title}</span>

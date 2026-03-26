@@ -2,14 +2,14 @@
 """
 Code Quality Checker - BAND V COMPLIANCE
 Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file
-Test files: ≤25 lines for test functions | ≤1 nesting
+Test helpers: ≤20 lines | test functions: ≤25 lines | ≤1 nesting
 
 Python version of check_quality.js
 Usage:
     python check_quality.py [target_dir]
 
 Default target_dir:
-    ../frontend
+    ../backend
 """
 
 from __future__ import annotations
@@ -37,6 +37,7 @@ class FunctionViolation:
     lines: int
     limit: int
     is_test: bool
+    is_test_function: bool
 
 
 @dataclass
@@ -61,7 +62,7 @@ def print_header() -> None:
     print(f"{Colors.BOLD}{Colors.MAGENTA}{title.rjust(50)}{Colors.END}")
     print("=" * 75)
     print("Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file")
-    print("Test files: ≤25 lines for test functions | ≤1 nesting\n")
+    print("Test helpers: ≤20 lines | test functions: ≤25 lines | ≤1 nesting\n")
 
 
 def print_section(number: str, title: str) -> None:
@@ -76,7 +77,7 @@ def print_subsection(title: str) -> None:
 
 def shorten_path(file_path: str) -> str:
     normalized = file_path.replace("\\", "/")
-    normalized = re.sub(r"^\.\./frontend/", "", normalized)
+    normalized = re.sub(r"^\.\./(?:frontend|backend)/", "", normalized)
     return normalized
 
 
@@ -185,7 +186,6 @@ def check_function_length(target_dir: str) -> List[FunctionViolation]:
             return
 
         is_test = is_test_file(file_path)
-        limit = 25 if is_test else 20
 
         try:
             tree = parse_file(file_path)
@@ -196,12 +196,13 @@ def check_function_length(target_dir: str) -> List[FunctionViolation]:
                 if isinstance(fn_node, ast.Lambda):
                     continue
 
+                is_test_function = False
                 if is_test:
                     if is_nested_function(parent_stack):
                         continue
-                    if not is_pytest_test_function(fn_node):
-                        continue
+                    is_test_function = is_pytest_test_function(fn_node)
 
+                limit = 25 if is_test_function else 20
                 lines = count_function_lines(fn_node)
                 if lines > limit:
                     violations.append(
@@ -211,6 +212,7 @@ def check_function_length(target_dir: str) -> List[FunctionViolation]:
                             lines=lines,
                             limit=limit,
                             is_test=is_test,
+                            is_test_function=is_test_function,
                         )
                     )
         except SyntaxError as e:
@@ -286,14 +288,15 @@ def check_nesting(target_dir: str) -> List[NestingViolation]:
 
 
 def main() -> int:
-    target = sys.argv[1] if len(sys.argv) > 1 else "../frontend"
+    target = sys.argv[1] if len(sys.argv) > 1 else "../backend"
 
     print_header()
 
     print_section("1", "FUNCTION LENGTH")
     func_violations = check_function_length(target)
     regular_func = [v for v in func_violations if not v.is_test]
-    test_func = [v for v in func_violations if v.is_test]
+    test_helpers = [v for v in func_violations if v.is_test and not v.is_test_function]
+    test_func = [v for v in func_violations if v.is_test_function]
 
     print_subsection("Regular Files (≤20 lines)")
     if regular_func:
@@ -304,7 +307,16 @@ def main() -> int:
     else:
         print("\n✅ All regular functions within 20 lines\n")
 
-    print_subsection("Test Files (≤25 lines for test_* functions)")
+    print_subsection("Test Helpers (≤20 lines)")
+    if test_helpers:
+        print(f"\n{Colors.RED}❌ {len(test_helpers)} VIOLATION(S){Colors.END}\n")
+        for v in sorted(test_helpers, key=lambda x: x.lines, reverse=True):
+            print(f"{Colors.BOLD}{v.file}{Colors.END}")
+            print(f"  {v.name}() → {Colors.RED}{v.lines} lines{Colors.END} (limit: {v.limit})\n")
+    else:
+        print("\n✅ All test helpers within 20 lines\n")
+
+    print_subsection("Test Functions (≤25 lines for test_* functions)")
     if test_func:
         print(f"\n{Colors.RED}❌ {len(test_func)} VIOLATION(S){Colors.END}\n")
         for v in sorted(test_func, key=lambda x: x.lines, reverse=True):
@@ -353,7 +365,7 @@ def main() -> int:
     total_violations = len(func_violations) + len(file_violations) + len(nest_violations)
     print(
         f"Function Length:  {'❌' if func_violations else '✅'} "
-        f"{len(func_violations)} violation(s) ({len(regular_func)} regular, {len(test_func)} test)"
+        f"{len(func_violations)} violation(s) ({len(regular_func)} regular, {len(test_helpers)} test helper, {len(test_func)} test)"
     )
     print(f"File Length:      {'❌' if file_violations else '✅'} {len(file_violations)} violation(s)")
     print(

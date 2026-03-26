@@ -1,6 +1,10 @@
+"""
+Tests for attendance helpers.
+"""
+
 from unittest.mock import patch, MagicMock
 from django.db import DatabaseError
-from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
 from studyFlax.models import CalendarEvent, EventAttendance, Tag
 from studyFlax.views.calendar.attendance_helpers import (
     _normalize_event_type,
@@ -12,6 +16,7 @@ from datetime import datetime, timedelta, timezone
 
 
 class AttendanceViewTests(BaseTestCase):
+    """Tests attendance view."""
 
     def _create_timetable_event(self, **overrides):
         defaults = {
@@ -133,6 +138,7 @@ class AttendanceViewTests(BaseTestCase):
 
 
 class NormalizeEventTypeTests(BaseTestCase):
+    """Tests normalize event type."""
 
     def test_none_returns_other(self):
         self.assertEqual(_normalize_event_type(None), "Other")
@@ -166,6 +172,7 @@ class NormalizeEventTypeTests(BaseTestCase):
 
 
 class InferTypeFromTitleAndDescTests(BaseTestCase):
+    """Tests infer type from title and desc."""
 
     def _make_event(self, title="", description=""):
         mock = MagicMock()
@@ -205,6 +212,7 @@ class InferTypeFromTitleAndDescTests(BaseTestCase):
 
 
 class EventTypeFromRecordTests(BaseTestCase):
+    """Tests event type from record."""
 
     def test_no_event_attr(self):
         record = MagicMock(spec=[])
@@ -243,6 +251,7 @@ class EventTypeFromRecordTests(BaseTestCase):
 
 
 class BuildAttendanceStatsTests(BaseTestCase):
+    """Tests build attendance stats."""
 
     def test_empty_records(self):
         result = build_attendance_stats([])

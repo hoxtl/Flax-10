@@ -10,11 +10,11 @@ import {
     buildFullName,
 } from '../../pages/Profile/utils/profileHelpers';
 
-vi.mock('../../components/Authentication/utils/userUtils', () => ({
+vi.mock('../../components/Auth/utils/userUtils', () => ({
     getInitials: vi.fn((name) => name.split(' ').map(p => p[0]).join('')),
 }));
 
-import { getInitials } from '../../components/Authentication/utils/userUtils';
+import { getInitials } from '../../components/Auth/utils/userUtils';
 
 const today = new Date('2026-03-08T00:00:00');
 const todayStr = '2026-03-08';

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "../../../../utils/test-utils";
+import { render, screen, fireEvent } from "../../../../utils/testUtils";
 import TaskFilterPanel from "../../../../pages/Tasks/components/TaskFilterPanel";
 
 describe("TaskFilterPanel", () => {

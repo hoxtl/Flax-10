@@ -1,6 +1,11 @@
+/**
+ * Covers Timer page controller state and content branches.
+ */
+
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 const useBreakpoint = vi.fn();
 const useNotificationPermission = vi.fn();
@@ -36,19 +41,19 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => useNavigate,
 }));
 
-vi.mock("../../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ title, children, className }) => <div data-class={className}><h1>{title}</h1>{children}</div>,
 }));
 
-vi.mock("../../../components/common/BackButton/BackButton.jsx", () => ({
+vi.mock("../../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label, className }) => <button type="button" className={className} onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../components/common/PageTransition/PageTransition", () => ({
+vi.mock("../../../components/common/page_transition/PageTransition", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock("../../../components/common/ScrollToTop/ScrollToTop", () => ({
+vi.mock("../../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>scroll-top</div>,
 }));
 
@@ -73,7 +78,7 @@ vi.mock("../../../components/Timer/WrapperComponents", () => ({
   FocusOverlayContent: ({ onExitFocus }) => <button type="button" onClick={onExitFocus}>exit-focus</button>,
 }));
 
-vi.mock("../../../components/ui/word-loader", () => ({
+vi.mock("../../../components/ui/WordLoader", () => ({
   default: ({ words }) => <div>{words.join(",")}</div>,
 }));
 
@@ -115,26 +120,34 @@ const buildTimerFlags = () => ({
   setDismissedWarning: vi.fn(),
 });
 
-const buildTimerState = (overrides = {}) => ({
+const timerStateActionNames = [
+  "request",
+  "setFocusMode",
+  "setShowShortcuts",
+  "setDismissedWarning",
+  "setStreakData",
+  "openFocusMode",
+  "setShowHistory",
+];
+
+const baseTimerState = {
   permission: "default",
-  request: vi.fn(),
   fromTaskPlay: true,
   showFocusTransition: true,
   showPageSkeleton: true,
   focusAccent: "#09f",
   focusMode: true,
-  setFocusMode: vi.fn(),
   showShortcuts: true,
-  setShowShortcuts: vi.fn(),
   streakData: { current_streak_days: 4, total_sessions: 0 },
   dismissedWarning: false,
-  setDismissedWarning: vi.fn(),
-  setStreakData: vi.fn(),
   t: { isActive: true, isPaused: false },
   isMobile: false,
-  openFocusMode: vi.fn(),
   showHistory: true,
-  setShowHistory: vi.fn(),
+};
+
+const buildTimerState = (overrides = {}) => ({
+  ...baseTimerState,
+  ...createFnMap(timerStateActionNames),
   ...overrides,
 });
 
@@ -246,18 +259,24 @@ describe("Timer page extras", () => {
     });
 
     it("handles overlay interactions (history, shortcuts, streak)", () => {
-      const state = buildTimerState({ focusMode: false, showPageSkeleton: false });
-      render(<TimerPageContent state={state} />);
-      fireEvent.click(screen.getByText("open-history"));
-      expect(state.setShowHistory).toHaveBeenCalledWith(true);
-      fireEvent.click(screen.getByText("open-focus"));
-      expect(state.openFocusMode).toHaveBeenCalled();
-      fireEvent.click(screen.getByText("✕"));
-      expect(state.setDismissedWarning).toHaveBeenCalledWith(true);
-      fireEvent.click(screen.getByText("shortcuts"));
-      expect(state.setShowShortcuts).toHaveBeenCalledWith(false);
-      fireEvent.click(screen.getByText("close-history"));
-      expect(state.setShowHistory).toHaveBeenCalledWith(false);
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-03-24T20:00:00.000Z"));
+      try {
+        const state = buildTimerState({ focusMode: false, showPageSkeleton: false });
+        render(<TimerPageContent state={state} />);
+        fireEvent.click(screen.getByText("open-history"));
+        expect(state.setShowHistory).toHaveBeenCalledWith(true);
+        fireEvent.click(screen.getByText("open-focus"));
+        expect(state.openFocusMode).toHaveBeenCalled();
+        fireEvent.click(screen.getByText("✕"));
+        expect(state.setDismissedWarning).toHaveBeenCalledWith(true);
+        fireEvent.click(screen.getByText("shortcuts"));
+        expect(state.setShowShortcuts).toHaveBeenCalledWith(false);
+        fireEvent.click(screen.getByText("close-history"));
+        expect(state.setShowHistory).toHaveBeenCalledWith(false);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("renders back button and skeleton in non-focus mode", () => {

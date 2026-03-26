@@ -1,0 +1,3 @@
+"""
+User seeding view tests.
+"""

@@ -8,7 +8,8 @@ from django.test import TestCase
 from django.utils import timezone
 
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
-from studyFlax.tests.helpers.factories import make_user, make_task
+from studyFlax.tests.helpers.test_model_builders import make_user, make_task
+
 
 class SyncCalendarEventForTaskTest(TestCase):
     """Unit tests for the sync_calendar_event_for_task helper."""

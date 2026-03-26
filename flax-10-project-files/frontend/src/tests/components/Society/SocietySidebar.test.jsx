@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import SocietySidebar from '../../../components/Society/SocietyDetail/SocietySidebar';
+import SocietySidebar from '../../../components/Society/society_detail/SocietySidebar';
 
 vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
   formatDateTime: () => 'Formatted Date',
 }));
 
-vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal', () => ({
+vi.mock('../../../components/Society/society_detail/tabs/announcement_tab/AnnouncementModal', () => ({
   default: ({ onClose, onSubmit, announcements }) => (
     <div>
       <button onClick={() => onSubmit({ title: 'new-announcement' }, announcements?.find((a) => a.pinned))}>submit-announcement</button>
@@ -15,7 +15,7 @@ vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/Announce
   ),
 }));
 
-vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
+vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({
   EventModal: ({ onSubmit, onClose }) => (
     <div>
       <button onClick={() => onSubmit({ title: 'new-event' })}>submit-event</button>

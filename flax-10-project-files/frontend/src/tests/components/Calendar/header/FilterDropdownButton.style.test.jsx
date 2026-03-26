@@ -12,7 +12,7 @@ vi.mock("lucide-react", () => ({
   Tag: () => <span>tag-icon</span>,
 }));
 
-vi.mock("../../../../components/common/TagsSelector/TagsSelector", () => ({
+vi.mock("../../../../components/common/tags_selector/TagsSelector", () => ({
   TagsSelector: () => <div data-testid="tags-selector" />,
 }));
 

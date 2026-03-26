@@ -1,9 +1,27 @@
+/**
+ * Covers CreateTaskModal field and mode behaviour.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 import CreateTaskModal from "../../../../pages/Tasks/components/CreateTaskModal";
 
 const hookMock = vi.hoisted(() => vi.fn());
+const createTaskModalDefaults = {
+  categoryOptions: [{ value: "1", label: "Inbox" }],
+  selectedListColor: "#aaa",
+  sortedModules: [{ id: 10, module_code: "KCL1", module_name: "Alpha" }],
+  showAddToScheduleToggle: true,
+  addToSchedule: false,
+  saveError: "",
+  saving: false,
+  sleepWarning: false,
+  sleepWarningProps: {},
+  isReadingList: false,
+};
 
 vi.mock("../../../../pages/Tasks/hooks/useCreateTaskModal", () => ({
   useCreateTaskModal: hookMock,
@@ -20,7 +38,7 @@ vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ options = [], onChange, placeholder }) => (
     <div data-testid={placeholder}>
       {options.map((option) => (
@@ -32,25 +50,25 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, pill, variant, size, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../../components/common/StandardModal/StandardModal", () => ({
+vi.mock("../../../../components/common/standard_modal/StandardModal", () => ({
   default: ({ children }) => <div data-testid="modal-shell">{children}</div>,
 }));
 
-vi.mock("../../../../components/common/TextInput/TextInput", () => ({
+vi.mock("../../../../components/common/text_input/TextInput", () => ({
   default: ({ multiline, inputClassName, ...props }) =>
     multiline ? <textarea {...props} /> : <input {...props} />,
 }));
 
-function buildState(overrides = {}) {
-  const form = {
+function buildForm(overrides = {}) {
+  return {
     title: "Task",
     description: "Desc",
     due_date: "2026-03-09T09:00",
@@ -58,28 +76,20 @@ function buildState(overrides = {}) {
     task_list: "1",
     priority: "",
     module: "",
+    ...overrides,
   };
+}
+
+function buildState(overrides = {}) {
+  const { form, ...rest } = overrides;
+  const nextForm = buildForm(form);
   return {
     isEditMode: false,
-    onClose: vi.fn(),
-    form,
-    set: vi.fn(),
-    setForm: vi.fn((updater) => (typeof updater === "function" ? updater(form) : updater)),
-    categoryOptions: [{ value: "1", label: "Inbox" }],
-    selectedListColor: "#aaa",
-    handleCategoryChange: vi.fn(),
-    sortedModules: [{ id: 10, module_code: "KCL1", module_name: "Alpha" }],
-    showAddToScheduleToggle: true,
-    addToSchedule: false,
-    setAddToSchedule: vi.fn(),
-    saveError: "",
-    saving: false,
-    handleSave: vi.fn(),
-    handleDelete: vi.fn(),
-    sleepWarning: false,
-    sleepWarningProps: {},
-    isReadingList: false,
-    ...overrides,
+    form: nextForm,
+    ...createFnMap(["onClose", "set", "handleCategoryChange", "setAddToSchedule", "handleSave", "handleDelete"]),
+    setForm: vi.fn((updater) => (typeof updater === "function" ? updater(nextForm) : updater)),
+    ...createTaskModalDefaults,
+    ...rest,
   };
 }
 

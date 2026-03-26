@@ -106,15 +106,13 @@ describe('useReminderNotifications', () => {
 
   it('should handle localStorage errors gracefully', () => {
     localStorageMock.setItem.mockImplementation(() => { throw new Error('QuotaExceeded'); });
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.setSystemTime(new Date('2024-03-15T09:59:00Z'));
     const event = { id: 1, title: 'Event', start_time: '2024-03-15T10:05:00Z', reminder_minutes: [5] };
     mockEvents.push(event);
     renderHook(() => useReminderNotifications(mockEvents));
     act(() => vi.advanceTimersByTime(120000));
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to save sent reminders', expect.any(Error));
+    expect(mockAddNotification).toHaveBeenCalledWith(expect.objectContaining({ title: 'Reminder: Event' }));
     localStorageMock.setItem.mockReset();
-    consoleSpy.mockRestore();
   });
 
   it('should handle corrupted localStorage gracefully', () => {

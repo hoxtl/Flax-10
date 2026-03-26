@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useTagManagerModal from '../../../components/Tags/tagManager/useTagManagerModal';
+import useTagManagerModal from '../../../components/Tags/tag_manager/useTagManagerModal';
 
 const mockTags = [
   { id: 1, label: 'Work', color: '#ff0000' },

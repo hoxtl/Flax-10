@@ -9,7 +9,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../../components/common/app_page/AppPage", () => ({
   default: ({ children, title, action }) => (
     <div>
       <h1>{title}</h1>
@@ -19,7 +19,7 @@ vi.mock("../../../components/common/AppPage/AppPage", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description, action }) => (
     <div>
       <div>{title}</div>
@@ -29,7 +29,7 @@ vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
+vi.mock("../../../components/common/page_toolbar/PageToolbar", () => ({
   default: ({ searchSlot, controlsSlot }) => (
     <div>
       <div data-testid="toolbar-search">{searchSlot}</div>
@@ -39,15 +39,15 @@ vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
   ToolbarSortControl: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
 }));
 
-vi.mock("../../../components/common/PageTransition/PageTransition.jsx", () => ({
+vi.mock("../../../components/common/page_transition/PageTransition.jsx", () => ({
   default: ({ children }) => <div data-testid="page-transition">{children}</div>,
 }));
 
-vi.mock("../../../components/common/SearchBar/SearchBar.jsx", () => ({
+vi.mock("../../../components/common/search_bar/SearchBar.jsx", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} />
   ),
@@ -66,7 +66,7 @@ vi.mock("../../../components/common/Tabs/Tabs", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/SegmentedControl/SegmentedControl", () => ({
+vi.mock("../../../components/common/segmented_control/SegmentedControl", () => ({
   SegmentedControl: ({ options, value, onChange }) => (
     <div>
       <div data-testid="segment-value">{value}</div>
@@ -79,7 +79,7 @@ vi.mock("../../../components/common/SegmentedControl/SegmentedControl", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState.jsx", () => ({
+vi.mock("../../../components/common/search_empty_state/SearchEmptyState.jsx", () => ({
   default: ({ title, hint, onClear, clearLabel }) => (
     <div>
       <div>{title || "search-empty"}</div>

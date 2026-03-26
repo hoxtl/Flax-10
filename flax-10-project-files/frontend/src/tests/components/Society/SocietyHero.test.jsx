@@ -6,7 +6,7 @@ vi.mock('../../../components/Society/hooks/useCarouselNavigation', () => ({
     useCarouselGestures: vi.fn(),
 }));
 
-import SocietyHero from '../../../components/Society/SocietyDetail/SocietyHero';
+import SocietyHero from '../../../components/Society/society_detail/SocietyHero';
 import { useCarouselNavigation } from '../../../components/Society/hooks/useCarouselNavigation';
 
 const baseSociety = {

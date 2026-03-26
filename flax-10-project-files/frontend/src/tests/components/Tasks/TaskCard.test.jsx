@@ -36,7 +36,7 @@ vi.mock('../../../api/userApi', () => ({
 vi.mock('../../../api/readingApi', () => ({
     getReadingSpeed: (...args) => getReadingSpeedMock(...args),
 }));
-vi.mock('../../../components/common/SleepWarningModal', () => ({
+vi.mock('../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
@@ -56,10 +56,10 @@ vi.mock('../../../pages/Tasks/components/CreateTaskModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/TaskCelebration/CheckBurst', () => ({
+vi.mock('../../../components/task_celebration/CheckBurst', () => ({
     CheckBurst: ({ children }) => <div data-testid="check-burst">{children}</div>,
 }));
-vi.mock('../../../components/common/AnimatedDropdown/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <div data-testid="animated-dropdown">
             {(options || []).map(o => (
@@ -364,6 +364,7 @@ describe('TaskContextMenu', () => {
         render(<TaskContextMenu {...menuProps} onEdit={onEdit} />);
         fireEvent.click(screen.getByText('Set due date'));
         fireEvent.change(screen.getByTestId('date-picker'), { target: { value: '2026-03-12T09:00' } });
+        fireEvent.click(screen.getByText('Set date'));
         await waitFor(() => expect(onEdit).toHaveBeenCalledWith(
             { due_date: '2026-03-12T09:00' },
             { source: 'context-menu', action: 'set-due-date', dueDate: '2026-03-12T09:00' },

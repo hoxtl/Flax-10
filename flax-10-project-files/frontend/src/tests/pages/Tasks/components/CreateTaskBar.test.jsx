@@ -2,6 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import CreateTaskBar from "../../../../pages/Tasks/components/CreateTaskBar";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const hookMock = vi.hoisted(() => vi.fn());
 
@@ -9,11 +10,11 @@ vi.mock("../../../../pages/Tasks/hooks/useCreateTaskBar", () => ({
   default: hookMock,
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options, placeholder }) => (
     <select aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)}>
       {options.map((option) => (
@@ -23,29 +24,39 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
+const taskBarActionNames = [
+  "setTitle",
+  "setInputFocused",
+  "handleInputBlur",
+  "handleInputKeyDown",
+  "setEstimatedMinutes",
+  "setModuleId",
+  "setTaskListId",
+  "setListError",
+];
+
+const baseTaskBarState = {
+  cardRef: { current: null },
+  title: "",
+  saving: false,
+  inputRef: { current: null },
+  showOptions: true,
+  estimatedMinutes: 25,
+  moduleId: "",
+  taskListId: "",
+  sortedLists: [{ id: 1, name: "Inbox" }],
+  moduleOptions: [{ value: "", label: "None" }],
+  listOptions: [{ value: "1", label: "Inbox" }],
+  sleepWarning: false,
+  sleepWarningProps: {},
+  listError: false,
+};
+
 function state(overrides = {}) {
   return {
+    ...baseTaskBarState,
+    ...createFnMap(taskBarActionNames),
     handleSubmit: vi.fn((e) => e?.preventDefault?.()),
-    cardRef: { current: null },
-    title: "",
-    setTitle: vi.fn(),
-    saving: false,
-    inputRef: { current: null },
-    setInputFocused: vi.fn(),
-    handleInputBlur: vi.fn(),
-    handleInputKeyDown: vi.fn(),
-    showOptions: true,
-  estimatedMinutes: 25,
-  setEstimatedMinutes: vi.fn(),
-    moduleId: "",
-    setModuleId: vi.fn(),
-    taskListId: "",
-    setTaskListId: vi.fn(),
-    sortedLists: [{ id: 1, name: "Inbox" }],
-    moduleOptions: [{ value: "", label: "None" }],
-    listOptions: [{ value: "1", label: "Inbox" }],
-    sleepWarning: false,
-    sleepWarningProps: {},
     ...overrides,
   };
 }
@@ -97,5 +108,12 @@ describe("CreateTaskBar", () => {
     fireEvent.change(screen.getByLabelText("Select list"), { target: { value: "" } });
     expect(s.setModuleId).toHaveBeenCalledWith(null);
     expect(s.setTaskListId).toHaveBeenCalledWith(1);
+  });
+
+  it("renders the list dropdown in its error state", () => {
+    hookMock.mockReturnValue(state({ listError: true }));
+    render(<CreateTaskBar inputRef={{ current: null }} />);
+    expect(screen.getByText("*")).toBeInTheDocument();
+    expect(screen.getByLabelText("Select list")).toBeInTheDocument();
   });
 });

@@ -1,3 +1,7 @@
+/**
+ * Covers supplemental timer hook paths and dynamic timer-logic mocks.
+ */
+
 import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
@@ -225,9 +229,13 @@ function buildHandlersTimer() {
   };
 }
 
-async function mockTimerLogic() {
-  vi.resetModules();
-  const timerState = {
+const timerLogicProps = {
+  activeTaskId: 7,
+  meta: { title: "Essay draft", estimatedWorkMinutes: 45, estimatedSessionCount: 3 },
+};
+
+function buildTimerLogicState() {
+  return {
     timeLeft: 0,
     mode: "work",
     updateTime: vi.fn(),
@@ -238,39 +246,51 @@ async function mockTimerLogic() {
     breakTime: 5,
     targetSessions: 4,
   };
-  const flowState = {
+}
+
+function buildFlowState() {
+  return {
     modal: "goal",
     setModal: vi.fn(),
     startNext: vi.fn(),
     resetBlockId: vi.fn(),
     endEarly: vi.fn(),
   };
-  const handlers = { break: vi.fn() };
-  const notify = vi.fn();
+}
+
+function mockTimerLogicModules(notify, timerState, flowState, handlers) {
   vi.doMock("../../../components/Notifications/hooks/useNotify", () => ({ useNotify: () => notify }));
   vi.doMock("../../../components/Timer/hooks/useTimer", () => ({ useTimer: () => timerState }));
   vi.doMock("../../../components/Timer/hooks/useTimerFlow", () => ({ useTimerFlow: vi.fn(() => flowState) }));
   vi.doMock("../../../components/Timer/hooks/useTimerHandlers", () => ({ useTimerHandlers: vi.fn(() => handlers) }));
+}
+
+async function renderTimerLogic() {
   const { useTimerLogic } = await import("../../../components/Timer/hooks/useTimerLogic");
-  const initialProps = {
-    activeTaskId: 7,
-    meta: { title: "Essay draft", estimatedWorkMinutes: 45, estimatedSessionCount: 3 },
-  };
-  const renderState = renderHook(({ activeTaskId, meta }) => useTimerLogic(activeTaskId, vi.fn(), meta), {
-    initialProps,
-  });
-  let currentProps = initialProps;
-  const rerender = async (props) => {
+  return renderHook(({ activeTaskId, meta }) => useTimerLogic(activeTaskId, vi.fn(), meta), { initialProps: timerLogicProps });
+}
+
+function createRerender(renderState) {
+  let currentProps = timerLogicProps;
+  return async (props) => {
     currentProps = props || currentProps;
-    await act(async () => {
-      renderState.rerender(currentProps);
-    });
+    await act(async () => { renderState.rerender(currentProps); });
   };
-  const cleanup = () => {
-    vi.doUnmock("../../../components/Notifications/hooks/useNotify");
-    vi.doUnmock("../../../components/Timer/hooks/useTimer");
-    vi.doUnmock("../../../components/Timer/hooks/useTimerFlow");
-    vi.doUnmock("../../../components/Timer/hooks/useTimerHandlers");
-  };
-  return { result: renderState.result, rerender, timerState, cleanup };
+}
+
+function unmockTimerLogicModules() {
+  vi.doUnmock("../../../components/Notifications/hooks/useNotify");
+  vi.doUnmock("../../../components/Timer/hooks/useTimer");
+  vi.doUnmock("../../../components/Timer/hooks/useTimerFlow");
+  vi.doUnmock("../../../components/Timer/hooks/useTimerHandlers");
+}
+
+async function mockTimerLogic() {
+  vi.resetModules();
+  const timerState = buildTimerLogicState();
+  const flowState = buildFlowState();
+  const handlers = { break: vi.fn() };
+  mockTimerLogicModules(vi.fn(), timerState, flowState, handlers);
+  const renderState = await renderTimerLogic();
+  return { result: renderState.result, rerender: createRerender(renderState), timerState, cleanup: unmockTimerLogicModules };
 }

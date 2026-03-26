@@ -13,7 +13,10 @@ from studyFlax.serialisers.common import (
     is_user_sharing_with,
 )
 
+
 class RegistrationUserSerialiser(serializers.Serializer):
+    """Serialiser for registration user."""
+
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
@@ -37,6 +40,8 @@ class RegistrationUserSerialiser(serializers.Serializer):
         return email_value
 
 class UserSerialiser(serializers.ModelSerializer):
+    """Serialiser for user."""
+
     name = serializers.SerializerMethodField()
     year = serializers.SerializerMethodField()
     major = serializers.SerializerMethodField()
@@ -52,6 +57,8 @@ class UserSerialiser(serializers.ModelSerializer):
     study_streak = serializers.SerializerMethodField(method_name='get_study_hours_this_week')
 
     class Meta:
+        """Metadata for user serialiser."""
+
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
@@ -125,5 +132,7 @@ UserSerialiser.get_modules = UserSerialiser._get_modules
 UserSerialiser.get_study_hours_this_week = UserSerialiser._get_study_hours_this_week
 
 class LoggedUserSerialiser(serializers.Serializer):
+    """Serialiser for logged user."""
+
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)

@@ -70,8 +70,8 @@ vi.mock('../../../pages/Homepage/components/DeadlinesWidget', async () => {
 });
 vi.mock('../../../pages/Homepage/components/SleepBanner', () => ({ __esModule: true, default: () => <div data-testid="sleep-banner">sleep</div> }));
 vi.mock('../../../components/Calendar/EventPopups', () => ({ EventPopups: () => <div data-testid="event-popups" /> }));
-vi.mock('../../../components/common/BackToTop/BackToTop', () => ({ __esModule: true, default: () => <div data-testid="back-to-top" /> }));
-vi.mock('../../../components/Tags/PillFilters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
+vi.mock('../../../components/common/back_to_top/BackToTop', () => ({ __esModule: true, default: () => <div data-testid="back-to-top" /> }));
+vi.mock('../../../components/Tags/pill_filters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
 vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   const actual = await vi.importActual('../../../pages/Tasks/components/TaskCard');
   const { EditTaskModalMock } = await import('./homepageMocks');

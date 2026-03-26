@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import RequestStatusCard from "../../../components/common/RequestStatusCard/RequestStatusCard";
+import RequestStatusCard from "../../../components/common/request_status_card/RequestStatusCard";
 
 describe("RequestStatusCard", () => {
   it("renders the full card state and calls cancel", () => {

@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { ViewSwitcher } from "../../../../components/Calendar/header/CalendarHeaderUtils";
 
 vi.mock(
-  "../../../../components/common/SegmentedControl/SegmentedControl",
+  "../../../../components/common/segmented_control/SegmentedControl",
   () => ({
     SegmentedControl: function MockSegmentedControl({
       value,

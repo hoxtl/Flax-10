@@ -5,7 +5,7 @@ vi.mock('../../../components/Society/hooks/useSocietyCalendarSync', () => ({
     useSocietyCalendarSync: vi.fn(() => ({ isSynced: false, loading: false, toggleSync: vi.fn() })),
 }));
 
-import SyncButton from '../../../components/Society/SocietyDetail/tabs/calendarTab/SyncButton';
+import SyncButton from '../../../components/Society/society_detail/tabs/calendar_tab/SyncButton';
 import { useSocietyCalendarSync } from '../../../components/Society/hooks/useSocietyCalendarSync';
 
 describe('SyncButton', () => {

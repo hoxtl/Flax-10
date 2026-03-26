@@ -1,10 +1,13 @@
+/**
+ * Covers TimerCircle controls, styling, and TimerRing rendering.
+ */
+
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { createFnMap } from '../../utils/testBuilderUtils';
 
-// ---------------------------------------------------------------------------
 // CSS module mocks
-// ---------------------------------------------------------------------------
 vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
@@ -12,9 +15,7 @@ vi.mock('../../../components/Timer/TreeAnimation.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-// ---------------------------------------------------------------------------
 // Dependency mocks for TimerCircle
-// ---------------------------------------------------------------------------
 vi.mock('../../../components/Timer/FocusAnimation', () => ({
   default: ({ progress, mode, isActive, showPicker }) => (
     <div data-testid="focus-animation" data-progress={progress} data-mode={mode} data-active={String(isActive)} data-showpicker={String(showPicker)} />
@@ -27,9 +28,7 @@ vi.mock('../../../components/Timer/TimerComponents', () => ({
   ),
 }));
 
-// ---------------------------------------------------------------------------
 // Canvas mock for FocusAnimation real tests
-// ---------------------------------------------------------------------------
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   clearRect: vi.fn(),
   beginPath: vi.fn(),
@@ -40,40 +39,25 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 vi.stubGlobal('requestAnimationFrame', vi.fn(() => 0));
 vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
-// ---------------------------------------------------------------------------
 // Imports under test
-// ---------------------------------------------------------------------------
 import TimerCircle, { TimerRing } from '../../../components/Timer/TimerCircle';
 import FocusAnimation from '../../../components/Timer/FocusAnimation';
 
-// ---------------------------------------------------------------------------
 // Helper timer state
-// ---------------------------------------------------------------------------
+const timerActionNames = ['setIsActive', 'togglePause', 'resetTimer', 'setModal'];
+const baseTimerProps = {
+  mode: 'work', workTime: 25, breakTime: 5, timeLeft: 1500, progress: 50,
+  isActive: false, isPaused: false, isOvertime: false, isBreakOvertime: false,
+  completedSessions: 0, targetSessions: 4, blockTotalWork: 0, blockTotalBreak: 0, totalPaused: 0,
+};
+
 const makeT = (overrides = {}) => ({
-  mode: 'work',
-  workTime: 25,
-  breakTime: 5,
-  timeLeft: 1500,
-  progress: 50,
-  isActive: false,
-  isPaused: false,
-  isOvertime: false,
-  isBreakOvertime: false,
-  completedSessions: 0,
-  targetSessions: 4,
-  blockTotalWork: 0,
-  blockTotalBreak: 0,
-  totalPaused: 0,
-  setIsActive: vi.fn(),
-  togglePause: vi.fn(),
-  resetTimer: vi.fn(),
-  setModal: vi.fn(),
+  ...baseTimerProps,
+  ...createFnMap(timerActionNames),
   ...overrides,
 });
 
-// ---------------------------------------------------------------------------
 // TimerCircle
-// ---------------------------------------------------------------------------
 
 describe('TimerCircle', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -209,9 +193,7 @@ describe('TimerCircle', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // TimerRing
-// ---------------------------------------------------------------------------
 
 describe('TimerRing', () => {
   it('renders SVG ring', () => {
@@ -241,9 +223,7 @@ describe('TimerRing', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // FocusAnimation – showPicker=false branch
-// ---------------------------------------------------------------------------
 
 describe('FocusAnimation – showPicker=false', () => {
   beforeEach(() => {

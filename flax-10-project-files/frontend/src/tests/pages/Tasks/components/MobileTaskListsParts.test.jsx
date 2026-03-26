@@ -7,7 +7,7 @@ import {
   MobileListSection,
 } from "../../../../pages/Tasks/components/MobileTaskListsParts";
 
-vi.mock("../../../../components/common/EmptyState/EmptyState", () => ({
+vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   default: ({ icon, title, description }) => (
     <div data-testid="empty-state">
       <span>{icon}</span>

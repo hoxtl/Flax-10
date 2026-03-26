@@ -17,7 +17,7 @@ vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     TYPES_WITH_LOCATION: ['exam', 'presentation'],
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}

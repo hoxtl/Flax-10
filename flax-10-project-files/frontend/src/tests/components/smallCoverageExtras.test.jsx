@@ -40,7 +40,7 @@ vi.mock("../../components/Analytics/attendanceChartConfig", () => ({
   getAttendanceSeries: (types, byType) => [{ types, byType }],
 }));
 
-import { CampusQuickNav } from "../../components/CampusMap/CampusQuickNav";
+import { CampusQuickNav } from "../../components/campus_map/CampusQuickNav";
 import AttendanceBarChart from "../../components/Analytics/AttendanceBarChart";
 import AppearanceSection from "../../components/Settings/preferences/AppearanceSection";
 import RequestDecisionNotice from "../../components/Settings/ui/RequestDecisionNotice";

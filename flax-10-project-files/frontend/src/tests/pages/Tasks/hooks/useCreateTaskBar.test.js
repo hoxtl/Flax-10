@@ -19,6 +19,7 @@ import useCreateTaskBar from "../../../../pages/Tasks/hooks/useCreateTaskBar";
 import { getModules, getEnrollments } from "../../../../api/moduleApi";
 import { getUserSettings } from "../../../../api/userApi";
 import { runQuickAdd } from "../../../../pages/Tasks/utils/createTaskBarUtils";
+import { createRejectablePromise } from "./taskHookTestUtils";
 
 describe("useCreateTaskBar", () => {
   beforeEach(() => {
@@ -83,6 +84,27 @@ describe("useCreateTaskBar", () => {
     await act(async () => result.current.handleSubmit({ preventDefault: vi.fn() }));
     expect(runQuickAdd).not.toHaveBeenCalled();
     expect(result.current.taskListId).toBe(2);
+  });
+
+  it("marks the list field invalid when submitting without a selected list", async () => {
+    const { result } = renderHook(() =>
+      useCreateTaskBar({
+        lists: [],
+        onAddTask: vi.fn(),
+      }),
+    );
+
+    act(() => {
+      result.current.setTitle("Read chapter");
+      result.current.setTaskListId("");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit({ preventDefault: vi.fn() });
+    });
+
+    expect(result.current.listError).toBe(true);
+    expect(runQuickAdd).not.toHaveBeenCalled();
   });
 
   it("closes on outside clicks", () => {
@@ -257,12 +279,8 @@ describe("useCreateTaskBar", () => {
   });
 
   it("ignores rejected sleep-setting results after unmount", async () => {
-    let rejectSettings;
-    getUserSettings.mockReturnValueOnce(
-      new Promise((_, reject) => {
-        rejectSettings = reject;
-      }),
-    );
+    const { promise, rejectPromise } = createRejectablePromise();
+    getUserSettings.mockReturnValueOnce(promise);
 
     const { unmount } = renderHook(() =>
       useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], onAddTask: vi.fn() }),
@@ -271,7 +289,7 @@ describe("useCreateTaskBar", () => {
     unmount();
 
     await act(async () => {
-      rejectSettings(new Error("late settings failure"));
+      rejectPromise(new Error("late settings failure"));
       await Promise.resolve();
     });
   });

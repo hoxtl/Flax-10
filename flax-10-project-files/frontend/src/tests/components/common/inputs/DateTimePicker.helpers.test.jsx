@@ -79,7 +79,9 @@ describe('DateTimePicker helpers', () => {
 
     navigateMonth(-1, 0, setViewM, setViewY);
     navigateMonth(1, 11, setViewM, setViewY);
+    navigateMonth(-1, 5, setViewM, setViewY);
+    navigateMonth(1, 5, setViewM, setViewY);
     expect(setViewY).toHaveBeenCalledTimes(2);
-    expect(setViewM).toHaveBeenCalled();
+    expect(setViewM).toHaveBeenCalledTimes(4);
   });
 });

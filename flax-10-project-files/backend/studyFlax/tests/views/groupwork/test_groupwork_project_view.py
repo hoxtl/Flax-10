@@ -1,3 +1,7 @@
+"""
+Tests for groupwork project views.
+"""
+
 from datetime import timedelta
 
 from rest_framework import status
@@ -6,8 +10,8 @@ from django.utils import timezone
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.models.tasks.task_model import Task
-from studyFlax.tests.helpers.base import BaseTestCase
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
+from studyFlax.tests.helpers.test_model_builders import make_user
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -23,8 +27,9 @@ def _add_members(project, count, prefix="member"):
         added.append(user)
     return added
 
-
 class GroupProjectListTests(BaseTestCase):
+    """Tests group project list."""
+
     def test_create_project(self):
         teammates = [
             make_user(f"alpha_teammate_{index}", f"alpha_teammate_{index}@example.com")
@@ -206,8 +211,9 @@ class GroupProjectListTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 12)
 
-
 class GroupProjectDetailTests(BaseTestCase):
+    """Tests group project detail."""
+
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -253,8 +259,9 @@ class GroupProjectDetailTests(BaseTestCase):
         res = self.client.delete(f"/api/group-work/projects/{self.project.id}/")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-
 class GroupProjectMembersTests(BaseTestCase):
+    """Tests group project members."""
+
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -324,8 +331,8 @@ class GroupProjectMembersTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(GroupMembership.objects.filter(id=membership.id).exists())
 
-
 class GroupProjectViewHelpersTest(BaseTestCase):
+    """Tests group project view helpers."""
 
     def test_create_project_with_future_deadline_succeeds(self):
         future = (timezone.localdate() + timedelta(days=7)).isoformat()

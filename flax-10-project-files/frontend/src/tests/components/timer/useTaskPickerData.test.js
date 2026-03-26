@@ -11,7 +11,7 @@ vi.mock('../../../api/moduleApi', () => ({
   getEnrollments: vi.fn(),
 }));
 
-vi.mock('../../../components/Timer/taskInput/taskInputUtils', () => ({
+vi.mock('../../../components/Timer/task_input/taskInputUtils', () => ({
   buildListItems: vi.fn((lists) => lists.map((l) => ({ id: String(l.id), label: l.name }))),
   buildModuleItems: vi.fn(() => []),
   filterListItems: vi.fn((items) => items),
@@ -23,13 +23,13 @@ vi.mock('../../../components/Timer/taskInput/taskInputUtils', () => ({
   sortTasks: vi.fn((tasks) => tasks),
 }));
 
-vi.mock('../../../components/Timer/taskInput/taskInputConstants', () => ({
+vi.mock('../../../components/Timer/task_input/taskInputConstants', () => ({
   SORT_URGENCY: 'urgency',
 }));
 
 import { fetchTasks, fetchTaskLists } from '../../../api/taskApi';
 import { getModules, getEnrollments } from '../../../api/moduleApi';
-import { useTaskPickerData } from '../../../components/Timer/taskInput/useTaskPickerData';
+import { useTaskPickerData } from '../../../components/Timer/task_input/useTaskPickerData';
 
 const TASKS = [{ id: 1, title: 'Task A', completed: false }];
 const LISTS = [{ id: 1, name: 'Work', color: '#000' }];
@@ -215,6 +215,23 @@ describe('useTaskPickerData – outside close', () => {
 
     wrap.remove();
     outside.remove();
+  });
+
+  it('keeps the picker open when the click lands inside the mounted ref element', () => {
+    const { result } = renderHook(() => useTaskPickerData());
+    const wrap = document.createElement('div');
+    const inside = document.createElement('button');
+    wrap.appendChild(inside);
+    document.body.appendChild(wrap);
+    result.current.ref.current = wrap;
+
+    act(() => result.current.setOpen(true));
+    act(() => {
+      inside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+    expect(result.current.open).toBe(true);
+
+    wrap.remove();
   });
 
   it('does not add a mousedown listener when open is false', () => {

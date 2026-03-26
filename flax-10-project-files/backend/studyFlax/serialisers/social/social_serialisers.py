@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from studyFlax.models.social.share_model import CalendarShare
 from studyFlax.serialisers.common import build_profile_photo_url, is_shared_with_requester, is_user_sharing_with
 
+
 User = get_user_model()
 
 class CalendarShareUserSerialiser(serializers.ModelSerializer):
@@ -17,6 +18,8 @@ class CalendarShareUserSerialiser(serializers.ModelSerializer):
     profile_photo_url = serializers.SerializerMethodField()
 
     class Meta:
+        """Metadata for calendar share user serialiser."""
+
         model = User
         fields = (
             "id",
@@ -41,13 +44,14 @@ class CalendarShareSerialiser(serializers.ModelSerializer):
     """Serialiser purely representing the CalendarShare relationship."""
 
     class Meta:
+        """Metadata for calendar share serialiser."""
+
         model = CalendarShare
         fields = ("id", "owner", "shared_with", "created_at")
         read_only_fields = ("owner",)
 
     def _validate(self, data):
         """Ensure a user cannot share with themselves."""
-
         request = self.context.get("request")
         if request and request.user == data.get("shared_with"):
             raise serializers.ValidationError("You cannot share your calendar with yourself.")
@@ -55,7 +59,6 @@ class CalendarShareSerialiser(serializers.ModelSerializer):
 
     def _create(self, validated_data):
         """Automatically set the owner to the current user."""
-
         request = self.context.get("request")
         validated_data["owner"] = request.user
         return super().create(validated_data)

@@ -1,3 +1,7 @@
+"""
+Tests for calendar event serialisers.
+"""
+
 import json
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -9,13 +13,12 @@ from studyFlax.serialisers.calendar.event_serialisers import (
 from datetime import timedelta
 from django.utils import timezone
 
+
 User = get_user_model()
 
 
 class CalendarEventSerialiserTests(TestCase):
-    """
-    Tests for calendar event serializers with location fields.
-    """
+    """Tests for calendar event serializers with location fields."""
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')
@@ -60,6 +63,7 @@ class CalendarEventSerialiserTests(TestCase):
 
 
 class CalendarEventCreateSerialiserTests(TestCase):
+    """Tests calendar event create serialiser."""
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')

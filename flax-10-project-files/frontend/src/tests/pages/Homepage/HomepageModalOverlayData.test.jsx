@@ -1,6 +1,12 @@
+/**
+ * Covers Homepage modal, overlay, and semester-data branches.
+ */
+
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 const navigateMock = vi.fn();
 const createTask = vi.fn();
@@ -90,25 +96,24 @@ import { HomepageOverlays } from "../../../pages/Homepage/components/HomepageOve
 import { useSemesterData, useSemesterRange } from "../../../pages/Homepage/components/useSemesterOverviewData";
 
 const styles = new Proxy({}, { get: (_, key) => key });
+const overlayModule = { id: 7, module_code: "CS101", module_name: "Algorithms", description: "A".repeat(140), module_leader: "Dr Ada", department: "Computing" };
+const overlayDeadline = { title: "Essay", module_code: "CS101", deadline_type: "exam", location: "Bush House", start_due_date: "2026-03-30T10:00:00.000Z", module_id: 7, description: "Submit online" };
+const modalActionNames = ["refetchTasks", "setLastCreatedListId", "setPlanTimelineReadItem", "setRescheduleTask", "setShowCreateListFromTask", "setShowCreateTaskModal", "setTaskLists", "showToast", "openModal"];
+
+const createAsyncModalActions = () => ({
+  addEvent: vi.fn().mockResolvedValue(undefined),
+  createTask: vi.fn().mockResolvedValue({ id: 10, title: "Breakfast prep", description: "Cook" }),
+  createTaskList: vi.fn().mockResolvedValue({ id: 22 }),
+  deleteTask: vi.fn().mockResolvedValue(undefined),
+  fetchTaskLists: vi.fn().mockResolvedValue([{ id: 22, name: "Weekend" }]),
+  updateTask: vi.fn().mockResolvedValue(undefined),
+  handleTimelineDelete: vi.fn().mockResolvedValue(undefined),
+});
 
 function buildModalProps(overrides = {}) {
   return {
-    addEvent: vi.fn().mockResolvedValue(undefined),
-    createTask: vi.fn().mockResolvedValue({ id: 10, title: "Breakfast prep", description: "Cook" }),
-    createTaskList: vi.fn().mockResolvedValue({ id: 22 }),
-    deleteTask: vi.fn().mockResolvedValue(undefined),
-    fetchTaskLists: vi.fn().mockResolvedValue([{ id: 22, name: "Weekend" }]),
-    refetchTasks: vi.fn(),
-    setLastCreatedListId: vi.fn(),
-    setPlanTimelineReadItem: vi.fn(),
-    setRescheduleTask: vi.fn(),
-    setShowCreateListFromTask: vi.fn(),
-    setShowCreateTaskModal: vi.fn(),
-    setTaskLists: vi.fn(),
-    showToast: vi.fn(),
-    updateTask: vi.fn().mockResolvedValue(undefined),
-    openModal: vi.fn(),
-    handleTimelineDelete: vi.fn().mockResolvedValue(undefined),
+    ...createAsyncModalActions(),
+    ...createFnMap(modalActionNames),
     taskLists: [],
     enrolledModules: [],
     tags: [{ id: 99, label: "Routine" }],
@@ -132,27 +137,10 @@ function renderHomepageModals(overrides = {}) {
 function buildOverlayProps(overrides = {}) {
   return {
     styles,
-    enrolledModules: [
-      {
-        id: 7,
-        module_code: "CS101",
-        module_name: "Algorithms",
-        description: "A".repeat(140),
-        module_leader: "Dr Ada",
-        department: "Computing",
-      },
-    ],
+    enrolledModules: [overlayModule],
     selectedModulePill: { id: 7, code: "CS101" },
     setSelectedModulePill: vi.fn(),
-    selectedDeadline: {
-      title: "Essay",
-      module_code: "CS101",
-      deadline_type: "exam",
-      location: "Bush House",
-      start_due_date: "2026-03-30T10:00:00.000Z",
-      module_id: 7,
-      description: "Submit online",
-    },
+    selectedDeadline: overlayDeadline,
     setSelectedDeadline: vi.fn(),
     ...overrides,
   };

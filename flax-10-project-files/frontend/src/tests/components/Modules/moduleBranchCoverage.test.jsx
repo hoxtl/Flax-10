@@ -17,7 +17,7 @@ vi.mock("../../../components/Modules/utils/moduleUtils.js", () => ({
   normaliseModuleCode: (...args) => normaliseModuleCodeMock(...args),
 }));
 
-vi.mock("../../../components/Authentication/utils/userUtils.js", () => ({
+vi.mock("../../../components/Auth/utils/userUtils.js", () => ({
   getInitials: (name) => (name ? name.split(" ").map((part) => part[0]).join("") : "T"),
 }));
 
@@ -36,11 +36,11 @@ vi.mock("../../../components/common/Card/GridCard", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../components/common/EntityLinkChip/EntityLinkChip.jsx", () => ({
+vi.mock("../../../components/common/entity_link_chip/EntityLinkChip.jsx", () => ({
   default: ({ children, to }) => <a href={to}>{children}</a>,
 }));
 

@@ -42,7 +42,7 @@ export const mockSocialComponents = () => {
     ),
   }));
 
-  vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+  vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
     default: ({ children, onClick, ...rest }) => (
       <button onClick={onClick} {...rest}>
         {children}

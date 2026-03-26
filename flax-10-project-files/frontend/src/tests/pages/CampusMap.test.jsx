@@ -79,7 +79,7 @@ vi.mock('../../api/geocodeApi', () => ({
     geocodeAddress: vi.fn().mockResolvedValue({ latitude: 51.5, longitude: -0.1 }),
 }));
 
-import CampusMap from '../../pages/CampusMap/CampusMap';
+import CampusMap from '../../pages/campus_map/CampusMap';
 import { getHomeAddress } from '../../api/userApi';
 import { tflService } from '../../api/tflApi';
 

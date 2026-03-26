@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent } from "@testing-library/react";
 
-import { render, screen } from "../../../utils/test-utils";
+import { render, screen } from "../../../utils/testUtils";
 
 const dismissAttendancePromptMock = vi.fn();
 const submitAttendancePromptAnswerMock = vi.fn();

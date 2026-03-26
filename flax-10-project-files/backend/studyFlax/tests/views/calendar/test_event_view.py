@@ -3,12 +3,13 @@ Backend tests for event views.
 """
 
 from rest_framework import status
-from ..base import BaseEventTestCase
-from ..fixtures import (
-    create_simple_event, create_minimal_event, 
+from ...helpers.test_case_support import BaseEventTestCase
+from ...helpers.test_fixture_builders import (
+    create_simple_event, create_minimal_event,
     create_recurring_event, get_datetime_str
 )
 from studyFlax.models import CalendarEvent
+
 
 class EventCreateTests(BaseEventTestCase):
     """Tests for creating events."""
@@ -19,32 +20,32 @@ class EventCreateTests(BaseEventTestCase):
         self.assert_event_response(response, status.HTTP_201_CREATED)
         self.assert_event_data(response.data, data)
         self.assertEqual(CalendarEvent.objects.count(), 1)
-    
+
     def test_create_minimal_event(self):
         data = create_minimal_event()
         response = self.client.post(self.url, data, format='json')
         self.assert_event_response(response, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], data['title'])
-    
+
     def test_create_event_with_tag(self):
         tag = self.get_tag_by_name('study')
         data = {**create_simple_event(), 'tag': tag.id}
         response = self.client.post(self.url, data, format='json')
         self.assert_event_response(response, status.HTTP_201_CREATED)
         self.assertEqual(response.data['tag'], tag.id)
-    
+
     def test_create_recurring_event(self):
         data = create_recurring_event()
         response = self.client.post(self.url, data, format='json')
         self.assert_event_response(response, status.HTTP_201_CREATED)
         event = CalendarEvent.objects.get(id=response.data['id'])
         self.assertIsNotNone(event.recurrence_rule)
-    
+
     def test_create_event_missing_title(self):
         data = {'start_time': get_datetime_str(), 'end_time': get_datetime_str(hours_offset=1)}
         response = self.client.post(self.url, data, format='json')
         self.assert_event_response(response, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_create_event_invalid_datetime(self):
         data = {**create_simple_event(), 'start_time': 'invalid'}
         response = self.client.post(self.url, data, format='json')
@@ -59,12 +60,12 @@ class EventListTests(BaseEventTestCase):
         response = self.client.get(self.url)
         self.assert_event_response(response, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-    
+
     def test_list_empty_events(self):
         response = self.client.get(self.url)
         self.assert_event_response(response, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
-    
+
     def test_list_events_with_date_filter(self):
         self.create_event_in_db(create_simple_event())
         start = get_datetime_str(days_offset=-1)
@@ -80,7 +81,7 @@ class EventDetailTests(BaseEventTestCase):
         response = self.client.get(f"{self.url}{event.id}/")
         self.assert_event_response(response, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], event.id)
-    
+
     def test_get_nonexistent_event(self):
         response = self.client.get(f"{self.url}9999/")
         self.assert_event_response(response, status.HTTP_404_NOT_FOUND)
@@ -94,14 +95,14 @@ class EventUpdateTests(BaseEventTestCase):
         response = self.client.put(f"{self.url}{event.id}/", data, content_type='application/json')
         self.assert_event_response(response, status.HTTP_200_OK)
         self.assertEqual(response.data['title'], 'Updated Title')
-    
+
     def test_update_event_times(self):
         event = self.create_event_in_db(create_simple_event())
         new_start = get_datetime_str(hours_offset=2)
         data = {'start_time': new_start}
         response = self.client.put(f"{self.url}{event.id}/", data, content_type='application/json')
         self.assert_event_response(response, status.HTTP_200_OK)
-    
+
     def test_update_event_tag(self):
         event = self.create_event_in_db(create_simple_event())
         tag = self.get_tag_by_name('class')
@@ -192,11 +193,11 @@ class EventDeleteTests(BaseEventTestCase):
         response = self.client.delete(f"{self.url}{event.id}/")
         self.assert_event_response(response, status.HTTP_204_NO_CONTENT)
         self.assertEqual(CalendarEvent.objects.count(), 0)
-    
+
     def test_delete_nonexistent_event(self):
         response = self.client.delete(f"{self.url}9999/")
         self.assert_event_response(response, status.HTTP_404_NOT_FOUND)
-    
+
     def test_delete_recurring_event(self):
         event_data = create_recurring_event()
         response = self.client.post(self.url, event_data, format='json')
@@ -217,14 +218,14 @@ class ExceptionDateViewTests(BaseEventTestCase):
         self.assert_event_response(response, status.HTTP_200_OK)
         event = CalendarEvent.objects.get(id=event_id)
         self.assertIn('2026-02-15', event.recurrence_rule.exception_dates)
-    
+
     def test_add_exception_to_non_recurring(self):
         event = self.create_event_in_db(create_simple_event())
         exception_data = {'date': '2026-02-15'}
         url = f"{self.url}{event.id}/exception/"
         response = self.client.post(url, exception_data, format='json')
         self.assert_event_response(response, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_add_exception_without_date(self):
         event_data = create_recurring_event()
         response = self.client.post(self.url, event_data, format='json')
