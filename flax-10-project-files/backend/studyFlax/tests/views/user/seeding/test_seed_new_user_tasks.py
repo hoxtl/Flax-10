@@ -1,3 +1,7 @@
+"""
+Tests for seeded new-user tasks.
+"""
+
 from datetime import datetime
 
 from django.test import TestCase
@@ -10,10 +14,11 @@ from studyFlax.management.commands.seed_helpers.tasks.tasks import (
 )
 from studyFlax.models import Enrollment
 from studyFlax.models.tasks.task_model import Task
-from studyFlax.tests.helpers.factories import make_module, make_user
+from studyFlax.tests.helpers.test_model_builders import make_module, make_user
 
 
 class SeedNewUserTasksTests(TestCase):
+    """Tests seed new user tasks."""
     def test_due_today_task_uses_evening_seed_time_instead_of_11pm(self):
         user = make_user("new_user_seed", "new_user_seed@example.com")
         teacher = make_user("seed_teacher_owner", "seed_teacher_owner@example.com")

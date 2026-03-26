@@ -1,3 +1,7 @@
+"""
+Tests for seeded society tasks.
+"""
+
 from django.test import TestCase
 from django.utils import timezone
 
@@ -7,7 +11,7 @@ from studyFlax.management.commands.seed_helpers.tasks.tasks import (
     seed_society_tasks_for_user,
 )
 from studyFlax.models.tasks.task_model import Task, TaskList
-from studyFlax.tests.helpers.factories import (
+from studyFlax.tests.helpers.test_model_builders import (
     make_society,
     make_society_admin,
     make_society_member,
@@ -16,6 +20,7 @@ from studyFlax.tests.helpers.factories import (
 
 
 class SeedSocietyTasksTests(TestCase):
+    """Tests seed society tasks."""
     def test_seeds_society_lists_and_tasks_for_admin_memberships(self):
         user = make_user("soc_admin_seed", "soc_admin_seed@example.com")
         society = make_society("Chess Society")
