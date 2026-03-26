@@ -53,13 +53,13 @@ vi.mock("../../../../lib/termConfig", () => ({
   loadTermConfig: (...args) => loadTermConfigMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/components/IntelligenceUtils", () => ({
+vi.mock("../../../../pages/homepage/components/IntelligenceUtils", () => ({
   getCurrentEvent: (...args) => getCurrentEventMock(...args),
   getLiveContext: (...args) => getLiveContextMock(...args),
   getUpcomingEvent: (...args) => getUpcomingEventMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/utils/kclTflMapping", () => ({
+vi.mock("../../../../pages/homepage/utils/kclTflMapping", () => ({
   getRelevantDelays: (...args) => getRelevantDelaysMock(...args),
   isSevereDisruption: (...args) => isSevereDisruptionMock(...args),
 }));
@@ -71,7 +71,7 @@ vi.mock("../../../../pages/Analytics/hooks/useAnalyticsOverview", () => ({
 import {
   getSemesterProgress,
   useIntelligenceDashboard,
-} from "../../../../pages/Homepage/hooks/useIntelligenceDashboard";
+} from "../../../../pages/homepage/hooks/useIntelligenceDashboard";
 
 describe("useIntelligenceDashboard", () => {
   beforeEach(() => {

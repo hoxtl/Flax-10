@@ -9,12 +9,12 @@ const isTodayMock = vi.fn(() => false);
 const loadScheduleSettingsMock = vi.fn();
 const submitAutoScheduleWithPrefsMock = vi.fn();
 
-vi.mock("../../../../pages/Homepage/utils/index", () => ({
+vi.mock("../../../../pages/homepage/utils/index", () => ({
   formatTime: (...args) => formatTimeMock(...args),
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/utils/ScheduleAutoForm", () => ({
+vi.mock("../../../../pages/homepage/utils/ScheduleAutoForm", () => ({
   buildScheduleAutoForm: (...args) => buildScheduleAutoFormMock(...args),
 }));
 
@@ -38,7 +38,7 @@ vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts
   buildConflictResolutionToastMessage: vi.fn(() => "No conflicts."),
 }));
 
-import { useHomepageReschedule } from "../../../../pages/Homepage/hooks/useHomepageReschedule";
+import { useHomepageReschedule } from "../../../../pages/homepage/hooks/useHomepageReschedule";
 
 function buildProps(overrides = {}) {
   return {
