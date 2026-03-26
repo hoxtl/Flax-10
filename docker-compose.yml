@@ -1,8 +1,26 @@
+x-postgres-config: &postgres_config
+  POSTGRES_DB: appdb
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: "1234"
+  
 services:
   backend:
     build: .
     ports:
       - "8000:8000"
+      
+  postgres:
+    image: postgres:18
+    container_name: postgres-db
+    environment:
+      <<: *postgres_config
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-net
+      
   nix:
     image: nixos/nix:latest
     container_name: nix-shell
@@ -17,12 +35,18 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       # Django will use these
-      POSTGRES_HOST: host.docker.internal
+      <<: *postgres_config
+      POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
-      POSTGRES_DB: appdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "1234"
     command: bash
+    depends_on:
+      - postgres
+    networks:
+      - app-net
+      
+networks:
+  app-net:
 
 volumes:
   nix-store:
+  postgres-data:
