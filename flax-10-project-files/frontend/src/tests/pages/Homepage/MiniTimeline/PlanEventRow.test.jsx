@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { createFnMap } from '../../../utils/factoryUtils';
+import { createFnMap } from '../../../utils/testBuilderUtils';
 
 vi.mock('react-router-dom', () => ({
     Link: ({ children, to }) => <a href={to}>{children}</a>,

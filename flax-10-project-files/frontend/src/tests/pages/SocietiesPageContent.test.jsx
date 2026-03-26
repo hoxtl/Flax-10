@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-import { createFnMap } from "./utils/factoryUtils";
+import { createFnMap } from "./utils/testBuilderUtils";
 
 vi.mock("../../pages/Societies/SocietiesPage.module.css", () => ({ default: { container: "container", smallSearch: "smallSearch" } }));
 vi.mock("../../pages/Societies/SocietiesPageExtras.module.css", () => ({ default: {} }));

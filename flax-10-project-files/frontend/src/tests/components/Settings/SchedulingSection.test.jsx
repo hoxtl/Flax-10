@@ -5,7 +5,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, fireEvent, render, screen, waitFor, renderHook } from "@testing-library/react";
 
-import { createFnMap } from "../../utils/factoryUtils";
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 const getUserSettings = vi.fn();
 const preventDefault = (event) => event.preventDefault();

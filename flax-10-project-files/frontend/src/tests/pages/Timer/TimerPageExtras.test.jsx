@@ -5,7 +5,7 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
-import { createFnMap } from "../../utils/factoryUtils";
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 const useBreakpoint = vi.fn();
 const useNotificationPermission = vi.fn();

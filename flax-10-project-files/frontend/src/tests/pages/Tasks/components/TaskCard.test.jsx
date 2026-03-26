@@ -111,7 +111,7 @@ import { isRoutineTask } from "../../../../lib/completionMessages";
 import { getUserSettings } from "../../../../api/userApi";
 import { formatDueDate } from "../../../../pages/Tasks/utils/taskCardUtils";
 
-import { createFnMap } from "../../../utils/factoryUtils";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 function renderWithRouter(ui) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);

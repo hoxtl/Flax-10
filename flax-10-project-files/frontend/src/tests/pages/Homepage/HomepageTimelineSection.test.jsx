@@ -5,7 +5,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { createFnMap } from "../../utils/factoryUtils";
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 const navigateMock = vi.fn();
 const isTodayMock = vi.fn(() => true);

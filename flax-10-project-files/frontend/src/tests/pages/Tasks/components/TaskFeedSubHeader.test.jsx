@@ -5,7 +5,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createFnMap } from "../../../utils/factoryUtils";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 vi.mock("lucide-react", () => ({
   Plus: () => <span>plus-icon</span>,

@@ -7,7 +7,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Profile from '../../../pages/Profile/Profile';
 
-import { createFnMap } from '../../utils/factoryUtils';
+import { createFnMap } from '../../utils/testBuilderUtils';
 
 // Mock hooks
 vi.mock('../../../pages/Profile/hooks/useProfile', () => ({

@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
-import { createFnMap } from '../../utils/factoryUtils';
+import { createFnMap } from '../../utils/testBuilderUtils';
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
 }));

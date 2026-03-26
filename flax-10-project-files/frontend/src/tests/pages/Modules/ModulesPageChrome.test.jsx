@@ -6,7 +6,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { createFnMap } from "../utils/factoryUtils";
+import { createFnMap } from "../utils/testBuilderUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,

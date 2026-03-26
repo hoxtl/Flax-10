@@ -8,7 +8,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MiniTimeline } from '../../../../../pages/Homepage/components/MiniTimeline/MiniTimeline';
 import { isToday } from '../../../../../components/Calendar/utils/dateUtils';
 
-import { createFnMap } from '../../../../utils/factoryUtils';
+import { createFnMap } from '../../../../utils/testBuilderUtils';
 
 let mockRows = [];
 

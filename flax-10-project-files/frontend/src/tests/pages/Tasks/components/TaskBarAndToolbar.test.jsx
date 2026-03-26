@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { renderHook, act } from "@testing-library/react";
 
-import { createFnMap } from "../../../utils/factoryUtils";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const taskBarHookMock = vi.hoisted(() => vi.fn());
 

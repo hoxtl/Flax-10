@@ -1,5 +1,5 @@
 /**
- * Shared helpers for compact test data factories.
+ * Shared helpers for compact test data builders.
  */
 
 import { vi } from "vitest";

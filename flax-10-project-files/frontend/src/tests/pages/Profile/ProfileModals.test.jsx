@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProfileModals from '../../../pages/Profile/ProfileModals';
 
-import { createFnMap } from '../../utils/factoryUtils';
+import { createFnMap } from '../../utils/testBuilderUtils';
 
 vi.mock('../../../components/Dashboard/EditProfileModal', () => ({
     default: ({ isOpen, onClose }) =>

@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import TaskFeedToolbar from "../../../../pages/Tasks/components/TaskFeedToolbar";
-import { createFnMap } from "../../../utils/factoryUtils";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   default: ({ onChange, value }) => (
