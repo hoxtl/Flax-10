@@ -1,8 +1,14 @@
+/**
+ * Covers MiniTimeline rows, popovers, and timer strips.
+ */
+
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MiniTimeline } from '../../../../../pages/Homepage/components/MiniTimeline/MiniTimeline';
 import { isToday } from '../../../../../components/Calendar/utils/dateUtils';
+
+import { createFnMap } from '../../../../utils/factoryUtils';
 
 let mockRows = [];
 
@@ -115,37 +121,42 @@ const styles = {
   planTimelineNowStripTimer: 'planTimelineNowStripTimer',
 };
 
-function renderTL(props = {}) {
+const timelineActionNames = ['onQuickStart', 'onTaskToggle', 'onCardClick', 'onEdit', 'onConflictAutoMove', 'onDelete', 'onPushTomorrow', 'onReschedule', 'onToggleComplete'];
+const timelineBaseProps = {
+  sortedEvents: [],
+  dayTasks: [],
+  tasksDueToday: [],
+  suggestableTasks: [],
+  deadlineSuggestions: [],
+  taskLists: [],
+  getTag: null,
+  completedEventIds: new Set(),
+  hasTimerSession: false,
+  timerTask: null,
+  timeLeft: 0,
+  timerMode: 'work',
+  styles,
+};
+
+function startOfToday() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  return render(
-    <MiniTimeline
-      sortedEvents={props.sortedEvents ?? []}
-      selectedDate={props.selectedDate ?? today}
-      now={props.now ?? new Date(today.getTime() + 12 * 60 * 60 * 1000)}
-      dayTasks={props.dayTasks ?? []}
-      tasksDueToday={props.tasksDueToday ?? []}
-      suggestableTasks={props.suggestableTasks ?? []}
-      deadlineSuggestions={props.deadlineSuggestions ?? []}
-      taskLists={props.taskLists ?? []}
-      onQuickStart={props.onQuickStart ?? vi.fn()}
-      onTaskToggle={props.onTaskToggle ?? vi.fn()}
-      onCardClick={props.onCardClick ?? vi.fn()}
-      onEdit={props.onEdit ?? vi.fn()}
-      onConflictAutoMove={props.onConflictAutoMove ?? vi.fn()}
-      onDelete={props.onDelete ?? vi.fn()}
-      onPushTomorrow={props.onPushTomorrow ?? vi.fn()}
-      onReschedule={props.onReschedule ?? vi.fn()}
-      getTag={props.getTag ?? null}
-      completedEventIds={props.completedEventIds ?? new Set()}
-      onToggleComplete={props.onToggleComplete ?? vi.fn()}
-      hasTimerSession={props.hasTimerSession ?? false}
-      timerTask={props.timerTask ?? null}
-      timeLeft={props.timeLeft ?? 0}
-      timerMode={props.timerMode ?? 'work'}
-      styles={styles}
-    />,
-  );
+  return today;
+}
+
+function buildTimelineProps(overrides = {}) {
+  const baseDate = overrides.selectedDate ?? startOfToday();
+  return {
+    ...timelineBaseProps,
+    ...createFnMap(timelineActionNames),
+    ...overrides,
+    selectedDate: baseDate,
+    now: overrides.now ?? new Date(baseDate.getTime() + 12 * 60 * 60 * 1000),
+  };
+}
+
+function renderTL(props = {}) {
+  return render(<MiniTimeline {...buildTimelineProps(props)} />);
 }
 
 describe('MiniTimeline', () => {

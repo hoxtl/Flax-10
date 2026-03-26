@@ -1,49 +1,60 @@
+/**
+ * Shared state and ref builders for CampusMap tests.
+ */
+
 import { vi } from "vitest";
 
-export function createMutableState(overrides = {}) {
-  const state = {
-    selection: {
-      customDestination: null,
-      selectedCampus: null,
-      startLocation: null,
-      ...overrides.selection,
-    },
-    routes: {
-      loadingRoute: false,
-      loadingTflRoute: false,
-      routeError: "",
-      routeInfo: null,
-      tflRouteError: "",
-      tflRouteInfo: null,
-      ...overrides.routes,
-    },
-    form: {
-      manualDestination: "",
-      manualStart: "",
-      ...overrides.form,
-    },
-    ui: {
-      isMobile: false,
-      locating: false,
-      mapLoaded: true,
-      minSkeletonElapsed: true,
-      mobileInitialOpen: true,
-      tflInstructions: false,
-      walkingInstructions: false,
-      ...overrides.ui,
-    },
+const createSelection = (overrides = {}) => ({
+  customDestination: null,
+  selectedCampus: null,
+  startLocation: null,
+  ...overrides,
+});
+
+const createRoutes = (overrides = {}) => ({
+  loadingRoute: false,
+  loadingTflRoute: false,
+  routeError: "",
+  routeInfo: null,
+  tflRouteError: "",
+  tflRouteInfo: null,
+  ...overrides,
+});
+
+const createForm = (overrides = {}) => ({
+  manualDestination: "",
+  manualStart: "",
+  ...overrides,
+});
+
+const createUi = (overrides = {}) => ({
+  isMobile: false,
+  locating: false,
+  mapLoaded: true,
+  minSkeletonElapsed: true,
+  mobileInitialOpen: true,
+  tflInstructions: false,
+  walkingInstructions: false,
+  ...overrides,
+});
+
+function createSetter(state, key) {
+  return vi.fn((updater) => {
+    state[key] = typeof updater === "function" ? updater(state[key]) : updater;
+    return state[key];
+  });
+}
+
+function createStateApi(state) {
+  return {
+    setSelection: createSetter(state, "selection"),
+    setRoutes: createSetter(state, "routes"),
+    setForm: createSetter(state, "form"),
+    setUi: createSetter(state, "ui"),
   };
-  const wrapSetter = (key) =>
-    vi.fn((updater) => {
-      state[key] = typeof updater === "function" ? updater(state[key]) : updater;
-      return state[key];
-    });
-  const api = {
-    setSelection: wrapSetter("selection"),
-    setRoutes: wrapSetter("routes"),
-    setForm: wrapSetter("form"),
-    setUi: wrapSetter("ui"),
-  };
+}
+
+function attachStateGetters(api, state) {
   Object.defineProperties(api, {
     selection: { get: () => state.selection },
     routes: { get: () => state.routes },
@@ -51,6 +62,16 @@ export function createMutableState(overrides = {}) {
     ui: { get: () => state.ui },
   });
   return api;
+}
+
+export function createMutableState(overrides = {}) {
+  const state = {
+    selection: createSelection(overrides.selection),
+    routes: createRoutes(overrides.routes),
+    form: createForm(overrides.form),
+    ui: createUi(overrides.ui),
+  };
+  return attachStateGetters(createStateApi(state), state);
 }
 
 export function createMockRefs() {

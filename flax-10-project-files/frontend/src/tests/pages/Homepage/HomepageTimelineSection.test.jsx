@@ -1,5 +1,11 @@
+/**
+ * Covers HomepageTimelineSection interactions and widget mode branches.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+
+import { createFnMap } from "../../utils/factoryUtils";
 
 const navigateMock = vi.fn();
 const isTodayMock = vi.fn(() => true);
@@ -79,41 +85,49 @@ vi.mock("../../../pages/Homepage/components/MiniTimeline", () => ({
 
 import { HomepageTimelineSection } from "../../../pages/Homepage/components/HomepageTimelineSection";
 
+const baseTimelineProps = {
+  completedEventIds: new Set(),
+  dayTasks: [{ id: 1, title: "Essay" }],
+  deadlineSuggestions: [{ id: 2 }],
+  hasTimerSession: true,
+  now: new Date("2026-03-24T12:00:00.000Z"),
+  resolveConflictsLoading: false,
+  selectedDate: new Date("2026-03-24T12:00:00.000Z"),
+  sortedEvents: [{ id: 99, title: "Lecture" }],
+  styles: {
+    bentoSpine: "bento-spine",
+    timelineBox: "timeline-box",
+    timelineHeaderButton: "timeline-header-button",
+    timelineHeaderRight: "timeline-header-right",
+    timelineTrack: "timeline-track",
+    timelineTrackContent: "timeline-track-content",
+  },
+  suggestableTasks: [{ id: 4, title: "Read" }],
+  taskLists: [{ id: 1, name: "Inbox" }],
+  tasksDueToday: [{ id: 5 }],
+  timeLeft: 1800,
+  timerMode: "work",
+  timerTask: "Essay",
+};
+
+const propFnNames = [
+  "handleConflictAutoMove",
+  "handleConflictPushTomorrow",
+  "handleQuickStartGap",
+  "handleReschedule",
+  "handleTaskToggle",
+  "handleTimelineDelete",
+  "openModal",
+  "openTimelinePopup",
+  "setCompletedEventIds",
+];
+
 function createProps(overrides = {}) {
   return {
-    completedEventIds: new Set(),
-    dayTasks: [{ id: 1, title: "Essay" }],
-    deadlineSuggestions: [{ id: 2 }],
+    ...baseTimelineProps,
     getTag: vi.fn(() => ({ label: "Routine" })),
-    handleConflictAutoMove: vi.fn(),
-    handleConflictPushTomorrow: vi.fn(),
-    handleQuickStartGap: vi.fn(),
+    ...createFnMap(propFnNames),
     handleResolveTimelineConflicts: vi.fn().mockResolvedValue(undefined),
-    handleReschedule: vi.fn(),
-    handleTaskToggle: vi.fn(),
-    handleTimelineDelete: vi.fn(),
-    hasTimerSession: true,
-    now: new Date("2026-03-24T12:00:00.000Z"),
-    openModal: vi.fn(),
-    openTimelinePopup: vi.fn(),
-    resolveConflictsLoading: false,
-    selectedDate: new Date("2026-03-24T12:00:00.000Z"),
-    setCompletedEventIds: vi.fn(),
-    sortedEvents: [{ id: 99, title: "Lecture" }],
-    styles: {
-      bentoSpine: "bento-spine",
-      timelineBox: "timeline-box",
-      timelineHeaderButton: "timeline-header-button",
-      timelineHeaderRight: "timeline-header-right",
-      timelineTrack: "timeline-track",
-      timelineTrackContent: "timeline-track-content",
-    },
-    suggestableTasks: [{ id: 4, title: "Read" }],
-    taskLists: [{ id: 1, name: "Inbox" }],
-    tasksDueToday: [{ id: 5 }],
-    timeLeft: 1800,
-    timerMode: "work",
-    timerTask: "Essay",
     ...overrides,
   };
 }

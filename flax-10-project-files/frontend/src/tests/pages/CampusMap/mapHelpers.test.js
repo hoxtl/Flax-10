@@ -1,3 +1,7 @@
+/**
+ * Covers CampusMap helper branches for markers, routes, and geocoding.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { markerInstances, boundsExtend, MockLngLatBounds } = vi.hoisted(() => {
@@ -72,22 +76,22 @@ import {
   syncStartMarker,
 } from "../../../pages/CampusMap/mapHelpers";
 
+const createMapMock = () => ({
+  addLayer: vi.fn(),
+  addSource: vi.fn(),
+  fitBounds: vi.fn(),
+  flyTo: vi.fn(),
+  getSource: vi.fn(() => ({ setData: vi.fn() })),
+  getStyle: vi.fn(() => ({ layers: [{ id: "labels", type: "symbol", layout: { "text-field": "name" } }] })),
+  remove: vi.fn(),
+});
+
 function createRefs() {
   return {
     campusMarkers: { current: [] },
     homePointer: { current: null },
     homePopup: { current: null },
-    map: {
-      current: {
-        addLayer: vi.fn(),
-        addSource: vi.fn(),
-        fitBounds: vi.fn(),
-        flyTo: vi.fn(),
-        getSource: vi.fn(() => ({ setData: vi.fn() })),
-        getStyle: vi.fn(() => ({ layers: [{ id: "labels", type: "symbol", layout: { "text-field": "name" } }] })),
-        remove: vi.fn(),
-      },
-    },
+    map: { current: createMapMock() },
     routeLayerAdded: { current: false },
     startMarker: { current: null },
     startPopup: { current: null },
