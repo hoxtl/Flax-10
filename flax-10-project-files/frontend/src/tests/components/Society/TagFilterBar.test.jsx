@@ -68,4 +68,11 @@ describe('TagFilterBar', () => {
         fireEvent.click(screen.getByTestId('pill-Sports'));
         expect(onFilterChange).toHaveBeenCalledWith([]);
     });
+
+    it('keeps other active filters when toggling a different tag', () => {
+        const onFilterChange = vi.fn();
+        render(<TagFilterBar tags={mockTags} activeFilters={[2]} onFilterChange={onFilterChange} />);
+        fireEvent.click(screen.getByTestId('pill-Sports'));
+        expect(onFilterChange).toHaveBeenCalledWith([2, 1]);
+    });
 });

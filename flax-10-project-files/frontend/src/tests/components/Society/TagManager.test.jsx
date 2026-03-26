@@ -90,6 +90,14 @@ describe('TagManager', () => {
         expect(screen.getByText('A tag with this name already exists.')).toBeTruthy();
     });
 
+    it('treats duplicate labels as trimmed and case-insensitive', () => {
+        render(<TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
+        const input = screen.getByPlaceholderText('Tag name');
+        fireEvent.change(input, { target: { value: '  important  ' } });
+        fireEvent.click(screen.getByText('Add'));
+        expect(screen.getByText('A tag with this name already exists.')).toBeTruthy();
+    });
+
     it('resets form after successful add', async () => {
         const onAddTag = vi.fn().mockResolvedValue(true);
         render(<TagManager tags={[]} onAddTag={onAddTag} onDeleteTag={vi.fn()} />);
@@ -104,6 +112,7 @@ describe('TagManager', () => {
         const colorInput = document.querySelector('input[type="color"]');
         fireEvent.change(colorInput, { target: { value: '#123456' } });
         expect(colorInput.value).toBe('#123456');
+        expect(colorInput.closest('label')?.className).toMatch(/selected/);
     });
 
     it('submits a tag using a custom color', async () => {
@@ -118,6 +127,26 @@ describe('TagManager', () => {
         });
 
         expect(onAddTag).toHaveBeenCalledWith({ label: 'Custom', color: '#123456' });
+    });
+
+    it('keeps the current value when add does not succeed and clears duplicate errors on input change', async () => {
+        const onAddTag = vi.fn().mockResolvedValue(false);
+        render(<TagManager tags={mockTags} onAddTag={onAddTag} onDeleteTag={vi.fn()} />);
+
+        const input = screen.getByPlaceholderText('Tag name');
+        fireEvent.change(input, { target: { value: 'Important' } });
+        fireEvent.click(screen.getByText('Add'));
+        expect(screen.getByText('A tag with this name already exists.')).toBeTruthy();
+
+        fireEvent.change(input, { target: { value: 'Planning' } });
+        expect(screen.queryByText('A tag with this name already exists.')).toBeNull();
+
+        await act(async () => {
+            fireEvent.click(screen.getByText('Add'));
+        });
+
+        expect(onAddTag).toHaveBeenCalledWith({ label: 'Planning', color: expect.any(String) });
+        expect(input.value).toBe('Planning');
     });
 
     it('getNextColor falls back to first color if all taken', () => {
