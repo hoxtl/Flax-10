@@ -3,7 +3,7 @@ Model tracking which UI theme a user was using during a timed session.
 """
 
 from django.db import models
-from ..authentication.user_model import User
+from ..auth.user_model import User
 
 
 class ThemeSession(models.Model):

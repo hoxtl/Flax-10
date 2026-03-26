@@ -3,7 +3,7 @@ Model representing a student's enrollment in a module.
 """
 
 from django.db import models
-from ..authentication.user_model import User
+from ..auth.user_model import User
 from .module_model import Module
 
 

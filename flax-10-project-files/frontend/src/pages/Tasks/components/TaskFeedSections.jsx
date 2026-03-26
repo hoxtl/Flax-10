@@ -12,7 +12,7 @@ import TaskSection from "./TaskSection";
 import { getVisibleSections } from "./taskFeedSectionConfigs";
 
 import styles from "./TaskFeedSections.module.css";
-import { useAuth } from "../../../context/AuthenticationContext";
+import { useAuth } from "../../../context/AuthContext";
 
 const LIST_SWITCH_ANIM = {
   initial: { opacity: 0, y: 10 },

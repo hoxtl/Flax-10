@@ -20,12 +20,12 @@ from studyFlax.views.admin.course_change_view import (
 )
 from studyFlax.views.analytics import ai_chat, get_ai_insights, get_theme_stats, log_theme_session
 from studyFlax.views.analytics.analytics_view import get_analytics_summary, get_progress_data
-from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
-from studyFlax.views.authentication.home_address_view import home_address_view
-from studyFlax.views.authentication.login_view import login_view
-from studyFlax.views.authentication.logout_view import logout_view
-from studyFlax.views.authentication.password_reset_request_view import reset_password_view
-from studyFlax.views.authentication.register_view import register_view
+from studyFlax.views.auth.confirm_password_reset_view import confirm_password_reset_view
+from studyFlax.views.auth.home_address_view import home_address_view
+from studyFlax.views.auth.login_view import login_view
+from studyFlax.views.auth.logout_view import logout_view
+from studyFlax.views.auth.password_reset_request_view import reset_password_view
+from studyFlax.views.auth.register_view import register_view
 from studyFlax.views.calendar.attendance_view import attendance_records, attendance_stats, record_attendance
 from studyFlax.views.calendar.event_detail_view import add_exception_date, event_detail
 from studyFlax.views.calendar.event_map_view import calendar_events_map_view

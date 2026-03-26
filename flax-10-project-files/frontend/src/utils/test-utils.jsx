@@ -1,5 +1,5 @@
 import { render as rtlRender, renderHook as rtlRenderHook } from '@testing-library/react';
-import { AuthContext } from '../context/AuthenticationContext';
+import { AuthContext } from '../context/AuthContext';
 
 function readStoredUser() {
     const storedUser = localStorage.getItem('user');

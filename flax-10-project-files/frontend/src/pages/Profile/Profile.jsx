@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
 import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
-import { useAuth } from "../../context/AuthenticationContext";
+import { useAuth } from "../../context/AuthContext";
 import AchievementsModal from "./AchievementsModal";
 import { ProfileCalendar } from "./ProfileCalendar";
 import styles from "./ProfilePage.module.css";

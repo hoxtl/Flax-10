@@ -2,7 +2,7 @@
  * Profile utility helpers – event filtering, date ranges, and name formatting.
  */
 
-import { getInitials } from "../../../components/Authentication/utils/userUtils";
+import { getInitials } from "../../../components/Auth/utils/userUtils";
 
 export const RANGE_OPTIONS = [
   ['today', 'Today'],

@@ -3,7 +3,7 @@
  */
 
 import { ConfirmModal } from "../../../components/common";
-import { useAuth } from "../../../context/AuthenticationContext";
+import { useAuth } from "../../../context/AuthContext";
 import styles from "./IntelligenceRow.module.css";
 import IntelligenceGrid from "./IntelligenceGrid";
 import { renderIntelligenceWidget } from "./IntelligenceWidgetRenderer";

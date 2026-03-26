@@ -12,7 +12,7 @@ from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_model import Society
-from studyFlax.models.authentication.user_settings_model import UserSettings
+from studyFlax.models.auth.user_settings_model import UserSettings
 
 
 User = get_user_model()

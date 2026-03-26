@@ -5,8 +5,8 @@
 import { useState, useRef, useEffect } from "react";
 import { LogOut, Settings, UserRound } from "lucide-react";
 import styles from "./ProfileDropdown.module.css";
-import { getInitials } from "../Authentication/utils/userUtils";
-import { useAuth } from "../../context/AuthenticationContext";
+import { getInitials } from "../Auth/utils/userUtils";
+import { useAuth } from "../../context/AuthContext";
 import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 
 function useClickOutside(ref, onClose, isActive) {

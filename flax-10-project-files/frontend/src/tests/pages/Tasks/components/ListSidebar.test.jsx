@@ -13,7 +13,7 @@ vi.mock("../../../../pages/Tasks/components/useListSidebarState", () => ({
   useListSidebarState: sidebarStateMock,
 }));
 
-vi.mock("../../../../context/AuthenticationContext", () => ({
+vi.mock("../../../../context/AuthContext", () => ({
   useAuth: authMock,
 }));
 

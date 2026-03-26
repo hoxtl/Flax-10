@@ -3,7 +3,7 @@ Serialisers for user settings and preferences.
 """
 
 from rest_framework import serializers
-from studyFlax.models.authentication.user_settings_model import UserSettings
+from studyFlax.models.auth.user_settings_model import UserSettings
 
 
 class UserSettingsSerialiser(serializers.ModelSerializer):

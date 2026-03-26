@@ -1,5 +1,5 @@
 import BannedPage from "../../pages/Banned/BannedPage";
-import { AuthScreen } from "./AuthenticationScreens";
+import { AuthScreen } from "./AuthScreens";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { AppScreen } from "./AppScreen";
 

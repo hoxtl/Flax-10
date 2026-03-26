@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from datetime import timedelta
 from django.db import IntegrityError
-from studyFlax.models.authentication.user_model import User
+from studyFlax.models.auth.user_model import User
 from studyFlax.models.modules.module_model import Module
 
 

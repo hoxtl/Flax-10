@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../context/AuthenticationContext";
+import { useAuth } from "../../context/AuthContext";
 
 export function useOnboardingCheck() {
   const { profile, loading } = useAuth();

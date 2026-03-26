@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDisplayName, getPreferredFirstName } from '../../components/Authentication/utils/userDisplay';
+import { getDisplayName, getPreferredFirstName } from '../../components/Auth/utils/userDisplay';
 
 describe('getDisplayName', () => {
   it('returns empty string for null user', () => {

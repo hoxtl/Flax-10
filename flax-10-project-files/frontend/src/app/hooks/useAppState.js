@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useState } from "react";
-import { useAuth } from "../../context/AuthenticationContext";
+import { useAuth } from "../../context/AuthContext";
 import { hasSeenWelcome, isBannedFromStorage, persistActiveNav, readActiveNav } from "../storage";
 import { useThemeState } from "./useThemeState";
 

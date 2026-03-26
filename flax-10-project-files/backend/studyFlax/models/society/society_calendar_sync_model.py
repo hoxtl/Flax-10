@@ -4,7 +4,7 @@ Model tracking which users have synced a society's events to their calendar.
 
 from django.db import models
 
-from ..authentication.user_model import User
+from ..auth.user_model import User
 from .society_model import Society
 
 

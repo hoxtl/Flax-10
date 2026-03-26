@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
 from studyFlax.models import Tag, Category, RecurrenceRule
-from studyFlax.models.authentication.course_change_request_model import CourseChangeRequest
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models.calendar.event_attendance_model import EventAttendance
 from studyFlax.models.society.society_model import Society

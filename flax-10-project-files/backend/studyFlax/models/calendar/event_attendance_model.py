@@ -4,7 +4,7 @@ Model tracking per-user attendance records for timetable events.
 
 from django.db import models
 
-from ..authentication.user_model import User
+from ..auth.user_model import User
 from .calendar_event_model import CalendarEvent
 
 

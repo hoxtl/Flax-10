@@ -1,6 +1,6 @@
 import { createContext, useState, useCallback, useRef, useContext } from 'react';
 import * as api from '../api/notificationApi';
-import { useAuth } from './AuthenticationContext';
+import { useAuth } from './AuthContext';
 import { useNotificationLoader, useNotificationPolling } from './useNotificationData';
 
 const NotificationContext = createContext(null);

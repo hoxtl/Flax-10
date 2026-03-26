@@ -4,7 +4,7 @@ Models for group projects, memberships, meeting suggestions, and responses.
 
 from django.db import models
 
-from studyFlax.models.authentication.user_model import User
+from studyFlax.models.auth.user_model import User
 
 
 class GroupProject(models.Model):

@@ -23,7 +23,7 @@ const { authState } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("../../../context/AuthenticationContext", () => ({
+vi.mock("../../../context/AuthContext", () => ({
   useAuth: () => authState,
 }));
 

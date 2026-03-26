@@ -15,7 +15,7 @@ from studyFlax.models.modules.module_model import Module
 from studyFlax.models.social.share_model import CalendarShare
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.timer.session_model import StudySession
-from studyFlax.serialisers.authentication.authentication_serialisers import UserSerialiser
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
 
 
 def get_module_data(user):

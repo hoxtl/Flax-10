@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "./context/ThemeContext";
-import { AuthProvider } from "./context/AuthenticationContext";
+import { AuthProvider } from "./context/AuthContext";
 import { ROOT_STYLE } from "./app/constants";
 import { ScreenRouter } from "./app/components/ScreenRouter";
 import { useAppState } from "./app/hooks/useAppState";

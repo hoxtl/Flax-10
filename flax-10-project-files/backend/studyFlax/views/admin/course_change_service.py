@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from studyFlax.models import CalendarEvent, Enrollment
-from studyFlax.models.authentication.course_change_request_model import CourseChangeRequest
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
 from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.serialisers.modules.course_change_serialisers import CourseChangeRequestSerialiser
 from studyFlax.views.user.settings_view import enroll_user_in_modules, get_modules_for_major

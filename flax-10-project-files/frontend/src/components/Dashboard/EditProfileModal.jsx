@@ -1,5 +1,5 @@
 import styles from './EditProfileModal.module.css';
-import { getInitials } from '../Authentication/utils/userUtils';
+import { getInitials } from '../Auth/utils/userUtils';
 import FormField from '../common/FormField/FormField';
 import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../common/StandardModal/StandardModal';

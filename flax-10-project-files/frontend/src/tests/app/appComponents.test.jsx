@@ -17,7 +17,7 @@ vi.mock("../../pages/Banned/BannedPage", () => ({
   default: ({ reason }) => <div>{`Banned:${reason}`}</div>,
 }));
 
-vi.mock("../../app/components/AuthenticationScreens", () => ({
+vi.mock("../../app/components/AuthScreens", () => ({
   AuthScreen: () => <div>AuthScreen</div>,
 }));
 

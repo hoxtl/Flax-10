@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotificationProvider, useNotifications } from '../../context/NotificationContext';
 import * as api from '../../api/notificationApi';
 
-vi.mock('../../context/AuthenticationContext', () => ({
+vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ refreshProfile: vi.fn() }),
 }));
 

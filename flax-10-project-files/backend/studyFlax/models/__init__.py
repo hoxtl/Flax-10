@@ -2,10 +2,10 @@
 Model exports for the StudyFlax app.
 """
 
-from .authentication.user_model import *
-from .authentication.user_settings_model import *
-from .authentication.reset_password_token_model import ResetPasswordToken
-from .authentication.course_change_request_model import CourseChangeRequest
+from .auth.user_model import *
+from .auth.user_settings_model import *
+from .auth.reset_password_token_model import ResetPasswordToken
+from .auth.course_change_request_model import CourseChangeRequest
 
 from .calendar.calendar_event_model import *
 from .calendar.category_model import *

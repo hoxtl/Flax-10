@@ -25,7 +25,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../../context/AuthenticationContext", () => ({
+vi.mock("../../../../context/AuthContext", () => ({
   useAuth: useAuthMock,
 }));
 

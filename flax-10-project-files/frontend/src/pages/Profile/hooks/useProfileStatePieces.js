@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../context/AuthenticationContext";
+import { useAuth } from "../../../context/AuthContext";
 import { loadTaskCount, tryLoadEvents, tryLoadProfile } from "./profileDataLoaders";
 
 function useOwnProfileRefresh(isSelf, authLoading, setProfileData, setLoading) {

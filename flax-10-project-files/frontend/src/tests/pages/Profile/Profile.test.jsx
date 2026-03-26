@@ -25,7 +25,7 @@ vi.mock('../../../pages/Profile/hooks/useProfileVisibility', () => ({
 }));
 
 // ProfileHome uses AuthContext's useAuth().
-vi.mock('../../../context/AuthenticationContext', () => ({
+vi.mock('../../../context/AuthContext', () => ({
   useAuth: () => ({
     profile: { modules: [] },
     loading: false,

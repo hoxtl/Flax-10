@@ -38,7 +38,7 @@ vi.mock("../../../api/socialApi", () => ({
   getSharedWithMe: (...args) => getSharedWithMe(...args),
   getSharingWith: (...args) => getSharingWith(...args),
 }));
-vi.mock("../../../context/AuthenticationContext", () => ({
+vi.mock("../../../context/AuthContext", () => ({
   useAuth: () => ({
     profile: { id: 5, name: "Me" },
     loading: false,

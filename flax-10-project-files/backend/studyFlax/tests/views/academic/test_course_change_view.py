@@ -6,8 +6,8 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from studyFlax.models.authentication.course_change_request_model import CourseChangeRequest
-from studyFlax.models.authentication.user_settings_model import UserSettings
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
+from studyFlax.models.auth.user_settings_model import UserSettings
 from studyFlax.tests.helpers.test_model_builders import make_user, make_superuser, authed_client
 
 

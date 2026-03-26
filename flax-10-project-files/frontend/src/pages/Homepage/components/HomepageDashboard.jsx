@@ -5,7 +5,7 @@
 import { isToday } from "../../../components/Calendar/utils/dateUtils";
 import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/taskApi";
 import { EventPopups } from "../../../components/Calendar/EventPopups";
-import { useAuth } from "../../../context/AuthenticationContext";
+import { useAuth } from "../../../context/AuthContext";
 import BackToTop from "../../../components/common/BackToTop/BackToTop";
 import { TaskWidgetSlot } from "./TaskWidgetSlot";
 import { DeadlinesWidget } from "./DeadlinesWidget";

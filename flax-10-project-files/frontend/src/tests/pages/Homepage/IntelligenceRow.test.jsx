@@ -19,7 +19,7 @@ const state = vi.hoisted(() => ({
   renderIntelligenceWidget: vi.fn(() => <div data-testid="rendered-widget">widget</div>),
 }));
 
-vi.mock("../../../context/AuthenticationContext", () => ({
+vi.mock("../../../context/AuthContext", () => ({
   useAuth: () => ({
     profile: { id: 7, role: "student" },
     user: { id: 7, role: "student" },

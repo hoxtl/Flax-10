@@ -39,15 +39,15 @@ vi.mock('../pages/Welcome/WelcomeLanding', () => ({
     ),
 }));
 
-vi.mock('../pages/Authentication/AuthenticationPage', () => ({
+vi.mock('../pages/Auth/AuthPage', () => ({
     default: () => <div data-testid="auth-page">Auth</div>,
 }));
 
-vi.mock('../pages/Authentication/PasswordResetRequest', () => ({
+vi.mock('../pages/Auth/PasswordResetRequest', () => ({
     default: () => <div data-testid="password-reset-request">Reset</div>,
 }));
 
-vi.mock('../pages/Authentication/PasswordResetConfirm', () => ({
+vi.mock('../pages/Auth/PasswordResetConfirm', () => ({
     default: () => <div data-testid="password-reset-confirm">Confirm</div>,
 }));
 

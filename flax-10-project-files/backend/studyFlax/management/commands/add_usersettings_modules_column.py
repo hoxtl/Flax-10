@@ -4,7 +4,7 @@ Management command for adding the UserSettings modules column.
 
 from django.core.management.base import BaseCommand
 from django.db import connection
-from studyFlax.models.authentication.user_settings_model import UserSettings
+from studyFlax.models.auth.user_settings_model import UserSettings
 
 
 def _column_exists(cursor, table):

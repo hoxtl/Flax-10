@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
-from studyFlax.serialisers.authentication.authentication_serialisers import UserSerialiser
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
 from studyFlax.views.user.settings_view import get_or_create_user_settings
 
 
