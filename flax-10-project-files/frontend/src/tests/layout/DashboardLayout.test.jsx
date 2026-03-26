@@ -282,11 +282,9 @@ describe("DashboardLayout", () => {
   });
 
   it("getUser handles invalid JSON in localStorage", () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     localStorage.setItem("user", "{ invalid json");
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    expect(consoleSpy).toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    expect(screen.getByTestId("topbar")).toBeInTheDocument();
   });
 
   it("handleLogoutClick clears user data even when logout throws", async () => {

@@ -39,7 +39,7 @@ function SmartPickButton({ onPickForMe }) {
   return <PrimaryButton variant="primary" pill className={styles.taskPickSmartBtn} onClick={onPickForMe}>✦ Smart Pick — choose a task for me</PrimaryButton>;
 }
 
-function buildFilterPanelProps(state) {
+export function buildFilterPanelProps(state) {
   return {
     activeFilterTab: state.activeFilterTab,
     onTabChange: state.setActiveFilterTab,
@@ -71,21 +71,21 @@ function Toolbar({ state, filterWrapRef, activeFilterCount, onPickForMe }) {
   );
 }
 
-function changeSort(value, state) {
+export function changeSort(value, state) {
   state.setSortBy(value);
   state.loadTasks(value);
 }
 
-function toggleList(listId, setFilterListIds) {
+export function toggleList(listId, setFilterListIds) {
   const stringId = String(listId);
   setFilterListIds((previous) => previous.includes(stringId) ? previous.filter((id) => id !== stringId) : [...previous, stringId]);
 }
 
-function toggleModule(code, setFilterModuleCodes) {
+export function toggleModule(code, setFilterModuleCodes) {
   setFilterModuleCodes((previous) => previous.includes(code) ? previous.filter((item) => item !== code) : [...previous, code]);
 }
 
-function clearAllFilters(state) {
+export function clearAllFilters(state) {
   state.setFilterListIds([]);
   state.setFilterModuleCodes([]);
   state.setFilterQuery('');
@@ -109,6 +109,6 @@ export function TaskPickerModal({ state, filterWrapRef, onSelect, onPickForMe })
   );
 }
 
-function closeFilterPanel(event, state, filterWrapRef) {
+export function closeFilterPanel(event, state, filterWrapRef) {
   if (state.isFilterOpen && filterWrapRef.current && !filterWrapRef.current.contains(event.target)) state.setIsFilterOpen(false);
 }

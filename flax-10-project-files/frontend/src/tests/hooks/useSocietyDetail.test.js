@@ -218,7 +218,6 @@ describe('useSocietyDetail', () => {
   });
 
   it('swallows linked event sync errors without throwing', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     api.createSocietyEvent.mockRejectedValueOnce(new Error('event create failed'));
     api.deleteSocietyEvent.mockRejectedValueOnce(new Error('event delete failed'));
     api.updateSocietyEvent.mockRejectedValueOnce(new Error('event update failed'));
@@ -234,7 +233,7 @@ describe('useSocietyDetail', () => {
       await result.current.updateAnnouncement(10, { title: 'A', content: 'B', addAsEvent: true, event_id: 99 });
     });
 
-    expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(api.createSocietyEvent).toHaveBeenCalled();
+    expect(api.deleteSocietyEvent).toHaveBeenCalled();
   });
 });

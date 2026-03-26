@@ -21,6 +21,16 @@ const testUpdate = () => {
     helpers.blurInput(0);
     // Should reset to 1 (min for work)
     expect(onUpdate).toHaveBeenCalledWith('work', 1);
+
+    const breakInput = screen.getAllByRole('spinbutton')[1];
+    fireEvent.change(breakInput, { target: { value: '10' } });
+    helpers.blurInput(1);
+    expect(onUpdate).toHaveBeenCalledWith('break', 10);
+
+    const sessionsInput = screen.getAllByRole('spinbutton')[2];
+    fireEvent.change(sessionsInput, { target: { value: '6' } });
+    helpers.blurInput(2);
+    expect(onUpdate).toHaveBeenCalledWith('sessions', 6);
 };
 
 const testFocus = () => {
@@ -73,6 +83,13 @@ const testArrowDownWhenValueAboveMin = () => {
     expect(screen.queryByText(/Minimum study time/)).not.toBeInTheDocument();
 };
 
+const testArrowDownAtMinimum = () => {
+    helpers.renderTimerSettings({ work: 1, breakTime: 5, sessions: 4, isActive: false, onUpdate: () => { } });
+    const input = screen.getAllByRole('spinbutton')[0];
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    expect(screen.getByText(/Minimum study time/)).toBeInTheDocument();
+};
+
 describe('TimerSettings', () => {
     it('inputs call onUpdate', testUpdate);
     it('selects content on focus', testFocus);
@@ -80,4 +97,5 @@ describe('TimerSettings', () => {
     it('shows disclaimer on invalid input', testDisclaimerInput);
     it('shows disclaimer on arrow down', testDisclaimerArrow);
     it('does not show disclaimer on ArrowDown when value above min', testArrowDownWhenValueAboveMin);
+    it('shows disclaimer on ArrowDown when already at minimum', testArrowDownAtMinimum);
 });

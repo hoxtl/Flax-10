@@ -54,27 +54,26 @@ describe('useSocietyMembership', () => {
     });
 
     it('joinSociety handles error and subscription cancel/error', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
         api.joinSociety.mockRejectedValue(new Error('join fail'));
         const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
         await act(async () => { await result.current.joinSociety(); });
-        expect(spy).toHaveBeenCalledWith('Join failed:', expect.any(Error));
+        expect(api.joinSociety).toHaveBeenCalledWith(mockId);
+        expect(mockSoc.is_member).toBe(false);
 
         api.joinSociety.mockResolvedValue({});
         confirm.mockResolvedValue(false);
         await act(async () => { await result.current.joinSociety(); });
         expect(api.toggleSubscription).not.toHaveBeenCalled();
+        expect(mockSoc.is_member).toBe(true);
 
         confirm.mockResolvedValue(true);
-        api.toggleSubscription.mockRejectedValue(new Error('sub fail'));
+        api.toggleSubscription.mockRejectedValueOnce(new Error('sub fail'));
         await act(async () => { await result.current.joinSociety(); });
-        expect(spy).toHaveBeenCalledWith('Join failed:', expect.any(Error));
-        
-        spy.mockRestore();
+        expect(api.toggleSubscription).toHaveBeenCalledWith(mockId, true);
+        expect(mockSoc.is_member).toBe(true);
     });
 
     it('leaveSociety successfully and error paths', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
         api.leaveSociety.mockResolvedValue({});
         const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
         
@@ -86,15 +85,13 @@ describe('useSocietyMembership', () => {
 
         api.leaveSociety.mockRejectedValue(new Error('leave fail'));
         await act(async () => { await result.current.leaveSociety(); });
-        expect(spy).toHaveBeenCalledWith('Leave failed:', expect.any(Error));
+        expect(api.leaveSociety).toHaveBeenCalledWith(mockId, 'me');
 
         // Missing member_count branch
         mockSoc = { id: 1, is_member: true }; // No member_count
         api.leaveSociety.mockResolvedValue({});
         await act(async () => { await result.current.leaveSociety(); });
         expect(mockSoc.member_count).toBe(0);
-
-        spy.mockRestore();
     });
 
     it('joinSociety missing member_count branch', async () => {

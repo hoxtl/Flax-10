@@ -124,6 +124,27 @@ describe("group tasks state extras", () => {
       expect(hook.result.current.taskView).toBe("board");
       expect(hook.result.current.showAddModal).toBe(true);
     });
+
+    it("filters tasks by assignee when filterUsers is set", async () => {
+      const { hook } = await renderTasksHook([
+        mockJsonResponse([
+          { id: 1, title: "A", assignees_info: [{ id: 5 }], status: "todo" },
+          { id: 2, title: "B", assignees_info: [{ id: 4 }], status: "todo" },
+        ]),
+      ]);
+      act(() => {
+        hook.result.current.setFilterUsers(["4"]);
+      });
+      expect(hook.result.current.sortedTasks).toHaveLength(1);
+    });
+
+    it("ignores blank task titles when adding a task", async () => {
+      const { hook } = await renderTasksHook();
+      await act(async () => {
+        await hook.result.current.taskActions.addTask("", { due_date: "2026-03-30" });
+      });
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("task helpers and timeline state", () => {

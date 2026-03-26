@@ -172,9 +172,51 @@ describe("GroupWork task component extras", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("returns null when the assignee popup is closed", () => {
+    const { container } = render(
+      <TaskAssigneePopup
+        isOpen={false}
+        onClose={vi.fn()}
+        members={[]}
+        assignees={[]}
+        onToggleAssignee={vi.fn()}
+        triggerRef={{ current: null }}
+      />,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("positions the popup above the trigger when needed", () => {
+    shouldShowPopupAbove.mockReturnValueOnce(true);
+    createPopupCoords.mockReturnValueOnce({ top: 100, left: 40, width: 220 });
+    const triggerRef = {
+      current: {
+        getBoundingClientRect: () => ({ top: 1, bottom: 2, left: 3, right: 4, width: 5, height: 6 }),
+        contains: () => false,
+      },
+    };
+
+    render(
+      <TaskAssigneePopup
+        isOpen
+        onClose={vi.fn()}
+        members={[{ id: 1, user: 1, name: "Alex" }]}
+        assignees={[]}
+        onToggleAssignee={vi.fn()}
+        triggerRef={triggerRef}
+      />,
+    );
+
+    expect(shouldShowPopupAbove).toHaveBeenCalled();
+    expect(createPopupCoords).toHaveBeenCalled();
+    expect(screen.getByText("Assign Members")).toBeInTheDocument();
+  });
+
   it("renders context menu and handles outside click", () => {
     const onClose = vi.fn();
     render(<TaskContextMenu pos={{ x: 10, y: 20 }} task={{ id: 11 }} onDelete={vi.fn()} onClose={onClose} onEditStart={vi.fn()} />);
+    fireEvent.mouseDown(screen.getByText("Edit").closest("div"));
+    expect(onClose).not.toHaveBeenCalled();
     fireEvent.mouseDown(document.body);
     expect(onClose).toHaveBeenCalled();
   });
