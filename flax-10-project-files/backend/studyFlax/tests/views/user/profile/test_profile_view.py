@@ -15,6 +15,7 @@ from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.notifications.notification_model import Notification
 
+
 User = get_user_model()
 
 
@@ -210,7 +211,7 @@ class ProfileViewCoverageTest(TestCase):
 
 
 class SuggestStudySessionViewTest(TestCase):
-
+    """Tests suggest study session view."""
     def setUp(self):
         self.client = APIClient()
         self.sender = User.objects.create_user(
