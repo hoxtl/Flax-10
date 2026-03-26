@@ -8,11 +8,11 @@ const getProjectTeacherInitials = vi.fn(() => "AB");
 const getProjectTeacherName = vi.fn(() => "Ada Byron");
 const getDisplayName = vi.fn((member) => member.name || member.username || "Unknown");
 
-vi.mock("../../../components/common/badge/Badge", () => ({
+vi.mock("../../../components/common/Badge/Badge", () => ({
   default: ({ children, className }) => <span className={className}>{children}</span>,
 }));
 
-vi.mock("../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 

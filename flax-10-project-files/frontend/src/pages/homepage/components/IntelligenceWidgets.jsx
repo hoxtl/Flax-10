@@ -11,7 +11,7 @@ import WelcomeBackgroundPaths from "../../../components/welcome/WelcomeBackgroun
 import { useCountUp } from "../../../hooks/useCountUp";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceHeader.module.css";
-import { getGreeting, getTodayLabel } from "./intelligenceUtils";
+import { getGreeting, getTodayLabel } from "./IntelligenceUtils";
 
 const HERO_STAT_ROUTES = { societies: "/societies", tasks: "/tasks?filter=today" };
 

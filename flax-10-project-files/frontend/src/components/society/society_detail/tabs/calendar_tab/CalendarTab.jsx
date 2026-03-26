@@ -5,7 +5,7 @@
 import { useState } from "react";
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../calendar/month_view/MonthView";
-import { CalendarNav } from "../../../../calendar/header/calendarHeaderUtils";
+import { CalendarNav } from "../../../../calendar/header/CalendarHeaderUtils";
 import { addMonths, formatMonthYear, isSameMonth } from "../../../../calendar/utils/dateUtils";
 import { expandRecurringEvents } from "../../../../calendar/utils/recurrenceUtils";
 import { hasRecurrence, extractBaseEventId } from "../../../../calendar/utils/eventUtils";

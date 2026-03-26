@@ -20,7 +20,7 @@ import {
   usePeakHour,
   useProfileAnalytics,
   useSuggestionState,
-} from "../../../pages/Profile/hooks/useProfileInsights";
+} from "../../../pages/profile/hooks/useProfileInsights";
 
 async function flushEffects() {
   await act(async () => {

@@ -90,7 +90,7 @@ vi.mock("../../../components/common/user_avatar/UserAvatar", () => ({
   default: () => <div data-testid="user-avatar" />,
 }));
 
-vi.mock("../../../components/common/card/GridCard", () => ({
+vi.mock("../../../components/common/Card/GridCard", () => ({
   default: ({ children, onClick }) => (
     <div data-testid="grid-card" onClick={onClick}>
       {children}

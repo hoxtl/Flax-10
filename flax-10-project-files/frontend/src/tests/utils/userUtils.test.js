@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getInitials } from '../../components/auth/utils/userUtils';
+import { getInitials } from '../../components/Auth/utils/userUtils';
 
 describe('getInitials', () => {
   it('returns empty string for default empty name', () => {

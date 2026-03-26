@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
-import Tooltip from "../../../components/common/tooltip/Tooltip";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import { useToast } from "../../../context/ToastContext";
 import styles from "./ProjectHeader.module.css";
 

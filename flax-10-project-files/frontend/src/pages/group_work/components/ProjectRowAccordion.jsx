@@ -3,7 +3,7 @@
  */
 
 import { motion } from "framer-motion";
-import Tooltip from "../../../components/common/tooltip/Tooltip";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import styles from "./ProjectRowExpanded.module.css";
 
 export default function ProjectRowAccordion({ percent }) {

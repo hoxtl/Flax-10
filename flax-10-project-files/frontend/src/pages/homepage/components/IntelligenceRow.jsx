@@ -6,7 +6,7 @@ import { ConfirmModal } from "../../../components/common";
 import { useAuth } from "../../../context/AuthContext";
 import styles from "./IntelligenceRow.module.css";
 import IntelligenceGrid from "./IntelligenceGrid";
-import { renderIntelligenceWidget } from "./intelligenceWidgetRenderer";
+import { renderIntelligenceWidget } from "./IntelligenceWidgetRenderer";
 import { CATALOGUE, DEFAULT_LAYOUT, getSemesterProgress, useIntelligenceDashboard } from "../hooks/useIntelligenceDashboard";
 
 export default function IntelligenceRow(props) {

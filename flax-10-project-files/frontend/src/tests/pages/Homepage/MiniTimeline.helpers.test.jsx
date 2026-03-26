@@ -28,7 +28,7 @@ vi.mock("lucide-react", () => {
   return { AlertTriangle: Icon, RotateCw: Icon, Pencil: Icon };
 });
 
-vi.mock("../../../components/common/badge/Badge", () => ({
+vi.mock("../../../components/common/Badge/Badge", () => ({
   default: ({ children }) => <span>{children}</span>,
 }));
 

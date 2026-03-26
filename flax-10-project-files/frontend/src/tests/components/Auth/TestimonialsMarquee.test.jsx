@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { TestimonialsMarquee } from '../../../components/auth/TestimonialsMarquee';
+import { TestimonialsMarquee } from '../../../components/Auth/TestimonialsMarquee';
 
-vi.mock('../../../components/auth/TestimonialCard', () => ({
+vi.mock('../../../components/Auth/TestimonialCard', () => ({
   TestimonialCard: ({ author, text }) => <div data-testid="card">{author.name}: {text}</div>,
 }));
 

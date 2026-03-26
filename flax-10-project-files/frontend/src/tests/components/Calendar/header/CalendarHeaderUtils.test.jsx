@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/calendar/header/calendarHeaderUtils';
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/calendar/header/CalendarHeaderUtils';
 
 vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,

@@ -7,7 +7,7 @@ import {
   getErrorMessage,
   saveUserData,
   validatePasswords,
-} from "../../../components/auth/utils/authHelpers";
+} from "../../../components/Auth/utils/authHelpers";
 
 async function tryRequest(requestAction, payload) {
   try {

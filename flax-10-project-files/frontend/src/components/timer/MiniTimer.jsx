@@ -5,7 +5,7 @@
 import styles from './MiniTimer.module.css';
 import { formatTime } from './TimerComponents';
 import { useTimerContext } from '../../context/TimerContext';
-import Tooltip from '../common/tooltip/Tooltip';
+import Tooltip from '../common/Tooltip/Tooltip';
 
 export default function MiniTimer({ onNavigate, activeNav }) {
   const { isActive, isPaused, timeLeft, totalPaused, mode, isOvertime, isBreakOvertime } = useTimerContext();
