@@ -148,8 +148,15 @@ describe("ReadingsPanel coverage", () => {
   it("handles undefined readings and falls back for missing metadata", async () => {
     const { rerender } = render(<ReadingsPanel readings={undefined} onReadingAdded={vi.fn()} />);
     expect(screen.getByText("No readings assigned")).toBeInTheDocument();
+  });
 
-    rerender(<ReadingsPanel readings={edgeReadings} onReadingAdded={vi.fn()} />);
+  it("falls back for missing metadata", async () => {
+    const edgeReadings = [
+      { id: 9, title: null, module_name: "Philosophy" },
+      { id: 10, title: "History: Intro", module_name: "History" },
+      { id: 11, title: "No due date" },
+    ];
+    render(<ReadingsPanel readings={edgeReadings} onReadingAdded={vi.fn()} />);
     expect(screen.getAllByTestId("countdown-distant")).toHaveLength(3);
     fireEvent.click(screen.getByText("Intro"));
     expect(await screen.findByTestId("task-info-modal")).toBeInTheDocument();
