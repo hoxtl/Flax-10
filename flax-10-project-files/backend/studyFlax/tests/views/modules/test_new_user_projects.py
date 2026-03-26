@@ -44,13 +44,16 @@ class SeedNewUserProjectsTest(TestCase):
 
     def test_creates_project_for_enrolled_module(self):
         from studyFlax.views.modules.new_user_projects import seed_new_user_projects
+
         module = _make_module(self.user)
         Enrollment.objects.create(student=self.user, module=module)
         demo_user = make_user('np_demo', 'np_demo@e.com')
         spec = {'name': 'NP Project', 'module': module, 'source_deadline': None}
-        with patch('studyFlax.views.modules.new_user_projects._get_demo_users', return_value=[demo_user]):
-            with patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', return_value=[spec]):
-                result = seed_new_user_projects(self.user, now=self.now)
+        with (
+            patch('studyFlax.views.modules.new_user_projects._get_demo_users', return_value=[demo_user]),
+            patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', return_value=[spec]),
+        ):
+            result = seed_new_user_projects(self.user, now=self.now)
         self.assertGreater(result, 0)
         self.assertTrue(GroupProject.objects.filter(name='NP Project').exists())
 
@@ -74,7 +77,6 @@ class SeedNewUserProjectsTest(TestCase):
 
     def test_add_demo_members_does_nothing_when_no_candidates(self):
         from studyFlax.views.modules.new_user_projects import _add_demo_members
-        module = _make_module(self.user, code='NP07')
         project = GroupProject.objects.create(name='No Candidates Project', owner=self.user, course_code='NP07')
         GroupMembership.objects.create(project=project, user=self.user, role='owner')
         _add_demo_members(project, self.user, [self.user])
@@ -82,7 +84,6 @@ class SeedNewUserProjectsTest(TestCase):
 
     def test_add_demo_members_adds_members_to_project(self):
         from studyFlax.views.modules.new_user_projects import _add_demo_members
-        module = _make_module(self.user, code='NP04')
         project = GroupProject.objects.create(name='Demo Project', owner=self.user, course_code='NP04')
         GroupMembership.objects.create(project=project, user=self.user, role='owner')
         demo1 = make_user('np_d1', 'np_d1@e.com')

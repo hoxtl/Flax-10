@@ -26,6 +26,7 @@ LONG_SESSION_SECONDS = 90 * 60
 
 
 def derive_persona(sessions):
+    """Return the best-fit study persona for the supplied sessions."""
     if not sessions:
         return PERSONAS[0]
     peak_hour, avg_duration, is_consistent = collect_session_stats(sessions)
@@ -170,7 +171,8 @@ def collect_all_badges(sessions_all, session_count, total_hours, longest_streak,
         earned.extend(badge_group)
     return earned
 
-def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, user):
+def compute_badges(sessions_all, sessions_90, _current_streak, _longest_streak, module_count, user):
+    """Return earned badges for the user's completed study activity."""
     complete_sessions = filter_complete(sessions_all)
     recent_complete_sessions = filter_complete(sessions_90)
     _, longest_streak = compute_streaks(complete_sessions)
@@ -179,6 +181,7 @@ def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, u
     return collect_all_badges(complete_sessions, session_count, total_hours, longest_streak, active_days, module_count, user)
 
 def get_weekly_study_hours(sessions_all):
+    """Return the total study hours completed during the last week."""
     week_ago = timezone.now() - timedelta(days=7)
     week_sessions = [session for session in sessions_all if session.end_time >= week_ago]
     return round(sum(session.duration for session in week_sessions) / 3600, 1)

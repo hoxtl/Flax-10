@@ -20,27 +20,31 @@ from ..helpers.test_case_support import BaseTestCase
 
 class ScheduleViewsTests(BaseTestCase):
     """Tests schedule views."""
+
     def setUp(self):
         super().setUp()
         self.url = '/api/schedules/'
-
-        now = timezone.now()
+        self.now = timezone.now()
         self.module = Module.objects.create(
             module_code='CS100',
             module_name='Foundations',
             description='Test module',
             created_by=self.user,
-            start_time=now,
-            end_time=now + timedelta(hours=1),
+            start_time=self.now,
+            end_time=self.now + timedelta(hours=1),
             location='Room 1',
         )
         Enrollment.objects.create(student=self.user, module=self.module)
-        self.deadline = Deadline.objects.create(
+        self.deadline = self._create_deadline('Coursework 1')
+
+    def _create_deadline(self, title, days_offset=2, hours_offset=1):
+        due_time = self.now + timedelta(days=days_offset)
+        return Deadline.objects.create(
             module=self.module,
-            title='Coursework 1',
+            title=title,
             deadline_type='coursework',
-            start_due_date=now + timedelta(days=2),
-            end_due_date=now + timedelta(days=2, hours=1),
+            start_due_date=due_time,
+            end_due_date=due_time + timedelta(hours=hours_offset),
         )
 
     def test_create_auto_schedule(self):
@@ -182,11 +186,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(response.data['detail'], 'title is required.')
 
     def _create_second_deadline(self):
-        return Deadline.objects.create(
-            module=self.module, title='Coursework 2', deadline_type='coursework',
-            start_due_date=timezone.now() + timedelta(days=2),
-            end_due_date=timezone.now() + timedelta(days=2, hours=1),
-        )
+        return self._create_deadline('Coursework 2')
 
     def _set_daily_budget(self, minutes):
         settings, _ = UserSettings.objects.get_or_create(user=self.user)

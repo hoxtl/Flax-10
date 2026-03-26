@@ -22,6 +22,21 @@ from dataclasses import dataclass
 from typing import Callable, List
 
 
+IGNORED_DIRS = {
+    "node_modules",
+    "coverage",
+    "htmlcov",
+    "build",
+    "dist",
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "media",
+    "migrations",
+}
+
+
 class Colors:
     RED = "\033[91m"
     YELLOW = "\033[33m"
@@ -94,9 +109,8 @@ def is_test_file(file_path: str) -> bool:
 
 
 def walk_dir(directory: str, callback: Callable[[str], None]) -> None:
-    ignored = {"node_modules", "coverage", "build", "dist", ".git", "__pycache__", ".venv", "venv"}
     for root, dirs, files in os.walk(directory):
-        dirs[:] = [d for d in dirs if d not in ignored]
+        dirs[:] = [d for d in dirs if d not in IGNORED_DIRS]
         for file_name in files:
             callback(os.path.join(root, file_name))
 
