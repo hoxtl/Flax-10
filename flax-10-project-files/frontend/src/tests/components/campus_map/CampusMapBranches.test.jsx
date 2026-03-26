@@ -44,31 +44,15 @@ import { UserJourneySection } from "../../../components/campus_map/UserJourneySe
 import { TransportModesSection } from "../../../components/campus_map/TransportModesSection";
 import { CampusMapSidebar } from "../../../components/campus_map/CampusMapSidebar";
 
-function JourneyHarness({
-  initialStart = "",
-  initialDestination = "",
-  locating = false,
-  onCalculate = vi.fn(),
-  onClearAll = vi.fn(),
-  onGeolocateStart = vi.fn(),
-  onGeolocateDestination = vi.fn(),
-}) {
-  const [manualStart, setManualStart] = useState(initialStart);
-  const [manualDestination, setManualDestination] = useState(initialDestination);
-
-  return (
-    <UserJourneySection
-      manualStart={manualStart}
-      setManualStart={setManualStart}
-      manualDestination={manualDestination}
-      setManualDestination={setManualDestination}
-      onCalculate={onCalculate}
-      onClearAll={onClearAll}
-      onGeolocateStart={onGeolocateStart}
-      onGeolocateDestination={onGeolocateDestination}
-      locating={locating}
-    />
-  );
+function JourneyHarness(props) {
+  const [manualStart, setManualStart] = useState(props.initialStart || "");
+  const [manualDestination, setManualDestination] = useState(props.initialDestination || "");
+  const hProps = {
+    onCalculate: vi.fn(), onClearAll: vi.fn(),
+    onGeolocateStart: vi.fn(), onGeolocateDestination: vi.fn(),
+    ...props, manualStart, setManualStart, manualDestination, setManualDestination
+  };
+  return <UserJourneySection {...hProps} />;
 }
 
 describe("UserJourneySection", () => {
@@ -77,28 +61,22 @@ describe("UserJourneySection", () => {
     geocodeAddressMock.mockResolvedValue({ latitude: 51.5, longitude: -0.1 });
   });
 
-  it("parses coordinate input, enables calculate, and clears both fields", async () => {
+  it("parses coordinate input and enables calculate", async () => {
     const onCalculate = vi.fn();
-    const onClearAll = vi.fn();
-
-    render(
-      <JourneyHarness
-        initialStart="51.5000, -0.1200"
-        initialDestination="51.5100,-0.1300"
-        onCalculate={onCalculate}
-        onClearAll={onClearAll}
-      />
-    );
-
+    render(<JourneyHarness
+      initialStart="51.5000, -0.1200" initialDestination="51.5100,-0.1300"
+      onCalculate={onCalculate}
+    />);
     await waitFor(() => expect(screen.getByRole("button", { name: /calculate route/i })).toBeEnabled());
     fireEvent.click(screen.getByRole("button", { name: /calculate route/i }));
-
     expect(geocodeAddressMock).not.toHaveBeenCalled();
     expect(onCalculate).toHaveBeenCalledWith(
-      { latitude: 51.5, longitude: -0.12 },
-      { latitude: 51.51, longitude: -0.13 }
+      { latitude: 51.5, longitude: -0.12 }, { latitude: 51.51, longitude: -0.13 }
     );
-
+  });
+  it("clears both fields and calls onClearAll", async () => {
+    const onClearAll = vi.fn();
+    render(<JourneyHarness initialStart="A" initialDestination="B" onClearAll={onClearAll} />);
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
     expect(screen.getByLabelText("Enter a starting location")).toHaveValue("");
     expect(screen.getByLabelText("Enter a destination")).toHaveValue("");
@@ -282,31 +260,22 @@ describe("CampusMapSidebar", () => {
     expect(sidebarContentMock).toHaveBeenCalled();
   });
 
-  it("switches mobile sheets between open and closed animation states", () => {
-    const { rerender } = render(
-      <CampusMapSidebar
-        showInitialSkeleton={false}
-        ui={{ isMobile: true, mobileInitialOpen: true }}
-        disruptions={[]}
-        loadingDisruptions={false}
-      />
-    );
-
-    let props = JSON.parse(screen.getByTestId("sidebar").dataset.props);
+  it("uses open animation state for mobile sheets", () => {
+    render(<CampusMapSidebar
+      showInitialSkeleton={false} ui={{ isMobile: true, mobileInitialOpen: true }}
+      disruptions={[]} loadingDisruptions={false}
+    />);
+    const props = JSON.parse(screen.getByTestId("sidebar").dataset.props);
     expect(props.initial).toBe("open");
     expect(props.animate).toBe("open");
     expect(props.drag).toBe("y");
-
-    rerender(
-      <CampusMapSidebar
-        showInitialSkeleton={false}
-        ui={{ isMobile: true, mobileInitialOpen: false }}
-        disruptions={[]}
-        loadingDisruptions={false}
-      />
-    );
-
-    props = JSON.parse(screen.getByTestId("sidebar").dataset.props);
+  });
+  it("uses closed animation state for mobile sheets", () => {
+    render(<CampusMapSidebar
+      showInitialSkeleton={false} ui={{ isMobile: true, mobileInitialOpen: false }}
+      disruptions={[]} loadingDisruptions={false}
+    />);
+    const props = JSON.parse(screen.getByTestId("sidebar").dataset.props);
     expect(props.animate).toBeUndefined();
   });
 });

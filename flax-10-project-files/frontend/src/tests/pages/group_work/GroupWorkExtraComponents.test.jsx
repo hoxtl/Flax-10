@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 
 import GroupProjectDetail from "../../../pages/group_work/GroupWorkDetail";
 import MemberAvatar from "../../../pages/group_work/components/MemberAvatar";
@@ -138,6 +138,14 @@ describe("GroupWork extra components", () => {
       expect(onToggle).toHaveBeenCalledWith("1");
     });
 
+    it("toggles members when the checkbox is clicked", () => {
+      const onToggle = vi.fn();
+      render(<MemberFilter members={[{ id: 1, user: 1, name: "Alex" }]} selectedUsers={[]} onToggle={onToggle} />);
+      fireEvent.mouseEnter(screen.getByRole("button", { name: /Filter/ }).parentElement);
+      fireEvent.click(screen.getByRole("checkbox"));
+      expect(onToggle).toHaveBeenCalledWith("1");
+    });
+
     it("renders the empty state and hides it after mouse leave", () => {
       render(<MemberFilter members={[]} selectedUsers={["1"]} onToggle={vi.fn()} />);
       const wrapper = screen.getByRole("button", { name: /Filter/ }).parentElement;
@@ -146,6 +154,15 @@ describe("GroupWork extra components", () => {
       expect(emptyMessage).toBeInTheDocument();
       fireEvent.mouseLeave(wrapper);
       expect(emptyMessage).not.toBeVisible();
+    });
+
+    it("opens from the filter button and closes on mouse leave", () => {
+      render(<MemberFilter members={[]} selectedUsers={[]} onToggle={vi.fn()} />);
+      const button = screen.getByRole("button", { name: /Filter/ });
+      fireEvent.click(button);
+      expect(screen.getByText("No members")).toBeInTheDocument();
+      fireEvent.mouseLeave(button.closest("div"));
+      return waitForElementToBeRemoved(() => screen.getByText("No members"));
     });
   });
 

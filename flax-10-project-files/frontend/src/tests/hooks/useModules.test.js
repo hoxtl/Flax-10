@@ -10,6 +10,10 @@ vi.mock('../../context/NotificationContext.jsx', () => ({
     useNotifications: vi.fn(() => ({ addNotification: vi.fn() })),
 }));
 
+vi.mock('../../context/TagContext.jsx', () => ({
+    useTags: vi.fn(() => ({ refreshTags: vi.fn(async () => {}) })),
+}));
+
 vi.mock('../../api/moduleApi.js', () => ({
     getModules: vi.fn(),
     getEnrollments: vi.fn(),

@@ -4,12 +4,14 @@
 .modalShell {
     width: 90%;
     max-width: 460px;
+    overflow: visible !important;
 }
 
 .modalContent {
     display: flex;
     flex-direction: column;
     padding-top: 0;
+    overflow: visible !important;
 }
 
 .searchContainer {

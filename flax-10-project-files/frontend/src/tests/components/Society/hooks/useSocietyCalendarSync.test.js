@@ -43,13 +43,11 @@ describe('useSocietyCalendarSync', () => {
     });
 
     it('handles load error', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
         api.getSyncStatus.mockRejectedValue(new Error('fail'));
         const { result } = renderHook(() => useSocietyCalendarSync(mockId, 'Soc'));
         await act(async () => {});
-        expect(spy).toHaveBeenCalled();
+        expect(result.current.isSynced).toBe(false);
         expect(result.current.loading).toBe(false);
-        spy.mockRestore();
     });
 
     it('toggleSync unsyncs when already synced', async () => {
@@ -84,7 +82,6 @@ describe('useSocietyCalendarSync', () => {
     });
 
     it('toggleSync handles error', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
         const { result } = renderHook(() => useSocietyCalendarSync(mockId, 'Soc'));
         await act(async () => {});
         
@@ -92,8 +89,8 @@ describe('useSocietyCalendarSync', () => {
         await act(async () => {
             await result.current.toggleSync();
         });
-        expect(spy).toHaveBeenCalled();
-        spy.mockRestore();
+        expect(api.syncCalendar).toHaveBeenCalledWith(mockId);
+        expect(result.current.isSynced).toBe(false);
     });
 
     it('does not load if id is missing', () => {

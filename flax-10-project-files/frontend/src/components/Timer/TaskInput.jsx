@@ -15,26 +15,26 @@ const TASK_CARD_MOTION = {
   transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
 };
 
-function openPicker(state) {
+export function openPicker(state) {
   if (!state.open) state.loadTasks();
   state.setOpen((value) => !value);
 }
 
-function selectTask(task, state, onChange, onTaskSelect) {
+export function selectTask(task, state, onChange, onTaskSelect) {
   state.setSelectedTaskId(task.id);
   onChange(task.title);
   state.setOpen(false);
   onTaskSelect?.(task);
 }
 
-function clearTask(state, onChange, onClearTask) {
+export function clearTask(state, onChange, onClearTask) {
   state.setSelectedTaskId(null);
   onChange('');
   onClearTask?.();
   state.setRecommendedTaskId(null);
 }
 
-function pickRecommendedTask(state, onChange, onTaskSelect) {
+export function pickRecommendedTask(state, onChange, onTaskSelect) {
   if (!state.recommendedTask) return;
   state.setRecommendedTaskId(state.recommendedTask.id);
   window.setTimeout(() => selectTask(state.recommendedTask, state, onChange, onTaskSelect), 140);

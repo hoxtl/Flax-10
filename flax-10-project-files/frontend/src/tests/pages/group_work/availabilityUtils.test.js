@@ -60,6 +60,10 @@ describe('availabilityUtils – formatSuggestionDateLabel', () => {
     expect(formatSuggestionDateLabel(null)).toBe('--');
   });
 
+  it('returns -- for invalid date strings', () => {
+    expect(formatSuggestionDateLabel('not-a-date')).toBe('--');
+  });
+
   it('returns a formatted date string', () => {
     const result = formatSuggestionDateLabel('2026-03-24');
     expect(result).toContain('24');

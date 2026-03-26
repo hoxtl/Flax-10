@@ -4,19 +4,20 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
+import { useTags } from '../../../context/TagContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
 import { fetchTasks } from '../../../api/taskApi.js';
 import { isEnrolledIn, getEnrollmentId, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { createNotify } from '../utils/notifyHelper.js';
 import { useConfirm } from '../../../context/ConfirmContext.jsx';
 
-function buildEnrollmentHandlers(enrollments, setEnrollments, notify) {
+function buildEnrollmentHandlers(enrollments, setEnrollments, notify, refreshTags) {
   return {
-    handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify),
-    handleDisenrol: (m) => handleDisenrol(m, enrollments, setEnrollments, notify),
+    handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify, refreshTags),
+    handleDisenrol: (m) => handleDisenrol(m, enrollments, setEnrollments, notify, refreshTags),
     toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments)
-      ? handleDisenrol(m, enrollments, setEnrollments, notify)
-      : handleEnrollment(m, setEnrollments, notify),
+      ? handleDisenrol(m, enrollments, setEnrollments, notify, refreshTags)
+      : handleEnrollment(m, setEnrollments, notify, refreshTags),
   };
 }
 
@@ -29,8 +30,8 @@ function buildModuleHandlers(setModules, notify, confirmFn) {
   };
 }
 
-function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn, taskCountsByModule) {
-  const enrollmentHandlers = buildEnrollmentHandlers(enrollments, setEnrollments, notify);
+function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn, taskCountsByModule, refreshTags) {
+  const enrollmentHandlers = buildEnrollmentHandlers(enrollments, setEnrollments, notify, refreshTags);
   const moduleHandlers = buildModuleHandlers(setModules, notify, confirmFn);
   return { modules, enrollments, loading, taskCountsByModule, ...enrollmentHandlers, ...moduleHandlers };
 }
@@ -67,11 +68,17 @@ function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule,
     .finally(() => setLoading(false));
 }
 
-async function handleEnrollment(module, setEnrollments, notify) {
+async function safeRefreshTags(refreshTags) {
+  if (!refreshTags) return;
+  await refreshTags().catch(() => { });
+}
+
+async function handleEnrollment(module, setEnrollments, notify, refreshTags) {
   try {
     const new_enrollment = await enrollInModule(module.id);
     setEnrollments(prev => [...prev, new_enrollment]);
     notify(`Successfully enrolled in ${module.module_name}! Check your calendar for any updates.`, 'success');
+    await safeRefreshTags(refreshTags);
   } catch (err) {
     notify(err.message, 'error');
   }
@@ -85,12 +92,13 @@ function handleDisenrolError(err, module, setEnrollments, notify) {
   }
 }
 
-async function handleDisenrol(module, enrollments, setEnrollments, notify) {
+async function handleDisenrol(module, enrollments, setEnrollments, notify, refreshTags) {
   try {
     const enrollment_id = getEnrollmentId(module.id, enrollments);
     await disenrolFromModule(enrollment_id);
     setEnrollments(prev => prev.filter(e => e.id !== enrollment_id));
     notify(`Unenrolled from ${module.module_name}!`, 'success');
+    await safeRefreshTags(refreshTags);
   } catch (err) {
     handleDisenrolError(err, module, setEnrollments, notify);
   }
@@ -131,15 +139,10 @@ export default function useModules() {
   const { addNotification } = useNotifications();
   const notify = useMemo(() => createNotify(addNotification), [addNotification]);
   const confirmFn = useConfirm();
+  const { refreshTags } = useTags();
   useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, [notify]);
   return useModuleActions(
-    modules,
-    enrollments,
-    loading,
-    setModules,
-    setEnrollments,
-    notify,
-    confirmFn,
-    taskCountsByModule,
+    modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn,
+    taskCountsByModule, refreshTags
   );
 }

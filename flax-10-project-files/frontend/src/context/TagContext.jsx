@@ -111,7 +111,7 @@ function mapBackendTag(tag) {
 export function useTags() {
     const context = useContext(TagContext);
     if (!context) {
-        return { tags: [], loading: false, getTag: () => null, addTag: () => { }, deleteTag: () => { }, updateTag: () => { }, refreshTags: () => { } };
+        return { tags: [], loading: false, getTag: () => null, addTag: () => { }, deleteTag: () => { }, updateTag: () => { }, refreshTags: async () => { } };
     }
     return context;
 }
