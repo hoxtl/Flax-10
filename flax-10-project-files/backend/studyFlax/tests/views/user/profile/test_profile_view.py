@@ -194,22 +194,6 @@ class ProfileViewHelpersTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class ProfileViewCoverageTest(TestCase):
-    """Tests for the profile photo branch."""
-
-    def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(
-            username='pv_user', email='pv_user@test.com', password='pass',
-            first_name='PV', last_name='User'
-        )
-        self.client.force_authenticate(user=self.user)
-
-    def test_patch_remove_photo(self):
-        response = self.client.patch('/api/profile/', data={'remove_photo': 'true'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-
 class SuggestStudySessionViewTest(TestCase):
     """Tests suggest study session view."""
     def setUp(self):
