@@ -25,7 +25,7 @@ vi.mock("../../../../pages/attendance/components/SegmentDetailPanel", () => ({
   default: () => <div data-testid="segment-detail-panel" />,
 }));
 
-import { beforeEach, CompactAttendanceTile, expect, fireEvent, render, screen, ThisWeek, useAttendanceWidgetData } from "./ProfileWidgets.shared";
+import { beforeEach, CompactAttendanceTile, expect, fireEvent, render, screen, ThisWeek, useAttendanceWidgetData } from "./ProfileWidgets.shared.jsx";
 
 describe("ThisWeek", () => {
   it("returns null when weekly is missing", () => {

@@ -28,7 +28,7 @@ vi.mock("../../components/common/page_transition/PageTransition", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../components/common/tabs/Tabs", () => ({
+vi.mock("../../components/common/Tabs/Tabs", () => ({
   default: ({ tabs, activeTab, onTabChange, rightAction }) => (
     <div>
       {rightAction}

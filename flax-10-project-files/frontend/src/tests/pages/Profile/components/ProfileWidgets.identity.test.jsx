@@ -25,7 +25,7 @@ vi.mock("../../../../pages/attendance/components/SegmentDetailPanel", () => ({
   default: () => <div data-testid="segment-detail-panel" />,
 }));
 
-import { expect, fireEvent, MiniHeatmap, PersonaCard, render, screen, StudyDNA } from "./ProfileWidgets.shared";
+import { expect, fireEvent, MiniHeatmap, PersonaCard, render, screen, StudyDNA } from "./ProfileWidgets.shared.jsx";
 
 describe("PersonaCard", () => {
   it("returns null when persona is null", () => {

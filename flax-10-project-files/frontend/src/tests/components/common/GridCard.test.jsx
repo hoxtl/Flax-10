@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import GridCard from "../../../components/common/card/GridCard";
+import GridCard from "../../../components/common/Card/GridCard";
 
 describe("GridCard", () => {
   it("renders with default className trimming and custom style", () => {

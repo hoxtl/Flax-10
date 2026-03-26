@@ -17,7 +17,7 @@ import {
   getTodayLabel,
   getTravelContext,
   getUpcomingEvent,
-} from "../../../pages/homepage/components/intelligenceUtils";
+} from "../../../pages/homepage/components/IntelligenceUtils";
 
 const pinnedNow = new Date("2026-03-24T09:30:00.000Z");
 const baseLiveContextInput = {

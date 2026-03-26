@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Sidebar from '../../components/dashboard/sidebar';
+import Sidebar from '../../components/dashboard/Sidebar';
 
 vi.mock('framer-motion', () => ({
   motion: {
