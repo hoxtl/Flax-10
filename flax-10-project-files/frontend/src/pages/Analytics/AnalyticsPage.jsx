@@ -9,12 +9,8 @@ import { useAuth } from '../../context/AuthContext';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import getAnalyticsTabs from './components/AnalyticsPageTabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
-<<<<<<< HEAD
-import EmptyState from '../../components/common/EmptyState/EmptyState';
+import EmptyState from '../../components/common/empty_state/EmptyState';
 import { BackToTop } from '../../components/Pagination/Pagination';
-=======
-import { BackToTop } from '../../components/Pagination/Pagination';
->>>>>>> origin/main
 import { PERIODS } from './pageConfig';
 import { useAnalyticsPageState } from './pageState';
 import styles from './AnalyticsPage.module.css';

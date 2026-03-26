@@ -3,20 +3,11 @@
  */
 
 import { useState } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/GroupWork/components/CreateProjectForm.jsx
-import FormField from "../../../components/common/FormField/FormField";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
-import { TagsSelector } from "../../../components/common/TagsSelector/TagsSelector";
-import UserSearch from "../../../components/Social/UserSearch";
-=======
 import FormField from "../../../components/common/form_field/FormField";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
-import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import { TagsSelector } from "../../../components/common/tags_selector/TagsSelector";
 import UserSearch from "../../../components/Social/UserSearch";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/group_work/components/CreateProjectForm.jsx
 import { CreateProjectInputs } from "./CreateProjectInputs";
 import GroupWorkUserSearchEmptyState from "./GroupWorkUserSearchEmptyState";
 import { getStoredViewer } from "../utils/memberAvatarUtils";

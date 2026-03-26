@@ -1,12 +1,8 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import AnimatedDropdown from '../../../common/animated_dropdown';
 import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/EventModal/components/TimeRow.jsx
 import { FREQUENCY_OPTIONS } from './recurrenceOptions';
 import './TimeRow.css';
-=======
-import './time-row.css';
->>>>>>> origin/main:flax-10-project-files/frontend/src/components/Calendar/event_modal/components/TimeRow.jsx
 
 export function TimeRow({ form, update, setForm, recurrenceValue, onRecurrenceChange }) {
     return (

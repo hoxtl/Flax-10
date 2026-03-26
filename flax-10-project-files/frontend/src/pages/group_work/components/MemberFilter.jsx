@@ -4,13 +4,9 @@
 
 import { useState, useRef } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/GroupWork/components/MemberFilter.jsx
-import FilterButton from "../../../components/common/FilterButton/FilterButton";
-=======
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName } from "../utils/memberAvatarUtils";
 import FilterButton from "../../../components/common/filter_button/FilterButton";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/group_work/components/MemberFilter.jsx
 import { useClickOutside } from "../../../components/common/hooks/useClickOutside";
 import SelectableMemberRow from "./SelectableMemberRow";
 import styles from "./MemberFilter.module.css";

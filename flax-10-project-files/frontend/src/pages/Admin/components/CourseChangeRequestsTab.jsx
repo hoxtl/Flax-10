@@ -3,12 +3,7 @@
  */
 
 import { fetchCourseChangeRequests, resolveCourseChangeRequest } from "../../../api/adminApi";
-<<<<<<< HEAD
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
-=======
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
-import styles from "../styles";
->>>>>>> origin/main
 import { ADMIN_LIST_PAGE_SIZE } from "../constants";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncList } from "../hooks/useAsyncList";

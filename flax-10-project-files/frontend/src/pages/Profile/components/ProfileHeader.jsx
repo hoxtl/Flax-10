@@ -274,7 +274,6 @@ function HeaderInsightsEmptyState() {
 }
 
 function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, visibility }) {
-<<<<<<< HEAD
   const hasBadges = badges?.length > 0;
   const hasInsights = hasBadges || !!persona;
 
@@ -286,13 +285,6 @@ function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, pe
     <div className={styles.headerBadgesPersonaRow}>
       {hasBadges && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}
       {persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}
-=======
-  if (!badges?.length && !persona) return null;
-  return (
-    <div className={styles.headerBadgesPersonaRow}>
-      <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />
-      <PersonaInlineChip persona={persona} peakHour={peakHour} />
->>>>>>> origin/main
     </div>
   );
 }

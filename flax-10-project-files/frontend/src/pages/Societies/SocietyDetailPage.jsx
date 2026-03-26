@@ -16,12 +16,8 @@ import ReportSocietyModal from "../../components/Society/society_detail/ReportSo
 import MemberDirectoryModal from "../../components/Society/society_detail/MemberDirectoryModal";
 import { Flag } from "lucide-react";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
-<<<<<<< HEAD
-import BackButton from "../../components/common/BackButton/BackButton.jsx";
-import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
-=======
 import BackButton from "../../components/common/back_button/BackButton.jsx";
->>>>>>> origin/main
+import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { useLocation } from "react-router-dom";
 import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
 import { getImageUrls } from "./SocietyDetailPageUtils";

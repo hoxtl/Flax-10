@@ -5,16 +5,9 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/GroupWork/components/ProjectHeaderMeta.jsx
-import Badge from "../../../components/common/Badge/Badge";
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
-import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
-=======
-import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/group_work/components/ProjectHeaderMeta.jsx
 import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
