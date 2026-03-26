@@ -3,16 +3,16 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { calculateEventLayout } from '../../../components/calendar/week_view/components/allDayRowHelpers';
+import { calculateEventLayout } from '../../../components/Calendar/week_view/components/allDayRowHelpers';
 
 // Mock dependencies
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
     isSameDay: vi.fn((d1, d2) => {
         return d1.toDateString() === d2.toDateString();
     }),
 }));
 
-vi.mock('../../../components/calendar/utils/eventDisplayUtils', () => ({
+vi.mock('../../../components/Calendar/utils/eventDisplayUtils', () => ({
     getAllDayVisualRange: vi.fn((event) => {
         if (event._noRange) return null;
         const start = new Date(event.start_time);
@@ -23,7 +23,7 @@ vi.mock('../../../components/calendar/utils/eventDisplayUtils', () => ({
     }),
 }));
 
-const { getAllDayVisualRange } = await import('../../../components/calendar/utils/eventDisplayUtils');
+const { getAllDayVisualRange } = await import('../../../components/Calendar/utils/eventDisplayUtils');
 
 function makeDays(startStr, count = 7) {
     const days = [];

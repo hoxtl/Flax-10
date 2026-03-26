@@ -27,6 +27,7 @@ def _make_module(user, code='NP01', name='New Projects Module'):
 
 class SeedNewUserProjectsTest(TestCase):
     """Tests seed new user projects."""
+
     def setUp(self):
         self.user = make_user('np_user', 'np_user@e.com')
         self.now = timezone.now()

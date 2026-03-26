@@ -23,14 +23,14 @@ vi.mock("../../../lib/routes", () => ({
   ],
 }));
 
-import SidebarDesktop from "../../../components/dashboard/sidebar/SidebarDesktop";
-import SidebarMobile from "../../../components/dashboard/sidebar/SidebarMobile";
-import useDeadlinePressure from "../../../components/dashboard/sidebar/useDeadlinePressure";
+import SidebarDesktop from "../../../components/Dashboard/sidebar/SidebarDesktop";
+import SidebarMobile from "../../../components/Dashboard/sidebar/SidebarMobile";
+import useDeadlinePressure from "../../../components/Dashboard/sidebar/useDeadlinePressure";
 import {
   getDeadlineTime,
   getSidebarRoutes,
   hasDeadlineWithin48Hours,
-} from "../../../components/dashboard/sidebar/sidebarUtils";
+} from "../../../components/Dashboard/sidebar/sidebarUtils";
 
 describe("Dashboard sidebar extras", () => {
   beforeEach(() => {

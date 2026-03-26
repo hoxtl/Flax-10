@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import SettingsModal from '../../../components/society/society_detail/SettingsModal';
+import SettingsModal from '../../../components/Society/society_detail/SettingsModal';
 
 const confirmMock = vi.fn();
 
@@ -8,12 +8,12 @@ vi.mock('../../../context/ConfirmContext', () => ({
   useConfirm: () => confirmMock,
 }));
 
-vi.mock('../../../components/society/society_detail/SettingsModal.module.css', () => ({
+vi.mock('../../../components/Society/society_detail/SettingsModal.module.css', () => ({
     default: { backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title' }
 }));
-import styles from '../../../components/society/society_detail/SettingsModal.module.css';
+import styles from '../../../components/Society/society_detail/SettingsModal.module.css';
 
-vi.mock('../../../components/society/AddCollaboratorModal', () => ({
+vi.mock('../../../components/Society/AddCollaboratorModal', () => ({
   default: ({ onClose, onAdd, existingUsernames }) => (
     <div>
       <div data-testid="existing-users">{existingUsernames.join(',')}</div>
@@ -23,7 +23,7 @@ vi.mock('../../../components/society/AddCollaboratorModal', () => ({
   ),
 }));
 
-vi.mock('../../../components/society/CollaboratorList', () => ({
+vi.mock('../../../components/Society/CollaboratorList', () => ({
   default: ({ collaborators, onRoleChange, onRemove }) => (
     <div>
       <div data-testid="collab-count">{collaborators.length}</div>
@@ -33,7 +33,7 @@ vi.mock('../../../components/society/CollaboratorList', () => ({
   ),
 }));
 
-vi.mock('../../../components/society/society_detail/RatificationSection', () => ({
+vi.mock('../../../components/Society/society_detail/RatificationSection', () => ({
   RatificationSection: ({ status }) => <div>Ratification: {status}</div>,
 }));
 

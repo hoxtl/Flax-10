@@ -6,7 +6,7 @@
 import UserSearch from "../../../components/Social/UserSearch";
 =======
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
-import UserSearch from "../../../components/social/UserSearch";
+import UserSearch from "../../../components/Social/UserSearch";
 >>>>>>> origin/main:flax-10-project-files/frontend/src/pages/group_work/components/AddMemberForm.jsx
 import { addProjectMember } from "../api/groupWorkApi";
 import GroupWorkUserSearchEmptyState from "./GroupWorkUserSearchEmptyState";

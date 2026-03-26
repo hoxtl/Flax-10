@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatHour12h, formatTime, formatTime12h, formatTimeHHMM, fmtDurationShort } from "../../../pages/homepage/utils/dateFormatUtils";
+import { formatHour12h, formatTime, formatTime12h, formatTimeHHMM, fmtDurationShort } from "../../../pages/Homepage/utils/dateFormatUtils";
 
 describe("homepageDateFormatUtils", () => {
   it("formats short 24-hour time strings gracefully", () => {

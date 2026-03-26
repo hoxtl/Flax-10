@@ -7,34 +7,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { createFnMap } from '../../utils/testBuilderUtils';
 
-// ---------------------------------------------------------------------------
 // CSS module mocks
-// ---------------------------------------------------------------------------
-vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
-vi.mock('../../../components/timer/TreeAnimation.module.css', () => ({
+vi.mock('../../../components/Timer/TreeAnimation.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-// ---------------------------------------------------------------------------
 // Dependency mocks for TimerCircle
-// ---------------------------------------------------------------------------
-vi.mock('../../../components/timer/FocusAnimation', () => ({
+vi.mock('../../../components/Timer/FocusAnimation', () => ({
   default: ({ progress, mode, isActive, showPicker }) => (
     <div data-testid="focus-animation" data-progress={progress} data-mode={mode} data-active={String(isActive)} data-showpicker={String(showPicker)} />
   ),
 }));
 
-vi.mock('../../../components/timer/TimerComponents', () => ({
+vi.mock('../../../components/Timer/TimerComponents', () => ({
   TimerDisplay: ({ timeLeft, mode, isOvertime }) => (
     <div data-testid="timer-display" data-timeleft={timeLeft} data-mode={mode} data-overtime={String(isOvertime)} />
   ),
 }));
 
-// ---------------------------------------------------------------------------
 // Canvas mock for FocusAnimation real tests
-// ---------------------------------------------------------------------------
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   clearRect: vi.fn(),
   beginPath: vi.fn(),
@@ -45,15 +39,11 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 vi.stubGlobal('requestAnimationFrame', vi.fn(() => 0));
 vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
-// ---------------------------------------------------------------------------
 // Imports under test
-// ---------------------------------------------------------------------------
-import TimerCircle, { TimerRing } from '../../../components/timer/TimerCircle';
-import FocusAnimation from '../../../components/timer/FocusAnimation';
+import TimerCircle, { TimerRing } from '../../../components/Timer/TimerCircle';
+import FocusAnimation from '../../../components/Timer/FocusAnimation';
 
-// ---------------------------------------------------------------------------
 // Helper timer state
-// ---------------------------------------------------------------------------
 const timerActionNames = ['setIsActive', 'togglePause', 'resetTimer', 'setModal'];
 const baseTimerProps = {
   mode: 'work', workTime: 25, breakTime: 5, timeLeft: 1500, progress: 50,
@@ -67,9 +57,7 @@ const makeT = (overrides = {}) => ({
   ...overrides,
 });
 
-// ---------------------------------------------------------------------------
 // TimerCircle
-// ---------------------------------------------------------------------------
 
 describe('TimerCircle', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -205,9 +193,7 @@ describe('TimerCircle', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // TimerRing
-// ---------------------------------------------------------------------------
 
 describe('TimerRing', () => {
   it('renders SVG ring', () => {
@@ -237,9 +223,7 @@ describe('TimerRing', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // FocusAnimation – showPicker=false branch
-// ---------------------------------------------------------------------------
 
 describe('FocusAnimation – showPicker=false', () => {
   beforeEach(() => {

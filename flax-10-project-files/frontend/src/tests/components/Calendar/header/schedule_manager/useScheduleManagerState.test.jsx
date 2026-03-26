@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
-import { buildScheduleManagerHandlers, useScheduleManagerState } from "../../../../../components/calendar/header/schedule_manager/useScheduleManagerState";
+import { buildScheduleManagerHandlers, useScheduleManagerState } from "../../../../../components/Calendar/header/schedule_manager/useScheduleManagerState";
 
 const getSchedules = vi.fn();
 const renameSchedule = vi.fn();

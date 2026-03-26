@@ -40,6 +40,7 @@ def _make_reading(module, title="Chapter 1", start=1, end=20, deadline=None, est
 
 class ReadingModelTests(BaseTestCase):
     """Tests reading model."""
+
     def test_page_count(self):
         teacher = _make_teacher()
         module = _make_module(teacher)

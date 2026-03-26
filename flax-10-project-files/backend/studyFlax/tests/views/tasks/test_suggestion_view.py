@@ -15,6 +15,7 @@ User = get_user_model()
 
 class SuggestionViewsTest(TestCase):
     """Tests suggestion views."""
+
     def setUp(self):
         self.client = APIClient()
         self.owner = User.objects.create_user(username="owner", email="o@e.com", password="p")

@@ -17,6 +17,7 @@ User = get_user_model()
 
 class SocietyEventViewTest(TestCase):
     """Tests society event view."""
+
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username="admin", email="admin@example.com", password="pass")

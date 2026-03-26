@@ -2,7 +2,7 @@
  * Shared attendance widget primitives.
  */
 
-import SegmentDetailPanel from "../../../../attendance/components/SegmentDetailPanel";
+import SegmentDetailPanel from "../../../../Attendance/components/SegmentDetailPanel";
 import { PieChart } from "@mui/x-charts/PieChart";
 import widgetStyles from "../ProfileWidgets.module.css";
 import attendanceStyles from "../ProfileAttendance.module.css";

@@ -5,13 +5,13 @@
 import { render as rtlRender, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { EventPopover } from '../../../../components/calendar/event_popover/EventPopover';
+import { EventPopover } from '../../../../components/Calendar/event_popover/EventPopover';
 import { createMockEvent, createMockTag } from '../mocks/calendarMocks';
 
 const mockCalculatePopoverPosition = vi.fn(() => ({ top: 100, left: 200, placement: 'right' }));
 const mockCalculateArrowPosition = vi.fn(() => 50);
 
-vi.mock('../../../../components/calendar/event_popover/popoverUtils', () => ({
+vi.mock('../../../../components/Calendar/event_popover/popoverUtils', () => ({
     calculatePopoverPosition: (...args) => mockCalculatePopoverPosition(...args),
     calculateArrowPosition: (...args) => mockCalculateArrowPosition(...args),
 }));

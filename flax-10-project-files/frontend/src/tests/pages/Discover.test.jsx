@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import Discover from '../../pages/discover/Discover';
+import Discover from '../../pages/Discover/Discover';
 
 vi.mock('../../api/userApi', () => ({
     searchUsers: vi.fn().mockResolvedValue({ results: [], total_count: 0 }),
 }));
 
-vi.mock('../../components/social/UserSearch', () => ({
+vi.mock('../../components/Social/UserSearch', () => ({
     FilterSection: () => <div data-testid="filter-section" />,
     useSearchInit: vi.fn(() => ({ allCourses: {}, allSocieties: [] })),
     useFilterState: vi.fn(() => ({
@@ -17,7 +17,7 @@ vi.mock('../../components/social/UserSearch', () => ({
     useClickOutside: vi.fn(),
 }));
 
-vi.mock('../../components/pagination/Pagination', () => ({
+vi.mock('../../components/Pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages }) => (
         <div data-testid="pagination">{currentPage}/{totalPages}</div>
     ),

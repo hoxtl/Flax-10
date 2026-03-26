@@ -3,15 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const useModulesPageStateMock = vi.fn();
 
-vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/Modules/modulesPageHooks.js", () => ({
   useModulesPageState: (...args) => useModulesPageStateMock(...args),
 }));
 
-vi.mock("../../../pages/modules/ModulesPageResults.jsx", () => ({
+vi.mock("../../../pages/Modules/ModulesPageResults.jsx", () => ({
   MainView: () => <div>Main view</div>,
 }));
 
-vi.mock("../../../pages/modules/ModulesPageChrome.jsx", () => ({
+vi.mock("../../../pages/Modules/ModulesPageChrome.jsx", () => ({
   AnimatedContent: () => <div>Animated content</div>,
   ModulesPageModals: () => <div>Page modals</div>,
   ModulesSkeleton: () => <div data-testid="modules-skeleton" />,
@@ -29,7 +29,7 @@ vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal.jsx", ()
   ),
 }));
 
-import ModulesPage from "../../../pages/modules/ModulesPage";
+import ModulesPage from "../../../pages/Modules/ModulesPage";
 
 describe("ModulesPage delete modal", () => {
   const originalEnv = process.env.NODE_ENV;

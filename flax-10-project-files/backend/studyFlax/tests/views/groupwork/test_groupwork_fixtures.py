@@ -11,6 +11,7 @@ from studyFlax.tests.helpers.test_case_support import BaseTestCase
 
 class GroupworkFixturesTests(BaseTestCase):
     """Tests groupwork fixtures."""
+
     def test_fixtures_are_defined(self):
         self.assertGreater(len(GROUP_PROJECT_FIXTURES), 0)
         self.assertGreater(len(GROUP_TASK_TEMPLATES), 0)

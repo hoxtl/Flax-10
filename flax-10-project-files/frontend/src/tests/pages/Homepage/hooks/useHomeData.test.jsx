@@ -17,7 +17,7 @@ vi.mock("../../../../api/eventApi", () => ({
   getEvents: (...args) => getEventsMock(...args),
 }));
 
-import { useHomeData } from "../../../../pages/homepage/hooks/useHomeData.js";
+import { useHomeData } from "../../../../pages/Homepage/hooks/useHomeData.js";
 
 describe("useHomeData", () => {
   beforeEach(() => {

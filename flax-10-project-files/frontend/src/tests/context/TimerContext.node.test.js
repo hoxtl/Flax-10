@@ -35,7 +35,7 @@ vi.mock('react', () => ({
   useState: (...args) => useStateMock(...args),
 }));
 
-vi.mock('../../components/timer/hooks/useTimerLogic', () => ({
+vi.mock('../../components/Timer/hooks/useTimerLogic', () => ({
   useTimerLogic: (...args) => useTimerLogicMock(...args),
 }));
 

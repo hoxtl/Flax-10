@@ -4,11 +4,11 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useSocietyDetail } from '../../components/society/hooks/useSocietyDetail';
+import { useSocietyDetail } from '../../components/Society/hooks/useSocietyDetail';
 
 const notifyMock = vi.fn();
 
-vi.mock('../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
   useNotify: () => notifyMock,
 }));
 

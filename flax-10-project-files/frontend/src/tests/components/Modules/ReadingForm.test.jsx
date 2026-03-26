@@ -4,9 +4,9 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ReadingForm from '../../../components/modules/readings/ReadingForm';
+import ReadingForm from '../../../components/Modules/Readings/ReadingForm';
 
-vi.mock('../../../components/modules/deadlines/DeadlineForm.module.css', () => ({ default: { } }));
+vi.mock('../../../components/Modules/Deadlines/DeadlineForm.module.css', () => ({ default: { } }));
 vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
     default: ({onChange, placeholder }) => (
         <input placeholder={placeholder} onChange={e =>onChange(e.target.value)} />

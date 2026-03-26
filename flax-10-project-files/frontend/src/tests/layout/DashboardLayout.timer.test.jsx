@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,87 +10,6 @@ import {
 
 beforeEach(async () => {
   await prepareDashboardLayoutTest();
-=======
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-
-const mockOpenModal = vi.fn();
-
-vi.mock("../../context/CalendarContext", () => ({
-  useCalendar: vi.fn(() => ({ selectedDate: new Date() })),
-  useEventModal: vi.fn(() => ({
-    isModalOpen: false, closeModal: vi.fn(), openModal: mockOpenModal,
-    modalEvent: null, modalType: null, modalInitialDate: null,
-  })),
-}));
-
-import DashboardLayout from "../../layout/DashboardLayout";
-import { useEventModal, useCalendar } from "../../context/CalendarContext";
-import { useLocation } from "react-router-dom";
-
-vi.mock("../../components/dashboard/sidebar", async () => {
-  const { SidebarMock } = await import("./dashboardMocks");
-  return { default: SidebarMock };
-});
-vi.mock("../../components/dashboard/Topbar", async () => {
-  const { TopbarMock } = await import("./dashboardMocks");
-  return { default: TopbarMock };
-});
-vi.mock("../../components/dashboard/QuickAddModal", async () => {
-  const { QuickAddMock } = await import("./dashboardMocks");
-  return { default: QuickAddMock };
-});
-vi.mock("../../components/calendar/event_modal/EventModal", async () => {
-  const { EventModalMock } = await import("./dashboardMocks");
-  return { EventModal: EventModalMock };
-});
-vi.mock("../../components/society/CreateSocietyModal", async () => {
-  const { CreateSocietyMock } = await import("./dashboardMocks");
-  return { default: CreateSocietyMock };
-});
-vi.mock("../../components/modules/deadlines/DeadlineModal", async () => {
-  const { DeadlineModalMock } = await import("./dashboardMocks");
-  return { default: DeadlineModalMock };
-});
-vi.mock("../../components/timer/TimerPopups", async () => {
-  const { LeaveTimerMock } = await import("./dashboardMocks");
-  return { LeaveTimerModal: LeaveTimerMock };
-});
-vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
-  const { CreateTaskMock } = await import("./dashboardMocks");
-  return { default: CreateTaskMock };
-});
-
-vi.mock("../../components/dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
-vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
-vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
-vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
-vi.mock("../../components/auth/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
-vi.mock("react-router-dom", () => ({
-  useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
-}));
-
-const mockTimerContext = {
-  isActive: false, isPaused: false, mode: "work", timeLeft: 1500,
-  togglePause: vi.fn(), setIsActive: vi.fn(), setMode: vi.fn(), setTimeLeft: vi.fn(), resetTimer: vi.fn(),
-};
-vi.mock("../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
-vi.mock("../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
-vi.mock("../../api/societyApi", () => ({ createSociety: vi.fn().mockResolvedValue({}) }));
-vi.mock("../../api/taskApi", () => ({
-  createTask: vi.fn().mockResolvedValue({}), fetchTaskLists: vi.fn().mockResolvedValue([]),
-}));
-vi.mock("../../api/moduleApi", () => ({
-  getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]),
-}));
-vi.mock("../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
-
-const mockStore = {};
-vi.stubGlobal('localStorage', {
-  setItem: (key, val) => { mockStore[key] = val.toString(); },
-  getItem: (key) => mockStore[key] || null,
-  removeItem: (key) => { delete mockStore[key]; },
->>>>>>> origin/main
 });
 
 function openHomeQuickAdd() {
@@ -282,7 +200,7 @@ describe("DashboardLayout - society, timer, global task", () => {
 
   it("GlobalTaskModal filters modules by isEnrolledIn so enrolledModules is passed to CreateTaskModal", async () => {
     const { getModules, getEnrollments } = await import("../../api/moduleApi");
-    const { isEnrolledIn } = await import("../../components/modules/utils/moduleUtils");
+    const { isEnrolledIn } = await import("../../components/Modules/utils/moduleUtils");
     getModules.mockResolvedValueOnce([{ id: 1, module_code: "CS101" }, { id: 2, module_code: "CS102" }]);
     getEnrollments.mockResolvedValueOnce([{ module: 1 }]);
     isEnrolledIn.mockImplementation((moduleId, enrollments) => enrollments.some((e) => e.module === moduleId));

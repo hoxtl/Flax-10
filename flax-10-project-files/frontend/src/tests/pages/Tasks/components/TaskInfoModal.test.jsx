@@ -5,7 +5,7 @@ vi.mock("../../../../api/readingApi", () => ({
   getReadingSpeed: vi.fn(),
 }));
 
-import { TaskInfoModal } from "../../../../pages/tasks/components/TaskInfoModal";
+import { TaskInfoModal } from "../../../../pages/Tasks/components/TaskInfoModal";
 import { getReadingSpeed } from "../../../../api/readingApi";
 
 describe("TaskInfoModal coverage", () => {

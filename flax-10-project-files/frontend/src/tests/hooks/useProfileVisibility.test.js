@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { useProfileVisibility } from '../../pages/profile/hooks/useProfileVisibility';
+import { useProfileVisibility } from '../../pages/Profile/hooks/useProfileVisibility';
 
 describe('useProfileVisibility', () => {
     it('returns isSelf and all canView* true when profile is self', () => {

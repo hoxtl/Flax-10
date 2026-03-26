@@ -5,10 +5,10 @@
 import styles from "./Topbar.module.css";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../../context/NotificationContext";
-import { NotificationPanel } from "../notifications/NotificationPanel";
+import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
-import MiniTimer from "../timer/MiniTimer";
+import MiniTimer from "../Timer/MiniTimer";
 import {
   Bell,
   BookOpen,

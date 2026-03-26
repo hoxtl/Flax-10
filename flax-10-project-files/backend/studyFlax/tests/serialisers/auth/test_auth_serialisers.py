@@ -19,6 +19,7 @@ User = get_user_model()
 
 class ResetPasswordSerializerTest(TestCase):
     """Tests reset password serialiser."""
+
     def test_normalise_email(self):
         from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordSerialiser
         serializer = ResetPasswordSerialiser()
@@ -41,6 +42,7 @@ class ResetPasswordSerializerTest(TestCase):
 
 class RegistrationSerializerEmailTest(TestCase):
     """Tests registration serialiser email."""
+
     def setUp(self):
         User.objects.create_user(
             username='existing', email='existing@test.com', password='pass',
@@ -61,6 +63,7 @@ class RegistrationSerializerEmailTest(TestCase):
 
 class AuthAndTaskCoverageTest(TestCase):
     """Tests auth and task coverage."""
+
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = User.objects.create_user(username='auth_cov', email='auth_cov@example.com', password='pass')
@@ -92,6 +95,7 @@ class AuthAndTaskCoverageTest(TestCase):
 
 class SerializerCoverageTest(TestCase):
     """Tests serialiser coverage."""
+
     def setUp(self):
         self.user = User.objects.create_user(username='ser_user', email='ser_user@test.com', password='pass')
 
@@ -166,6 +170,7 @@ class SerializerCoverageTest(TestCase):
 
 class ResetPasswordSerialiserCoverageTest(TestCase):
     """Tests reset password serialiser coverage."""
+
     def test_validate_email_normalises(self):
         from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordSerialiser
         s = ResetPasswordSerialiser(data={'email': 'Test@Example.COM'})
@@ -183,6 +188,7 @@ class ResetPasswordSerialiserCoverageTest(TestCase):
 
 class CommonSerialiserUtilsTest(TestCase):
     """Tests common serialiser utils."""
+
     def test_is_user_sharing_with_allow_self_returns_true(self):
         from studyFlax.serialisers.common import is_user_sharing_with
         user = User.objects.create_user(username='self_share', email='self_share@test.com', password='pass')
@@ -194,6 +200,7 @@ class CommonSerialiserUtilsTest(TestCase):
 
 class FormatTeacherNameTest(TestCase):
     """Tests format teacher name."""
+
     def test_returns_unknown_for_none_user(self):
         from studyFlax.serialisers.common import format_teacher_name
         self.assertEqual(format_teacher_name(None), 'Unknown')
@@ -201,6 +208,7 @@ class FormatTeacherNameTest(TestCase):
 
 class RegistrationSerialiserFieldTest(TestCase):
     """Tests registration serialiser field."""
+
     def test_get_first_name_from_valid_registration(self):
         from studyFlax.serialisers.auth.auth_serialisers import RegistrationUserSerialiser
         data = {

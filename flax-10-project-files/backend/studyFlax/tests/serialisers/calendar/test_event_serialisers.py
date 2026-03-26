@@ -64,6 +64,7 @@ class CalendarEventSerialiserTests(TestCase):
 
 class CalendarEventCreateSerialiserTests(TestCase):
     """Tests calendar event create serialiser."""
+
     def setUp(self):
         self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')
         self.tag = Tag.objects.create(user=self.user, name='Work', color='#0000FF')

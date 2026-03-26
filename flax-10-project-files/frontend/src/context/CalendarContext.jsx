@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, useMemo } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
-import { useReminderNotifications } from "../components/notifications/hooks/useReminderNotifications";
-import { getEffectiveTagName } from "../components/calendar/utils/eventUtils";
+import { useReminderNotifications } from "../components/Notifications/hooks/useReminderNotifications";
+import { getEffectiveTagName } from "../components/Calendar/utils/eventUtils";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);

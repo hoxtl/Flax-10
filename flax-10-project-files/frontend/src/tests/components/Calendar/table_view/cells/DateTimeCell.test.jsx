@@ -4,21 +4,21 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { DateTimeCell, formatTimeRange, isAllDay } from '../../../../../components/calendar/table_view/cells/DateTimeCell';
+import { DateTimeCell, formatTimeRange, isAllDay } from '../../../../../components/Calendar/table_view/cells/DateTimeCell';
 import { createMockEvent } from '../../mocks/calendarMocks';
 
 vi.mock('../../../../../components/common/inputs/DateTimePicker', () => ({
     default: ({ value, onChange }) => <input data-testid="datetime-picker" type="datetime-local" value={value} onChange={e => onChange(e.target.value)} />,
 }));
 
-vi.mock('../../../../../components/calendar/utils/dateValidation', () => ({
+vi.mock('../../../../../components/Calendar/utils/dateValidation', () => ({
     validateEventTimes: ({ start_time, end_time }) => {
         if (new Date(end_time) <= new Date(start_time)) return 'End time must be after start time';
         return null;
     },
 }));
 
-vi.mock('../../../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../../components/Calendar/utils/eventUtils', () => ({
     isAllDay: (e) => e.all_day,
 }));
 

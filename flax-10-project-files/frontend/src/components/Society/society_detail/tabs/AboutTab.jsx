@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import PrimaryButton from "../../../common/primary_button/PrimaryButton";
-import styles from "./tabs.module.css";
+import styles from "./Tabs.module.css";
 
 const isValidEmail = (email) => {
     const trimmed = email.trim();

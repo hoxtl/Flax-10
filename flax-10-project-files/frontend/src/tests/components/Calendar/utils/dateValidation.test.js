@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { validateDateRange, validateEventTimes } from '../../../../components/calendar/utils/dateValidation';
+import { validateDateRange, validateEventTimes } from '../../../../components/Calendar/utils/dateValidation';
 
 describe('validateDateRange', () => {
     it('returns null when startTime is falsy', () => {

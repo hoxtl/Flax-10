@@ -2,7 +2,7 @@
  * Session progress dots and live stats.
  */
 
-import styles from '../../pages/timer/TimerPage.module.css';
+import styles from '../../pages/Timer/TimerPage.module.css';
 import { fmtDuration } from './utils/timerFormatters';
 
 function getDotState(index, completedSessions, isActive, isPaused) {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { CompatibilityScore } from '../../../../pages/profile/components/ProfileWidgets';
+import { CompatibilityScore } from '../../../../pages/Profile/components/ProfileWidgets';
 
 describe('CompatibilityScore', () => {
   const viewedSummary = { persona: { id: 'night_owl' } };

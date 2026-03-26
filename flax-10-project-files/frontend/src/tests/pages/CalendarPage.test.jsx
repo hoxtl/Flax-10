@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import CalendarPage from '../../pages/calendar/CalendarPage';
+import CalendarPage from '../../pages/Calendar/CalendarPage';
 
 const { mockEventPopups, mockGetAnotherUserProfile } = vi.hoisted(() => ({
     mockEventPopups: vi.fn(),
@@ -33,26 +33,26 @@ vi.mock('../../context/CalendarContext', () => ({
     useCalendarDispatch: vi.fn(() => mockDispatch),
 }));
 
-vi.mock('../../components/calendar/Calendar', () => ({
+vi.mock('../../components/Calendar/Calendar', () => ({
     Calendar: () => <div data-testid="calendar" />,
 }));
 
-vi.mock('../../components/calendar/CalendarHeader', () => ({
+vi.mock('../../components/Calendar/CalendarHeader', () => ({
     CalendarHeader: () => <div data-testid="calendar-header" />,
 }));
 
-vi.mock('../../components/calendar/EventPopups', () => ({
+vi.mock('../../components/Calendar/EventPopups', () => ({
     EventPopups: (props) => {
         mockEventPopups(props);
         return <div data-testid="event-popups" />;
     },
 }));
 
-vi.mock('../../components/calendar/hooks/useEventPopupListener', () => ({
+vi.mock('../../components/Calendar/hooks/useEventPopupListener', () => ({
     useEventPopupListener: vi.fn(),
 }));
 
-vi.mock('../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../components/Calendar/utils/eventUtils', () => ({
     getVisibleEventsInView: vi.fn(() => []),
 }));
 

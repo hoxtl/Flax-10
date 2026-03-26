@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('../../../../pages/homepage/utils/dateFormatUtils', () => ({
+vi.mock('../../../../pages/Homepage/utils/dateFormatUtils', () => ({
     formatHour12h: vi.fn((h) => `${h}:00`),
 }));
 
-import { HourMarkRow } from '../../../../pages/homepage/components/mini_timeline/HourMarkRow';
+import { HourMarkRow } from '../../../../pages/Homepage/components/mini_timeline/HourMarkRow';
 
 const mockStyles = {
     planTimelineHourMark: 'hourMark',

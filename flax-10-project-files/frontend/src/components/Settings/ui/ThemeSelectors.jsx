@@ -2,8 +2,8 @@
  * Theme-selection controls used by settings preferences.
  */
 
-import styles from "../../../pages/settings/Settings.module.css";
-import { THEME_GROUPS } from "../../../context/themeConstants";
+import styles from "../../../pages/Settings/Settings.module.css";
+import { THEME_GROUPS } from "../../../context/ThemeConstants";
 
 const MODE_OPTIONS = [
   { id: "light", label: "Light" },

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ManualScheduleEventList } from '../../../components/schedules/manual/ManualScheduleEventList';
+import { ManualScheduleEventList } from '../../../components/Schedules/manual/ManualScheduleEventList';
 
-vi.mock('../../../components/schedules/shared/scheduleFormStyles', () => ({
+vi.mock('../../../components/Schedules/shared/scheduleFormStyles', () => ({
     default: {
         eventList: 'eventList',
         muted: 'muted',

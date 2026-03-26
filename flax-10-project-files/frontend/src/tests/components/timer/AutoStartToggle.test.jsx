@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { AutoStartToggle } from "../../../components/timer/presets/AutoStartToggle";
-import { AUTOSTART_KEY } from "../../../components/timer/utils/presetUtils";
+import { AutoStartToggle } from "../../../components/Timer/presets/AutoStartToggle";
+import { AUTOSTART_KEY } from "../../../components/Timer/utils/presetUtils";
 
 describe("AutoStartToggle", () => {
   beforeEach(() => {

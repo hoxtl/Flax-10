@@ -2,7 +2,7 @@
  * Appearance settings section for theme and mode selection.
  */
 
-import styles from "../../../pages/settings/Settings.module.css";
+import styles from "../../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "../SettingsContextCard";
 import { SectionHeader, SubmitButton, ThemeGridSelector, ThemeSelector } from "../SettingsUI";
 

@@ -4,9 +4,9 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ModulesCard from '../../../components/modules/modules/ModulesCard';
+import ModulesCard from '../../../components/Modules/Modules/ModulesCard';
 
-vi.mock('../../../components/modules/utils/moduleUtils', () => ({
+vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     formatWeekdayTime: vi.fn(() => 'Mondays at 09:00'),
     formatTime: vi.fn(() => '09:00'),
@@ -16,7 +16,7 @@ vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     normaliseModuleCode: vi.fn((code) => code),
 }));
 
-vi.mock('../../../components/modules/modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
+vi.mock('../../../components/Modules/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
 
 const module = {
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',
@@ -65,7 +65,7 @@ describe('ModulesCard', () => {
     });
 
     it('should render leave button when enrolled', async () => {
-        const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
+        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValueOnce(true);
         render(<ModulesCard {...mockParameters} />);
         expect(screen.getByText('× Leave Module')).toBeInTheDocument();
@@ -86,14 +86,14 @@ describe('ModulesCard', () => {
     });
 
     it('shows Core badge when enrolled in core module', async () => {
-        const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
+        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValueOnce(true);
         render(<ModulesCard {...mockParameters} enrollments={[{ module: 1, is_core: true }]} />);
         expect(screen.getByText('📌 Core')).toBeInTheDocument();
     });
 
     it('shows the core badge when enrolled in a core module', async () => {
-        const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
+        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValueOnce(true);
         render(<ModulesCard {...mockParameters} enrollments={[{ module: 1, is_core: true }]} />);
         expect(screen.getAllByText('📌 Core').length).toBeGreaterThan(0);

@@ -2,9 +2,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 
-import { LocationEditCell } from '../../../../../components/calendar/table_view/cells/LocationEditCell';
+import { LocationEditCell } from '../../../../../components/Calendar/table_view/cells/LocationEditCell';
 
-vi.mock('../../../../../components/calendar/event_modal/components/LocationAutoComplete', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/LocationAutoComplete', () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input
       data-testid="location-autocomplete"

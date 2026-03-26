@@ -5,7 +5,7 @@
 import { beforeEach, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import Homepage from "../../../pages/homepage/Homepage";
+import Homepage from "../../../pages/Homepage/Homepage";
 
 export { expect, fireEvent, Homepage, MemoryRouter, render, screen, vi, waitFor, within };
 
@@ -47,7 +47,7 @@ export const homepageState = {
   allTasks: [],
 };
 
-vi.mock("../../../components/calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
   isToday: vi.fn((date) => {
     const today = new Date();
     return date && today.toDateString() === new Date(date).toDateString();
@@ -61,11 +61,11 @@ vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   }),
 }));
 
-vi.mock("../../../components/calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => (typeof id === "string" && id.includes("_") ? id.split("_")[0] : id)),
 }));
 
-vi.mock("../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../pages/Homepage/utils/index", () => ({
   formatTime: vi.fn((date) => new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
   isNow: vi.fn(() => false),
   isRoutineEvent: vi.fn(() => false),
@@ -82,13 +82,13 @@ vi.mock("../../../context/CalendarContext", () => ({
   useEventPopup: () => ({ openPopup: vi.fn() }),
 }));
 
-vi.mock("../../../components/calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
   useEventActions: () => ({ removeEvent: mockRemoveEvent, addEvent: mockAddEvent, editEvent: mockEditEvent }),
   useEventPopup: () => ({ openPopup: vi.fn() }),
 }));
 
-vi.mock("../../../pages/homepage/hooks/useHomeData", () => ({
+vi.mock("../../../pages/Homepage/hooks/useHomeData", () => ({
   useHomeData: () => ({
     dayEvents: homepageState.dayEvents,
     dayTasks: homepageState.dayTasks,
@@ -129,11 +129,11 @@ vi.mock("../../../context/NotificationContext", () => ({
   useNotifications: () => ({ addNotification: vi.fn() }),
 }));
 
-vi.mock("../../../components/notifications/hooks/useNotify", () => ({
+vi.mock("../../../components/Notifications/hooks/useNotify", () => ({
   useNotify: () => vi.fn(),
 }));
 
-vi.mock("../../../components/modules/hooks/useModuleDisenrollment", () => ({
+vi.mock("../../../components/Modules/hooks/useModuleDisenrollment", () => ({
   useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }),
 }));
 
@@ -141,7 +141,7 @@ vi.mock("../../../context/ConfirmContext", () => ({
   useConfirm: () => vi.fn(),
 }));
 
-vi.mock("../../../pages/homepage/components/IntelligenceRow", () => ({
+vi.mock("../../../pages/Homepage/components/IntelligenceRow", () => ({
   __esModule: true,
   default: ({ displayName, slot1TodayTasks, slot3Urgent }) => (
     <div data-testid="intelligence-row">
@@ -152,7 +152,7 @@ vi.mock("../../../pages/homepage/components/IntelligenceRow", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/TaskWidgetSlot", () => ({
+vi.mock("../../../pages/Homepage/components/TaskWidgetSlot", () => ({
   TaskWidgetSlot: ({ handleTaskWidgetComplete, onStartFocus, getTaskCategoryPill, getTaskCategoryColor, onEditTask, onDeleteTask, onInlineTaskEdit }) => (
     <div data-testid="task-widget-slot">
       <button type="button" onClick={() => handleTaskWidgetComplete({ id: "task-1", title: "Task A", completed: false, task_list: 123, tag: 1 })}>complete-task</button>
@@ -171,7 +171,7 @@ vi.mock("../../../pages/homepage/components/TaskWidgetSlot", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/DeadlinesWidget", () => ({
+vi.mock("../../../pages/Homepage/components/DeadlinesWidget", () => ({
   DeadlinesWidget: ({ deadlines, onSelectDeadline, onSelectModule }) => (
     <div data-testid="deadlines-count">deadlines:{(deadlines || []).length}
       <button type="button" onClick={() => onSelectDeadline?.({ id: 1, assessment_title: "Essay", start_due_date: new Date().toISOString(), module_code: "AB1", deadline_type: "assignment", description: "D", location: "Room 1", module_id: 10 })}>select-deadline</button>
@@ -181,12 +181,12 @@ vi.mock("../../../pages/homepage/components/DeadlinesWidget", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/SleepBanner", () => ({
+vi.mock("../../../pages/Homepage/components/SleepBanner", () => ({
   __esModule: true,
   default: () => <div data-testid="sleep-banner">sleep</div>,
 }));
 
-vi.mock("../../../components/calendar/EventPopups", () => ({
+vi.mock("../../../components/Calendar/EventPopups", () => ({
   EventPopups: () => <div data-testid="event-popups" />,
 }));
 
@@ -195,13 +195,13 @@ vi.mock("../../../components/common/back_to_top/BackToTop", () => ({
   default: () => <div data-testid="back-to-top" />,
 }));
 
-vi.mock("../../../components/tags/pill_filters", () => ({
+vi.mock("../../../components/Tags/pill_filters", () => ({
   __esModule: true,
   default: () => <div data-testid="pill-filters" />,
 }));
 
-vi.mock("../../../pages/tasks/components/TaskCard", async () => {
-  const actual = await vi.importActual("../../../pages/tasks/components/TaskCard");
+vi.mock("../../../pages/Tasks/components/TaskCard", async () => {
+  const actual = await vi.importActual("../../../pages/Tasks/components/TaskCard");
   return {
     ...actual,
     EditTaskModal: ({ task, onSave, onDelete, onClose }) => (
@@ -214,7 +214,7 @@ vi.mock("../../../pages/tasks/components/TaskCard", async () => {
   };
 });
 
-vi.mock("../../../pages/homepage/components", () => ({
+vi.mock("../../../pages/Homepage/components", () => ({
   MiniTimeline: ({ sortedEvents, onQuickStart, onTaskToggle, onCardClick, onEdit, onConflictAutoMove, onPushTomorrow, onDelete, onReschedule, onToggleComplete }) => (
     <div data-testid="mini-timeline">events:{(sortedEvents || []).length}
       <button type="button" onClick={() => onQuickStart?.(new Date(), 25, { id: 1, title: "T", estimated_blocks: 1 })}>quick-start</button>
@@ -255,7 +255,7 @@ vi.mock("../../../api/taskApi", () => ({
   deleteTask: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("../../../pages/tasks/components/CreateTaskModal", () => ({
+vi.mock("../../../pages/Tasks/components/CreateTaskModal", () => ({
   __esModule: true,
   default: ({ onSave, onClose, onOpenCreateList }) => (
     <div data-testid="create-task-modal">
@@ -268,7 +268,7 @@ vi.mock("../../../pages/tasks/components/CreateTaskModal", () => ({
   ),
 }));
 
-vi.mock("../../../pages/tasks/components/CreateListModal", () => ({
+vi.mock("../../../pages/Tasks/components/CreateListModal", () => ({
   __esModule: true,
   default: ({ onSave, onClose }) => (
     <div data-testid="create-list-modal">
@@ -278,7 +278,7 @@ vi.mock("../../../pages/tasks/components/CreateListModal", () => ({
   ),
 }));
 
-vi.mock("../../../pages/homepage/components/PlanReadDetailModal", () => ({
+vi.mock("../../../pages/Homepage/components/PlanReadDetailModal", () => ({
   PlanReadDetailModal: ({ item, onClose, onEditTask, onDeleteTask, onEditEvent, onDeleteEvent }) => (
     <div data-testid="plan-read-detail-modal">
       <button type="button" onClick={onClose}>plan-read-close</button>

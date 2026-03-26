@@ -10,19 +10,19 @@ import urgentGlowStyles from '../../components/common/urgent_glow/UrgentGlow.mod
 import {
     TIER_ACCENT,
     getUrgencyTier,
-} from '../../components/modules/deadlines/upcomingDeadlinesUtils';
-import { AddReadingToTasksButton } from '../../components/modules/shared/taskButtons.jsx';
+} from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
+import { AddReadingToTasksButton } from '../../components/Modules/shared/taskButtons.jsx';
 import {
     containerVariants,
     expandBodyVariants,
     itemVariants,
     listVariants,
-} from '../../components/modules/shared/widgetVariants.js';
+} from '../../components/Modules/shared/widgetVariants.js';
 import {
     WidgetHeader,
     ShowMoreButton,
-} from '../../components/modules/shared/widgetParts.jsx';
-import { TaskInfoModal } from '../tasks/components/TaskInfoModal';
+} from '../../components/Modules/shared/widgetParts.jsx';
+import { TaskInfoModal } from '../Tasks/components/TaskInfoModal';
 import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 

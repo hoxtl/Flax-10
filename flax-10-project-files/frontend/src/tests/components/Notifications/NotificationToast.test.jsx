@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { NotificationToast, showNextToast } from '../../../components/notifications/NotificationToast';
+import { NotificationToast, showNextToast } from '../../../components/Notifications/NotificationToast';
 
 const useNotificationsMock = vi.fn();
 const playNotificationSoundMock = vi.fn();
@@ -12,11 +12,11 @@ vi.mock('../../../context/NotificationContext', () => ({
   useNotifications: () => useNotificationsMock(),
 }));
 
-vi.mock('../../../components/notifications/utils/notificationSound', () => ({
+vi.mock('../../../components/Notifications/utils/notificationSound', () => ({
   playNotificationSound: () => playNotificationSoundMock(),
 }));
 
-vi.mock('../../../components/notifications/utils/notificationAction', () => ({
+vi.mock('../../../components/Notifications/utils/notificationAction', () => ({
   executeNotificationAction: (...args) => executeNotificationActionMock(...args),
   parseNotificationAction: (...args) => parseNotificationActionMock(...args),
   hasNotificationAction: (...args) => hasNotificationActionMock(...args),

@@ -60,7 +60,7 @@ vi.mock("../../context/CalendarContext", () => ({
   useEventModal: hoistedMocks.useEventModal,
 }));
 
-vi.mock("../../components/Dashboard/Sidebar", async () => {
+vi.mock("../../components/Dashboard/sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });

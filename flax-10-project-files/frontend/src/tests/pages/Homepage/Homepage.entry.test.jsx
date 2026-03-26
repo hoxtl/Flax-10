@@ -9,11 +9,11 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../pages/homepage/hooks/useHomepageController", () => ({
+vi.mock("../../../pages/Homepage/hooks/useHomepageController", () => ({
   useHomepageController: (...args) => useHomepageControllerMock(...args),
 }));
 
-vi.mock("../../../pages/homepage/components/HomepageDashboard", () => ({
+vi.mock("../../../pages/Homepage/components/HomepageDashboard", () => ({
   HomepageDashboard: (props) => {
     dashboardMock(props);
     return <div data-testid="homepage-dashboard">dashboard</div>;
@@ -27,7 +27,7 @@ vi.mock("../../../components/common/app_toast/AppToast", () => ({
   },
 }));
 
-import Homepage from "../../../pages/homepage/Homepage.jsx";
+import Homepage from "../../../pages/Homepage/Homepage.jsx";
 
 describe("Homepage entry", () => {
   it("passes route defaults into the controller and renders the dashboard", () => {

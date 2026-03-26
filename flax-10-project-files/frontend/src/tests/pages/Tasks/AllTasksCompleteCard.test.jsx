@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import AllTasksCompleteCard from "../../../pages/tasks/components/AllTasksCompleteCard";
+import AllTasksCompleteCard from "../../../pages/Tasks/components/AllTasksCompleteCard";
 
 describe("AllTasksCompleteCard", () => {
   it("renders default emoji and message", () => {

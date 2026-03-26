@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { fireEvent, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -6,93 +5,8 @@ import {
   renderSocietyDetailPage,
   societyDetailPageStateMocks,
 } from "./societyDetailPageTestUtils.jsx";
-=======
-/**
- * Verifies the modal props forwarded by SocietyDetailPage.
- */
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-
-import { mergeNested } from "../utils/testBuilderUtils";
-import { buildPageData } from "./societyDetailPageTestUtils";
-
-const useSocietyPageDataMock = vi.fn();
-
-vi.mock("../../pages/societies/useSocietyDetailPageState", () => ({
-  useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
-  useSocietyInit: vi.fn(),
-}));
-
-vi.mock("../../components/society/society_detail/SocietyHero", () => ({
-  default: () => <div>hero</div>,
-}));
-
-vi.mock("../../components/society/society_detail/SocietyInfo", () => ({
-  default: () => <div>info</div>,
-}));
-
-vi.mock("../../components/society/society_detail/tabs/SocietyTabs", () => ({
-  default: () => <div>tabs</div>,
-}));
-
-vi.mock("../../components/society/society_detail/SocietySidebar", () => ({
-  default: () => <div>sidebar</div>,
-}));
-
-vi.mock("../../components/society/society_detail/image_handlers/CoverImageModal", () => ({
-  default: ({ images }) => <div data-testid="cover-modal">{images.length}</div>,
-}));
-
-vi.mock("../../components/society/society_detail/image_handlers/ImageGalleryModal", () => ({
-  default: ({ images, initialIndex }) => (
-    <div data-testid="gallery-modal">
-      <span>{images.length}</span>
-      <span>{initialIndex}</span>
-    </div>
-  ),
-}));
-
-vi.mock("../../components/society/society_detail/SettingsModal", () => ({
-  default: ({ members, ratificationStatus, isRatified, isAdmin }) => (
-    <div data-testid="settings-modal">
-      <span>{members.length}</span>
-      <span>{ratificationStatus}</span>
-      <span>{String(isRatified)}</span>
-      <span>{String(isAdmin)}</span>
-    </div>
-  ),
-}));
-
-vi.mock("../../components/society/society_detail/ReportSocietyModal", () => ({
-  default: ({ society }) => <div data-testid="report-modal">{society.name}</div>,
-}));
-
-vi.mock("../../components/society/society_detail/MemberDirectoryModal", () => ({
-  default: ({ societyName, isAdmin }) => (
-    <div data-testid="members-modal">
-      <span>{societyName}</span>
-      <span>{String(isAdmin)}</span>
-    </div>
-  ),
-}));
-
-vi.mock("../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal", () => ({
-  default: ({ societyId, tags = [] }) => (
-    <div data-testid="announcement-modal">
-      <span>{societyId}</span>
-      <span>{tags.join(",")}</span>
-    </div>
-  ),
-}));
-
-vi.mock("../../components/common/back_button/BackButton.jsx", () => ({
-  default: ({ label }) => <button type="button">{label}</button>,
-}));
->>>>>>> origin/main
-
-import SocietyDetailPage from "../../pages/societies/SocietyDetailPage";
+import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
 const modalDataDefaults = {
   society: {
@@ -116,7 +30,6 @@ const modalDataDefaults = {
 };
 
 function buildData(overrides = {}) {
-<<<<<<< HEAD
   return createSocietyDetailPageData({
     ...overrides,
     members: overrides.members ?? [{ id: 1 }, { id: 2 }],
@@ -164,9 +77,6 @@ function buildData(overrides = {}) {
       ...overrides.tracker,
     },
   });
-=======
-  return buildPageData(mergeNested(modalDataDefaults, overrides, ["society", "modals"]));
->>>>>>> origin/main
 }
 
 describe("SocietyDetailPage modal props", () => {

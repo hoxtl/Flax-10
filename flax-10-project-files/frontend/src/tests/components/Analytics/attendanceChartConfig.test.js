@@ -7,7 +7,7 @@ import {
   getAttendanceMargin,
   getAttendancePercentage,
   getAttendanceSeries,
-} from "../../../components/analytics/attendanceChartConfig";
+} from "../../../components/Analytics/attendanceChartConfig";
 
 describe("attendanceChartConfig", () => {
   it("returns mobile and desktop margins", () => {

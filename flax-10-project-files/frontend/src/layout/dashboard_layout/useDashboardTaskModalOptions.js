@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getEnrollments, getModules } from "../../api/moduleApi";
 import { fetchTaskLists } from "../../api/taskApi";
-import { isEnrolledIn } from "../../components/modules/utils/moduleUtils";
+import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 
 function loadTaskLists(setLists) {
   fetchTaskLists().then((response) => setLists(Array.isArray(response) ? response : [])).catch(() => {});

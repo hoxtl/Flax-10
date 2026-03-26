@@ -22,6 +22,7 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for user settings serialiser."""
+
         model = UserSettings
         fields = [
             'theme',

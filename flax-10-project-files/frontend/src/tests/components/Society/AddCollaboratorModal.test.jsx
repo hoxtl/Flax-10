@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AddCollaboratorModal from '../../../components/society/AddCollaboratorModal';
+import AddCollaboratorModal from '../../../components/Society/AddCollaboratorModal';
 
-vi.mock('../../../components/social/UserSearch', () => ({
+vi.mock('../../../components/Social/UserSearch', () => ({
     default: ({ onUserSelect, filterUsers, renderEmptyState }) => {
         // Expose a way to test the filter
         const dummyResults = [

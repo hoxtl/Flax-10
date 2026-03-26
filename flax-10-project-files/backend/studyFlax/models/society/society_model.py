@@ -19,6 +19,7 @@ VALID_CATEGORIES = [
 
 class Society(models.Model):
     """Student society managed within StudyFlax."""
+
     name = models.CharField(max_length=200)
     bio = models.CharField(max_length=500, blank=True, default="")
     about = models.TextField(blank=True, default="")
@@ -32,6 +33,7 @@ class Society(models.Model):
 
     class Meta:
         """Metadata for society."""
+
         verbose_name_plural = "societies"
 
     def __str__(self):

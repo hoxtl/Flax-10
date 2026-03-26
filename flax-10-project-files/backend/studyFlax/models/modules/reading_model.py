@@ -8,6 +8,7 @@ from .module_model import Module
 
 class Reading(models.Model):
     """Reading item assigned within a module."""
+
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='readings')
     title = models.CharField(max_length=200)
     chapter = models.CharField(max_length=100, blank=True, default='')

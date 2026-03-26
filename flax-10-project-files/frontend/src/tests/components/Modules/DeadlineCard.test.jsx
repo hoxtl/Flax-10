@@ -5,20 +5,20 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import DeadlineCard from '../../../components/modules/deadlines/DeadlineCard';
+import DeadlineCard from '../../../components/Modules/Deadlines/DeadlineCard';
 
-vi.mock('../../../components/modules/utils/deadlineUtils', () => ({
+vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     getDeadlineCountdown: vi.fn(() => '5 days remaining'),
     DEADLINE_LABELS: { exam: 'Exam', coursework: 'Coursework', quiz: 'Quiz', presentation: 'Presentation' },
 }));
 
-vi.mock('../../../components/modules/utils/moduleUtils', () => ({
+vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     formatFullDateTime: vi.fn(() => 'Friday, 6 March 2026, 10:00'),
 }));
 
-vi.mock('../../../components/modules/deadlines/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
+vi.mock('../../../components/Modules/Deadlines/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
 
-import { getDeadlineCountdown } from '../../../components/modules/utils/deadlineUtils';
+import { getDeadlineCountdown } from '../../../components/Modules/utils/deadlineUtils';
 
 const deadline = {
     id: 1, title: 'Small Group Project', deadline_type: 'coursework',

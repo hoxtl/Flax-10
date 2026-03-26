@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/tags/BasePill', () => ({
+vi.mock('../../../components/Tags/BasePill', () => ({
     default: ({ label, isActive, onClick }) => (
         <button
             data-testid={`pill-${label}`}
@@ -13,7 +13,7 @@ vi.mock('../../../components/tags/BasePill', () => ({
     ),
 }));
 
-import TagFilterBar from '../../../components/society/society_detail/tags/TagFilterBar';
+import TagFilterBar from '../../../components/Society/society_detail/tags/TagFilterBar';
 
 const mockTags = [
     { id: 1, label: 'Sports', color: '#ff0000' },

@@ -24,13 +24,13 @@ vi.mock("../../../../lib/sounds", () => ({
   playCompletionChime: (...args) => playCompletionChimeMock(...args),
 }));
 
-import { useHomepageResources } from "../../../../pages/homepage/hooks/useHomepageResources";
+import { useHomepageResources } from "../../../../pages/Homepage/hooks/useHomepageResources";
 import {
   useHomepageNow,
   useHomepageSelection,
   useHomepageEventBootstrap,
   useTimerCompletionSound,
-} from "../../../../pages/homepage/hooks/useHomepagePageEffects";
+} from "../../../../pages/Homepage/hooks/useHomepagePageEffects";
 
 describe("Homepage hooks", () => {
   beforeEach(() => {

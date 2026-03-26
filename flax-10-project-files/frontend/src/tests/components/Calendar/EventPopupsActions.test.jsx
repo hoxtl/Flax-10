@@ -2,9 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-// ---------------------------------------------------------------------------
 // Hoisted mocks
-// ---------------------------------------------------------------------------
 
 const {
     mockRefreshTags,
@@ -43,7 +41,7 @@ vi.mock('../../../context/CalendarContext', () => ({
     })),
 }));
 
-vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
+vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({
     EventModal: ({ event, onClose }) => (
         <div data-testid="event-modal">
             <span>{event?.title || 'New Event'}</span>
@@ -52,7 +50,7 @@ vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
     ),
 }));
 
-vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
+vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({
     EventPopover: ({ event, onClose, actions, tag }) => (
         <div data-testid="event-popup">
             <span>{event?.title}</span>
@@ -72,11 +70,11 @@ vi.mock('../../../context/TagContext', () => ({
     }),
 }));
 
-vi.mock('../../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../../components/Notifications/hooks/useNotify', () => ({
     useNotify: () => vi.fn(),
 }));
 
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
     useCalendarEvents: () => ({ loadEvents: mockLoadEvents }),
     useEventActions: () => ({
         removeEvent: mockRemoveEvent,
@@ -84,12 +82,12 @@ vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
     }),
 }));
 
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../components/Calendar/utils/eventUtils', () => ({
     getEventType: vi.fn(() => 'personal'),
     hasRecurrence: vi.fn(() => false),
 }));
 
-vi.mock('../../../components/calendar/utils/formUtils', () => ({
+vi.mock('../../../components/Calendar/utils/formUtils', () => ({
     executeDelete: vi.fn(() => Promise.resolve()),
     deleteRecurrenceOccurrence: vi.fn(() => Promise.resolve()),
 }));
@@ -98,7 +96,7 @@ vi.mock('../../../api/societyApi', () => ({
     unsyncCalendar: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../components/modules/hooks/useModuleDisenrollment', () => ({
+vi.mock('../../../components/Modules/hooks/useModuleDisenrollment', () => ({
     useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }),
 }));
 
@@ -121,19 +119,15 @@ vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => 
     ),
 }));
 
-// ---------------------------------------------------------------------------
 // Import under test (after mocks)
-// ---------------------------------------------------------------------------
 
-import { EventPopups } from '../../../components/calendar/EventPopups';
+import { EventPopups } from '../../../components/Calendar/EventPopups';
 import { useEventModal, useEventPopup, useEventDelete } from '../../../context/CalendarContext';
-import { getEventType, hasRecurrence } from '../../../components/calendar/utils/eventUtils';
+import { getEventType, hasRecurrence } from '../../../components/Calendar/utils/eventUtils';
 import { unsyncCalendar } from '../../../api/societyApi';
-import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/calendar/utils/formUtils';
+import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/Calendar/utils/formUtils';
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 
 function setupModalClosed() {
     useEventModal.mockReturnValue({
@@ -153,9 +147,7 @@ function setupPopupEvent(evt, extra = {}) {
     });
 }
 
-// ---------------------------------------------------------------------------
 // Tests
-// ---------------------------------------------------------------------------
 
 describe('EventPopups extra coverage', () => {
     beforeEach(() => {
@@ -171,9 +163,7 @@ describe('EventPopups extra coverage', () => {
         });
     });
 
-    // -----------------------------------------------------------------------
     // getPopupActions – society events show only Unsync action
-    // -----------------------------------------------------------------------
 
     it('returns only Unsync action for society events', () => {
         setupModalClosed();
@@ -186,10 +176,8 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
 });
     // getPopupActions – non-personal, non-society returns null (no actions)
-    // -----------------------------------------------------------------------
 
     it('returns no actions for timetable events', () => {
         setupModalClosed();
@@ -212,9 +200,7 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByText('Unsync')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // getPopupActions – readOnly popup returns null regardless of type
-    // -----------------------------------------------------------------------
 
     it('returns no actions when popup is readOnly', () => {
         setupModalClosed();
@@ -226,9 +212,7 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------
     // EventPopupContainer – tag_name on society event used as tag label
-    // -----------------------------------------------------------------------
 
     it('uses tag_name and tag_color from society event as the tag prop', () => {
         setupModalClosed();
@@ -274,9 +258,7 @@ describe('EventPopups extra coverage', () => {
         expect(screen.getByTestId('popup-tag').textContent).toBe('TagLabel');
     });
 
-    // -----------------------------------------------------------------------
     // EventPopupContainer – society event without tag_name uses getTag path
-    // -----------------------------------------------------------------------
 
     it('uses getTag when society event has no tag_name', () => {
         setupModalClosed();
@@ -295,9 +277,7 @@ describe('EventPopups extra coverage', () => {
         expect(screen.getByTestId('popup-tag').textContent).toBe('TagLabel');
     });
 
-    // -----------------------------------------------------------------------
     // Unsync action – calls unsyncCalendar, refreshTags, loadEvents, toast
-    // -----------------------------------------------------------------------
 
     it('Unsync action on society event without society_name uses "society" fallback', async () => {
         setupModalClosed();
@@ -323,9 +303,7 @@ describe('EventPopups extra coverage', () => {
         });
     });
 
-    // -----------------------------------------------------------------------
     // Edit action – opens modal and closes popup
-    // -----------------------------------------------------------------------
 
     it('Edit action calls openModal and closePopup', () => {
         const mockClosePopup = vi.fn();
@@ -345,9 +323,7 @@ describe('EventPopups extra coverage', () => {
         expect(mockOpenModalFn).toHaveBeenCalledWith(evt);
     });
 
-    // -----------------------------------------------------------------------
     // Delete action for non-recurring event – opens delete directly
-    // -----------------------------------------------------------------------
 
     it('Delete action calls openDelete directly for non-recurring event', async () => {
         setupModalClosed();
@@ -362,9 +338,7 @@ describe('EventPopups extra coverage', () => {
         });
     });
 
-    // -----------------------------------------------------------------------
     // EventPopupContainer – not rendered when modal open
-    // -----------------------------------------------------------------------
 
     it('EventPopupContainer is not rendered when isModalOpen is true', () => {
         useEventModal.mockReturnValue({
@@ -385,4 +359,3 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByTestId('event-popup')).not.toBeInTheDocument();
     });
 
-    // -----------------------------------------------------------------------

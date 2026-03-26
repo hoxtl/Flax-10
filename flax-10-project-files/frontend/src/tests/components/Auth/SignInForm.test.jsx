@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { SignInForm } from '../../../components/auth/SignInForm';
+import { SignInForm } from '../../../components/Auth/SignInForm';
 
 const defaultFormData = { username: '', password: '' };
 const updateField = (field) => (e) => {};

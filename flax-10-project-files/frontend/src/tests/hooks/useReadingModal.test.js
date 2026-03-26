@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 
-import { useReadingModal } from "../../components/modules/hooks/useReadingModal";
+import { useReadingModal } from "../../components/Modules/hooks/useReadingModal";
 
 const getReadingsMock = vi.fn();
 const createReadingMock = vi.fn();

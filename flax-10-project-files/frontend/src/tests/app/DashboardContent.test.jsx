@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const resolveRouteContentMock = vi.fn();
 
-vi.mock("../../pages/settings/Settings", () => ({
+vi.mock("../../pages/Settings/Settings", () => ({
   default: ({ user, onBack }) => (
     <div data-testid="settings-screen">
       <span>{user.name}</span>
@@ -12,7 +12,7 @@ vi.mock("../../pages/settings/Settings", () => ({
   ),
 }));
 
-vi.mock("../../pages/profile/Profile", () => ({
+vi.mock("../../pages/Profile/Profile", () => ({
   default: ({ user, viewedUserId, backLabel, onBack, onNavigate }) => (
     <div data-testid="profile-screen">
       <span>{user.name}</span>

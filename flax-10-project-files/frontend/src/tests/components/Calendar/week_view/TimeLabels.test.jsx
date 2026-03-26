@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('../../../../components/calendar/day_view/dayViewHelpers', () => ({
+vi.mock('../../../../components/Calendar/day_view/dayViewHelpers', () => ({
     getHoursOfDay: vi.fn(() => [0, 6, 12, 18, 23]),
     formatHour: vi.fn(h => `${h}:00`),
 }));
 
-import { TimeLabels } from '../../../../components/calendar/week_view/TimeLabels';
+import { TimeLabels } from '../../../../components/Calendar/week_view/TimeLabels';
 
 describe('TimeLabels', () => {
     it('renders a time label for each hour', () => {

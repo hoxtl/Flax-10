@@ -1,22 +1,22 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../pages/homepage/utils/eventUtils", () => ({
+vi.mock("../../../pages/Homepage/utils/eventUtils", () => ({
   extractModuleCode: vi.fn((text) => (String(text || "").includes("CS") ? "CS100" : null)),
   isNow: vi.fn((start, end) => start === "now-start" && end === "now-end"),
   isRoutineEvent: vi.fn((item) => item.title === "Routine thing"),
 }));
 
-import { getCampusKey, getTransitMins } from "../../../pages/homepage/utils/plan_timeline/campus";
+import { getCampusKey, getTransitMins } from "../../../pages/Homepage/utils/plan_timeline/campus";
 import {
   addSpacing,
   buildEventEntry,
   buildGapOrTinyGap,
   filterEventsInWindow,
   groupOverlappingEvents,
-} from "../../../pages/homepage/utils/plan_timeline/eventRows";
-import { computeGapContext } from "../../../pages/homepage/utils/plan_timeline/gapContext";
-import { injectHourMarks, insertNowMarker } from "../../../pages/homepage/utils/plan_timeline/hourMarks";
-import { computePlanTimelineRows } from "../../../pages/homepage/utils/plan_timeline";
+} from "../../../pages/Homepage/utils/plan_timeline/eventRows";
+import { computeGapContext } from "../../../pages/Homepage/utils/plan_timeline/gapContext";
+import { injectHourMarks, insertNowMarker } from "../../../pages/Homepage/utils/plan_timeline/hourMarks";
+import { computePlanTimelineRows } from "../../../pages/Homepage/utils/plan_timeline";
 
 const buildDayBounds = () => ({ start: new Date("2026-03-24T06:00:00Z"), end: new Date("2026-03-24T22:00:00Z") });
 const buildEventRow = (overrides) => ({ type: "event", id: overrides.id ?? 1, startMins: overrides.startMins ?? 60, endMins: overrides.endMins ?? 120, spacingBeforePx: overrides.spacingBeforePx });

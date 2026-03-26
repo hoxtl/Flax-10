@@ -3,8 +3,8 @@
  */
 
 import { useState } from "react";
-import UserSearch from "../social/UserSearch";
-import Badge from "../common/badge/Badge";
+import UserSearch from "../Social/UserSearch";
+import Badge from "../common/Badge/Badge";
 import PrimaryButton from "../common/primary_button/PrimaryButton";
 import SearchEmptyState from "../common/search_empty_state/SearchEmptyState";
 import StandardModal from "../common/standard_modal/StandardModal";

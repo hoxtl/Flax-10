@@ -6,24 +6,20 @@ const checkSleepAndRunMock = vi.hoisted(() => vi.fn((_dueDate, callback) => call
 
 vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn(), getEnrollments: vi.fn() }));
 vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn() }));
-vi.mock("../../../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => true) }));
-vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
+vi.mock("../../../../components/Modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => true) }));
+vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: checkSleepAndRunMock }),
 }));
-vi.mock("../../../../pages/tasks/utils/createTaskBarUtils", async (importOriginal) => {
+vi.mock("../../../../pages/Tasks/utils/createTaskBarUtils", async (importOriginal) => {
   const actual = await importOriginal();
   return { ...actual, runQuickAdd: vi.fn() };
 });
 
-import useCreateTaskBar from "../../../../pages/tasks/hooks/useCreateTaskBar";
+import useCreateTaskBar from "../../../../pages/Tasks/hooks/useCreateTaskBar";
 import { getModules, getEnrollments } from "../../../../api/moduleApi";
 import { getUserSettings } from "../../../../api/userApi";
-<<<<<<< HEAD
 import { runQuickAdd } from "../../../../pages/Tasks/utils/createTaskBarUtils";
 import { createRejectablePromise } from "./taskHookTestUtils";
-=======
-import { runQuickAdd } from "../../../../pages/tasks/utils/createTaskBarUtils";
->>>>>>> origin/main
 
 describe("useCreateTaskBar", () => {
   beforeEach(() => {

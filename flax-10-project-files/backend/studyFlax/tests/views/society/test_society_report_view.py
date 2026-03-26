@@ -16,6 +16,7 @@ User = get_user_model()
 
 class ReportSocietyViewTest(TestCase):
     """Tests report society view."""
+
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="reporter", email="r@test.com", password="pass")

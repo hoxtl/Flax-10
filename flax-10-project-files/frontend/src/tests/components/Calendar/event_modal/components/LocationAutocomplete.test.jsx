@@ -11,11 +11,11 @@ const autocompleteState = {
   wrapperRef: { current: null },
 };
 
-vi.mock("../../../../../components/calendar/event_modal/components/useLocationAutocomplete", () => ({
+vi.mock("../../../../../components/Calendar/event_modal/components/useLocationAutocomplete", () => ({
   useLocationAutocomplete: () => autocompleteState,
 }));
 
-import { LocationAutocomplete } from "../../../../../components/calendar/event_modal/components/LocationAutoComplete";
+import { LocationAutocomplete } from "../../../../../components/Calendar/event_modal/components/LocationAutoComplete";
 
 describe("LocationAutocomplete", () => {
   beforeEach(() => {

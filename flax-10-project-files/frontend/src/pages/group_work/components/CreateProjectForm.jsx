@@ -15,7 +15,7 @@ import PrimaryButton from "../../../components/common/primary_button/PrimaryButt
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import { TagsSelector } from "../../../components/common/tags_selector/TagsSelector";
-import UserSearch from "../../../components/social/UserSearch";
+import UserSearch from "../../../components/Social/UserSearch";
 >>>>>>> origin/main:flax-10-project-files/frontend/src/pages/group_work/components/CreateProjectForm.jsx
 import { CreateProjectInputs } from "./CreateProjectInputs";
 import GroupWorkUserSearchEmptyState from "./GroupWorkUserSearchEmptyState";

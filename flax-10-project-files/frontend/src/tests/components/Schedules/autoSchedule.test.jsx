@@ -1,25 +1,25 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { ScheduleAutoForm, ScheduleManualForm } from "../../../components/schedules/ScheduleForms";
-import { AutoScheduleForm } from "../../../components/schedules/auto/AutoScheduleForm";
+import { ScheduleAutoForm, ScheduleManualForm } from "../../../components/Schedules/ScheduleForms";
+import { AutoScheduleForm } from "../../../components/Schedules/auto/AutoScheduleForm";
 
 const submitAutoSchedule = vi.fn();
 const useUpcomingDeadlines = vi.fn();
 
-vi.mock("../../../components/schedules/auto/submitAutoSchedule", () => ({
+vi.mock("../../../components/Schedules/auto/submitAutoSchedule", () => ({
   submitAutoSchedule: (...args) => submitAutoSchedule(...args),
 }));
 
-vi.mock("../../../components/schedules/auto/useUpcomingDeadlines", () => ({
+vi.mock("../../../components/Schedules/auto/useUpcomingDeadlines", () => ({
   useUpcomingDeadlines: (...args) => useUpcomingDeadlines(...args),
 }));
 
-vi.mock("../../../components/schedules/auto/AutoScheduleSummary", () => ({
+vi.mock("../../../components/Schedules/auto/AutoScheduleSummary", () => ({
   AutoScheduleSummary: ({ deadlines }) => <div>Summary count: {deadlines.length}</div>,
 }));
 
-vi.mock("../../../components/schedules/manual/ManualScheduleForm", () => ({
+vi.mock("../../../components/Schedules/manual/ManualScheduleForm", () => ({
   ManualScheduleForm: ({ onDone }) => <button onClick={onDone}>manual-proxy</button>,
 }));
 

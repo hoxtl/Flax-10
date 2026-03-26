@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const overlapSleepMock = vi.fn();
 
-vi.mock("../../../components/settings/hooks/useSleepWarning", () => ({
+vi.mock("../../../components/Settings/hooks/useSleepWarning", () => ({
   doesEventOverlapSleepWindow: (...args) => overlapSleepMock(...args),
 }));
 
@@ -17,7 +17,7 @@ import {
   getTodayLabel,
   getTravelContext,
   getUpcomingEvent,
-} from "../../../pages/homepage/components/intelligenceUtils";
+} from "../../../pages/Homepage/components/IntelligenceUtils";
 
 const pinnedNow = new Date("2026-03-24T09:30:00.000Z");
 const baseLiveContextInput = {

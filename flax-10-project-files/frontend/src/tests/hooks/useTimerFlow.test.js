@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useTimerFlow } from '../../components/timer/hooks/useTimerFlow';
-import * as historyUtils from '../../components/timer/utils/historyUtils';
+import { useTimerFlow } from '../../components/Timer/hooks/useTimerFlow';
+import * as historyUtils from '../../components/Timer/utils/historyUtils';
 
-vi.mock('../../components/timer/utils/timerUtils', () => ({
+vi.mock('../../components/Timer/utils/timerUtils', () => ({
     useCompletionCheck: vi.fn(),
 }));
 

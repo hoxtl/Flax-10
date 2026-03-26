@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Calendar } from '../../../components/calendar/Calendar';
+import { Calendar } from '../../../components/Calendar/Calendar';
 
 vi.mock('../../../context/CalendarContext', () => ({
     useCalendar: vi.fn(() => ({ viewMode: 'month' })),
@@ -12,32 +12,32 @@ vi.mock('../../../context/ResizeHighlightContext', () => ({
     ResizeHighlightProvider: ({ children }) => <div data-testid="resize-provider">{children}</div>,
 }));
 
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
     useCalendarEvents: vi.fn(),
 }));
 
-vi.mock('../../../components/calendar/day_view/DayView', () => ({
+vi.mock('../../../components/Calendar/day_view/DayView', () => ({
     DayView: ({ readOnly }) => <div data-testid="day-view">{`Day View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/calendar/week_view/WeekView', () => ({
+vi.mock('../../../components/Calendar/week_view/WeekView', () => ({
     WeekView: ({ readOnly }) => <div data-testid="week-view">{`Week View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/calendar/month_view/SwipeMonthView', () => ({
+vi.mock('../../../components/Calendar/month_view/SwipeMonthView', () => ({
     SwipeMonthView: ({ readOnly }) => <div data-testid="month-view">{`Month View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/calendar/list_view/ListView', () => ({
+vi.mock('../../../components/Calendar/list_view/ListView', () => ({
     ListView: ({ readOnly }) => <div data-testid="list-view">{`List View ${String(readOnly)}`}</div>,
 }));
 
-vi.mock('../../../components/calendar/table_view/TableView', () => ({
+vi.mock('../../../components/Calendar/table_view/TableView', () => ({
     TableView: ({ readOnly }) => <div data-testid="table-view">{`Table View ${String(readOnly)}`}</div>,
 }));
 
 import { useCalendar } from '../../../context/CalendarContext';
-import { useCalendarEvents } from '../../../components/calendar/hooks/useCalendarEvents';
+import { useCalendarEvents } from '../../../components/Calendar/hooks/useCalendarEvents';
 
 describe('Calendar', () => {
     it('renders ResizeHighlightProvider', () => {

@@ -3,7 +3,7 @@
  */
 
 import ModulesCard from './ModulesCard.jsx';
-import gridStyles from '../../common/card/CardGrid.module.css';
+import gridStyles from '../../common/Card/CardGrid.module.css';
 
 export default function ModuleGrid({
     modules, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines, onManageReadings, taskCountsByModule = {}

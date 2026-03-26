@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { buildScheduleAutoForm, getUrgencyTier } from '../../../pages/homepage/utils/scheduleAutoForm';
+import { buildScheduleAutoForm, getUrgencyTier } from '../../../pages/Homepage/utils/ScheduleAutoForm';
 
 describe('ScheduleAutoForm', () => {
   it('builds payload with deadline preferences for valid upcoming deadlines', () => {

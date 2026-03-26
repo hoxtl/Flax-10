@@ -3,19 +3,19 @@
  */
 
 import { useState } from "react";
-import styles from "../tabs.module.css";
-import { MonthView } from "../../../../calendar/month_view/MonthView";
-import { CalendarNav } from "../../../../calendar/header/calendarHeaderUtils";
-import { addMonths, formatMonthYear, isSameMonth } from "../../../../calendar/utils/dateUtils";
-import { expandRecurringEvents } from "../../../../calendar/utils/recurrenceUtils";
-import { hasRecurrence, extractBaseEventId } from "../../../../calendar/utils/eventUtils";
+import styles from "../Tabs.module.css";
+import { MonthView } from "../../../../Calendar/month_view/MonthView";
+import { CalendarNav } from "../../../../Calendar/header/CalendarHeaderUtils";
+import { addMonths, formatMonthYear, isSameMonth } from "../../../../Calendar/utils/dateUtils";
+import { expandRecurringEvents } from "../../../../Calendar/utils/recurrenceUtils";
+import { hasRecurrence, extractBaseEventId } from "../../../../Calendar/utils/eventUtils";
 import { CalendarProvider, useEventModal } from "../../../../../context/CalendarContext";
-import { EventModal } from "../../../../calendar/event_modal/EventModal";
-import TagFilterBar from "../../tags/TagFilterBar";
-import TagManager from "../../tags/TagManager";
-import { EventPopover } from "../../../../calendar/event_popover/EventPopover";
+import { EventModal } from "../../../../Calendar/event_modal/EventModal";
+import TagFilterBar from "../../Tags/TagFilterBar";
+import TagManager from "../../Tags/TagManager";
+import { EventPopover } from "../../../../Calendar/event_popover/EventPopover";
 import SyncButton from "./SyncButton";
-import { EventsSummaryModal } from "../../../../calendar/events_summary_modal/EventsSummaryModal";
+import { EventsSummaryModal } from "../../../../Calendar/events_summary_modal/EventsSummaryModal";
 import { useConfirm } from "../../../../../context/ConfirmContext";
 
 const confirmNonRecurringDeletion = (event, confirmFn) =>
@@ -50,7 +50,7 @@ const executeWithConfirm = async (event, handlers, confirmFn) => {
 function handleEventDeletion(handlers, close, confirmFn) {
     return async (event) => {
         try { await executeWithConfirm(event, handlers, confirmFn); }
-        catch (err) { console.error('Error deleting event:', err); }
+        catch (err) {}
         close();
     };
 }

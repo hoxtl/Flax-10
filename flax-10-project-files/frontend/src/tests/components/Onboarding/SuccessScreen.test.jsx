@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import SuccessScreen from '../../../components/onboarding/SuccessScreen';
+import SuccessScreen from '../../../components/Onboarding/SuccessScreen';
 
 vi.mock('framer-motion', () => ({
   motion: {

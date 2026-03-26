@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useHomepageModals } from "../../../../pages/homepage/hooks/useHomepageModals";
-import { useHomepageDisplayName } from "../../../../pages/homepage/hooks/useHomepageDisplayName";
-import { useHomepageToast } from "../../../../pages/homepage/hooks/useHomepageToast";
+import { useHomepageModals } from "../../../../pages/Homepage/hooks/useHomepageModals";
+import { useHomepageDisplayName } from "../../../../pages/Homepage/hooks/useHomepageDisplayName";
+import { useHomepageToast } from "../../../../pages/Homepage/hooks/useHomepageToast";
 
 describe("Homepage UI hooks", () => {
   beforeEach(() => {

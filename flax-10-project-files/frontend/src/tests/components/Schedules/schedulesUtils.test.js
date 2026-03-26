@@ -7,15 +7,15 @@ import {
   getAutoScheduleError,
   buildAutoSchedulePayload,
   getMoveTomorrowWindow,
-} from '../../../components/schedules/auto/autoScheduleUtils';
+} from '../../../components/Schedules/auto/autoScheduleUtils';
 import {
   filterScheduleEvents,
   toggleSelectedEventId,
   getManualScheduleError,
-} from '../../../components/schedules/manual/manualScheduleUtils';
-import { submitAutoSchedule } from '../../../components/schedules/auto/submitAutoSchedule';
-import { submitManualSchedule } from '../../../components/schedules/manual/submitManualSchedule';
-import { loadScheduleTaggedEvents } from '../../../components/schedules/manual/loadScheduleTaggedEvents';
+} from '../../../components/Schedules/manual/manualScheduleUtils';
+import { submitAutoSchedule } from '../../../components/Schedules/auto/submitAutoSchedule';
+import { submitManualSchedule } from '../../../components/Schedules/manual/submitManualSchedule';
+import { loadScheduleTaggedEvents } from '../../../components/Schedules/manual/loadScheduleTaggedEvents';
 
 vi.mock('../../../api/scheduleApi', () => ({
   createSchedule: vi.fn(),

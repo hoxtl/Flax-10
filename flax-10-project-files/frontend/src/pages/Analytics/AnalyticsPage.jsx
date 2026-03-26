@@ -13,7 +13,7 @@ import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import EmptyState from '../../components/common/EmptyState/EmptyState';
 import { BackToTop } from '../../components/Pagination/Pagination';
 =======
-import { BackToTop } from '../../components/pagination/Pagination';
+import { BackToTop } from '../../components/Pagination/Pagination';
 >>>>>>> origin/main
 import { PERIODS } from './pageConfig';
 import { useAnalyticsPageState } from './pageState';

@@ -5,14 +5,14 @@ const extractBaseEventIdMock = vi.fn((id) => id);
 const formatTimeMock = vi.fn(() => "10:00");
 const getNextFreeSlotTodayMock = vi.fn(() => null);
 
-vi.mock("../../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../../pages/Homepage/utils/index", () => ({
   formatTime: (...args) => formatTimeMock(...args),
   getAllFreeWindowsToday: vi.fn(() => []),
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
   isRoutineEvent: vi.fn(() => false),
 }));
 
-vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
+vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
 }));
 
@@ -24,7 +24,7 @@ const conflictMocks = vi.hoisted(() => ({
 
 vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => conflictMocks);
 
-import { useHomepageReschedule } from "../../../../pages/homepage/hooks/useHomepageReschedule";
+import { useHomepageReschedule } from "../../../../pages/Homepage/hooks/useHomepageReschedule";
 
 function buildRescheduleProps(overrides = {}) {
   return {

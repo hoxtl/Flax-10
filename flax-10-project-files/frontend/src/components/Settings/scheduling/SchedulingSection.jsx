@@ -3,7 +3,7 @@
  */
 
 import AnimatedDropdown from "../../common/animated_dropdown";
-import styles from "../../../pages/settings/Settings.module.css";
+import styles from "../../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "../SettingsContextCard";
 import { SectionHeader, SubmitButton } from "../SettingsUI";
 import { STUDY_TIME_OPTIONS, WEEK_PREFERENCE_OPTIONS, WORKTIME_PREFERENCE_OPTIONS } from "./useSchedulingState";

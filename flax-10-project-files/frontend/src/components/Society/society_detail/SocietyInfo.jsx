@@ -3,15 +3,10 @@
  */
 
 import { useState } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietyInfo.jsx
-import { Bell, BellOff, MapPin } from "lucide-react";
-import Badge from "../../common/Badge/Badge";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-=======
 import { Bell, BellOff } from "lucide-react";
-import Badge from "../../common/badge/Badge";
+import Badge from "../../common/Badge/Badge";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
->>>>>>> origin/main:flax-10-project-files/frontend/src/components/Society/society_detail/SocietyInfo.jsx
+import LocationLink from "../../common/location_link/LocationLink";
 import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
@@ -36,10 +31,13 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
 
 function LocationRow({ location }) {
     return (
-        <div className={styles.locationRow}>
-            <MapPin size={13} className={styles.locationIcon} aria-hidden="true" />
-            <span className={styles.locationText}>{location}</span>
-        </div>
+        <LocationLink
+            location={location}
+            className={styles.locationRow}
+            iconClassName={styles.locationIcon}
+            textClassName={styles.locationText}
+            iconSize={13}
+        />
     );
 }
 

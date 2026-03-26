@@ -15,13 +15,13 @@ vi.mock("../../../../components/common/stat_strip/StatStrip", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/card/Card", () => ({
+vi.mock("../../../../components/common/Card/Card", () => ({
   default: ({ children, className }) => <div data-testid="card" className={className}>{children}</div>,
 }));
 
-import { QuickStatsRail } from "../../../../pages/profile/components/widgets/QuickStatsRail";
-import { StudyDNA } from "../../../../pages/profile/components/widgets/StudyDNA";
-import { PersonaCard } from "../../../../pages/profile/components/widgets/PersonaCard";
+import { QuickStatsRail } from "../../../../pages/Profile/components/widgets/QuickStatsRail";
+import { StudyDNA } from "../../../../pages/Profile/components/widgets/StudyDNA";
+import { PersonaCard } from "../../../../pages/Profile/components/widgets/PersonaCard";
 
 describe("Profile low-coverage widgets", () => {
   beforeEach(() => {

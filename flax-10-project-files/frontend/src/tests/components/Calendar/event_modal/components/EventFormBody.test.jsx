@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { EventFormBody } from '../../../../../components/calendar/event_modal/components/EventFormBody';
+import { EventFormBody } from '../../../../../components/Calendar/event_modal/components/EventFormBody';
 
-vi.mock('../../../../../components/calendar/event_modal/components/FormField', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/FormField', () => ({
     FormField: ({ label, value, onChange }) => (
         <div data-testid={`field-${label}`}>
             <label>{label}</label>
@@ -10,34 +10,34 @@ vi.mock('../../../../../components/calendar/event_modal/components/FormField', (
         </div>
     ),
 }));
-vi.mock('../../../../../components/calendar/event_modal/components/TagField', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/TagField', () => ({
     TagField: () => <div data-testid="tag-field">TagField</div>,
 }));
-vi.mock('../../../../../components/calendar/event_modal/components/RecurrenceField', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/RecurrenceField', () => ({
     RecurrenceField: ({ onChange }) => (
         <button type="button" data-testid="recurrence-field" onClick={() => onChange({ frequency: 'monthly' })}>
             RecurrenceField
         </button>
     ),
 }));
-vi.mock('../../../../../components/calendar/event_modal/components/TimeRow', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/TimeRow', () => ({
     TimeRow: ({ onRecurrenceChange }) => (
         <button type="button" data-testid="time-row" onClick={() => onRecurrenceChange({ frequency: 'weekly' })}>
             TimeRow
         </button>
     ),
 }));
-vi.mock('../../../../../components/calendar/event_modal/components/ActionButtons', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/ActionButtons', () => ({
     ActionButtons: () => <div data-testid="action-buttons">ActionButtons</div>,
 }));
-vi.mock('../../../../../components/calendar/event_modal/components/ReminderField', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/ReminderField', () => ({
     ReminderField: ({ onChange }) => (
         <button type="button" data-testid="reminder-field" onClick={() => onChange(30)}>
             ReminderField
         </button>
     ),
 }));
-vi.mock('../../../../../components/calendar/event_modal/components/LocationAutoComplete', () => ({
+vi.mock('../../../../../components/Calendar/event_modal/components/LocationAutoComplete', () => ({
     LocationAutocomplete: ({ onChange }) => (
         <button type="button" data-testid="location-field" onClick={() => onChange('Strand Campus')}>
             LocationAutocomplete

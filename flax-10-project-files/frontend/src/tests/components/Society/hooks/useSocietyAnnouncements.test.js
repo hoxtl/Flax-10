@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useSocietyAnnouncements } from '../../../../components/society/hooks/useSocietyAnnouncements';
+import { useSocietyAnnouncements } from '../../../../components/Society/hooks/useSocietyAnnouncements';
 import * as api from '../../../../api/societyApi';
 
 vi.mock('../../../../api/societyApi', () => ({

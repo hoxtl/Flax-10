@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { calculatePopoverPosition, calculateArrowPosition } from '../../../../components/calendar/event_popover/popoverUtils';
+import { calculatePopoverPosition, calculateArrowPosition } from '../../../../components/Calendar/event_popover/popoverUtils';
 
 describe('popoverUtils', () => {
     const anchor = { top: 200, left: 300, right: 350, bottom: 250, width: 50, height: 50 };

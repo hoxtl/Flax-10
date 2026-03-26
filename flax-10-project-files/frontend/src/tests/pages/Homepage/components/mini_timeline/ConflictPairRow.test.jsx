@@ -5,10 +5,10 @@ import {
   getConflictPriorityRank,
   getConflictResolutionPlan,
   getMoveTomorrowWindow,
-} from '../../../../../pages/homepage/components/mini_timeline/ConflictPairRow';
-import * as useSleepWarning from '../../../../../components/settings/hooks/useSleepWarning';
+} from '../../../../../pages/Homepage/components/mini_timeline/ConflictPairRow';
+import * as useSleepWarning from '../../../../../components/Settings/hooks/useSleepWarning';
 
-vi.mock('../../../../../components/settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../../../components/Settings/hooks/useSleepWarning', () => ({
   doesEventOverlapSleepWindow: vi.fn(() => false),
 }));
 

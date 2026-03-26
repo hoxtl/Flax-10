@@ -12,7 +12,7 @@ vi.mock("../../../context/ToastContext", () => ({
   useToast: () => toastMock,
 }));
 
-import { useUpcomingDeadlines } from "../../../components/schedules/auto/useUpcomingDeadlines";
+import { useUpcomingDeadlines } from "../../../components/Schedules/auto/useUpcomingDeadlines";
 
 describe("useUpcomingDeadlines", () => {
   beforeEach(() => {

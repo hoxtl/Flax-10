@@ -15,7 +15,7 @@ import {
   getCompletedWeekCount,
   getCompletedLaterCount,
   getFilterHandlers,
-} from "../../../pages/tasks/utils/taskFeedDataUtils";
+} from "../../../pages/Tasks/utils/taskFeedDataUtils";
 
 const listMap = { "1": { name: "Work" } };
 

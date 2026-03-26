@@ -4,7 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useTableEdit } from '../../../../components/calendar/hooks/useTableEdit';
+import { useTableEdit } from '../../../../components/Calendar/hooks/useTableEdit';
 import { createMockEvent, createMockDispatch, mockTags } from '../mocks/calendarMocks';
 
 const mockDispatch = createMockDispatch();

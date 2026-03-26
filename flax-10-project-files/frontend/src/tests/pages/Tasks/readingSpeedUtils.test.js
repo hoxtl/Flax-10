@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getAvgMinPerPage,
   recalculatePendingBlocks,
-} from "../../../pages/tasks/utils/readingSpeedUtils";
+} from "../../../pages/Tasks/utils/readingSpeedUtils";
 
 describe("readingSpeedUtils", () => {
   it("calculates average minutes per page from completed reading tasks", () => {

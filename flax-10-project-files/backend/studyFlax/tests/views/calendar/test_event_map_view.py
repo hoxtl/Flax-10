@@ -10,6 +10,7 @@ from studyFlax.models import CalendarEvent
 
 class EventMapViewTests(BaseTestCase):
     """Tests event map view."""
+
     def _create_map_event(self, **overrides):
         now = datetime.now(timezone.utc)
         defaults = {

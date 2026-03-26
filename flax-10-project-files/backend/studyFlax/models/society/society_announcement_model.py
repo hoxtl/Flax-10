@@ -10,6 +10,7 @@ from .society_tag_model import SocietyTag
 
 class SocietyAnnouncement(models.Model):
     """Announcement posted by a society."""
+
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='announcements')
     title = models.CharField(max_length=200)
     content = models.TextField(blank=True, default="")
@@ -20,6 +21,7 @@ class SocietyAnnouncement(models.Model):
 
     class Meta:
         """Metadata for society announcement."""
+
         ordering = ['-pinned', '-created_at']
 
     def __str__(self):
@@ -27,6 +29,7 @@ class SocietyAnnouncement(models.Model):
 
 class SocietyAnnouncementImage(models.Model):
     """Image attached to a society announcement."""
+
     announcement = models.ForeignKey(
         SocietyAnnouncement, on_delete=models.CASCADE, related_name='images'
     )
@@ -35,6 +38,7 @@ class SocietyAnnouncementImage(models.Model):
 
     class Meta:
         """Metadata for society announcement image."""
+
         ordering = ['order']
 
     def __str__(self):

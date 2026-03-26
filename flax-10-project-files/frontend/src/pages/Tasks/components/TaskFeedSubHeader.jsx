@@ -9,7 +9,7 @@ import PrimaryButton from "../../../components/common/primary_button/PrimaryButt
 
 import CreateTaskBar from "./CreateTaskBar";
 import TaskFeedToolbar from "./TaskFeedToolbar";
-import { MOBILE_VIEW_OPTIONS } from "./taskFeedConstants";
+import { MOBILE_VIEW_OPTIONS } from "./TaskFeedConstants";
 
 import styles from "./TaskFeedLayout.module.css";
 

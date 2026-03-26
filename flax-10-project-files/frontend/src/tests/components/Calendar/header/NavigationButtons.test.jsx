@@ -1,19 +1,19 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NavigationButtons } from '../../../../components/calendar/header/NavigationButtons';
+import { NavigationButtons } from '../../../../components/Calendar/header/NavigationButtons';
 import { useCalendar } from '../../../../context/CalendarContext';
 
 vi.mock('../../../../context/CalendarContext', () => ({
     useCalendar: vi.fn(() => ({ viewMode: 'week' })),
 }));
 
-vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
     isSameDay: vi.fn(() => false),
     getWeekDays: vi.fn(() => []),
     isSameMonth: vi.fn(() => false),
 }));
 
-vi.mock('../../../../components/calendar/header/DatePickerButton', () => ({
+vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
     DatePickerButton: ({ selectedDate, onDatePick }) => (
         <div data-testid="date-picker-button">
             <span data-testid="date-value">{selectedDate instanceof Date ? selectedDate.toISOString() : selectedDate}</span>
@@ -22,7 +22,7 @@ vi.mock('../../../../components/calendar/header/DatePickerButton', () => ({
     ),
 }));
 
-import * as dateUtils from '../../../../components/calendar/utils/dateUtils';
+import * as dateUtils from '../../../../components/Calendar/utils/dateUtils';
 
 describe('NavigationButtons', () => {
     const mockNavigate = vi.fn();

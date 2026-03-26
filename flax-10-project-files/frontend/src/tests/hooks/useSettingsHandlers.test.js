@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useSettingsHandlers from '../../components/settings/hooks/useSettingsHandlers';
+import useSettingsHandlers from '../../components/Settings/hooks/useSettingsHandlers';
 
 vi.mock('../../api/userApi', () => ({
     updateUserSettings: vi.fn(),

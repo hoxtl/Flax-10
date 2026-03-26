@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, Clock3, Plus, Star, Trash2, X } from "lucide-react";
 import ConfirmModal from "../../components/common/confirm_modal/ConfirmModal";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState";
-import Tooltip from "../../components/common/tooltip/Tooltip";
+import Tooltip from "../../components/common/Tooltip/Tooltip";
 import { useConfirm } from "../../context/ConfirmContext";
 import { getPhotoUrl } from "./utils/memberAvatarUtils";
 import { useAvailability } from "./hooks/useAvailability";

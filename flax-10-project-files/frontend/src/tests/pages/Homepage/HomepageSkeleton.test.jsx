@@ -5,7 +5,7 @@ vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: ({ className }) => <div data-testid="skeleton-block" className={className} />,
 }));
 
-import { HomepageSkeleton } from "../../../pages/homepage/components/HomepageSkeleton";
+import { HomepageSkeleton } from "../../../pages/Homepage/components/HomepageSkeleton";
 
 describe("HomepageSkeleton", () => {
   it("renders the homepage loading layout with timeline rows", () => {

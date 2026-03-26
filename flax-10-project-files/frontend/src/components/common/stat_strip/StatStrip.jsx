@@ -4,7 +4,7 @@
 
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import Tooltip from '../tooltip/Tooltip';
+import Tooltip from '../Tooltip/Tooltip';
 import styles from './StatStrip.module.css';
 
 const TONE_CLASS = {
