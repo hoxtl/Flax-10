@@ -17,7 +17,7 @@ import {
   getTodayLabel,
   getTravelContext,
   getUpcomingEvent,
-} from "../../../pages/homepage/components/intelligenceUtils";
+} from "../../../pages/homepage/components/IntelligenceUtils";
 
 const pinnedNow = new Date("2026-03-24T09:30:00.000Z");
 const baseLiveContextInput = {
@@ -48,11 +48,22 @@ describe("IntelligenceUtils", () => {
     it("greets people with or without honorifics", () => {
       expect(getGreeting("Pat", true)).toBe("Good Morning, Dr. Pat.");
       expect(getGreeting("Ava", false)).toBe("Good Morning, Ava.");
+      expect(getGreeting("Sam")).toBe("Good Morning, Sam.");
+      expect(getGreeting("", true)).toBe("Good Morning.");
+    });
+
+    it("switches greeting copy across the afternoon and evening", () => {
+      vi.setSystemTime(new Date("2026-03-24T13:30:00.000Z"));
+      expect(getGreeting("Ava")).toBe("Good Afternoon, Ava.");
+
+      vi.setSystemTime(new Date("2026-03-24T18:30:00.000Z"));
+      expect(getGreeting("Ava")).toBe("Good Evening, Ava.");
     });
 
     it("formats today label and event times", () => {
       expect(getTodayLabel()).toContain("TUESDAY");
       expect(formatEventTime("2026-03-24T11:15:00.000Z")).toBe("11:15");
+      expect(formatEventTime(null)).toBeNull();
     });
 
     it("renders friendly duration strings", () => {
@@ -80,11 +91,24 @@ describe("IntelligenceUtils", () => {
     it("returns the active timeline event", () => {
       expect(getCurrentEvent([currentEvent, upcomingEvent], pinnedNow)).toEqual(currentEvent);
       expect(getCurrentEvent([{ id: 3 }], pinnedNow)).toBeNull();
+      expect(getCurrentEvent([{ id: 5, start_time: "2026-03-24T09:00:00.000Z" }], pinnedNow)).toBeNull();
+      expect(getCurrentEvent()).toBeNull();
     });
 
     it("returns the next upcoming event", () => {
       expect(getUpcomingEvent([currentEvent, upcomingEvent], pinnedNow)).toEqual(upcomingEvent);
       expect(getUpcomingEvent([{ id: 4, start_time: "2026-03-24T08:00:00.000Z" }], pinnedNow)).toBeNull();
+      expect(
+        getUpcomingEvent(
+          [
+            { id: 5, start_time: "2026-03-24T12:00:00.000Z" },
+            { id: 6, start_time: "2026-03-24T10:45:00.000Z" },
+            { id: 7 },
+          ],
+          pinnedNow,
+        ),
+      ).toEqual({ id: 6, start_time: "2026-03-24T10:45:00.000Z" });
+      expect(getUpcomingEvent()).toBeNull();
     });
 
     it("describes the next focus window duration", () => {
@@ -94,6 +118,16 @@ describe("IntelligenceUtils", () => {
       ];
       expect(getNextWindowMeta(windows, pinnedNow)).toEqual({ duration: "1h 30m", label: "Next focus window 11:00" });
       expect(getNextWindowMeta([], pinnedNow)).toBeNull();
+      expect(getNextWindowMeta(undefined, pinnedNow)).toBeNull();
+      expect(
+        getNextWindowMeta(
+          [
+            { start: new Date("2026-03-24T08:00:00.000Z") },
+            { start: new Date("2026-03-24T10:45:00.000Z"), end: new Date("2026-03-24T11:15:00.000Z") },
+          ],
+          pinnedNow,
+        ),
+      ).toEqual({ duration: "30m", label: "Next focus window 10:45" });
     });
   });
 
@@ -140,6 +174,24 @@ describe("IntelligenceUtils", () => {
       const futureEvent = { ...baseTravelInput.upcomingEvent, start_time: "2026-03-24T14:00:00.000Z" };
       expect(getTravelContext({ ...baseTravelInput, upcomingEvent: futureEvent, tflDelays: [delay] })).toBeNull();
     });
+
+    it("falls back to generic travel copy when event details are sparse", () => {
+      expect(
+        getTravelContext({
+          upcomingEvent: { start_time: "2026-03-24T10:00:00.000Z" },
+          tflDelays: [{ severityDescription: "Signal issue" }],
+          now: new Date("2026-03-24T09:30:00.000Z"),
+          getRelevantDelays: () => [{ severityDescription: "Signal issue" }],
+          isSevereDisruption: () => false,
+        }),
+      ).toEqual({
+        iconKey: "Train",
+        label: "Travel",
+        meta: "Signal issue",
+        text: "TfL line delays — you may be late for your 10:00 your next class.",
+        tone: "warning",
+      });
+    });
   });
 
   describe("live context", () => {
@@ -174,6 +226,16 @@ describe("IntelligenceUtils", () => {
       });
     });
 
+    it("warns without a time when overlap metadata is missing", () => {
+      expect(getLiveContext(buildLiveContextInput({ overlaps: [{ a: {} }] }))).toEqual({
+        iconKey: "AlertTriangle",
+        label: "Attention",
+        meta: null,
+        text: "You have an overlap in today’s plan.",
+        tone: "warning",
+      });
+    });
+
     it("surfaces travel disruptions when no current event exists", () => {
       const context = buildLiveContextInput({
         getRelevantDelays: () => [{ lineName: "Northern", severityDescription: "Minor delays" }],
@@ -196,6 +258,43 @@ describe("IntelligenceUtils", () => {
         label: "Up next",
         meta: "Starts 10:00",
         text: "Workshop · Room 2",
+        tone: "neutral",
+      });
+    });
+
+    it("handles current and upcoming events without optional metadata", () => {
+      overlapSleepMock.mockReturnValue(false);
+      expect(
+        getLiveContext(
+          buildLiveContextInput({
+            currentEvent: {
+              start_time: "2026-03-24T09:30:00.000Z",
+              end_time: null,
+              title: "Solo focus",
+            },
+          }),
+        ),
+      ).toEqual({
+        iconKey: "Clock3",
+        label: "On now",
+        meta: null,
+        text: "Solo focus",
+        tone: "neutral",
+      });
+
+      expect(
+        getLiveContext(
+          buildLiveContextInput({
+            upcomingEvent: {
+              title: "Unnamed block",
+            },
+          }),
+        ),
+      ).toEqual({
+        iconKey: "Clock3",
+        label: "Up next",
+        meta: null,
+        text: "Unnamed block",
         tone: "neutral",
       });
     });

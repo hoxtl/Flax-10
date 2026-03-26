@@ -34,7 +34,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../components/common/badge/Badge', () => ({
+vi.mock('../../../components/common/Badge/Badge', () => ({
   default: ({ children, tone, className }) => <span className={className} data-tone={tone}>{children}</span>,
 }));
 

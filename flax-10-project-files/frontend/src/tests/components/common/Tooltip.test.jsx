@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import Tooltip from "../../../components/common/tooltip/Tooltip";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 
 describe("Tooltip", () => {
   beforeEach(() => {

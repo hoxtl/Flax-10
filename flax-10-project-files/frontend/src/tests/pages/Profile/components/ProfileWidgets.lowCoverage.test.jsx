@@ -15,7 +15,7 @@ vi.mock("../../../../components/common/stat_strip/StatStrip", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/card/Card", () => ({
+vi.mock("../../../../components/common/Card/Card", () => ({
   default: ({ children, className }) => <div data-testid="card" className={className}>{children}</div>,
 }));
 

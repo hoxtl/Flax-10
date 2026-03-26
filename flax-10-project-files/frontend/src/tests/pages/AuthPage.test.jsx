@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AuthPage from '../../pages/Auth/AuthPage';
 
+<<<<<<< HEAD
 vi.mock('../../components/Authentication/AuthComponents', () => ({
   Container: ({ children }) => <div>{children}</div>,
 }));
@@ -12,6 +13,18 @@ vi.mock('../../components/Authentication/SignInForm', () => ({
   SignInForm: ({ onSubmit }) => <button onClick={onSubmit}>signin</button>,
 }));
 vi.mock('../../components/Authentication/Overlay', () => ({
+=======
+vi.mock('../../components/Auth/AuthComponents', () => ({
+  Container: ({ children }) => <div>{children}</div>,
+}));
+vi.mock('../../components/Auth/SignUpForm', () => ({
+  SignUpForm: ({ onSubmit }) => <button onClick={onSubmit}>signup</button>,
+}));
+vi.mock('../../components/Auth/SignInForm', () => ({
+  SignInForm: ({ onSubmit }) => <button onClick={onSubmit}>signin</button>,
+}));
+vi.mock('../../components/Auth/Overlay', () => ({
+>>>>>>> main
   AuthOverlay: ({ onToggle }) => (
     <div>
       <button onClick={() => onToggle(true)}>to-signin</button>
@@ -19,12 +32,21 @@ vi.mock('../../components/Authentication/Overlay', () => ({
     </div>
   ),
 }));
+<<<<<<< HEAD
 vi.mock('../../components/Authentication/ErrorMessage', () => ({
   ErrorMessage: ({ error }) => error ? <div data-testid="error">{error}</div> : null,
 }));
 vi.mock('../../components/Authentication/AuthHeroGeometric', () => ({ default: () => <div /> }));
 vi.mock('../../components/Authentication/TestimonialsMarquee', () => ({ TestimonialsMarquee: () => <div /> }));
 vi.mock('../../components/Authentication/AuthBranding', () => ({
+=======
+vi.mock('../../components/Auth/ErrorMessage', () => ({
+  ErrorMessage: ({ error }) => error ? <div data-testid="error">{error}</div> : null,
+}));
+vi.mock('../../components/Auth/AuthHeroGeometric', () => ({ default: () => <div /> }));
+vi.mock('../../components/Auth/TestimonialsMarquee', () => ({ TestimonialsMarquee: () => <div /> }));
+vi.mock('../../components/Auth/AuthBranding', () => ({
+>>>>>>> main
   AuthBrand: () => <div />, AuthFooter: () => <div />,
 }));
 
@@ -32,14 +54,22 @@ const { mockAuthService } = vi.hoisted(() => ({
     mockAuthService: { register: vi.fn(), login: vi.fn() },
 }));
 vi.mock('../../api/authApi', () => ({ authService: mockAuthService }));
+<<<<<<< HEAD
 vi.mock('../../components/Authentication/utils/authHelpers', () => ({
+=======
+vi.mock('../../components/Auth/utils/authHelpers', () => ({
+>>>>>>> main
   validatePasswords: vi.fn(() => null),
   getErrorMessage: vi.fn(() => 'error'),
   saveUserData: vi.fn(),
   clearUserData: vi.fn(),
 }));
 
+<<<<<<< HEAD
 import { validatePasswords, saveUserData } from '../../components/Authentication/utils/authHelpers';
+=======
+import { validatePasswords, saveUserData } from '../../components/Auth/utils/authHelpers';
+>>>>>>> main
 
 describe('AuthPage', () => {
   it('renders without crashing', () => {

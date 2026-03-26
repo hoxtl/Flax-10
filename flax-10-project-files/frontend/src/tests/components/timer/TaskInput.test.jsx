@@ -1,6 +1,6 @@
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { clearTask, openPicker, pickRecommendedTask, selectTask } from "../../../components/Timer/TaskInput";
+import { clearTask, openPicker, pickRecommendedTask, selectTask } from "../../../components/timer/TaskInput";
 
 <<<<<<< HEAD
 const taskPickerState = {
@@ -12,7 +12,7 @@ const taskPickerState = {
   recommendedTask: null,
 };
 
-vi.mock("../../../components/Timer/taskInput/useTaskPickerData", () => ({
+vi.mock("../../../components/timer/task_input/useTaskPickerData", () => ({
   useTaskPickerData: vi.fn(() => ({
     ref: { current: null },
     filterWrapRef: { current: null },
@@ -20,7 +20,7 @@ vi.mock("../../../components/Timer/taskInput/useTaskPickerData", () => ({
   })),
 }));
 
-vi.mock("../../../components/Timer/taskInput/TaskPickerModal", () => ({
+vi.mock("../../../components/timer/task_input/TaskPickerModal", () => ({
   TaskPickerModal: ({ onSelect, onPickForMe }) => (
     <div>
       <button onClick={() => onSelect({ id: 7, title: "Deep Work" })}>Pick task</button>
@@ -29,7 +29,7 @@ vi.mock("../../../components/Timer/taskInput/TaskPickerModal", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 =======
 // Keep dropdowns testable (native controls)
@@ -63,7 +63,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-import { TaskInput } from "../../../components/Timer/TaskInput";
+import { TaskInput } from "../../../components/timer/TaskInput";
 
 describe("TaskInput coverage", () => {
   beforeEach(() => {

@@ -7,7 +7,7 @@ import {
   getRangeLabel,
   getUpcomingCount,
   RANGE_OPTIONS,
-} from "../../../pages/Profile/utils/profileHelpers";
+} from "../../../pages/profile/utils/profileHelpers";
 
 describe("profileHelpers", () => {
   beforeEach(() => {

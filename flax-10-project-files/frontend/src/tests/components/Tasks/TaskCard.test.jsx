@@ -385,6 +385,7 @@ describe('TaskContextMenu', () => {
         render(<TaskContextMenu {...menuProps} onEdit={onEdit} />);
         fireEvent.click(screen.getByText('Set due date'));
         fireEvent.change(screen.getByTestId('date-picker'), { target: { value: '2026-03-12T09:00' } });
+        fireEvent.click(screen.getByText('Set date'));
         await waitFor(() => expect(onEdit).toHaveBeenCalledWith(
             { due_date: '2026-03-12T09:00' },
             { source: 'context-menu', action: 'set-due-date', dueDate: '2026-03-12T09:00' },
