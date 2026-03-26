@@ -10,7 +10,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from studyFlax.fixtures.data_fixtures import reading_fixtures
+from studyFlax.fixtures.planning.data_fixtures import reading_fixtures
 
 READING_DAY_OFFSETS = [1, 5, 14]
 

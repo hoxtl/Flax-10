@@ -8,8 +8,8 @@ from django.contrib.auth import get_user_model
 from django.db import OperationalError
 from django.utils import timezone
 
-from studyFlax.fixtures.data_fixtures import get_course_prefixes
-from studyFlax.fixtures.module_fixtures import module_fixtures
+from studyFlax.fixtures.planning.data_fixtures import get_course_prefixes
+from studyFlax.fixtures.catalogue.module_fixtures import module_fixtures
 from studyFlax.models import Enrollment, Module
 from studyFlax.models.calendar.recurrence_rule_model import RecurrenceRule
 from studyFlax.views.modules import enrollment_event_service

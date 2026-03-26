@@ -13,7 +13,7 @@ from django.contrib.auth import get_user_model
 from faker import Faker
 
 from studyFlax.models import UserSettings
-from studyFlax.fixtures.data_fixtures import course_fixtures
+from studyFlax.fixtures.users.courses import course_fixtures
 
 User = get_user_model()
 faker = Faker('en_GB')

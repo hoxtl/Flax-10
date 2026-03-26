@@ -9,7 +9,7 @@ import hashlib
 from datetime import datetime, timedelta, timezone as dt_timezone
 
 from studyFlax.models import CalendarEvent
-from studyFlax.fixtures.data_fixtures import lecture_theatre_fixtures
+from studyFlax.fixtures.planning.data_fixtures import lecture_theatre_fixtures
 
 SEED_START = datetime(2026, 1, 15, tzinfo=dt_timezone.utc)
 SEED_END = datetime(2026, 6, 14, tzinfo=dt_timezone.utc)

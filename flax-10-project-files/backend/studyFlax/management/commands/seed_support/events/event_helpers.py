@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone as dt_timezone
 from django.utils import timezone
 
 from studyFlax.models import CalendarEvent, Deadline
-from studyFlax.fixtures.data_fixtures import (
+from studyFlax.fixtures.planning.data_fixtures import (
     event_title_fixtures, description_fixtures,
     location_fixtures, lecture_theatre_fixtures,
     breakfast_fixtures, lunch_fixtures, dinner_fixtures,
