@@ -18,12 +18,12 @@ vi.mock("../../../../pages/Homepage/utils/ScheduleAutoForm", () => ({
   buildScheduleAutoForm: (...args) => buildScheduleAutoFormMock(...args),
 }));
 
-vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
   overlapsDay: (...args) => overlapsDayMock(...args),
   isToday: (...args) => isTodayMock(...args),
 }));
 
-vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => id),
 }));
 
