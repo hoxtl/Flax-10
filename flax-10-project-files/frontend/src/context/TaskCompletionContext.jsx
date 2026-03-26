@@ -5,7 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { PartyPopper } from "lucide-react";
-import AppToast from "../components/common/AppToast/AppToast";
+import AppToast from "../components/common/app_toast/AppToast";
 
 const TaskCompletionContext = createContext(null);
 const DEFAULT_MESSAGE = "Task complete.";

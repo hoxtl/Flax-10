@@ -5,7 +5,7 @@ vi.mock('../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-import StudyHeatmap from '../../../components/Analytics/StudyHeatmap';
+import StudyHeatmap from '../../../components/analytics/StudyHeatmap';
 import { useTheme } from '../../../context/ThemeContext';
 
 const mockHeatmapData = {

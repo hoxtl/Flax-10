@@ -6,7 +6,7 @@ vi.mock('../../../api/socialApi', () => ({
     unshareCalendar: vi.fn().mockResolvedValue({}),
 }));
 
-import ShareButton from '../../../components/Social/ShareButton';
+import ShareButton from '../../../components/social/ShareButton';
 import { shareCalendar, unshareCalendar } from '../../../api/socialApi';
 
 describe('ShareButton', () => {

@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Minimal mock of AppToast so we can inspect props
-vi.mock('../../components/common/AppToast/AppToast', () => ({
+vi.mock('../../components/common/app_toast/AppToast', () => ({
     default: ({ message, variant, icon, actionLabel, onClose }) => (
         <div data-testid="toast" data-variant={variant} data-icon={icon} data-action={actionLabel}>
             <span data-testid="toast-message">{message}</span>

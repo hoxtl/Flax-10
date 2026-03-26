@@ -1,13 +1,13 @@
 /* Tests for CommonGroundSection widget */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { CommonGroundSection } from '../../../pages/Profile/components/widgets/CommonGround';
+import { CommonGroundSection } from '../../../pages/profile/components/widgets/CommonGround';
 
-vi.mock('../../../components/common/Card/Card', () => ({
+vi.mock('../../../components/common/card/Card', () => ({
   default: ({ children, className }) => <div className={className} data-testid="card">{children}</div>,
 }));
 
-vi.mock('../../../pages/Profile/components/widgets/ProfileCompat.module.css', () => ({
+vi.mock('../../../pages/profile/components/widgets/ProfileCompat.module.css', () => ({
   default: {},
 }), { virtual: true });
 

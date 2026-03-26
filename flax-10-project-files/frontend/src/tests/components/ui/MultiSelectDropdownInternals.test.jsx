@@ -21,14 +21,14 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-import { MultiSelectDropdownTrigger } from "../../../components/ui/multi-select-dropdown/MultiSelectDropdownTrigger";
-import { MultiSelectDropdownMenu } from "../../../components/ui/multi-select-dropdown/MultiSelectDropdownMenu";
+import { MultiSelectDropdownTrigger } from "../../../components/ui/multi_select_dropdown/MultiSelectDropdownTrigger";
+import { MultiSelectDropdownMenu } from "../../../components/ui/multi_select_dropdown/MultiSelectDropdownMenu";
 import {
   createHoverHandlers,
   useCloseOnOutsideClick,
   useDropdownHoverTimeout,
   useDropdownRootRef,
-} from "../../../components/ui/multi-select-dropdown/useDropdownInteractions";
+} from "../../../components/ui/multi_select_dropdown/useDropdownInteractions";
 
 const buildTriggerProps = (overrides = {}) => ({
   customTrigger: null,

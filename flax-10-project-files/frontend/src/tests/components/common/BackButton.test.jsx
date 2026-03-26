@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import BackButton from '../../../components/common/BackButton/BackButton';
+import BackButton from '../../../components/common/back_button/BackButton';
 
 describe('BackButton', () => {
   it('renders the default label', () => {

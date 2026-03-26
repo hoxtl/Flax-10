@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import GenericSummaryModal from '../../../components/common/GenericSummaryModal/GenericSummaryModal';
+import GenericSummaryModal from '../../../components/common/generic_summary_modal/GenericSummaryModal';
 
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     default: ({ title, subtitle, onClose, children }) => (
         <div data-testid="standard-modal">
             <h2>{title}</h2>
@@ -12,7 +12,7 @@ vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/common/GenericSummaryModal/GenericSummaryModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/common/generic_summary_modal/GenericSummaryModal.module.css', () => ({ default: {} }));
 
 describe('GenericSummaryModal', () => {
     it('returns null when isOpen is false', () => {

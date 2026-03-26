@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { submitManualSchedule } from '../../../components/Schedules/manual/submitManualSchedule';
+import { submitManualSchedule } from '../../../components/schedules/manual/submitManualSchedule';
 
 vi.mock('../../../api/scheduleApi', () => ({
     createSchedule: vi.fn(),

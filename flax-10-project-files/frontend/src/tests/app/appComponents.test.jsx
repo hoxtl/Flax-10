@@ -13,7 +13,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("../../pages/Banned/BannedPage", () => ({
+vi.mock("../../pages/banned/BannedPage", () => ({
   default: ({ reason }) => <div>{`Banned:${reason}`}</div>,
 }));
 
@@ -45,7 +45,7 @@ vi.mock("../../app/navigation/useNavHandler", () => ({
   useNavHandler: (...args) => useNavHandlerMock(...args),
 }));
 
-vi.mock("../../components/common/ScrollToTop/ScrollToTop", () => ({
+vi.mock("../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>ScrollToTop</div>,
 }));
 
@@ -81,11 +81,11 @@ vi.mock("../../context/TaskCompletionContext", () => ({
   TaskCompletionProvider: ({ children }) => <div data-testid="task-completion-provider">{children}</div>,
 }));
 
-vi.mock("../../components/Notifications", () => ({
+vi.mock("../../components/notifications", () => ({
   NotificationToast: () => <div>NotificationToast</div>,
 }));
 
-vi.mock("../../components/Attendance/AttendancePrompt", () => ({
+vi.mock("../../components/attendance/AttendancePrompt", () => ({
   default: () => <div>AttendancePrompt</div>,
 }));
 

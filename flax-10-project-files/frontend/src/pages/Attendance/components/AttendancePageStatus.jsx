@@ -2,7 +2,7 @@
  * Attendance page loading and error states.
  */
 
-import SkeletonBlock from '../../../components/common/LoadingState/SkeletonBlock';
+import SkeletonBlock from '../../../components/common/loading_state/SkeletonBlock';
 import styles from "../AttendancePage.module.css";
 
 export default function AttendancePageStatus({ loading, error }) {

@@ -29,11 +29,11 @@ vi.mock("lucide-react", () => ({
   MapPin: () => <svg aria-hidden="true" />,
 }));
 
-vi.mock("../../../pages/Homepage/hooks/useRightNowData", () => ({
+vi.mock("../../../pages/homepage/hooks/useRightNowData", () => ({
   useRightNowData: (...args) => useRightNowData(...args),
 }));
 
-vi.mock("../../../pages/Homepage/components/RightNowSubComponents", () => ({
+vi.mock("../../../pages/homepage/components/RightNowSubComponents", () => ({
   fadeIn: () => ({}),
   ActiveEventCard: ({ currentBlock, timeLeftStr }) => <div>{`Active ${currentBlock.title} ${timeLeftStr || ""}`}</div>,
   CommuteContextCard: ({ campus, loading, leaveByInfo }) => (
@@ -53,7 +53,7 @@ vi.mock("../../../pages/Homepage/components/RightNowSubComponents", () => ({
   ),
 }));
 
-import { RightNowWidget } from "../../../pages/Homepage/components/RightNowWidget";
+import { RightNowWidget } from "../../../pages/homepage/components/RightNowWidget";
 
 const baseModel = {
   conflicts: [],

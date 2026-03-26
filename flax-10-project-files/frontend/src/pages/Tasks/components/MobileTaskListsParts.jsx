@@ -2,7 +2,7 @@
  * Shared sections for the mobile task list picker modal.
  */
 
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import EmptyState from "../../../components/common/empty_state/EmptyState";
 
 import { getListColor } from "../utils/listColorUtils";
 

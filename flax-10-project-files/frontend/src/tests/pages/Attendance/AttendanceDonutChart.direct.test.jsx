@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import AttendanceDonutChart from "../../../pages/Attendance/components/AttendanceDonutChart";
+import AttendanceDonutChart from "../../../pages/attendance/components/AttendanceDonutChart";
 
 const buildDonutSeriesMock = vi.hoisted(() => vi.fn());
 const buildPieClickHandlerMock = vi.hoisted(() => vi.fn());
@@ -21,7 +21,7 @@ vi.mock("@mui/x-charts/PieChart", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Attendance/utils/attendanceChartUtils", () => ({
+vi.mock("../../../pages/attendance/utils/attendanceChartUtils", () => ({
   buildDonutSeries: (...args) => buildDonutSeriesMock(...args),
   buildPieClickHandler: (...args) => buildPieClickHandlerMock(...args),
 }));

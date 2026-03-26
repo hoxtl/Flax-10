@@ -4,9 +4,9 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import useModules from "../../components/Modules/hooks/useModules.js";
-import useModuleSorting from "../../components/Modules/hooks/useModuleSorting.js";
-import { filterModules } from "../../components/Modules/utils/moduleUtils.js";
+import useModules from "../../components/modules/hooks/useModules.js";
+import useModuleSorting from "../../components/modules/hooks/useModuleSorting.js";
+import { filterModules } from "../../components/modules/utils/moduleUtils.js";
 
 function readUserRole() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");

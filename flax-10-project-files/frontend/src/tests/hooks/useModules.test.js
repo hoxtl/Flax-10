@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import useModules from '../../components/Modules/hooks/useModules';
+import useModules from '../../components/modules/hooks/useModules';
 
 vi.mock('../../context/NotificationContext.jsx', () => ({
     useNotifications: vi.fn(() => ({ addNotification: vi.fn() })),
@@ -22,13 +22,13 @@ vi.mock('../../api/taskApi.js', () => ({
     fetchTasks: vi.fn(),
 }));
 
-vi.mock('../../components/Modules/utils/moduleUtils.js', () => ({
+vi.mock('../../components/modules/utils/moduleUtils.js', () => ({
     isEnrolledIn: vi.fn(),
     getEnrollmentId: vi.fn(),
     normaliseModuleCode: vi.fn((value) => String(value || "").trim().toUpperCase()),
 }));
 
-vi.mock('../../components/Modules/utils/notifyHelper.js', () => ({
+vi.mock('../../components/modules/utils/notifyHelper.js', () => ({
     createNotify: vi.fn(() => vi.fn()),
 }));
 
@@ -39,8 +39,8 @@ vi.mock('../../context/ConfirmContext.jsx', () => ({
 import { useNotifications } from '../../context/NotificationContext.jsx';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi.js';
 import { fetchTasks } from '../../api/taskApi.js';
-import { isEnrolledIn, getEnrollmentId } from '../../components/Modules/utils/moduleUtils.js';
-import { createNotify } from '../../components/Modules/utils/notifyHelper.js';
+import { isEnrolledIn, getEnrollmentId } from '../../components/modules/utils/moduleUtils.js';
+import { createNotify } from '../../components/modules/utils/notifyHelper.js';
 import { useConfirm } from '../../context/ConfirmContext.jsx';
 
 const mockModules = [

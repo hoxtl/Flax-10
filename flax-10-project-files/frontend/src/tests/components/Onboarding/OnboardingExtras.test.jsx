@@ -39,7 +39,7 @@ vi.mock(
   })
 );
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, disabled }) => (
     <button onClick={onClick} disabled={disabled}>
       {children}
@@ -47,7 +47,7 @@ vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/FilterCheckbox/FilterCheckbox", () => ({
+vi.mock("../../../components/common/filter_checkbox/FilterCheckbox", () => ({
   default: ({ checked, onChange }) => (
     <input
       type="checkbox"
@@ -58,7 +58,7 @@ vi.mock("../../../components/common/FilterCheckbox/FilterCheckbox", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ placeholder, onChange, onOpenChange }) => (
     <div>
       <button onClick={() => onChange("changed")}>{placeholder}</button>
@@ -67,7 +67,7 @@ vi.mock("../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../components/Onboarding/WarningBox", () => ({
+vi.mock("../../../components/onboarding/WarningBox", () => ({
   default: ({ major, confirmed, onConfirm }) => (
     <div>
       <span>{`Warning for ${major}`}</span>
@@ -81,9 +81,9 @@ vi.mock("../../../components/Onboarding/WarningBox", () => ({
   ),
 }));
 
-import SuccessScreen from "../../../components/Onboarding/SuccessScreen";
-import WarningBox from "../../../components/Onboarding/WarningBox";
-import OnboardingForm from "../../../components/Onboarding/OnboardingForm";
+import SuccessScreen from "../../../components/onboarding/SuccessScreen";
+import WarningBox from "../../../components/onboarding/WarningBox";
+import OnboardingForm from "../../../components/onboarding/OnboardingForm";
 
 // ─── SuccessScreen ────────────────────────────────────────────────────────────
 

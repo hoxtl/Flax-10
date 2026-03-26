@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { isRoutineOrEventTask, getHeaderTitle } from "../../../pages/Tasks/utils/taskFeedUtils";
+import { isRoutineOrEventTask, getHeaderTitle } from "../../../pages/tasks/utils/taskFeedUtils";
 
 describe("taskFeedUtils", () => {
   describe("isRoutineOrEventTask", () => {

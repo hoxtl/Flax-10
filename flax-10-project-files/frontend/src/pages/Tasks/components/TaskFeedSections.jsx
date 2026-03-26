@@ -4,7 +4,7 @@
 
 import { AnimatePresence, motion as Motion } from "framer-motion";
 
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 
 import CompletedTasksSection from "./CompletedTasksSection";
 import SuggestedReadingsSection from "./SuggestedReadingsSection";

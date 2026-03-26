@@ -3,7 +3,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import TaskCard, { EditTaskModal, TaskContextMenu } from '../../../pages/Tasks/components/TaskCard';
+import TaskCard, { EditTaskModal, TaskContextMenu } from '../../../pages/tasks/components/TaskCard';
 const navigateMock = vi.fn();
 const setActiveTaskIdMock = vi.fn();
 const showCompletionToastMock = vi.fn();
@@ -36,10 +36,10 @@ vi.mock('../../../api/userApi', () => ({
 vi.mock('../../../api/readingApi', () => ({
     getReadingSpeed: (...args) => getReadingSpeedMock(...args),
 }));
-vi.mock('../../../components/common/SleepWarningModal', () => ({
+vi.mock('../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
-vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
     useSleepWarning: vi.fn(() => sleepWarningState),
 }));
 vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
@@ -47,7 +47,7 @@ vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
         <input data-testid="date-picker" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
-vi.mock('../../../pages/Tasks/components/CreateTaskModal', () => ({
+vi.mock('../../../pages/tasks/components/CreateTaskModal', () => ({
     default: ({ onClose, onSave, mode }) => (
         <div data-testid="create-task-modal">
             <span>{mode === 'edit' ? 'Edit' : 'Create'} task modal</span>
@@ -56,10 +56,10 @@ vi.mock('../../../pages/Tasks/components/CreateTaskModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/TaskCelebration/CheckBurst', () => ({
+vi.mock('../../../components/task_celebration/CheckBurst', () => ({
     CheckBurst: ({ children }) => <div data-testid="check-burst">{children}</div>,
 }));
-vi.mock('../../../components/common/AnimatedDropdown/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <div data-testid="animated-dropdown">
             {(options || []).map(o => (

@@ -24,11 +24,11 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => navigateMock,
 }));
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
 }));
 
-vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: (...args) => extractBaseEventId(...args),
 }));
 
@@ -48,7 +48,7 @@ vi.mock("../../../api/deadlineApi", () => ({
   getUpcomingDeadlines: (...args) => getUpcomingDeadlines(...args),
 }));
 
-vi.mock("../../../pages/Tasks/components/CreateTaskModal", () => ({
+vi.mock("../../../pages/tasks/components/CreateTaskModal", () => ({
   default: ({ onSave, onClose, onOpenCreateList, showAddToScheduleToggle, addToScheduleLabel }) => (
     <div>
       <div>{String(showAddToScheduleToggle)}</div>
@@ -60,7 +60,7 @@ vi.mock("../../../pages/Tasks/components/CreateTaskModal", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Tasks/components/CreateListModal", () => ({
+vi.mock("../../../pages/tasks/components/CreateListModal", () => ({
   default: ({ onSave, onClose }) => (
     <div>
       <button type="button" onClick={() => onSave({ name: "Weekend" })}>save-list</button>
@@ -69,7 +69,7 @@ vi.mock("../../../pages/Tasks/components/CreateListModal", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Tasks/components/TaskCard", () => ({
+vi.mock("../../../pages/tasks/components/TaskCard", () => ({
   EditTaskModal: ({ onSave, onDelete, onClose }) => (
     <div>
       <button type="button" onClick={() => onSave({ title: "Edited task" })}>save-edit</button>
@@ -79,7 +79,7 @@ vi.mock("../../../pages/Tasks/components/TaskCard", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/PlanReadDetailModal", () => ({
+vi.mock("../../../pages/homepage/components/PlanReadDetailModal", () => ({
   PlanReadDetailModal: ({ onClose, onEditTask, onDeleteTask, onEditEvent, onDeleteEvent }) => (
     <div>
       <button type="button" onClick={onClose}>close-plan</button>
@@ -91,9 +91,9 @@ vi.mock("../../../pages/Homepage/components/PlanReadDetailModal", () => ({
   ),
 }));
 
-import { HomepageModals } from "../../../pages/Homepage/components/HomepageModals";
-import { HomepageOverlays } from "../../../pages/Homepage/components/HomepageOverlays";
-import { useSemesterData, useSemesterRange } from "../../../pages/Homepage/components/useSemesterOverviewData";
+import { HomepageModals } from "../../../pages/homepage/components/HomepageModals";
+import { HomepageOverlays } from "../../../pages/homepage/components/HomepageOverlays";
+import { useSemesterData, useSemesterRange } from "../../../pages/homepage/components/useSemesterOverviewData";
 
 const styles = new Proxy({}, { get: (_, key) => key });
 const overlayModule = { id: 7, module_code: "CS101", module_name: "Algorithms", description: "A".repeat(140), module_leader: "Dr Ada", department: "Computing" };

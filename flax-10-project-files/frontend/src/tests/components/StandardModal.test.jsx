@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import StandardModal, { ModalHeader } from '../../components/common/StandardModal/StandardModal';
+import StandardModal, { ModalHeader } from '../../components/common/standard_modal/StandardModal';
 
 describe('StandardModal', () => {
     it('renders title', () => {

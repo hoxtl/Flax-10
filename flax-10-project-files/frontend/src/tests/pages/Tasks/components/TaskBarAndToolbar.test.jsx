@@ -10,19 +10,19 @@ import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const taskBarHookMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../../pages/Tasks/hooks/useCreateTaskBar", () => ({
+vi.mock("../../../../pages/tasks/hooks/useCreateTaskBar", () => ({
   default: taskBarHookMock,
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, pill, variant, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options = [], placeholder }) => (
     <select aria-label={placeholder} value={value ?? ""} onChange={(event) => onChange(event.target.value)}>
       <option value="">empty</option>
@@ -35,7 +35,7 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/SearchBar", () => ({
+vi.mock("../../../../components/common/search_bar", () => ({
   default: ({ value, onChange, onKeyDown, inputClassName, ...props }) => (
     <input
       {...props}
@@ -46,12 +46,12 @@ vi.mock("../../../../components/common/SearchBar", () => ({
   ),
 }));
 
-import CreateTaskBar from "../../../../pages/Tasks/components/CreateTaskBar";
+import CreateTaskBar from "../../../../pages/tasks/components/CreateTaskBar";
 import {
   ToolbarSearch,
   ToolbarViewLists,
-} from "../../../../pages/Tasks/components/TaskFeedToolbarParts";
-import useTaskFeedResponsive from "../../../../pages/Tasks/components/useTaskFeedResponsive";
+} from "../../../../pages/tasks/components/TaskFeedToolbarParts";
+import useTaskFeedResponsive from "../../../../pages/tasks/components/useTaskFeedResponsive";
 
 const taskBarDefaults = {
   title: "",
@@ -82,7 +82,7 @@ function buildTaskBarState(overrides = {}) {
 
 describe("Task bar and toolbar coverage", () => {
   it("covers reading-list fields, dropdown fallbacks, and sleep warnings", () => {
-    const state = buildTaskBarState(); taskBarHookMock.mockReturnValue(state);
+    const state = buildTaskBarState({ isReadingList: true, sleepWarning: true }); taskBarHookMock.mockReturnValue(state);
     const externalInputRef = { current: null };
     render(<CreateTaskBar inputRef={externalInputRef} />);
 
@@ -105,6 +105,7 @@ describe("Task bar and toolbar coverage", () => {
 
   it("renders blank page counts and keeps selected module values when they are present", () => {
     const state = buildTaskBarState({
+      isReadingList: true,
       pageCount: null,
       moduleId: "",
       moduleOptions: [

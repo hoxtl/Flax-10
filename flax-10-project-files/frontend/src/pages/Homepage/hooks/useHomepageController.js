@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCalendar, useCalendarDispatch, useEventModal, useEventPopup } from "../../../context/CalendarContext";
-import { useCalendarEvents, useEventActions } from "../../../components/Calendar/hooks/useCalendarEvents";
+import { useCalendarEvents, useEventActions } from "../../../components/calendar/hooks/useCalendarEvents";
 import { useTags } from "../../../context/TagContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { useToast } from "../../../context/ToastContext";

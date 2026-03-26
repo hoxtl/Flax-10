@@ -9,7 +9,7 @@ vi.mock("../../../../api/taskApi", () => ({
   deleteTask: vi.fn(),
 }));
 
-vi.mock("../../../../pages/Tasks/utils/readingSpeedUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/readingSpeedUtils", () => ({
   recalculatePendingBlocks: vi.fn((tasks) => tasks.map((task) => ({ ...task, recalculated: true }))),
 }));
 
@@ -25,13 +25,13 @@ const loadState = {
   load: vi.fn(),
 };
 
-vi.mock("../../../../pages/Tasks/hooks/useTasksLoad", () => ({
+vi.mock("../../../../pages/tasks/hooks/useTasksLoad", () => ({
   default: vi.fn(() => loadState),
 }));
 
-import useTasks from "../../../../pages/Tasks/hooks/useTasks";
+import useTasks from "../../../../pages/tasks/hooks/useTasks";
 import { deleteTask, updateTask } from "../../../../api/taskApi";
-import { recalculatePendingBlocks } from "../../../../pages/Tasks/utils/readingSpeedUtils";
+import { recalculatePendingBlocks } from "../../../../pages/tasks/utils/readingSpeedUtils";
 
 describe("useTasks coverage", () => {
   beforeEach(() => {

@@ -4,8 +4,8 @@
 
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
-import SearchBar from '../../common/SearchBar/SearchBar';
-import SearchEmptyState from '../../common/SearchEmptyState/SearchEmptyState';
+import SearchBar from '../../common/search_bar/SearchBar';
+import SearchEmptyState from '../../common/search_empty_state/SearchEmptyState';
 import { useClickOutside } from '../../common/hooks/useClickOutside';
 import { useModuleCourseFilterState } from './useModuleCourseFilterState';
 import styles from './ModuleCourseFilter.module.css';

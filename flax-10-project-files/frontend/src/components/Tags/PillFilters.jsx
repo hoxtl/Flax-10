@@ -4,11 +4,11 @@
 
 import { useState } from "react";
 import styles from "./PillFilters.module.css";
-import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
+import AnimatedDropdown from "../common/animated_dropdown/AnimatedDropdown";
 import TagManagerModal from "./TagManagerModal";
-import { usePillFilterOptions } from "./pillFilters/usePillFilterOptions";
-import { FilterTriggerButton } from "./pillFilters/PillFilterControls";
-import { ManageTagsButton } from "./pillFilters/PillFilterControls";
+import { usePillFilterOptions } from "./pill_filters/usePillFilterOptions";
+import { FilterTriggerButton } from "./pill_filters/PillFilterControls";
+import { ManageTagsButton } from "./pill_filters/PillFilterControls";
 
 export default function PillFilters({ active, items, onChange }) {
   const [showManager, setShowManager] = useState(false);

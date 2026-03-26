@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import EmptyState from "../../../components/common/empty_state/EmptyState";
 
 describe("EmptyState", () => {
   it("renders the action area when provided", () => {

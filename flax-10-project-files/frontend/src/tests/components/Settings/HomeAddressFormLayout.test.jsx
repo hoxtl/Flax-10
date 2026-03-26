@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../components/Calendar/EventModal/components/LocationAutoComplete", () => ({
+vi.mock("../../../components/calendar/event_modal/components/LocationAutoComplete", () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input
       aria-label="Address"
@@ -12,20 +12,20 @@ vi.mock("../../../components/Calendar/EventModal/components/LocationAutoComplete
   ),
 }));
 
-vi.mock("../../../components/common/InlineAlert/InlineAlert", () => ({
+vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message, variant }) => <div>{variant}:{message}</div>,
 }));
 
-vi.mock("../../../components/Settings/SettingsContextCard", () => ({
+vi.mock("../../../components/settings/SettingsContextCard", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
-vi.mock("../../../components/Settings/SettingsUI", () => ({
+vi.mock("../../../components/settings/SettingsUI", () => ({
   SectionHeader: ({ title }) => <div>{title}</div>,
   SubmitButton: ({ label }) => <button type="submit">{label}</button>,
 }));
 
-import HomeAddressFormLayout from "../../../components/Settings/HomeAddressFormLayout";
+import HomeAddressFormLayout from "../../../components/settings/HomeAddressFormLayout";
 
 describe("HomeAddressFormLayout", () => {
   it("renders without an inline alert when there is no error", () => {

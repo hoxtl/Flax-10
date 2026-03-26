@@ -10,23 +10,23 @@ const useModulesMock = vi.fn();
 const useModuleSortingMock = vi.fn();
 const filterModulesMock = vi.fn();
 
-vi.mock("../../../components/Modules/hooks/useModules.js", () => ({
+vi.mock("../../../components/modules/hooks/useModules.js", () => ({
   default: function UseModulesMock(...args) {
     return useModulesMock(...args);
   },
 }));
 
-vi.mock("../../../components/Modules/hooks/useModuleSorting.js", () => ({
+vi.mock("../../../components/modules/hooks/useModuleSorting.js", () => ({
   default: function UseModuleSortingMock(...args) {
     return useModuleSortingMock(...args);
   },
 }));
 
-vi.mock("../../../components/Modules/utils/moduleUtils.js", () => ({
+vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-import { useMainModuleView, useModulesPageState } from "../../../pages/Modules/modulesPageHooks.js";
+import { useMainModuleView, useModulesPageState } from "../../../pages/modules/modulesPageHooks.js";
 
 function wrapper({ children }) {
   return <MemoryRouter>{children}</MemoryRouter>;

@@ -16,7 +16,7 @@ function EnrolmentsHint() {
   );
 }
 
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../common/primary_button/PrimaryButton";
 
 export default function SuccessScreen({ major, onComplete }) {
   return (

@@ -3,7 +3,7 @@
  */
 
 import styles from "./CollaboratorList.module.css";
-import AnimatedDropdown from "../common/AnimatedDropdown";
+import AnimatedDropdown from "../common/animated_dropdown";
 
 const ROLES = [
     { value: "editor", label: "Editor" },

@@ -75,7 +75,7 @@ vi.mock("../../../lib/routes", () => ({
 }));
 
 // ── Dependency mocks ─────────────────────────────────────────────────────────
-vi.mock("../../../components/Dashboard/ProfileDropdown", () => ({
+vi.mock("../../../components/dashboard/ProfileDropdown", () => ({
   default: () => <div data-testid="profile-dropdown" />,
 }));
 
@@ -86,23 +86,23 @@ vi.mock("../../../context/NotificationContext", () => ({
   }),
 }));
 
-vi.mock("../../../components/Notifications/NotificationPanel", () => ({
+vi.mock("../../../components/notifications/NotificationPanel", () => ({
   NotificationPanel: () => <div data-testid="notification-panel" />,
 }));
 
-vi.mock("../../../components/Dashboard/ExpandableTabs", () => ({
+vi.mock("../../../components/dashboard/ExpandableTabs", () => ({
   ExpandableTabs: () => <div data-testid="expandable-tabs" />,
 }));
 
-vi.mock("../../../components/Dashboard/ThemeToggle", () => ({
+vi.mock("../../../components/dashboard/ThemeToggle", () => ({
   default: () => <div data-testid="theme-toggle" />,
 }));
 
-vi.mock("../../../components/Timer/MiniTimer", () => ({
+vi.mock("../../../components/timer/MiniTimer", () => ({
   default: () => <div data-testid="mini-timer" />,
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ customTrigger, options, onChange, value }) => (
     <div data-testid="animated-dropdown">
       {customTrigger}
@@ -140,7 +140,7 @@ vi.mock("../../../components/common", () => ({
 }));
 
 // ── Import the real TopBar component ─────────────────────────────────────────
-import TopBar from "../../../components/Dashboard/Topbar";
+import TopBar from "../../../components/dashboard/Topbar";
 
 // ─────────────────────────────────────────────────────────────────────────────
 

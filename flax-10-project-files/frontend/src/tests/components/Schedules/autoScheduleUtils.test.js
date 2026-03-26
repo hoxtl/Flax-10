@@ -3,7 +3,7 @@ import {
     getAutoScheduleError,
     buildAutoSchedulePayload,
     getMoveTomorrowWindow,
-} from '../../../components/Schedules/auto/autoScheduleUtils';
+} from '../../../components/schedules/auto/autoScheduleUtils';
 
 describe('getAutoScheduleError', () => {
     it('returns null when deadlines are present', () => {

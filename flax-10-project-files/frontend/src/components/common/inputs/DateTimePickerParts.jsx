@@ -4,7 +4,7 @@
 
 import { forwardRef } from "react";
 import { Clock } from "lucide-react";
-import AnimatedDropdown from "../AnimatedDropdown";
+import AnimatedDropdown from "../animated_dropdown";
 import styles from "./DateTimePicker.module.css";
 import { MONTHS, DAYS, HOUR_OPTIONS, MINUTE_OPTIONS, getDisplayValue } from "./dateTimePickerUtils";
 

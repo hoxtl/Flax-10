@@ -4,8 +4,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo } from "react";
-import SearchBar from "../../../components/common/SearchBar/SearchBar";
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import SearchBar from "../../../components/common/search_bar/SearchBar";
+import EmptyState from "../../../components/common/empty_state/EmptyState";
 import { banUser, unbanUser } from "../../../api/adminApi";
 import styles from "../styles";
 import { USER_FILTER_GROUPS, USER_LIST_PAGE_SIZE } from "../constants";
@@ -19,7 +19,7 @@ import { filterUsers, getUserRoleValue, toggleArrayValue } from "../utils/userFi
 import { banUserState, unbanUserState } from "../utils/userState";
 import { rowAnim, stagger } from "../utils/adminMotion";
 import { isProtectedFixtureUser } from "../utils/protectedUsers";
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import { navigateToProfile } from "../utils/adminNavigation";
 import { useUsersTabState } from "../hooks/useUsersTabState";
 

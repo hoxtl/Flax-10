@@ -2,8 +2,8 @@
  * Aggregated design token entrypoint.
  */
 
-@import "./variableParts/base-core.css";
-@import "./variableParts/base-tokens.css";
-@import "./variableParts/base-semantic.css";
-@import "./variableParts/themes.css";
-@import "./variableParts/dark-overrides.css";
+@import "./variable_parts/base-core.css";
+@import "./variable_parts/base-tokens.css";
+@import "./variable_parts/base-semantic.css";
+@import "./variable_parts/themes.css";
+@import "./variable_parts/dark-overrides.css";

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   isDuringSleepWindow,
   doesEventOverlapSleepWindow,
-} from "../../../../components/Settings/sleep/sleepWarningUtils";
+} from "../../../../components/settings/sleep/sleepWarningUtils";
 
 // ---------------------------------------------------------------------------
 // Helpers

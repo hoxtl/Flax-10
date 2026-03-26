@@ -4,8 +4,8 @@
 
 import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
 
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
 import { isReadingListName } from "../utils/readingListUtils";
 import styles from "./TaskInfoModal.module.css";

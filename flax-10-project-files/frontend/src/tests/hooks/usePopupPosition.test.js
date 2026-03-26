@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { usePopupPosition } from '../../components/Calendar/EventDetailPopup/usePopupPosition';
+import { usePopupPosition } from '../../components/calendar/event_detail_popup/usePopupPosition';
 
 describe('usePopupPosition', () => {
     beforeEach(() => {

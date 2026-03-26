@@ -5,7 +5,7 @@ vi.mock('lucide-react', () => ({
     ArrowUp: () => <svg data-testid="arrow-up" />,
 }));
 
-import { Pagination, BackToTop } from '../../components/Pagination/Pagination';
+import { Pagination, BackToTop } from '../../components/pagination/Pagination';
 
 describe('Pagination', () => {
     it('returns null when totalPages <= 1', () => {

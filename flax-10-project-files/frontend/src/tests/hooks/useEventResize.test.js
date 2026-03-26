@@ -4,7 +4,7 @@
 
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useEventResize } from '../../components/Calendar/hooks/useEventResize';
+import { useEventResize } from '../../components/calendar/hooks/useEventResize';
 
 const useCalendarMock = vi.fn();
 const useConfirmMock = vi.fn();
@@ -24,9 +24,9 @@ const eventRef = { current: { offsetHeight: 60 } };
 vi.mock('../../context/CalendarContext', () => ({ useCalendar: () => useCalendarMock() }));
 vi.mock('../../context/ConfirmContext', () => ({ useConfirm: () => useConfirmMock() }));
 vi.mock('../../context/ResizeHighlightContext', () => ({ useResizeHighlight: () => useResizeHighlightMock() }));
-vi.mock('../../components/Calendar/utils/resizeUtils', () => ({ createResizeSession: (...args) => createResizeSessionMock(...args) }));
-vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
-vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../components/calendar/utils/resizeUtils', () => ({ createResizeSession: (...args) => createResizeSessionMock(...args) }));
+vi.mock('../../components/calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
+vi.mock('../../components/calendar/utils/eventUtils', () => ({
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),
 }));

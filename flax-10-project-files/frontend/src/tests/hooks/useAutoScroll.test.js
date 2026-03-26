@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-vi.mock('../../components/Calendar/calendarConstants', () => ({
+vi.mock('../../components/calendar/calendarConstants', () => ({
     SLOT_HEIGHT: 60,
 }));
 
-import { useAutoScroll } from '../../components/Calendar/hooks/useAutoScroll';
+import { useAutoScroll } from '../../components/calendar/hooks/useAutoScroll';
 
 describe('useAutoScroll', () => {
     let mockRef;

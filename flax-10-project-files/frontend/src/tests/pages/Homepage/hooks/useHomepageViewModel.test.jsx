@@ -25,13 +25,13 @@ const utils = vi.hoisted(() => ({
   getUpcomingItems: vi.fn(() => ["upcoming"]),
 }));
 
-vi.mock("../../../../components/Modules/utils/moduleUtils", () => ({
+vi.mock("../../../../components/modules/utils/moduleUtils", () => ({
   isEnrolledIn: (...args) => isEnrolledInMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/utils/homepageViewModel", () => utils);
+vi.mock("../../../../pages/homepage/utils/homepageViewModel", () => utils);
 
-import { useHomepageViewModel } from "../../../../pages/Homepage/hooks/useHomepageViewModel.js";
+import { useHomepageViewModel } from "../../../../pages/homepage/hooks/useHomepageViewModel.js";
 
 describe("useHomepageViewModel", () => {
   beforeEach(() => {

@@ -6,7 +6,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { createFnMap } from "../utils/testBuilderUtils";
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -15,11 +15,11 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../components/common/LoadingState/SkeletonBlock", () => ({
+vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: (props) => <div data-testid="skeleton-block" {...props} />,
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleForm.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleForm.jsx", () => ({
   default: ({ onSuccess, onCancel, module }) => (
     <div>
       <div>{module ? "Editing module" : "New module"}</div>
@@ -29,7 +29,7 @@ vi.mock("../../../components/Modules/Modules/ModuleForm.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleDetails.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleDetails.jsx", () => ({
   default: ({ module, onBack, onEnroll, onUnenroll }) => (
     <div>
       <div>{module.module_code}</div>
@@ -40,7 +40,7 @@ vi.mock("../../../components/Modules/Modules/ModuleDetails.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Deadlines/DeadlineModal.jsx", () => ({
+vi.mock("../../../components/modules/deadlines/DeadlineModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Deadline ${module.module_code}`}</div>
@@ -49,7 +49,7 @@ vi.mock("../../../components/Modules/Deadlines/DeadlineModal.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Readings/ReadingModal.jsx", () => ({
+vi.mock("../../../components/modules/readings/ReadingModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Reading ${module.module_code}`}</div>
@@ -66,7 +66,7 @@ import {
   ModulesPageModals,
   ModulesSkeleton,
   TestModeContent,
-} from "../../../pages/Modules/ModulesPageChrome";
+} from "../../../pages/modules/ModulesPageChrome";
 
 const buildHookState = (overrides = {}) => ({
   enrollments: [],

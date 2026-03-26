@@ -1,9 +1,9 @@
 import styles from './EditProfileModal.module.css';
-import { getInitials } from '../Auth/utils/userUtils';
-import FormField from '../common/FormField/FormField';
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
-import StandardModal from '../common/StandardModal/StandardModal';
-import TextInput from '../common/TextInput/TextInput';
+import { getInitials } from '../auth/utils/userUtils';
+import FormField from '../common/form_field/FormField';
+import PrimaryButton from '../common/primary_button/PrimaryButton';
+import StandardModal from '../common/standard_modal/StandardModal';
+import TextInput from '../common/text_input/TextInput';
 import { useTransientSavedState } from '../common/hooks/useTransientSavedState';
 import { buildEditProfileSubmitHandler, useEditProfileForm } from './useEditProfileForm';
 

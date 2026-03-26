@@ -7,7 +7,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 
-import MyModulesDashboard from "../../../pages/Modules/MyModulesDashboard";
+import MyModulesDashboard from "../../../pages/modules/MyModulesDashboard";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getSuggestedReadings, convertReadingToTask } from "../../../api/readingApi";
 import { createTask } from "../../../api/taskApi";
@@ -34,7 +34,7 @@ vi.mock("../../../context/ToastContext", () => ({
   useToast: () => toastMock,
 }));
 
-vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
+vi.mock("../../../pages/tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: () => null,
 }));
 

@@ -22,27 +22,27 @@ vi.mock("lucide-react", () => ({
   Trash2: () => <span>trash</span>,
 }));
 
-vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   isReadOnlyEvent: (...args) => isReadOnlyEvent(...args),
 }));
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isToday(...args),
 }));
 
-vi.mock("../../../pages/Homepage/hooks/useMiniTimelineData", () => ({
+vi.mock("../../../pages/homepage/hooks/useMiniTimelineData", () => ({
   useMiniTimelineData: (...args) => useMiniTimelineData(...args),
 }));
 
-vi.mock("../../../pages/Homepage/hooks/useMiniTimelineState", () => ({
+vi.mock("../../../pages/homepage/hooks/useMiniTimelineState", () => ({
   useMiniTimelineState: (...args) => useMiniTimelineState(...args),
 }));
 
-vi.mock("../../../pages/Homepage/components/MiniTimeline/NowStrip", () => ({
+vi.mock("../../../pages/homepage/components/mini_timeline/NowStrip", () => ({
   NowStrip: ({ timerTask }) => <div>now-strip-{timerTask}</div>,
 }));
 
-vi.mock("../../../pages/Homepage/components/MiniTimeline/MiniTimelineRowRenderer", () => ({
+vi.mock("../../../pages/homepage/components/mini_timeline/MiniTimelineRowRenderer", () => ({
   MiniTimelineRowRenderer: ({ row, props }) => (
     <div>
       <button type="button" onClick={() => props.onEventContextMenu?.({ id: row.id, title: row.title || "Event" }, 12, 34)}>
@@ -58,13 +58,13 @@ vi.mock("../../../pages/Homepage/components/MiniTimeline/MiniTimelineRowRenderer
   ),
 }));
 
-import { EventContextMenu } from "../../../pages/Homepage/components/MiniTimeline/EventContextMenu";
-import { MiniTimeline } from "../../../pages/Homepage/components/MiniTimeline/MiniTimeline";
+import { EventContextMenu } from "../../../pages/homepage/components/mini_timeline/EventContextMenu";
+import { MiniTimeline } from "../../../pages/homepage/components/mini_timeline/MiniTimeline";
 import {
   getConflictPriorityRank,
   getConflictResolutionPlan,
   getMoveTomorrowWindow,
-} from "../../../pages/Homepage/components/MiniTimeline/ConflictPairRow";
+} from "../../../pages/homepage/components/mini_timeline/ConflictPairRow";
 
 const styles = new Proxy({}, { get: (_, key) => key });
 

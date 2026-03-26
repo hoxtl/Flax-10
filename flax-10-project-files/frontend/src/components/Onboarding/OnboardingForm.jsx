@@ -3,8 +3,8 @@
  */
 
 import { AnimatePresence, motion as Motion } from "framer-motion";
-import AnimatedDropdown from "../common/AnimatedDropdown";
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import AnimatedDropdown from "../common/animated_dropdown";
+import PrimaryButton from "../common/primary_button/PrimaryButton";
 import WarningBox from "./WarningBox";
 import styles from "./OnboardingModal.module.css";
 

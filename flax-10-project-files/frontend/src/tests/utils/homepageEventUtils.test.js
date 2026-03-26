@@ -5,7 +5,7 @@ import {
     isRoutineEvent,
     isNow,
     extractModuleCode,
-} from '../../pages/Homepage/utils/eventUtils';
+} from '../../pages/homepage/utils/eventUtils';
 
 describe('stripEmojiFromTitle', () => {
     it('removes emoji from string', () => {

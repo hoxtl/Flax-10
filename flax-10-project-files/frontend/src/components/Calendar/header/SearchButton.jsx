@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import SearchBar from "../../common/SearchBar/SearchBar";
+import SearchBar from "../../common/search_bar/SearchBar";
 import styles from "./CalendarHeaderUtils.module.css";
 
 const MotionDiv = motion.div;

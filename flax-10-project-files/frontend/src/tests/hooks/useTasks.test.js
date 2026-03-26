@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useTasks from '../../pages/Tasks/hooks/useTasks';
+import useTasks from '../../pages/tasks/hooks/useTasks';
 
 vi.mock('../../api/taskApi', () => ({
     fetchTasks: vi.fn(),

@@ -30,7 +30,7 @@ vi.mock('../../../lib/kclCourses', () => ({
     },
 }));
 
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     default: ({ value, onChange, placeholder, onFocus }) => (
         <input
             value={value}
@@ -42,7 +42,7 @@ vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
     ),
 }));
 
-import UserSearch, { useSearchInit, FilterSection } from '../../../components/Social/UserSearch';
+import UserSearch, { useSearchInit, FilterSection } from '../../../components/social/UserSearch';
 
 import { searchUsers } from '../../../api/userApi';
 import { fetchSocieties } from '../../../api/societyApi';

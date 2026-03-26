@@ -4,10 +4,10 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useModuleSorting from '../../../../components/Modules/hooks/useModuleSorting';
-import * as moduleUtils from '../../../../components/Modules/utils/moduleUtils';
+import useModuleSorting from '../../../../components/modules/hooks/useModuleSorting';
+import * as moduleUtils from '../../../../components/modules/utils/moduleUtils';
 
-vi.mock('../../../../components/Modules/utils/moduleUtils', () => ({
+vi.mock('../../../../components/modules/utils/moduleUtils', () => ({
     applyFiltersAndSort: vi.fn((modules) => [...(modules || [])]),
 }));
 

@@ -5,20 +5,20 @@ import {
   getBreakdownColors,
   getBreakdownSeries,
   getChartMargin as getDailyBreakdownMargin,
-} from '../../../components/Analytics/dailyBreakdownChartConfig';
+} from '../../../components/analytics/dailyBreakdownChartConfig';
 import {
   formatDate,
   getChartMargin as getStudyHoursMargin,
   getStudyHoursAxis,
   getStudyHoursSeries,
-} from '../../../components/Analytics/studyHoursChartConfig';
+} from '../../../components/analytics/studyHoursChartConfig';
 import {
   DARK_COLOR,
   LIGHT_COLOR,
   formatPercentage,
   getBadge,
   getPieSeries,
-} from '../../../components/Analytics/themeUsageChartData';
+} from '../../../components/analytics/themeUsageChartData';
 
 describe('Analytics helper coverage extras', () => {
   it('covers daily breakdown config branches and fallback values', () => {

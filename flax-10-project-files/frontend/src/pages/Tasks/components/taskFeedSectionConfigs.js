@@ -2,7 +2,7 @@
  * Section config builders for each task feed filter state.
  */
 
-import { SECTION_SHOW_LIMIT } from "./TaskFeedConstants";
+import { SECTION_SHOW_LIMIT } from "./taskFeedConstants";
 
 function todaySection(data) {
   return {

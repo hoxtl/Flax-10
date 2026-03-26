@@ -5,14 +5,14 @@
 
 import { useEffect, useState } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
-import { addMonths, formatMonthYear, isSameMonth } from "../../components/Calendar/utils/dateUtils";
-import { CalendarNav } from "../../components/Calendar/header/CalendarHeaderUtils";
-import { MonthView } from "../../components/Calendar/MonthView/MonthView";
-import { EventPopups } from "../../components/Calendar/EventPopups";
+import { addMonths, formatMonthYear, isSameMonth } from "../../components/calendar/utils/dateUtils";
+import { CalendarNav } from "../../components/calendar/header/calendarHeaderUtils";
+import { MonthView } from "../../components/calendar/month_view/MonthView";
+import { EventPopups } from "../../components/calendar/EventPopups";
 import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
-import { EventsSummaryModal } from "../../components/Calendar/EventsSummaryModal/EventsSummaryModal";
-import "../../components/Calendar/CalendarHeader.css";
-import "../../components/Calendar/Calendar.css";
+import { EventsSummaryModal } from "../../components/calendar/events_summary_modal/EventsSummaryModal";
+import "../../components/calendar/calendar-header.css";
+import "../../components/calendar/calendar.css";
 
 function useProfileCalendarMode(dispatch) {
   useEffect(() => {

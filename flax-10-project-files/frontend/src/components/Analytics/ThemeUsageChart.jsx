@@ -4,7 +4,7 @@
 
 import { PieChart } from "@mui/x-charts/PieChart";
 
-import EmptyState from "../common/EmptyState/EmptyState";
+import EmptyState from "../common/empty_state/EmptyState";
 import chartStyles from "./Charts.module.css";
 
 import ThemeUsageHeader from "./ThemeUsageHeader";

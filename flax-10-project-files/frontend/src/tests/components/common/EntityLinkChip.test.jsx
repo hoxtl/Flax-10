@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import EntityLinkChip from "../../../components/common/EntityLinkChip/EntityLinkChip";
+import EntityLinkChip from "../../../components/common/entity_link_chip/EntityLinkChip";
 
 describe("EntityLinkChip", () => {
   it("renders a router link when a destination is provided inside router context", () => {

@@ -3,7 +3,7 @@
  */
 
 import { AnimatePresence } from "framer-motion";
-import AppToast from "../../components/common/AppToast/AppToast";
+import AppToast from "../../components/common/app_toast/AppToast";
 import { HomepageDashboard } from "./components/HomepageDashboard";
 import { useHomepageController } from "./hooks/useHomepageController";
 

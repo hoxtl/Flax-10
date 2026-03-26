@@ -29,7 +29,7 @@ vi.mock("../../../../context/AuthContext", () => ({
   useAuth: useAuthMock,
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
+vi.mock("../../../../pages/tasks/components/TaskCard", () => ({
   default: ({ task, onEdit }) => (
     <div data-testid={`task-card-${task.id}`}>
       <span>{task.title}</span>
@@ -42,7 +42,7 @@ vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
+vi.mock("../../../../pages/tasks/components/AllTasksCompleteCard", () => ({
   default: ({ message, sub }) => (
     <div data-testid="all-complete-card">
       <span>{message}</span>
@@ -51,9 +51,9 @@ vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
   ),
 }));
 
-import TaskFilterPanel from "../../../../pages/Tasks/components/TaskFilterPanel";
-import TaskSection from "../../../../pages/Tasks/components/TaskSection";
-import { getVisibleSections } from "../../../../pages/Tasks/components/taskFeedSectionConfigs";
+import TaskFilterPanel from "../../../../pages/tasks/components/TaskFilterPanel";
+import TaskSection from "../../../../pages/tasks/components/TaskSection";
+import { getVisibleSections } from "../../../../pages/tasks/components/taskFeedSectionConfigs";
 
 describe("Filters and sections coverage", () => {
   it("hides module filters for teachers and still searches lists", () => {

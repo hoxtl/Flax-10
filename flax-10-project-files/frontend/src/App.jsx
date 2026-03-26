@@ -5,7 +5,7 @@ import { ROOT_STYLE } from "./app/constants";
 import { ScreenRouter } from "./app/components/ScreenRouter";
 import { useAppState } from "./app/hooks/useAppState";
 import { resolveScreen } from "./app/navigation/helpers";
-import "./App.css";
+import "./app.css";
 
 function AppContent() {
   const state = useAppState();

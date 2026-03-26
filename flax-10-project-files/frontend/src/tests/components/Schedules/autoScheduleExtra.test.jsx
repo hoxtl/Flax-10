@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 
-import { AutoScheduleSummary } from '../../../components/Schedules/auto/AutoScheduleSummary';
-import { useUpcomingDeadlines } from '../../../components/Schedules/auto/useUpcomingDeadlines';
+import { AutoScheduleSummary } from '../../../components/schedules/auto/AutoScheduleSummary';
+import { useUpcomingDeadlines } from '../../../components/schedules/auto/useUpcomingDeadlines';
 
 vi.mock('../../../api/deadlineApi', () => ({
   getUpcomingDeadlines: vi.fn(),

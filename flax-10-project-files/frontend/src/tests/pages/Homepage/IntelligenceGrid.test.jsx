@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 const gridWidgetListPropsSpy = vi.fn();
 
-vi.mock("../../../pages/Homepage/components/IntelligenceGridControls", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceGridControls", () => ({
   GridActions: ({ edit, onRandomize, onReset, onToggleEdit }) => (
     <div>
       <button type="button" onClick={onToggleEdit}>
@@ -23,7 +23,7 @@ vi.mock("../../../pages/Homepage/components/IntelligenceGridControls", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceGridSheets", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceGridSheets", () => ({
   AddSheet: ({ visible, active, onAdd, onClose }) => (
     <div>
       <div>{visible ? `sheet:${active.join(",")}` : "sheet-hidden"}</div>
@@ -40,7 +40,7 @@ vi.mock("../../../pages/Homepage/components/IntelligenceGridSheets", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceGridWidgets", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceGridWidgets", () => ({
   AddWidgetSlot: ({ edit, onClick }) => (
     <button type="button" onClick={onClick}>
       {edit ? "open-add-sheet-edit" : "open-add-sheet"}
@@ -84,7 +84,7 @@ vi.mock("../../../pages/Homepage/components/IntelligenceGridWidgets", () => ({
   HeroWidget: () => <div>hero-widget</div>,
 }));
 
-import IntelligenceGrid from "../../../pages/Homepage/components/IntelligenceGrid";
+import IntelligenceGrid from "../../../pages/homepage/components/IntelligenceGrid";
 
 function createProps(overrides = {}) {
   return {

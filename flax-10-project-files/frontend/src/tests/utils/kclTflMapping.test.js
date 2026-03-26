@@ -7,7 +7,7 @@ import {
     isSevereDisruption,
     TFL_LINE_COLOURS,
     TFL_LINE_PILL_COLOURS,
-} from '../../pages/Homepage/utils/kclTflMapping';
+} from '../../pages/homepage/utils/kclTflMapping';
 
 describe('getTflLinesForLocation', () => {
     it('returns empty array for null or empty location', () => {

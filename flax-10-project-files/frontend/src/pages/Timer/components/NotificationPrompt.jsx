@@ -3,7 +3,7 @@
  */
 
 import styles from '../TimerPage.module.css';
-import PrimaryButton from '../../../components/common/PrimaryButton/PrimaryButton';
+import PrimaryButton from '../../../components/common/primary_button/PrimaryButton';
 
 export function NotificationPrompt({ permission, request }) {
   if (permission !== 'default') return null;

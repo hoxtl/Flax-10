@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import PageToolbar, { ToolbarSortControl } from '../../../components/common/PageToolbar/PageToolbar';
+import PageToolbar, { ToolbarSortControl } from '../../../components/common/page_toolbar/PageToolbar';
 
 describe('PageToolbar', () => {
   it('renders search slot when provided', () => {

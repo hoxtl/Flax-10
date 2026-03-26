@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import BackButton from "../../components/common/back_button/BackButton.jsx";
 import styles from "./BannedPage.module.css";
 
 function handleBackToAuth() {

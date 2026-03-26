@@ -7,13 +7,13 @@ import { useState } from "react";
 import styles from "./CreateSocietyModal.module.css";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
-import { RatificationToggle } from "./SocietyDetail/RatificationSection";
-import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
-import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
-import { TagsSelector } from "../common/TagsSelector/TagsSelector";
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
-import StandardModal from "../common/StandardModal/StandardModal";
-import TextInput from "../common/TextInput/TextInput";
+import { RatificationToggle } from "./society_detail/RatificationSection";
+import CoverImageModal from "./society_detail/image_handlers/CoverImageModal";
+import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/societies/societyFilters";
+import { TagsSelector } from "../common/tags_selector/TagsSelector";
+import PrimaryButton from "../common/primary_button/PrimaryButton";
+import StandardModal from "../common/standard_modal/StandardModal";
+import TextInput from "../common/text_input/TextInput";
 
 const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map(c => ({ id: c.id, label: c.label }));
 

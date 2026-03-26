@@ -18,7 +18,7 @@ vi.mock("../../../lib/kclCourses", () => ({
   },
 }));
 
-vi.mock("../../../components/Settings/SettingsUI", () => ({
+vi.mock("../../../components/settings/SettingsUI", () => ({
   FormInput: ({ label, name, value, onChange, type = "text", required }) => (
     <div>
       <label htmlFor={name}>{label}</label>
@@ -63,10 +63,10 @@ vi.mock("../../../components/Settings/SettingsUI", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Settings/Settings.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/settings/Settings.module.css", () => ({ default: {} }));
 
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
-import AccountForm from "../../../components/Settings/AccountForm";
+import AccountForm from "../../../components/settings/AccountForm";
 
 const baseUser = {
   first_name: "Alice",

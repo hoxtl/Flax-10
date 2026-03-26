@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, render } from '@testing-library/react';
 import React from 'react';
-import { useFocusCanvasAnimation } from '../../../components/Timer/focusAnimation/useFocusCanvasAnimation';
+import { useFocusCanvasAnimation } from '../../../components/timer/focus_animation/useFocusCanvasAnimation';
 
 // Mock treePixels
-vi.mock('../../../components/Timer/focusAnimation/treePixels', () => ({
+vi.mock('../../../components/timer/focus_animation/treePixels', () => ({
     BRANCH_TIPS: [
         { x: 10, y: 20 },
         { x: 30, y: 40 },
@@ -15,7 +15,7 @@ vi.mock('../../../components/Timer/focusAnimation/treePixels', () => ({
 }));
 
 // Mock focusCanvasColors.json
-vi.mock('../../../components/Timer/focusAnimation/focusCanvasColors.json', () => ({
+vi.mock('../../../components/timer/focus_animation/focusCanvasColors.json', () => ({
     default: {
         glowBreakBase: '100,200,100',
         glowWorkBase: '50,100,200',

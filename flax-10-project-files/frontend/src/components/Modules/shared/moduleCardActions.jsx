@@ -2,7 +2,7 @@
  * Shared teacher actions and delete confirmation for module cards.
  */
 
-import ConfirmModal from "../../common/ConfirmModal/ConfirmModal";
+import ConfirmModal from "../../common/confirm_modal/ConfirmModal";
 
 export function ModuleItemCardActions({ onEdit, onDelete, styles }) {
   return (

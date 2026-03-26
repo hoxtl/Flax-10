@@ -2,10 +2,10 @@
  * Tag manager modal entry component.
  */
 
-import StandardModal from "../common/StandardModal/StandardModal";
+import StandardModal from "../common/standard_modal/StandardModal";
 import styles from "./TagManagerModal.module.css";
-import TagManagerContent from "./tagManager/TagManagerContent";
-import useTagManagerModal from "./tagManager/useTagManagerModal";
+import TagManagerContent from "./tag_manager/TagManagerContent";
+import useTagManagerModal from "./tag_manager/useTagManagerModal";
 
 export default function TagManagerModal({ onClose }) {
   const modal = useTagManagerModal();

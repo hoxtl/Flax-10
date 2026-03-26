@@ -24,7 +24,7 @@ vi.mock("../../../api/userApi", () => ({
   getUserSettings: getUserSettingsMock,
 }));
 
-vi.mock("../../../pages/Homepage/utils/ScheduleAutoForm", () => ({
+vi.mock("../../../pages/homepage/utils/scheduleAutoForm", () => ({
   buildScheduleAutoForm: buildScheduleAutoFormMock,
 }));
 
@@ -33,7 +33,7 @@ import {
   loadScheduleSettings,
   loadUpcomingDeadlineItems,
   submitAutoScheduleWithPrefs,
-} from "../../../components/Schedules/auto/autoScheduleActions";
+} from "../../../components/schedules/auto/autoScheduleActions";
 
 describe("autoScheduleActions", () => {
   beforeEach(() => {

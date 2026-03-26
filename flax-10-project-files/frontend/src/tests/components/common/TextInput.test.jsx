@@ -2,7 +2,7 @@ import React from "react";
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import TextInput from "../../../components/common/TextInput/TextInput";
+import TextInput from "../../../components/common/text_input/TextInput";
 
 describe("TextInput", () => {
   it("renders a plain input by default", () => {

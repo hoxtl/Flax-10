@@ -35,7 +35,7 @@ vi.mock("../../../api/adminApi", () => ({
   getMyCourseChangeRequest: vi.fn().mockResolvedValue(null),
 }));
 
-vi.mock("../../../pages/Analytics/hooks/useAnalyticsOverview", () => ({
+vi.mock("../../../pages/analytics/hooks/useAnalyticsOverview", () => ({
   default: vi.fn(() => null),
 }));
 
@@ -43,15 +43,15 @@ vi.mock("../../../components/common", () => ({
   ConfirmModal: () => null,
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceGrid", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceGrid", () => ({
   default: ({ layout }) => <div data-testid="homepage-layout">{layout.join("|")}</div>,
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceWidgetRenderer", () => ({
+vi.mock("../../../pages/homepage/components/intelligenceWidgetRenderer", () => ({
   renderIntelligenceWidget: () => null,
 }));
 
-import IntelligenceRow from "../../../pages/Homepage/components/IntelligenceRow";
+import IntelligenceRow from "../../../pages/homepage/components/IntelligenceRow";
 
 function renderRow() {
   return render(<IntelligenceRow />);

@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const studyHeatmapMock = vi.fn();
 
-vi.mock("../../../../components/common/Card/Card", () => ({
+vi.mock("../../../../components/common/card/Card", () => ({
   default: ({ children, ...props }) => <div data-testid="card" {...props}>{children}</div>,
 }));
 
-vi.mock("../../../../components/Analytics/StudyHeatmap", () => ({
+vi.mock("../../../../components/analytics/StudyHeatmap", () => ({
   default: (props) => {
     studyHeatmapMock(props);
     return <div data-testid="study-heatmap" />;
@@ -17,7 +17,7 @@ vi.mock("../../../../components/Analytics/StudyHeatmap", () => ({
 import {
   ContributionHeatmap,
   FocusHeatmapWidget,
-} from "../../../../pages/Profile/components/widgets/FocusHeatmap";
+} from "../../../../pages/profile/components/widgets/FocusHeatmap";
 
 describe("FocusHeatmap widgets", () => {
   beforeEach(() => {
