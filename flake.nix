@@ -18,9 +18,6 @@
 
       commonScript = ''
         WORK_DIR="$(pwd)"
-        VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
-        FRONTEND_DIR="$WORK_DIR/flax-10-project-files/frontend"
-        BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
       '';
 
     in {
@@ -43,6 +40,9 @@
             ];
             text = ''
               ${commonScript}
+              VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
+              FRONTEND_DIR="$WORK_DIR/flax-10-project-files/frontend"
+              BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
 
               echo ""
               echo "Entering Flax-10 wonderland..."
@@ -62,12 +62,28 @@
               # ── Frontend dependencies ───────────────────────────────────
               echo "Installing frontend dependencies..."
               cd "$FRONTEND_DIR"
-              npm install --silent
+              npm ci --silent
 
               # ── Database setup and seeding ──────────────────────────────
               echo "Running database migrations..."
               cd "$BACKEND_DIR"
-              python manage.py makemigrations --noinput
+              if python manage.py shell -c '
+from django.db import connection
+
+with connection.cursor() as cursor:
+    cursor.execute(
+        """
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = %s AND column_name = %s
+        """,
+        ["studyFlax_society", "location"],
+    )
+    print("present" if cursor.fetchone() else "missing")
+' | grep -qx "present" && ! python manage.py showmigrations studyFlax | grep -Fq "[X] 0022_society_location"; then
+                echo "Society location column already exists; faking studyFlax.0022_society_location..."
+                python manage.py migrate studyFlax 0022_society_location --fake --noinput
+              fi
               python manage.py migrate --noinput
 
               echo "Seeding database..."
@@ -92,24 +108,56 @@
             ];
             text = ''
               ${commonScript}
+              VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
+              FRONTEND_DIR="$WORK_DIR/flax-10-project-files/frontend"
+              BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
 
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
+
+              pick_port() {
+                python - "$1" <<'PY'
+import socket
+import sys
+
+start = int(sys.argv[1])
+for port in range(start, start + 100):
+    with socket.socket() as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            sock.bind(("127.0.0.1", port))
+        except OSError:
+            continue
+        print(port)
+        break
+else:
+    raise SystemExit(f"No free port found starting at {start}")
+PY
+              }
+
+              BACKEND_PORT="$(pick_port 8000)"
+              FRONTEND_PORT="$(pick_port 5173)"
+
+              cleanup() {
+                [ -n "$BACKEND_PID" ] && kill "$BACKEND_PID" 2>/dev/null || true
+                [ -n "$FRONTEND_PID" ] && kill "$FRONTEND_PID" 2>/dev/null || true
+              }
+              trap cleanup EXIT INT TERM
 
               echo ""
               echo "Starting Flax-10 development servers..."
               echo ""
 
               cd "$BACKEND_DIR"
-              python manage.py runserver &
+              python manage.py runserver "127.0.0.1:$BACKEND_PORT" &
               BACKEND_PID=$!
 
               cd "$FRONTEND_DIR"
-              npm run dev &
+              npm run dev -- --host 127.0.0.1 --port "$FRONTEND_PORT" &
               FRONTEND_PID=$!
 
-              echo "Backend:  http://localhost:8000"
-              echo "Frontend: http://localhost:5173"
+              echo "Backend:  http://127.0.0.1:$BACKEND_PORT"
+              echo "Frontend: http://127.0.0.1:$FRONTEND_PORT"
               echo ""
               echo "Press Ctrl+C to stop both servers."
 
@@ -128,6 +176,9 @@
             ];
             text = ''
               ${commonScript}
+              VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
+              FRONTEND_DIR="$WORK_DIR/flax-10-project-files/frontend"
+              BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
 
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
@@ -166,10 +217,12 @@
             runtimeInputs = with pkgs; [ python312 ];
             text = ''
               ${commonScript}
+              VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
+              BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
               cd "$BACKEND_DIR"
-              python manage.py unseed
+              printf 'yes\n' | python manage.py unseed
               echo "Seed data removed. Run 'nix run .#init' to re-seed."
             '';
           };
@@ -181,6 +234,8 @@
             runtimeInputs = with pkgs; [ python312 ];
             text = ''
               ${commonScript}
+              VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
+              BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
               cd "$BACKEND_DIR"
