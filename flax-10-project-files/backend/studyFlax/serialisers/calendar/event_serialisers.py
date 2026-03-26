@@ -7,12 +7,16 @@ from rest_framework import serializers
 from studyFlax.models import CalendarEvent, RecurrenceRule, Tag
 from .tag_serialisers import TagSerialiser
 
+
 class RecurrenceSerialiser(serializers.ModelSerializer):
+    """Serialiser for recurrence."""
     class Meta:
+        """Metadata for recurrence serialiser."""
         model = RecurrenceRule
         fields = ['id', 'frequency', 'interval', 'end_date', 'count', 'exception_dates']
 
 class CalendarEventSerialiser(serializers.ModelSerializer):
+    """Serialiser for calendar event."""
     tag_details = TagSerialiser(source='tag', read_only=True)
     tag_name = serializers.CharField(source='tag.name', read_only=True, allow_null=True)
     recurrence_details = RecurrenceSerialiser(source='recurrence_rule', read_only=True)
@@ -20,6 +24,7 @@ class CalendarEventSerialiser(serializers.ModelSerializer):
     module_code = serializers.CharField(source='module.module_code', read_only=True, allow_null=True)
 
     class Meta:
+        """Metadata for calendar event serialiser."""
         model = CalendarEvent
         fields = ['id', 'title', 'description',
         'start_time', 'end_time', 'location',
@@ -30,6 +35,7 @@ class CalendarEventSerialiser(serializers.ModelSerializer):
         'source', 'external_id', 'module', 'module_name', 'module_code', 'is_private']
 
 class CalendarEventCreateSerialiser(serializers.ModelSerializer):
+    """Serialiser for calendar event create."""
     recurrence_rule = serializers.JSONField(required=False, allow_null=True)
     tag = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     location_latitude = serializers.FloatField(required=False, allow_null=True)
@@ -37,6 +43,7 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
     location_validated = serializers.BooleanField(required=False, default=False)
 
     class Meta:
+        """Metadata for calendar event create serialiser."""
         model = CalendarEvent
         fields = ['id', 'title', 'description',
         'start_time', 'end_time', 'location', 'tag',
@@ -80,7 +87,7 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
             return Tag.objects.filter(id=int(tag_value)).first()
         tag, _ = Tag.objects.get_or_create(name=tag_value, defaults={'is_default': True})
         return tag
-    
+
     def _handle_recurrence(self, recurrence_data, existing_rule=None):
         data = self._parse_recurrence_input(recurrence_data)
         if not data or not isinstance(data, dict):
@@ -93,12 +100,12 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
         if not isinstance(data, str): return data
         try: return json.loads(data)
         except json.JSONDecodeError: return None
-    
+
     def _delete_existing_rule(self, rule):
         if rule:
             rule.delete()
         return None
-    
+
     def _update_existing_rule(self, rule, data):
         self._apply_rule_updates(rule, data)
         rule.save()

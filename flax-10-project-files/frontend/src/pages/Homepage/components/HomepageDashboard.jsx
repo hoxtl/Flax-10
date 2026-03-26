@@ -2,11 +2,11 @@
  * Homepage dashboard body.
  */
 
-import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/taskApi";
-import { EventPopups } from "../../../components/Calendar/EventPopups";
+import { EventPopups } from "../../../components/calendar/EventPopups";
 import { useAuth } from "../../../context/AuthContext";
-import BackToTop from "../../../components/common/BackToTop/BackToTop";
+import BackToTop from "../../../components/common/back_to_top/BackToTop";
 import { TaskWidgetSlot } from "./TaskWidgetSlot";
 import { DeadlinesWidget } from "./DeadlinesWidget";
 import IntelligenceRow from "./IntelligenceRow";

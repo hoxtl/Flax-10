@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 
-import SectionSkeleton from "../../../components/common/LoadingState/SectionSkeleton";
+import SectionSkeleton from "../../../components/common/loading_state/SectionSkeleton";
 
 describe("SectionSkeleton", () => {
   it("renders the default skeleton structure", () => {

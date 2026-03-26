@@ -1,7 +1,13 @@
+/**
+ * Verifies TaskFeedContent wiring across its child sections.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedHeader", () => ({
+import { createFnMap } from "../../../utils/testBuilderUtils";
+
+vi.mock("../../../../pages/tasks/components/TaskFeedHeader", () => ({
   default: ({ title, subtitle, isReadingList }) => (
     <div data-testid="task-feed-header">
       <span>{title}</span>
@@ -11,7 +17,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedHeader", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedSubHeader", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedSubHeader", () => ({
   default: ({ onOpenLists, onSelectFilter, onSelectList }) => (
     <div data-testid="task-feed-subheader">
       <button type="button" onClick={onOpenLists}>open-lists</button>
@@ -21,7 +27,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedSubHeader", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedSections", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedSections", () => ({
   default: ({ taskCount, activeFilter, activeListId, readingList, activeList }) => (
     <div data-testid="task-feed-sections">
       <span>{taskCount}</span>
@@ -33,7 +39,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedSections", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedMobileLists", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedMobileLists", () => ({
   default: ({ showMobileLists, onClose, onSelectFilter, onSelectList }) => (
     <div data-testid="task-feed-mobile-lists">
       <span>{String(showMobileLists)}</span>
@@ -44,43 +50,42 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedMobileLists", () => ({
   ),
 }));
 
-import TaskFeedContent from "../../../../pages/Tasks/components/TaskFeedContent";
+import TaskFeedContent from "../../../../pages/tasks/components/TaskFeedContent";
+
+const taskActionNames = ["onAddTask", "onCreateTask", "onToggleComplete", "onDeleteTask", "onEditTask", "onReloadTasks"];
+
+function buildTaskFeedProps(overrides = {}) {
+  return {
+    lists: [{ id: 1, name: "Inbox" }],
+    activeListId: "1",
+    activeFilter: "all",
+    defaultDueDateForNewTask: "2026-03-25",
+    tasks: [{ id: 1 }, { id: 2 }],
+    ...createFnMap(taskActionNames),
+    ...overrides,
+  };
+}
+
+function buildVm(overrides = {}) {
+  const { data, sidebarProps, sectionPropsWithHandlers, ...rest } = overrides;
+  return {
+    data: { headerTitle: "Tasks", ...(data || {}) },
+    taskFeedSubtitle: "Everything due soon",
+    readingList: true,
+    activeList: { id: 1, name: "Inbox" },
+    isMobile: true,
+    showMobileLists: true,
+    setShowMobileLists: vi.fn(),
+    modalLists: [{ id: 1 }],
+    modalTasks: [{ id: 1 }],
+    sidebarProps: { ...createFnMap(["onSelectFilter", "onSelectList", "onNewList"]), ...sidebarProps },
+    sectionPropsWithHandlers: { sections: [], ...sectionPropsWithHandlers },
+    ...rest,
+  };
+}
 
 function buildProps(overrides = {}) {
-  return {
-    props: {
-      lists: [{ id: 1, name: "Inbox" }],
-      activeListId: "1",
-      activeFilter: "all",
-      defaultDueDateForNewTask: "2026-03-25",
-      onAddTask: vi.fn(),
-      onCreateTask: vi.fn(),
-      onToggleComplete: vi.fn(),
-      onDeleteTask: vi.fn(),
-      onEditTask: vi.fn(),
-      onReloadTasks: vi.fn(),
-      tasks: [{ id: 1 }, { id: 2 }],
-      ...overrides.props,
-    },
-    vm: {
-      data: { headerTitle: "Tasks" },
-      taskFeedSubtitle: "Everything due soon",
-      readingList: true,
-      activeList: { id: 1, name: "Inbox" },
-      isMobile: true,
-      showMobileLists: true,
-      setShowMobileLists: vi.fn(),
-      modalLists: [{ id: 1 }],
-      modalTasks: [{ id: 1 }],
-      sidebarProps: {
-        onSelectFilter: vi.fn(),
-        onSelectList: vi.fn(),
-        onNewList: vi.fn(),
-      },
-      sectionPropsWithHandlers: { sections: [] },
-      ...overrides.vm,
-    },
-  };
+  return { props: buildTaskFeedProps(overrides.props), vm: buildVm(overrides.vm) };
 }
 
 describe("TaskFeedContent", () => {

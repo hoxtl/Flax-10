@@ -3,7 +3,7 @@
  */
 
 import { Clock3, Lock, MapPin, Moon, Paintbrush, User } from "lucide-react";
-import styles from "../../../pages/Settings/Settings.module.css";
+import styles from "../../../pages/settings/Settings.module.css";
 
 const TAB_CONFIG = [
   { id: "account", label: "Account", icon: User, group: "My Details" },

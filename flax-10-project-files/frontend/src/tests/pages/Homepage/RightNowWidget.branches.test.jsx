@@ -1,7 +1,13 @@
+/**
+ * Covers RightNowWidget branch and alert rendering states.
+ */
+
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 const useRightNowData = vi.fn();
 
@@ -23,11 +29,11 @@ vi.mock("lucide-react", () => ({
   MapPin: () => <svg aria-hidden="true" />,
 }));
 
-vi.mock("../../../pages/Homepage/hooks/useRightNowData", () => ({
+vi.mock("../../../pages/homepage/hooks/useRightNowData", () => ({
   useRightNowData: (...args) => useRightNowData(...args),
 }));
 
-vi.mock("../../../pages/Homepage/components/RightNowSubComponents", () => ({
+vi.mock("../../../pages/homepage/components/RightNowSubComponents", () => ({
   fadeIn: () => ({}),
   ActiveEventCard: ({ currentBlock, timeLeftStr }) => <div>{`Active ${currentBlock.title} ${timeLeftStr || ""}`}</div>,
   CommuteContextCard: ({ campus, loading, leaveByInfo }) => (
@@ -47,67 +53,62 @@ vi.mock("../../../pages/Homepage/components/RightNowSubComponents", () => ({
   ),
 }));
 
-import { RightNowWidget } from "../../../pages/Homepage/components/RightNowWidget";
+import { RightNowWidget } from "../../../pages/homepage/components/RightNowWidget";
+
+const baseModel = {
+  conflicts: [],
+  countdown: { text: "" },
+  currentBlock: null,
+  currentProgressPct: null,
+  eventCount: 0,
+  isEmptyDay: false,
+  isEndOfDay: false,
+  isToday: true,
+  leaveByInfo: null,
+  loadingCommute: false,
+  nextCampus: null,
+  nextEvent: null,
+  showConflictAlert: true,
+  showTfl: false,
+  showTflAlert: true,
+  tasksPending: 0,
+  timeLeftStr: null,
+  timeRangeStr: null,
+  commuteInfo: null,
+};
+
+const widgetProps = {
+  now: new Date("2026-03-24T12:00:00.000Z"),
+  isToday: true,
+  navigatorContext: {},
+  sortedEvents: [],
+  tflDelays: [],
+  tomorrowFirstEvent: null,
+  taskWidgetItemsOnly: [],
+};
 
 function buildModel(overrides = {}) {
   return {
-    conflicts: [],
-    countdown: { text: "" },
-    currentBlock: null,
-    currentProgressPct: null,
-    eventCount: 0,
-    isEmptyDay: false,
-    isEndOfDay: false,
-    isToday: true,
-    leaveByInfo: null,
-    loadingCommute: false,
-    nextCampus: null,
-    nextEvent: null,
-    showConflictAlert: true,
-    setShowConflictAlert: vi.fn(),
-    showTfl: false,
-    showTflAlert: true,
-    setShowTflAlert: vi.fn(),
-    tasksPending: 0,
-    timeLeftStr: null,
-    timeRangeStr: null,
-    commuteInfo: null,
+    ...baseModel,
+    ...createFnMap(["setShowConflictAlert", "setShowTflAlert"]),
     ...overrides,
   };
 }
 
 function renderWidget(props = {}, model = {}) {
   useRightNowData.mockReturnValue(buildModel(model));
-  const defaultProps = {
-    now: new Date("2026-03-24T12:00:00.000Z"),
-    isToday: true,
-    navigatorContext: {},
-    sortedEvents: [],
-    tflDelays: [],
-    tomorrowFirstEvent: null,
-    taskWidgetItemsOnly: [],
-  };
   return render(
     <MemoryRouter>
-      <RightNowWidget {...defaultProps} {...props} />
+      <RightNowWidget {...widgetProps} {...props} />
     </MemoryRouter>,
   );
 }
 
 function rerenderWidget(rerender, props = {}, model = {}) {
   useRightNowData.mockReturnValue(buildModel(model));
-  const defaultProps = {
-    now: new Date("2026-03-24T12:00:00.000Z"),
-    isToday: true,
-    navigatorContext: {},
-    sortedEvents: [],
-    tflDelays: [],
-    tomorrowFirstEvent: null,
-    taskWidgetItemsOnly: [],
-  };
   rerender(
     <MemoryRouter>
-      <RightNowWidget {...defaultProps} {...props} />
+      <RightNowWidget {...widgetProps} {...props} />
     </MemoryRouter>,
   );
 }

@@ -7,8 +7,8 @@ import { createModule, updateModule } from '../../../api/moduleApi';
 import { serialiseModule } from '../utils/moduleUtils';
 import { validateForm, getFormData, updateForm } from '../utils/moduleHelpers';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
-import AnimatedDropdown from '../../common/AnimatedDropdown/AnimatedDropdown';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import AnimatedDropdown from '../../common/animated_dropdown/AnimatedDropdown';
+import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import styles from './ModuleForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
 

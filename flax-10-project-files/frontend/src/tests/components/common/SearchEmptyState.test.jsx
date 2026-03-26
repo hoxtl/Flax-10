@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SearchEmptyState from '../../../components/common/SearchEmptyState/SearchEmptyState';
+import SearchEmptyState from '../../../components/common/search_empty_state/SearchEmptyState';
 
-vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: ({ children, onClick, ...props }) => (
     <button onClick={onClick} {...props}>{children}</button>
   ),

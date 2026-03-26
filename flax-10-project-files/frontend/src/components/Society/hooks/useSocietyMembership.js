@@ -32,7 +32,7 @@ const makeJoinSociety = (id, setSociety, confirm, onMembershipChange) =>
             await promptSubscription(confirm, id, setSociety);
             onMembershipChange?.();
         } catch (err) {
-            // Silent catch
+            console.error('Join failed:', err);
         }
     };
 
@@ -44,7 +44,7 @@ const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
             refreshTags();
             onMembershipChange?.();
         } catch (err) {
-            // Silent catch
+            console.error('Leave failed:', err);
         }
     };
 

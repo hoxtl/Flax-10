@@ -1,3 +1,7 @@
+/**
+ * Covers additional RightNowWidget states and dismiss flows.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -17,11 +21,11 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../pages/Homepage/hooks/useRightNowData", () => ({
+vi.mock("../../../pages/homepage/hooks/useRightNowData", () => ({
   useRightNowData: (...args) => mockUseRightNowData(...args),
 }));
 
-vi.mock("../../../pages/Homepage/components/RightNowSubComponents", () => ({
+vi.mock("../../../pages/homepage/components/RightNowSubComponents", () => ({
   fadeIn: () => ({}),
   ActiveEventCard: ({ currentBlock, timeRangeStr, timeLeftStr, currentProgressPct }) => (
     <div data-testid="active-event">
@@ -47,7 +51,7 @@ vi.mock("../../../pages/Homepage/components/RightNowSubComponents", () => ({
   ),
 }));
 
-import { RightNowWidget } from "../../../pages/Homepage/components/RightNowWidget";
+import { RightNowWidget } from "../../../pages/homepage/components/RightNowWidget";
 
 function renderWidget(props = {}) {
   return render(
@@ -87,6 +91,25 @@ const baseModel = {
   nextCampus: null,
   isEndOfDay: false,
   isEmptyDay: false,
+};
+
+const baseAlertState = {
+  eventCount: 2,
+  tasksPending: 1,
+  conflicts: [{ id: "c1" }],
+  leaveByInfo: { label: "Leave by 2:20pm" },
+  showConflictAlert: true,
+  showTflAlert: true,
+  showTfl: true,
+  currentBlock: { title: "Workshop" },
+  currentProgressPct: 40,
+  timeRangeStr: "2pm-3pm",
+  timeLeftStr: "20m left",
+  nextEvent: { title: "Lecture", start_time: "2024-03-08T15:00:00Z", location: "Strand" },
+  countdown: { text: "in 1h" },
+  commuteInfo: { duration: 18 },
+  loadingCommute: false,
+  nextCampus: "Strand",
 };
 
 function mockModel(overrides = {}) {
@@ -250,24 +273,9 @@ function expectEmptyDayTomorrow() {
 
 function alertState({ setShowConflictAlert, setShowTflAlert }) {
   return {
-    eventCount: 2,
-    tasksPending: 1,
-    conflicts: [{ id: "c1" }],
-    leaveByInfo: { label: "Leave by 2:20pm" },
-    showConflictAlert: true,
-    showTflAlert: true,
+    ...baseAlertState,
     setShowConflictAlert,
     setShowTflAlert,
-    showTfl: true,
-    currentBlock: { title: "Workshop" },
-    currentProgressPct: 40,
-    timeRangeStr: "2pm-3pm",
-    timeLeftStr: "20m left",
-    nextEvent: { title: "Lecture", start_time: "2024-03-08T15:00:00Z", location: "Strand" },
-    countdown: { text: "in 1h" },
-    commuteInfo: { duration: 18 },
-    loadingCommute: false,
-    nextCampus: "Strand",
   };
 }
 

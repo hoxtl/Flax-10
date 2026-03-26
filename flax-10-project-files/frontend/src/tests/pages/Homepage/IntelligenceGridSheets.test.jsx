@@ -2,7 +2,7 @@ import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { AddSheet } from "../../../pages/Homepage/components/IntelligenceGridSheets";
+import { AddSheet } from "../../../pages/homepage/components/IntelligenceGridSheets";
 
 describe("IntelligenceGridSheets", () => {
   const catalogue = [

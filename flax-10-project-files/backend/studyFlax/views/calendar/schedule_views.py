@@ -17,6 +17,7 @@ from .auto_scheduler_views import build_auto_schedule
 from .system_tags import get_schedule_tag
 from .schedule_helpers import _overwrite_same_name_schedules, _schedule_queryset
 
+
 def _events_for_manual_schedule(user, event_ids):
     schedule_tag = get_schedule_tag()
     return list(
@@ -60,16 +61,13 @@ def _create_manual_schedule_atomic(user, title, events):
 def _invalid_manual_events(events, event_ids):
     return len(events) != len(set(event_ids))
 
-
 def _manual_schedule_payload(schedule, overwritten):
     payload = ScheduleSerialiser(schedule).data
     payload['overwritten'] = overwritten
     return payload
 
-
 def _manual_schedule_error(error_resp):
     return None, error_resp.data, error_resp.status_code
-
 
 def _build_manual_schedule_data(user, data):
     title, error_resp = _validate_manual_input(data)
@@ -84,13 +82,11 @@ def _build_manual_schedule_data(user, data):
     schedule, overwritten = _create_manual_schedule_atomic(user, title, events)
     return _manual_schedule_payload(schedule, overwritten), None, status.HTTP_201_CREATED
 
-
 def _build_manual_schedule_response(user, data):
     payload, errors, status_code = _build_manual_schedule_data(user, data)
     if errors:
         return Response(errors, status=status_code)
     return Response(payload, status=status_code)
-
 
 def _schedule_list_response(request):
     if request.method == 'GET':
@@ -116,7 +112,6 @@ def _handle_schedule_patch(request, schedule):
     payload = ScheduleSerialiser(schedule).data
     payload['overwritten'] = ovr
     return Response(payload)
-
 
 def _schedule_detail_response(request, schedule):
     if request.method == 'GET':

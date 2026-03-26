@@ -1,15 +1,21 @@
+/**
+ * Covers SocietiesPageContent loading, tabs, and modal flows.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../pages/Societies/SocietiesPage.module.css", () => ({ default: { container: "container", smallSearch: "smallSearch" } }));
-vi.mock("../../pages/Societies/SocietiesPageExtras.module.css", () => ({ default: {} }));
+import { createFnMap } from "../utils/testBuilderUtils";
+
+vi.mock("../../pages/societies/SocietiesPage.module.css", () => ({ default: { container: "container", smallSearch: "smallSearch" } }));
+vi.mock("../../pages/societies/SocietiesPageExtras.module.css", () => ({ default: {} }));
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../components/common/AppPage/AppPage", () => ({
+vi.mock("../../components/common/app_page/AppPage", () => ({
   default: ({ title, children }) => (
     <div>
       <h1>{title}</h1>
@@ -18,11 +24,11 @@ vi.mock("../../components/common/AppPage/AppPage", () => ({
   ),
 }));
 
-vi.mock("../../components/common/PageTransition/PageTransition", () => ({
+vi.mock("../../components/common/page_transition/PageTransition", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../components/common/Tabs/Tabs", () => ({
+vi.mock("../../components/common/tabs/Tabs", () => ({
   default: ({ tabs, activeTab, onTabChange, rightAction }) => (
     <div>
       {rightAction}
@@ -36,7 +42,7 @@ vi.mock("../../components/common/Tabs/Tabs", () => ({
   ),
 }));
 
-vi.mock("../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input
       aria-label={placeholder}
@@ -47,7 +53,7 @@ vi.mock("../../components/common/SearchBar/SearchBar", () => ({
   ),
 }));
 
-vi.mock("../../components/Pagination/Pagination", () => ({
+vi.mock("../../components/pagination/Pagination", () => ({
   BackToTop: () => <div data-testid="back-to-top" />,
 }));
 
@@ -60,7 +66,7 @@ vi.mock("../../hooks/usePagination", () => ({
   }),
 }));
 
-vi.mock("../../components/Society/CreateSocietyModal", () => ({
+vi.mock("../../components/society/CreateSocietyModal", () => ({
   default: ({ onClose, onCreate }) => (
     <div data-testid="create-society-modal">
       <button onClick={onClose}>Close create modal</button>
@@ -69,7 +75,7 @@ vi.mock("../../components/Society/CreateSocietyModal", () => ({
   ),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({
+vi.mock("../../components/society/society_detail/ReportSocietyModal", () => ({
   default: ({ society, onClose, onReportSuccess }) => (
     <div data-testid="report-modal">
       <span>{society.name}</span>
@@ -79,7 +85,7 @@ vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({
   ),
 }));
 
-vi.mock("../../pages/Societies/AllSocieties", () => ({
+vi.mock("../../pages/societies/AllSocieties", () => ({
   default: ({ onBack, onSelect, onReport, onUnreport, societies }) => (
     <div data-testid="all-societies">
       <button onClick={onBack}>Back from all</button>
@@ -90,7 +96,7 @@ vi.mock("../../pages/Societies/AllSocieties", () => ({
   ),
 }));
 
-vi.mock("../../pages/Societies/SocietySection", () => ({
+vi.mock("../../pages/societies/SocietySection", () => ({
   default: ({ items, type, onAction, onSelect, onReport, onUnreport }) => (
     <div data-testid={`section-${type}`}>
       <button onClick={onAction}>Action {type}</button>
@@ -105,7 +111,7 @@ vi.mock("../../pages/Societies/SocietySection", () => ({
   ),
 }));
 
-vi.mock("../../pages/Societies/SocietyDetailPage", () => ({
+vi.mock("../../pages/societies/SocietyDetailPage", () => ({
   default: ({ societyId, onBack, onDelete, onMembershipChange }) => (
     <div data-testid="society-detail">
       <span>{societyId}</span>
@@ -116,37 +122,30 @@ vi.mock("../../pages/Societies/SocietyDetailPage", () => ({
   ),
 }));
 
-vi.mock("../../pages/Societies/SocietySkeletons", () => ({
+vi.mock("../../pages/societies/SocietySkeletons", () => ({
   SocietiesSkeleton: () => <div>Societies loading</div>,
 }));
 
-import { SocietiesPageContent } from "../../pages/Societies/SocietiesPageContent";
+import { SocietiesPageContent } from "../../pages/societies/SocietiesPageContent";
 
 function renderPage(ui, initialEntries = ["/"]) {
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 }
+
+const societies = [
+  { id: 1, name: "Photography Club", is_member: true, is_admin: false },
+  { id: 2, name: "Debate Society", is_member: true, is_admin: true },
+];
 
 function buildState(overrides = {}) {
   return {
     loading: false,
     selectedSocietyId: null,
     view: "my",
-    societies: [
-      { id: 1, name: "Photography Club", is_member: true, is_admin: false },
-      { id: 2, name: "Debate Society", is_member: true, is_admin: true },
-    ],
-    refresh: vi.fn(),
-    removeSociety: vi.fn(),
-    setView: vi.fn(),
-    clearSelection: vi.fn(),
-    selectSociety: vi.fn(),
-    setReportingSociety: vi.fn(),
-    handleUnreport: vi.fn(),
+    societies,
     showCreateModal: false,
-    setShowCreateModal: vi.fn(),
-    onCreate: vi.fn(),
     reportingSociety: null,
-    onReportSuccess: vi.fn(),
+    ...createFnMap(["refresh", "removeSociety", "setView", "clearSelection", "selectSociety", "setReportingSociety", "handleUnreport", "setShowCreateModal", "onCreate", "onReportSuccess"]),
     ...overrides,
   };
 }

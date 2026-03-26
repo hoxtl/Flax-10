@@ -20,12 +20,10 @@ def enrollment_list(request):
         return get_enrollments(request)
     return create_enrollments(request)
 
-
 def get_enrollments(request):
     enrollments = Enrollment.objects.filter(student=request.user)
     serialiser = EnrollmentSerialiser(enrollments, many=True)
     return Response(serialiser.data)
-
 
 def create_enrollments(request):
     serialiser = EnrollmentSerialiser(data=request.data, context={'request': request})
@@ -35,7 +33,6 @@ def create_enrollments(request):
     enrollment, _created = enroll_user_in_module(request.user, module)
     return Response(EnrollmentSerialiser(enrollment).data, status=status.HTTP_201_CREATED)
 
-
 @api_view(['GET', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def enrollment_detail(request, enrollment_id):
@@ -43,7 +40,6 @@ def enrollment_detail(request, enrollment_id):
     if request.method == 'GET':
         return Response(EnrollmentSerialiser(enrollment).data)
     return delete_enrollment(request, enrollment)
-
 
 def delete_enrollment(request, enrollment):
     if enrollment.student != request.user:
@@ -53,14 +49,12 @@ def delete_enrollment(request, enrollment):
     _remove_enrollment_calendar_events(request.user, enrollment.module)
     return _delete_enrollment_record(enrollment)
 
-
 def _remove_enrollment_calendar_events(user, module):
     CalendarEvent.objects.filter(
         user=user,
         module=module,
         source__in=['module_enrollment', 'module_deadline'],
     ).delete()
-
 
 def _delete_enrollment_record(enrollment):
     enrollment.delete()

@@ -18,59 +18,45 @@ from studyFlax.views.groupwork.groupwork_limits import (
     group_project_limit_message,
 )
 
+
 User = get_user_model()
 
 
 def serialiser_context(request):
     """Return DRF serialiser context for the request."""
-
     return {"request": request}
 
-
 def parse_member_id(value):
-    """Parse a member ID from request data."""
-
     try:
         return int(value)
     except (TypeError, ValueError):
         return None
 
-
 def collect_unique_ids(raw_ids):
     """Return unique member IDs while preserving order."""
-
     parsed = [parse_member_id(value) for value in raw_ids]
     if None in parsed:
         return None
     return list(dict.fromkeys(parsed))
 
-
 def normalise_member_ids(raw_member_ids):
-    """Normalise raw member IDs into a clean list."""
-
     if raw_member_ids in (None, "", []):
         return []
     if not isinstance(raw_member_ids, list):
         return None
     return collect_unique_ids(raw_member_ids)
 
-
 def member_ids_response(message):
     """Return a member ID validation response."""
-
     return Response({"member_ids": [message]}, status=status.HTTP_400_BAD_REQUEST)
-
 
 def missing_members_response(missing_ids):
     """Return a response for missing selected users."""
-
     missing = ", ".join(str(member_id) for member_id in missing_ids)
     return member_ids_response(f"Some selected users were not found: {missing}.")
 
-
 def validate_member_ids(member_ids):
     """Validate that each supplied member ID exists."""
-
     if member_ids is None:
         return member_ids_response("Provide member IDs as a list of user IDs.")
     existing_ids = set(User.objects.filter(id__in=member_ids).values_list("id", flat=True))
@@ -79,10 +65,8 @@ def validate_member_ids(member_ids):
         return missing_members_response(missing_ids)
     return None
 
-
 def users_over_project_limit(user_ids):
     """Return users who have reached the project limit."""
-
     return (
         User.objects.filter(id__in=user_ids)
         .annotate(project_total=Count("group_memberships"))
@@ -90,23 +74,16 @@ def users_over_project_limit(user_ids):
         .order_by("username")
     )
 
-
 def over_limit_member_names(users):
     """Return usernames for over-limit members."""
-
     return ", ".join(user.username for user in users)
 
-
 def member_limit_response(names):
-    """Return a response for members over the project limit."""
-
     message = f"{group_project_limit_message()} Over limit: {names}."
     return member_ids_response(message)
 
-
 def validate_users_within_project_limit(user_ids):
     """Validate that selected users can join another project."""
-
     if not user_ids:
         return None
     over_limit = users_over_project_limit(user_ids)
@@ -114,14 +91,11 @@ def validate_users_within_project_limit(user_ids):
         return None
     return member_limit_response(over_limit_member_names(over_limit))
 
-
 def validate_user_within_project_limit(user):
     """Validate that a single user can join another project."""
-
     if GroupMembership.objects.filter(user=user).count() < MAX_GROUP_PROJECTS_PER_USER:
         return None
     return Response({"detail": group_project_limit_message()}, status=status.HTTP_400_BAD_REQUEST)
-
 
 def validate_project_create_input(data):
     member_ids = normalise_member_ids(data.get("member_ids", []))
@@ -135,13 +109,11 @@ def validate_project_create_input(data):
         return None, limit_error.data, limit_error.status_code
     return member_ids, None, None
 
-
 def project_create_payload(data):
     payload = {key: value for key, value in data.items() if key != "member_ids"}
     if "course_code" not in payload:
         payload["course_code"] = ""
     return payload
-
 
 def validate_project_deadline(deadline):
     if not deadline:
@@ -151,18 +123,14 @@ def validate_project_deadline(deadline):
         return Response({"deadline": ["Project due date can't be in the past."]}, status=status.HTTP_400_BAD_REQUEST)
     return None
 
-
 def create_project_memberships(project, owner, member_ids):
     GroupMembership.objects.bulk_create(build_project_memberships(project, owner, member_ids), ignore_conflicts=True)
-
 
 def non_owner_members(owner, member_ids):
     return User.objects.filter(id__in=member_ids).exclude(id=owner.id).order_by("id")
 
-
 def build_project_memberships(project, owner, member_ids):
     return [GroupMembership(project=project, user=user, role="member") for user in non_owner_members(owner, member_ids)]
-
 
 def module_tutor_subqueries(module_base):
     return {
@@ -175,14 +143,11 @@ def module_tutor_subqueries(module_base):
         "module_tutor_profile_photo": Subquery(module_base.values("created_by__profile_photo")[:1]),
     }
 
-
 def project_metrics_queryset():
     return annotate_project_metrics(GroupProject.objects.all())
 
-
 def annotate_project_metrics(queryset):
     return queryset.annotate(module_name=module_name_annotation(), **project_metric_annotations(), **project_tutor_annotations())
-
 
 def project_metric_annotations():
     return {
@@ -191,24 +156,19 @@ def project_metric_annotations():
         "completed_task_count": Count("tasks", filter=Q(tasks__completed=True), distinct=True),
     }
 
-
 def project_tutor_annotations():
     module_base = Module.objects.filter(module_code=OuterRef("course_code"))
     return module_tutor_subqueries(module_base)
 
-
 def module_name_annotation():
     return Subquery(Module.objects.filter(module_code=OuterRef("course_code")).values("module_name")[:1])
-
 
 def with_project_metrics(project):
     return project_metrics_queryset().filter(id=project.id).first()
 
-
 def project_list_response(request):
     queryset = project_metrics_queryset().filter(memberships__user=request.user).order_by("-created_at")[:MAX_GROUP_PROJECTS_PER_USER]
     return Response(GroupProjectSerialiser(queryset, many=True, context=serialiser_context(request)).data)
-
 
 def create_project_result(data, user, context):
     member_ids, member_error, member_status = validate_project_create_input(data)
@@ -222,7 +182,6 @@ def create_project_result(data, user, context):
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
     return create_valid_project_data(serialiser, user, member_ids, context)
 
-
 def create_valid_project_data(serialiser, user, member_ids, context):
     deadline_error = validate_project_deadline(serialiser.validated_data.get("deadline"))
     if deadline_error:
@@ -230,66 +189,47 @@ def create_valid_project_data(serialiser, user, member_ids, context):
     project = save_project_with_members(serialiser, user, member_ids)
     return serialised_project(project, context), None, status.HTTP_201_CREATED
 
-
 def save_project_with_members(serialiser, owner, member_ids):
     project = serialiser.save(owner=owner)
     GroupMembership.objects.create(project=project, user=owner, role="owner")
     create_project_memberships(project, owner, member_ids)
     return project
 
-
 def get_project_for_user(user, project_id):
     """Return a project that belongs to the user."""
-
     return get_object_or_404(GroupProject.objects.filter(memberships__user=user), id=project_id)
-
 
 def list_project_members_response(project, request):
     """Return the membership list for a project."""
-
     memberships = project.memberships.select_related("user").order_by("joined_at")
     return Response(GroupMembershipSerialiser(memberships, many=True, context=serialiser_context(request)).data)
 
-
 def project_owner_error(project, user):
     """Return an error when a non-owner edits members."""
-
     if project.owner_id == user.id:
         return None
     return Response({"detail": "Only the project owner can edit team members."}, status=status.HTTP_403_FORBIDDEN)
 
-
 def membership_serialiser(request):
     """Build the membership input serialiser."""
-
     return GroupMembershipSerialiser(data=request.data, context=serialiser_context(request))
-
 
 def membership_error_response(serialiser):
     """Return serialiser errors for membership creation."""
-
     return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 def member_add_limit_error(project, target_user):
-    """Return an error when a new member is already at the limit."""
-
     is_existing_member = GroupMembership.objects.filter(project=project, user=target_user).exists()
     if is_existing_member:
         return None
     return validate_user_within_project_limit(target_user)
 
-
 def created_membership_response(membership, request):
-    """Return the created membership payload."""
-
     payload = GroupMembershipSerialiser(membership, context=serialiser_context(request)).data
     return Response(payload, status=status.HTTP_201_CREATED)
 
-
 def add_member_to_project_response(project, request):
     """Add a member to a project when the owner is allowed to do so."""
-
     owner_error = project_owner_error(project, request.user)
     if owner_error:
         return owner_error
@@ -303,16 +243,13 @@ def add_member_to_project_response(project, request):
     membership = save_project_member(project, serialiser.validated_data)
     return created_membership_response(membership, request)
 
-
 def save_project_member(project, validated_data):
     """Create a membership unless it already exists."""
-
     return GroupMembership.objects.get_or_create(
         project=project,
         user=validated_data["user"],
         defaults={"role": validated_data.get("role", "member")},
     )[0]
-
 
 def delete_project_response(project, user):
     if project.owner_id != user.id:
@@ -320,13 +257,11 @@ def delete_project_response(project, user):
     project.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 def update_project_result(project, request):
     serialiser = GroupProjectSerialiser(project, data=request.data, partial=True, context=serialiser_context(request))
     if not serialiser.is_valid():
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
     return update_valid_project_data(project, request, serialiser)
-
 
 def update_valid_project_data(project, request, serialiser):
     deadline_error = validate_project_deadline(serialiser.validated_data.get("deadline"))
@@ -335,12 +270,10 @@ def update_valid_project_data(project, request, serialiser):
     serialiser.save()
     return serialised_project(project, serialiser_context(request)), None, status.HTTP_200_OK
 
-
 def serialised_project(project, context):
     if not isinstance(context, dict):
         context = serialiser_context(context)
     return GroupProjectSerialiser(with_project_metrics(project), context=context).data
-
 
 def remove_project_member(project, user, membership_id):
     if project.owner_id != user.id:
@@ -350,7 +283,6 @@ def remove_project_member(project, user, membership_id):
         return status.HTTP_400_BAD_REQUEST
     delete_project_member(membership)
     return status.HTTP_204_NO_CONTENT
-
 
 def delete_project_member(membership):
     membership.delete()

@@ -26,7 +26,7 @@ vi.mock('../../../api/client', () => ({
   fetchApi: (...args) => fetchApiMock(...args),
 }));
 
-import ProfileHeader from '../../../pages/Profile/components/ProfileHeader';
+import ProfileHeader from '../../../pages/profile/components/ProfileHeader';
 
 // ---------------------------------------------------------------------------
 // ProfileHeader component tests – part 1

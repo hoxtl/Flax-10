@@ -1,20 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
-import AttendancePageStatus from "../../../pages/Attendance/components/AttendancePageStatus";
-import AttendancePageBody from "../../../pages/Attendance/components/AttendancePageBody";
-import AttendanceListSection from "../../../pages/Attendance/components/AttendanceListSection";
-import AttendanceListColumn from "../../../pages/Attendance/components/AttendanceListColumn";
-import RecordAttendanceList from "../../../pages/Attendance/components/RecordAttendanceList";
-import MarkedAttendanceList from "../../../pages/Attendance/components/MarkedAttendanceList";
-import AttendanceEventList from "../../../pages/Attendance/components/AttendanceEventList";
-import AttendanceEventInfo from "../../../pages/Attendance/components/AttendanceEventInfo";
-import AttendanceRecordActions from "../../../pages/Attendance/components/AttendanceRecordActions";
-import AttendanceMarkedActions from "../../../pages/Attendance/components/AttendanceMarkedActions";
-import AttendanceSuccessOverlay from "../../../pages/Attendance/components/AttendanceSuccessOverlay";
-import SegmentDetailPanel from "../../../pages/Attendance/components/SegmentDetailPanel";
-import SegmentDetailHeader from "../../../pages/Attendance/components/SegmentDetailHeader";
-import SegmentDetailList from "../../../pages/Attendance/components/SegmentDetailList";
+import AttendancePageStatus from "../../../pages/attendance/components/AttendancePageStatus";
+import AttendancePageBody from "../../../pages/attendance/components/AttendancePageBody";
+import AttendanceListSection from "../../../pages/attendance/components/AttendanceListSection";
+import AttendanceListColumn from "../../../pages/attendance/components/AttendanceListColumn";
+import RecordAttendanceList from "../../../pages/attendance/components/RecordAttendanceList";
+import MarkedAttendanceList from "../../../pages/attendance/components/MarkedAttendanceList";
+import AttendanceEventList from "../../../pages/attendance/components/AttendanceEventList";
+import AttendanceEventInfo from "../../../pages/attendance/components/AttendanceEventInfo";
+import AttendanceRecordActions from "../../../pages/attendance/components/AttendanceRecordActions";
+import AttendanceMarkedActions from "../../../pages/attendance/components/AttendanceMarkedActions";
+import AttendanceSuccessOverlay from "../../../pages/attendance/components/AttendanceSuccessOverlay";
+import SegmentDetailPanel from "../../../pages/attendance/components/SegmentDetailPanel";
+import SegmentDetailHeader from "../../../pages/attendance/components/SegmentDetailHeader";
+import SegmentDetailList from "../../../pages/attendance/components/SegmentDetailList";
 
 const recordAttendanceMock = vi.fn();
 
@@ -22,15 +22,15 @@ vi.mock("../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendanceMock(...args),
 }));
 
-vi.mock("../../../components/common/LoadingState/SkeletonBlock", () => ({
+vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: ({ className }) => <div data-testid="skeleton" className={className} />,
 }));
 
-vi.mock("../../../pages/Attendance/components/AttendanceChartsColumn", () => ({
+vi.mock("../../../pages/attendance/components/AttendanceChartsColumn", () => ({
   default: ({ model }) => <div>Charts: {model.summary?.pct}</div>,
 }));
 
-vi.mock("../../../pages/Attendance/components/AttendanceSummaryBar", () => ({
+vi.mock("../../../pages/attendance/components/AttendanceSummaryBar", () => ({
   default: ({ summary }) => <div>Summary: {summary?.pct}</div>,
 }));
 
@@ -48,7 +48,7 @@ vi.mock("../../../components/common", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, className }) => (
     <button className={className} onClick={onClick}>{children}</button>
   ),

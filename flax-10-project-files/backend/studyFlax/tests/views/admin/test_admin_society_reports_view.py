@@ -9,10 +9,11 @@ from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_report_model import SocietyReport
-from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
+from studyFlax.tests.helpers.test_model_builders import make_user, make_superuser, authed_client
 
 
 class AdminReportedSocietiesTest(TestCase):
+    """Tests admin reported societies."""
     def setUp(self):
         self.admin = make_superuser()
         self.list_url = '/api/admin/reported-societies/'
@@ -49,6 +50,7 @@ class AdminReportedSocietiesTest(TestCase):
 
 
 class BanReportedSocietyTest(TestCase):
+    """Tests ban reported society."""
     def setUp(self):
         self.admin = make_superuser()
         self.reporter = make_user('reporter_ban')

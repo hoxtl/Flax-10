@@ -19,10 +19,10 @@ import { renderHook, act } from '@testing-library/react';
 // CSS module mocks
 // ---------------------------------------------------------------------------
 
-vi.mock('../../../components/Modules/Modules/ModuleCourseFilter.module.css', () => ({
+vi.mock('../../../components/modules/modules/ModuleCourseFilter.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
-vi.mock('../../../components/common/Card/CardGrid.module.css', () => ({
+vi.mock('../../../components/common/card/CardGrid.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
@@ -50,7 +50,7 @@ vi.mock('framer-motion', () => ({
 // ---------------------------------------------------------------------------
 // Common mocks required by ModuleCourseFilter
 // ---------------------------------------------------------------------------
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../components/common/search_bar/SearchBar', () => ({
   default: ({ value, onChange, placeholder }) => (
     <input
       aria-label={placeholder || 'search'}
@@ -60,7 +60,7 @@ vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
   ),
 }));
 
-vi.mock('../../../components/common/SearchEmptyState/SearchEmptyState', () => ({
+vi.mock('../../../components/common/search_empty_state/SearchEmptyState', () => ({
   default: ({ query, itemLabel }) => (
     <div>{`No ${itemLabel} match "${query}"`}</div>
   ),
@@ -80,7 +80,7 @@ vi.mock('../../../lib/kclCourses', () => ({
 // ---------------------------------------------------------------------------
 // ModuleGrid dependency: ModulesCard mock
 // ---------------------------------------------------------------------------
-vi.mock('../../../components/Modules/Modules/ModulesCard.jsx', () => ({
+vi.mock('../../../components/modules/modules/ModulesCard.jsx', () => ({
   default: ({ module }) => <div data-testid="modules-card">{module.module_name}</div>,
 }));
 
@@ -88,9 +88,9 @@ vi.mock('../../../components/Modules/Modules/ModulesCard.jsx', () => ({
 // Imports under test
 // ---------------------------------------------------------------------------
 
-import { useModuleCourseFilterState } from '../../../components/Modules/Modules/useModuleCourseFilterState';
-import ModuleCourseFilter from '../../../components/Modules/Modules/ModuleCourseFilter';
-import ModuleGrid from '../../../components/Modules/Modules/ModuleGrid';
+import { useModuleCourseFilterState } from '../../../components/modules/modules/useModuleCourseFilterState';
+import ModuleCourseFilter from '../../../components/modules/modules/ModuleCourseFilter';
+import ModuleGrid from '../../../components/modules/modules/ModuleGrid';
 
 
 // ---------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useCountdown } from "../../../../pages/Homepage/hooks/useCountdown";
-import { getSemesterProgress } from "../../../../pages/Homepage/hooks/useIntelligenceDashboard";
+import { useCountdown } from "../../../../pages/homepage/hooks/useCountdown";
+import { getSemesterProgress } from "../../../../pages/homepage/hooks/useIntelligenceDashboard";
 
 vi.mock("../../../../lib/termConfig", () => ({
   loadTermConfig: vi.fn(() => null),
@@ -67,6 +67,12 @@ describe("useCountdown branches", () => {
     const target = new Date(Date.now() + 2000); // 2 seconds
     renderHook(() => useCountdown(target));
     act(() => { vi.advanceTimersByTime(5000); });
+  });
+
+  it("returns empty text and relaxed urgency once a target is already in the past", () => {
+    const target = new Date(Date.now() - 60000);
+    const { result } = renderHook(() => useCountdown(target));
+    expect(result.current).toEqual({ text: "", urgency: "relaxed" });
   });
 });
 

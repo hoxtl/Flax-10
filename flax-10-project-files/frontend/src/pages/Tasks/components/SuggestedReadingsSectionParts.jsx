@@ -5,8 +5,8 @@
 import { useState } from "react";
 import { FileText, Calendar, Clock, Timer } from "lucide-react";
 
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import EmptyState from "../../../components/common/empty_state/EmptyState";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 
 import { convertReadingToTask } from "../../../api/readingApi";
 

@@ -4,7 +4,7 @@
  */
 
 import { Plus } from "lucide-react";
-import AnimatedDropdown from "../../common/AnimatedDropdown";
+import AnimatedDropdown from "../../common/animated_dropdown";
 import styles from "./CalendarHeaderUtils.module.css";
 
 const ACTION_OPTIONS = [

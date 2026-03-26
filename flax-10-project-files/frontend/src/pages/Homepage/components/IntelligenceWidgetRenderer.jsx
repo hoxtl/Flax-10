@@ -4,8 +4,8 @@
 
 import React from "react";
 import { BarChart3, LayoutGrid, Presentation, TrendingUp, Zap } from "lucide-react";
-import { getEventType } from "../../../components/Calendar/utils/eventUtils";
-import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
+import { getEventType } from "../../../components/calendar/utils/eventUtils";
+import SharedWidgetHeader from "../../../components/common/widget_header/WidgetHeader";
 import styles from "./IntelligenceRow.module.css";
 import { IntelligenceHero } from "./IntelligenceWidgets";
 import { RightNowWidget } from "./RightNowWidget";
@@ -14,11 +14,11 @@ import SemesterOverviewWidget from "./SemesterOverviewWidget";
 import StudyStreakWidget from "./StudyStreakWidget";
 import WeeklyGoalWidget from "./WeeklyGoalWidget";
 import PhotoWidget from "./PhotoWidget";
-import ProductivityCards from "../../../components/Analytics/ProductivityCards";
-import DailyBreakdownChart from "../../../components/Analytics/DailyBreakdownChart";
-import StudyHeatmap from "../../../components/Analytics/StudyHeatmap";
-import AttendanceChart from "../../../components/Analytics/AttendanceChart";
-import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/InsightCards";
+import ProductivityCards from "../../../components/analytics/ProductivityCards";
+import DailyBreakdownChart from "../../../components/analytics/DailyBreakdownChart";
+import StudyHeatmap from "../../../components/analytics/StudyHeatmap";
+import AttendanceChart from "../../../components/analytics/AttendanceChart";
+import { ConsistencyScore, PeakHoursCard } from "../../../components/analytics/InsightCards";
 import { TinyTimelineWidget } from "./TinyTimelineWidget";
 
 export function renderIntelligenceWidget(id, props, size) {

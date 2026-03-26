@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../../pages/Tasks/components/MobileTaskListsModal", () => ({
+vi.mock("../../../../pages/tasks/components/MobileTaskListsModal", () => ({
   default: ({ activeListId, lists, tasks }) => (
     <div data-testid="mobile-task-lists-modal">
       <span>{activeListId}</span>
@@ -11,7 +11,7 @@ vi.mock("../../../../pages/Tasks/components/MobileTaskListsModal", () => ({
   ),
 }));
 
-import TaskFeedMobileLists from "../../../../pages/Tasks/components/TaskFeedMobileLists";
+import TaskFeedMobileLists from "../../../../pages/tasks/components/TaskFeedMobileLists";
 
 describe("TaskFeedMobileLists", () => {
   it("returns null when not mobile or when the modal is hidden", () => {

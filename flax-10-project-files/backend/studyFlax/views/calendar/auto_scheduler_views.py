@@ -21,17 +21,14 @@ def build_auto_schedule(request):
         return deadlines
     return _build_auto_schedule_response(request.user, payload, deadlines, deadline_map)
 
-
 def _build_auto_schedule_response(user, payload, deadlines, deadline_map):
     prefs = _resolved_preferences(user, payload)
     schedule, overwritten = _create_auto_schedule(user, payload, deadlines, prefs)
     _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, prefs)
     return _created_schedule_response(schedule, overwritten)
 
-
 def _create_auto_schedule(user, payload, deadlines, prefs):
     return _create_auto_schedule_atomic(user, payload, deadlines, prefs)
-
 
 def _create_auto_schedule_atomic(user, payload, deadlines, prefs):
     with transaction.atomic():
@@ -41,17 +38,14 @@ def _create_auto_schedule_atomic(user, payload, deadlines, prefs):
         schedule.deadline.set(deadlines)
     return schedule, overwritten
 
-
 def _clear_existing_schedules(user, payload):
     if payload.get("clear_existing"):
         user.schedules.all().delete()
-
 
 def _build_schedule_payload(schedule, overwritten):
     data = ScheduleSerialiser(schedule).data
     data["overwritten"] = overwritten
     return data
-
 
 def _created_schedule_response(schedule, overwritten):
     return Response(_build_schedule_payload(schedule, overwritten), status=status.HTTP_201_CREATED)

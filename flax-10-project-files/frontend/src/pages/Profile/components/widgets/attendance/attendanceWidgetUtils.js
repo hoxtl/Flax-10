@@ -2,9 +2,9 @@
  * Attendance widget helpers.
  */
 
-import { buildMarkedEventsFromRecords } from "../../../../Attendance/utils/attendanceRecords";
-import { buildSegmentEvents } from "../../../../Attendance/utils/attendanceSegments";
-import { computeAttendancePct } from "../../../../Attendance/utils/attendanceSummary";
+import { buildMarkedEventsFromRecords } from "../../../../attendance/utils/attendanceRecords";
+import { buildSegmentEvents } from "../../../../attendance/utils/attendanceSegments";
+import { computeAttendancePct } from "../../../../attendance/utils/attendanceSummary";
 
 export function buildMarkedEvents(records) {
   return buildMarkedEventsFromRecords(records);

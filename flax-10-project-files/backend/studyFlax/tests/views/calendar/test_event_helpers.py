@@ -14,6 +14,7 @@ from studyFlax.models import CalendarEvent, User
 from studyFlax.models.calendar.recurrence_rule_model import RecurrenceRule
 from studyFlax.models.timer.theme_session_model import ThemeSession
 
+
 class EventHelpersCoverageTest(TestCase):
     """Tests for event helpers coverage."""
 
@@ -26,9 +27,13 @@ class EventHelpersCoverageTest(TestCase):
         from studyFlax.views.calendar.event_helpers import get_base_instance
 
         class Rule:
+            """Rule stub."""
+
             exception_dates = [timezone.now().strftime('%Y-%m-%d')]
 
         class Event:
+            """Event stub."""
+
             start_time = timezone.now()
             end_time = start_time + timedelta(hours=1)
 
@@ -149,7 +154,7 @@ class RecurrenceEndDateTest(TestCase):
 
 
 class ApplyFilterNoneRecurringTests(TestCase):
-    """_apply_start_end_filter and _apply_start_only_filter with recurring_qs=None."""
+    """Apply start filters when recurring_qs is None."""
 
     def test_apply_start_end_filter_with_none_recurring(self):
         from studyFlax.views.calendar.event_helpers import _apply_start_end_filter

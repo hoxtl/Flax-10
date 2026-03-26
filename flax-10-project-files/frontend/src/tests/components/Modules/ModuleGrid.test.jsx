@@ -4,11 +4,11 @@
 
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ModuleGrid from '../../../components/Modules/Modules/ModuleGrid';
+import ModuleGrid from '../../../components/modules/modules/ModuleGrid';
 
 const modulesCardMock = vi.fn();
 
-vi.mock('../../../components/Modules/Modules/ModulesCard.jsx', () => ({
+vi.mock('../../../components/modules/modules/ModulesCard.jsx', () => ({
     default: (props) => {
         modulesCardMock(props);
         return <div>{props.module.module_name}</div>;

@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { getSyncStatus, syncCalendar, unsyncCalendar } from '../../../api/societyApi';
-import { useNotify } from '../../Notifications/hooks/useNotify';
+import { useNotify } from '../../notifications/hooks/useNotify';
 import { useTags } from '../../../context/TagContext';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 
@@ -32,7 +32,7 @@ async function loadSyncStatus(societyId, setIsSynced, setLoading) {
         const { is_synced } = await getSyncStatus(societyId);
         setIsSynced(is_synced);
     } catch (err) {
-        // Silent catch for sync status load errors
+        console.error('Failed to load sync status:', err);
     } finally {
         setLoading(false);
     }
@@ -44,7 +44,7 @@ async function handleToggle(societyId, isSynced, setIsSynced, setLoading, notify
         const action = isSynced ? handleUnsync : handleSync;
         await action(societyId, setIsSynced, notify, societyName, refreshTags, reloadCalendar);
     } catch (err) {
-        // Silent catch for toggle sync errors
+        console.error('Failed to toggle sync:', err);
     }
     finally { setLoading(false); }
 }

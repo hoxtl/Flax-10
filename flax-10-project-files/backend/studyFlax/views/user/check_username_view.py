@@ -11,10 +11,8 @@ from studyFlax.models import User
 def _username_error(message):
     return Response({'available': False, 'error': message})
 
-
 def _username_exists(username, user_id):
     return User.objects.filter(username=username).exclude(id=user_id).exists()
-
 
 def _invalid_username_message(username):
     if not username:
@@ -27,7 +25,6 @@ def _invalid_username_message(username):
 @permission_classes([IsAuthenticated])
 def check_username(request):
     return _username_check_response(request)
-
 
 def _username_check_response(request):
     username = request.data.get('username', '').strip()

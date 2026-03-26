@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/Society/CreateSocietyModal.module.css', () => ({ default: {} }));
-vi.mock('../../../components/Society/AddCollaboratorModal', () => ({
+vi.mock('../../../components/society/CreateSocietyModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/society/AddCollaboratorModal', () => ({
     default: ({ onClose, onAdd }) => (
         <div data-testid="collab-modal">
             <button onClick={onClose}>CloseCollab</button>
@@ -10,7 +10,7 @@ vi.mock('../../../components/Society/AddCollaboratorModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/Society/CollaboratorList', () => ({
+vi.mock('../../../components/society/CollaboratorList', () => ({
     default: ({ collaborators, onRoleChange, onRemove, emptyMessage }) => (
         <div data-testid="collab-list">
             <span>{emptyMessage}</span>
@@ -24,14 +24,14 @@ vi.mock('../../../components/Society/CollaboratorList', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/Society/SocietyDetail/RatificationSection', () => ({
+vi.mock('../../../components/society/society_detail/RatificationSection', () => ({
     RatificationToggle: ({ requested, onToggle }) => (
         <button data-testid="ratification-toggle" onClick={() => onToggle(!requested)}>
             {requested ? 'Ratification On' : 'Ratification Off'}
         </button>
     ),
 }));
-vi.mock('../../../components/Society/SocietyDetail/imageHandlers/CoverImageModal', () => ({
+vi.mock('../../../components/society/society_detail/image_handlers/CoverImageModal', () => ({
     default: ({ onClose, onUpdate }) => (
         <div data-testid="photo-modal">
             <button onClick={onClose}>ClosePhoto</button>
@@ -39,7 +39,7 @@ vi.mock('../../../components/Society/SocietyDetail/imageHandlers/CoverImageModal
         </div>
     ),
 }));
-vi.mock('../../../components/common/TagsSelector/TagsSelector', () => ({
+vi.mock('../../../components/common/tags_selector/TagsSelector', () => ({
     TagsSelector: ({ tags, selectedTags, onSelectionChange, emptyHint }) => (
         <div>
             <span>{emptyHint}</span>
@@ -47,7 +47,7 @@ vi.mock('../../../components/common/TagsSelector/TagsSelector', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     default: ({ title, subtitle, onClose, children }) => (
         <div data-testid="standard-modal">
             <span>{title}</span>
@@ -58,7 +58,7 @@ vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
     ),
 }));
 
-import CreateSocietyModal from '../../../components/Society/CreateSocietyModal';
+import CreateSocietyModal from '../../../components/society/CreateSocietyModal';
 
 describe('CreateSocietyModal', () => {
     let onClose;

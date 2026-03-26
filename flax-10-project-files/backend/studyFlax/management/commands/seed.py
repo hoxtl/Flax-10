@@ -6,49 +6,45 @@ import random
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.db import connection
 
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
     Module, Enrollment, Deadline, Reading, UserSettings,
     Society, CalendarShare,
 )
-from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
-from studyFlax.models.society.society_report_model import SocietyReport
 from studyFlax.models.notifications.notification_model import Notification
-from studyFlax.models.tasks.task_model import Task, TaskList
+from studyFlax.models.tasks.task_model import Task
 from studyFlax.models.groupwork.groupwork_model import GroupProject
 from studyFlax.models.calendar.event_attendance_model import EventAttendance
-from studyFlax.fixtures.data_fixtures import (
-    category_fixtures, tag_fixtures, recurrence_fixtures,
-    MODULE_PILL_COLORS,
-)
-from .seed_support.users.users import (
+from studyFlax.fixtures.planning.data_fixtures import MODULE_PILL_COLORS
+from studyFlax.fixtures.users.user_fixtures import category_fixtures, recurrence_fixtures, tag_fixtures
+from .seed_helpers.users.users import (
     FIXTURE_USERS, ROLE_LABELS,
     create_admin_user, create_fixture_users, create_random_users,
 )
-from .seed_support.users.calendar_shares import (
+from .seed_helpers.users.calendar_shares import (
     build_calendar_share_pairs,
     create_calendar_shares,
     seed_shares_with_fixtures,
 )
-from .seed_support.events.events import create_events_for_users
-from .seed_support.content.modules import create_modules, create_deadlines, create_enrollments
-from .seed_support.content.tasks import create_tasks, create_society_tasks
-from .seed_support.groups.groups import (
+from .seed_helpers.calendar.events import create_events_for_users
+from .seed_helpers.academics.modules import create_modules, create_deadlines, create_enrollments
+from .seed_helpers.tasks.tasks import create_tasks, create_society_tasks
+from .seed_helpers.groupwork.groups import (
     create_group_projects, create_group_memberships, create_group_tasks, seed_group_availability,
 )
-from .seed_support.sessions.sessions import create_study_sessions
-from .seed_support.content.societies import (
+from .seed_helpers.timer.sessions import create_study_sessions
+from .seed_helpers.societies.societies import (
     create_societies, create_society_memberships,
     create_society_events, create_society_images,
 )
-from .seed_support.readings.readings import create_readings
-from .seed_support.events.attendance import seed_attendance
-from .seed_support.users.admin import seed_course_change_requests, seed_society_reports
+from .seed_helpers.academics.readings import create_readings
+from .seed_helpers.calendar.attendance import seed_attendance
+from .seed_helpers.users.admin import seed_course_change_requests, seed_society_reports
+from .seed_helpers.users.usersettings import ensure_usersettings_seed_compatibility
+
 
 User = get_user_model()
-LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
 SOFT_TAG_COLORS = {
     "Lecture": "#C98C56",
     "Deadline": "#7F5B63",
@@ -72,29 +68,11 @@ SOFT_FALLBACK_TAG_COLORS = (
 def _seed_user_pool():
     return list(User.objects.filter(role__in=['student', 'teacher']))
 
-
-def _table_columns(table_name):
-    with connection.cursor() as cursor:
-        return {column.name for column in connection.introspection.get_table_description(cursor, table_name)}
-
-
-def _apply_legacy_column_fix(table_name):
-    """Apply default and null fix for legacy widget sizes column."""
-
-    alter_sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{LEGACY_WIDGET_SIZES_COLUMN}" SET DEFAULT \'{{}}\'::jsonb;'
-    update_sql = f'UPDATE "{table_name}" SET "{LEGACY_WIDGET_SIZES_COLUMN}" = \'{{}}\'::jsonb WHERE "{LEGACY_WIDGET_SIZES_COLUMN}" IS NULL;'
-    with connection.cursor() as cursor:
-        cursor.execute(alter_sql)
-        cursor.execute(update_sql)
-
-
 def _display_role(username, role):
     return 'admin/student' if username == 'johndoe' else role
 
-
 def _is_already_seeded():
     """Check if fixture users exist to detect prior seeding."""
-
     fixture_usernames = {'johndoe', 'janedoe', 'charlie', 'amiller'}
     existing = set(User.objects.filter(username__in=fixture_usernames).values_list('username', flat=True))
     return len(existing) >= 2
@@ -106,6 +84,7 @@ class Command(BaseCommand):
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
     def add_arguments(self, parser):
+        """Register the optional teacher-count override for seed runs."""
         parser.add_argument(
             '--teacher-count', type=int, default=14,
             help='Target total number of teacher accounts.',
@@ -143,10 +122,7 @@ class Command(BaseCommand):
         self.stdout.write("")
 
     def _ensure_usersettings_seed_compatibility(self):
-        table_name = UserSettings._meta.db_table
-        if LEGACY_WIDGET_SIZES_COLUMN not in _table_columns(table_name):
-            return
-        _apply_legacy_column_fix(table_name)
+        ensure_usersettings_seed_compatibility(UserSettings._meta.db_table)
 
     def _load_shared_data(self):
         self.users = _seed_user_pool()
@@ -249,6 +225,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  \u2713  {'Categories':<16} {len(self.categories):,}")
 
     def _tag_color(self, name):
+        """Tag colour."""
         if name in SOFT_TAG_COLORS:
             return SOFT_TAG_COLORS[name]
         return SOFT_FALLBACK_TAG_COLORS[sum(ord(char) for char in name) % len(SOFT_FALLBACK_TAG_COLORS)]
@@ -315,8 +292,6 @@ class Command(BaseCommand):
             self.stdout.write(f"  {label:<16}{count:,}")
 
     def print_stats(self):
-        """Print a summary of all seeded data."""
-
         div = "\u2500" * 40
         self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))

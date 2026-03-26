@@ -5,24 +5,24 @@
 import { useState, useMemo } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
-import DeadlineCountdown from '../../components/common/DeadlineCountdown/DeadlineCountdown';
-import urgentGlowStyles from '../../components/common/UrgentGlow/UrgentGlow.module.css';
+import DeadlineCountdown from '../../components/common/deadline_countdown/DeadlineCountdown';
+import urgentGlowStyles from '../../components/common/urgent_glow/UrgentGlow.module.css';
 import {
     TIER_ACCENT,
     getUrgencyTier,
-} from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
-import { AddReadingToTasksButton } from '../../components/Modules/shared/taskButtons.jsx';
+} from '../../components/modules/deadlines/upcomingDeadlinesUtils';
+import { AddReadingToTasksButton } from '../../components/modules/shared/taskButtons.jsx';
 import {
     containerVariants,
     expandBodyVariants,
     itemVariants,
     listVariants,
-} from '../../components/Modules/shared/widgetVariants.js';
+} from '../../components/modules/shared/widgetVariants.js';
 import {
     WidgetHeader,
     ShowMoreButton,
-} from '../../components/Modules/shared/widgetParts.jsx';
-import { TaskInfoModal } from '../Tasks/components/TaskInfoModal';
+} from '../../components/modules/shared/widgetParts.jsx';
+import { TaskInfoModal } from '../tasks/components/TaskInfoModal';
 import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 

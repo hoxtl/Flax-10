@@ -33,15 +33,15 @@ vi.mock("../../../api/adminApi", () => ({
   getMyCourseChangeRequest: (...args) => getMyCourseChangeRequest(...args),
 }));
 
-vi.mock("../../../components/common/InlineAlert/InlineAlert", () => ({
+vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message, variant }) => message ? <div>{variant}:{message}</div> : null,
 }));
 
-vi.mock("../../../components/common/TextInput/TextInput", () => ({
+vi.mock("../../../components/common/text_input/TextInput", () => ({
   default: (props) => <input {...props} />,
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
@@ -49,7 +49,7 @@ vi.mock("../../../components/common/hooks/useTransientSavedState", () => ({
   useTransientSavedState: vi.fn((signal) => signal > 0),
 }));
 
-vi.mock("../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ onChange, placeholder, searchable, usePortal }) => (
     <button type="button" data-searchable={String(searchable)} data-portal={String(usePortal)} onClick={() => onChange("dark")}>
       {placeholder}
@@ -57,7 +57,7 @@ vi.mock("../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../context/ThemeConstants", () => ({
+vi.mock("../../../context/themeConstants", () => ({
   THEME_GROUPS: [
     {
       label: "Classic",
@@ -83,17 +83,17 @@ import {
   SuccessBanner,
   TabButton,
   ThemeGridSelector,
-} from "../../../components/Settings/SettingsUI";
+} from "../../../components/settings/SettingsUI";
 import {
   clearCachedPendingRequest,
   getCachedPendingRequest,
   normaliseCourseRequest,
   setCachedPendingRequest,
-} from "../../../components/Settings/account/accountCourseRequests";
+} from "../../../components/settings/account/accountCourseRequests";
 import {
   createCancelCourseRequestHandler,
   createCourseRequestSuccessHandler,
-} from "../../../components/Settings/account/useCourseRequestActions";
+} from "../../../components/settings/account/useCourseRequestActions";
 import {
   saveAccount,
   saveAddress,
@@ -105,8 +105,8 @@ import {
   saveWeekPreference,
   saveWorktimePreference,
   showTemporaryMessage,
-} from "../../../components/Settings/hooks/settingsHandlerHelpers";
-import { getSleepDuration, getSleepMinutes, getSleepQuality } from "../../../components/Settings/preferences/sleepUtils";
+} from "../../../components/settings/hooks/settingsHandlerHelpers";
+import { getSleepDuration, getSleepMinutes, getSleepQuality } from "../../../components/settings/preferences/sleepUtils";
 
 const renderSettingsUiShowcase = () => {
   const onChange = vi.fn();

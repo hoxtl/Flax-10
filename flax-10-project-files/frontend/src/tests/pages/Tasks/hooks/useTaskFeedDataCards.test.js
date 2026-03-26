@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+<<<<<<< HEAD
 import { act } from "@testing-library/react";
 import {
   getTaskFeedDataMocks,
@@ -8,6 +9,29 @@ import {
 import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
 
 const { navigateMock } = getTaskFeedDataMocks();
+=======
+import { renderHook, act } from "@testing-library/react";
+import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
+import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
+
+const navigateMock = vi.hoisted(() => vi.fn());
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return { ...actual, useNavigate: () => navigateMock };
+});
+vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn().mockResolvedValue([]) }));
+vi.mock("../../../../components/timer/task_input/taskInputUtils", () => ({ buildListItems: () => [], filterListItems: (arr) => arr, groupModuleItems: (arr) => ({ All: arr }) }));
+vi.mock("../../../../lib/allTasksCompleteMessages", () => ({ getClearMessage: () => "Great job" }));
+vi.mock("../../../../pages/tasks/utils/taskFeedUtils", () => ({ getHeaderTitle: () => "Header" }));
+
+vi.mock("../../../../pages/tasks/utils/taskFeedDataUtils", () => ({
+  buildDateBounds: vi.fn(() => ({ now: new Date(), dayStart: new Date(), todayEnd: new Date(), weekEnd: new Date() })),
+  filterBySearch: vi.fn((arr) => arr), getOverdue: vi.fn(() => []), getToday: vi.fn(() => []),
+  getThisWeek: vi.fn(() => []), getLater: vi.fn(() => []), getCompletedTodayCount: vi.fn(),
+  getCompletedWeekCount: vi.fn(), getCompletedLaterCount: vi.fn(),
+  getFilterHandlers: vi.fn(() => ({ toggleListFilter: vi.fn(), toggleModuleFilter: vi.fn(), clearAllFilters: vi.fn() })),
+}));
+>>>>>>> origin/main
 
 describe("useTaskFeedData - Empty State Cards", () => {
   beforeEach(() => {

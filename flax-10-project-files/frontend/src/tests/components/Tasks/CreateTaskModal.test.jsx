@@ -2,9 +2,9 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import CreateTaskModal from '../../../pages/Tasks/components/CreateTaskModal';
+import CreateTaskModal from '../../../pages/tasks/components/CreateTaskModal';
 
-vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
+vi.mock('../../../pages/tasks/components/DateTimePicker', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input
             data-testid={`date-picker-${placeholder}`}
@@ -15,7 +15,7 @@ vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
     ),
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}
@@ -27,15 +27,15 @@ vi.mock('../../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
-vi.mock('../../../components/ui/EstTimeHelpBanner', () => ({
+vi.mock('../../../components/ui/est_time_help_banner', () => ({
     default: () => <div data-testid="est-time-help" />,
 }));
 
-vi.mock('../../../components/common/SleepWarningModal', () => ({
+vi.mock('../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 
-vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
     useSleepWarning: vi.fn(() => ({
         sleepWarning: false,
         checkSleepAndRun: (_date, fn) => fn(),
@@ -47,7 +47,7 @@ vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
-vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({
+vi.mock('../../../pages/tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#ff0000', '#00ff00'],
 }));
 

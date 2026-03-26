@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TagManagerModal from '../../../components/Tags/TagManagerModal';
+import TagManagerModal from '../../../components/tags/TagManagerModal';
 
 vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({

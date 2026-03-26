@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import AttendanceChartsColumn from "../../../pages/Attendance/components/AttendanceChartsColumn";
-import OverallAttendanceChart from "../../../pages/Attendance/components/OverallAttendanceChart";
-import ByTypeAttendanceChart from "../../../pages/Attendance/components/ByTypeAttendanceChart";
-import AttendancePercentLine from "../../../pages/Attendance/components/AttendancePercentLine";
+import AttendanceChartsColumn from "../../../pages/attendance/components/AttendanceChartsColumn";
+import OverallAttendanceChart from "../../../pages/attendance/components/OverallAttendanceChart";
+import ByTypeAttendanceChart from "../../../pages/attendance/components/ByTypeAttendanceChart";
+import AttendancePercentLine from "../../../pages/attendance/components/AttendancePercentLine";
 
-vi.mock("../../../pages/Attendance/components/AttendanceDonutChart", async () => {
+vi.mock("../../../pages/attendance/components/AttendanceDonutChart", async () => {
   return {
     default: ({ chart, data, onSegmentClick, valueFormatter }) => (
       <div>

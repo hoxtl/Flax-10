@@ -1,15 +1,21 @@
+"""
+Tests for seeded societies.
+"""
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from studyFlax.fixtures.society_fixtures import _join_tags, _normalise_phrase
-from studyFlax.management.commands.seed_societies import _ensure_seed_membership
+from studyFlax.fixtures.societies.society_fixtures import _join_tags, _normalise_phrase
+from studyFlax.management.commands.seed_helpers.societies.societies import _ensure_seed_membership
 from studyFlax.models.society import SocietyCalendarSync, SocietyMembership
-from studyFlax.tests.helpers.factories import make_society
+from studyFlax.tests.helpers.test_model_builders import make_society
+
 
 User = get_user_model()
 
 
 class NormalisePhraseBranchTest(TestCase):
+    """Tests normalise phrase branch."""
     def test_empty_string_returns_empty(self):
         self.assertEqual(_normalise_phrase(""), "")
 
@@ -21,6 +27,7 @@ class NormalisePhraseBranchTest(TestCase):
 
 
 class JoinTagsBranchTest(TestCase):
+    """Tests join tags branch."""
     def test_empty_list_returns_empty(self):
         self.assertEqual(_join_tags([]), "")
 
@@ -32,6 +39,7 @@ class JoinTagsBranchTest(TestCase):
 
 
 class SeedSocietyMembershipDefaultsTest(TestCase):
+    """Tests seed society membership defaults."""
     def setUp(self):
         self.user = User.objects.create_user(
             username="seed_society_member",

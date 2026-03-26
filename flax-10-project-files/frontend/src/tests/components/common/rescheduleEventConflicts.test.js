@@ -4,7 +4,7 @@ import {
   buildConflictResolutionPlan,
   buildConflictResolutionToastMessage,
   undoConflictResolutionPlan,
-} from "../../../components/common/RescheduleEvents/rescheduleEventConflicts";
+} from "../../../components/common/reschedule_events/rescheduleEventConflicts";
 
 function iso(dateString) {
   return new Date(dateString).toISOString();

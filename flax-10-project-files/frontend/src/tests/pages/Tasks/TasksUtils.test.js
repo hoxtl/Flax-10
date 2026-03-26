@@ -1,22 +1,26 @@
+/**
+ * Covers task utility fallbacks and handler wiring branches.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getListColor } from "../../../pages/Tasks/utils/listColorUtils";
-import { getCompletedDueLabel, splitEstimatedBlocks } from "../../../pages/Tasks/utils/taskCardUtils";
-import { getFilterHandlers, getCompletedWeekCount } from "../../../pages/Tasks/utils/taskFeedDataUtils";
-import { getHeaderTitle } from "../../../pages/Tasks/utils/taskFeedUtils";
+import { getListColor } from "../../../pages/tasks/utils/listColorUtils";
+import { getCompletedDueLabel, splitEstimatedBlocks } from "../../../pages/tasks/utils/taskCardUtils";
+import { getFilterHandlers, getCompletedWeekCount } from "../../../pages/tasks/utils/taskFeedDataUtils";
+import { getHeaderTitle } from "../../../pages/tasks/utils/taskFeedUtils";
 import {
   getReadingListLabel,
   matchesReadingList,
-} from "../../../pages/Tasks/utils/readingListUtils";
-import { sortTasks } from "../../../pages/Tasks/utils/taskSortUtils";
+} from "../../../pages/tasks/utils/readingListUtils";
+import { sortTasks } from "../../../pages/tasks/utils/taskSortUtils";
 import {
   addListImpl,
   mergeListColors,
-} from "../../../pages/Tasks/utils/useTaskListsUtils";
+} from "../../../pages/tasks/utils/useTaskListsUtils";
 import {
   buildTasksPageHandlers,
   buildTasksPageViewProps,
-} from "../../../pages/Tasks/utils/tasksPageUtils";
+} from "../../../pages/tasks/utils/tasksPageUtils";
 
 vi.mock("../../../api/taskApi", () => ({
   createTaskList: vi.fn(),
@@ -114,27 +118,33 @@ describe("Tasks utility coverage", () => {
     expect(asc).toHaveLength(2);
   });
 
+  const buildStateMocks = () => ({
+    activeListId: null, activeFilter: "all", filterListIds: [], taskModalDueDate: null,
+    showTaskModal: false, toastUndo: null, toastDelete: false, toastInfo: null,
+    showListModal: false, showCreateListFromTask: false, lastCreatedListId: null,
+    setActiveListId: vi.fn(), setActiveFilter: vi.fn(), setFilterListIds: vi.fn(),
+    setShowListModal: vi.fn(), setShowTaskModal: vi.fn(), setTaskModalDueDate: vi.fn(),
+    setToastUndo: vi.fn(), setToastDelete: vi.fn(), setToastInfo: vi.fn(),
+    setShowCreateListFromTask: vi.fn(), setLastCreatedListId: vi.fn(),
+  });
+
+  const buildListsApiMocks = () => ({
+    lists: [{ id: 2, name: "Coursework" }], archivedLists: [], loading: false,
+    addList: vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 9, name: "Reading list" }),
+    renameList: vi.fn(), removeList: vi.fn(), restoreList: vi.fn(), permanentlyDeleteList: vi.fn(),
+  });
+
+  const buildTasksApiMocks = () => ({
+    tasks: [], initialLoading: false,
+    addTask: vi.fn().mockResolvedValueOnce({ id: 5, title: "Essay draft" }).mockResolvedValueOnce({ id: 6, title: "Follow up" }),
+    removeTask: vi.fn(), toggleComplete: vi.fn(), reload: vi.fn(),
+    editTask: vi.fn().mockResolvedValueOnce({ id: 7, task_list: 77 }).mockResolvedValueOnce({ id: 8, task_list: null }),
+  });
+
   const makeMocks = () => ({
-    state: {
-      activeListId: null, activeFilter: "all", filterListIds: [], taskModalDueDate: null,
-      showTaskModal: false, toastUndo: null, toastDelete: false, toastInfo: null,
-      showListModal: false, showCreateListFromTask: false, lastCreatedListId: null,
-      setActiveListId: vi.fn(), setActiveFilter: vi.fn(), setFilterListIds: vi.fn(),
-      setShowListModal: vi.fn(), setShowTaskModal: vi.fn(), setTaskModalDueDate: vi.fn(),
-      setToastUndo: vi.fn(), setToastDelete: vi.fn(), setToastInfo: vi.fn(),
-      setShowCreateListFromTask: vi.fn(), setLastCreatedListId: vi.fn(),
-    },
-    listsApi: {
-      lists: [{ id: 2, name: "Coursework" }], archivedLists: [], loading: false,
-      addList: vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 9, name: "Reading list" }),
-      renameList: vi.fn(), removeList: vi.fn(), restoreList: vi.fn(), permanentlyDeleteList: vi.fn(),
-    },
-    tasksApi: {
-      tasks: [], initialLoading: false,
-      addTask: vi.fn().mockResolvedValueOnce({ id: 5, title: "Essay draft" }).mockResolvedValueOnce({ id: 6, title: "Follow up" }),
-      removeTask: vi.fn(), toggleComplete: vi.fn(), reload: vi.fn(),
-      editTask: vi.fn().mockResolvedValueOnce({ id: 7, task_list: 77 }).mockResolvedValueOnce({ id: 8, task_list: null }),
-    }
+    state: buildStateMocks(),
+    listsApi: buildListsApiMocks(),
+    tasksApi: buildTasksApiMocks(),
   });
 
   it("covers move-list toast naming fallbacks", async () => {

@@ -2,12 +2,12 @@
  * Modal for showing and interacting with a list of users.
  */
 
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
+import PrimaryButton from '../common/primary_button/PrimaryButton';
 import ShareButton from './ShareButton';
-import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
-import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
-import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
-import UserAvatar from '../common/UserAvatar/UserAvatar';
+import GenericSummaryModal from '../common/generic_summary_modal/GenericSummaryModal';
+import SearchEmptyState from '../common/search_empty_state/SearchEmptyState';
+import SummaryItem from '../common/generic_summary_modal/SummaryItem';
+import UserAvatar from '../common/user_avatar/UserAvatar';
 import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 
 function getCurrentUser() {

@@ -5,32 +5,30 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Profile from '../../../pages/Profile/Profile';
+import Profile from '../../../pages/profile/Profile';
+
+import { createFnMap } from '../../utils/testBuilderUtils';
+
+const useAuthMock = vi.fn();
 
 // Mock hooks
-vi.mock('../../../pages/Profile/hooks/useProfile', () => ({
+vi.mock('../../../pages/profile/hooks/useProfile', () => ({
   useProfileState: vi.fn(),
   useProfileBodyData: vi.fn(),
   useProfileContent: vi.fn(),
 }));
 
-vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
+vi.mock('../../../pages/profile/hooks/useProfileSummary', () => ({
   useProfileSummary: vi.fn(),
 }));
 
-vi.mock('../../../pages/Profile/hooks/useProfileVisibility', () => ({
+vi.mock('../../../pages/profile/hooks/useProfileVisibility', () => ({
   useProfileVisibility: vi.fn(),
 }));
 
 // ProfileHome uses AuthContext's useAuth().
 vi.mock('../../../context/AuthContext', () => ({
-  useAuth: () => ({
-    profile: { modules: [] },
-    loading: false,
-    authenticated: true,
-    user: { role: 'student' },
-    refreshProfile: vi.fn(),
-  }),
+  useAuth: () => useAuthMock(),
 }));
 
 // StudyHeatmap + other analytics widgets depend on ThemeProvider via useTheme().
@@ -54,25 +52,25 @@ vi.mock('../../../api/client', () => ({
 }));
 
 // Mock components
-vi.mock('../../../pages/Profile/ProfileModals', () => ({
+vi.mock('../../../pages/profile/ProfileModals', () => ({
   default: () => <div data-testid="profile-modals" />,
 }));
 
-vi.mock('../../../pages/Profile/ProfileCalendar', () => ({
+vi.mock('../../../pages/profile/ProfileCalendar', () => ({
   ProfileCalendar: () => <div data-testid="profile-calendar" />,
 }));
 
-vi.mock('../../../components/Social/ShareButton', () => ({
+vi.mock('../../../components/social/ShareButton', () => ({
   default: () => <button data-testid="share-button">Share</button>,
 }));
 
-vi.mock('../../../pages/Profile/AchievementsModal', () => ({
+vi.mock('../../../pages/profile/AchievementsModal', () => ({
   default: ({ onClose }) => <div data-testid="achievements-modal"><button onClick={onClose}>Close</button></div>,
 }));
 
-import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/Profile/hooks/useProfile';
-import { useProfileSummary } from '../../../pages/Profile/hooks/useProfileSummary';
-import { useProfileVisibility } from '../../../pages/Profile/hooks/useProfileVisibility';
+import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/profile/hooks/useProfile';
+import { useProfileSummary } from '../../../pages/profile/hooks/useProfileSummary';
+import { useProfileVisibility } from '../../../pages/profile/hooks/useProfileVisibility';
 import analyticsService from '../../../api/analyticsApi';
 import { fetchApi } from '../../../api/client';
 
@@ -80,28 +78,23 @@ const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 
 const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', year: 'Year 2', major: 'Physics', module_count: 3 };
 const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones', year: 'Year 3', major: 'Chemistry' };
 
-const makeProfileState = (overrides = {}) => ({
+const profileStateDefaults = {
   loading: false,
   profileData: defaultProfileData,
   events: [],
   viewedUserId: 1,
-  onNavChange: vi.fn(),
   showEditProfile: false,
-  setShowEditProfile: vi.fn(),
   showModules: false,
-  setShowModules: vi.fn(),
   showTasks: false,
-  setShowTasks: vi.fn(),
   showSharedWith: false,
-  setShowSharedWith: vi.fn(),
   showSharedBy: false,
-  setShowSharedBy: vi.fn(),
   showEvents: false,
-  setShowEvents: vi.fn(),
   eventRange: 'week',
-  setEventRange: vi.fn(),
-  reload: vi.fn(),
-  handleSaveProfile: vi.fn(),
+};
+
+const makeProfileState = (overrides = {}) => ({
+  ...profileStateDefaults,
+  ...createFnMap(['onNavChange', 'setShowEditProfile', 'setShowModules', 'setShowTasks', 'setShowSharedWith', 'setShowSharedBy', 'setShowEvents', 'setEventRange', 'reload', 'handleSaveProfile']),
   ...overrides,
 });
 
@@ -145,6 +138,13 @@ const makeHeatmap = () => ({
 describe('Profile', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    useAuthMock.mockReturnValue({
+      profile: { modules: [] },
+      loading: false,
+      authenticated: true,
+      user: { role: 'student' },
+      refreshProfile: vi.fn(),
+    });
 
     // Set up default mock implementations
     useProfileState.mockReturnValue(makeProfileState());
@@ -224,6 +224,174 @@ describe('Profile', () => {
     renderProfile({ user: defaultUser, viewedUserId: 2 });
     await waitFor(() => expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0));
     expect(screen.queryByText(/edit profile/i)).toBeNull();
+  });
+
+  it('falls back to the current user object when profileData is missing', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: null,
+      viewedUserId: 1,
+    }));
+    useProfileVisibility.mockReturnValue(defaultVisibility);
+
+    renderProfile({ user: defaultUser, viewedUserId: 1 });
+
+    expect((await screen.findAllByText('alice')).length).toBeGreaterThan(0);
+  });
+
+  it('falls back to empty auth modules and empty shared events when they are missing', async () => {
+    useAuthMock.mockReturnValue({
+      profile: null,
+      loading: false,
+      authenticated: true,
+      user: { role: 'student' },
+      refreshProfile: vi.fn(),
+    });
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, is_shared_with_me: true },
+      viewedUserId: 2,
+      filteredEvents: undefined,
+    }));
+    useProfileBodyData.mockReturnValue({
+      modules: undefined,
+      upcomingEventCount: 0,
+      filteredEvents: undefined,
+    });
+    useProfileVisibility.mockReturnValue({
+      ...defaultVisibility,
+      isSelf: false,
+      canEditProfile: false,
+      canViewCalendar: true,
+      canViewAnalytics: false,
+      canViewModules: true,
+      canViewSharedWith: false,
+    });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+
+    expect(await screen.findByText('SHARED CALENDAR')).toBeInTheDocument();
+    expect(screen.getByTestId('profile-calendar')).toBeTruthy();
+  });
+
+  it('falls back to onNavChange when onNavigate is missing', async () => {
+    const onNavChange = vi.fn();
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, is_shared_with_me: true },
+      viewedUserId: 2,
+    }));
+    useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canEditProfile: false, canViewCalendar: true });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2, onNavigate: undefined, onNavChange });
+
+    fireEvent.click(await screen.findByText('View their calendar'));
+    expect(onNavChange).toHaveBeenCalled();
+  });
+
+  it('uses the teacher self layout when the current profile is a teacher', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...defaultProfileData, role: 'teacher' },
+      viewedUserId: 1,
+    }));
+    useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: true, canEditProfile: true });
+
+    renderProfile({ user: defaultUser, viewedUserId: 1 });
+
+    expect(document.querySelector('[class*="leftTopMetricsRowTeacher"]')).toBeTruthy();
+  });
+
+  it('renders teacher insights for teacher profiles', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, role: 'teacher' },
+      viewedUserId: 2,
+    }));
+    useProfileVisibility.mockReturnValue({
+      ...defaultVisibility,
+      isSelf: false,
+      canEditProfile: false,
+      canViewAnalytics: false,
+      canViewCalendar: false,
+      canViewSharedWith: false,
+      canViewModules: true,
+    });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+
+    expect(await screen.findByText('CS101')).toBeInTheDocument();
+  });
+
+  it('renders the common ground row for non-teacher profiles', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, role: 'student' },
+      viewedUserId: 2,
+    }));
+    useProfileVisibility.mockReturnValue({
+      ...defaultVisibility,
+      isSelf: false,
+      canEditProfile: false,
+      canViewAnalytics: false,
+      canViewCalendar: false,
+      canViewSharedWith: false,
+      canViewModules: true,
+    });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+
+    expect(await screen.findByText('Common Ground')).toBeInTheDocument();
+  });
+
+  it('renders the compatibility-only branch when there is no common ground', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, role: 'student' },
+      viewedUserId: 2,
+    }));
+    useProfileBodyData.mockReturnValue({
+      modules: [],
+      upcomingEventCount: 0,
+      filteredEvents: [],
+    });
+    useProfileVisibility.mockReturnValue({
+      ...defaultVisibility,
+      isSelf: false,
+      canEditProfile: false,
+      canViewAnalytics: false,
+      canViewCalendar: false,
+      canViewSharedWith: false,
+      canViewModules: true,
+    });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+
+    expect(await screen.findByText('Similar study times')).toBeInTheDocument();
+    expect(screen.queryByText('Common Ground')).toBeNull();
+  });
+
+  it('renders compatibility score when there is no shared ground', async () => {
+    useProfileState.mockReturnValue(makeProfileState({
+      profileData: { ...otherProfileData, role: 'student' },
+      viewedUserId: 2,
+    }));
+    useProfileBodyData.mockReturnValue({
+      modules: [],
+      upcomingEventCount: 0,
+      filteredEvents: [],
+    });
+    useProfileSummary.mockReturnValue({
+      summary: { persona: null, badges: [], weekly: null, streaks: null, societies: [] },
+      loading: false,
+      refetch: vi.fn(),
+    });
+    useProfileVisibility.mockReturnValue({
+      ...defaultVisibility,
+      isSelf: false,
+      canEditProfile: false,
+      canViewAnalytics: false,
+      canViewCalendar: false,
+      canViewSharedWith: false,
+      canViewModules: true,
+    });
+
+    renderProfile({ user: defaultUser, viewedUserId: 2 });
+
+    expect(await screen.findByText('Similar study times')).toBeInTheDocument();
   });
 
   it('renders a standalone back button above the header when onBack is provided', async () => {

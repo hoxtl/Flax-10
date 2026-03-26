@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import TagManager from '../../../components/Society/SocietyDetail/tags/TagManager';
+import TagManager from '../../../components/society/society_detail/tags/TagManager';
 
 const mockTags = [
     { id: 1, label: 'Important', color: '#3b82f6' },

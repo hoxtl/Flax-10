@@ -1,8 +1,12 @@
+/**
+ * Covers TaskCard rendering, menu, and modal behaviours.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-import TaskCard, { EditTaskModal, TaskContextMenu } from "../../../../pages/Tasks/components/TaskCard";
+import TaskCard, { EditTaskModal, TaskContextMenu } from "../../../../pages/tasks/components/TaskCard";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const timerMock = vi.hoisted(() => ({ setActiveTaskId: vi.fn() }));
@@ -36,11 +40,11 @@ vi.mock("../../../../api/userApi", () => ({
   getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }),
 }));
 
-vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
+vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
   useSleepWarning: sleepWarningHookMock,
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/common/sleep_warning_modal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
@@ -57,11 +61,11 @@ vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
   ),
 }));
 
-vi.mock("../../../../components/TaskCelebration/CheckBurst", () => ({
+vi.mock("../../../../components/task_celebration/CheckBurst", () => ({
   CheckBurst: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../../pages/Tasks/components/CreateTaskModal", () => ({
+vi.mock("../../../../pages/tasks/components/CreateTaskModal", () => ({
   default: ({ onSave, onClose }) => (
     <div data-testid="edit-modal">
       <button type="button" onClick={() => onSave({ title: "Updated" })}>
@@ -74,11 +78,11 @@ vi.mock("../../../../pages/Tasks/components/CreateTaskModal", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskInfoModal", () => ({
+vi.mock("../../../../pages/tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: () => <div data-testid="info-modal" />,
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ options = [], onChange }) => (
     <div data-testid="animated-dropdown">
       <button type="button" onClick={() => onChange("__missing__")}>
@@ -93,8 +97,8 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/utils/taskCardUtils", async () => {
-  const actual = await vi.importActual("../../../../pages/Tasks/utils/taskCardUtils");
+vi.mock("../../../../pages/tasks/utils/taskCardUtils", async () => {
+  const actual = await vi.importActual("../../../../pages/tasks/utils/taskCardUtils");
   return {
     ...actual,
     formatDueDate: vi.fn(() => ({ label: "Today", status: "today" })),
@@ -105,40 +109,43 @@ vi.mock("../../../../pages/Tasks/utils/taskCardUtils", async () => {
 
 import { isRoutineTask } from "../../../../lib/completionMessages";
 import { getUserSettings } from "../../../../api/userApi";
-import { formatDueDate } from "../../../../pages/Tasks/utils/taskCardUtils";
+import { formatDueDate } from "../../../../pages/tasks/utils/taskCardUtils";
+
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 function renderWithRouter(ui) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
 }
 
+const baseTask = {
+  id: 1,
+  title: "Read book",
+  completed: false,
+  task_list: 1,
+  module_code: "KCL1",
+  module_id: 11,
+  due_date: "2026-03-09T09:00",
+  priority: "urgent",
+  estimated_blocks: 2,
+  group_project_name: "Capstone",
+};
+
 function buildProps(overrides = {}) {
+  const { task, ...rest } = overrides;
   return {
-    task: {
-      id: 1,
-      title: "Read book",
-      completed: false,
-      task_list: 1,
-      module_code: "KCL1",
-      module_id: 11,
-      due_date: "2026-03-09T09:00",
-      priority: "urgent",
-      estimated_blocks: 2,
-      group_project_name: "Capstone",
-    },
+    task: { ...baseTask, ...task },
     listName: "Inbox",
     listColor: "#ccc",
     lists: [
       { id: 1, name: "Inbox", color: "#ccc" },
       { id: 2, name: "Work", color: "#eee" },
     ],
-    onToggle: vi.fn(),
-    onDelete: vi.fn(),
-    onEdit: vi.fn(),
     hideDueBadge: false,
     hideListBadge: false,
     isOverdue: false,
     searchQuery: "",
-    ...overrides,
+    ...createFnMap(["onToggle", "onDelete", "onEdit"]),
+    ...rest,
   };
 }
 

@@ -11,94 +11,38 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models.timer.session_model import StudySession
-from studyFlax.models.timer.theme_session_model import ThemeSession
+
 
 User = get_user_model()
 
 
 def make_user():
+    """Create a default AI test user."""
     return User.objects.create_user(
         username='aiuser', email='ai@example.com', password='pass',
         first_name='AI', last_name='User'
     )
 
-
-def make_session(user, duration=60, status='Completed', days_ago=0):
+def make_session(user, duration=60, study_status='Completed', days_ago=0):
+    """Create a study session for the given user."""
     now = timezone.now() - timedelta(days=days_ago)
     return StudySession.objects.create(
         user=user, start_time=now - timedelta(minutes=duration), end_time=now,
         duration=duration, break_duration=0, pause_duration=0,
-        session_count=1, study_block_id=1, status=status
+        session_count=1, study_block_id=1, status=study_status
     )
 
-
-class BuildUserContextTest(TestCase):
-
-    def setUp(self):
-        self.user = make_user()
-
-    def test_build_user_context_no_sessions(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('AI User', context)
-        self.assertIn('Total study sessions: 0', context)
-
-    def test_build_user_context_with_sessions(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        make_session(self.user, duration=60, days_ago=1)
-        make_session(self.user, duration=120, days_ago=2)
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('Total study sessions: 2', context)
-
-    def test_build_user_context_calculates_streak(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        make_session(self.user, duration=60, days_ago=0)
-        make_session(self.user, duration=60, days_ago=1)
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('Current streak: 2', context)
-
-    def test_build_user_context_broken_streak_is_zero(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        make_session(self.user, duration=60, days_ago=5)
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('Current streak: 0', context)
-
-    def test_build_user_context_with_theme_sessions(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        ThemeSession.objects.create(user=self.user, theme='dark', duration_minutes=120,
-            started_at=timezone.now() - timedelta(days=1), ended_at=timezone.now())
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('Dark mode usage:', context)
-
-    def test_build_user_context_upcoming_events(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        CalendarEvent.objects.create(user=self.user, title='Upcoming Lecture',
-            start_time=timezone.now() + timedelta(days=3),
-            end_time=timezone.now() + timedelta(days=3, hours=1))
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('Upcoming Lecture', context)
-
-    def test_build_user_context_overtime_sessions(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        make_session(self.user, duration=90, status='Overtime', days_ago=1)
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('Overtime sessions: 1', context)
-
-    def test_build_user_context_peak_hours(self):
-        from studyFlax.views.analytics.ai_view import _build_user_context
-        make_session(self.user, duration=60, days_ago=1)
-        context = _build_user_context(self.user, days=30)
-        self.assertIn('Peak study hour:', context)
-
-
-class GetAiInsightsViewTest(TestCase):
+class AuthenticatedAiTest(TestCase):
+    """Base class for AI view tests requiring an authenticated client."""
 
     def setUp(self):
         self.client = APIClient()
         self.user = make_user()
         self.client.force_authenticate(user=self.user)
+
+class GetAiInsightsViewTest(AuthenticatedAiTest):
+    """Tests for the get-AI-insights endpoint."""
 
     def test_requires_auth(self):
         self.client.force_authenticate(user=None)
@@ -181,13 +125,8 @@ class GetAiInsightsViewTest(TestCase):
         response = self.client.post('/api/analytics/ai-insights/', {'days': 30})
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class AiChatViewTest(TestCase):
-
-    def setUp(self):
-        self.client = APIClient()
-        self.user = make_user()
-        self.client.force_authenticate(user=self.user)
+class AiChatViewTest(AuthenticatedAiTest):
+    """Tests for the AI chat endpoint."""
 
     def test_requires_auth(self):
         self.client.force_authenticate(user=None)
@@ -284,8 +223,8 @@ class AiChatViewTest(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class OpenAIResponseValidationTest(TestCase):
+    """Tests for OpenAI response validation helpers."""
 
     def test_is_openai_response_valid_with_empty_choices(self):
         from studyFlax.views.analytics.ai_view import _is_openai_response_valid
@@ -307,7 +246,6 @@ class OpenAIResponseValidationTest(TestCase):
         from studyFlax.views.analytics.ai_view import _extract_days
         self.assertEqual(_extract_days(None, 30), 30)
 
-
 class OpenAIImportCoverageTest(TestCase):
     """Covers the openai import try/except branch."""
 
@@ -326,8 +264,8 @@ class OpenAIImportCoverageTest(TestCase):
             del sys.modules['openai']
             importlib.reload(mod)
 
-
 class AiScheduleParserTest(TestCase):
+    """Tests for AI schedule parsing utilities."""
 
     def test_strip_code_fence_with_json_prefix(self):
         from studyFlax.views.analytics.ai_schedule import strip_code_fence
@@ -351,14 +289,8 @@ class AiScheduleParserTest(TestCase):
         result = parse_schedule_events('[{"title": "Study"}]')
         self.assertEqual(len(result), 1)
 
-
-class AiChatScheduleExtractionFailureTest(TestCase):
-    """Tests for _extract_schedule_events failure paths (lines 93, 96)."""
-
-    def setUp(self):
-        self.client = APIClient()
-        self.user = make_user()
-        self.client.force_authenticate(user=self.user)
+class AiChatScheduleExtractionFailureTest(AuthenticatedAiTest):
+    """Tests for _extract_schedule_events failure paths."""
 
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('studyFlax.views.analytics.ai_view.OpenAI')

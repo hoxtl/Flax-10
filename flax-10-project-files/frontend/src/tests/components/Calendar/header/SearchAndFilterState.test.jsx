@@ -27,7 +27,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../../components/common/SearchBar/SearchBar", () => ({
+vi.mock("../../../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, onBlur, placeholder }) => (
     <input
       aria-label={placeholder}
@@ -38,9 +38,9 @@ vi.mock("../../../../components/common/SearchBar/SearchBar", () => ({
   ),
 }));
 
-import { SearchButton } from "../../../../components/Calendar/header/SearchButton";
-import { useFilterDropdownState } from "../../../../components/Calendar/header/useFilterDropdownState";
-import styles from "../../../../components/Calendar/header/CalendarHeaderUtils.module.css";
+import { SearchButton } from "../../../../components/calendar/header/SearchButton";
+import { useFilterDropdownState } from "../../../../components/calendar/header/useFilterDropdownState";
+import styles from "../../../../components/calendar/header/CalendarHeaderUtils.module.css";
 
 describe("SearchButton and filter state extras", () => {
   beforeEach(() => {

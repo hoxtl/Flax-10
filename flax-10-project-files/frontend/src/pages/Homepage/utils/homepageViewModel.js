@@ -2,7 +2,7 @@
  * Homepage view-model helpers.
  */
 
-import { isToday, overlapsDay } from "../../../components/Calendar/utils/dateUtils";
+import { isToday, overlapsDay } from "../../../components/calendar/utils/dateUtils";
 import { getAllFreeWindowsToday, getNavigatorContext, isNow, isRoutineOrEventTask } from "./index";
 
 const MEAL_TITLES = ["breakfast", "lunch", "dinner"];

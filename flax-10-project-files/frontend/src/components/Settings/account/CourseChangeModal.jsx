@@ -4,11 +4,11 @@
 
 import { useState } from "react";
 import { requestCourseChange } from "../../../api/adminApi";
-import styles from "../../../pages/Settings/Settings.module.css";
-import AnimatedDropdown from "../../common/AnimatedDropdown/AnimatedDropdown";
-import InlineAlert from "../../common/InlineAlert/InlineAlert";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-import StandardModal from "../../common/StandardModal/StandardModal";
+import styles from "../../../pages/settings/Settings.module.css";
+import AnimatedDropdown from "../../common/animated_dropdown/AnimatedDropdown";
+import InlineAlert from "../../common/inline_alert/InlineAlert";
+import PrimaryButton from "../../common/primary_button/PrimaryButton";
+import StandardModal from "../../common/standard_modal/StandardModal";
 import RequestDecisionNotice from "../ui/RequestDecisionNotice";
 import { groupedCourses } from "./accountCourseRequests";
 

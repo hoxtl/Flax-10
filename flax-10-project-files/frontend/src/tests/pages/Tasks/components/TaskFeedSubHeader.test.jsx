@@ -1,11 +1,17 @@
+/**
+ * Covers TaskFeedSubHeader mobile and desktop controls.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 vi.mock("lucide-react", () => ({
   Plus: () => <span>plus-icon</span>,
 }));
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options = [] }) => (
     <select aria-label="mobile-view-dropdown" value={value} onChange={(event) => onChange(event.target.value)}>
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
@@ -13,21 +19,53 @@ vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../../pages/Tasks/components/CreateTaskBar", () => ({
+vi.mock("../../../../pages/tasks/components/CreateTaskBar", () => ({
   default: (props) => <div data-testid="create-task-bar">{props.defaultListId}</div>,
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedToolbar", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedToolbar", () => ({
   default: (props) => <div data-testid="task-feed-toolbar">{props.search}</div>,
 }));
 
-import TaskFeedSubHeader from "../../../../pages/Tasks/components/TaskFeedSubHeader";
+import TaskFeedSubHeader from "../../../../pages/tasks/components/TaskFeedSubHeader";
+
+const dataActionNames = [
+  "setSearch",
+  "setSortBy",
+  "setIsFilterOpen",
+  "setActiveFilterTab",
+  "setFilterQuery",
+  "toggleListFilter",
+  "toggleModuleFilter",
+  "clearAllFilters",
+];
+
+function buildData(overrides = {}) {
+  return {
+    search: "abc",
+    searchInputRef: { current: null },
+    sortBy: "priority",
+    filterRef: { current: null },
+    isFilterOpen: false,
+    activeFilterCount: 0,
+    activeFilterTab: "lists",
+    filterQuery: "",
+    visibleListItems: [],
+    filterListIds: [],
+    moduleGroupKeys: [],
+    groupedVisibleModuleItems: {},
+    filterModuleCodes: [],
+    ...createFnMap(dataActionNames),
+    ...overrides,
+  };
+}
 
 function buildProps(overrides = {}) {
+  const { data, ...rest } = overrides;
   return {
     isMobile: true,
     activeFilter: "all",
@@ -39,30 +77,8 @@ function buildProps(overrides = {}) {
     onAddTask: vi.fn(),
     onCreateTask: vi.fn(),
     onOpenLists: vi.fn(),
-    data: {
-      search: "abc",
-      setSearch: vi.fn(),
-      searchInputRef: { current: null },
-      sortBy: "priority",
-      setSortBy: vi.fn(),
-      filterRef: { current: null },
-      isFilterOpen: false,
-      setIsFilterOpen: vi.fn(),
-      activeFilterCount: 0,
-      activeFilterTab: "lists",
-      setActiveFilterTab: vi.fn(),
-      filterQuery: "",
-      setFilterQuery: vi.fn(),
-      visibleListItems: [],
-      filterListIds: [],
-      toggleListFilter: vi.fn(),
-      moduleGroupKeys: [],
-      groupedVisibleModuleItems: {},
-      filterModuleCodes: [],
-      toggleModuleFilter: vi.fn(),
-      clearAllFilters: vi.fn(),
-    },
-    ...overrides,
+    data: buildData(data),
+    ...rest,
   };
 }
 

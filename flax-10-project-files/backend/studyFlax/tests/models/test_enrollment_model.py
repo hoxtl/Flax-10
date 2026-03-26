@@ -10,8 +10,9 @@ from studyFlax.models.auth.user_model import User
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.modules.enrollment_model import Enrollment
 
+
 class EnrollmentModelTests(TestCase):
-    """ Test suite for Enrollment model."""
+    """Test suite for Enrollment model."""
 
     def setUp(self):
         self.teacher = User.objects.create_user(

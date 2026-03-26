@@ -831,7 +831,7 @@ SECTION_META = {
     "DRY"               : ("7",  "Frontend — DRY",                        "duplicate normalised blocks across source files"),
     "Dead Code"         : ("8",  "Dead Code",                             "console.log, commented-out blocks, unused imports"),
     "Unused Files"      : ("9",  "Unused Files",                          "files never imported and not a convention entry point"),
-    "Formatting"        : ("10", "Docstring Spacing",                     "exactly one blank line required after every docstring"),
+    "Formatting"        : ("10", "Docstring Spacing",                     "module/class docstrings need 1 blank line; functions need none"),
     "Comments"          : ("11", "Frontend — Comment Quality",            "banners, American spelling, emojis, arrow text"),
 }
 
@@ -1135,8 +1135,8 @@ def find_unused_js_files(root: Path) -> list[Issue]:
 
 def check_py_docstring_spacing(root: Path) -> list[Issue]:
     """
-    Every module/function/class docstring must be followed by exactly one blank
-    line before the next code statement.
+    Module and class docstrings must be followed by one blank line before the
+    next statement. Function docstrings must be followed by no blank lines.
     """
     issues = []
     for path in iter_py(root):
@@ -1174,19 +1174,34 @@ def check_py_docstring_spacing(root: Path) -> list[Issue]:
                 if lines[li].strip() == "":
                     blank_count += 1
 
-            if blank_count == 0:
+            expects_blank = isinstance(node, (ast.Module, ast.ClassDef))
+            unit_name = getattr(node, "name", "<module>")
+            unit_type = "function"
+            if isinstance(node, ast.Module):
+                unit_type = "module"
+            elif isinstance(node, ast.ClassDef):
+                unit_type = "class"
+
+            if expects_blank and blank_count == 0:
                 issues.append(Issue(
                     "Formatting", "DOCSTRING_NO_BLANK", "WARN",
                     fstr, doc_end + 1,
-                    f"No blank line after docstring in `{getattr(node, 'name', '<module>')}`",
+                    f"No blank line after docstring in `{unit_name}`",
                     "Add one blank line after the closing triple-quote.",
                 ))
-            elif blank_count > 1:
+            elif expects_blank and blank_count > 1:
                 issues.append(Issue(
                     "Formatting", "DOCSTRING_EXTRA_BLANK", "WARN",
                     fstr, doc_end + 1,
-                    f"{blank_count} blank lines after docstring in `{getattr(node, 'name', '<module>')}` (expected 1)",
+                    f"{blank_count} blank lines after docstring in `{unit_name}` (expected 1)",
                     "Remove extra blank lines — keep exactly one.",
+                ))
+            elif not expects_blank and blank_count > 0:
+                issues.append(Issue(
+                    "Formatting", "DOCSTRING_FUNC_BLANK", "WARN",
+                    fstr, doc_end + 1,
+                    f"{blank_count} blank lines after {unit_type} docstring in `{unit_name}` (expected 0)",
+                    "Remove the blank line after the closing triple-quote.",
                 ))
     return issues
 

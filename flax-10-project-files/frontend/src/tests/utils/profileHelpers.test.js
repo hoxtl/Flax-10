@@ -8,13 +8,13 @@ import {
     getRangeLabel,
     buildInitials,
     buildFullName,
-} from '../../pages/Profile/utils/profileHelpers';
+} from '../../pages/profile/utils/profileHelpers';
 
-vi.mock('../../components/Authentication/utils/userUtils', () => ({
+vi.mock('../../components/auth/utils/userUtils', () => ({
     getInitials: vi.fn((name) => name.split(' ').map(p => p[0]).join('')),
 }));
 
-import { getInitials } from '../../components/Authentication/utils/userUtils';
+import { getInitials } from '../../components/auth/utils/userUtils';
 
 const today = new Date('2026-03-08T00:00:00');
 const todayStr = '2026-03-08';

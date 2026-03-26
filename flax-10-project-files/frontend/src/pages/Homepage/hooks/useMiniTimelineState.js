@@ -1,8 +1,8 @@
 /* UI state for the homepage mini timeline. */
 
 import { useCallback, useRef, useState } from "react";
-import { usePopoverDismiss } from "./miniTimeline/usePopoverDismiss";
-import { useSleepWindow } from "./miniTimeline/useSleepWindow";
+import { usePopoverDismiss } from "./mini_timeline/usePopoverDismiss";
+import { useSleepWindow } from "./mini_timeline/useSleepWindow";
 
 function useRowPopoverState() {
   const [rowId, setRowId] = useState(null);

@@ -2,9 +2,9 @@
  * Focus tree animation with selectable visual mode.
  */
 
-import styles from '../../pages/Timer/TimerPage.module.css';
-import { TreeScene } from './focusAnimation/TreeScene';
-import { useFocusCanvasAnimation } from './focusAnimation/useFocusCanvasAnimation';
+import styles from '../../pages/timer/TimerPage.module.css';
+import { TreeScene } from './focus_animation/TreeScene';
+import { useFocusCanvasAnimation } from './focus_animation/useFocusCanvasAnimation';
 
 const ANIMATION_TYPES = [
   { key: 'tree', title: 'Tree' },

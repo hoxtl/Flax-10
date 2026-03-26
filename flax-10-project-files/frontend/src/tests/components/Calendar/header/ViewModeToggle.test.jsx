@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { ViewSwitcher } from "../../../../components/Calendar/header/CalendarHeaderUtils";
+import { ViewSwitcher } from "../../../../components/calendar/header/calendarHeaderUtils";
 
 vi.mock(
-  "../../../../components/common/SegmentedControl/SegmentedControl",
+  "../../../../components/common/segmented_control/SegmentedControl",
   () => ({
     SegmentedControl: function MockSegmentedControl({
       value,

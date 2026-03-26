@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.db import OperationalError
 from django.test import TestCase
 
+
 User = get_user_model()
 
 
@@ -18,7 +19,7 @@ def _make_user():
 
 
 class SafeCreateEnrollmentEventsTest(TestCase):
-
+    """Tests safe create enrollment events."""
     def setUp(self):
         self.user = _make_user()
         self.module = MagicMock()
@@ -39,7 +40,7 @@ class SafeCreateEnrollmentEventsTest(TestCase):
 
 
 class LogEnrollmentCreationErrorTest(TestCase):
-
+    """Tests log enrollment creation error."""
     def setUp(self):
         self.user = _make_user()
         self.module = MagicMock()

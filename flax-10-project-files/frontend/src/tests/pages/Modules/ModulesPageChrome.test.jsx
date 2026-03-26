@@ -1,6 +1,12 @@
+/**
+ * Covers ModulesPageChrome view switching and modal wiring.
+ */
+
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -9,11 +15,11 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../components/common/LoadingState/SkeletonBlock", () => ({
+vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: (props) => <div data-testid="skeleton-block" {...props} />,
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleForm.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleForm.jsx", () => ({
   default: ({ onSuccess, onCancel, module }) => (
     <div>
       <div>{module ? "Editing module" : "New module"}</div>
@@ -23,7 +29,7 @@ vi.mock("../../../components/Modules/Modules/ModuleForm.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleDetails.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleDetails.jsx", () => ({
   default: ({ module, onBack, onEnroll, onUnenroll }) => (
     <div>
       <div>{module.module_code}</div>
@@ -34,7 +40,7 @@ vi.mock("../../../components/Modules/Modules/ModuleDetails.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Deadlines/DeadlineModal.jsx", () => ({
+vi.mock("../../../components/modules/deadlines/DeadlineModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Deadline ${module.module_code}`}</div>
@@ -43,7 +49,7 @@ vi.mock("../../../components/Modules/Deadlines/DeadlineModal.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Readings/ReadingModal.jsx", () => ({
+vi.mock("../../../components/modules/readings/ReadingModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Reading ${module.module_code}`}</div>
@@ -60,30 +66,25 @@ import {
   ModulesPageModals,
   ModulesSkeleton,
   TestModeContent,
-} from "../../../pages/Modules/ModulesPageChrome";
+} from "../../../pages/modules/ModulesPageChrome";
+
+const buildHookState = (overrides = {}) => ({
+  enrollments: [],
+  ...createFnMap(["handleModuleCreated", "handleModuleUpdated", "handleEnrollment", "handleDisenrol"]),
+  ...overrides,
+});
 
 function buildState(overrides = {}) {
+  const { hook, ...rest } = overrides;
   return {
-    hook: {
-      handleModuleCreated: vi.fn(),
-      handleModuleUpdated: vi.fn(),
-      handleEnrollment: vi.fn(),
-      handleDisenrol: vi.fn(),
-      enrollments: [],
-      ...overrides.hook,
-    },
+    hook: buildHookState(hook),
     editingModule: null,
     viewingModule: { id: 1, module_code: "CS101", module_name: "Intro" },
     showForm: false,
-    setShowForm: vi.fn(),
-    setEditingModule: vi.fn(),
-    setViewingModule: vi.fn(),
-    setSearchQuery: vi.fn(),
     deadlineModule: null,
-    setDeadlineModule: vi.fn(),
     readingModule: null,
-    setReadingModule: vi.fn(),
-    ...overrides,
+    ...createFnMap(["setShowForm", "setEditingModule", "setViewingModule", "setSearchQuery", "setDeadlineModule", "setReadingModule"]),
+    ...rest,
   };
 }
 

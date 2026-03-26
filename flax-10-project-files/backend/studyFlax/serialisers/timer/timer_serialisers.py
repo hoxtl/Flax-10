@@ -5,8 +5,11 @@ Serialiser for study session timer records.
 from rest_framework import serializers
 from studyFlax.models.timer.session_model import StudySession
 
+
 class StudySessionSerializer(serializers.ModelSerializer):
+    """Serialiser for study session."""
     class Meta:
+        """Metadata for study session serialiser."""
         model = StudySession
         fields = [
             'id', 'start_time', 'end_time', 'duration',
@@ -16,7 +19,6 @@ class StudySessionSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'user']
 
     def create(self, validated_data):
-        # Automatically associate with the current user
         request = self.context.get('request')
         validated_data['user'] = request.user
         return super().create(validated_data)

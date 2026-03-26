@@ -3,11 +3,11 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 const useAttendanceWidgetDataMock = vi.fn();
 
-vi.mock("../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
+vi.mock("../../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
   useAttendanceWidgetData: (...args) => useAttendanceWidgetDataMock(...args),
 }));
 
-vi.mock("../../../../pages/Profile/components/widgets/ProfileWidget", () => ({
+vi.mock("../../../../pages/profile/components/widgets/ProfileWidget", () => ({
   default: ({ title, subtitle, children }) => (
     <div>
       <div>{title}</div>
@@ -17,11 +17,11 @@ vi.mock("../../../../pages/Profile/components/widgets/ProfileWidget", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Profile/components/widgets/attendance/AttendanceCharts", () => ({
+vi.mock("../../../../pages/profile/components/widgets/attendance/AttendanceCharts", () => ({
   default: ({ onSegmentClick }) => <button onClick={() => onSegmentClick("overall", undefined)}>chart</button>,
 }));
 
-vi.mock("../../../../pages/Profile/components/widgets/attendance/AttendanceShared", () => ({
+vi.mock("../../../../pages/profile/components/widgets/attendance/AttendanceShared", () => ({
   AttendanceWarningBadge: ({ attendancePct }) => <div>Low Attendance ({attendancePct}%)</div>,
   CompactAttHeader: () => null,
   CompactByTypeDonut: () => null,
@@ -29,7 +29,7 @@ vi.mock("../../../../pages/Profile/components/widgets/attendance/AttendanceShare
   SegmentDetailPanelWrapper: ({ selectedSegment }) => <div data-testid="segment-detail">{selectedSegment?.label ?? "none"}</div>,
 }));
 
-import { AttendanceWidget } from "../../../../pages/Profile/components/widgets/AttendanceWidgets";
+import { AttendanceWidget } from "../../../../pages/profile/components/widgets/AttendanceWidgets";
 
 describe("AttendanceWidget coverage", () => {
   beforeEach(() => {

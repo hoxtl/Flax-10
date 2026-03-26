@@ -23,6 +23,7 @@ from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.models.timer.theme_session_model import ThemeSession
 from studyFlax.admin import ReportedSociety, ReportedSocietyAdmin
 
+
 User = get_user_model()
 
 class ModelStringTests(TestCase):
@@ -31,11 +32,11 @@ class ModelStringTests(TestCase):
     def test_tag_str(self):
         tag = Tag(name="Study")
         self.assertEqual(str(tag), "Study")
-        
+
     def test_category_str(self):
         category = Category(name="Work")
         self.assertEqual(str(category), "Work")
-        
+
     def test_recurrence_rule_str(self):
         rule = RecurrenceRule(frequency="daily", interval=2)
         self.assertEqual(str(rule), "daily every 2")
@@ -181,7 +182,7 @@ class ReportedSocietyAdminTest(TestCase):
 
 
 class ScheduleModelStringTests(TestCase):
-
+    """Tests schedule model string."""
     def setUp(self):
         from studyFlax.models.calendar.schedule_model import Schedule, ScheduleEventAllocation
         from studyFlax.models.calendar.calendar_event_model import CalendarEvent

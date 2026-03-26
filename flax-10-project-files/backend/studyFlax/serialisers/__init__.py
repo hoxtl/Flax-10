@@ -20,6 +20,7 @@ from .schedule_serialiser import (
     ScheduleEventAllocationSerialiser,
 )
 
+
 _ = (
     CalendarEventSerialiser,
     CalendarEventCreateSerialiser,

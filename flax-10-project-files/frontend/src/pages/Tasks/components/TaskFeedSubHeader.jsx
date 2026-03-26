@@ -4,12 +4,12 @@
 
 import { Plus } from "lucide-react";
 
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import AnimatedDropdown from "../../../components/common/animated_dropdown";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 
 import CreateTaskBar from "./CreateTaskBar";
 import TaskFeedToolbar from "./TaskFeedToolbar";
-import { MOBILE_VIEW_OPTIONS } from "./TaskFeedConstants";
+import { MOBILE_VIEW_OPTIONS } from "./taskFeedConstants";
 
 import styles from "./TaskFeedLayout.module.css";
 

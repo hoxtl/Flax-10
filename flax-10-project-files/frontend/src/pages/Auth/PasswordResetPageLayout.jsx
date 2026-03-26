@@ -3,8 +3,8 @@
  */
 
 import styles from "./PasswordReset.module.css";
-import AuthHeroGeometric from "../../components/Authentication/AuthHeroGeometric";
-import { AuthBrand, AuthFooter } from "../../components/Authentication/AuthBranding";
+import AuthHeroGeometric from "../../components/auth/AuthHeroGeometric";
+import { AuthBrand, AuthFooter } from "../../components/auth/AuthBranding";
 import { PageTransition } from "../../components/common";
 
 export default function PasswordResetPageLayout({ children }) {

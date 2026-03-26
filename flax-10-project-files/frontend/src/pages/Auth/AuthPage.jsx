@@ -6,8 +6,8 @@ import styles from "./AuthPage.module.css";
 import { useAuthPage } from "./hooks/useAuthPage";
 import { useAuthPageScroll } from "./hooks/useAuthPageScroll";
 import { useAuthLandingSections } from "./hooks/useAuthLandingSections";
-import { AuthFooter } from "../../components/Authentication/AuthBranding";
-import StudyFlaxLandingPage from "../../components/ui/landing-page";
+import { AuthFooter } from "../../components/auth/AuthBranding";
+import StudyFlaxLandingPage from "../../components/ui/LandingPage";
 import { PageTransition } from "../../components/common";
 
 export default function AuthPage({ initialSignIn = true }) {

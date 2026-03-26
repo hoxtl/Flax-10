@@ -8,10 +8,10 @@ import {
     getVisibleEventsInView,
     sortByStartTime,
     isAllDay,
-} from '../../../../components/Calendar/utils/eventUtils';
+} from '../../../../components/calendar/utils/eventUtils';
 
 // Mock dateUtils.overlapsDay for day view tests
-vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
     overlapsDay: vi.fn((start, end, day) => {
         const dayStart = new Date(day);
         dayStart.setHours(0, 0, 0, 0);

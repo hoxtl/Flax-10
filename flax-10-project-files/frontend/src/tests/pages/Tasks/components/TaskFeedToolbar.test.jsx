@@ -1,41 +1,50 @@
 /* Tests for TaskFeedToolbar component sort and filter controls */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import TaskFeedToolbar from "../../../../pages/Tasks/components/TaskFeedToolbar";
+import TaskFeedToolbar from "../../../../pages/tasks/components/TaskFeedToolbar";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
-vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ onChange, value }) => (
     <button data-testid="sort" onClick={() => onChange(value === "priority" ? "due" : "priority")}>sort</button>
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFilterPanel", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFilterPanel", () => ({
   default: () => <div data-testid="task-filter-panel" />,
 }));
 
+const toolbarActionNames = [
+  "onSearchChange",
+  "onSortChange",
+  "onFilterOpenChange",
+  "onFilterTabChange",
+  "onFilterQueryChange",
+  "onToggleList",
+  "onToggleModule",
+  "onClearAllFilters",
+];
+
+const baseToolbarProps = {
+  search: "",
+  searchInputRef: { current: null },
+  sortBy: "priority",
+  filterRef: { current: null },
+  isFilterOpen: false,
+  activeFilterCount: 0,
+  activeFilterTab: "lists",
+  filterQuery: "",
+  visibleListItems: [],
+  filterListIds: [],
+  moduleGroupKeys: [],
+  groupedVisibleModuleItems: {},
+  filterModuleCodes: [],
+};
+
 function props(overrides = {}) {
   return {
-    search: "",
-    onSearchChange: vi.fn(),
-    searchInputRef: { current: null },
-    sortBy: "priority",
-    onSortChange: vi.fn(),
-    filterRef: { current: null },
-    isFilterOpen: false,
-    onFilterOpenChange: vi.fn(),
-    activeFilterCount: 0,
-    activeFilterTab: "lists",
-    onFilterTabChange: vi.fn(),
-    filterQuery: "",
-    onFilterQueryChange: vi.fn(),
-    visibleListItems: [],
-    filterListIds: [],
-    onToggleList: vi.fn(),
-    moduleGroupKeys: [],
-    groupedVisibleModuleItems: {},
-    filterModuleCodes: [],
-    onToggleModule: vi.fn(),
-    onClearAllFilters: vi.fn(),
+    ...baseToolbarProps,
+    ...createFnMap(toolbarActionNames),
     ...overrides,
   };
 }

@@ -3,8 +3,8 @@
  */
 
 import styles from "./Discover.module.css";
-import ErrorBoundary from "../../components/common/ErrorBoundary/ErrorBoundary";
-import AppPage from "../../components/common/AppPage/AppPage";
+import ErrorBoundary from "../../components/common/error_boundary/ErrorBoundary";
+import AppPage from "../../components/common/app_page/AppPage";
 import { DiscoverSkeleton, DiscoverToolbar, UsersGrid } from "./DiscoverComponents";
 import { useDiscoverSearch } from "./discoverHooks";
 

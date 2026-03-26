@@ -4,7 +4,7 @@
  */
 
 import { isSameDay, getStartOfWeek, addDays } from "../utils/dateUtils";
-import "../CalendarHeader.css";
+import "../calendar-header.css";
 
 function DateCard({ day, isActive, onClick }) {
   const dayName = day.toLocaleDateString("en-US", { weekday: "short" }).charAt(0);

@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const useNavigateMock = vi.fn();
@@ -40,7 +40,7 @@ vi.mock("../../../../context/CalendarContext", () => ({
   useEventPopup: () => useEventPopupMock(),
 }));
 
-vi.mock("../../../../components/Calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../../components/calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => useCalendarEventsMock(),
   useEventActions: () => useEventActionsMock(),
 }));
@@ -61,46 +61,46 @@ vi.mock("../../../../context/TimerContext", () => ({
   useTimerContext: () => useTimerContextMock(),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomeData", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomeData", () => ({
   useHomeData: (...args) => useHomeDataMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepageActions", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepageActions", () => ({
   useHomepageActions: (...args) => useHomepageActionsMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepageDisplayName", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepageDisplayName", () => ({
   useHomepageDisplayName: () => useHomepageDisplayNameMock(),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepageModals", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepageModals", () => ({
   useHomepageModals: (...args) => useHomepageModalsMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepageReschedule", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepageReschedule", () => ({
   useHomepageReschedule: (...args) => useHomepageRescheduleMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepageResources", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepageResources", () => ({
   useHomepageResources: () => useHomepageResourcesMock(),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepageToast", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepageToast", () => ({
   useHomepageToast: (...args) => useHomepageToastMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepageViewModel", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepageViewModel", () => ({
   useHomepageViewModel: (...args) => useHomepageViewModelMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useHomepagePageEffects", () => ({
+vi.mock("../../../../pages/homepage/hooks/useHomepagePageEffects", () => ({
   useHomepageEventBootstrap: (...args) => useHomepageEventBootstrapMock(...args),
   useHomepageNow: () => useHomepageNowMock(),
   useHomepageSelection: (...args) => useHomepageSelectionMock(...args),
   useTimerCompletionSound: (...args) => useTimerCompletionSoundMock(...args),
 }));
 
-import { useHomepageController } from "../../../../pages/Homepage/hooks/useHomepageController.js";
+import { useHomepageController } from "../../../../pages/homepage/hooks/useHomepageController.js";
 
 describe("useHomepageController", () => {
   beforeEach(() => {
@@ -198,5 +198,23 @@ describe("useHomepageController", () => {
       taskLists: [{ id: 3 }], upcomingDeadlines: [{ id: 4 }], breakTime: 5, hasTimerSession: true,
       timerMode: "work", timerTask: "Essay", workTime: 25,
     }));
+  });
+
+  it("falls back to calendar events when allEvents is empty and allows completed-event updates", () => {
+    useCalendarMock.mockReturnValue({
+      selectedDate: new Date("2026-03-25T00:00:00Z"),
+      events: [{ id: "fallback-event" }],
+      allEvents: [],
+    });
+
+    const { result } = renderHook(() => useHomepageController(true, { id: "read-1" }));
+
+    expect(result.current.calendarEvents).toEqual([{ id: "fallback-event" }]);
+
+    act(() => {
+      result.current.setCompletedEventIds(new Set(["event-1"]));
+    });
+
+    expect(result.current.completedEventIds.has("event-1")).toBe(true);
   });
 });

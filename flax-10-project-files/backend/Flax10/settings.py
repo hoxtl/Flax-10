@@ -1,9 +1,16 @@
+"""
+Django settings for the backend project.
+"""
+
 from pathlib import Path
 import os
+
+
 try:
     from dotenv import load_dotenv
 except ImportError:
     def load_dotenv(*_args, **_kwargs):
+        """Return False when python-dotenv is unavailable."""
         return False
 
 load_dotenv()

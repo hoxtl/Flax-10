@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useProfileSummary } from '../../pages/Profile/hooks/useProfileSummary';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { useProfileSummary } from '../../pages/profile/hooks/useProfileSummary';
 
 vi.mock('../../api/client', () => ({
     fetchApi: vi.fn(),
@@ -75,5 +75,48 @@ describe('useProfileSummary', () => {
         });
 
         expect(result.current.summary).toEqual({ total_sessions: 20, total_hours: 40 });
+    });
+
+    it('refetch preserves the previous summary and records an error when it fails', async () => {
+        fetchApi.mockResolvedValueOnce({ total_sessions: 10, total_hours: 20 });
+        const { result } = renderHook(() => useProfileSummary());
+        await act(async () => {});
+        expect(result.current.summary).toEqual({ total_sessions: 10, total_hours: 20 });
+
+        const err = new Error('Refetch failed');
+        fetchApi.mockRejectedValueOnce(err);
+
+        await act(async () => {
+            await result.current.refetch();
+        });
+
+        expect(result.current.summary).toEqual({ total_sessions: 10, total_hours: 20 });
+        expect(result.current.error).toBe(err);
+        expect(result.current.loading).toBe(false);
+    });
+
+    it('refetch shows loading again while summary is still null', async () => {
+        fetchApi.mockRejectedValueOnce(new Error('Initial load failed'));
+        const { result } = renderHook(() => useProfileSummary());
+        await act(async () => {});
+        expect(result.current.summary).toBeNull();
+
+        let resolveRefetch;
+        fetchApi.mockImplementationOnce(
+            () => new Promise((resolve) => { resolveRefetch = resolve; })
+        );
+
+        act(() => {
+            result.current.refetch();
+        });
+
+        expect(result.current.loading).toBe(true);
+
+        await act(async () => {
+            resolveRefetch({ total_sessions: 30, total_hours: 60 });
+        });
+
+        expect(result.current.summary).toEqual({ total_sessions: 30, total_hours: 60 });
+        await waitFor(() => expect(result.current.loading).toBe(false));
     });
 });

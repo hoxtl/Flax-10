@@ -2,7 +2,7 @@
  * Attendance prompt event helpers.
  */
 
-import { isTimetableEvent } from "../../pages/Attendance/utils/attendanceTimetable";
+import { isTimetableEvent } from "../../pages/attendance/utils/attendanceTimetable";
 
 const PROMPT_WINDOW_START_MIN = 15;
 const PAST_PROMPT_WINDOW_MS = 48 * 60 * 60 * 1000; // 48 hours

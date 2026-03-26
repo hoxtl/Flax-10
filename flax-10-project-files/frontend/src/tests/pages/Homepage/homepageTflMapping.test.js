@@ -6,7 +6,7 @@ import {
   getTflLinePillStyle,
   getTflLinesForLocation,
   isSevereDisruption,
-} from "../../../pages/Homepage/utils/kclTflMapping";
+} from "../../../pages/homepage/utils/kclTflMapping";
 
 describe("homepageTflMapping", () => {
   it("determines TfL line arrays reliably from standard KCL buildings", () => {

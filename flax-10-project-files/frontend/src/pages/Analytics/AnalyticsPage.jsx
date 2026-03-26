@@ -2,15 +2,19 @@
  * Analytics page shell.
  */
 
-import AppPage from '../../components/common/AppPage/AppPage';
+import AppPage from '../../components/common/app_page/AppPage';
 import { SegmentedControl, Tabs } from '../../components/common';
 import Breadcrumb from '../../components/common/Breadcrumb/Breadcrumb.jsx';
 import { useAuth } from '../../context/AuthContext';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import getAnalyticsTabs from './components/AnalyticsPageTabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
+<<<<<<< HEAD
 import EmptyState from '../../components/common/EmptyState/EmptyState';
 import { BackToTop } from '../../components/Pagination/Pagination';
+=======
+import { BackToTop } from '../../components/pagination/Pagination';
+>>>>>>> origin/main
 import { PERIODS } from './pageConfig';
 import { useAnalyticsPageState } from './pageState';
 import styles from './AnalyticsPage.module.css';

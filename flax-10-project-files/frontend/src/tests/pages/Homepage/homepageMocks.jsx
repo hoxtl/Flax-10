@@ -1,4 +1,6 @@
-// Shared mock components for Homepage tests
+/**
+ * Shared mock components for Homepage tests.
+ */
 
 export const IntelligenceRowMock = ({ displayName, slot1TodayTasks, slot3Urgent, slot6Timeline }) => (
   <div data-testid="intelligence-row">
@@ -52,38 +54,33 @@ export const MiniTimelineMock = ({ sortedEvents, onQuickStart, onTaskToggle, onC
   </div>
 );
 
-export const HomepageTimelineSectionMock = ({
-  sortedEvents,
-  handleQuickStartGap,
-  handleTaskToggle,
-  openTimelinePopup,
-  openModal,
-  handleConflictAutoMove,
-  handleConflictPushTomorrow,
-  handleTimelineDelete,
-  handleReschedule,
-  setCompletedEventIds,
-}) => (
+function toggleCompletedEvent(setCompletedEventIds, eventId) {
+  setCompletedEventIds?.((prev) => {
+    const next = new Set(prev);
+    if (next.has(eventId)) next.delete(eventId);
+    else next.add(eventId);
+    return next;
+  });
+}
+
+function buildHomepageTimelineProps(props) {
+  return {
+    sortedEvents: props.sortedEvents,
+    onQuickStart: props.handleQuickStartGap,
+    onTaskToggle: props.handleTaskToggle,
+    onCardClick: props.openTimelinePopup,
+    onEdit: (event) => props.openModal?.(event, event?.tag),
+    onConflictAutoMove: props.handleConflictAutoMove,
+    onPushTomorrow: props.handleConflictPushTomorrow,
+    onDelete: props.handleTimelineDelete,
+    onReschedule: props.handleReschedule,
+    onToggleComplete: (eventId) => toggleCompletedEvent(props.setCompletedEventIds, eventId),
+  };
+}
+
+export const HomepageTimelineSectionMock = (props) => (
   <div data-testid="homepage-timeline-section">
-    <MiniTimelineMock
-      sortedEvents={sortedEvents}
-      onQuickStart={handleQuickStartGap}
-      onTaskToggle={handleTaskToggle}
-      onCardClick={openTimelinePopup}
-      onEdit={(event) => openModal?.(event, event?.tag)}
-      onConflictAutoMove={handleConflictAutoMove}
-      onPushTomorrow={handleConflictPushTomorrow}
-      onDelete={handleTimelineDelete}
-      onReschedule={handleReschedule}
-      onToggleComplete={(eventId) => {
-        setCompletedEventIds?.((prev) => {
-          const next = new Set(prev);
-          if (next.has(eventId)) next.delete(eventId);
-          else next.add(eventId);
-          return next;
-        });
-      }}
-    />
+    <MiniTimelineMock {...buildHomepageTimelineProps(props)} />
   </div>
 );
 

@@ -18,12 +18,57 @@ function appendFocusableElements() {
   input.focus = focus;
   document.body.appendChild(input);
 
+<<<<<<< HEAD
   const textarea = document.createElement("textarea");
   textarea.blur = blur;
   document.body.appendChild(textarea);
 
   return { focus, blur, input, textarea };
 }
+=======
+vi.mock("../../../../api/moduleApi", () => ({
+  getModules: (...args) => getModulesMock(...args),
+}));
+
+vi.mock("../../../../components/timer/task_input/taskInputUtils", () => ({
+  buildListItems: (lists = []) => lists.map((list) => ({ value: list.id, label: list.name })),
+  filterListItems: (items) => items,
+  groupModuleItems: (items) => ({ All: items }),
+}));
+
+vi.mock("../../../../lib/allTasksCompleteMessages", () => ({
+  getClearMessage: () => "Great job",
+}));
+
+vi.mock("../../../../pages/tasks/utils/taskFeedUtils", () => ({
+  getHeaderTitle: () => "Header",
+}));
+
+vi.mock("../../../../pages/tasks/utils/taskFeedDataUtils", () => ({
+  buildDateBounds: vi.fn(() => ({
+    now: new Date("2026-03-08T10:00:00Z"),
+    dayStart: new Date("2026-03-08T00:00:00Z"),
+    todayEnd: new Date("2026-03-08T23:59:59Z"),
+    weekEnd: new Date("2026-03-15T23:59:59Z"),
+  })),
+  filterBySearch: vi.fn((arr) => arr),
+  getOverdue: vi.fn(() => [{ id: 1 }]),
+  getToday: vi.fn(() => [{ id: 2 }]),
+  getThisWeek: vi.fn(() => [{ id: 3 }]),
+  getLater: vi.fn(() => [{ id: 4 }]),
+  getCompletedTodayCount: vi.fn(() => 1),
+  getCompletedWeekCount: vi.fn(() => 2),
+  getCompletedLaterCount: vi.fn(() => 3),
+  getFilterHandlers: vi.fn(() => ({
+    toggleListFilter: vi.fn(),
+    toggleModuleFilter: vi.fn(),
+    clearAllFilters: vi.fn(),
+  })),
+}));
+
+import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
+import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
+>>>>>>> origin/main
 
 describe("useTaskFeedData", () => {
   beforeEach(() => {

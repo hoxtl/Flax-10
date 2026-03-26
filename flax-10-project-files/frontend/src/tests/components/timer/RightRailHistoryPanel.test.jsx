@@ -4,12 +4,12 @@ import { fireEvent, render, screen } from "@testing-library/react";
 const useRightRailHistoryMock = vi.fn();
 const clearRightRailHistoryMock = vi.fn();
 
-vi.mock("../../../components/Timer/historyPanel/useRightRailHistory", () => ({
+vi.mock("../../../components/timer/history_panel/useRightRailHistory", () => ({
   useRightRailHistory: () => useRightRailHistoryMock(),
   clearRightRailHistory: (...args) => clearRightRailHistoryMock(...args),
 }));
 
-vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
+vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick }) => (
     <button type="button" onClick={onClick}>
       {children}
@@ -17,7 +17,7 @@ vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/HoldConfirmModal/HoldConfirmModal", () => ({
+vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal", () => ({
   default: ({ title, warningText, cancelLabel, holdLabel, onConfirm, onCancel }) => (
     <div data-testid="clear-history-modal">
       <div>{title}</div>
@@ -32,17 +32,17 @@ vi.mock("../../../components/common/HoldConfirmModal/HoldConfirmModal", () => ({
   ),
 }));
 
-vi.mock("../../../components/Timer/historyPanel/HistoryRailSection", () => ({
+vi.mock("../../../components/timer/history_panel/HistoryRailSection", () => ({
   HistoryRailSection: ({ group }) => <div>{group.label}:{group.items.length}</div>,
 }));
 
-vi.mock("../../../components/Timer/historyPanel/WeeklyChart", () => ({
+vi.mock("../../../components/timer/history_panel/WeeklyChart", () => ({
   WeeklyChart: ({ weeklySeries, maxWeeklySeconds }) => (
     <div>{`Weekly chart ${weeklySeries.length}:${maxWeeklySeconds}`}</div>
   ),
 }));
 
-import RightRailHistoryPanel from "../../../components/Timer/RightRailHistoryPanel";
+import RightRailHistoryPanel from "../../../components/timer/RightRailHistoryPanel";
 
 describe("RightRailHistoryPanel", () => {
   beforeEach(() => {

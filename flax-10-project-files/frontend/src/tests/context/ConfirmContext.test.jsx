@@ -1,43 +1,26 @@
+/**
+ * Covers ConfirmContext promise resolution branches.
+ */
+
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ConfirmProvider, useConfirm } from '../../context/ConfirmContext';
 
+const setBodyResult = (key, value) => document.body.setAttribute(key, String(value));
+
+const openConfirm = (confirm, key, options) => async () => setBodyResult(key, await confirm(options));
+
+function buildConsumerActions(confirm) {
+  return [
+    { label: 'open-default', onClick: openConfirm(confirm, 'data-result-default', { title: 'Confirm?', message: 'Default path' }) },
+    { label: 'open-custom', onClick: openConfirm(confirm, 'data-result-custom', { title: 'Custom?', message: 'Custom path', confirmValue: 'YES', alternateValue: 'MAYBE', cancelValue: 'NO', alternateText: 'Alternate' }) },
+    { label: 'open-alt-default', onClick: openConfirm(confirm, 'data-result-alt-default', { title: 'Alternate default?', message: 'Alternate path', alternateText: 'Alternate' }) },
+  ];
+}
+
 function Consumer() {
   const confirm = useConfirm();
-
-  const openDefault = async () => {
-    const value = await confirm({ title: 'Confirm?', message: 'Default path' });
-    document.body.setAttribute('data-result-default', String(value));
-  };
-
-  const openCustom = async () => {
-    const value = await confirm({
-      title: 'Custom?',
-      message: 'Custom path',
-      confirmValue: 'YES',
-      alternateValue: 'MAYBE',
-      cancelValue: 'NO',
-      alternateText: 'Alternate',
-    });
-    document.body.setAttribute('data-result-custom', String(value));
-  };
-
-  const openAlternateDefault = async () => {
-    const value = await confirm({
-      title: 'Alternate default?',
-      message: 'Alternate path',
-      alternateText: 'Alternate',
-    });
-    document.body.setAttribute('data-result-alt-default', String(value));
-  };
-
-  return (
-    <>
-      <button onClick={openDefault}>open-default</button>
-      <button onClick={openCustom}>open-custom</button>
-      <button onClick={openAlternateDefault}>open-alt-default</button>
-    </>
-  );
+  return buildConsumerActions(confirm).map(({ label, onClick }) => <button key={label} onClick={onClick}>{label}</button>);
 }
 
 describe('ConfirmContext', () => {

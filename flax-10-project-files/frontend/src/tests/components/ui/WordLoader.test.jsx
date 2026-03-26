@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { renderHook } from "@testing-library/react";
 
-import { WordLoaderCharacters } from "../../../components/ui/word-loader/WordLoaderCharacters";
-import { useWordLoader } from "../../../components/ui/word-loader/useWordLoader";
+import { WordLoaderCharacters } from "../../../components/ui/word_loader/WordLoaderCharacters";
+import { useWordLoader } from "../../../components/ui/word_loader/useWordLoader";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,

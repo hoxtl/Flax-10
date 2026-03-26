@@ -21,7 +21,6 @@ def build_module_tutor_photo_url(photo, request):
         return photo_path
     return absolute_photo_url(photo_path, request)
 
-
 def cleaned_photo_path(photo):
     if not photo:
         return None
@@ -30,12 +29,12 @@ def cleaned_photo_path(photo):
     photo_path = str(photo).strip()
     return photo_path or None
 
-
 def absolute_photo_url(photo_path, request):
     relative_url = photo_path if photo_path.startswith("/") else f"{settings.MEDIA_URL.rstrip('/')}/{photo_path.lstrip('/')}"
     return request.build_absolute_uri(relative_url) if request else relative_url
 
 class GroupProjectSerialiser(serializers.ModelSerializer):
+    """Serialiser for group project."""
     course_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     member_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True, default=0)
@@ -49,6 +48,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
     members = serializers.SerializerMethodField()
 
     class Meta:
+        """Metadata for group project serialiser."""
         model = GroupProject
         fields = [
             "id",
@@ -84,12 +84,14 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
 
 
 class GroupMembershipSerialiser(serializers.ModelSerializer):
+    """Serialiser for group membership."""
     user_name = serializers.CharField(source="user.username", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
 
     class Meta:
+        """Metadata for group membership serialiser."""
         model = GroupMembership
         fields = [
             "id",

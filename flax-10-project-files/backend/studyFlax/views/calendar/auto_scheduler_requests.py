@@ -22,10 +22,8 @@ def _validate_auto_request(request):
         return None, None, Response({"detail": "Invalid deadlines."}, status=status.HTTP_400_BAD_REQUEST)
     return payload, deadline_map, deadlines
 
-
 def _deadline_map(payload):
     return {item["deadline_id"]: item["ideal_minutes_per_day"] for item in payload["deadline_preferences"]}
-
 
 def _enrolled_deadlines(user, deadline_map):
     return list(

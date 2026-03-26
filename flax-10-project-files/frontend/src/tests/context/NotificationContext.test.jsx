@@ -1,3 +1,7 @@
+/**
+ * Covers NotificationContext provider and hook branches.
+ */
+
 import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotificationProvider, useNotifications } from '../../context/NotificationContext';
@@ -15,41 +19,39 @@ vi.mock('../../api/notificationApi', () => ({
     clearAllNotifications: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/browserNotification', () => ({
+vi.mock('../../components/notifications/utils/browserNotification', () => ({
     requestPermission: vi.fn(),
     sendBrowserNotification: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/notificationSound', () => ({
+vi.mock('../../components/notifications/utils/notificationSound', () => ({
     playNotificationSound: vi.fn(),
 }));
 
-const TestComponent = () => {
-    const {
-        notifications,
-        addNotification,
-        dismissNotification,
-        markAllRead,
-        clearAll,
-        hasUnread,
-        isOpen,
-        togglePanel,
-        closePanel
-    } = useNotifications();
+const buildNotificationActions = ({ addNotification, dismissNotification, markAllRead, clearAll, togglePanel, closePanel }) => [
+    { label: 'Add', onClick: () => addNotification({ title: 'New' }) },
+    { label: 'Dismiss', onClick: () => dismissNotification(1) },
+    { label: 'Read All', onClick: markAllRead },
+    { label: 'Clear', onClick: clearAll },
+    { label: 'Toggle', onClick: togglePanel },
+    { label: 'Close', onClick: closePanel },
+];
 
-    return (
-        <div>
-            <div data-testid="count">{notifications.length}</div>
-            <div data-testid="unread">{hasUnread ? 'yes' : 'no'}</div>
-            <div data-testid="isOpen">{isOpen ? 'open' : 'closed'}</div>
-            <button onClick={() => addNotification({ title: 'New' })}>Add</button>
-            <button onClick={() => dismissNotification(1)}>Dismiss</button>
-            <button onClick={markAllRead}>Read All</button>
-            <button onClick={clearAll}>Clear</button>
-            <button onClick={togglePanel}>Toggle</button>
-            <button onClick={closePanel}>Close</button>
-        </div>
-    );
+function NotificationState({ notifications, hasUnread, isOpen }) {
+    return <>
+        <div data-testid="count">{notifications.length}</div>
+        <div data-testid="unread">{hasUnread ? 'yes' : 'no'}</div>
+        <div data-testid="isOpen">{isOpen ? 'open' : 'closed'}</div>
+    </>;
+}
+
+function NotificationActions({ actions }) {
+    return actions.map(({ label, onClick }) => <button key={label} onClick={onClick}>{label}</button>);
+}
+
+const TestComponent = () => {
+    const state = useNotifications();
+    return <div><NotificationState {...state} /><NotificationActions actions={buildNotificationActions(state)} /></div>;
 };
 
 describe('NotificationContext', () => {
@@ -213,7 +215,7 @@ describe('NotificationContext', () => {
     });
 
     it('should process new notifications from poll and notify user', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         vi.useFakeTimers();
         api.fetchNotifications.mockResolvedValueOnce([]);
         render(
@@ -234,7 +236,7 @@ describe('NotificationContext', () => {
     });
 
     it('should not send browser notification for reminder type from poll', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         sendBrowserNotification.mockClear();
         vi.useFakeTimers();
         api.fetchNotifications.mockResolvedValueOnce([]);

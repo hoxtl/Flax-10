@@ -61,11 +61,22 @@ const TOUR_STEPS = [
 ];
 
 const PAD = 10;
+<<<<<<< HEAD
+=======
+const CARD_W = 280;
+>>>>>>> origin/main
 
 function useTargetRect(tourId) {
   const [rect, setRect] = useState(null);
   useEffect(() => {
+<<<<<<< HEAD
     if (!tourId) return;
+=======
+    if (!tourId) {
+      setRect(null);
+      return;
+    }
+>>>>>>> origin/main
     function measure() {
       const el = document.querySelector(`[data-tour="${tourId}"]`);
       if (el) setRect(el.getBoundingClientRect());
@@ -73,6 +84,7 @@ function useTargetRect(tourId) {
     measure();
     const id = setTimeout(measure, 100);
     window.addEventListener("resize", measure);
+<<<<<<< HEAD
     return () => { clearTimeout(id); window.removeEventListener("resize", measure); };
   }, [tourId]);
   return tourId ? rect : null;
@@ -90,6 +102,14 @@ function useTourActions(step, setStep, onDone) {
     if (step > 0) setStep((current) => current - 1);
   }, [step, setStep]);
   return { next, prev };
+=======
+    return () => {
+      clearTimeout(id);
+      window.removeEventListener("resize", measure);
+    };
+  }, [tourId]);
+  return rect;
+>>>>>>> origin/main
 }
 
 function SpotlightOverlay({ rect }) {
@@ -107,6 +127,7 @@ function SpotlightOverlay({ rect }) {
   return <div className={styles.overlay} style={{ clipPath: clip }} />;
 }
 
+<<<<<<< HEAD
 function getCardPosition(rect, placement) {
   if (!rect || placement === "center") return null;
   const { x, y, width, height } = rect;
@@ -142,15 +163,51 @@ function TourCard({ step, stepIndex, total, onNext, onPrev, onSkip, rect }) {
       key={stepIndex}
       className={getTourCardClassName(rect, step.placement)}
       style={position ? { inset: `${position.top}px auto auto ${position.left}px` } : undefined}
+=======
+function getCardPosition(rect, step) {
+  if (!rect || step.placement === "center") {
+    return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+  }
+  const { x, y, width, height } = rect;
+  const cardLeft = x + width + PAD + 8;
+  const cardTop = Math.max(PAD, y + height / 2 - 80);
+  return { top: cardTop, left: cardLeft };
+}
+
+function TourCard({ step, stepIndex, total, onNext, onPrev, onSkip, rect }) {
+  const pos = getCardPosition(rect, step);
+  return (
+    <Motion.div
+      key={stepIndex}
+      className={styles.card}
+      style={{ ...pos, width: CARD_W }}
+>>>>>>> origin/main
       initial={{ opacity: 0, scale: 0.92, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.92, y: 8 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
     >
+<<<<<<< HEAD
       <TourHeader stepIndex={stepIndex} total={total} onSkip={onSkip} />
       <h3 className={styles.cardTitle}>{step.title}</h3>
       <p className={styles.cardDescription}>{step.description}</p>
       <TourActions stepIndex={stepIndex} total={total} onNext={onNext} onPrev={onPrev} />
+=======
+      <div className={styles.cardHeader}>
+        <span className={styles.stepCount}>{stepIndex + 1} / {total}</span>
+        <button className={styles.skipBtn} onClick={onSkip}>Skip tour</button>
+      </div>
+      <h3 className={styles.cardTitle}>{step.title}</h3>
+      <p className={styles.cardDescription}>{step.description}</p>
+      <div className={styles.cardActions}>
+        {stepIndex > 0 && (
+          <button className={styles.prevBtn} onClick={onPrev}>Back</button>
+        )}
+        <button className={styles.nextBtn} onClick={onNext}>
+          {stepIndex === total - 1 ? "Finish" : "Next"}
+        </button>
+      </div>
+>>>>>>> origin/main
       <ProgressDots total={total} current={stepIndex} />
     </Motion.div>
   );
@@ -169,6 +226,7 @@ function ProgressDots({ total, current }) {
 export default function AppTour({ onDone }) {
   const [step, setStep] = useState(0);
   const currentStep = TOUR_STEPS[step];
+<<<<<<< HEAD
   const rect = useTargetRect(currentStep?.tourId);
   const { next, prev } = useTourActions(step, setStep, onDone);
 
@@ -189,5 +247,43 @@ function TourFrame({ step, stepIndex, rect, onNext, onPrev, onSkip }) {
         <TourCard key={stepIndex} step={step} stepIndex={stepIndex} total={TOUR_STEPS.length} onNext={onNext} onPrev={onPrev} onSkip={onSkip} rect={rect} />
       </AnimatePresence>
     </>
+=======
+  const rect = useTargetRect(currentStep.tourId);
+
+  const next = useCallback(() => {
+    if (step < TOUR_STEPS.length - 1) setStep((s) => s + 1);
+    else onDone?.();
+  }, [step, onDone]);
+
+  const prev = useCallback(() => {
+    if (step > 0) setStep((s) => s - 1);
+  }, [step]);
+
+  return (
+    <div className={styles.root} role="dialog" aria-modal="true" aria-label="App tour">
+      <Motion.div
+        key={step}
+        className={styles.overlayWrap}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+      >
+        <SpotlightOverlay rect={rect} />
+      </Motion.div>
+      <AnimatePresence mode="wait">
+        <TourCard
+          key={step}
+          step={currentStep}
+          stepIndex={step}
+          total={TOUR_STEPS.length}
+          onNext={next}
+          onPrev={prev}
+          onSkip={onDone}
+          rect={rect}
+        />
+      </AnimatePresence>
+    </div>
+>>>>>>> origin/main
   );
 }

@@ -6,7 +6,7 @@ import {
     getEventType,
     getEffectiveTagName,
     getVisibleEventsInView,
-} from '../../components/Calendar/utils/eventUtils';
+} from '../../components/calendar/utils/eventUtils';
 
 describe('extractBaseEventId', () => {
     it('returns _baseId from event object when present', () => {

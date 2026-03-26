@@ -11,6 +11,7 @@ from studyFlax.models.society.society_image_model import SocietyImage
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_model import Society
 
+
 User = get_user_model()
 
 def make_user(username='miscuser', email='misc@example.com'):

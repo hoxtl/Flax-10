@@ -1,7 +1,7 @@
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Link } from "react-router-dom";
 
-import buttonStyles from "../common/PrimaryButton/PrimaryButton.module.css";
+import buttonStyles from "../common/primary_button/PrimaryButton.module.css";
 import chartStyles from "./Charts.module.css";
 import { useTheme } from "../../context/ThemeContext";
 

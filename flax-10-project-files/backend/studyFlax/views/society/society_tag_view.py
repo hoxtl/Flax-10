@@ -16,6 +16,7 @@ from .helpers import (
     permission_denied_response,
 )
 
+
 MAX_TAGS = 7
 
 @api_view(['GET', 'POST'])
@@ -54,17 +55,14 @@ def society_tag_detail(request, society_id, tag_id):
         return permission_denied_response()
     return _society_tag_detail_result(request.method, request.data, society, tag_id)
 
-
 def _society_tag_detail_result(method, data, society, tag_id):
     tag = get_society_object_or_none(SocietyTag, society, tag_id)
     if not tag:
         return _society_tag_not_found_response()
     return _society_tag_detail_response(method, tag, data)
 
-
 def _society_tag_not_found_response():
     return Response({'error': 'Tag not found'}, status=status.HTTP_404_NOT_FOUND)
-
 
 def _society_tag_detail_response(method, tag, data):
     if method == 'DELETE':

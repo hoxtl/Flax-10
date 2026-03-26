@@ -9,8 +9,8 @@ import headerStyles from "./ProfileHeader.module.css";
 import badgeStyles from "./ProfileHeaderBadges.module.css";
 import { buildPeakLabel } from "./widgets/PersonaCard";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
-import ShareButton from "../../../components/Social/ShareButton";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import ShareButton from "../../../components/social/ShareButton";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };
 
@@ -247,6 +247,7 @@ function HeaderMeta({ user, profileData, handlers, visibility, societies, onSoci
     <>
       <HeaderTitleRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} isShared={isShared} />
       {description && <div className={styles.headerSubline}>{description}</div>}
+      <ContactEmail email={profileData?.email} />
       {!visibility.canEditProfile && <SharedPlanningTip />}
       {isShared && <SharedCalendarActions user={user} route={route} onNavigate={onNavigate} />}
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
@@ -273,6 +274,7 @@ function HeaderInsightsEmptyState() {
 }
 
 function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, visibility }) {
+<<<<<<< HEAD
   const hasBadges = badges?.length > 0;
   const hasInsights = hasBadges || !!persona;
 
@@ -284,6 +286,13 @@ function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, pe
     <div className={styles.headerBadgesPersonaRow}>
       {hasBadges && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}
       {persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}
+=======
+  if (!badges?.length && !persona) return null;
+  return (
+    <div className={styles.headerBadgesPersonaRow}>
+      <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />
+      <PersonaInlineChip persona={persona} peakHour={peakHour} />
+>>>>>>> origin/main
     </div>
   );
 }

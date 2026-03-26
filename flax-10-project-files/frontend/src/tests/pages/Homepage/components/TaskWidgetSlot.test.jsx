@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { TaskWidgetSlot } from "../../../../pages/Homepage/components/TaskWidgetSlot";
+import { TaskWidgetSlot } from "../../../../pages/homepage/components/TaskWidgetSlot";
 
 vi.mock("framer-motion", () => ({
   motion: new Proxy(
@@ -26,7 +26,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
+vi.mock("../../../../pages/tasks/components/TaskCard", () => ({
   TaskContextMenu: ({ task, onClose, onEditOpen, onDelete, onEdit }) => (
     <div data-testid="task-context-menu">
       <span>{task?.title}</span>

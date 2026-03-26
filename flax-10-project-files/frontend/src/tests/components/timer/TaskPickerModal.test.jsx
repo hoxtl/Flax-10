@@ -1,10 +1,16 @@
+/**
+ * Covers TaskPickerModal open, loading, and filter states.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '../../../utils/test-utils';
-import { TaskPickerModal } from '../../../components/Timer/taskInput/TaskPickerModal';
+import { render, screen, fireEvent } from '../../../utils/testUtils';
+import { TaskPickerModal } from '../../../components/timer/task_input/TaskPickerModal';
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+import { createFnMap } from '../../utils/testBuilderUtils';
 
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
+
+vi.mock('../../../components/common/search_bar/SearchBar', () => ({
   default: ({ value, onChange, placeholder }) => (
     <input
       data-testid="search-bar"
@@ -15,7 +21,7 @@ vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
   ),
 }));
 
-vi.mock('../../../components/common/SearchEmptyState/SearchEmptyState', () => ({
+vi.mock('../../../components/common/search_empty_state/SearchEmptyState', () => ({
   default: ({ query, onClear }) => (
     <div data-testid="empty-state">
       <span>No tasks found{query ? ` for "${query}"` : ''}</span>
@@ -24,19 +30,19 @@ vi.mock('../../../components/common/SearchEmptyState/SearchEmptyState', () => ({
   ),
 }));
 
-vi.mock('../../../components/common/LoadingState/SkeletonBlock', () => ({
+vi.mock('../../../components/common/loading_state/SkeletonBlock', () => ({
   default: () => <div data-testid="skeleton-block" />,
 }));
 
-vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
 }));
 
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
   default: ({ children, onClose }) => <div data-testid="standard-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>{children}</div>,
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown', () => ({
   default: ({ value, onChange, options }) => (
     <select data-testid="sort-dropdown" value={value} onChange={(e) => onChange(e.target.value)}>
       {options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -48,7 +54,7 @@ vi.mock('../../../pages/Tasks/components/TaskFeedFilterPanel', () => ({
   default: () => <div data-testid="filter-panel" />,
 }));
 
-vi.mock('../../../components/Timer/taskInput/TaskPickItem', () => ({
+vi.mock('../../../components/timer/task_input/TaskPickItem', () => ({
   TaskPickItem: ({ task, onSelect }) => (
     <button data-testid={`task-item-${task.id}`} onClick={() => onSelect(task)}>
       {task.title}
@@ -56,41 +62,40 @@ vi.mock('../../../components/Timer/taskInput/TaskPickItem', () => ({
   ),
 }));
 
-vi.mock('../../../components/Timer/taskInput/taskInputConstants', () => ({
+vi.mock('../../../components/timer/task_input/taskInputConstants', () => ({
   SORT_OPTIONS: [
     { value: 'urgency', label: 'Urgency' },
     { value: 'due', label: 'Due date' },
   ],
 }));
 
-const makeState = (overrides = {}) => ({
+const taskPickerActionNames = ['setSearch', 'setSortBy', 'setIsFilterOpen', 'setActiveFilterTab', 'setFilterQuery', 'setFilterListIds', 'setFilterModuleCodes', 'loadTasks', 'setOpen'];
+const defaultFilteredTasks = [
+  { id: 1, title: 'Task One' },
+  { id: 2, title: 'Task Two' },
+];
+
+const baseTaskPickerState = {
   open: true,
   loading: false,
   search: '',
-  setSearch: vi.fn(),
   sortBy: 'urgency',
-  setSortBy: vi.fn(),
   isFilterOpen: false,
-  setIsFilterOpen: vi.fn(),
   activeFilterTab: 'lists',
-  setActiveFilterTab: vi.fn(),
   filterQuery: '',
-  setFilterQuery: vi.fn(),
   visibleListItems: [],
   filterListIds: [],
-  setFilterListIds: vi.fn(),
   groupedModuleItems: {},
   moduleGroupKeys: [],
   filterModuleCodes: [],
-  setFilterModuleCodes: vi.fn(),
-  filteredTasks: [
-    { id: 1, title: 'Task One' },
-    { id: 2, title: 'Task Two' },
-  ],
+  filteredTasks: defaultFilteredTasks,
   selectedTaskId: null,
   recommendedTaskId: null,
-  loadTasks: vi.fn(),
-  setOpen: vi.fn(),
+};
+
+const makeState = (overrides = {}) => ({
+  ...baseTaskPickerState,
+  ...createFnMap(taskPickerActionNames),
   ...overrides,
 });
 

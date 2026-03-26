@@ -1,7 +1,8 @@
 /* Tests for the TaskFeed component including filtering, search, and sections. */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
+import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
+import { createFnMap } from '../../utils/testBuilderUtils';
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
 }));
@@ -22,10 +23,10 @@ vi.mock('lucide-react', () => ({
     Plus: () => <svg data-testid="plus-icon" />,
     Filter: () => <svg data-testid="filter-icon" />,
 }));
-vi.mock('../../../components/ui/EstTimeHelpBanner', () => ({
+vi.mock('../../../components/ui/est_time_help_banner', () => ({
     default: () => <div data-testid="est-time-banner" />,
 }));
-vi.mock('../../../pages/Tasks/components/TaskCard', () => ({
+vi.mock('../../../pages/tasks/components/TaskCard', () => ({
     default: ({ task, onToggle, onDelete }) => (
         <div data-testid={`task-card-${task.id}`}>
             <span>{task.title}</span>
@@ -34,20 +35,20 @@ vi.mock('../../../pages/Tasks/components/TaskCard', () => ({
         </div>
     ),
 }));
-vi.mock('../../../pages/Tasks/components/CreateTaskBar', () => ({
+vi.mock('../../../pages/tasks/components/CreateTaskBar', () => ({
     default: () => <div data-testid="create-task-bar" />,
 }));
-vi.mock('../../../pages/Tasks/components/SuggestedReadingsSection', () => ({
+vi.mock('../../../pages/tasks/components/SuggestedReadingsSection', () => ({
     default: () => <div data-testid="suggested-readings-section" />,
 }));
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options }) => (
         <select value={value} onChange={e => onChange(e.target.value)} data-testid="sort-dropdown">
             {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
     ),
 }));
-vi.mock('../../../pages/Tasks/components/AllTasksCompleteCard', () => ({
+vi.mock('../../../pages/tasks/components/AllTasksCompleteCard', () => ({
     default: ({ message, sub, ctaLabel, onCtaClick }) => (
         <div data-testid="all-complete-card">
             <p>{message}</p>
@@ -67,7 +68,7 @@ vi.stubGlobal('localStorage', {
 });
 mockStore['user'] = JSON.stringify({ first_name: 'John', username: 'jdoe' });
 
-import TaskFeed from '../../../pages/Tasks/components/TaskFeed';
+import TaskFeed from '../../../pages/tasks/components/TaskFeed';
 const now = new Date();
 const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
 const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
@@ -79,27 +80,20 @@ const baseTasks = [
     { id: 4, title: 'Completed Task', completed: true, due_date: yesterday.toISOString(), priority: 'low', task_list: 1 },
 ];
 const baseLists = [{ id: 1, name: 'Work', color: '#3b82f6' }];
+const taskFeedActionNames = ['onPlanTomorrow', 'onToggleComplete', 'onDeleteTask', 'onEditTask', 'onCreateTask', 'onAddTask', 'onFilterByList'];
+const baseFeedProps = {
+    tasks: baseTasks,
+    allTasks: baseTasks,
+    lists: baseLists,
+    activeFilter: 'all',
+    activeListId: null,
+    activeModuleCode: null,
+    defaultDueDateForNewTask: null,
+    filterListIds: [],
+};
+
 function renderFeed(props = {}) {
-    return render(
-        <TaskFeed
-            tasks={baseTasks}
-            allTasks={baseTasks}
-            lists={baseLists}
-            activeFilter="all"
-            activeListId={null}
-            activeModuleCode={null}
-            defaultDueDateForNewTask={null}
-            onPlanTomorrow={vi.fn()}
-            onToggleComplete={vi.fn()}
-            onDeleteTask={vi.fn()}
-            onEditTask={vi.fn()}
-            onCreateTask={vi.fn()}
-            onAddTask={vi.fn()}
-            filterListIds={[]}
-            onFilterByList={vi.fn()}
-            {...props}
-        />
-    );
+    return render(<TaskFeed {...baseFeedProps} {...createFnMap(taskFeedActionNames)} {...props} />);
 }
 describe('TaskFeed', () => {
     beforeEach(() => {

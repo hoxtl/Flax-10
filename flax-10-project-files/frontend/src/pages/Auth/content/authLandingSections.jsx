@@ -2,7 +2,7 @@
  * Auth landing page section builders.
  */
 
-import { TestimonialsMarquee } from "../../../components/Authentication/TestimonialsMarquee";
+import { TestimonialsMarquee } from "../../../components/auth/TestimonialsMarquee";
 import { AuthForms } from "../components/AuthForms";
 
 function createHeroDescription(styles) {

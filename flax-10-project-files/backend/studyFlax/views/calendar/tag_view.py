@@ -11,6 +11,7 @@ from studyFlax.models.society import SocietyCalendarSync
 from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
+
 PROTECTED_TAGS = {'other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'}
 
 @api_view(['GET', 'POST'])
@@ -47,7 +48,6 @@ def ensure_user_system_tags(user):
     _ensure_society_tags(user, get_societies_tag)
     get_schedule_tag()
 
-
 def _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, fix_untagged_deadline_events):
     if not has_module_enrollments(user):
         return
@@ -56,15 +56,16 @@ def _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, f
     get_exam_tag()
     fix_untagged_deadline_events()
 
-
 def _ensure_society_tags(user, get_societies_tag):
     if has_society_syncs(user):
         get_societies_tag()
 
 def has_module_enrollments(user):
+    """Return whether has module enrollments."""
     return Enrollment.objects.filter(student=user).exists()
 
 def has_society_syncs(user):
+    """Return whether has society syncs."""
     return SocietyCalendarSync.objects.filter(user=user).exists()
 
 def get_filtered_tags(user):
@@ -141,6 +142,7 @@ def delete_tag(tag):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def can_delete_tag(tag):
+    """Return whether can delete tag."""
     if tag.is_default:
         return False
     return tag.name.lower() not in PROTECTED_TAGS

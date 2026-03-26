@@ -5,6 +5,7 @@ Utility functions for estimating reading time and updating task estimates.
 import math
 from studyFlax.models.tasks.task_model import Task
 
+
 DEFAULT_PAGE_TIME = 2.0
 MINUTES_PER_BLOCK = 25
 

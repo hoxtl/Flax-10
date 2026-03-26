@@ -17,6 +17,7 @@ from .helpers import (
     permission_denied_response,
 )
 
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def event_list(request, society_id):
@@ -30,14 +31,15 @@ def event_list(request, society_id):
 
 def get_events(society):
     events = SocietyEvent.objects.filter(society=society)
+
     return Response(SocietyEventSerialiser(events, many=True).data)
 
 def create_event(request, society):
     payload, errors, status_code = create_event_result(request.user, request.data, society, is_silent_request(request))
     if errors:
+
         return Response(errors, status=status_code)
     return Response(payload, status=status_code)
-
 
 def create_event_result(user, data, society, silent):
     permission_response = _event_admin_error(user, society)
@@ -45,22 +47,22 @@ def create_event_result(user, data, society, silent):
         return None, permission_response.data, permission_response.status_code
     serialiser = SocietyEventSerialiser(data=data, context={'skip_notification': silent})
     if not serialiser.is_valid():
+
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
     serialiser.save(society=society)
-    return serialiser.data, None, status.HTTP_201_CREATED
 
+    return serialiser.data, None, status.HTTP_201_CREATED
 
 def _event_not_found_response():
     return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
 def _event_detail_get_response(event):
     return Response(SocietyEventSerialiser(event).data)
-
 
 def _event_detail_write_response(request, society, event):
     permission_response = _event_admin_error(request.user, society)
     if permission_response:
+
         return permission_response
     silent = is_silent_request(request)
     if request.method == 'DELETE':
@@ -68,6 +70,7 @@ def _event_detail_write_response(request, society, event):
     return update_event(event, request.data, silent)
 
 @api_view(['GET', 'PATCH', 'DELETE'])
+
 @permission_classes([IsAuthenticated])
 def event_detail(request, society_id, event_id):
     society = get_society_or_404(society_id)
@@ -75,30 +78,31 @@ def event_detail(request, society_id, event_id):
         return society_not_found_response()
     return _event_detail_response(request, society, event_id)
 
-
 def _event_detail_response(request, society, event_id):
     event = get_society_object_or_none(SocietyEvent, society, event_id)
     if not event:
         return _event_not_found_response()
     if request.method == 'GET':
+
         return _event_detail_get_response(event)
     return _event_detail_write_response(request, society, event)
 
-
 def _event_admin_error(user, society):
     if is_society_admin(user, society):
+
         return None
     return permission_denied_response()
 
 def update_event(event, data, silent=False):
     payload, errors, status_code = update_event_result(event, data, silent)
     if errors:
+
         return Response(errors, status=status_code)
     return Response(payload)
 
-
 def update_event_result(event, data, silent=False):
     serialiser = SocietyEventSerialiser(event, data=data, partial=True, context={'skip_notification': silent})
+
     if not serialiser.is_valid():
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
     serialiser.save()
@@ -114,6 +118,7 @@ def _add_exception_date(event, date):
     if date not in event.exception_dates:
         event.exception_dates.append(date)
         event.save()
+
         notify_exception(event, date)
 
 @api_view(['POST'])
@@ -121,41 +126,40 @@ def _add_exception_date(event, date):
 def add_society_event_exception(request, society_id, event_id):
     return _society_event_exception_response(request, society_id, event_id)
 
-
 def _society_event_exception_response(request, society_id, event_id):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
-    return _event_exception_response(request, society, event_id)
 
+    return _event_exception_response(request, society, event_id)
 
 def _event_exception_response(request, society, event_id):
     event = get_society_object_or_none(SocietyEvent, society, event_id)
     if not event:
         return _event_not_found_response()
+
     permission_response = _event_admin_error(request.user, society)
     if permission_response:
         return permission_response
     date = _event_exception_date(request)
     if isinstance(date, Response):
+
         return date
     return _event_exception_result(event, date)
 
-
 def _event_exception_result(event, date):
+
     recurrence_error = _event_recurrence_error(event)
     if recurrence_error:
         return recurrence_error
     _add_exception_date(event, date)
     return Response(SocietyEventSerialiser(event).data)
 
-
 def _event_exception_date(request):
     date = request.data.get('date')
     if date:
         return date
     return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 def _event_recurrence_error(event):
     if event.recurrence == 'none':

@@ -5,7 +5,7 @@ import {
     parseNotificationAction,
     hasNotificationAction,
     executeNotificationAction,
-} from '../../../components/Notifications/utils/notificationAction';
+} from '../../../components/notifications/utils/notificationAction';
 
 describe('createNotificationAction', () => {
     it('returns null when url is falsy', () => {

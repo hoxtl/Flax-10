@@ -2,18 +2,18 @@
  * Defines all app routes and their page components for the dashboard.
  */
 
-import Homepage from "../pages/Homepage/Homepage";
-import CalendarPage from "../pages/Calendar/CalendarPage";
-import SocietiesPage from "../pages/Societies/SocietiesPage";
-import ModulesPage from "../pages/Modules/ModulesPage";
-import CampusMap from "../pages/CampusMap/CampusMap";
-import TimerPage from "../pages/Timer/TimerPage";
-import AnalyticsPage from "../pages/Analytics/AnalyticsPage";
-import AdminPage from "../pages/Admin/AdminPage";
-import TasksPage from "../pages/Tasks/TasksPage";
-import GroupWorkIndexPage from "../pages/GroupWork/GroupWorkIndexPage";
-import Discover from "../pages/Discover/Discover";
-import AttendancePage from "../pages/Attendance/AttendancePage";
+import Homepage from "../pages/homepage/Homepage";
+import CalendarPage from "../pages/calendar/CalendarPage";
+import SocietiesPage from "../pages/societies/SocietiesPage";
+import ModulesPage from "../pages/modules/ModulesPage";
+import CampusMap from "../pages/campus_map/CampusMap";
+import TimerPage from "../pages/timer/TimerPage";
+import AnalyticsPage from "../pages/analytics/AnalyticsPage";
+import AdminPage from "../pages/admin/AdminPage";
+import TasksPage from "../pages/tasks/TasksPage";
+import GroupWorkIndexPage from "../pages/group_work/GroupWorkIndexPage";
+import Discover from "../pages/discover/Discover";
+import AttendancePage from "../pages/attendance/AttendancePage";
 
 export const APP_ROUTES = [
   { id: "home", label: "Home", icon: "🏠", path: "/", element: <Homepage /> },

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { resolveQuickAddModal } from "../../layout/dashboardLayout/dashboardLayoutActions";
-import { formatUserYear } from "../../layout/dashboardLayout/dashboardLayoutUser";
+import { resolveQuickAddModal } from "../../layout/dashboard_layout/dashboardLayoutActions";
+import { formatUserYear } from "../../layout/dashboard_layout/dashboardLayoutUser";
 
 describe("dashboard layout helpers", () => {
   it("formats non-numeric years without forcing a Year prefix", () => {

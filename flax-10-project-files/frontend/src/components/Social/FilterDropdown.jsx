@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react';
-import SearchBar from '../common/SearchBar/SearchBar';
+import SearchBar from '../common/search_bar/SearchBar';
 import { CourseResultItem, RoleResultItem, SocietyResultItem, YearResultItem } from './UserSearchItems';
 import { FILTER_TABS, SEARCH_EMPTY_CONFIG, styles } from './userSearchShared';
 import { getSocietyCategories, matchCat } from './userSearchUtils';

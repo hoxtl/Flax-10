@@ -2,10 +2,10 @@
  * Quick-add task bar with optional reading and module details.
  */
 
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import EstimatedDurationControl from "../../../components/common/EstimatedDurationControl/EstimatedDurationControl";
+import AnimatedDropdown from "../../../components/common/animated_dropdown";
+import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+import EstimatedDurationControl from "../../../components/common/estimated_duration_control/EstimatedDurationControl";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";
 

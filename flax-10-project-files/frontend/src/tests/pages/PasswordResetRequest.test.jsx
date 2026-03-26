@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import PasswordResetRequest from '../../pages/Auth/PasswordResetRequest';
+import PasswordResetRequest from '../../pages/auth/PasswordResetRequest';
 
-vi.mock('../../components/Authentication/AuthHeroGeometric', () => ({ default: () => <div /> }));
-vi.mock('../../components/Authentication/AuthBranding', () => ({
+vi.mock('../../components/auth/AuthHeroGeometric', () => ({ default: () => <div /> }));
+vi.mock('../../components/auth/AuthBranding', () => ({
     AuthBrand: () => <div />,
     AuthFooter: () => <div />,
 }));

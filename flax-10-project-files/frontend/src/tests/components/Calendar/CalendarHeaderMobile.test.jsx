@@ -1,7 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '../../../utils/test-utils';
+import { render, screen, fireEvent } from '../../../utils/testUtils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
+import { CalendarHeader } from '../../../components/calendar/CalendarHeader';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 import { TagProvider } from '../../../context/TagContext';
 
@@ -17,7 +17,7 @@ vi.mock('../../../api/tagApi', () => ({
     getTags: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
+vi.mock('../../../components/calendar/header/calendarHeaderUtils', () => ({
     CalendarNav: ({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) => (
         <div className="nav">
             <button type="button" onClick={onPrev}>&lt;</button>
@@ -44,7 +44,7 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
     ScheduleManagerButton: () => null,
 }));
 
-vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
+vi.mock('../../../components/notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 

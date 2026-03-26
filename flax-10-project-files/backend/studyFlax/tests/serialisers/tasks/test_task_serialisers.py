@@ -1,4 +1,6 @@
-"""Tests for task serialiser and task query helper branches."""
+"""
+Tests for task serialisers.
+"""
 
 from datetime import timedelta
 
@@ -7,7 +9,7 @@ from django.utils import timezone
 from rest_framework import status
 
 from studyFlax.models.tasks.task_model import Task, TaskList
-from studyFlax.tests.helpers.factories import make_society, make_user
+from studyFlax.tests.helpers.test_model_builders import make_society, make_user
 
 
 class TaskSerializerTest(TestCase):

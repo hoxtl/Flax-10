@@ -5,6 +5,7 @@ Module notification helpers for module lifecycle events.
 from studyFlax.models import Enrollment
 from studyFlax.models.notifications.notification_model import Notification
 
+
 MODULE_FIELD_LABELS = {
     'module_code': 'module code',
     'module_name': 'module name',
@@ -23,16 +24,13 @@ def get_changed_module_fields(module, validated_data):
         if getattr(module, field_name) != next_value
     ]
 
-
 def _get_enrollments(module):
     return Enrollment.objects.filter(module=module).select_related('student')
-
 
 def notify_enrolled_students(module):
     enrollments = _get_enrollments(module)
     notifications = [build_module_deleted_notification(item.student, module) for item in enrollments]
     Notification.objects.bulk_create(notifications)
-
 
 def notify_module_updated(module, updated_fields):
     if not updated_fields:
@@ -43,7 +41,6 @@ def notify_module_updated(module, updated_fields):
         for item in enrollments
     ]
     Notification.objects.bulk_create(notifications)
-
 
 def _format_updated_fields(updated_fields):
     labels = [MODULE_FIELD_LABELS.get(field, field.replace('_', ' ')) for field in updated_fields]
@@ -57,7 +54,6 @@ def _format_updated_fields(updated_fields):
         return f'{labels[0]}, {labels[1]}, and {labels[2]}'
     return 'details'
 
-
 def build_module_updated_notification(student, module, updated_fields):
     changed_summary = _format_updated_fields(updated_fields)
     return Notification(
@@ -70,7 +66,6 @@ def build_module_updated_notification(student, module, updated_fields):
         notification_type='module_updated',
         action_url=f"/modules?code={module.module_code}",
     )
-
 
 def build_module_deleted_notification(student, module):
     return Notification(

@@ -2,7 +2,7 @@
  * Search results dropdown for the user search bar.
  */
 
-import EmptyState from '../common/EmptyState/EmptyState';
+import EmptyState from '../common/empty_state/EmptyState';
 import { UserResultItem } from './UserSearchItems';
 import { SEARCH_EMPTY_CONFIG, styles } from './userSearchShared';
 

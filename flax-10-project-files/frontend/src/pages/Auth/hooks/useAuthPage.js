@@ -3,7 +3,7 @@
  */
 
 import { useState } from "react";
-import { useAuthForm } from "../../../components/Authentication/hooks/useAuthForm";
+import { useAuthForm } from "../../../components/auth/hooks/useAuthForm";
 import { submitSignIn, submitSignUp } from "../utils/authSubmitHandlers";
 
 const SIGNUP_DEFAULTS = {

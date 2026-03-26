@@ -4,9 +4,9 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import FilterCheckbox from '../../../components/common/FilterCheckbox/FilterCheckbox';
+import FilterCheckbox from '../../../components/common/filter_checkbox/FilterCheckbox';
 
-vi.mock('../../../components/common/FilterCheckbox/FilterCheckbox.module.css', () => ({
+vi.mock('../../../components/common/filter_checkbox/FilterCheckbox.module.css', () => ({
   default: { filterCheckbox: 'filterCheckbox' },
 }));
 

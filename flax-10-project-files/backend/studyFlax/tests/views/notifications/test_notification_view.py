@@ -9,8 +9,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
-from ..base import BaseTestCase
+from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Notification
+
 
 User = get_user_model()
 

@@ -9,7 +9,8 @@ from datetime import timedelta
 
 from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.tasks.task_model import Task
-from studyFlax.tests.helpers.factories import make_user, make_session, authed_client
+from studyFlax.tests.helpers.test_model_builders import make_user, make_session, authed_client
+
 
 class StudySessionSerializerTest(TestCase):
     """Tests for timer_serialisers.py (StudySessionSerializer)."""

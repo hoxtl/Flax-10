@@ -18,7 +18,6 @@ def create_description(reading):
     details = ', '.join(part for part in [reading.title, chapter_part, page_part] if part)
     return details or reading.title
 
-
 def task_payload(task):
     return {
         'id': task.id,
@@ -30,11 +29,9 @@ def task_payload(task):
         'page_count': task.page_count,
     }
 
-
 def create_reading_task(user, reading):
     task = Task.objects.create(**build_task_data(user, reading))
     return Response(task_payload(task), status=status.HTTP_201_CREATED)
-
 
 def build_task_data(user, reading):
     estimated_minutes = estimated_time_reading(reading, user)
@@ -50,7 +47,6 @@ def build_task_data(user, reading):
         'task_list': get_reading_list(user, reading.module),
         'page_count': reading.page_count(),
     }
-
 
 def estimated_blocks(estimated_minutes):
     block_count = estimated_minutes / MINUTES_PER_BLOCK

@@ -9,13 +9,15 @@ from django.contrib.auth import get_user_model
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_announcement_model import SocietyAnnouncement
-from studyFlax.tests.helpers.factories import (
+from studyFlax.tests.helpers.test_model_builders import (
     make_society, make_society_admin, make_society_member,
 )
+
 
 User = get_user_model()
 
 class SocietyTagViewExtendedTest(TestCase):
+    """Tests society tag view extended."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='stag_admin', email='stag_admin@e.com', password='pass')
@@ -63,6 +65,7 @@ class SocietyTagViewExtendedTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class SocietySerializerEdgeCaseTest(TestCase):
+    """Tests society serialiser edge case."""
     def test_profile_photo_url_with_request_and_photo(self):
         from unittest.mock import MagicMock, PropertyMock, patch
         from rest_framework.test import APIRequestFactory
@@ -87,6 +90,7 @@ class SocietySerializerEdgeCaseTest(TestCase):
         self.assertFalse(serializer.data['has_reported'])
 
 class SocietyAnnouncementViewTest(TestCase):
+    """Tests society announcement view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -127,6 +131,7 @@ class SocietyAnnouncementViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class SocietyTagViewTest(TestCase):
+    """Tests society tag view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -159,6 +164,7 @@ class SocietyTagViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class RatificationViewTest(TestCase):
+    """Tests ratification view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -211,6 +217,7 @@ class RatificationViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class CalendarSyncViewTest(TestCase):
+    """Tests calendar sync view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='user', email='user@example.com', password='pass')
@@ -245,6 +252,7 @@ class CalendarSyncViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class PublishChangesViewTest(TestCase):
+    """Tests publish changes view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
