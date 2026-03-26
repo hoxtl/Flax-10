@@ -225,11 +225,16 @@ def serialised_project(project, context):
     return GroupProjectSerialiser(with_project_metrics(project), context=context).data
 
 def remove_project_member(project, user, membership_id):
-    if project.owner_id != user.id:
-        return status.HTTP_403_FORBIDDEN
     membership = get_object_or_404(GroupMembership.objects.filter(project=project), id=membership_id)
-    if membership.user_id == project.owner_id:
-        return status.HTTP_400_BAD_REQUEST
+    is_owner = project.owner_id == user.id
+    is_self = membership.user_id == user.id
+
+    if is_owner:
+        if is_self:
+            return status.HTTP_400_BAD_REQUEST
+    elif not is_self:
+        return status.HTTP_403_FORBIDDEN
+
     delete_project_member(membership)
     return status.HTTP_204_NO_CONTENT
 

@@ -1,55 +1,43 @@
-/*
- * GroupWork project header delete action.
- */
-
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, LogOut } from "lucide-react";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
-import Tooltip from "../../../components/common/tooltip/Tooltip";
 import { useToast } from "../../../context/ToastContext";
+import { getCurrentMember } from "../utils/memberAvatarUtils";
 import styles from "./ProjectHeader.module.css";
 
-function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal, showToast }) {
+function ProjectActionModal({ isLeaving, onConfirm, onCancel }) {
+    const title = isLeaving ? "Leave project" : "Delete project";
+    const banner = isLeaving ? "You will no longer have access to this project or its tasks." : "This will permanently remove the project and all its tasks for every team member.";
+    const text = isLeaving ? "Hold to leave this group project." : "Hold to permanently delete this shared project and its tasks.";
     return (
-        <HoldConfirmModal
-            title="Delete project"
-            warningBanner="This will permanently remove the project and all its tasks for every team member."
-            warningText="Hold to permanently delete this shared project and its tasks."
-            cancelLabel="Keep project"
-            holdLabel="Hold to delete"
-            onCancel={() => setShowDeleteModal(false)}
-            onConfirm={() => confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal, showToast)}
-        />
+        <HoldConfirmModal title={title} warningBanner={banner} warningText={text} cancelLabel="Cancel" holdLabel={isLeaving ? "Hold to leave" : "Hold to delete"} onCancel={onCancel} onConfirm={onConfirm} />
     );
 }
 
-function DeleteButton({ isOwner, onClick }) {
-    return (
-        <PrimaryButton type="button" size="small" variant="danger" pill className={!isOwner ? styles.deleteBtnDisabled : undefined} onClick={isOwner ? onClick : undefined} disabled={!isOwner} aria-disabled={!isOwner}>
-            <Trash2 size={14} />Delete project
-        </PrimaryButton>
-    );
-}
-
-function DeleteButtonWithTooltip({ isOwner, onClick }) {
-    const btn = <DeleteButton isOwner={isOwner} onClick={onClick} />;
-    if (isOwner) return btn;
-    return <Tooltip content="Only project owner can delete" position="bottom"><span className={styles.deleteBtnTooltipWrap}>{btn}</span></Tooltip>;
-}
-
-export default function ProjectDeleteAction({ onDelete, isOwner }) {
+export default function ProjectHeaderActions({ onDelete, onMemberRemove, isOwner, teamMembers, onBack }) {
     const showToast = useToast();
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const currentMember = getCurrentMember(teamMembers);
+    const handleAction = async () => {
+        setShowModal(false);
+        if (isOwner) {
+            if (await onDelete()) showToast("Project deleted.");
+        } else if (currentMember) {
+            const success = await onMemberRemove(currentMember.id);
+            if (success) {
+                showToast("You left the project.");
+                onBack?.();
+            }
+        }
+    };
     return (
         <>
-            <DeleteButtonWithTooltip isOwner={isOwner} onClick={() => setShowDeleteModal(true)} />
-            {showDeleteModal && <DeleteProjectModal onDelete={onDelete} setDeleteError={() => {}} setShowDeleteModal={setShowDeleteModal} showToast={showToast} />}
+            <PrimaryButton type="button" size="small" variant="danger" pill onClick={() => setShowModal(true)}>
+                {isOwner ? <Trash2 size={13} /> : <LogOut size={13} />}
+                {isOwner ? "Delete project" : "Leave project"}
+            </PrimaryButton>
+            {showModal && <ProjectActionModal isLeaving={!isOwner} onConfirm={handleAction} onCancel={() => setShowModal(false)} />}
         </>
     );
-}
-
-async function confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal, showToast) {
-    setShowDeleteModal(false);
-    if (await onDelete()) showToast("Project deleted.");
 }

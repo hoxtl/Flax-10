@@ -4,7 +4,7 @@
 
 import { CalendarDays, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import ProjectDeleteAction from "./ProjectHeaderSub";
+import ProjectHeaderActions from "./ProjectHeaderSub";
 import { ProjectHeaderMeta, ProjectTeacherMeta } from "./ProjectHeaderMeta";
 import { getStoredViewer } from "../utils/memberAvatarUtils";
 import DeadlineCountdown from "../../../components/common/deadline_countdown/DeadlineCountdown";
@@ -70,7 +70,7 @@ export default function ProjectHeader({ project, members, teamMembers, onMemberA
         <section className={styles.headerSection}>
             <div className={styles.topActions}>
                 <BackButton onClick={onBack} label="Back to all projects" />
-                <ProjectDeleteAction onDelete={onDelete} isOwner={isOwner} />
+                <ProjectHeaderActions onDelete={onDelete} onMemberRemove={onMemberRemove} isOwner={isOwner} teamMembers={teamMembers} onBack={onBack} />
             </div>
             <ProjectHeaderContent project={project} date={date} members={members} teamMembers={teamMembers} onMemberAdded={onMemberAdded} onMemberRemove={onMemberRemove} onDelete={onDelete} />
         </section>
