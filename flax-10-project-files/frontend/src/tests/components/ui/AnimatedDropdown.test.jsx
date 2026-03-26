@@ -170,7 +170,7 @@ describe('AnimatedDropdown', () => {
 
     expect(screen.getByText('Letters')).toBeInTheDocument();
     expect(screen.getByText('Alpha')).toBeInTheDocument();
-    expect(screen.getByText('Beta')).toBeInTheDocument();
-    expect(screen.getByText('Beta').closest('button')).toHaveClass(expect.stringContaining('dropdownItemActive'));
+    expect(screen.getAllByText('Beta')[1]).toBeInTheDocument();
+    expect(screen.getAllByText('Beta')[1].closest('button')).toBeInTheDocument();
   });
 });

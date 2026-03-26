@@ -65,6 +65,13 @@ describe("useAvailability", () => {
     expect(screen.getByTestId("suggestions").textContent).toContain('"id":1');
   });
 
+  it("keeps defaults when the initial fetch fails", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, json: vi.fn() }));
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+    expect(screen.getByTestId("suggestions").textContent).toBe("[]");
+  });
+
   it("updates the suggesting slot when the setter is used", async () => {
     renderAvailability();
     fireEvent.click(screen.getByText("set slot"));
@@ -127,5 +134,41 @@ describe("useAvailability", () => {
       "You declined the meeting slot.",
       { variant: "neutral" }
     ));
+  });
+
+  it("does not toast when suggestion submission fails", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
+      .mockResolvedValueOnce({ ok: false }));
+
+    renderAvailability();
+    fireEvent.click(screen.getByText("suggest"));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(toastMock).not.toHaveBeenCalledWith("You proposed a time for the team.");
+  });
+
+  it("does not refresh or toast when deleting a suggestion fails", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
+      .mockResolvedValueOnce({ ok: false }));
+
+    renderAvailability();
+    fireEvent.click(screen.getByText("delete"));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    expect(toastMock).not.toHaveBeenCalledWith("Meeting suggestion deleted.");
+  });
+
+  it("does not toast when voting fails", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
+      .mockResolvedValueOnce({ ok: false }));
+
+    renderAvailability();
+    fireEvent.click(screen.getByText("accept"));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(toastMock).not.toHaveBeenCalledWith("You accepted the meeting slot.");
   });
 });

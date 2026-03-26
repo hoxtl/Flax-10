@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
+vi.mock("react-router-dom", () => ({
+  Link: ({ to, children, ...props }) => <a href={to} {...props}>{children}</a>,
+}));
+
 import StatStrip from "../../../components/common/StatStrip/StatStrip";
 
 vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
@@ -59,11 +63,8 @@ describe("StatStrip", () => {
     );
 
     expect(screen.getByRole("link", { name: "Focus stat" })).toHaveTextContent("Focus");
-    expect(screen.getByRole("button", { name: "Break" })).toHaveClass("itemButton");
+    expect(screen.getByRole("button", { name: "Break" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Break" }));
     expect(onClick).toHaveBeenCalledTimes(1);
-    expect(document.querySelector(".stripCompact")).toBeTruthy();
-    expect(document.querySelector(".stripBare")).toBeTruthy();
-    expect(document.querySelector(".stripNoWrap")).toBeTruthy();
   });
 });

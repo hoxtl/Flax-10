@@ -10,9 +10,11 @@ import { mergeNested } from "../utils/testBuilderUtils";
 import { buildPageData } from "./societyDetailPageTestUtils";
 
 const useSocietyPageDataMock = vi.fn();
+const useSocietyInitMock = vi.fn();
 
 vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
   useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
+  useSocietyInit: (...args) => useSocietyInitMock(...args),
 }));
 
 vi.mock("../../components/Society/SocietyDetail/SocietyHero", () => ({
@@ -98,8 +100,9 @@ vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({
 }));
 
 vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({
-  default: ({ onClose }) => (
+  default: ({ onClose, isAdmin }) => (
     <div data-testid="members-modal">
+      <span>{String(isAdmin)}</span>
       <button type="button" onClick={onClose}>close-members</button>
     </div>
   ),
@@ -185,6 +188,20 @@ describe("SocietyDetailPage Modals", () => {
       expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith(null);
     });
 
+    it("passes the non-admin flag to the members modal", () => {
+      renderDetailPageWithData({
+        modals: {
+          showMembersModal: true,
+        },
+        society: {
+          role: "member",
+          is_admin: false,
+        },
+      });
+
+      expect(screen.getByTestId("members-modal")).toHaveTextContent("false");
+    });
+
     it("handles cover image and announcement persistence", () => {
       const data = renderDetailPageWithData(interactiveOverrides);
       fireEvent.click(screen.getByText("save-cover"));
@@ -259,5 +276,28 @@ describe("SocietyDetailPage Modals", () => {
 
     expect(data.publishChanges).not.toHaveBeenCalled();
     expect(data.modals.setEditMode).toHaveBeenCalledWith(true);
+  });
+
+  it("leaves edit mode without publishing when there are no tracked changes", async () => {
+    const data = buildPageData({
+      modals: {
+        editMode: true,
+        setEditMode: vi.fn(),
+      },
+      tracker: {
+        hasChanges: vi.fn(() => false),
+        getChangeSummary: vi.fn(() => []),
+        resetChanges: vi.fn(),
+      },
+      publishChanges: vi.fn(),
+    });
+    useSocietyPageDataMock.mockReturnValue(data);
+
+    renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("toggle-edit-mode"));
+
+    expect(data.publishChanges).not.toHaveBeenCalled();
+    expect(data.tracker.resetChanges).not.toHaveBeenCalled();
+    expect(data.modals.setEditMode).toHaveBeenCalledWith(false);
   });
 });

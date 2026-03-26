@@ -55,14 +55,12 @@ describe('useSocietyCalendarSync', () => {
   });
 
   it('handles load errors gracefully', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getSyncStatusMock.mockRejectedValueOnce(new Error('load failed'));
 
     const { result } = renderHook(() => useSocietyCalendarSync(5, 'Chess'));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to load sync status:', expect.any(Error));
-    consoleSpy.mockRestore();
+    expect(result.current.isSynced).toBe(false);
   });
 
   it('syncs calendar when currently unsynced', async () => {
@@ -100,7 +98,6 @@ describe('useSocietyCalendarSync', () => {
   });
 
   it('handles toggle errors gracefully', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getSyncStatusMock.mockResolvedValueOnce({ is_synced: false });
     syncCalendarMock.mockRejectedValueOnce(new Error('sync failed'));
 
@@ -111,8 +108,8 @@ describe('useSocietyCalendarSync', () => {
       await result.current.toggleSync();
     });
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to toggle sync:', expect.any(Error));
+    expect(syncCalendarMock).toHaveBeenCalledWith(9);
+    expect(result.current.isSynced).toBe(false);
     expect(result.current.loading).toBe(false);
-    consoleSpy.mockRestore();
   });
 });

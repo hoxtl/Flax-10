@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   WEEK_MS,
   DAY_MS,
@@ -17,6 +17,10 @@ describe('taskTimelineUtils – constants', () => {
   });
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe('taskTimelineUtils – getTimelineAnchor', () => {
   it('returns a Date set to midnight', () => {
     const anchor = getTimelineAnchor();
@@ -25,6 +29,13 @@ describe('taskTimelineUtils – getTimelineAnchor', () => {
   });
 
   it('returns a Monday', () => {
+    const anchor = getTimelineAnchor();
+    expect(anchor.getDay()).toBe(1);
+  });
+
+  it('treats Sunday as the end of the previous week', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-29T12:00:00.000Z'));
     const anchor = getTimelineAnchor();
     expect(anchor.getDay()).toBe(1);
   });
@@ -59,5 +70,16 @@ describe('taskTimelineUtils – placeTasksIntoWeeks', () => {
     expect(layout[0]).toHaveLength(6);
     expect(layout[0][1]).toHaveLength(1);
     expect(layout[0][1][0].id).toBe(1);
+  });
+
+  it('skips tasks without a due date or outside the visible range', () => {
+    const anchor = getTimelineAnchor();
+    const weeks = buildWeeks(anchor);
+    const layout = placeTasksIntoWeeks([
+      { id: 1, due_date: null },
+      { id: 2, due_date: new Date(anchor.getTime() + 6 * DAY_MS).toISOString() },
+    ], weeks);
+    expect(layout[0].flat()).toHaveLength(0);
+    expect(Object.values(layout).flat(2)).toHaveLength(0);
   });
 });

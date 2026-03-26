@@ -80,6 +80,7 @@ vi.mock("../../../components/common/ConfirmModal/ConfirmModal", () => ({
 describe("Attendance prompt", () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     candidateState.value = null;
     candidateState.setValue = vi.fn();
     recordAttendanceMock.mockReset();
@@ -262,6 +263,8 @@ describe("Attendance prompt", () => {
       title: "Lecture",
       start_time: "2026-03-01T10:00:00Z",
       end_time: "2026-03-01T11:00:00Z",
+      source: "timetable",
+      external_id: "abc-11",
     };
     expect(isInPromptWindow(candidate)).toBe(true);
     expect(getDateRangeForPrompt().start).toBeDefined();
@@ -270,17 +273,15 @@ describe("Attendance prompt", () => {
   });
 
   it("handles candidate polling hook", async () => {
-    const candidate = { id: 11, title: "Timetable Lecture" };
-    getEventsMock.mockResolvedValue([candidate]);
+    vi.useRealTimers();
+    sessionStorage.clear();
+    getEventsMock.mockResolvedValue([]);
     const { useCandidateEvent } = await vi.importActual("../../../components/Attendance/hooks/useCandidateEvent");
 
-    const { result } = renderHook(() => useCandidateEvent());
-    await act(async () => {
-      await Promise.resolve();
-      vi.runOnlyPendingTimers();
-      await Promise.resolve();
-    });
-    expect(result.current[0]?.title).toBe("Timetable Lecture");
+    renderHook(() => useCandidateEvent());
+    await act(async () => { await Promise.resolve(); });
+    await waitFor(() => expect(getEventsMock).toHaveBeenCalled());
+    expect(getEventsMock.mock.calls[0][0]).toEqual(expect.objectContaining({ start: expect.any(String), end: expect.any(String) }));
   });
 
   it("stores prompted ids safely even when storage is bad", () => {

@@ -259,6 +259,8 @@ describe("Timer page extras", () => {
     });
 
     it("handles overlay interactions (history, shortcuts, streak)", () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-03-24T20:00:00.000Z"));
       const state = buildTimerState({ focusMode: false, showPageSkeleton: false });
       render(<TimerPageContent state={state} />);
       fireEvent.click(screen.getByText("open-history"));
@@ -271,6 +273,7 @@ describe("Timer page extras", () => {
       expect(state.setShowShortcuts).toHaveBeenCalledWith(false);
       fireEvent.click(screen.getByText("close-history"));
       expect(state.setShowHistory).toHaveBeenCalledWith(false);
+      vi.useRealTimers();
     });
 
     it("renders back button and skeleton in non-focus mode", () => {

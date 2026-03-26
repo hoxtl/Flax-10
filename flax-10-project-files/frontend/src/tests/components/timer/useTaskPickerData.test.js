@@ -217,6 +217,23 @@ describe('useTaskPickerData – outside close', () => {
     outside.remove();
   });
 
+  it('keeps the picker open when the click lands inside the mounted ref element', () => {
+    const { result } = renderHook(() => useTaskPickerData());
+    const wrap = document.createElement('div');
+    const inside = document.createElement('button');
+    wrap.appendChild(inside);
+    document.body.appendChild(wrap);
+    result.current.ref.current = wrap;
+
+    act(() => result.current.setOpen(true));
+    act(() => {
+      inside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+    expect(result.current.open).toBe(true);
+
+    wrap.remove();
+  });
+
   it('does not add a mousedown listener when open is false', () => {
     const addSpy = vi.spyOn(document, 'addEventListener');
     renderHook(() => useTaskPickerData());

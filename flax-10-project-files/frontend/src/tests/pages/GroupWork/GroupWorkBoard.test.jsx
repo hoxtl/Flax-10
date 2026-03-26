@@ -57,6 +57,62 @@ describe("GroupWork task component - Board", () => {
     expect(adding.setAddingToCol).toHaveBeenCalledWith("todo");
   });
 
+  it("drops a task into a column", () => {
+    const onUpdate = vi.fn();
+    const adding = {
+      addingToCol: null,
+      setAddingToCol: vi.fn(),
+      newCardTitle: "",
+      setNewCardTitle: vi.fn(),
+      onSubmit: vi.fn(),
+      onKeyDown: vi.fn(),
+    };
+
+    const { container } = render(
+      <TaskBoardColumn
+        column={{ id: "done", title: "Done", tasks: [], className: "col", dotClass: "dot", textClass: "text" }}
+        members={[]}
+        onUpdate={onUpdate}
+        onDelete={vi.fn()}
+        adding={adding}
+      />,
+    );
+
+    fireEvent.drop(container.firstChild, {
+      dataTransfer: { getData: vi.fn(() => "9") },
+    });
+
+    expect(onUpdate).toHaveBeenCalledWith(9, { status: "done" });
+  });
+
+  it("ignores drops without a task id", () => {
+    const onUpdate = vi.fn();
+    const adding = {
+      addingToCol: null,
+      setAddingToCol: vi.fn(),
+      newCardTitle: "",
+      setNewCardTitle: vi.fn(),
+      onSubmit: vi.fn(),
+      onKeyDown: vi.fn(),
+    };
+
+    const { container } = render(
+      <TaskBoardColumn
+        column={{ id: "done", title: "Done", tasks: [], className: "col", dotClass: "dot", textClass: "text" }}
+        members={[]}
+        onUpdate={onUpdate}
+        onDelete={vi.fn()}
+        adding={adding}
+      />,
+    );
+
+    fireEvent.drop(container.firstChild, {
+      dataTransfer: { getData: vi.fn(() => "") },
+    });
+
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
   it("renders the add card editor and accepts drops", () => {
     const adding = {
       addingToCol: "todo",
@@ -86,16 +142,75 @@ describe("GroupWork task component - Board", () => {
 
   it("renders TaskBoardView correctly", () => {
     const tasks = [{ id: 1, title: "Card A", status: "todo" }, { id: 2, title: "Card B", status: "done" }];
+    const onAdd = vi.fn();
     render(
       <TaskBoardView
         tasks={tasks}
         members={[]}
         onUpdate={vi.fn()}
         onDelete={vi.fn()}
-        onAdd={vi.fn()}
+        onAdd={onAdd}
       />,
     );
     expect(screen.getByText("Card A")).toBeInTheDocument();
     expect(screen.getByText("Card B")).toBeInTheDocument();
+  });
+
+  it("adds a card from TaskBoardView with Enter and cancels with Escape", () => {
+    const onAdd = vi.fn();
+    render(
+      <TaskBoardView
+        tasks={[{ id: 1, title: "Card A", status: "todo" }]}
+        members={[]}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onAdd={onAdd}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByText("+ Add card")[0]);
+    const input = screen.getByPlaceholderText("Enter title...");
+    fireEvent.change(input, { target: { value: "Board task" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onAdd).toHaveBeenCalledWith("Board task", "todo");
+  });
+
+  it("clears the add-card editor when Escape is pressed", () => {
+    const onAdd = vi.fn();
+    render(
+      <TaskBoardView
+        tasks={[{ id: 1, title: "Card A", status: "todo" }]}
+        members={[]}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onAdd={onAdd}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByText("+ Add card")[0]);
+    const input = screen.getByPlaceholderText("Enter title...");
+    fireEvent.change(input, { target: { value: "Board task" } });
+    fireEvent.keyDown(input, { key: "Escape" });
+    expect(onAdd).not.toHaveBeenCalled();
+    expect(screen.queryByDisplayValue("Board task")).toBeNull();
+  });
+
+  it("ignores unrelated add-card key presses", () => {
+    const onAdd = vi.fn();
+    render(
+      <TaskBoardView
+        tasks={[{ id: 1, title: "Card A", status: "todo" }]}
+        members={[]}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onAdd={onAdd}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByText("+ Add card")[0]);
+    const input = screen.getByPlaceholderText("Enter title...");
+    fireEvent.change(input, { target: { value: "Board task" } });
+    fireEvent.keyDown(input, { key: "Tab" });
+    expect(onAdd).not.toHaveBeenCalled();
   });
 });

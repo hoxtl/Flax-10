@@ -287,7 +287,6 @@ describe('CalendarHeader extra coverage', () => {
         fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
-    });
 
     // -----------------------------------------------------------------------
     // onDatePick (pick button in CalendarNav) dispatches SET_SELECTED_DATE

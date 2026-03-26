@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { startManualTask } from "../../../components/Timer/utils/timerTaskActions";
+import { clearManualTask, startManualTask } from "../../../components/Timer/utils/timerTaskActions";
 
 import { PopupSection } from "../../../components/Timer/sections/PopupSection";
 import { FocusOverlayContent } from "../../../components/Timer/sections/FocusOverlayContent";
@@ -145,6 +145,11 @@ describe("Timer sections", () => {
     expect(screen.getByText("End early")).toBeInTheDocument();
   });
 
+  it("uses break mode goal timing when the popup section is in break mode", () => {
+    render(<PopupSection t={{ ...t, mode: "break", modal: "goal" }} showHistory={false} onCloseHistory={vi.fn()} />);
+    expect(screen.getByText("Goal modal")).toBeInTheDocument();
+  });
+
   it("skips rendering when disabled and hides the break modal when autostart is enabled", () => {
     localStorage.setItem("timer_autostart", "true");
     const { rerender, container } = render(
@@ -184,6 +189,7 @@ describe("Timer sections", () => {
     fireEvent.click(screen.getByText("View History 📜"));
 
     expect(onOpenFocus).toHaveBeenCalled();
+    expect(clearManualTask).toHaveBeenCalledWith(t);
     expect(t.togglePause).toHaveBeenCalled();
     expect(t.resetTimer).toHaveBeenCalled();
     expect(t.setModal).toHaveBeenCalledWith("endEarly");
@@ -203,7 +209,7 @@ describe("Timer sections", () => {
     const setModal = vi.fn();
     render(<PopupSection t={{ ...t, modal: "endEarly", setModal }} showHistory={false} onCloseHistory={vi.fn()} />);
 
-    fireEvent.click(screen.getByText("Cancel"));
+    fireEvent.click(screen.getByText("Cancel end early"));
     expect(setModal).toHaveBeenCalledWith(null);
   });
 });

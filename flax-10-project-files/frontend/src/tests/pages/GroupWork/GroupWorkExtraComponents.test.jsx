@@ -138,6 +138,14 @@ describe("GroupWork extra components", () => {
       expect(onToggle).toHaveBeenCalledWith("1");
     });
 
+    it("toggles members when the checkbox is clicked", () => {
+      const onToggle = vi.fn();
+      render(<MemberFilter members={[{ id: 1, user: 1, name: "Alex" }]} selectedUsers={[]} onToggle={onToggle} />);
+      fireEvent.mouseEnter(screen.getByRole("button", { name: /Filter/ }).parentElement);
+      fireEvent.click(screen.getByRole("checkbox"));
+      expect(onToggle).toHaveBeenCalledWith("1");
+    });
+
     it("renders the empty state and hides it after mouse leave", () => {
       render(<MemberFilter members={[]} selectedUsers={["1"]} onToggle={vi.fn()} />);
       const wrapper = screen.getByRole("button", { name: /Filter/ }).parentElement;

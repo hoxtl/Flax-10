@@ -183,12 +183,33 @@ describe('projectRowUtils – compareProjectsBySort', () => {
     expect(compareProjectsBySort(alpha, beta, 'most-members')).toBeGreaterThan(0);
   });
 
+  it('sorts by least members and completed tasks', () => {
+    expect(compareProjectsBySort(alpha, beta, 'least-members')).toBeLessThan(0);
+    expect(compareProjectsBySort(alpha, beta, 'most-completed')).toBeGreaterThan(0);
+  });
+
+  it('uses completion and created-date tie breakers when member counts match', () => {
+    const gamma = { name: 'Gamma', task_count: 4, completed_task_count: 1, members: [1, 2] };
+    const delta = { name: 'Delta', task_count: 4, completed_task_count: 4, members: [3, 4] };
+    expect(compareProjectsBySort(gamma, delta, 'least-members')).toBeGreaterThan(0);
+    expect(compareProjectsBySort(
+      { name: 'Gamma', created_at: '2026-02-01', deadline: '2026-03-05', members: [1, 2] },
+      { name: 'Delta', created_at: '2026-02-01', deadline: '2026-03-10', members: [3, 4] },
+      'created-asc',
+    )).toBeLessThan(0);
+  });
+
   it('uses created date and deadline fallbacks when sorting', () => {
     expect(compareProjectsBySort(
       { name: 'Alpha', created_at: '2026-01-01', deadline: '2026-03-01', members: [] },
       { name: 'Beta', created_at: '2026-02-01', deadline: '2026-03-02', members: [] },
       'created-asc',
     )).toBeLessThan(0);
+    expect(compareProjectsBySort(
+      { name: 'Alpha', created_at: '2026-02-01', deadline: '2026-03-01', members: [] },
+      { name: 'Beta', created_at: '2026-02-01', deadline: '2026-03-02', members: [] },
+      'created-desc',
+    )).toBeGreaterThan(0);
     expect(compareProjectsBySort(
       { name: 'Alpha', members: [] },
       { name: 'Beta', members: [] },

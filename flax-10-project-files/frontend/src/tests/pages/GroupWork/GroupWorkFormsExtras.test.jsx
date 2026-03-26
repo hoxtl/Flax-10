@@ -270,6 +270,14 @@ describe("useCreateProjectForm", () => {
     expect(result.current.form.members).toEqual([]);
   });
 
+  it("ignores members without an id", () => {
+    const { result } = renderHook(() => useCreateProjectForm(vi.fn()));
+    act(() => {
+      result.current.addMember({ username: "missing-id" });
+    });
+    expect(result.current.form.members).toEqual([]);
+  });
+
   it("submits the form successfully and resets state", async () => {
     const onCreated = vi.fn();
     createGroupProject.mockResolvedValue({ id: 4, name: "Capstone" });
@@ -279,10 +287,11 @@ describe("useCreateProjectForm", () => {
       result.current.change("name", "Capstone");
       result.current.change("course_code", " 5CCS2SEG ");
       result.current.change("deadline", "2099-04-01T12:00:00.000Z");
+      result.current.addMember({ id: 7, username: "alex" });
     });
     await act(async () => { await result.current.submit({ preventDefault: vi.fn() }); });
 
-    expect(createGroupProject).toHaveBeenCalledWith(expect.objectContaining({ name: "Capstone", course_code: "5CCS2SEG" }));
+    expect(createGroupProject).toHaveBeenCalledWith(expect.objectContaining({ name: "Capstone", course_code: "5CCS2SEG", member_ids: [7] }));
     expect(onCreated).toHaveBeenCalled();
     expect(result.current.form.name).toBe("");
   });

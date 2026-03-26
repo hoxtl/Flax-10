@@ -6,7 +6,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { createFnMap } from "../utils/testBuilderUtils";
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -97,6 +97,8 @@ describe("ModulesPageChrome", () => {
     expect(getViewKey(true, null)).toBe("modules-form");
     expect(getViewKey(false, null)).toBe("modules-list");
     expect(getViewKey(false, { id: 7 })).toBe("modules-details-7");
+    expect(getViewKey(false, { module_code: "CS204" })).toBe("modules-details-CS204");
+    expect(getViewKey(false, {})).toBe("modules-details-active");
 
     render(<ModulesSkeleton />);
     expect(screen.getByTestId("modules-skeleton")).toBeInTheDocument();
@@ -129,6 +131,7 @@ describe("ModulesPageChrome", () => {
     expect(state.hook.handleEnrollment).toHaveBeenCalledWith(state.viewingModule);
     expect(state.hook.handleDisenrol).toHaveBeenCalledWith(state.viewingModule);
     expect(state.setViewingModule).toHaveBeenCalledWith(null);
+    expect(state.setSearchQuery).toHaveBeenCalledWith("");
   });
 
   it("renders and closes modals", () => {
@@ -142,6 +145,16 @@ describe("ModulesPageChrome", () => {
     fireEvent.click(screen.getByText("Close reading"));
     expect(state.setDeadlineModule).toHaveBeenCalledWith(null);
     expect(state.setReadingModule).toHaveBeenCalledWith(null);
+  });
+
+  it("renders reading-only modals when the page is idle", () => {
+    const state = buildState({
+      viewingModule: null,
+      deadlineModule: null,
+      readingModule: { module_code: "MA202" },
+    });
+    render(<ModulesPageModals state={state} />);
+    expect(screen.getByText("Reading MA202")).toBeInTheDocument();
   });
 
   it("returns null for page modals when form or details are active", () => {
@@ -169,9 +182,20 @@ describe("ModulesPageChrome", () => {
     fireEvent.click(screen.getByText("Save module"));
     expect(editState.hook.handleModuleUpdated).toHaveBeenCalledWith({ id: 9, module_code: "CS9" });
     expect(editState.setEditingModule).toHaveBeenCalledWith(null);
+    expect(editState.setShowForm).toHaveBeenCalledWith(false);
     const freshState = buildState({ showForm: true, viewingModule: null, editingModule: null });
     rerender(<AnimatedContent state={freshState} viewKey="create" MainView={MainView} />);
     fireEvent.click(screen.getByText("Cancel module form"));
     expect(freshState.setShowForm).toHaveBeenCalledWith(false);
+    expect(freshState.setEditingModule).toHaveBeenCalledWith(null);
+  });
+
+  it("creates a module from the create modal flow", () => {
+    const state = buildState({ showForm: true, viewingModule: null, editingModule: null });
+    render(<AnimatedContent state={state} viewKey="create" MainView={() => null} />);
+    fireEvent.click(screen.getByText("Save module"));
+    expect(state.hook.handleModuleCreated).toHaveBeenCalledWith({ id: 9, module_code: "CS9" });
+    expect(state.setShowForm).toHaveBeenCalledWith(false);
+    expect(state.setEditingModule).toHaveBeenCalledWith(null);
   });
 });

@@ -68,7 +68,6 @@ describe('useSocietyAnnouncements', () => {
     });
 
     it('deleteAnnouncement covers deletion and sync error', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
         mockSoc.announcements = [{ id: 10, title: 'A', event_id: 100 }];
         api.fetchSociety.mockResolvedValue({ announcements: [{ id: 10, event_id: 100 }] });
         eventOps.deleteEvent.mockRejectedValue(new Error('fail'));
@@ -79,9 +78,8 @@ describe('useSocietyAnnouncements', () => {
             await result.current.deleteAnnouncement(10);
         });
         expect(api.deleteAnnouncement).toHaveBeenCalledWith(mockId, 10, false);
-        expect(spy).toHaveBeenCalledWith('Failed to delete linked event:', expect.any(Error));
+        expect(eventOps.deleteEvent).toHaveBeenCalledWith(100, true);
         expect(mockSoc.announcements).toHaveLength(0);
-        spy.mockRestore();
     });
 
     it('handleSync update branch coverage', async () => {
@@ -99,13 +97,12 @@ describe('useSocietyAnnouncements', () => {
     });
 
     it('handleSync catch branch coverage', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
         api.createAnnouncement.mockResolvedValue({ id: 10 });
         eventOps.addEvent.mockRejectedValue(new Error('sync fail'));
         const { result } = renderHook(() => useSocietyAnnouncements(mockId, setSociety, eventOps));
         await act(async () => { await result.current.addAnnouncement({ addAsEvent: true }); });
-        expect(spy).toHaveBeenCalledWith('Failed to sync announcement with event:', expect.any(Error));
-        spy.mockRestore();
+        expect(api.createAnnouncement).toHaveBeenCalledWith(mockId, { addAsEvent: true }, false);
+        expect(eventOps.addEvent).toHaveBeenCalled();
     });
 
     it('deleteAnnouncement skips linked-event deletion when no event is attached', async () => {

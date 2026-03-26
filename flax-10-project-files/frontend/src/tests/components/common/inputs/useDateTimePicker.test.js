@@ -28,40 +28,42 @@ describe("useDateTimePicker", () => {
     const setOpen = vi.fn();
     const inside = document.createElement("button");
     const dropdown = document.createElement("div");
-    const portal = document.createElement("div");
-    portal.closest = vi.fn(() => null);
-    inside.closest = vi.fn(() => null);
-    dropdown.closest = vi.fn(() => null);
+    const portalTarget = document.createElement("div");
+    portalTarget.closest = vi.fn(() => null);
 
     const ref = { current: document.createElement("div") };
     const dropdownRef = { current: document.createElement("div") };
+    document.body.append(ref.current, dropdownRef.current);
+    ref.current.appendChild(inside);
+    dropdownRef.current.appendChild(dropdown);
+    document.body.appendChild(portalTarget);
 
     renderHook(() => useClickOutside(true, ref, dropdownRef, setOpen));
 
     act(() => {
       ref.current.contains = vi.fn(() => true);
-      document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, cancelable: true, target: inside }));
+      inside.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
     });
     expect(setOpen).not.toHaveBeenCalled();
 
     act(() => {
       ref.current.contains = vi.fn(() => false);
       dropdownRef.current.contains = vi.fn(() => true);
-      document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, cancelable: true, target: dropdown }));
+      dropdown.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
     });
     expect(setOpen).not.toHaveBeenCalled();
 
     act(() => {
       ref.current.contains = vi.fn(() => false);
       dropdownRef.current.contains = vi.fn(() => false);
-      portal.closest = vi.fn(() => portal);
-      document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, cancelable: true, target: portal }));
+      portalTarget.closest = vi.fn(() => document.createElement("div"));
+      portalTarget.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
     });
     expect(setOpen).not.toHaveBeenCalled();
 
     act(() => {
-      portal.closest = vi.fn(() => null);
-      document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, cancelable: true, target: document.body }));
+      portalTarget.closest = vi.fn(() => null);
+      document.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
     });
     expect(setOpen).toHaveBeenCalledWith(false);
 
@@ -70,6 +72,10 @@ describe("useDateTimePicker", () => {
       document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     });
     expect(setOpen).toHaveBeenCalledWith(false);
+
+    ref.current.remove();
+    dropdownRef.current.remove();
+    portalTarget.remove();
   });
 
   it("syncs value, exposes handlers, and derives calendar flags", () => {
@@ -83,7 +89,7 @@ describe("useDateTimePicker", () => {
     const setHour = vi.fn();
     const setMinute = vi.fn();
     const onChange = vi.fn();
-    const handlers = useDateTimeHandlers(2026, 2, setViewM, setViewY, null, setSelDate, 10, setHour, 30, setMinute, false, false, onChange);
+    const handlers = useDateTimeHandlers(2026, 0, setViewM, setViewY, null, setSelDate, 10, setHour, 30, setMinute, false, false, onChange);
     handlers.selectDay(18);
     handlers.changeHour(11);
     handlers.changeMinute(45);

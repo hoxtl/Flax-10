@@ -29,6 +29,11 @@ describe("IntelligenceGridWidgets", () => {
     { id: "photo", label: "Photo", col: 1, row: 2 },
   ];
 
+  it("returns null when the hero widget is not present", () => {
+    const { container } = render(<HeroWidget catalogue={catalogue} edit layout={["timeline"]} widgetRenderer={vi.fn()} widgetSizes={{}} setWidgetSize={vi.fn()} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it("renders hero content with widget sizing", () => {
     const widgetRenderer = vi.fn((id, size) => <div>{`${id}-${size.col}x${size.row}`}</div>);
     render(<HeroWidget catalogue={catalogue} edit layout={["hero"]} widgetRenderer={widgetRenderer} widgetSizes={{ hero: { row: 3 } }} setWidgetSize={vi.fn()} />);
@@ -41,6 +46,13 @@ describe("IntelligenceGridWidgets", () => {
     render(<HeroWidget catalogue={catalogue} edit layout={["hero"]} setWidgetSize={setWidgetSize} widgetRenderer={vi.fn()} widgetSizes={{ hero: { row: 3 } }} />);
     fireEvent.click(screen.getByText("Resize hero"));
     expect(setWidgetSize).toHaveBeenCalledWith("hero", { col: 2, row: 3 });
+  });
+
+  it("renders hero without edit controls when not editing", () => {
+    const widgetRenderer = vi.fn(() => <div>hero body</div>);
+    render(<HeroWidget catalogue={catalogue} layout={["hero"]} widgetRenderer={widgetRenderer} widgetSizes={{}} setWidgetSize={vi.fn()} />);
+    expect(screen.getByText("hero body")).toBeInTheDocument();
+    expect(screen.queryByText("Resize hero")).not.toBeInTheDocument();
   });
 
   it("renders grid widgets and skips null content", () => {
@@ -58,5 +70,52 @@ describe("IntelligenceGridWidgets", () => {
     expect(setLayout).toHaveBeenCalled();
     fireEvent.click(screen.getByText(/Resize/));
     expect(setWidgetSize).toHaveBeenCalled();
+  });
+
+  it("calls drag handlers and applies drag state classes", () => {
+    const onDragStart = vi.fn();
+    const onDragOver = vi.fn();
+    const onDragEnd = vi.fn();
+    const onDrop = vi.fn();
+    render(
+      <GridWidgetList
+        catalogue={catalogue}
+        edit
+        layout={["timeline"]}
+        setLayout={vi.fn()}
+        widgetRenderer={(id) => <div>{id}</div>}
+        widgetSizes={{ timeline: { col: 1, row: 2 } }}
+        setWidgetSize={vi.fn()}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+        dragOver={"timeline"}
+        dragging={"timeline"}
+      />,
+    );
+
+    const widget = screen.getByText("timeline").closest("[data-widget-id='timeline']");
+    fireEvent.dragStart(widget, { dataTransfer: { setData: vi.fn() } });
+    fireEvent.dragOver(widget, { dataTransfer: { setData: vi.fn() } });
+    fireEvent.drop(widget, { dataTransfer: { getData: vi.fn(() => "timeline") } });
+    fireEvent.dragEnd(widget);
+
+    expect(onDragStart).toHaveBeenCalled();
+    expect(onDragOver).toHaveBeenCalled();
+    expect(onDrop).toHaveBeenCalled();
+    expect(onDragEnd).toHaveBeenCalled();
+    expect(widget.className).toContain("dragging");
+    expect(widget.className).toContain("dragOver");
+  });
+
+  it("renders the add widget slot only in edit mode", () => {
+    const onClick = vi.fn();
+    const { rerender } = render(<AddWidgetSlot edit={false} onClick={onClick} />);
+    expect(screen.queryByText("Add Widget")).not.toBeInTheDocument();
+
+    rerender(<AddWidgetSlot edit onClick={onClick} />);
+    fireEvent.click(screen.getByText("Add Widget"));
+    expect(onClick).toHaveBeenCalled();
   });
 });

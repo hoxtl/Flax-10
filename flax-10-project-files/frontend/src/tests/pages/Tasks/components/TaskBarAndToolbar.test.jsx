@@ -82,7 +82,8 @@ function buildTaskBarState(overrides = {}) {
 
 describe("Task bar and toolbar coverage", () => {
   it("covers reading-list fields, dropdown fallbacks, and sleep warnings", () => {
-    const state = buildTaskBarState(); taskBarHookMock.mockReturnValue(state);
+    const state = buildTaskBarState({ isReadingList: true, sleepWarning: true, sleepWarningProps: { reason: "tired" } });
+    taskBarHookMock.mockReturnValue(state);
     const externalInputRef = { current: null };
     render(<CreateTaskBar inputRef={externalInputRef} />);
 
@@ -105,8 +106,9 @@ describe("Task bar and toolbar coverage", () => {
 
   it("renders blank page counts and keeps selected module values when they are present", () => {
     const state = buildTaskBarState({
+      isReadingList: true,
       pageCount: null,
-      moduleId: "",
+      moduleId: "11",
       moduleOptions: [
         { value: "11", label: "KCL1" },
         { value: "22", label: "KCL2" },

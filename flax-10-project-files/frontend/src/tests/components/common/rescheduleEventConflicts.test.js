@@ -153,4 +153,39 @@ describe("rescheduleEventConflicts", () => {
       end_time: iso("2026-03-23T10:00:00Z"),
     });
   });
+
+  it("handles default planning arguments, empty inputs, and operation-only toast messages", async () => {
+    expect(buildConflictResolutionPlan()).toEqual({ operations: [], unresolved: [] });
+    expect(buildConflictResolutionToastMessage({ operations: [{ event: { title: "Solo" }, movedToTomorrow: false }], unresolved: [] })).toBe("Cleared 1 conflict.");
+    expect(buildConflictResolutionToastMessage({
+      operations: [
+        { event: { title: "A" }, movedToTomorrow: true },
+        { event: { title: "B" }, movedToTomorrow: true },
+      ],
+      unresolved: [{ reason: "fixed" }, { reason: "no-slot" }],
+    })).toContain("2 moved to tomorrow");
+
+    const editEvent = vi.fn().mockRejectedValue(new Error("fail"));
+    const plan = {
+      operations: [{
+        event: { id: "task-1", title: "Task 1" },
+        start: new Date("2026-03-23T12:00:00Z"),
+        end: new Date("2026-03-23T13:00:00Z"),
+        originalStart: iso("2026-03-23T09:00:00Z"),
+        originalEnd: iso("2026-03-23T10:00:00Z"),
+      }],
+      unresolved: [],
+    };
+
+    const result = await applyConflictResolutionPlan(plan, editEvent);
+    expect(result.failures).toHaveLength(1);
+
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const sparsePlan = buildConflictResolutionPlan([
+      { id: "keep", source: "personal", title: "Keep", start_time: iso("2026-03-23T12:00:00Z") },
+      { source: "personal", title: "Ignore me" },
+    ], selectedDate);
+    expect(sparsePlan.operations).toEqual([]);
+    expect(sparsePlan.unresolved).toEqual([]);
+  });
 });

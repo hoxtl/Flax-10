@@ -134,6 +134,40 @@ describe("IntelligenceWidgetRenderer", () => {
     expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
   });
 
+  it("counts society events from the timeline fallback when calendar events are absent", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [],
+      slot5Data: {
+        now: "2024-03-08T10:00:00Z",
+        sortedEvents: [
+          { id: 11, kind: "society", society_id: 7, start_time: "2024-03-10T10:00:00Z" },
+          { id: 12, kind: "club", start_time: "2024-03-11T10:00:00Z" },
+        ],
+      },
+      profile: { role: "student", summary: { societies: [{ society_id: 7, name: "Robotics Society" }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
+  it("counts society events matched by name and ignores events missing a start time", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [],
+      slot5Data: {
+        now: "2024-03-08T10:00:00Z",
+        sortedEvents: [
+          { id: 21, kind: "society", society_name: "Robotics Society", start_time: "2024-03-10T10:00:00Z" },
+          { id: 22, kind: "society", society_id: 7 },
+        ],
+      },
+      profile: { role: "student", summary: { societies: [{ name: "Robotics Society" }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
   it("handles course change dismissal and teacher role in hero", () => {
     const props = { ...baseProps, profile: { role: "teacher", summary: { societies: [] } } };
     renderWidget("hero", props);
@@ -191,6 +225,25 @@ describe("IntelligenceWidgetRenderer", () => {
 
     rerender(<>{renderIntelligenceWidget("analyticsHeatmap", baseProps, { row: 2 })}</>);
     expect(screen.getByTestId("heatmap")).toBeTruthy();
+  });
+
+  it("renders empty states for analytics breakdown widgets", () => {
+    const emptyProps = {
+      ...baseProps,
+      dashboard: {
+        ...baseProps.dashboard,
+        analytics: {
+          ...baseProps.dashboard.analytics,
+          loading: false,
+          data: {},
+        },
+      },
+    };
+    render(<>{renderIntelligenceWidget("analyticsDailyBreakdown", emptyProps, { row: 2 })}</>);
+    expect(screen.getByText("No daily-breakdown data yet.")).toBeTruthy();
+
+    render(<>{renderIntelligenceWidget("analyticsHeatmap", emptyProps, { row: 2 })}</>);
+    expect(screen.getByText("No focus heatmap data yet.")).toBeTruthy();
   });
 
   it("renders the remaining widgets and returns null for unknown ids", () => {

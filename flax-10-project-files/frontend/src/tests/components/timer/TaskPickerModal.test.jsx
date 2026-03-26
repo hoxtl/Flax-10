@@ -215,8 +215,7 @@ describe('TaskPickerModal – filter panel', () => {
     const filterWrapRef = { current: document.createElement('div') };
     const state = makeState({ isFilterOpen: true, setIsFilterOpen });
     render(<TaskPickerModal state={state} filterWrapRef={filterWrapRef} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
-    const shell = document.querySelector('[data-testid="standard-modal"]');
-    if (shell) fireEvent.mouseDown(shell);
+    fireEvent.mouseDown(screen.getByText('Task One'));
     expect(setIsFilterOpen).toHaveBeenCalledWith(false);
   });
 });

@@ -357,15 +357,26 @@ describe("GroupWork pages and header extras", () => {
     });
 
     it("hides module and deadline metadata when project data is incomplete", () => {
-      getProjectDate.mockReturnValueOnce(null);
+      getProjectDate.mockReturnValue(null);
+      getProjectTeacherName.mockReturnValue("");
       renderProjectHeaderWith({
-        project: { ...baseProject, course_code: "", module_name: "", deadline: null },
+        project: { ...baseProject, course_code: "", module_name: "", teacher_name: "", deadline: null },
         teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }],
       });
 
       expect(screen.queryByLabelText(/Open .* module/i)).toBeNull();
       expect(screen.queryByText(/day left|days left|Due today|overdue/i)).toBeNull();
       expect(screen.queryByLabelText(/Open .* module/i)).toBeNull();
+      expect(screen.queryByLabelText(/Open .*'s profile/i)).toBeNull();
+    });
+
+    it("treats a non-owner viewer as unable to delete the project", () => {
+      getStoredViewer.mockReturnValueOnce({ id: 99, user: 99 });
+      renderProjectHeaderWith({
+        teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }],
+      });
+
+      expect(screen.getByRole("button", { name: /Delete project/i })).toBeDisabled();
     });
   });
 });
