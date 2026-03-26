@@ -111,6 +111,37 @@ The system architecture is illustrated across two component diagrams below. Figu
 
 \FloatBarrier
 
+\section{Deployment methods}
+
+This section documents the deployment method practiced by this project, and the relevant deployment-sensitive changes made with comparison of those under development settings.\ref{fig:deployment_workflow}
+
+\FloatBarrier
+
+\begin{landscape}
+\begin{figure}[!htbp]
+    \centering
+    \adjustbox{max width=\linewidth, max totalheight=\textheight-2cm}{%
+        \includegraphics{figures/deployment_workflow.png}%
+    }
+    \vspace{-0.5cm}
+    \caption{Component Diagram --- Deployment Workflow}
+    \label{fig:deployment_workflow}
+\end{figure}
+\end{landscape}
+
+\FloatBarrier
+
+\subsection{Database communicating}
+
+Deployment database communication service is fully provided by the Railway's internal network handling, specified by \texttt{DATABASE\_URL} in the deployment setting. As a seperated container it is such a convenience to set up even comparing with development database, thanks to the graphic IO approach offered by the Railway deployment service.
+
+\subsection{API Handling}
+
+Unlike the prior SEG project, in this project API is handled using \texttt{Django REST Framework} and practicing JSON-based API call formatting. In deployment such method functions in a however less intuitive way-- A static, manifest-based api pipeline instead of an inter-server communication. This differs from what is practiced under development environement, which is a localhost server based frontend-backend 2 servers paradigm. This actually creates sort of difference on how api pathing and http call handling behaves upon deployment, forming challenges to deploying attempts and our transport-layer knowledge base for debugging unexpected http behaviors(unexpected errors like 401, 502, 400, 404, etc.).
+
+\subsection{Asset Serving}
+
+Losing access to vite HMR dev server certainly makes static assest serving less dev-friendly and creates unecessary asset rebuild, static manifesting and vite building configuration. However we managed to form a complete and sound toolchain fullfilling our design-- Django-Vite + Whitenoise + Static assests. While Django-Vite helps backend processing asset manifestations, Whitenoise enables django to serve static file upon requested.
 \section{Key Design Decisions}
 \label{sect:design-decisions}
 
