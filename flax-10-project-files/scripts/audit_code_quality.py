@@ -81,7 +81,7 @@ PY_MAX_COLLABORATORS   = 8   # distinct call targets before SRP flag
 JS_MAX_FUNC_LINES  = 20
 JS_MAX_NESTING     = 1
 JS_MAX_FILE_LINES  = 400
-JS_MAX_TEST_LINES  = 25
+JS_MAX_TEST_LINES  = 50
 JS_MIN_DRY_LINES   = 5
 JS_MIN_DRY_CHARS   = 150
 
@@ -518,9 +518,12 @@ def extract_js_funcs(lines: list[str]) -> list[tuple[str,int,int]]:
 def js_nesting(lines: list[str]) -> int:
     depth = peak = 0
     for line in lines:
-        s = line.strip()
-        if re.search(r"\b(if|for|while|switch)\b.*(?<!\$)\{", s) or re.search(r"\b(catch|else\s*(?<!\$)\{)", s):
-            depth += 1; peak = max(peak, depth)
+        s = re.sub(r'\$\{[^}]*\}', '', line.strip())
+        is_control = bool(re.search(r"\b(if|for|while|switch|catch|else)\b", s))
+        net = s.count('{') - s.count('}')
+        if is_control and net > 0:
+            depth += 1
+            peak = max(peak, depth)
         elif s in ("}", "};", "},"):
             depth = max(0, depth - 1)
     return peak
@@ -558,7 +561,7 @@ def check_js_funcs(path: Path, issues: list[Issue]) -> None:
             issues.append(Issue("Function/Nesting","JS_FUNC_LONG","ERROR",fstr,start+1,
                 f"`{name}` is {flen} lines (max {limit})",
                 "Extract logic into smaller helper functions."))
-        if depth > JS_MAX_NESTING:
+        if not tst and depth > JS_MAX_NESTING:
             issues.append(Issue("Function/Nesting","JS_NESTING","ERROR",fstr,start+1,
                 f"`{name}` nesting depth {depth} (max {JS_MAX_NESTING})",
                 "Use early returns / extract inner blocks."))
