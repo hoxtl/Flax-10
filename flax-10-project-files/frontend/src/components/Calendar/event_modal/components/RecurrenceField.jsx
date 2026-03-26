@@ -1,7 +1,7 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import AnimatedDropdown from '../../../common/animated_dropdown';
 import { FREQUENCY_OPTIONS } from './recurrenceOptions';
-import './RecurrenceField.css';
+import './recurrence-field.css';
 
 const END_TYPE_OPTIONS = [
     { value: 'never', label: 'Never' },

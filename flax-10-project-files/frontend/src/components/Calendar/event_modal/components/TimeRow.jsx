@@ -2,7 +2,7 @@ import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import AnimatedDropdown from '../../../common/animated_dropdown';
 import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
 import { FREQUENCY_OPTIONS } from './recurrenceOptions';
-import './TimeRow.css';
+import './time-row.css';
 
 export function TimeRow({ form, update, setForm, recurrenceValue, onRecurrenceChange }) {
     return (
