@@ -1,3 +1,7 @@
+/**
+ * Covers internal dropdown trigger, menu, and interaction hooks.
+ */
+
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, renderHook, screen } from "@testing-library/react";
 
@@ -49,24 +53,30 @@ const renderTrigger = (overrides = {}) => {
   return { ...utils, props, rerenderTrigger };
 };
 
+const menuBaseProps = {
+  activeItemClassName: "",
+  align: "left",
+  hideCheckboxForValues: [],
+  isModuleVariant: false,
+  isOpen: true,
+  itemClassName: "",
+  menuClassName: "",
+  options: [{ label: "Alpha", value: "alpha" }],
+  optionsAsPills: false,
+  selected: ["alpha"],
+  selectedSet: new Set(["alpha"]),
+  showCheckboxes: true,
+  variant: "default",
+};
+
+const buildMenuProps = (overrides = {}) => ({
+  ...menuBaseProps,
+  onToggle: vi.fn(),
+  ...overrides,
+});
+
 const renderMenu = (overrides = {}) => {
-  const props = {
-    activeItemClassName: "",
-    align: "left",
-    hideCheckboxForValues: [],
-    isModuleVariant: false,
-    isOpen: true,
-    itemClassName: "",
-    menuClassName: "",
-    onToggle: vi.fn(),
-    options: [{ label: "Alpha", value: "alpha" }],
-    optionsAsPills: false,
-    selected: ["alpha"],
-    selectedSet: new Set(["alpha"]),
-    showCheckboxes: true,
-    variant: "default",
-    ...overrides,
-  };
+  const props = buildMenuProps(overrides);
   const utils = render(<MultiSelectDropdownMenu {...props} />);
   const rerenderMenu = (next) => {
     Object.assign(props, next);
