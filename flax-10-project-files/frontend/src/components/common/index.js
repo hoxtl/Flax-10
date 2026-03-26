@@ -17,7 +17,7 @@ export { default as SearchEmptyState } from "./search_empty_state/SearchEmptySta
 export { default as SectionHeader } from "./section_header/SectionHeader";
 export { SleepWarningModal } from "./sleep_warning_modal/SleepWarningModal";
 export { default as StandardModal } from "./standard_modal/StandardModal";
-export { default as Tabs } from "./tabs/Tabs";
+export { default as Tabs } from "./Tabs/Tabs";
 export { default as TextInput } from "./text_input/TextInput";
 export { default as UserAvatar } from "./user_avatar/UserAvatar";
 export * from "./motion/transitions";

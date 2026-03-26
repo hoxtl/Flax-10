@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Tabs from '../../../components/common/tabs/Tabs';
+import Tabs from '../../../components/common/Tabs/Tabs';
 
-vi.mock('../../../components/common/tabs/Tabs.module.css', () => ({ default: { container: 'container', compact: 'compact', tabBar: 'tabBar', tab: 'tab', active: 'active', headingTab: 'headingTab', tabIndicator: 'tabIndicator', content: 'content' } }));
+vi.mock('../../../components/common/Tabs/Tabs.module.css', () => ({ default: { container: 'container', compact: 'compact', tabBar: 'tabBar', tab: 'tab', active: 'active', headingTab: 'headingTab', tabIndicator: 'tabIndicator', content: 'content' } }));
 
 describe('Tabs', () => {
   it('returns null when tabs is empty or null', () => {

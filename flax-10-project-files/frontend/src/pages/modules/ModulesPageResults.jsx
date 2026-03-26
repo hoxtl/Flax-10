@@ -10,7 +10,7 @@ import PageToolbar, { ToolbarSortControl } from "../../components/common/page_to
 import PrimaryButton from "../../components/common/primary_button/PrimaryButton";
 import PageTransition from "../../components/common/page_transition/PageTransition.jsx";
 import SearchBar from "../../components/common/search_bar/SearchBar.jsx";
-import Tabs from "../../components/common/tabs/Tabs";
+import Tabs from "../../components/common/Tabs/Tabs";
 import { SegmentedControl } from "../../components/common/segmented_control/SegmentedControl";
 import { Pagination, BackToTop } from "../../components/pagination/Pagination.jsx";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState.jsx";
