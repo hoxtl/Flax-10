@@ -139,5 +139,5 @@ function useProjectState(projectId, onBack, onDelete, onUpdate) {
   const { members, setMembers } = useProjectMembers(projectId);
   const actions = useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate);
   const onAdded = (member) => addMemberIfMissing(member, setMembers);
-  return { project, loading, members, onAdded, onBack, ...actions };
+  return { project, setProject, loading, members, onAdded, onBack, ...actions };
 }

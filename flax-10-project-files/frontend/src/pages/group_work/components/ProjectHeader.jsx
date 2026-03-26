@@ -63,14 +63,14 @@ function currentUserIsOwner(teamMembers) {
     return (teamMembers || []).some((m) => String(m.user ?? "") === viewerId && m.role === "owner");
 }
 
-export default function ProjectHeader({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDelete, onBack }) {
+export default function ProjectHeader({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDelete, onUpdate, onBack }) {
     const date = getProjectDate(project.deadline);
     const isOwner = currentUserIsOwner(teamMembers);
     return (
         <section className={styles.headerSection}>
             <div className={styles.topActions}>
                 <BackButton onClick={onBack} label="Back to all projects" />
-                <ProjectHeaderActions onDelete={onDelete} onMemberRemove={onMemberRemove} isOwner={isOwner} teamMembers={teamMembers} onBack={onBack} />
+                <ProjectHeaderActions project={project} onDelete={onDelete} onMemberRemove={onMemberRemove} isOwner={isOwner} teamMembers={teamMembers} onBack={onBack} onUpdate={onUpdate} />
             </div>
             <ProjectHeaderContent project={project} date={date} members={members} teamMembers={teamMembers} onMemberAdded={onMemberAdded} onMemberRemove={onMemberRemove} onDelete={onDelete} />
         </section>

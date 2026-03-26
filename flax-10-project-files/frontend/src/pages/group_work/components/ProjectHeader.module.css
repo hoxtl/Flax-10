@@ -21,6 +21,12 @@
     gap: 16px;
     flex-wrap: wrap;
 }
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .deleteBtn {
     padding: 8px 16px;
     border-radius: 999px;
