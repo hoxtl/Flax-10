@@ -2,31 +2,32 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, screen } from '@testing-library/react';
 import * as helpers from '../../utils/timerTestHelpers';
 
-const testUpdate = () => {
+const testWorkUpdate = () => {
     const onUpdate = vi.fn();
     helpers.renderTimerSettings({ work: 25, breakTime: 5, sessions: 4, isActive: false, onUpdate });
-
-    // Changing input should NOT trigger update immediately
     const input = screen.getAllByRole('spinbutton')[0];
     fireEvent.change(input, { target: { value: '30' } });
     expect(onUpdate).not.toHaveBeenCalled();
-
-    // Blurring should trigger update
     helpers.blurInput(0);
     expect(onUpdate).toHaveBeenCalledWith('work', 30);
-
-    // Changing to empty string and blurring should NOT update to empty, but reset to min/default
     onUpdate.mockClear();
     fireEvent.change(input, { target: { value: '' } });
     helpers.blurInput(0);
-    // Should reset to 1 (min for work)
     expect(onUpdate).toHaveBeenCalledWith('work', 1);
+};
 
+const testBreakUpdate = () => {
+    const onUpdate = vi.fn();
+    helpers.renderTimerSettings({ work: 25, breakTime: 5, sessions: 4, isActive: false, onUpdate });
     const breakInput = screen.getAllByRole('spinbutton')[1];
     fireEvent.change(breakInput, { target: { value: '10' } });
     helpers.blurInput(1);
     expect(onUpdate).toHaveBeenCalledWith('break', 10);
+};
 
+const testSessionsUpdate = () => {
+    const onUpdate = vi.fn();
+    helpers.renderTimerSettings({ work: 25, breakTime: 5, sessions: 4, isActive: false, onUpdate });
     const sessionsInput = screen.getAllByRole('spinbutton')[2];
     fireEvent.change(sessionsInput, { target: { value: '6' } });
     helpers.blurInput(2);
@@ -91,7 +92,9 @@ const testArrowDownAtMinimum = () => {
 };
 
 describe('TimerSettings', () => {
-    it('inputs call onUpdate', testUpdate);
+    it('work input calls onUpdate', testWorkUpdate);
+    it('break input calls onUpdate', testBreakUpdate);
+    it('sessions input calls onUpdate', testSessionsUpdate);
     it('selects content on focus', testFocus);
     it('resets invalid values on blur', testBlur);
     it('shows disclaimer on invalid input', testDisclaimerInput);
