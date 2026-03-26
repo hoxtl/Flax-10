@@ -1,3 +1,7 @@
+"""
+API URL routes for studyFlax.
+"""
+
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -80,6 +84,7 @@ from studyFlax.views.user.profile_summary_view import profile_summary_view
 from studyFlax.views.user.profile_view import another_user_profile_view, profile_view, suggest_study_session_view
 from studyFlax.views.user.settings_view import onboarding_view
 from studyFlax.views.user.user_search_view import user_search
+
 
 router = DefaultRouter()
 router.register(r'timer/history', StudySessionViewSet, basename='study-session')

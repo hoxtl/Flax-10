@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from studyFlax.models.society import Society, SocietyMembership
 from studyFlax.models.notifications.notification_model import Notification
 
+
 User = get_user_model()
 
 @receiver(pre_save, sender=Society)
