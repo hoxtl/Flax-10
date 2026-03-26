@@ -1,5 +1,5 @@
 /*
- * Task card with quick actions, contextual menu, and detail modals.
+ * Task card with focused actions, context controls, and detail modals.
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -62,12 +62,12 @@ function useTaskContextMenuState(task) {
   return { view, setView, dueValue, setDueValue, sleepSettings, setSleepSettings, sleepWarning, checkSleepAndRun, sleepWarningProps };
 }
 
-function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
+function useTaskContextMenuEffects(onClose, setSleepSettings) {
   useEffect(() => {
     const handler = () => { onClose(); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [menuRef, onClose]);
+  }, [onClose]);
   useEffect(() => {
     let cancelled = false;
     getUserSettings()
@@ -89,6 +89,15 @@ function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) 
   );
 }
 
+function ContextMenuBackControl({ onClick }) {
+  return (
+    <>
+      <button className={styles.ctxBack} onClick={onClick}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
+      <div className={styles.ctxDivider} />
+    </>
+  );
+}
+
 function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
   const fromListName = lists.find((x) => String(x.id) === String(task.task_list))?.name;
   const options = lists.map(l => ({ value: String(l.id), label: l.name }));
@@ -100,8 +109,7 @@ function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
   };
   return (
     <>
-      <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
-      <div className={styles.ctxDivider} />
+      <ContextMenuBackControl onClick={() => setView("main")} />
       <div className={styles.ctxMoveDropdownWrap}>
         <AnimatedDropdown value={String(task.task_list ?? "")} onChange={handleMove} options={options} menuMaxHeight={200} usePortal allowFlipUpward />
       </div>
@@ -109,48 +117,66 @@ function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
   );
 }
 
-function ContextMenuDueView({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun, setView }) {
-  const [pending, setPending] = useState(dueValue);
-  const [changed, setChanged] = useState(false);
-  const handlePickerChange = (val) => {
-    if (!val) {
-      setPending(null);
-      setDueValue(null);
-      onEdit({ due_date: null }, { source: "context-menu", action: "set-due-date", dueDate: null });
-      onClose();
-      return;
-    }
-    setPending(val);
-    setChanged(true);
-  };
-  const handleConfirm = () => {
-    if (!pending) return;
-    setDueValue(pending);
-    checkSleepAndRun(pending, () => { onEdit({ due_date: pending }, { source: "context-menu", action: "set-due-date", dueDate: pending }); onClose(); });
-  };
+function saveDueDate(onEdit, dueDate) {
+  onEdit({ due_date: dueDate }, { source: "context-menu", action: "set-due-date", dueDate });
+}
+
+function clearDueDate(setPending, setDueValue, onEdit, onClose) {
+  setPending(null);
+  setDueValue(null);
+  saveDueDate(onEdit, null);
+  onClose();
+}
+
+function confirmDueDate(pending, setDueValue, checkSleepAndRun, onEdit, onClose) {
+  if (!pending) return;
+  setDueValue(pending);
+  checkSleepAndRun(pending, () => { saveDueDate(onEdit, pending); onClose(); });
+}
+
+function ContextMenuDateField({ pending, onChange }) {
+  return <div className={styles.ctxDateWrap}><DateTimePicker value={pending} onChange={onChange} placeholder="Pick date & time" /></div>;
+}
+
+function ContextMenuDueConfirm({ changed, pending, onConfirm }) {
+  if (!changed || !pending) return null;
   return (
     <>
-      <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
       <div className={styles.ctxDivider} />
-      <div className={styles.ctxDateWrap}><DateTimePicker value={pending} onChange={handlePickerChange} placeholder="Pick date & time" /></div>
-      {changed && pending && (
-        <>
-          <div className={styles.ctxDivider} />
-          <button className={styles.ctxItem} onClick={handleConfirm}>Set date</button>
-        </>
-      )}
+      <button className={styles.ctxItem} onClick={onConfirm}>Set date</button>
     </>
   );
 }
 
+function ContextMenuDueView({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun, setView }) {
+  const [pending, setPending] = useState(dueValue);
+  const [changed, setChanged] = useState(false);
+  const handlePickerChange = (value) => {
+    if (!value) return clearDueDate(setPending, setDueValue, onEdit, onClose);
+    setPending(value);
+    setChanged(true);
+  };
+  const handleConfirm = () => confirmDueDate(pending, setDueValue, checkSleepAndRun, onEdit, onClose);
+  return (
+    <>
+      <ContextMenuBackControl onClick={() => setView("main")} />
+      <ContextMenuDateField pending={pending} onChange={handlePickerChange} />
+      <ContextMenuDueConfirm changed={changed} pending={pending} onConfirm={handleConfirm} />
+    </>
+  );
+}
+
+/**
+ * Shows the contextual task menu for editing, moving, and due-date actions.
+ */
+
 export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists = [], pos, onClose }) {
-  const menuRef = useRef(null);
   const state = useTaskContextMenuState(task);
-  useTaskContextMenuEffects(menuRef, onClose, state.setSleepSettings);
+  useTaskContextMenuEffects(onClose, state.setSleepSettings);
   const menuPos = { '--ctx-top': `${pos.y}px`, '--ctx-left': `${pos.x}px` };
   const menu = (
     <>
-      <div ref={menuRef} className={styles.ctxMenu} style={menuPos} onMouseDown={(e) => e.stopPropagation()}>
+      <div className={styles.ctxMenu} style={menuPos} onMouseDown={(e) => e.stopPropagation()}>
         {state.view === "main" && <ContextMenuMainView onEditOpen={onEditOpen} onDelete={onDelete} onClose={onClose} lists={lists} setView={state.setView} />}
         {state.view === "move" && <ContextMenuMoveView task={task} lists={lists} onEdit={onEdit} onClose={onClose} setView={state.setView} />}
         {state.view === "due" && <ContextMenuDueView dueValue={state.dueValue} setDueValue={state.setDueValue} onEdit={onEdit} onClose={onClose} checkSleepAndRun={state.checkSleepAndRun} setView={state.setView} />}
@@ -175,6 +201,10 @@ function buildCheckClickHandler(opts) {
     onToggle();
   };
 }
+
+/**
+ * Opens the task editor with the current task prefilled for editing.
+ */
 
 export function EditTaskModal({ task, onSave, onDelete, onClose, lists = [] }) {
   return (
@@ -284,6 +314,10 @@ function TaskCardView(card) {
     </div>
   );
 }
+
+/**
+ * Renders a task row with completion, details, and timer actions.
+ */
 
 export default function TaskCard(props) {
   const card = useTaskCard(props);

@@ -1,8 +1,8 @@
 /*
- * Quick-add task bar with optional reading and module details.
+ * Quick-add task bar for creating tasks with focused optional fields.
  */
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import AnimatedDropdown from "../../../components/common/animated_dropdown";
 import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
@@ -38,13 +38,13 @@ function PageCountField({ styles: s, pageCount, setPageCount }) {
   );
 }
 
-function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions, listError }) {
+function ListDropdown({ s, taskListId, setTaskListId, listOptions, listError, sortedLists }) {
   return (
     <>
       <span className={s.optionsRowDivider} aria-hidden />
       <span className={s.optionsRowLabel}>List <span className={s.requiredMark}>*</span></span>
       <div className={`${s.dropdownWrap} ${s.listDropdownWrap} ${listError ? s.listDropdownError : ""}`}>
-        <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || "")} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+        <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || sortedLists?.[0]?.id)} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
       </div>
     </>
   );
@@ -54,6 +54,22 @@ const optionsPanelVariants = {
   hidden: { height: 0, opacity: 0, marginTop: 0 },
   visible: { height: "auto", opacity: 1, marginTop: 8 },
 };
+
+function OptionsPanel({ children }) {
+  return (
+    <Motion.div
+      key="options-panel"
+      variants={optionsPanelVariants}
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      style={{ overflow: "visible" }}
+    >
+      {children}
+    </Motion.div>
+  );
+}
 
 function OptionsRowContent(props) {
   const primaryField = props.isReadingList
@@ -70,21 +86,7 @@ function OptionsRowContent(props) {
 function CreateTaskBarOptions(props) {
   return (
     <div className={props.styles.optionsRowWrapper}>
-      <AnimatePresence initial={false}>
-        {props.showOptions && (
-          <motion.div
-            key="options-panel"
-            variants={optionsPanelVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            style={{ overflow: "visible" }}
-          >
-            <OptionsRowContent {...props} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <AnimatePresence initial={false}>{props.showOptions && <OptionsPanel><OptionsRowContent {...props} /></OptionsPanel>}</AnimatePresence>
     </div>
   );
 }
@@ -102,9 +104,9 @@ function TaskBarDropdownFields(props) {
         s={props.styles}
         taskListId={props.taskListId}
         setTaskListId={props.setTaskListId}
-        sortedLists={props.sortedLists}
         listOptions={props.listOptions}
         listError={props.listError}
+        sortedLists={props.sortedLists}
       />
     </>
   );
@@ -156,6 +158,10 @@ function ModuleDropdownField({ moduleId, setModuleId, moduleOptions, styles: s }
   );
 }
 
+/**
+ * Renders the quick-add task bar with optional module, list, and reading fields.
+ */
+
 export default function CreateTaskBar(props) {
   const { cardRef, handleSubmit, handleInputBlur, handleInputKeyDown, inputRef, sleepWarning, sleepWarningProps, ...bar } = useCreateTaskBar(props);
   return (
@@ -163,9 +169,9 @@ export default function CreateTaskBar(props) {
       <form className={styles.card} onSubmit={handleSubmit} ref={cardRef} data-create-task-bar-card>
         <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={handleInputBlur} onKeyDown={handleInputKeyDown} />
         <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedMinutes={bar.estimatedMinutes} setEstimatedMinutes={bar.setEstimatedMinutes} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId}
-         sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions}
+         moduleOptions={bar.moduleOptions} listOptions={bar.listOptions}
          isReadingList={bar.isReadingList} pageCount={bar.pageCount} setPageCount={bar.setPageCount}
-         listError={bar.listError}
+         listError={bar.listError} sortedLists={bar.sortedLists}
         />
       </form>
       {sleepWarning && <SleepWarningModal {...sleepWarningProps} />}

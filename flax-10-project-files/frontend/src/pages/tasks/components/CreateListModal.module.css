@@ -1,10 +1,6 @@
-/* Styles for the create/edit list modal. */
-
-.modalShell {
-    background: var(--panel, #FFFCFA);
-    border-radius: var(--card-radius, 24px);
-    box-shadow: 0 24px 80px rgba(74, 52, 33, 0.12), 0 2px 8px rgba(74, 52, 33, 0.06);
-}
+/*
+ * Styles for the create-list modal body and footer layout.
+ */
 
 .modalContent {
     display: flex;
