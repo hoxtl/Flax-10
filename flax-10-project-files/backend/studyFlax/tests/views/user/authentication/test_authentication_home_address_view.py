@@ -7,10 +7,12 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+
 User = get_user_model()
 
 
 class HomeAddressViewCoverageTest(TestCase):
+    """Tests home address view coverage."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='hacov', email='hacov@example.com', password='pass')

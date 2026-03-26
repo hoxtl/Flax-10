@@ -14,10 +14,12 @@ from studyFlax.models.authentication.reset_password_token_model import ResetPass
 
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
 
 
 class PasswordResetRequestViewTest(TestCase):
+    """Tests password reset request view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -54,6 +56,7 @@ class PasswordResetRequestViewTest(TestCase):
 
 
 class ConfirmPasswordResetViewTest(TestCase):
+    """Tests confirm password reset view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -98,6 +101,7 @@ class ConfirmPasswordResetViewTest(TestCase):
 
 
 class ConfirmPasswordResetDatabaseErrorTest(TestCase):
+    """Tests confirm password reset database error."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='dberr', email='dberr@example.com', password='testpass123')
@@ -117,6 +121,7 @@ class ConfirmPasswordResetDatabaseErrorTest(TestCase):
 
 
 class PasswordResetValidationErrorTest(TestCase):
+    """Tests password reset validation error."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='valerr', email='valerr@example.com', password='testpass123')

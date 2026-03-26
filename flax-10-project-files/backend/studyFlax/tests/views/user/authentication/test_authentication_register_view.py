@@ -10,10 +10,12 @@ from rest_framework.test import APIClient
 from studyFlax.models.authentication.user_settings_model import UserSettings
 from studyFlax.views.user.settings_view import DEFAULT_HOMEPAGE_WIDGETS
 
+
 User = get_user_model()
 
 
 class RegisterViewTest(TestCase):
+    """Tests register view."""
     def setUp(self):
         self.client = APIClient()
         self.url = '/api/auth/register/'
@@ -38,6 +40,7 @@ class RegisterViewTest(TestCase):
 
 
 class RegisterViewCoverageTest(TestCase):
+    """Tests register view coverage."""
     def setUp(self):
         self.client = APIClient()
         self.url = '/api/auth/register/'

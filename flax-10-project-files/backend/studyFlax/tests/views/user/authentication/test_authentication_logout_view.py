@@ -8,10 +8,12 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+
 User = get_user_model()
 
 
 class LogoutViewTest(TestCase):
+    """Tests logout view."""
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
@@ -36,6 +38,7 @@ class LogoutViewTest(TestCase):
 
 
 class LogoutViewCoverageTest(TestCase):
+    """Tests logout view coverage."""
     def setUp(self):
         self.client = APIClient()
         self.url = '/api/auth/logout/'
