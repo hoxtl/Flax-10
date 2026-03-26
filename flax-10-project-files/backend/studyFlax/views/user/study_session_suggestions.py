@@ -15,14 +15,12 @@ def get_target_user(target_user_id):
     except (ValueError, TypeError, User.DoesNotExist):
         return None
 
-
 def validate_target_user(target_user, request_user):
     if not target_user:
         return Response({'error': 'Target user not found'}, status=status.HTTP_404_NOT_FOUND)
     if target_user == request_user:
         return Response({'error': 'Cannot suggest a session to yourself'}, status=status.HTTP_400_BAD_REQUEST)
     return None
-
 
 def build_suggestion_message(request_user, data):
     custom_message = (data.get('message') or '').strip()
@@ -33,7 +31,6 @@ def build_suggestion_message(request_user, data):
     if slot_start and slot_end:
         return f"{request_user.username} suggested a study session from {slot_start} to {slot_end}."
     return f"{request_user.username} suggested studying together this week."
-
 
 def create_study_suggestion(target_user, request_user, data):
     Notification.objects.create(

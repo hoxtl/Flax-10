@@ -9,9 +9,9 @@ from rest_framework.response import Response
 
 from studyFlax.models import CalendarEvent
 
+
 def _normalize_event_type(name):
     """Map tag name to display type: Small group, Lecture, Practical/lab, Other."""
-
     if not name or not isinstance(name, str):
         return "Other"
     lower = name.lower().strip()
@@ -25,7 +25,6 @@ def _normalize_event_type(name):
 
 def _infer_type_from_title_and_desc(event):
     """Infer type from title/description only (Briefing=other, then LGT=lecture, SmG=small group)."""
-
     title = (getattr(event, "title", None) or "") or ""
     desc = (getattr(event, "description", None) or "") or ""
     combined = f"{title} {desc}".lower()
@@ -41,7 +40,6 @@ def _infer_type_from_title_and_desc(event):
 
 def _event_type_from_record(record):
     """Derive display type: title/description first, then tag."""
-
     event = getattr(record, "event", None)
     if not event:
         return "Other"
@@ -53,7 +51,6 @@ def _event_type_from_record(record):
 
 def _validate_event_for_attendance(user, event_id):
     """Return (event, None) on success or (None, detail_string) on failure."""
-
     if event_id is None:
         return None, "event_id is required"
     try:
@@ -66,7 +63,6 @@ def _validate_event_for_attendance(user, event_id):
 
 def get_event_for_attendance(user, event_id):
     """Resolve and validate event; return (event, None) or (None, error_response)."""
-
     event, detail = _validate_event_for_attendance(user, event_id)
     if detail is not None:
         code = status.HTTP_404_NOT_FOUND if "not found" in detail else status.HTTP_400_BAD_REQUEST

@@ -1,3 +1,7 @@
+"""
+View for calendar event map data.
+"""
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,7 +13,6 @@ def _day_window(now):
     start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
     return start, end
-
 
 def _map_events_queryset(user, now, start_time, end_time):
     return CalendarEvent.objects.filter(
@@ -26,7 +29,6 @@ def _map_events_queryset(user, now, start_time, end_time):
         'start_time', 'end_time', 'priority'
     ).order_by('start_time')
 
-
 def _serialise_map_event(event):
     return {
         'id': event.id,
@@ -39,18 +41,13 @@ def _serialise_map_event(event):
         'priority': event.priority,
     }
 
-
 def _serialise_map_events(events):
     return [_serialise_map_event(event) for event in events]
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def calendar_events_map_view(request):
-    """
-    Retrieve calendar events with a valid location to display on the map for that day.
-    """
-
+    """Retrieve calendar events with a valid location to display on the map for that day."""
     now = timezone.now()
     start_time, end_time = _day_window(now)
     events = _map_events_queryset(request.user, now, start_time, end_time)

@@ -12,7 +12,6 @@ def strip_code_fence(content):
     fenced = raw.split('```')[1]
     return fenced[4:] if fenced.startswith('json') else fenced
 
-
 def parse_schedule_events(content):
     try:
         events = json.loads(strip_code_fence(content))

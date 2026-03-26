@@ -8,11 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    """View method for user logout."""
-
     try:
         token = request.user.auth_token
     except ObjectDoesNotExist:

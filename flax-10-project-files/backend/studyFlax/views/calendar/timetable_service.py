@@ -13,6 +13,7 @@ from icalendar import Calendar
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models.calendar.timetable_source_model import TimetableSource
 
+
 class TimetableSyncError(Exception):
     """Raised when a remote timetable sync cannot be processed."""
 
@@ -44,6 +45,7 @@ def load_events(source_url, source_key):
     return parse_ics_events(fetch_url_text(ics_url), source_key)
 
 def should_sync(source, min_interval):
+    """Return whether should sync."""
     if not source.last_synced:
         return True
     return django_timezone.now() - source.last_synced >= min_interval

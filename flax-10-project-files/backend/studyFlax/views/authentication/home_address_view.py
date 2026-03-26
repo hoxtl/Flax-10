@@ -8,9 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
 
+
 def _get_home_address_data(user):
     """Return the user's current home address as a dict."""
-
     return {
         "home_address": user.home_address or "",
         "home_latitude": user.home_latitude,
@@ -19,7 +19,6 @@ def _get_home_address_data(user):
 
 def _save_home_address(user, data):
     """Update the user's home address fields from the given data dict."""
-
     user.home_address = data.get("home_address", "")
     user.home_latitude = _to_float(data.get("home_latitude"), "home_latitude")
     user.home_longitude = _to_float(data.get("home_longitude"), "home_longitude")
@@ -27,7 +26,6 @@ def _save_home_address(user, data):
 
 def _to_float(value, field_name):
     """Convert input to float if present, else raise ValidationError."""
-
     if value in (None, ""):
         return None
     try:
@@ -35,14 +33,11 @@ def _to_float(value, field_name):
     except (TypeError, ValueError) as exc:
         raise ValidationError({field_name: f"{field_name} must be a valid number."}) from exc
 
-
 def _home_address_success_response(user):
     return Response({"success": True, "home_address": user.home_address})
 
-
 def _home_address_error_response(exc):
     return Response({"success": False, "error": exc.message_dict}, status=status.HTTP_400_BAD_REQUEST)
-
 
 def _update_home_address(user, data):
     try:
@@ -55,7 +50,6 @@ def _update_home_address(user, data):
 @permission_classes([IsAuthenticated])
 def home_address_view(request):
     """Retrieve or update the authenticated user's home address."""
-
     if request.method == "GET":
         return Response(_get_home_address_data(request.user))
     return _update_home_address(request.user, request.data)

@@ -9,11 +9,11 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
 from studyFlax.serialisers.authentication.authentication_serialisers import UserSerialiser, LoggedUserSerialiser
 
+
 User = get_user_model()
 
 def _get_candidate(username):
     """Return the User with this username, or None if not found."""
-
     try:
         return User.objects.get(username=username)
     except User.DoesNotExist:
@@ -21,7 +21,6 @@ def _get_candidate(username):
 
 def _build_ban_response(candidate, password):
     """Return a 403 Response if the account exists but is suspended, else None."""
-
     if candidate and candidate.check_password(password) and not candidate.is_active:
         return Response(
             {
@@ -33,22 +32,18 @@ def _build_ban_response(candidate, password):
         )
     return None
 
-
 def _auth_failure_response():
     return Response({'error': 'Credentials are not valid!'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 def _auth_success_response(logged_user, request):
     token, _ = Token.objects.get_or_create(user=logged_user)
     return Response({'user': UserSerialiser(logged_user, context={'request': request}).data, 'token': token.key})
-
 
 def _login_input(request):
     user_serialiser = LoggedUserSerialiser(data=request.data)
     if user_serialiser.is_valid():
         return user_serialiser, None
     return None, Response(user_serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 def _authenticate_user(user_serialiser):
     username = user_serialiser.validated_data['username']
@@ -61,9 +56,7 @@ def _authenticate_user(user_serialiser):
 @api_view(['POST'])
 def login_view(request):
     """Log in a user, returning a token or an appropriate error response."""
-
     return _login_response(request)
-
 
 def _login_response(request):
     user_serialiser, error_response = _login_input(request)

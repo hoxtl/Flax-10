@@ -17,6 +17,7 @@ from .helpers import (
     permission_denied_response,
 )
 
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def announcement_list(request, society_id):
@@ -30,51 +31,52 @@ def announcement_list(request, society_id):
 
 def get_announcements(society):
     announcements = SocietyAnnouncement.objects.filter(society=society)
+
     return Response(SocietyAnnouncementSerialiser(announcements, many=True).data)
 
 def create_announcement(request, society, silent=False):
     payload, errors, status_code = create_announcement_result(request.user, request.data, society, silent)
     if errors:
+
         return Response(errors, status=status_code)
     return Response(payload, status=status_code)
 
-
 def create_announcement_result(user, data, society, silent=False):
     permission_response = _society_admin_error(user, society)
+
     if permission_response:
         return _permission_error_result(permission_response)
-    return _create_announcement_payload(data, society, silent)
 
+    return _create_announcement_payload(data, society, silent)
 
 def _permission_error_result(permission_response):
     return None, permission_response.data, permission_response.status_code
-
 
 def _create_announcement_payload(data, society, silent=False):
     context = {'skip_notification': silent}
     serialiser = SocietyAnnouncementSerialiser(data=data, context=context)
     if not serialiser.is_valid():
+
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
     announcement = serialiser.save(society=society)
+
     save_announcement_images(announcement, get_image_urls(data))
     announcement.refresh_from_db()
     return SocietyAnnouncementSerialiser(announcement).data, None, status.HTTP_201_CREATED
 
 def get_image_urls(data):
+
     return data.get('images') or data.get('image_urls', [])
 
 def save_announcement_images(announcement, image_urls):
     for i, url in enumerate(image_urls):
         SocietyAnnouncementImage.objects.create(announcement=announcement, url=url, order=i)
 
-
 def _announcement_not_found_response():
     return Response({'error': 'Announcement not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
 def _announcement_detail_get_response(announcement):
     return Response(SocietyAnnouncementSerialiser(announcement).data)
-
 
 def _announcement_detail_write_response(request, society, announcement):
     permission_response = _society_admin_error(request.user, society)
@@ -82,6 +84,7 @@ def _announcement_detail_write_response(request, society, announcement):
         return permission_response
     silent = is_silent_request(request)
     if request.method == 'DELETE':
+
         return delete_announcement(announcement, silent)
     return update_announcement(announcement, request.data, silent)
 
@@ -89,10 +92,10 @@ def _announcement_detail_write_response(request, society, announcement):
 @permission_classes([IsAuthenticated])
 def announcement_detail(request, society_id, announcement_id):
     society = get_society_or_404(society_id)
+
     if not society:
         return society_not_found_response()
     return _announcement_detail_response(request, society, announcement_id)
-
 
 def _announcement_detail_response(request, society, announcement_id):
     announcement = get_society_object_or_none(SocietyAnnouncement, society, announcement_id)
@@ -100,8 +103,8 @@ def _announcement_detail_response(request, society, announcement_id):
         return _announcement_not_found_response()
     if request.method == 'GET':
         return _announcement_detail_get_response(announcement)
-    return _announcement_detail_write_response(request, society, announcement)
 
+    return _announcement_detail_write_response(request, society, announcement)
 
 def _society_admin_error(user, society):
     if is_society_admin(user, society):
@@ -112,10 +115,11 @@ def update_announcement(announcement, data, silent=False):
     payload, errors, status_code = update_announcement_result(announcement, data, silent)
     if errors:
         return Response(errors, status=status_code)
+
     return Response(payload)
 
-
 def update_announcement_result(announcement, data, silent=False):
+
     context = {'skip_notification': silent}
     serialiser = SocietyAnnouncementSerialiser(announcement, data=data, partial=True, context=context)
     if not serialiser.is_valid():

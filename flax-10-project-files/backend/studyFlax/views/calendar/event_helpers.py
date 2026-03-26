@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from django.utils import timezone
 from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
 
+
 MAX_SIMULTANEOUS_OVERLAPS = 2
 
 def filter_events_by_date_range(queryset, params):
@@ -78,6 +79,7 @@ def _future_instances(event, view_start, view_end):
     ]
 
 def _should_stop_generation(start, view_end, rule):
+    """Return whether should stop generation."""
     if start is None:
         return True
     if start > view_end:
@@ -156,6 +158,7 @@ def is_exception_date(dt, rule):
     return is_exception(dt, rule)
 
 def should_stop_generating(current, end_date, rule):
+    """Return whether should stop generating."""
     return _should_stop_generation(current, end_date, rule)
 
 def get_base_instance(event, rule):

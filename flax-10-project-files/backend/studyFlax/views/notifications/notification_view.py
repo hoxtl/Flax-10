@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Notification
 from studyFlax.serialisers import NotificationSerialiser
 
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def notification_list(request):
@@ -20,19 +21,20 @@ def notification_list(request):
 def get_notifications(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     serialiser = NotificationSerialiser(notifications, many=True)
+
     return Response(serialiser.data)
 
 def create_notification(request):
     serialiser = NotificationSerialiser(data=request.data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+
     serialiser.save(user=request.user)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def notification_detail(request, pk):
-    # Filter by user
     notification = get_object_or_404(Notification, pk=pk, user=request.user)
     notification.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

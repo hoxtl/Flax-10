@@ -9,6 +9,7 @@ from studyFlax.models.authentication.user_model import User
 from studyFlax.serialisers.authentication.authentication_serialisers import UserSerialiser
 from django.db.models import Q
 
+
 _FILTER_MAP = {
     'module': 'enrollments__module__module_code__in',
     'course': 'settings__major__in',
@@ -19,12 +20,10 @@ _FILTER_MAP = {
 
 def _parse_csv(param):
     """Split a comma-separated parameter string into a cleaned list."""
-
     return [v.strip() for v in param.split(',') if v.strip()]
 
 def _apply_csv_filters(users, params):
     """Apply comma-separated value filters from request params to the queryset."""
-
     for param_name, lookup in _FILTER_MAP.items():
         values = _parse_csv(params.get(param_name, ''))
         users = users.filter(**{lookup: values}).distinct() if values else users
@@ -32,7 +31,6 @@ def _apply_csv_filters(users, params):
 
 def _apply_filters(request):
     """Apply all query parameter filters to the user queryset."""
-
     params = request.query_params
     users = User.objects.exclude(id=request.user.id)
     query = params.get('q', '').strip()
@@ -60,7 +58,6 @@ def _build_search_response(users, offset, limit, request):
 @permission_classes([IsAuthenticated])
 def user_search(request):
     """Search for users by name, module, course, society, year, or role."""
-
     users = _apply_filters(request)
     offset, limit = _parse_pagination(request.query_params)
     return Response(_build_search_response(users, offset, limit, request))

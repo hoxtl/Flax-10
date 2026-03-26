@@ -52,7 +52,6 @@ class StudySessionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["delete"])
     def clear_history(self, request):
         """Delete all study sessions for the current user."""
-
         return self._clear_history_result()
 
     def _clear_history_result(self):

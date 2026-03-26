@@ -21,15 +21,13 @@ from studyFlax.views.admin.course_change_service import (
     validate_decision,
 )
 
+
 def _get_user_settings(user):
     """Return user settings with course-related defaults."""
-
     return get_or_create_user_settings(user, {'major': '', 'year': ''})
-
 
 def _latest_course_change_request(user):
     return CourseChangeRequest.objects.filter(user=user).order_by('-created_at').first()
-
 
 def _cancel_pending_request(user):
     change_request = _latest_course_change_request(user)
@@ -38,22 +36,18 @@ def _cancel_pending_request(user):
     delete_pending_request(change_request)
     return Response({'message': 'Course change request cancelled.'}, status=status.HTTP_200_OK)
 
-
 def _apply_decision(change_request, decision, get_user_settings):
     apply_decision(change_request, decision, get_user_settings)
-
 
 def _resolve_course_change_data(change_request, decision):
     _apply_decision(change_request, decision, _get_user_settings)
     return CourseChangeRequestSerialiser(change_request).data
-
 
 def _course_change_or_none(request_id):
     try:
         return CourseChangeRequest.objects.select_related('user').get(pk=request_id)
     except CourseChangeRequest.DoesNotExist:
         return None
-
 
 def _resolved_course_change_response(change_request, decision):
     try:
@@ -65,7 +59,6 @@ def _resolved_course_change_response(change_request, decision):
 @permission_classes([IsAuthenticated])
 def request_course_change(request):
     """Submit a request to change the user's enrolled course."""
-
     requested_course = (request.data.get('requested_course') or '').strip()
     if not requested_course:
         return Response({'error': 'requested_course is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -79,7 +72,6 @@ def request_course_change(request):
 @permission_classes([IsAuthenticated])
 def my_course_change_request(request):
     """Retrieve or cancel the current user's latest course change request."""
-
     if request.method == 'DELETE':
         return _cancel_pending_request(request.user)
     return Response(serialise_optional_request(_latest_course_change_request(request.user)))
@@ -87,8 +79,6 @@ def my_course_change_request(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def list_course_change_requests(request):
-    """List all pending course change requests for admin review."""
-
     qs = CourseChangeRequest.objects.filter(status='pending').select_related('user')
     return Response(CourseChangeRequestSerialiser(qs, many=True).data)
 
@@ -96,7 +86,6 @@ def list_course_change_requests(request):
 @permission_classes([IsAdminUser])
 def resolve_course_change_request(request, request_id):
     """Approve or reject a pending course change request."""
-
     change_request = _course_change_or_none(request_id)
     if change_request is None:
         return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)

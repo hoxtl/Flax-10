@@ -6,6 +6,7 @@ from studyFlax.models.society import SocietyCalendarSync, SocietyEvent
 from studyFlax.serialisers.society.society_serialisers import get_society_color
 from .recurrence_utils import is_time_overlap, next_society_occurrence, add_months, add_years
 
+
 def add_month(dt):
     return add_months(dt, 1, max_day=28)
 
@@ -28,6 +29,7 @@ def _expand_event(event, start_date, end_date):
     return [serialize_event(event, 0)]
 
 def expand_and_serialize(events, start_date, end_date):
+    """Expand and serialise."""
     result = []
     for event in events:
         result.extend(_expand_event(event, start_date, end_date))
@@ -51,6 +53,7 @@ def expand_recurring(event, start_date, end_date):
     return instances
 
 def should_continue(current, end_date, recurrence_end):
+    """Return whether should continue."""
     if current > end_date:
         return False
     if recurrence_end and current.date() > recurrence_end:
@@ -65,6 +68,7 @@ def get_next_occurrence(current, recurrence):
     return next_society_occurrence(current, recurrence)
 
 def serialize_event(event, idx, start_override=None, end_override=None):
+    """Serialise event."""
     return {
         'id': f"society_{event.society_id}_{event.id}_{idx}",
         'title': f"📢 {event.title}" if event.announcement else event.title,

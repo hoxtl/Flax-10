@@ -9,6 +9,7 @@ from studyFlax.views.admin.reported_society_view import (
 )
 from studyFlax.views.admin.user_management_view import ban_user, user_list
 
+
 _ = (
     ban_reported_society,
     dismiss_report,

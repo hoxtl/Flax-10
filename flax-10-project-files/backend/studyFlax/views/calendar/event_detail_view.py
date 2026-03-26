@@ -14,6 +14,7 @@ from studyFlax.serialisers.calendar.event_serialisers import (
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from .event_helpers import exceeds_overlap_limit
 
+
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def event_detail(request, pk):
@@ -27,6 +28,7 @@ def event_detail(request, pk):
 
 def get_event(event):
     serialiser = CalendarEventSerialiser(event)
+
     return Response(serialiser.data)
 
 def _is_locked_event(event):
@@ -34,13 +36,16 @@ def _is_locked_event(event):
     if source == 'society':
         return True
     if source.startswith('module_'):
+
         return True
     return event.title.lower().startswith('lecture:')
 
 def _locked_event_response():
     return Response(
+
         {'error': 'Lecture and society events are read-only.'},
         status=status.HTTP_403_FORBIDDEN,
+
     )
 
 def _pick_time(event, data, field):
@@ -53,50 +58,53 @@ def _overlap_limit_response():
     )
 
 def _event_update_error(event, data):
+
     if _is_locked_event(event):
         return _locked_event_response()
     if _exceeds_overlap_limit(event, data):
         return _overlap_limit_response()
-    return None
 
+    return None
 
 def _exceeds_overlap_limit(event, data):
     start_time = _pick_time(event, data, 'start_time')
     end_time = _pick_time(event, data, 'end_time')
     return exceeds_overlap_limit(event.user, start_time, end_time, exclude_id=event.id)
 
-
 def _event_update_result(event, data):
     error_response = _event_update_error(event, data)
+
     if error_response:
         return None, error_response
     serialiser = CalendarEventCreateSerialiser(event, data=data, partial=True)
     if not serialiser.is_valid():
         return None, Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+
     serialiser.save()
     return CalendarEventSerialiser(event).data, None
 
-
 def update_event(event, data):
     payload, error_response = _event_update_result(event, data)
+
     if error_response:
         return error_response
     return Response(payload)
 
 def delete_event(event):
     if _is_locked_event(event):
+
         return _locked_event_response()
     event.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 def _exception_date_error(event, date):
     if not date:
         return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
+
     if not event.recurrence_rule:
         return Response({'error': 'Event has no recurrence rule'}, status=status.HTTP_400_BAD_REQUEST)
-    return None
 
+    return None
 
 def _append_exception_date(event, date):
     exception_dates = event.recurrence_rule.exception_dates or []
@@ -104,12 +112,11 @@ def _append_exception_date(event, date):
         return
     exception_dates.append(date)
     event.recurrence_rule.exception_dates = exception_dates
-    event.recurrence_rule.save()
 
+    event.recurrence_rule.save()
 
 def _exception_date_payload(event):
     return CalendarEventSerialiser(event).data
-
 
 def _exception_date_response(request, pk):
     event = get_object_or_404(CalendarEvent, pk=pk, user=request.user)

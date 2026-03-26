@@ -11,6 +11,7 @@ from .ratification_view import (
     request_ratification, approve_ratification, reject_ratification, pending_ratifications
 )
 
+
 _ = (
     society_list,
     publish_changes,
