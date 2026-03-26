@@ -6,18 +6,19 @@ import { useState } from "react";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
-import MemberAvatar from "./MemberAvatar";
-import { getDisplayName } from "../utils/memberAvatarUtils";
+import SelectableMemberRow from "./SelectableMemberRow";
 import styles from "./AddTaskModal.module.css";
 
 function MemberCheckItem({ member, checked, onToggle }) {
-    return (
-        <div className={styles.memberItem} onClick={() => onToggle(member.user)}>
-            <input type="checkbox" checked={checked} onChange={() => onToggle(member.user)} className={styles.checkbox} onClick={(e) => e.stopPropagation()} />
-            <MemberAvatar member={member} size={24} />
-            <span className={styles.memberLabel}>{getDisplayName(member)}</span>
-        </div>
-    );
+  return (
+    <SelectableMemberRow
+      member={member}
+      checked={checked}
+      onToggle={onToggle}
+      classNames={{ row: styles.memberItem, checkbox: styles.checkbox, label: styles.memberLabel }}
+      avatarSize={24}
+    />
+  );
 }
 
 function TaskTwoColFields({ title, setTitle, dueDate, setDueDate }) {

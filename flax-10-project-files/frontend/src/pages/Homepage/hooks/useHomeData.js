@@ -7,6 +7,7 @@ import { overlapsDay } from "../../../components/Calendar/utils/dateUtils";
 import { useCalendar } from "../../../context/CalendarContext";
 import { fetchTasks } from "../../../api/taskApi";
 import { getEvents } from "../../../api/eventApi";
+import { getDayBounds } from "../utils/slotUtils";
 
 export function useHomeData(selectedDate) {
   const { events, allEvents } = useCalendar();
@@ -84,9 +85,6 @@ function updateEvents(isCancelled, setEvents, data) {
 }
 
 function getEventRange(selectedDate) {
-  const dayStart = new Date(selectedDate);
-  const dayEnd = new Date(selectedDate);
-  dayStart.setHours(0, 0, 0, 0);
-  dayEnd.setHours(23, 59, 59, 999);
+  const { dayStart, dayEnd } = getDayBounds(selectedDate);
   return { start: dayStart.toISOString(), end: dayEnd.toISOString() };
 }

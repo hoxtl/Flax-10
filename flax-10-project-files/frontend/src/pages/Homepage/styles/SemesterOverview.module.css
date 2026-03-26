@@ -7,61 +7,6 @@
   height: 100%;
 }
 
-/* ── Header ───────────────────────────────────────────────────────────────── */
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.iconWrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--widget-icon-bg);
-  border: 1px solid var(--widget-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--widget-accent);
-}
-
-.titleBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.title {
-  margin: 0;
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--widget-text-primary);
-}
-
-.subtitle {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--widget-text-secondary);
-}
-
 /* ── Legend ───────────────────────────────────────────────────────────────── */
 
 .legend {

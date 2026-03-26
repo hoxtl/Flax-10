@@ -2,9 +2,9 @@
  * GroupWork add member form.
  */
 
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 import UserSearch from "../../../components/Social/UserSearch";
 import { addProjectMember } from "../api/groupWorkApi";
+import GroupWorkUserSearchEmptyState from "./GroupWorkUserSearchEmptyState";
 import styles from "./AddMemberForm.module.css";
 
 export default function AddMemberForm({ projectId, members = [], onAdded }) {
@@ -26,9 +26,14 @@ export default function AddMemberForm({ projectId, members = [], onAdded }) {
 
 function AddMemberSearchEmptyState({ query, clear }) {
   return (
-    <div className={styles.inlineEmptyState}>
-      <SearchEmptyState query={query} itemLabel="users" title="No teammates found" hint="Try a different name or username." onClear={clear} className={styles.inlineEmptyCard} titleClassName={styles.inlineEmptyTitle} hintClassName={styles.inlineEmptyHint} />
-    </div>
+    <GroupWorkUserSearchEmptyState
+      query={query}
+      clear={clear}
+      wrapperClassName={styles.inlineEmptyState}
+      className={styles.inlineEmptyCard}
+      titleClassName={styles.inlineEmptyTitle}
+      hintClassName={styles.inlineEmptyHint}
+    />
   );
 }
 

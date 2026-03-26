@@ -93,10 +93,7 @@ export function getSuggestableTasks(dayTasks, upcomingItems) {
 }
 
 export function getTasksDueToday(allTasks, now) {
-  const todayStart = new Date(now);
-  const todayEnd = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
-  todayEnd.setHours(23, 59, 59, 999);
+  const { todayStart, todayEnd } = getTodayBounds(now);
   const isOverdue = (task) => !task.completed && task.due_date && new Date(task.due_date) < todayStart;
   return (allTasks || []).filter((task) => {
     const dueDate = task.due_date ? new Date(task.due_date) : null;
@@ -125,10 +122,7 @@ export function getOverdueTasksForNow(tasksDueToday, getTag, now) {
 }
 
 export function getTaskWidgetList(allTasks, now) {
-  const todayStart = new Date(now);
-  const todayEnd = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
-  todayEnd.setHours(23, 59, 59, 999);
+  const { todayStart, todayEnd } = getTodayBounds(now);
   const tasks = (allTasks || []).filter((task) => isDueToday(task, todayStart, todayEnd)).map((task) => buildTaskWidgetItem(task, todayEnd));
   const nextTask = tasks.filter((task) => !task.completed).sort((left, right) => left.sortTime - right.sortTime).find((task) => leftAfterNow(task, now));
   if (nextTask) nextTask.taskWidgetStatus = "now";
@@ -144,10 +138,7 @@ export function getTaskWidgetDisplayList(allTasks, now, taskWidgetItemsOnly = []
   const displayList = [...(taskWidgetItemsOnly || [])];
   const incompleteCount = displayList.filter((task) => !task.completed).length;
   if (incompleteCount >= TASK_WIDGET_MIN_INCOMPLETE) return displayList;
-  const todayStart = new Date(now);
-  const todayEnd = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
-  todayEnd.setHours(23, 59, 59, 999);
+  const { todayStart, todayEnd } = getTodayBounds(now);
   const excludedIds = new Set(displayList.map((task) => String(task.id)));
   const fillers = buildTaskWidgetFillers(allTasks, todayStart, todayEnd)
     .filter((task) => !excludedIds.has(String(task.id)))
@@ -161,6 +152,14 @@ function isFillerCandidate(task, todayStart, todayEnd) {
   const dueDate = new Date(task.due_date);
   if (Number.isNaN(dueDate.getTime())) return false;
   return dueDate < todayStart || dueDate > todayEnd;
+}
+
+function getTodayBounds(now) {
+  const todayStart = new Date(now);
+  const todayEnd = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  todayEnd.setHours(23, 59, 59, 999);
+  return { todayStart, todayEnd };
 }
 
 function classifyFillerTask(task, acc, todayStart) {

@@ -7,6 +7,7 @@ import { motion as Motion, AnimatePresence } from "framer-motion";
 import widgetStyles from "./widgets/ProfileWidgets.module.css";
 import headerStyles from "./ProfileHeader.module.css";
 import badgeStyles from "./ProfileHeaderBadges.module.css";
+import { buildPeakLabel } from "./widgets/PersonaCard";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
 import ShareButton from "../../../components/Social/ShareButton";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
@@ -183,11 +184,6 @@ function ProfileStats({
       {visibility.canViewSharedWith && <StatItem value={profileData?.shared_by_count || 0} label="sharing with me" onClick={handlers.onSharedByClick} />}
     </div>
   );
-}
-
-function buildPeakLabel(peakHour) {
-  if (peakHour == null) return null;
-  return `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak`;
 }
 
 function PersonaInlineChip({ persona, peakHour }) {

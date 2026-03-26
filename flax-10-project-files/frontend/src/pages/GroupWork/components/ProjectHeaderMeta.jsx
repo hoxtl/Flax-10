@@ -5,7 +5,6 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
-import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
@@ -13,9 +12,21 @@ import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
 import MemberAvatar from "./MemberAvatar";
+import GroupWorkProjectModuleBadge from "./ProjectModuleBadge";
 import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import { useAuth } from "../../../context/AuthContext";
 import styles from "./ProjectHeader.module.css";
+
+export function ProjectModuleTag({ project }) {
+  return (
+    <GroupWorkProjectModuleBadge
+      project={project}
+      linkClassName={styles.metaLink}
+      badgeClassName={styles.modulePill}
+      codeClassName={styles.moduleCode}
+    />
+  );
+}
 
 export function ProjectHeaderMeta({ project, members, teamMembers = [], onMemberAdded, onMemberRemove, onDeleteProject }) {
   return (
@@ -29,19 +40,6 @@ export function ProjectHeaderMeta({ project, members, teamMembers = [], onMember
         onDeleteProject={onDeleteProject}
       />
     </div>
-  );
-}
-
-function ProjectModuleTag({ project }) {
-  if (!project.course_code && !project.module_name) return null;
-
-  return (
-    <Link to={`/modules?code=${encodeURIComponent(project.course_code || "")}`} className={styles.metaLink}>
-      <Badge className={styles.modulePill}>
-        {project.course_code ? <span className={styles.moduleCode}>{project.course_code}</span> : null}
-        <span>{project.module_name || project.course_code}</span>
-      </Badge>
-    </Link>
   );
 }
 

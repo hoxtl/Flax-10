@@ -4,7 +4,7 @@
 
 import { isToday, overlapsDay } from "../../../components/Calendar/utils/dateUtils";
 
-function getDayBounds(selectedDate) {
+export function getDayBounds(selectedDate) {
   const dayStart = new Date(selectedDate);
   const dayEnd = new Date(selectedDate);
   dayStart.setHours(0, 0, 0, 0);
