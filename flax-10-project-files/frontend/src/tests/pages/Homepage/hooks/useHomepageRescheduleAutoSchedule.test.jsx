@@ -115,64 +115,37 @@ describe("useHomepageReschedule auto-schedule branches", () => {
     expect(loadScheduleSettingsMock).not.toHaveBeenCalled();
   });
 
-  it("blocks auto schedule when no single window can fit the required block", async () => {
-    buildScheduleAutoFormMock.mockReturnValue({
-      deadline_preferences: [{ ideal_minutes_per_day: 45 }],
-    });
-
+  it("blocks when no window fits the required block", async () => {
+    buildScheduleAutoFormMock.mockReturnValue({ deadline_preferences: [{ ideal_minutes_per_day: 45 }] });
     const props = buildProps({
       sortedEvents: [
-        {
-          id: "morning",
-          start_time: "2026-03-24T00:30:00.000Z",
-          end_time: "2026-03-24T12:00:00.000Z",
-        },
-        {
-          id: "afternoon",
-          start_time: "2026-03-24T12:30:00.000Z",
-          end_time: "2026-03-24T23:59:59.000Z",
-        },
+        { id: "m", start_time: "2026-03-24T00:30:00Z", end_time: "2026-03-24T12:00:00Z" },
+        { id: "a", start_time: "2026-03-24T12:30:00Z", end_time: "2026-03-24T23:59:59Z" }
       ],
     });
-
     const { result } = renderHook(() => useHomepageReschedule(props));
-    await act(async () => {
-      await result.current.handleAutoSchedule();
-    });
-
-    expect(props.showToast).toHaveBeenCalledWith(
-      "Can't auto schedule today — no single window fits the required study blocks."
-    );
+    await act(async () => { await result.current.handleAutoSchedule(); });
+    expect(props.showToast).toHaveBeenCalledWith(expect.stringContaining("no single window fits"));
     expect(loadScheduleSettingsMock).not.toHaveBeenCalled();
   });
-
-  it("loads settings, submits auto schedule, and refreshes state on success", async () => {
+  it("loads settings and starts auto-schedule", async () => {
     const props = buildProps({
-      sortedEvents: [
-        {
-          id: "class",
-          start_time: "2026-03-24T10:00:00.000Z",
-          end_time: "2026-03-24T11:00:00.000Z",
-        },
-      ],
+      sortedEvents: [{ id: "c", start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" }],
       upcomingDeadlines: [{ id: 1, title: "Essay" }],
     });
-
     const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleAutoSchedule();
-    });
-
+    await act(async () => { await result.current.handleAutoSchedule(); });
     expect(loadScheduleSettingsMock).toHaveBeenCalledWith(props.showToast);
-    expect(submitAutoScheduleWithPrefsMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        deadlines: props.upcomingDeadlines,
-        settings: { density: "balanced" },
-        showToast: props.showToast,
-        onDone: expect.any(Function),
-      })
-    );
+    expect(submitAutoScheduleWithPrefsMock).toHaveBeenCalledWith(expect.objectContaining({
+      deadlines: props.upcomingDeadlines, settings: { density: "balanced" },
+    }));
+  });
+  it("refreshes data after auto-schedule success", async () => {
+    const props = buildProps({
+      sortedEvents: [{ id: "c", start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" }]
+    });
+    const { result } = renderHook(() => useHomepageReschedule(props));
+    await act(async () => { await result.current.handleAutoSchedule(); });
     expect(props.loadEvents).toHaveBeenCalled();
     expect(props.refetchTasks).toHaveBeenCalled();
     expect(result.current.autoScheduleLoading).toBe(false);

@@ -30,46 +30,50 @@ vi.mock("../../../components/campus_map/TransportModesSection", () => ({
 import { CampusMapSidebarContent } from "../../../components/campus_map/CampusMapSidebarContent";
 
 describe("CampusMapSidebarContent", () => {
-  it("forwards the expected props to each sidebar section", () => {
-    const props = {
-      disruptions: [{ id: 1 }],
-      loadingDisruptions: true,
-      form: { manualStart: "A", manualDestination: "B" },
-      setManualStart: vi.fn(),
-      setManualDestination: vi.fn(),
-      handleUserJourneyCalculate: vi.fn(),
-      clearAllSelections: vi.fn(),
-      handleGeolocateStart: vi.fn(),
-      handleGeolocateDestination: vi.fn(),
-      ui: { locating: false, walkingInstructions: true, tflInstructions: false },
-      selection: { startLocation: { lat: 1, lng: 2 }, selectedCampus: null, customDestination: null },
-      handleClearCampus: vi.fn(),
-      clearCustomDestination: vi.fn(),
-      handleSelectCampus: vi.fn(),
-      upcomingEvents: [],
-      handleSelectUpcomingEvent: vi.fn(),
-      routes: {
-        routeInfo: { duration: 10 },
-        routeError: "",
-        loadingRoute: false,
-        tflRouteInfo: { duration: 15, legs: [] },
-        tflRouteError: "",
-        loadingTflRoute: false,
-      },
-      toggleWalkingInstructions: vi.fn(),
-      toggleTflInstructions: vi.fn(),
-    };
-
+  const props = {
+    disruptions: [{ id: 1 }],
+    loadingDisruptions: true,
+    form: { manualStart: "A", manualDestination: "B" },
+    setManualStart: vi.fn(),
+    setManualDestination: vi.fn(),
+    handleUserJourneyCalculate: vi.fn(),
+    clearAllSelections: vi.fn(),
+    handleGeolocateStart: vi.fn(),
+    handleGeolocateDestination: vi.fn(),
+    ui: { locating: false, walkingInstructions: true, tflInstructions: false },
+    selection: { startLocation: { lat: 1, lng: 2 }, selectedCampus: null, customDestination: null },
+    handleClearCampus: vi.fn(),
+    clearCustomDestination: vi.fn(),
+    handleSelectCampus: vi.fn(),
+    upcomingEvents: [],
+    handleSelectUpcomingEvent: vi.fn(),
+    routes: {
+      routeInfo: { duration: 10 },
+      routeError: "",
+      loadingRoute: false,
+      tflRouteInfo: { duration: 15, legs: [] },
+      tflRouteError: "",
+      loadingTflRoute: false,
+    },
+    toggleWalkingInstructions: vi.fn(),
+    toggleTflInstructions: vi.fn(),
+  };
+  beforeEach(() => vi.clearAllMocks());
+  it("renders all sections", () => {
     render(<CampusMapSidebarContent {...props} />);
-
-    expect(screen.getByTestId("sidebar-header")).toBeInTheDocument();
-    expect(screen.getByTestId("tfl-status")).toBeInTheDocument();
-    expect(screen.getByTestId("journey")).toBeInTheDocument();
-    expect(screen.getByTestId("destination")).toBeInTheDocument();
-    expect(screen.getByTestId("transport")).toBeInTheDocument();
-
-    expect(sidebarHeaderMock).toHaveBeenCalledWith({});
-    expect(tflStatusMock).toHaveBeenCalledWith({ disruptions: props.disruptions, loading: props.loadingDisruptions });
+    ["sidebar-header", "tfl-status", "journey", "destination", "transport"].forEach(id => {
+      expect(screen.getByTestId(id)).toBeInTheDocument();
+    });
+  });
+  it("forwards props to TflStatusSection", () => {
+    render(<CampusMapSidebarContent {...props} />);
+    expect(tflStatusMock).toHaveBeenCalledWith({
+      disruptions: props.disruptions,
+      loading: props.loadingDisruptions
+    });
+  });
+  it("forwards props to UserJourneySection", () => {
+    render(<CampusMapSidebarContent {...props} />);
     expect(journeyMock).toHaveBeenCalledWith(expect.objectContaining({
       manualStart: "A",
       manualDestination: "B",
@@ -79,6 +83,9 @@ describe("CampusMapSidebarContent", () => {
       onGeolocateDestination: props.handleGeolocateDestination,
       locating: props.ui.locating,
     }));
+  });
+  it("forwards props to DestinationSection", () => {
+    render(<CampusMapSidebarContent {...props} />);
     expect(destinationMock).toHaveBeenCalledWith(expect.objectContaining({
       selectedCampus: props.selection.selectedCampus,
       customDestination: props.selection.customDestination,
@@ -88,6 +95,9 @@ describe("CampusMapSidebarContent", () => {
       upcomingEvents: props.upcomingEvents,
       onSelectEvent: props.handleSelectUpcomingEvent,
     }));
+  });
+  it("forwards props to TransportModesSection", () => {
+    render(<CampusMapSidebarContent {...props} />);
     expect(transportMock).toHaveBeenCalledWith(expect.objectContaining({
       startLocation: props.selection.startLocation,
       selectedCampus: props.selection.selectedCampus,

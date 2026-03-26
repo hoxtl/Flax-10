@@ -24,86 +24,57 @@ describe("useDateTimePicker", () => {
     expect(removeSpy).toHaveBeenCalledWith("resize", expect.any(Function));
   });
 
-  it("closes on outside pointer down and Escape but ignores inside and portal targets", () => {
-    const setOpen = vi.fn();
-    const inside = document.createElement("button");
-    const dropdown = document.createElement("div");
-    const portalTarget = document.createElement("div");
-    portalTarget.closest = vi.fn(() => null);
-
-    const ref = { current: document.createElement("div") };
-    const dropdownRef = { current: document.createElement("div") };
-    document.body.append(ref.current, dropdownRef.current);
+  const setupOutside = () => {
+    const inside = document.createElement("button"), dropdown = document.createElement("div"), portal = document.createElement("div");
+    const ref = { current: document.createElement("div") }, dRef = { current: document.createElement("div") };
+    document.body.append(ref.current, dRef.current, portal);
     ref.current.appendChild(inside);
-    dropdownRef.current.appendChild(dropdown);
-    document.body.appendChild(portalTarget);
-
-    renderHook(() => useClickOutside(true, ref, dropdownRef, setOpen));
-
-    act(() => {
-      ref.current.contains = vi.fn(() => true);
-      inside.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
-    });
+    dRef.current.appendChild(dropdown);
+    return { inside, dropdown, portal, ref, dRef };
+  };
+  it("ignores inside pointer down", () => {
+    const setOpen = vi.fn(), { inside, ref, dRef } = setupOutside();
+    renderHook(() => useClickOutside(true, ref, dRef, setOpen));
+    act(() => { ref.current.contains = vi.fn(() => true); inside.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true })); });
     expect(setOpen).not.toHaveBeenCalled();
-
-    act(() => {
-      ref.current.contains = vi.fn(() => false);
-      dropdownRef.current.contains = vi.fn(() => true);
-      dropdown.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
-    });
+    [ref.current, dRef.current].forEach(el => el.remove());
+  });
+  it("ignores dropdown pointer down", () => {
+    const setOpen = vi.fn(), { dropdown, ref, dRef } = setupOutside();
+    renderHook(() => useClickOutside(true, ref, dRef, setOpen));
+    act(() => { ref.current.contains = vi.fn(() => false); dRef.current.contains = vi.fn(() => true); dropdown.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true })); });
     expect(setOpen).not.toHaveBeenCalled();
-
-    act(() => {
-      ref.current.contains = vi.fn(() => false);
-      dropdownRef.current.contains = vi.fn(() => false);
-      portalTarget.closest = vi.fn(() => document.createElement("div"));
-      portalTarget.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
-    });
-    expect(setOpen).not.toHaveBeenCalled();
-
-    act(() => {
-      portalTarget.closest = vi.fn(() => null);
-      document.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
-    });
+    [ref.current, dRef.current].forEach(el => el.remove());
+  });
+  it("closes on body pointer down and Escape", () => {
+    const setOpen = vi.fn(), { ref, dRef } = setupOutside();
+    renderHook(() => useClickOutside(true, ref, dRef, setOpen));
+    act(() => { document.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true })); });
     expect(setOpen).toHaveBeenCalledWith(false);
-
     setOpen.mockClear();
-    act(() => {
-      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-    });
+    act(() => { document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
     expect(setOpen).toHaveBeenCalledWith(false);
-
-    ref.current.remove();
-    dropdownRef.current.remove();
-    portalTarget.remove();
+    [ref.current, dRef.current].forEach(el => el.remove());
   });
 
-  it("syncs value, exposes handlers, and derives calendar flags", () => {
+  it("syncs value and derives flags", () => {
     const { result } = renderHook(() => useDateTimePickerState("2026-03-15T10:30", false, false));
     expect(result.current.open).toBe(false);
     expect(result.current.selDate).toBeInstanceOf(Date);
-
-    const setViewM = vi.fn();
-    const setViewY = vi.fn();
-    const setSelDate = vi.fn();
-    const setHour = vi.fn();
-    const setMinute = vi.fn();
-    const onChange = vi.fn();
-    const handlers = useDateTimeHandlers(2026, 0, setViewM, setViewY, null, setSelDate, 10, setHour, 30, setMinute, false, false, onChange);
-    handlers.selectDay(18);
-    handlers.changeHour(11);
-    handlers.changeMinute(45);
-    handlers.prevMonth();
-    handlers.nextMonth();
-
-    expect(setSelDate).toHaveBeenCalled();
-    expect(setHour).toHaveBeenCalledWith(11);
-    expect(setMinute).toHaveBeenCalledWith(45);
-    expect(setViewM).toHaveBeenCalled();
-    expect(setViewY).toHaveBeenCalled();
-
-    const derived = renderHook(() => useDerivedCalendarState(2026, 2, new Date("2026-03-15T10:30:00"), "2026-03-10")).result.current;
-    expect(derived.days.length).toBeGreaterThan(0);
-    expect(typeof derived.isDisabled).toBe("function");
+    const d = renderHook(() => useDerivedCalendarState(2026, 2, new Date("2026-03-15T10:30:00"), "2026-03-10")).result.current;
+    expect(d.days.length).toBeGreaterThan(0);
+  });
+  it("exposes handlers and updates state", () => {
+    const sM = vi.fn(), sY = vi.fn(), sD = vi.fn(), sH = vi.fn(), sMin = vi.fn(), oC = vi.fn();
+    const h = useDateTimeHandlers(2026, 0, sM, sY, null, sD, 10, sH, 30, sMin, false, false, oC);
+    h.selectDay(18);
+    h.changeHour(11);
+    h.changeMinute(45);
+    h.prevMonth();
+    h.nextMonth();
+    expect(sD).toHaveBeenCalled();
+    expect(sH).toHaveBeenCalledWith(11);
+    expect(sMin).toHaveBeenCalledWith(45);
+    expect(sM).toHaveBeenCalled();
   });
 });

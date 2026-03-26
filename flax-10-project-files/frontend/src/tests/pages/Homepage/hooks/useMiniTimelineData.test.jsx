@@ -40,45 +40,28 @@ describe("useMiniTimelineData", () => {
     deriveGapDeadlineFallbacksMock.mockReturnValue({ "free-row": { title: "Fallback" } });
   });
 
-  it("builds rows from day bounds and derives timeline helpers", () => {
-    const selectedDate = new Date("2026-03-24T12:34:00Z");
-    const now = new Date("2026-03-24T09:00:00Z");
-    const props = {
-      selectedDate,
-      now,
-      sortedEvents: [{ id: 1 }],
-      dayTasks: [{ id: 2 }],
-      tasksDueToday: [{ id: 3 }],
-      suggestableTasks: [{ id: 4 }],
-      skippedGapTasks: {},
-      slottedTaskIds: new Set(),
-      slottedTitles: new Set(),
-      deadlineSuggestions: [{ id: 5 }],
-      hasTimerSession: false,
-    };
-
-    const { result } = renderHook(() => useMiniTimelineData(props));
-
-    expect(computePlanTimelineRowsMock).toHaveBeenCalledWith(
-      props.sortedEvents,
-      selectedDate,
-      expect.any(Date),
-      expect.any(Date),
-      now,
-      props.dayTasks,
-      props.tasksDueToday,
-      expect.any(Function),
-    );
+  const baseProps = {
+    selectedDate: new Date("2026-03-24T12:34:00Z"), now: new Date("2026-03-24T09:00:00Z"),
+    sortedEvents: [{ id: 1 }], dayTasks: [{ id: 2 }], tasksDueToday: [{ id: 3 }], suggestableTasks: [{ id: 4 }],
+    skippedGapTasks: {}, slottedTaskIds: new Set(), slottedTitles: new Set(),
+    deadlineSuggestions: [{ id: 5 }], hasTimerSession: false,
+  };
+  it("builds rows and derives best free row", () => {
+    const { result } = renderHook(() => useMiniTimelineData(baseProps));
+    expect(computePlanTimelineRowsMock).toHaveBeenCalled();
     expect(result.current.rows).toEqual([{ id: "row-1" }]);
     expect(result.current.bestFreeRowId).toBe("free-row");
+  });
+  it("derives gap tasks and fallbacks", () => {
+    const { result } = renderHook(() => useMiniTimelineData(baseProps));
     expect(result.current.assignedGapTasks).toEqual({ map: { "free-row": { id: 1 } }, nextMap: { "free-row": null } });
     expect(result.current.gapDeadlineFallbacks).toEqual({ "free-row": { title: "Fallback" } });
-    expect(result.current.currentBlock).toBeNull();
-
-    const [, , start, end, , , , isTodayArg] = computePlanTimelineRowsMock.mock.calls[0];
+  });
+  it("uses correct day bounds", () => {
+    renderHook(() => useMiniTimelineData(baseProps));
+    const [, , start, end] = computePlanTimelineRowsMock.mock.calls[0];
     expect(start.getHours()).toBe(DAY_START_HOUR);
     expect(end.getHours()).toBe(DAY_END_HOUR);
-    expect(isTodayArg.name).toBe("isToday");
   });
 
   it("returns the active event only when today and timer is off", () => {

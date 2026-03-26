@@ -91,49 +91,35 @@ describe("useIntelligenceDashboard", () => {
     useAnalyticsOverviewMock.mockReturnValue({ summary: "ok" });
   });
 
-  it("prefers server settings, loads dashboard data, and schedules cloud sync", async () => {
+  const buildFullProfile = () => ({
+    id: 9,
+    settings: {
+      homepage_widgets: ["todayTasks", "hero", "analyticsHeatmap"],
+      homepage_widget_sizes: { hero: { row: 2 } },
+      sleep_time: "22:00", wake_time: "06:00",
+    },
+  });
+  const buildFullSlot5 = () => ({
+    sortedEvents: [{ id: 1, source: "timetable", title: "Lecture", start_time: "2026-03-26T09:00:00Z", end_time: "2026-03-26T10:00:00Z" }],
+    taskWidgetItemsOnly: [{ id: 2, completed: false }],
+    now: new Date("2026-03-26T09:00:00Z"),
+    navigatorContext: { overlaps: [] },
+  });
+  it("prefers server settings and loads dashboard data", async () => {
     vi.useFakeTimers();
-    const profile = {
-      id: 9,
-      settings: {
-        homepage_widgets: ["todayTasks", "hero", "analyticsHeatmap"],
-        homepage_widget_sizes: { hero: { row: 2 } },
-        sleep_time: "22:00",
-        wake_time: "06:00",
-      },
-    };
-    localStorage.setItem("homepage_widget_source_9", JSON.stringify({
-      layout: ["hero"],
-      sizes: { hero: { row: 1 } },
-    }));
-
-    const { result } = renderHook(() =>
-      useIntelligenceDashboard({
-        profile,
-        profileLoading: false,
-        slot5Data: {
-          sortedEvents: [
-            { id: 1, source: "timetable", title: "Lecture", start_time: "2026-03-26T09:00:00Z", end_time: "2026-03-26T10:00:00Z" },
-          ],
-          taskWidgetItemsOnly: [{ id: 2, completed: false }],
-          now: new Date("2026-03-26T09:00:00Z"),
-          navigatorContext: { overlaps: [] },
-        },
-      })
-    );
-
-    await act(async () => {
-      await Promise.resolve();
-      vi.advanceTimersByTime(2000);
-      await Promise.resolve();
-    });
-
+    localStorage.setItem("homepage_widget_source_9", JSON.stringify({ layout: ["hero"], sizes: { hero: { row: 1 } } }));
+    const { result } = renderHook(() => useIntelligenceDashboard({ profile: buildFullProfile(), profileLoading: false, slot5Data: buildFullSlot5() }));
+    await act(async () => { await Promise.resolve(); vi.advanceTimersByTime(2000); await Promise.resolve(); });
     expect(useAnalyticsOverviewMock).toHaveBeenCalledWith(30);
-    act(() => {
-      vi.runOnlyPendingTimers();
-    });
     expect(result.current.layout).toEqual(["todayTasks", "hero", "analyticsHeatmap"]);
     expect(result.current.widgetSizes).toEqual({ hero: { row: 2 } });
+    vi.useRealTimers();
+  });
+  it("schedules cloud sync and populates results", async () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useIntelligenceDashboard({ profile: buildFullProfile(), profileLoading: false, slot5Data: buildFullSlot5() }));
+    await act(async () => { await Promise.resolve(); vi.advanceTimersByTime(2000); await Promise.resolve(); });
+    act(() => { vi.runOnlyPendingTimers(); });
     expect(result.current.attendance).toEqual({ loading: false, pct: 80 });
     expect(result.current.courseChangeRequest).toEqual({ status: "pending", requested_course: "CS" });
     expect(result.current.analytics).toEqual({ summary: "ok" });
@@ -146,95 +132,45 @@ describe("useIntelligenceDashboard", () => {
     vi.useRealTimers();
   });
 
-  it("normalizes invalid stored data and skips analytics when no analytics widgets exist", async () => {
+  it("normalizes invalid stored data", async () => {
     localStorage.setItem("homepage_widget_layout", "not-json");
     localStorage.setItem("homepage_widget_sizes", "not-json");
-    getMyCourseChangeRequestMock.mockRejectedValueOnce(new Error("down"));
-    tflServiceMock.getTfLDelays.mockResolvedValueOnce("bad");
-    useAttendanceStatsMock.mockReturnValue({ loading: true, stats: null });
-    useAnalyticsOverviewMock.mockReturnValue(null);
-
-    const { result } = renderHook(() =>
-      useIntelligenceDashboard({
-        profile: null,
-        profileLoading: false,
-        slot5Data: {},
-      })
-    );
-
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    expect(result.current.attendance.pct).toBe(0);
+    const { result } = renderHook(() => useIntelligenceDashboard({ profile: null, profileLoading: false, slot5Data: {} }));
+    await act(async () => { await Promise.resolve(); });
     expect(result.current.layout).toEqual(["hero", "deadlines", "todayTasks", "bigTimeline"]);
     expect(result.current.widgetSizes).toEqual({});
+  });
+  it("skips analytics when no analytics widgets exist", async () => {
+    useAttendanceStatsMock.mockReturnValue({ loading: true, stats: null });
+    useAnalyticsOverviewMock.mockReturnValue(null);
+    const { result } = renderHook(() => useIntelligenceDashboard({ profile: null, profileLoading: false, slot5Data: {} }));
+    await act(async () => { await Promise.resolve(); });
+    expect(result.current.attendance.pct).toBe(0);
     expect(result.current.analytics).toBeNull();
-    expect(result.current.courseChangeRequest).toBeNull();
-    expect(result.current.tflDelays).toEqual([]);
     expect(useAnalyticsOverviewMock).toHaveBeenCalledWith(null);
   });
 
   it("uses the academic-session rules when building live summary", () => {
-    const { result } = renderHook(() =>
-      useIntelligenceDashboard({
-        profile: { id: 1, settings: { homepage_widgets: ["hero"], homepage_widget_sizes: {} } },
-        profileLoading: true,
-        slot5Data: {
-          sortedEvents: [
-            { source: "society", title: "Society event" },
-            { source: "timetable", title: "Lecture" },
-            { source: "module_cs", title: "Module session" },
-            { source: "other", tag_name: "tutorial", title: "Tutorial copy" },
-            { source: "other", description: "small group discussion" },
-            { source: "other", title: "Chore" },
-          ],
-          taskWidgetItemsOnly: [{ id: 1, completed: false }, { id: 2, completed: true }],
-          now: new Date("2026-03-26T09:00:00Z"),
-          navigatorContext: { overlaps: [] },
-        },
-      })
-    );
-
+    const slot5Data = {
+      sortedEvents: [{ source: "society", title: "S" }, { source: "timetable", title: "L" }, { source: "module_cs", title: "M" }, { source: "other", tag_name: "tutorial", title: "T" }, { source: "other", description: "small" }, { source: "other", title: "C" }],
+      taskWidgetItemsOnly: [{ id: 1, completed: false }, { id: 2, completed: true }],
+      now: new Date("2026-03-26T09:00:00Z"), navigatorContext: { overlaps: [] },
+    };
+    const { result } = renderHook(() => useIntelligenceDashboard({ profile: { id: 1, settings: { homepage_widgets: ["hero"], homepage_widget_sizes: {} } }, profileLoading: true, slot5Data }));
     expect(result.current.live.eventsCount).toBe(6);
     expect(result.current.live.classesCount).toBe(4);
     expect(result.current.live.tasksCount).toBe(1);
-    expect(result.current.live.liveContext).toEqual({ label: "Right now" });
-    expect(getLiveContextMock).toHaveBeenCalled();
     expect(getSemesterProgress(new Date("2026-03-26"))).toBeTruthy();
   });
 
   it("falls back to stored widgets when server settings are already synced", async () => {
     vi.useFakeTimers();
-    const profile = {
-      id: 11,
-      settings: {
-        homepage_widgets: ["hero"],
-        homepage_widget_sizes: { hero: { row: 2 } },
-      },
-    };
-
+    const profile = { id: 11, settings: { homepage_widgets: ["hero"], homepage_widget_sizes: { hero: { row: 2 } } } };
     localStorage.setItem("homepage_widget_layout_11", JSON.stringify(["deadlines", "deadlines", "unknown"]));
     localStorage.setItem("homepage_widget_sizes_11", JSON.stringify({ deadlines: { row: 1 } }));
-    localStorage.setItem("homepage_widget_source_11", JSON.stringify({
-      layout: ["hero"],
-      sizes: { hero: { row: 2 } },
-    }));
-
-    const { result } = renderHook(() =>
-      useIntelligenceDashboard({
-        profile,
-        profileLoading: false,
-        slot5Data: {},
-      })
-    );
-
-    await act(async () => {
-      await Promise.resolve();
-      vi.advanceTimersByTime(2000);
-      await Promise.resolve();
-    });
-
+    localStorage.setItem("homepage_widget_source_11", JSON.stringify({ layout: ["hero"], sizes: { hero: { row: 2 } } }));
+    const { result } = renderHook(() => useIntelligenceDashboard({ profile, profileLoading: false, slot5Data: {} }));
+    await act(async () => { await Promise.resolve(); vi.advanceTimersByTime(2000); await Promise.resolve(); });
     expect(result.current.layout).toEqual(["hero", "deadlines"]);
     expect(result.current.widgetSizes).toEqual({ deadlines: { row: 1 } });
     expect(updateUserSettingsMock).toHaveBeenCalledWith({

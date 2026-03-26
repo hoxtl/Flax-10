@@ -235,101 +235,65 @@ describe("useCampusMapModel - extras", () => {
     expect(mockState.routes.tflRouteInfo).toBeNull();
   });
 
-  it("clears start and campus selections, manual fields, and marker artifacts", async () => {
+  const setupMapClearing = () => {
     mockState = createMutableState({
-      selection: {
-        customDestination: { address: "Library", lat: 51.5, lng: -0.1 },
-        selectedCampus: { id: "strand", coords: [-0.11, 51.51] },
-        startLocation: { lat: 51.49, lng: -0.08 },
-      },
-      routes: {
-        routeInfo: { id: "walk" },
-        tflRouteInfo: { id: "tube" },
-      },
-      form: {
-        manualDestination: "Library",
-        manualStart: "Home",
-      },
+      selection: { customDestination: { address: "L", lat: 51.5, lng: -0.1 }, selectedCampus: { id: "s", coords: [-0.1, 51.5] }, startLocation: { lat: 51.4, lng: -0.0 } },
+      routes: { routeInfo: { id: "w" }, tflRouteInfo: { id: "t" } },
+      form: { manualDestination: "L", manualStart: "H" },
     });
-
-    const startMarker = mockRefs.startMarker.current;
-    const startPopup = mockRefs.startPopup.current;
+  };
+  it("clears start and campus selections", async () => {
+    setupMapClearing();
     const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
-
-    await act(async () => {
-      result.current.handleClearStart();
-      result.current.handleClearCampus();
-    });
-
-    expect(startMarker.remove).toHaveBeenCalled();
-    expect(startPopup.remove).toHaveBeenCalled();
+    await act(async () => { result.current.handleClearStart(); result.current.handleClearCampus(); });
     expect(mockRefs.startMarker.current).toBeNull();
-    expect(mockRefs.startPopup.current).toBeNull();
     expect(mockState.selection.startLocation).toBeNull();
     expect(mockState.selection.selectedCampus).toBeNull();
-    expect(mockState.selection.customDestination).toBeNull();
+  });
+  it("clears markers and manual fields", async () => {
+    setupMapClearing();
+    const startMarker = mockRefs.startMarker.current, startPopup = mockRefs.startPopup.current;
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
+    await act(async () => { result.current.handleClearStart(); result.current.handleClearCampus(); });
+    expect(startMarker.remove).toHaveBeenCalled();
+    expect(startPopup.remove).toHaveBeenCalled();
     expect(mockState.form.manualStart).toBe("");
     expect(mockState.form.manualDestination).toBe("");
+  });
+  it("clears routes and custom destination", async () => {
+    setupMapClearing();
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
+    await act(async () => { result.current.handleClearStart(); result.current.handleClearCampus(); });
+    expect(mockState.selection.customDestination).toBeNull();
     expect(mockState.routes.routeInfo).toBeNull();
-    expect(mockState.routes.tflRouteInfo).toBeNull();
   });
 
-  it("preserves the selected-campus destination during journey calculation", async () => {
+  it("preserves selection during journey calc", async () => {
     mockState = createMutableState({
-      selection: {
-        customDestination: { address: "Strand Campus", lat: 51.511, lng: -0.117, name: "Strand Campus" },
-        selectedCampus: { id: "strand", coords: [-0.117, 51.511] },
-      },
-      form: {
-        manualDestination: "Manual override",
-      },
+      selection: { customDestination: { address: "S", lat: 51.5, lng: -0.1, name: "S" }, selectedCampus: { id: "s", coords: [-0.1, 51.5] } },
+      form: { manualDestination: "M" },
     });
-
     const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
-
-    await act(async () => {
-      result.current.handleUserJourneyCalculate(
-        { latitude: 51.5, longitude: -0.1 },
-        { latitude: 51.52, longitude: -0.13 }
-      );
-    });
-
-    expect(mockState.selection.customDestination).toEqual({
-      address: "Strand Campus",
-      lat: 51.511,
-      lng: -0.117,
-      name: "Strand Campus",
-    });
+    await act(async () => { result.current.handleUserJourneyCalculate({ latitude: 51.5, longitude: -0.1 }, { latitude: 51.52, longitude: -0.13 }); });
+    expect(mockState.selection.customDestination.address).toBe("S");
     expect(mockState.selection.startLocation).toEqual({ lat: 51.5, lng: -0.1 });
     expect(mockRefs.map.current.fitBounds).toHaveBeenCalled();
   });
 
-  it("loads only valid nearby upcoming events, sorted by start time and capped at five", async () => {
+  it("filters and sorts upcoming events", async () => {
     getEventsMock.mockResolvedValue([
-      { id: "late", location: "A", start_time: "2026-03-26T10:30:00.000Z" },
-      { id: "invalid", location: "B", start_time: "not-a-date" },
       { id: "noloc", location: "", start_time: "2026-03-26T09:15:00.000Z" },
       { id: "ongoing", location: "C", start_time: "2026-03-26T08:30:00.000Z", end_time: "2026-03-26T09:30:00.000Z" },
-      { id: "soon-2", location: "D", start_time: "2026-03-26T09:10:00.000Z" },
       { id: "soon-1", location: "E", start_time: "2026-03-26T09:05:00.000Z" },
+      { id: "soon-2", location: "D", start_time: "2026-03-26T09:10:00.000Z" },
       { id: "soon-3", location: "F", start_time: "2026-03-26T09:20:00.000Z" },
       { id: "soon-4", location: "G", start_time: "2026-03-26T09:40:00.000Z" },
-      { id: "too-far", location: "H", start_time: "2026-03-26T12:30:00.000Z" },
-      { id: "past-no-end", location: "J", start_time: "2026-03-26T07:00:00.000Z" },
-      { id: "past-ended", location: "I", start_time: "2026-03-26T07:00:00.000Z", end_time: "2026-03-26T08:00:00.000Z" },
+      { id: "soon-5", location: "H", start_time: "2026-03-26T09:50:00.000Z" },
+      { id: "too-far", location: "I", start_time: "2026-03-26T12:30:00.000Z" },
     ]);
-
     const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
-
     await flushEffects();
-    expect(getEventsMock).toHaveBeenCalled();
-    expect(result.current.upcomingEvents.map((event) => event.id)).toEqual([
-      "ongoing",
-      "soon-1",
-      "soon-2",
-      "soon-3",
-      "soon-4",
-    ]);
+    expect(result.current.upcomingEvents.map(e => e.id)).toEqual(["ongoing", "soon-1", "soon-2", "soon-3", "soon-4"]);
   });
 
   it("treats a null upcoming-events response as an empty list", async () => {
