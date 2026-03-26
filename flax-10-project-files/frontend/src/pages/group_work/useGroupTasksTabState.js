@@ -101,31 +101,35 @@ function useTasks(projectId, members, onStatsUpdate) {
 }
 
 function useFilteredTasks(tasks, filterUsers) {
-  if (filterUsers.length === 0) {
-    return sortTasks(tasks);
-  }
-
+  if (filterUsers.length === 0) return sortTasks(tasks);
   const filtered = tasks.filter((task) =>
     (task.assignees_info || []).some((assignee) => filterUsers.includes(String(assignee.id))),
   );
   return sortTasks(filtered);
 }
 
-export function useGroupTasksTabState(projectId, members, onStatsUpdate) {
-  const taskActions = useTasks(projectId, members, onStatsUpdate);
+function useSearchFilteredTasks(tasks, searchTerm) {
+  if (!searchTerm) return tasks;
+  const lower = searchTerm.toLowerCase();
+  return tasks.filter((t) => (t.title || "").toLowerCase().includes(lower));
+}
+
+function useTaskUIState() {
   const [filterUsers, setFilterUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [taskView, setTaskView] = useState("list");
   const [showAddModal, setShowAddModal] = useState(false);
-  const sortedTasks = useFilteredTasks(taskActions.tasks, filterUsers);
+  return { filterUsers, setFilterUsers, searchTerm, setSearchTerm, taskView, setTaskView, showAddModal, setShowAddModal };
+}
 
+export function useGroupTasksTabState(projectId, members, onStatsUpdate) {
+  const taskActions = useTasks(projectId, members, onStatsUpdate);
+  const ui = useTaskUIState();
+  const filtered = useFilteredTasks(taskActions.tasks, ui.filterUsers);
+  const searched = useSearchFilteredTasks(filtered, ui.searchTerm);
   return {
     taskActions,
-    filterUsers,
-    setFilterUsers,
-    taskView,
-    setTaskView,
-    showAddModal,
-    setShowAddModal,
-    sortedTasks,
+    ...ui,
+    sortedTasks: searched,
   };
 }
