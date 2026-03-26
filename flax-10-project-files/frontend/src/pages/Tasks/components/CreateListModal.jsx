@@ -1,5 +1,5 @@
 /*
- * Modal to create a new task list (name + colour). Subcomponents keep main fn under 20 lines.
+ * Modal to create a new task list (name + colour + category). Subcomponents keep main fn under 20 lines.
  */
 
 import { useState } from "react";
@@ -8,11 +8,33 @@ import styles from "./CreateListModal.module.css";
 import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 
-function CreateListModalBody({ name, setName, color, setColor, onEnter }) {
+const LIST_CATEGORIES = [
+  { value: "personal", label: "Life" },
+  { value: "uni", label: "University" },
+  { value: "society", label: "Society" },
+];
+
+function CategorySelector({ category, setCategory }) {
+  return (
+    <div className={styles.fieldRow}>
+      <span className={styles.fieldLabel}>SECTION</span>
+      <div className={styles.categoryChips}>
+        {LIST_CATEGORIES.map((cat) => (
+          <button key={cat.value} type="button" className={`${styles.categoryChip} ${category === cat.value ? styles.categoryChipActive : ""}`} onClick={() => setCategory(cat.value)}>
+            {cat.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CreateListModalBody({ name, setName, color, setColor, category, setCategory, onEnter }) {
   return (
     <div className={styles.body}>
-      <p className={styles.subtitle}>Choose a name and accent colour for your list.</p>
+      <p className={styles.subtitle}>Choose a name, section, and accent colour for your list.</p>
       <input className={styles.nameInput} placeholder="List name…" value={name} onChange={(e) => setName(e.target.value)} autoFocus onKeyDown={(e) => e.key === "Enter" && onEnter()} />
+      <CategorySelector category={category} setCategory={setCategory} />
       <div className={styles.fieldRow}>
         <span className={styles.fieldLabel}>COLOUR</span>
         <div className={styles.colorGrid}>
@@ -41,16 +63,17 @@ function CreateListModalFooter({ onClose, onSave, saving, canSave }) {
 export default function CreateListModal({ onSave, onClose }) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(FOCUS_BLOCK_PALETTE[0].hex);
+  const [category, setCategory] = useState("personal");
   const [saving, setSaving] = useState(false);
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await onSave({ name: name.trim(), color });
+    await onSave({ name: name.trim(), color, category });
     setSaving(false); onClose();
   };
   return (
       <StandardModal title="New list" onClose={onClose} size="sm" contentClassName={styles.modalContent}>
-        <CreateListModalBody name={name} setName={setName} color={color} setColor={setColor} onEnter={handleSave} />
+        <CreateListModalBody name={name} setName={setName} color={color} setColor={setColor} category={category} setCategory={setCategory} onEnter={handleSave} />
         <CreateListModalFooter onClose={onClose} onSave={handleSave} saving={saving} canSave={!!name.trim()} />
       </StandardModal>
   );

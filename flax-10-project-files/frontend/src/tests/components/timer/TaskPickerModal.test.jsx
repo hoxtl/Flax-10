@@ -4,7 +4,15 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '../../../utils/testUtils';
-import { TaskPickerModal } from '../../../components/timer/task_input/TaskPickerModal';
+import {
+  TaskPickerModal,
+  buildFilterPanelProps,
+  changeSort,
+  clearAllFilters,
+  closeFilterPanel,
+  toggleList,
+  toggleModule,
+} from '../../../components/timer/task_input/TaskPickerModal';
 
 import { createFnMap } from '../../utils/testBuilderUtils';
 
@@ -50,8 +58,14 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
   ),
 }));
 
-vi.mock('../../../pages/Tasks/components/TaskFeedFilterPanel', () => ({
-  default: () => <div data-testid="filter-panel" />,
+vi.mock('../../../pages/tasks/components/TaskFeedToolbarFilter', () => ({
+  default: ({ activeFilterCount, onFilterOpenChange, panelProps }) => (
+    <div data-testid="filter-panel">
+      <span data-testid="filter-count">{activeFilterCount}</span>
+      <button onClick={() => onFilterOpenChange(true)}>open filter</button>
+      <button onClick={() => panelProps.onClearAll()}>clear filters</button>
+    </div>
+  ),
 }));
 
 vi.mock('../../../components/timer/task_input/TaskPickItem', () => ({
@@ -186,11 +200,69 @@ describe('TaskPickerModal – filter panel', () => {
     const filterWrapRef = { current: document.createElement('div') };
     const state = makeState({ isFilterOpen: true, setIsFilterOpen });
     render(<TaskPickerModal state={state} filterWrapRef={filterWrapRef} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
-    // Simulate mousedown on the shell (not inside filterWrapRef)
-    const shell = document.querySelector('[data-testid="standard-modal"]');
-    if (shell) fireEvent.mouseDown(shell);
-    // setIsFilterOpen may be called
-    // We just assert no crash occurs
-    expect(setIsFilterOpen).toBeDefined();
+    closeFilterPanel({ target: document.createElement('div') }, state, filterWrapRef);
+    expect(setIsFilterOpen).toHaveBeenCalledWith(false);
+  });
+
+  it('closes the modal when the backdrop is clicked', () => {
+    const state = makeState();
+    render(<TaskPickerModal state={state} filterWrapRef={{ current: null }} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('standard-modal'));
+    expect(state.setOpen).toHaveBeenCalledWith(false);
+  });
+
+  it('wires helper callbacks through buildFilterPanelProps', () => {
+    const setFilterListIds = vi.fn();
+    const setFilterModuleCodes = vi.fn();
+    const state = makeState({
+      visibleListItems: [{ id: 1, label: 'Inbox' }],
+      groupedModuleItems: { CS: [{ value: 'CS101' }] },
+      moduleGroupKeys: ['CS'],
+      filterListIds: ['1'],
+      filterModuleCodes: ['CS101'],
+      setFilterListIds,
+      setFilterModuleCodes,
+    });
+
+    const props = buildFilterPanelProps(state);
+    props.onToggleList(1);
+    props.onToggleModule('CS101');
+    props.onClearAll();
+
+    expect(setFilterListIds.mock.calls[0][0](['1'])).toEqual([]);
+    expect(setFilterModuleCodes.mock.calls[0][0](['CS101'])).toEqual([]);
+    expect(setFilterListIds).toHaveBeenLastCalledWith([]);
+    expect(setFilterModuleCodes).toHaveBeenLastCalledWith([]);
+    expect(state.setFilterQuery).toHaveBeenCalledWith('');
+  });
+
+  it('exercises the exported list and module filter helpers', () => {
+    const setFilterListIds = vi.fn();
+    const setFilterModuleCodes = vi.fn();
+
+    changeSort('due', makeState({ setSortBy: vi.fn(), loadTasks: vi.fn() }));
+
+    toggleList(2, setFilterListIds);
+    expect(setFilterListIds.mock.calls[0][0](['1'])).toEqual(['1', '2']);
+    expect(setFilterListIds.mock.calls[0][0](['2'])).toEqual([]);
+
+    toggleModule('CS102', setFilterModuleCodes);
+    expect(setFilterModuleCodes.mock.calls[0][0](['CS101'])).toEqual(['CS101', 'CS102']);
+    expect(setFilterModuleCodes.mock.calls[0][0](['CS102'])).toEqual([]);
+  });
+
+  it('clears filters and only closes the panel for outside clicks', () => {
+    const state = makeState({ isFilterOpen: true });
+    clearAllFilters(state);
+    expect(state.setFilterListIds).toHaveBeenCalledWith([]);
+    expect(state.setFilterModuleCodes).toHaveBeenCalledWith([]);
+    expect(state.setFilterQuery).toHaveBeenCalledWith('');
+
+    const inside = document.createElement('div');
+    closeFilterPanel({ target: inside }, state, { current: inside });
+    expect(state.setIsFilterOpen).not.toHaveBeenCalled();
+
+    closeFilterPanel({ target: document.createElement('div') }, state, { current: inside });
+    expect(state.setIsFilterOpen).toHaveBeenCalledWith(false);
   });
 });

@@ -32,8 +32,15 @@ function stopPropagation(event) {
   event.stopPropagation();
 }
 
-function ModuleCodePill({ moduleCode }) {
+function ModuleCodePill({ moduleCode, onModuleCodeClick }) {
   if (!moduleCode) return null;
+  if (onModuleCodeClick) {
+    return (
+      <button type="button" className={styles.moduleCodePillBtn} onClick={(e) => { e.stopPropagation(); onModuleCodeClick(moduleCode); }}>
+        <Badge tone="muted" className={styles.moduleCodePill}>{moduleCode}</Badge>
+      </button>
+    );
+  }
   return <Badge tone="muted" className={styles.moduleCodePill}>{moduleCode}</Badge>;
 }
 
@@ -45,11 +52,11 @@ function DeadlineTypePill({ deadlineType }) {
   return <Badge tone="default" className={styles.typePill}>{(deadlineType || 'assessment').toUpperCase()}</Badge>;
 }
 
-function DeadlineRowLeft({ deadlineType, moduleCode, title }) {
+function DeadlineRowLeft({ deadlineType, moduleCode, title, onModuleCodeClick }) {
   return (
     <div className={styles.deadlineRowLeft}>
       <div className={styles.deadlinePills} onClick={stopPropagation} onMouseDown={stopPropagation}>
-        <ModuleCodePill moduleCode={moduleCode} />
+        <ModuleCodePill moduleCode={moduleCode} onModuleCodeClick={onModuleCodeClick} />
         <DeadlineTypePill deadlineType={deadlineType} />
       </div>
       <DeadlineTitle title={title} />
@@ -61,10 +68,10 @@ function DeadlineRowRight({ deadline, tier }) {
   return <div className={styles.widgetRowMeta}><DeadlineCountdown dueDate={deadline.start_due_date} tier={tier} showPriority={false} /></div>;
 }
 
-function DeadlineRowContent({ tier, moduleCode, deadline, title }) {
+function DeadlineRowContent({ tier, moduleCode, deadline, title, onModuleCodeClick }) {
   return (
     <>
-      <DeadlineRowLeft deadlineType={deadline.deadline_type} moduleCode={moduleCode} title={title} />
+      <DeadlineRowLeft deadlineType={deadline.deadline_type} moduleCode={moduleCode} title={title} onModuleCodeClick={onModuleCodeClick} />
       <DeadlineRowRight deadline={deadline} tier={tier} />
     </>
   );
@@ -100,7 +107,7 @@ function buildInteractiveProps(interactiveRows, onSelectDeadline, deadline) {
   };
 }
 
-function DeadlineRow({ deadline, interactiveRows, onSelectDeadline }) {
+function DeadlineRow({ deadline, interactiveRows, onSelectDeadline, onModuleCodeClick }) {
   const tier = getUrgencyTier(deadline.start_due_date);
   const urgentGlow = tier === 'overdue' || tier === 'critical';
   return (
@@ -111,7 +118,7 @@ function DeadlineRow({ deadline, interactiveRows, onSelectDeadline }) {
       variants={itemVariants}
       {...buildInteractiveProps(interactiveRows, onSelectDeadline, deadline)}
     >
-      <DeadlineRowContent tier={tier} moduleCode={deadline.module_code || ''} deadline={deadline} title={deadline.assessment_title || deadline.title || 'Assignment'} />
+      <DeadlineRowContent tier={tier} moduleCode={deadline.module_code || ''} deadline={deadline} title={deadline.assessment_title || deadline.title || 'Assignment'} onModuleCodeClick={onModuleCodeClick} />
     </Motion.div>
   );
 }
@@ -135,23 +142,24 @@ function compareDeadlines(a, b) {
   return new Date(a.start_due_date).getTime() - new Date(b.start_due_date).getTime();
 }
 
-function DeadlineRows({ deadlines, interactiveRows, onSelectDeadline }) {
+function DeadlineRows({ deadlines, interactiveRows, onSelectDeadline, onModuleCodeClick }) {
   return deadlines.map((deadline) => (
     <DeadlineRow
       key={deadline.id}
       deadline={deadline}
       interactiveRows={interactiveRows}
       onSelectDeadline={onSelectDeadline}
+      onModuleCodeClick={onModuleCodeClick}
     />
   ));
 }
 
-function ExpandedDeadlineRows({ expanded, extra, interactiveRows, onSelectDeadline }) {
+function ExpandedDeadlineRows({ expanded, extra, interactiveRows, onSelectDeadline, onModuleCodeClick }) {
   if (!expanded) return null;
   return (
     <Motion.div className={styles.expandableRows} variants={expandBodyVariants} initial="collapsed" animate="expanded" exit="collapsed" layout>
       <Motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
-        <DeadlineRows deadlines={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} />
+        <DeadlineRows deadlines={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onModuleCodeClick={onModuleCodeClick} />
       </Motion.div>
     </Motion.div>
   );
@@ -166,22 +174,22 @@ function EmptyWidget({ emptyMessage, emptySub }) {
   );
 }
 
-function DeadlineList({ initial, extra, expanded, interactiveRows, onSelectDeadline }) {
+function DeadlineList({ initial, extra, expanded, interactiveRows, onSelectDeadline, onModuleCodeClick }) {
   return (
     <Motion.div className={styles.widgetList} initial="hidden" animate="visible" variants={listVariants} layout>
-      <DeadlineRows deadlines={initial} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} />
+      <DeadlineRows deadlines={initial} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onModuleCodeClick={onModuleCodeClick} />
       <AnimatePresence initial={false}>
-        <ExpandedDeadlineRows expanded={expanded} extra={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} />
+        <ExpandedDeadlineRows expanded={expanded} extra={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onModuleCodeClick={onModuleCodeClick} />
       </AnimatePresence>
     </Motion.div>
   );
 }
 
-function WidgetBody({ sorted, initial, extra, expanded, setExpanded, emptyMessage, emptySub, interactiveRows, onSelectDeadline, renderEmpty }) {
+function WidgetBody({ sorted, initial, extra, expanded, setExpanded, emptyMessage, emptySub, interactiveRows, onSelectDeadline, renderEmpty, onModuleCodeClick }) {
   if (sorted.length === 0) return renderEmpty ? renderEmpty() : <EmptyWidget emptyMessage={emptyMessage} emptySub={emptySub} />;
   return (
     <>
-      <DeadlineList initial={initial} extra={extra} expanded={expanded} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} />
+      <DeadlineList initial={initial} extra={extra} expanded={expanded} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onModuleCodeClick={onModuleCodeClick} />
       {extra.length > 0 && <ShowMoreButton expanded={expanded} hiddenCount={extra.length} onToggle={() => setExpanded((prev) => !prev)} styles={styles} />}
     </>
   );
@@ -203,7 +211,7 @@ function useUpcomingDeadlineState(deadlines, initialShown) {
   };
 }
 
-export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Deadlines", initialShown = 4, embedded = false, interactiveRows = false, onSelectDeadline, emptyMessage = "No upcoming deadlines", emptySub = "You're all caught up — enjoy the calm.", renderEmpty = null }) {
+export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Deadlines", initialShown = 4, embedded = false, interactiveRows = false, onSelectDeadline, emptyMessage = "No upcoming deadlines", emptySub = "You're all caught up — enjoy the calm.", renderEmpty = null, onModuleCodeClick = null }) {
   const safeDeadlines = Array.isArray(deadlines) ? deadlines : [];
   const widgetState = useUpcomingDeadlineState(safeDeadlines, initialShown);
 
@@ -211,7 +219,7 @@ export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Dead
   return (
     <Motion.div className={buildWidgetClassName(embedded)} variants={containerVariants} initial="hidden" animate="visible" layout>
       {(widgetState.sorted.length > 0 || !renderEmpty) ? <WidgetHeader icon={AlertCircle} title={title} count={widgetState.sorted.length} className={styles.widgetHeader} /> : null}
-      <WidgetBody sorted={widgetState.sorted} initial={widgetState.initial} extra={widgetState.extra} expanded={widgetState.expanded} setExpanded={widgetState.setExpanded} emptyMessage={emptyMessage} emptySub={emptySub} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} renderEmpty={renderEmpty} />
+      <WidgetBody sorted={widgetState.sorted} initial={widgetState.initial} extra={widgetState.extra} expanded={widgetState.expanded} setExpanded={widgetState.setExpanded} emptyMessage={emptyMessage} emptySub={emptySub} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} renderEmpty={renderEmpty} onModuleCodeClick={onModuleCodeClick} />
     </Motion.div>
   );
 }

@@ -23,6 +23,7 @@ import {
     ShowMoreButton,
 } from '../../components/modules/shared/widgetParts.jsx';
 import { TaskInfoModal } from '../tasks/components/TaskInfoModal';
+import EmptyStateCard from '../homepage/components/EmptyStateCard';
 import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 
@@ -109,12 +110,7 @@ function sortByDueDate(readings) {
 }
 
 function EmptyReadings() {
-    return (
-        <div className={styles.emptyState}>
-            <p className={styles.emptyMessage}>No readings assigned</p>
-            <p className={styles.emptySub}>Your reading list will appear here when tutors add materials.</p>
-        </div>
-    );
+    return <EmptyStateCard icon={BookOpen} message="No readings assigned" sub="Your reading list will appear here when tutors add materials." />;
 }
 
 function ReadingsList({ initial, extra, expanded, onToggle, onReadingAdded, onSelect }) {

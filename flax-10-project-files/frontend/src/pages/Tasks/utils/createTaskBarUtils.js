@@ -39,7 +39,7 @@ export function buildQuickAddPayload(state, taskTitle) {
     description: "",
     priority: "medium",
     due_date: defaultDueDate ?? null,
-    task_list: taskListId ? Number(taskListId) : (sortedLists[0]?.id ?? null),
+    task_list: taskListId ? Number(taskListId) : null,
     estimated_blocks: estimatedBlocks,
     module: moduleId ? Number(moduleId) : null,
     page_count: pageCount ? Number(pageCount) : null,

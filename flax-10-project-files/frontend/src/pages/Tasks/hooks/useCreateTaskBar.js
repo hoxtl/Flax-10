@@ -17,7 +17,7 @@ function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   );
   const [title, setTitle] = useState("");
   const [estimatedMinutes, setEstimatedMinutes] = useState(POMODORO_BLOCK_MINUTES);
-  const [taskListId, setTaskListId] = useState(() => (defaultListId || sortedLists[0]?.id) ?? "");
+  const [taskListId, setTaskListId] = useState(() => defaultListId || "");
   const [moduleId, setModuleId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
@@ -27,7 +27,8 @@ function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   const cardRef = useRef(null);
   const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
   const [pageCount, setPageCount] = useState(null);
-  return { sortedLists, title, setTitle, estimatedMinutes, setEstimatedMinutes, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate, pageCount, setPageCount };
+  const [listError, setListError] = useState(false);
+  return { sortedLists, title, setTitle, estimatedMinutes, setEstimatedMinutes, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate, pageCount, setPageCount, listError, setListError };
 }
 
 function useEnrolledModulesEffect(setEnrolledModules) {
@@ -59,12 +60,14 @@ function useSleepSettingsEffect(setSleepSettings) {
   }, [setSleepSettings]);
 }
 
-function useTaskListIdSync(defaultListId, sortedLists, setTaskListId) {
+function useTaskListIdSync(defaultListId, sortedLists, setTaskListId, setListError) {
   useEffect(() => {
-    const next = (defaultListId || sortedLists[0]?.id) ?? "";
-    if (!next) return;
-    setTaskListId((prev) => (prev === next ? prev : next));
-  }, [defaultListId, sortedLists, setTaskListId]);
+    if (!defaultListId) return;
+    setTaskListId((prev) => {
+      if (prev !== defaultListId) setListError?.(false);
+      return prev === defaultListId ? prev : defaultListId;
+    });
+  }, [defaultListId, sortedLists, setTaskListId, setListError]);
 }
 
 function useClickOutsideEffect(inputFocused, cardRef, inputRef, externalInputRef, setInputFocused) {
@@ -91,6 +94,8 @@ function useCreateTaskBarHandlers(state, onAddTask) {
     event?.preventDefault();
     const title = state.title.trim();
     if (!title || state.saving || !onAddTask) return;
+    if (!state.taskListId) { state.setListError(true); return; }
+    state.setListError(false);
     if (state.defaultDueDate) state.checkSleepAndRun(state.defaultDueDate, () => doAdd(title));
     else await doAdd(title);
   };
@@ -137,7 +142,7 @@ export default function useCreateTaskBar(props) {
   const state = useCreateTaskBarFormState(lists, defaultListId, defaultDueDate);
   useEnrolledModulesEffect(state.setEnrolledModules);
   useSleepSettingsEffect(state.setSleepSettings);
-  useTaskListIdSync(state.defaultListId, state.sortedLists, state.setTaskListId);
+  useTaskListIdSync(state.defaultListId, state.sortedLists, state.setTaskListId, state.setListError);
   useClickOutsideEffect(state.inputFocused, state.cardRef, state.inputRef, externalInputRef, state.setInputFocused);
   const { handleSubmit } = useCreateTaskBarHandlers(state, onAddTask);
   const { handleInputBlur, handleInputKeyDown } = useCreateTaskBarInputHandlers(state);

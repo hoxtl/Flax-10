@@ -71,9 +71,10 @@ function allTasksSection(data) {
     completedCount: data.completed.length,
     applyLimit: data.allTasksCombined.length > SECTION_SHOW_LIMIT,
     emptyCardProps: data.allTasksEmptyCardProps,
+    useSearchEmptyState: !data.allTasksEmptyCardProps,
     emptyMessage: data.allTasksEmptyCardProps
       ? null
-      : "No tasks yet. Add one above or use Full Planning.",
+      : null,
   };
 }
 

@@ -67,7 +67,7 @@ function MainAction({ state, search }) {
 function MyModulesTabContent({ state }) {
   return (
     <>
-      <MyModulesDashboard modules={state.hook.modules} enrollments={state.hook.enrollments} />
+      <MyModulesDashboard modules={state.hook.modules} enrollments={state.hook.enrollments} onViewModule={state.setViewingModule} />
       <BackToTop />
     </>
   );
@@ -239,7 +239,7 @@ export function EmptyResults({ search, sorting, isTeacher }) {
   if (hasActiveFilter && !isStudentMyModules) return <FilterResultEmpty search={search} sorting={sorting} />;
   if (isTeacher) return <TeacherEmptyState />;
   if (isStudentMyModules) return <StudentEmptyState search={search} />;
-  return <EmptyState icon="📚" title="No modules found" description="Try adjusting your search or filters." />;
+  return <SearchEmptyState query="" itemLabel="modules" />;
 }
 
 function GridPagination({ sorting }) {

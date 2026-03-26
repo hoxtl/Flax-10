@@ -51,6 +51,12 @@ describe('CreateTaskBar', () => {
         vi.clearAllMocks();
     });
 
+    function focusQuickAddInput() {
+        const input = screen.getByPlaceholderText('Quick add: what needs to be done?');
+        fireEvent.focus(input);
+        return input;
+    }
+
     it('renders quick add input', () => {
         render(<CreateTaskBar lists={defaultLists} onAddTask={vi.fn()} />);
         expect(screen.getByPlaceholderText('Quick add: what needs to be done?')).toBeTruthy();
@@ -102,18 +108,21 @@ describe('CreateTaskBar', () => {
 
     it('renders duration buttons', () => {
         render(<CreateTaskBar lists={defaultLists} onAddTask={vi.fn()} />);
+        focusQuickAddInput();
         expect(screen.getByLabelText('25 minutes (1 Pomodoro block)')).toBeTruthy();
         expect(screen.getByLabelText('50 minutes (2 Pomodoro blocks)')).toBeTruthy();
     });
 
     it('25m button is pressed by default', () => {
         render(<CreateTaskBar lists={defaultLists} onAddTask={vi.fn()} />);
+        focusQuickAddInput();
         const btn25 = screen.getByLabelText('25 minutes (1 Pomodoro block)');
         expect(btn25.getAttribute('aria-pressed')).toBe('true');
     });
 
     it('clicking 50m button sets it as active', () => {
         render(<CreateTaskBar lists={defaultLists} onAddTask={vi.fn()} />);
+        focusQuickAddInput();
         const btn50 = screen.getByLabelText('50 minutes (2 Pomodoro blocks)');
         fireEvent.click(btn50);
         expect(btn50.getAttribute('aria-pressed')).toBe('true');
@@ -122,6 +131,7 @@ describe('CreateTaskBar', () => {
     it('passes estimated_blocks to onAddTask', async () => {
         const onAddTask = vi.fn().mockResolvedValue({ id: 1, title: 'Task' });
         const { container } = render(<CreateTaskBar lists={defaultLists} onAddTask={onAddTask} />);
+        focusQuickAddInput();
         fireEvent.click(screen.getByLabelText('50 minutes (2 Pomodoro blocks)'));
         const input = screen.getByPlaceholderText('Quick add: what needs to be done?');
         fireEvent.change(input, { target: { value: 'Task' } });
@@ -133,6 +143,7 @@ describe('CreateTaskBar', () => {
 
     it('renders list dropdown', () => {
         render(<CreateTaskBar lists={defaultLists} onAddTask={vi.fn()} />);
+        focusQuickAddInput();
         expect(screen.getByLabelText('Select list')).toBeTruthy();
     });
 

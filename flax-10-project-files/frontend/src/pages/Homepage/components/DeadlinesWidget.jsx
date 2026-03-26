@@ -24,7 +24,7 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       embedded
       interactiveRows
       onSelectDeadline={onSelectDeadline}
-      onSelectModule={onSelectModule}
+      onModuleCodeClick={onSelectModule ? (code) => onSelectModule({ code }) : null}
       emptyMessage={isTeacher ? "No teaching deadlines upcoming." : "No deadlines need attention."}
       emptySub={isTeacher ? "Deadlines from modules you teach will show up here." : "Upcoming coursework and exams will show up here."}
       renderEmpty={() => <DeadlineEmptyState isTeacher={isTeacher} />}

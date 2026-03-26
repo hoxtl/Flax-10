@@ -110,17 +110,35 @@ function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
 }
 
 function ContextMenuDueView({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun, setView }) {
-  const handleDueDateChange = (val) => {
-    const dueDate = val || null;
-    setDueValue(val);
-    if (!dueDate) { onEdit({ due_date: null }, { source: "context-menu", action: "set-due-date", dueDate: null }); onClose(); return; }
-    checkSleepAndRun(dueDate, () => { onEdit({ due_date: dueDate }, { source: "context-menu", action: "set-due-date", dueDate }); onClose(); });
+  const [pending, setPending] = useState(dueValue);
+  const [changed, setChanged] = useState(false);
+  const handlePickerChange = (val) => {
+    if (!val) {
+      setPending(null);
+      setDueValue(null);
+      onEdit({ due_date: null }, { source: "context-menu", action: "set-due-date", dueDate: null });
+      onClose();
+      return;
+    }
+    setPending(val);
+    setChanged(true);
+  };
+  const handleConfirm = () => {
+    if (!pending) return;
+    setDueValue(pending);
+    checkSleepAndRun(pending, () => { onEdit({ due_date: pending }, { source: "context-menu", action: "set-due-date", dueDate: pending }); onClose(); });
   };
   return (
     <>
       <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
       <div className={styles.ctxDivider} />
-      <div className={styles.ctxDateWrap}><DateTimePicker value={dueValue} onChange={handleDueDateChange} placeholder="Pick date & time" /></div>
+      <div className={styles.ctxDateWrap}><DateTimePicker value={pending} onChange={handlePickerChange} placeholder="Pick date & time" /></div>
+      {changed && pending && (
+        <>
+          <div className={styles.ctxDivider} />
+          <button className={styles.ctxItem} onClick={handleConfirm}>Set date</button>
+        </>
+      )}
     </>
   );
 }
