@@ -17,7 +17,7 @@ vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   normaliseModuleCode: (...args) => normaliseModuleCodeMock(...args),
 }));
 
-vi.mock("../../../components/auth/utils/userUtils.js", () => ({
+vi.mock("../../../components/Auth/utils/userUtils.js", () => ({
   getInitials: (name) => (name ? name.split(" ").map((part) => part[0]).join("") : "T"),
 }));
 

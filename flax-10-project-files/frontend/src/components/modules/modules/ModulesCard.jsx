@@ -3,7 +3,7 @@
  */
 
 import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
-import { getInitials } from '../../auth/utils/userUtils.js';
+import { getInitials } from '../../Auth/utils/userUtils.js';
 import GridCard from '../../common/Card/GridCard';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
