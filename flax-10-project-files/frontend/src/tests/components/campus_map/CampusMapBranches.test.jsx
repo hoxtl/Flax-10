@@ -12,7 +12,7 @@ vi.mock("../../../api/geocodeApi", () => ({
   geocodeAddress: (...args) => geocodeAddressMock(...args),
 }));
 
-vi.mock("../../../components/Calendar/EventModal/components/LocationAutoComplete", () => ({
+vi.mock("../../../components/calendar/event_modal/components/LocationAutoComplete", () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
   ),
@@ -22,15 +22,15 @@ vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/CampusMap/WalkingRouteCard", () => ({
+vi.mock("../../../components/campus_map/WalkingRouteCard", () => ({
   WalkingRouteCard: (props) => walkingCardMock(props),
 }));
 
-vi.mock("../../../components/CampusMap/TflRouteCard", () => ({
+vi.mock("../../../components/campus_map/TflRouteCard", () => ({
   TflRouteCard: (props) => tflCardMock(props),
 }));
 
-vi.mock("../../../components/CampusMap/CampusMapSidebarContent", () => ({
+vi.mock("../../../components/campus_map/CampusMapSidebarContent", () => ({
   CampusMapSidebarContent: (props) => sidebarContentMock(props),
 }));
 
@@ -40,9 +40,9 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-import { UserJourneySection } from "../../../components/CampusMap/UserJourneySection";
-import { TransportModesSection } from "../../../components/CampusMap/TransportModesSection";
-import { CampusMapSidebar } from "../../../components/CampusMap/CampusMapSidebar";
+import { UserJourneySection } from "../../../components/campus_map/UserJourneySection";
+import { TransportModesSection } from "../../../components/campus_map/TransportModesSection";
+import { CampusMapSidebar } from "../../../components/campus_map/CampusMapSidebar";
 
 function JourneyHarness({
   initialStart = "",

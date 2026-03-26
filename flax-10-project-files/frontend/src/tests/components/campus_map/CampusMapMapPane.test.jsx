@@ -7,16 +7,16 @@ const quickNavMock = vi.fn(({ onFly }) => (
   </button>
 ));
 
-vi.mock("../../pages/CampusMap/CampusMap.module.css", () => ({ default: {} }));
-vi.mock("../../pages/CampusMap/sidebar.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/CampusMap/CampusMap.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/CampusMap/sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../pages/campus_map/CampusMap.module.css", () => ({ default: {} }));
+vi.mock("../../pages/campus_map/sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/CampusMap.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/sidebar.module.css", () => ({ default: {} }));
 
-vi.mock("../../../components/CampusMap/CampusQuickNav", () => ({
+vi.mock("../../../components/campus_map/CampusQuickNav", () => ({
   CampusQuickNav: (props) => quickNavMock(props),
 }));
 
-import { CampusMapMapPane } from "../../../components/CampusMap/CampusMapMapPane";
+import { CampusMapMapPane } from "../../../components/campus_map/CampusMapMapPane";
 
 beforeEach(() => {
   vi.clearAllMocks();

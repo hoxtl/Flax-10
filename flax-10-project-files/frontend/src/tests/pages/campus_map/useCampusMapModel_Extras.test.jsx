@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
-import { useCampusMapModel } from "../../../pages/CampusMap/hooks/useCampusMapModel";
+import { useCampusMapModel } from "../../../pages/campus_map/hooks/useCampusMapModel";
 import { createMutableState, createMockRefs } from "./campusMapTestUtils";
 
 const geocodeAddressMock = vi.fn();
@@ -30,27 +30,27 @@ vi.mock("../../../api/tflApi", () => ({
   },
 }));
 
-vi.mock("../../../pages/CampusMap/hooks/useCampusMapRefs", () => ({
+vi.mock("../../../pages/campus_map/hooks/useCampusMapRefs", () => ({
   useCampusMapRefs: () => mockRefs,
 }));
 
-vi.mock("../../../pages/CampusMap/hooks/useCampusMapState", () => ({
+vi.mock("../../../pages/campus_map/hooks/useCampusMapState", () => ({
   useCampusMapState: () => mockState,
 }));
 
-vi.mock("../../../pages/CampusMap/hooks/useDisruptions", () => ({
+vi.mock("../../../pages/campus_map/hooks/useDisruptions", () => ({
   useDisruptions: () => ({ disruptions: [{ id: "delay" }], loading: true }),
 }));
 
-vi.mock("../../../pages/CampusMap/hooks/useHomeAddress", () => ({
+vi.mock("../../../pages/campus_map/hooks/useHomeAddress", () => ({
   useHomeAddress: () => ({ userHome: null }),
 }));
 
-vi.mock("../../../pages/CampusMap/hooks/useResponsiveCampusMap", () => ({
+vi.mock("../../../pages/campus_map/hooks/useResponsiveCampusMap", () => ({
   useResponsiveCampusMap: vi.fn(),
 }));
 
-vi.mock("../../../pages/CampusMap/mapHelpers", () => ({
+vi.mock("../../../pages/campus_map/mapHelpers", () => ({
   cleanupMap: vi.fn(),
   clearRouteSource: (...args) => clearRouteSourceMock(...args),
   createMapClickHandler: vi.fn(() => vi.fn()),

@@ -80,7 +80,7 @@ describe("CampusMap hooks", () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 700 });
     vi.resetModules();
 
-    const { useCampusMapState: useCampusMapStateFresh } = await import("../../../pages/CampusMap/hooks/useCampusMapState");
+    const { useCampusMapState: useCampusMapStateFresh } = await import("../../../pages/campus_map/hooks/useCampusMapState");
     const { result } = renderHook(() => useCampusMapStateFresh());
 
     expect(result.current.ui.isMobile).toBe(true);

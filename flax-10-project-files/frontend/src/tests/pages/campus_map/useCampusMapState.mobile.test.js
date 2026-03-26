@@ -9,7 +9,7 @@ vi.hoisted(() => {
   });
 });
 
-import { useCampusMapState } from "../../../pages/CampusMap/hooks/useCampusMapState";
+import { useCampusMapState } from "../../../pages/campus_map/hooks/useCampusMapState";
 
 describe("useCampusMapState mobile viewport", () => {
   it("marks narrow viewports as mobile", () => {

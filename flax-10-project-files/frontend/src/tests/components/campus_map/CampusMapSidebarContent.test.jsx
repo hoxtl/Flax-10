@@ -7,27 +7,27 @@ const journeyMock = vi.fn((props) => <div data-testid="journey" data-props={JSON
 const destinationMock = vi.fn((props) => <div data-testid="destination" data-props={JSON.stringify(props)} />);
 const transportMock = vi.fn((props) => <div data-testid="transport" data-props={JSON.stringify(props)} />);
 
-vi.mock("../../../components/CampusMap/SidebarHeader", () => ({
+vi.mock("../../../components/campus_map/SidebarHeader", () => ({
   SidebarHeader: (props) => sidebarHeaderMock(props),
 }));
 
-vi.mock("../../../components/CampusMap/TflStatusSection", () => ({
+vi.mock("../../../components/campus_map/TflStatusSection", () => ({
   TflStatusSection: (props) => tflStatusMock(props),
 }));
 
-vi.mock("../../../components/CampusMap/UserJourneySection", () => ({
+vi.mock("../../../components/campus_map/UserJourneySection", () => ({
   UserJourneySection: (props) => journeyMock(props),
 }));
 
-vi.mock("../../../components/CampusMap/DestinationSection", () => ({
+vi.mock("../../../components/campus_map/DestinationSection", () => ({
   DestinationSection: (props) => destinationMock(props),
 }));
 
-vi.mock("../../../components/CampusMap/TransportModesSection", () => ({
+vi.mock("../../../components/campus_map/TransportModesSection", () => ({
   TransportModesSection: (props) => transportMock(props),
 }));
 
-import { CampusMapSidebarContent } from "../../../components/CampusMap/CampusMapSidebarContent";
+import { CampusMapSidebarContent } from "../../../components/campus_map/CampusMapSidebarContent";
 
 describe("CampusMapSidebarContent", () => {
   it("forwards the expected props to each sidebar section", () => {
