@@ -8,6 +8,7 @@ from studyFlax.models import SocietyMembership
 from studyFlax.models.tasks.task_model import Task
 from .lists import build_due_date, ensure_society_task_list
 
+
 SOCIETY_TASK_FIXTURES = (
     ("Plan the next {society} committee agenda", "Set priorities for the next committee meeting, confirm owners, and keep the society plan moving.", "high", 2, 1),
     ("Publish this week's {society} update", "Draft a clear post for members covering the next event, reminders, and anything that needs sign-off.", "medium", 1, 2),
@@ -34,10 +35,7 @@ def _seed_society_task_list(user, society, task_list, now):
         count += 1
     return count
 
-
 def seed_society_tasks_for_user(user, now):
-    """Seed society admin tasks for one user."""
-
     memberships = list(SocietyMembership.objects.filter(user=user, role__in=["admin", "editor"]).select_related("society"))
     total = 0
     for membership in memberships:
@@ -45,10 +43,8 @@ def seed_society_tasks_for_user(user, now):
         total += _seed_society_task_list(user, membership.society, task_list, now)
     return total
 
-
 def create_society_tasks(stdout):
     """Seed society admin task lists across all eligible users."""
-
     now = timezone.now()
     memberships = SocietyMembership.objects.filter(role__in=["admin", "editor"]).select_related("user")
     users = {membership.user_id: membership.user for membership in memberships}

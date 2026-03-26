@@ -5,6 +5,7 @@ Society record builders for seed commands.
 from studyFlax.fixtures.societies.society_fixtures import build_society_seed_data
 from studyFlax.models import Society, SocietyTag
 
+
 PENDING_RATIFICATION_TARGET = 14
 APPROVED_SOCIETY_TARGET = 24
 PASTEL_TAG_COLORS = [
@@ -25,7 +26,6 @@ def _society_status_for_index(index, total):
         return "approved"
     return "rejected" if (index - pending_target - approved_target) % 2 == 0 else "none"
 
-
 def _create_society_from_config(data, index, total):
     status = _society_status_for_index(index, total)
     defaults = {
@@ -40,10 +40,9 @@ def _create_society_from_config(data, index, total):
     society, _ = Society.objects.update_or_create(name=data["name"], defaults=defaults)
     return society
 
-
 def _tag_color_for_label(label):
+    """Tag colour for label."""
     return PASTEL_TAG_COLORS[sum(ord(char) for char in label) % len(PASTEL_TAG_COLORS)]
-
 
 def _seed_society_tags(society, tag_labels):
     for label in tag_labels:
@@ -53,10 +52,7 @@ def _seed_society_tags(society, tag_labels):
             defaults={"color": _tag_color_for_label(label)},
         )
 
-
 def create_societies(stdout):
-    """Create the seeded societies and their tag records."""
-
     del stdout
     seed_data = build_society_seed_data()
     total = len(seed_data)
@@ -64,8 +60,6 @@ def create_societies(stdout):
         society = _create_society_from_config(data, index, total)
         _seed_society_tags(society, data.get("tags", []))
 
-
 def get_society_seed_lookup():
     """Return the seeded society payloads keyed by society name."""
-
     return {item["name"]: item for item in build_society_seed_data()}

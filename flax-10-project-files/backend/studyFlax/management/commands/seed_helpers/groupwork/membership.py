@@ -18,14 +18,12 @@ MAX_PROJECTS_PER_STUDENT = 12
 
 
 def _add_if_unique(user, seen, unique_users):
-    """Add if unique."""
     if not user or user.id in seen:
         return
     seen.add(user.id)
     unique_users.append(user)
 
 def _dedupe_users(users):
-    """Dedupe users."""
     seen = set()
     unique_users = []
     for user in users:
@@ -38,7 +36,6 @@ def _add_enrollment_to_maps(enrollment, student_modules, module_students):
     module_students.setdefault(enrollment.module.module_code, []).append(enrollment.student)
 
 def _build_enrollment_maps(students):
-    """Build enrollment maps."""
     student_modules = {}
     module_students = {}
     enrollments = (
@@ -52,19 +49,16 @@ def _build_enrollment_maps(students):
     return student_modules, module_students
 
 def _add_unique_module(module, seen, modules):
-    """Add unique module."""
     if module.module_code in seen:
         return
     seen.add(module.module_code)
     modules.append(module)
 
 def _collect_modules_from_list(module_list, seen, modules):
-    """Collect modules from list."""
     for module in module_list:
         _add_unique_module(module, seen, modules)
 
 def _list_seed_modules(student_modules):
-    """List seed modules."""
     seen = set()
     modules = []
     for module_list in student_modules.values():
@@ -72,7 +66,6 @@ def _list_seed_modules(student_modules):
     return modules
 
 def _pick_owner(students, rng):
-    """Pick owner."""
     return rng.choice(students) if students else None
 
 def _has_reached_project_limit(student):
@@ -80,18 +73,15 @@ def _has_reached_project_limit(student):
     return GroupMembership.objects.filter(user=student).count() >= MAX_PROJECTS_PER_STUDENT
 
 def _eligible_module_members(module, module_students):
-    """Eligible module members."""
     return [s for s in module_students.get(module.module_code, []) if not _has_reached_project_limit(s)]
 
 def _pick_from_module_members(module, module_students, rng):
-    """Pick from module members."""
     if not module:
         return None
     members = _eligible_module_members(module, module_students)
     return rng.choice(members) if members else None
 
 def _pick_owner_for_module(module, students, module_students, rng):
-    """Pick owner for module."""
     eligible_students = [s for s in students if not _has_reached_project_limit(s)]
     if not eligible_students:
         return None
@@ -99,18 +89,15 @@ def _pick_owner_for_module(module, students, module_students, rng):
     return module_pick if module_pick else _pick_owner(eligible_students, rng)
 
 def _get_showcase_student_modules(showcase_student, student_modules):
-    """Get showcase student modules."""
     if not showcase_student:
         return []
     return student_modules.get(showcase_student.id, [])
 
 def _showcase_modules(showcase_student, student_modules, seed_modules):
-    """Showcase modules."""
     modules = _get_showcase_student_modules(showcase_student, student_modules)
     return modules if modules else seed_modules
 
 def _select_project_cohort(project, students, module_students):
-    """Select project cohort."""
     cohort = _dedupe_users(module_students.get(project.course_code, []))
     if len(cohort) >= MIN_PROJECT_MEMBER_TOTAL:
         return cohort
@@ -118,7 +105,6 @@ def _select_project_cohort(project, students, module_students):
     return _dedupe_users(cohort + fallback_students)
 
 def _build_membership_counts(students, project_ids=None):
-    """Build membership counts."""
     counts = {student.id: 0 for student in students}
     memberships = GroupMembership.objects.filter(user__in=students)
     if project_ids is not None:
@@ -140,14 +126,12 @@ def _rank_member(student, project, cohort_ids, membership_counts, rng):
     )
 
 def _is_eligible_candidate(student, project, membership_counts, allow_over_limit):
-    """Is eligible candidate."""
     if student == project.owner:
         return False
     current_count = membership_counts.get(student.id, 0)
     return allow_over_limit or current_count < MAX_PROJECTS_PER_STUDENT
 
 def _ordered_member_candidates(project, students, module_students, membership_counts, rng, allow_over_limit=False):
-    """Ordered member candidates."""
     cohort = _select_project_cohort(project, students, module_students)
     cohort_ids = {s.id for s in cohort}
     ranked = [
@@ -159,7 +143,6 @@ def _ordered_member_candidates(project, students, module_students, membership_co
     return [s for _, s in ranked]
 
 def _add_members_to_project(project, students, rng, showcase_student, module_students, membership_counts):
-    """Add members to project."""
     del showcase_student
     candidate_pool = _ordered_member_candidates(project, students, module_students, membership_counts, rng)
     max_total = min(MAX_PROJECT_MEMBER_TOTAL, 1 + len(candidate_pool))
@@ -177,30 +160,25 @@ def _add_members_to_project(project, students, rng, showcase_student, module_stu
         membership_counts[member.id] = membership_counts.get(member.id, 0) + 1
 
 def _student_module_codes(student_modules):
-    """Student module codes."""
     return {
         student_id: {module.module_code for module in modules if module and module.module_code}
         for student_id, modules in student_modules.items()
     }
 
 def _project_member_sets(projects):
-    """Project member sets."""
     return {
         project.id: {membership.user_id for membership in project.memberships.all()}
         for project in projects
     }
 
 def _is_eligible_for_top_up(project, student, member_sets):
-    """Is eligible for top up."""
     members = member_sets.get(project.id, set())
     return student.id not in members and len(members) < MAX_PROJECT_MEMBER_TOTAL
 
 def _rank_top_up_project(project, student_module_codes, member_sets, rng):
-    """Rank top up project."""
     return (0 if project.course_code in student_module_codes else 1, len(member_sets.get(project.id, set())), rng.random())
 
 def _ordered_top_up_projects(student, projects, member_sets, module_codes, rng):
-    """Ordered top up projects."""
     student_module_codes = module_codes.get(student.id, set())
     ranked = [
         (_rank_top_up_project(project, student_module_codes, member_sets, rng), project)
@@ -227,13 +205,11 @@ def _top_up_single_student(student, projects, member_sets, module_codes, members
     return made_progress
 
 def _under_assigned_sorted(students, membership_counts):
-    """Under assigned sorted."""
     under = [s for s in students if membership_counts.get(s.id, 0) < MIN_PROJECTS_PER_STUDENT]
     under.sort(key=lambda s: (membership_counts.get(s.id, 0), s.username))
     return under
 
 def _process_top_up_pass(students, membership_counts, projects, member_sets, module_codes, rng):
-    """Process top up pass."""
     results = [
         _top_up_single_student(s, projects, member_sets, module_codes, membership_counts, rng)
         for s in _under_assigned_sorted(students, membership_counts)
@@ -241,7 +217,6 @@ def _process_top_up_pass(students, membership_counts, projects, member_sets, mod
     return any(results)
 
 def _top_up_students_to_minimum(projects, students, student_modules, membership_counts, rng):
-    """Top up students to minimum."""
     module_codes = _student_module_codes(student_modules)
     member_sets = _project_member_sets(projects)
     while _process_top_up_pass(students, membership_counts, projects, member_sets, module_codes, rng):
@@ -264,7 +239,6 @@ def _try_add_member(member, project, member_sets, membership_counts):
     return 1
 
 def _eligible_to_add(member, project, member_sets):
-    """Eligible to add."""
     return member.id not in member_sets.get(project.id, set())
 
 def _fill_from_candidates(project, candidates, needed, member_sets, membership_counts):
@@ -274,7 +248,6 @@ def _fill_from_candidates(project, candidates, needed, member_sets, membership_c
     return added > 0, needed - added
 
 def _fill_project_pass(project, students, module_students, membership_counts, member_sets, rng, allow_over_limit, needed):
-    """Fill project pass."""
     candidates = _ordered_member_candidates(project, students, module_students, membership_counts, rng, allow_over_limit=allow_over_limit)
     return _fill_from_candidates(project, candidates, needed, member_sets, membership_counts)
 
@@ -286,7 +259,6 @@ def _fill_project_to_minimum(project, students, module_students, membership_coun
     return made_first or made_second
 
 def _fill_underfilled_pass(projects, students, module_students, membership_counts, member_sets, rng):
-    """Fill underfilled pass."""
     results = [
         _fill_project_to_minimum(p, students, module_students, membership_counts, member_sets, rng)
         for p in _underfilled_projects(projects, member_sets)
@@ -294,7 +266,6 @@ def _fill_underfilled_pass(projects, students, module_students, membership_count
     return any(results)
 
 def _ensure_projects_have_minimum_members(projects, students, module_students, membership_counts, rng):
-    """Ensure projects have minimum members."""
     member_sets = _project_member_sets(projects)
     while _fill_underfilled_pass(projects, students, module_students, membership_counts, member_sets, rng):
         pass
@@ -309,7 +280,6 @@ def _fill_solo_project(project, students, module_students, membership_counts, me
 SPREAD_TARGETS = [5, 5, 6, 6, 7, 8, 9, 10]
 
 def _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng):
-    """Fill project to target."""
     current = len(member_sets.get(project.id, set()))
     needed = target - current
     if needed <= 0:
@@ -335,7 +305,6 @@ def ensure_member_count_spread(projects, students, module_students, membership_c
         _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng)
 
 def _ensure_projects_have_teammates(projects, students, module_students, membership_counts, rng):
-    """Ensure projects have teammates."""
     member_sets = _project_member_sets(projects)
     solo_projects = sorted(
         [project for project in projects if len(member_sets.get(project.id, set())) < 2],
@@ -345,7 +314,6 @@ def _ensure_projects_have_teammates(projects, students, module_students, members
         _fill_solo_project(project, students, module_students, membership_counts, member_sets, rng)
 
 def _membership_trim_sort_key(membership, preferred_module_codes, member_sets):
-    """Membership trim sort key."""
     project = membership.project
     return (
         0 if project.course_code not in preferred_module_codes else 1,
@@ -355,18 +323,15 @@ def _membership_trim_sort_key(membership, preferred_module_codes, member_sets):
     )
 
 def _can_trim_membership(membership, member_sets):
-    """Can trim membership."""
     return len(member_sets.get(membership.project_id, set())) > MIN_PROJECT_MEMBER_TOTAL
 
 def _do_trim_membership(membership, student, member_sets, membership_counts):
-    """Do trim membership."""
     current_members = member_sets.get(membership.project_id, set())
     membership.delete()
     current_members.discard(student.id)
     membership_counts[student.id] = max(membership_counts.get(student.id, 0) - 1, 0)
 
 def _sorted_trimmable_memberships(student, allowed_ids, preferred_codes, member_sets):
-    """Sorted trimmable memberships."""
     memberships = list(
         GroupMembership.objects.filter(user=student, project_id__in=allowed_ids)
         .exclude(role="owner")
@@ -385,7 +350,6 @@ def _trim_student_memberships(student, projects, preferred_codes, member_sets, m
         _do_trim_membership(membership, student, member_sets, membership_counts)
 
 def _trim_students_to_project_cap(projects, students, student_modules, membership_counts):
-    """Trim students to project cap."""
     allowed_project_ids = [project.id for project in projects]
     preferred_module_codes = _student_module_codes(student_modules)
     member_sets = _project_member_sets(projects)

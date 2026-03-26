@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from studyFlax.models import UserSettings
 from ..shared.helpers import build_users_list, build_settings_for_new_users
 
+
 User = get_user_model()
 
 USER_COUNT = 72
@@ -56,7 +57,6 @@ JOHNDOE_BIO = (
 
 def create_admin_user(stdout):
     """Create the default admin fixture user when it does not already exist."""
-
     del stdout
     if User.objects.filter(username='johndoe').exists():
         return
@@ -101,7 +101,6 @@ def _create_single_fixture_user(data, stdout):
 
 def create_fixture_users(stdout):
     """Create and report the named fixture users for the seed dataset."""
-
     role_order = {'admin': 0, 'student': 1, 'teacher': 2}
     ordered_fixtures = sorted(
         FIXTURE_USERS,
@@ -135,7 +134,6 @@ def _build_new_users(student_count, teacher_count):
 
 def _create_users_if_needed(stdout, target_teacher_count):
     """Create random users if below target count."""
-
     needed = USER_COUNT - User.objects.count()
     if needed <= 0:
         return
@@ -144,18 +142,14 @@ def _create_users_if_needed(stdout, target_teacher_count):
     User.objects.bulk_create(new_users, ignore_conflicts=True)
     stdout.write(f"  \u2713  {'Random users':<14} {needed}")
 
-
 def _ensure_user_settings(stdout):
     """Ensure all users have settings rows."""
-
     new_settings = build_settings_for_new_users()
     if not new_settings:
         return
     UserSettings.objects.bulk_create(new_settings)
 
-
 def create_random_users(stdout, target_teacher_count=14):
     """Create random users and ensure all have settings."""
-
     _create_users_if_needed(stdout, target_teacher_count)
     _ensure_user_settings(stdout)

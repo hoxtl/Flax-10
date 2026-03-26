@@ -39,7 +39,6 @@ def _normalise_phrase(text):
         return ""
     return phrase[0].lower() + phrase[1:]
 
-
 def _join_tags(tags):
     cleaned = [str(tag).strip() for tag in (tags or []) if str(tag).strip()]
     if not cleaned:
@@ -50,10 +49,8 @@ def _join_tags(tags):
         return f"{cleaned[0]} and {cleaned[1]}"
     return f"{', '.join(cleaned[:-1])}, and {cleaned[-1]}"
 
-
 def build_rich_about(name, bio, about, category, tags):
     """Build the long-form society description used during seeding."""
-
     focus = _normalise_phrase(about) or _normalise_phrase(bio) or "shared interests"
     tag_copy = _join_tags(tags)
     first = ABOUT_OPENERS.get(category, ABOUT_OPENERS["social"]).format(name=name)

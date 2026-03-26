@@ -8,6 +8,7 @@ from datetime import timedelta
 from studyFlax.models.groupwork.groupwork_model import MeetingSuggestion, MeetingResponse
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 
+
 SEEDED_SUGGESTION_COUNT = 4
 SEEDED_SUGGESTION_WINDOWS = (
     (1, 10),
@@ -43,7 +44,6 @@ def _seed_busy_events_for_member(member, project_id, now):
 
 def _resolve_response_status(suggestion_index, member, suggested_by, pattern, member_index):
     """Return the meeting response status for one member."""
-
     if suggestion_index == 0 or member == suggested_by:
         return "accepted"
     return pattern[member_index % len(pattern)]
@@ -60,7 +60,6 @@ def _seed_meeting_responses_for_suggestion(suggestion, members, suggestion_index
 
 def _create_suggestion_with_responses(project, suggester, start, end, members, idx):
     """Create or update a meeting suggestion and seed its responses."""
-
     suggestion, _ = MeetingSuggestion.objects.update_or_create(
         project=project,
         suggested_by=suggester,

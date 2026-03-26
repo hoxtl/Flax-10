@@ -25,7 +25,6 @@ from ..catalogue.deadline_fixtures import deadline_fixtures, module_deadline_fix
 
 def get_course_prefixes(course):
     """Return module code prefixes mapped to the given course."""
-
     return course_to_module_prefixes.get(course, [])
 
 # Per-module-prefix task templates

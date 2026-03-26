@@ -8,6 +8,7 @@ from datetime import timedelta
 from studyFlax.models.tasks.task_model import Task
 from studyFlax.fixtures.groupwork.groupwork_fixtures import GROUP_TASK_TEMPLATES
 
+
 PROJECT_TASK_STATUS_PATTERNS = (
     ("todo", "todo", "in_progress", "todo", "todo"),
     ("done", "in_progress", "todo", "todo", "todo"),
@@ -36,26 +37,18 @@ def _build_task_due_date(due, task_index, now):
     return due - timedelta(days=lead_days)
 
 def _completed_task_indexes(status_pattern):
-    """Return the indexes for completed tasks."""
-
     return [index for index, status in enumerate(status_pattern) if status == "done"]
-
 
 def _single_member_assignments(members, completed_indexes):
     """Assign the same member list to each completed task."""
-
     return {index: list(members) for index in completed_indexes}
-
 
 def _completed_pick_count(members, rng):
     """Return the number of members to assign to a completed task."""
-
     return rng.randint(1, min(3, len(members)))
-
 
 def _multi_member_assignments(members, completed_indexes, rng):
     """Assign varied members to completed tasks."""
-
     assignments = {index: [] for index in completed_indexes}
     for offset, member in enumerate(members):
         assignments[completed_indexes[offset % len(completed_indexes)]].append(member)
@@ -65,10 +58,8 @@ def _multi_member_assignments(members, completed_indexes, rng):
         assignments[task_index].extend(rng.sample(pool, min(extra_total, len(pool))))
     return assignments
 
-
 def _build_completed_task_assignments(members, status_pattern, rng):
     """Assign members to completed tasks with varied counts so contributions differ per person."""
-
     completed_indexes = _completed_task_indexes(status_pattern)
     if not completed_indexes:
         return {}
@@ -91,8 +82,6 @@ def _build_task_assignees(members, task_index, status, completed_assignments):
     return [primary]
 
 def _build_task_defaults(template, status, task_index, due, now):
-    """Return the defaults dict for Task.objects.update_or_create."""
-
     t_title, t_desc, t_priority, t_blocks = template
     is_completed, completed_at = _build_completed_fields(status, task_index, now)
     has_due_date = not (status == "todo" and task_index >= 3)

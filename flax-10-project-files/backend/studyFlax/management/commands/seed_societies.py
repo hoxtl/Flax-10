@@ -18,8 +18,6 @@ class Command(BaseCommand):
     help = "Seed societies and memberships"
 
     def handle(self, *args, **options):
-        """Seed the backend society dataset through the shared helper modules."""
-
         create_societies(self.stdout)
         create_society_memberships(self.stdout)
         create_society_events(self.stdout)

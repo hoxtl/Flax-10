@@ -9,6 +9,7 @@ from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.timer.theme_session_model import ThemeSession
 from .session_helpers import build_study_sessions_for_user, build_theme_sessions_for_user
 
+
 User = get_user_model()
 
 PROFILES = {
@@ -26,23 +27,17 @@ PROFILES = {
 
 def _get_profile(username):
     """Return (study_profile, theme_profile) for a user."""
-
     return PROFILES.get(username, ('balanced', 'balanced'))
-
 
 def _build_user_sessions(user):
     """Build study and theme sessions for a user based on their profile."""
-
     study_profile, theme_profile = _get_profile(user.username)
     study = build_study_sessions_for_user(user, study_profile)
     theme = build_theme_sessions_for_user(user, theme_profile)
     return study, theme
 
-
 @transaction.atomic
 def create_study_sessions(stdout):
-    """Create study and theme sessions for all seeded students and teachers."""
-
     students = list(User.objects.filter(role__in=['student', 'teacher']))
     all_study = []
     all_theme = []

@@ -13,6 +13,7 @@ from .event_helpers import (
 )
 from .overlap_utils import candidate_slots, event_day, event_duration, event_sort_key, fits_overlap_cap
 
+
 MAX_SEEDED_EVENT_OVERLAPS = 2
 SEED_EVENT_DAY_START_HOUR = 7
 SEED_EVENT_DAY_END_HOUR = 23
@@ -21,13 +22,10 @@ SEED_EVENT_SLOT_STEP_MINUTES = 30
 
 def _candidate_window(candidate, duration):
     """Return the start and end time for a candidate slot."""
-
     return candidate, candidate + duration
-
 
 def _slot_candidates(event, duration):
     """Return ordered slot candidates for one event."""
-
     return candidate_slots(
         event,
         duration,
@@ -36,28 +34,22 @@ def _slot_candidates(event, duration):
         SEED_EVENT_SLOT_STEP_MINUTES,
     )
 
-
 def _candidate_window_if_available(candidate, duration, day_events):
     """Return a candidate window when it fits the overlap cap."""
-
     start_time, end_time = _candidate_window(candidate, duration)
     if not fits_overlap_cap(start_time, end_time, day_events, MAX_SEEDED_EVENT_OVERLAPS):
         return None
     return start_time, end_time
 
-
 def _available_windows(event, duration, day_events):
     """Yield valid windows for one event."""
-
     return (
         _candidate_window_if_available(candidate, duration, day_events)
         for candidate in _slot_candidates(event, duration)
     )
 
-
 def _event_window(event, day_events):
     """Return the scheduled window for one event."""
-
     start_time = event.start_time
     end_time = event.end_time
     if fits_overlap_cap(start_time, end_time, day_events, MAX_SEEDED_EVENT_OVERLAPS):
@@ -65,10 +57,8 @@ def _event_window(event, day_events):
     duration = event_duration(event)
     return next((window for window in _available_windows(event, duration, day_events) if window), (start_time, end_time))
 
-
 def _rebalance_seeded_user_events(events):
     """Rebalance seeded personal events within each day."""
-
     events_by_day = defaultdict(list)
     for event in sorted(events, key=event_sort_key):
         day_events = events_by_day[event_day(event)]
@@ -78,10 +68,7 @@ def _rebalance_seeded_user_events(events):
         day_events.append(event)
     return events
 
-
 def _build_all_user_events(user, tags, rules):
-    """Build all event types for a single user."""
-
     events = []
     events.extend(build_events_for_user(user, tags, rules, 0))
     events.extend(build_meal_events(user, tags))
@@ -90,11 +77,9 @@ def _build_all_user_events(user, tags, rules):
     events.extend(build_weekend_events(user, tags, user_rng))
     return _rebalance_seeded_user_events(events)
 
-
 @transaction.atomic
 def create_events_for_users(users, tags, rules, stdout):
     """Create personal, meal, and afternoon events for all users."""
-
     all_events = []
     for user in users:
         all_events.extend(_build_all_user_events(user, tags, rules))

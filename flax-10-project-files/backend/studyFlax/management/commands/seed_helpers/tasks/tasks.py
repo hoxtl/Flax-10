@@ -12,6 +12,7 @@ from .task_seed.tasks import (
     seed_society_tasks_for_user,
 )
 
+
 __all__ = [
     "_seed_tasks_for_user",
     "create_module_reading_lists",

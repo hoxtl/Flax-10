@@ -6,6 +6,7 @@ import random
 
 from .catalogue import CATEGORY_MAPPING
 
+
 CATEGORY_IMAGES = {
     "sports": ["sports1.jpg", "sports2.jpg"],
     "cultural": ["cultural1.jpg", "cultural2.jpg"],
@@ -19,8 +20,6 @@ CATEGORY_IMAGES = {
 
 
 def get_random_category_image(category):
-    """Pick one seeded image for a society category."""
-
     mapped = CATEGORY_MAPPING.get(category, category)
     images = CATEGORY_IMAGES.get(mapped, CATEGORY_IMAGES["social"])
     original_prefix = category if category != mapped else None

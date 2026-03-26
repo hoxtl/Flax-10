@@ -10,7 +10,6 @@ from .images import get_random_category_image
 
 def build_society_dict(name, bio, about, category, tags):
     """Build one seeded society payload for the society seeding command."""
-
     image = get_random_category_image(category)
     mapped_category = CATEGORY_MAPPING.get(category, category)
     return {
@@ -23,10 +22,8 @@ def build_society_dict(name, bio, about, category, tags):
         "image": f"http://localhost:8000/static/seed_images/societies/{image}",
     }
 
-
 def build_society_seed_data():
     """Build the full seeded society dataset."""
-
     return [
         build_society_dict(name, bio, about, category, tags)
         for name, bio, about, category, tags in SOCIETY_DATA

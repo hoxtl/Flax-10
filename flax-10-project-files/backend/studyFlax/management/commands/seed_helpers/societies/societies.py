@@ -10,6 +10,7 @@ from .society_seed.societies import (
     create_society_memberships,
 )
 
+
 __all__ = [
     "_ensure_seed_membership",
     "create_societies",

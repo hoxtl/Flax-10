@@ -7,6 +7,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+
 TASK_LABELS = [
     'CS4303 programming assignment',
     'HI4101 essay',
@@ -94,6 +95,7 @@ ROLE_ACTIVITY_CONFIG = {
 }
 
 def _should_skip_day(session_date, config):
+    """Return whether should skip day."""
     is_weekend = session_date.weekday() >= 5
     if is_weekend:
         return random.random() > config['weekend_probability']
@@ -126,7 +128,6 @@ def _build_day_study_sessions(user, session_date, config, activity_config):
 
 def build_study_sessions_for_user(user, profile='balanced'):
     """Return realistic StudySession instances for the recent term window."""
-
     config = STUDY_PROFILES.get(profile, STUDY_PROFILES['balanced'])
     activity_config = ROLE_ACTIVITY_CONFIG.get(getattr(user, 'role', 'student'), ROLE_ACTIVITY_CONFIG['student'])
     adjusted_config = {
@@ -162,7 +163,6 @@ def _theme_sessions_for_day(user, base, slots):
 
 def build_theme_sessions_for_user(user, profile='balanced'):
     """Return ThemeSession instances across the past 90 days."""
-
     slots = THEME_PROFILES.get(profile, THEME_PROFILES['balanced'])
     now = timezone.now()
     sessions = []

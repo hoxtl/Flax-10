@@ -15,6 +15,7 @@ from faker import Faker
 from studyFlax.models import UserSettings
 from studyFlax.fixtures.users.courses import course_fixtures
 
+
 User = get_user_model()
 faker = Faker('en_GB')
 DEFAULT_PASSWORD = '1234'
@@ -88,7 +89,6 @@ PRIOR_UNIVERSITIES = [
 
 def is_name_taken(first, last, existing):
     """Return True if a user with this first and last name already exists."""
-
     return (
         User.objects.filter(first_name=first, last_name=last).exists()
         or any(u.first_name == first and u.last_name == last for u in existing)
@@ -96,7 +96,6 @@ def is_name_taken(first, last, existing):
 
 def is_username_taken(username, existing):
     """Return True if the username exists in the database or the given list."""
-
     return (
         User.objects.filter(username=username).exists()
         or any(u.username == username for u in existing)
@@ -104,7 +103,6 @@ def is_username_taken(username, existing):
 
 def generate_unique_name(existing):
     """Return a (first, last) pair not already present in *existing* or the database."""
-
     first, last = faker.first_name(), faker.last_name()
     while is_name_taken(first, last, existing):
         first, last = faker.first_name(), faker.last_name()
@@ -112,7 +110,6 @@ def generate_unique_name(existing):
 
 def generate_unique_username(first, last, existing):
     """Derive a first.last username that is unique, appending a counter if needed."""
-
     base = f"{first.lower()}.{last.lower()}"
     username, counter = base, 2
     while is_username_taken(username, existing):
@@ -141,7 +138,6 @@ def _student_bio(first):
 
 def build_user(first, last, existing, role='student'):
     """Construct an unsaved User with a KCL email address and hashed password."""
-
     username = generate_unique_username(first, last, existing)
     bio = _teacher_bio(first, last) if role == 'teacher' else _student_bio(first)
     user = User(
@@ -155,7 +151,6 @@ def build_user(first, last, existing, role='student'):
 
 def build_users_list(needed, role='student'):
     """Return a list of *needed* unsaved User instances with unique names and usernames."""
-
     users_to_create = []
     for _ in range(needed):
         first, last = generate_unique_name(users_to_create)
@@ -165,21 +160,17 @@ def build_users_list(needed, role='student'):
 def _random_year():
     return random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4'])
 
-
 def _random_theme():
     return random.choice(['light', 'dark'])
-
-
 CORE_WIDGETS = ["deadlines", "todayTasks", "bigTimeline"]
+
 def _select_widgets():
     """Seed only the core homepage widgets."""
-
     return CORE_WIDGETS.copy()
 
-
 def _widget_size(widget_id):
-    """Generate random size for a widget."""
 
+    """Generate random size for a widget."""
     if widget_id == "hero":
         return {"col": 2, "row": 1}
     if widget_id in {"deadlines", "todayTasks"}:
@@ -188,16 +179,11 @@ def _widget_size(widget_id):
         return {"col": 2, "row": 2}
     return {"col": 2 if random.random() > 0.6 else 1, "row": 2 if random.random() > 0.7 else 1}
 
-
 def _generate_widget_sizes(widgets):
     """Generate sizes for all widgets except hero."""
-
     return {w: _widget_size(w) for w in widgets if w != "hero"}
 
-
 def _build_single_settings(user):
-    """Build UserSettings for a single user."""
-
     is_teacher = getattr(user, 'role', None) == 'teacher'
     widgets = _select_widgets()
     return UserSettings(
@@ -210,5 +196,4 @@ def _build_single_settings(user):
 
 def build_settings_for_new_users():
     """Return UserSettings instances for every user that has no settings row yet."""
-
     return [_build_single_settings(u) for u in User.objects.filter(settings__isnull=True)]

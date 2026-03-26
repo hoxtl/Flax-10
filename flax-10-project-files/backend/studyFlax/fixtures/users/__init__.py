@@ -11,6 +11,7 @@ from .user_fixtures import (
     tag_fixtures,
 )
 
+
 __all__ = [
     "category_fixtures",
     "course_fixtures",

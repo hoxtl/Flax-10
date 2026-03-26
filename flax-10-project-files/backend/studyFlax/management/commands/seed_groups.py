@@ -11,6 +11,4 @@ class Command(BaseCommand):
     help = "Seed group projects and memberships"
 
     def handle(self, *args, **options):
-        """Report that the standalone group seeding command is not implemented."""
-
         self.stdout.write("Group seeding not yet implemented.")

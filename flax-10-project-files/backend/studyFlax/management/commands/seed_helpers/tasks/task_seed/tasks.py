@@ -27,7 +27,6 @@ def _get_templates_for_module(module):
     prefix = module.module_code[:2]
     return module_task_templates.get(module.module_code, module_task_templates.get(prefix, []))
 
-
 def _adjust_days(module, index, days_from_now):
     odd_days = [1, 3, 5]
     even_days = [2, 4, 6]
@@ -37,7 +36,6 @@ def _adjust_days(module, index, days_from_now):
         return even_days[index % len(even_days)]
     return days_from_now
 
-
 def _adjust_blocks(module, title_template, estimated_blocks):
     lower_title = title_template.lower()
     if module.module_code == "LS4101" and any(item in lower_title for item in ("lab", "microscopy", "cell division")):
@@ -45,7 +43,6 @@ def _adjust_blocks(module, title_template, estimated_blocks):
     if module.module_code == "LS4202" and any(item in lower_title for item in ("enzyme", "protein folding", "metabolic")):
         return estimated_blocks + 1
     return estimated_blocks
-
 
 def _create_module_task(user, task_list, module, template, index, now):
     title_template, description, priority, estimated_blocks, days_from_now = template
@@ -62,7 +59,6 @@ def _create_module_task(user, task_list, module, template, index, now):
         completed=False,
     )
 
-
 def _seed_tasks_for_enrolment(user, enrolment, lists_by_module, now):
     task_list = lists_by_module.get(enrolment.module.id)
     if not task_list:
@@ -72,11 +68,9 @@ def _seed_tasks_for_enrolment(user, enrolment, lists_by_module, now):
         _create_module_task(user, task_list, enrolment.module, template, index, now)
     return len(templates)
 
-
 def _seed_module_tasks(user, lists_by_module, now):
     enrolled = Enrollment.objects.filter(student=user).select_related("module")
     return sum(_seed_tasks_for_enrolment(user, enrolment, lists_by_module, now) for enrolment in enrolled)
-
 
 def _seed_personal_tasks(user, lists_by_name, personal_list, now):
     total = 0
@@ -95,7 +89,6 @@ def _seed_personal_tasks(user, lists_by_name, personal_list, now):
         )
         total += 1
     return total
-
 
 def _seed_teacher_tasks(user, lists_by_name, now):
     first_list = next(iter(lists_by_name.values()), None)
@@ -117,13 +110,11 @@ def _seed_teacher_tasks(user, lists_by_name, now):
         total += 1
     return total
 
-
 def _seed_tasks_for_teacher(user, now):
     if Task.objects.filter(user=user).exists():
         return 0
     lists_by_name = create_task_lists(user, teacher_task_list_fixtures)
     return _seed_teacher_tasks(user, lists_by_name, now)
-
 
 def _seed_tasks_for_user(user, now):
     if getattr(user, "role", None) == "teacher":
@@ -138,7 +129,6 @@ def _seed_tasks_for_user(user, now):
     total += _seed_personal_tasks(user, lists_by_name, lists_by_name.get("Personal"), now)
     return total
 
-
 def _ensure_task_due_today(user, now):
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
@@ -150,10 +140,8 @@ def _ensure_task_due_today(user, now):
     first_task.due_date = _apply_seed_due_time(now)
     first_task.save(update_fields=["due_date"])
 
-
 def seed_new_user_tasks(user, now):
     """Seed module task lists and tasks for a newly registered user."""
-
     if Task.objects.filter(user=user).exists():
         return 0
     create_task_lists(user, task_list_fixtures)
@@ -164,10 +152,8 @@ def seed_new_user_tasks(user, now):
     _ensure_task_due_today(user, now)
     return total
 
-
 def create_tasks(users, stdout):
     """Seed personal, module, and teacher tasks for the supplied users."""
-
     now = timezone.now()
     total = sum(_seed_tasks_for_user(user, now) for user in users)
     stdout.write(f"  \u2713  {'Tasks':<14} {total:,}")

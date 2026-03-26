@@ -33,14 +33,16 @@ from .membership import (
     _trim_students_to_project_cap,
     _build_membership_counts,
     ensure_member_count_spread,
-    _fixture_seed_users,
-    _pick_project_for_fixture_owner,
-    FIXTURE_USERNAMES,
-    FIXTURE_OWNER_MIN_PROJECTS,
     MIN_PROJECT_MEMBER_TOTAL,
     MAX_PROJECT_MEMBER_TOTAL,
     MIN_PROJECTS_PER_STUDENT,
     MAX_PROJECTS_PER_STUDENT,
+)
+from .fixture_owners import (
+    _fixture_seed_users,
+    _pick_project_for_fixture_owner,
+    FIXTURE_USERNAMES,
+    FIXTURE_OWNER_MIN_PROJECTS,
 )
 from .tasks import (
     _seed_tasks_for_project,
@@ -53,6 +55,7 @@ from .availability import (
     SEEDED_SUGGESTION_WINDOWS,
     SEEDED_RESPONSE_PATTERNS,
 )
+
 
 User = get_user_model()
 
@@ -76,6 +79,7 @@ def _get_deadline_offset(index):
     return PROJECT_DEADLINE_OFFSETS[index % len(PROJECT_DEADLINE_OFFSETS)]
 
 def _has_reached_project_limit(student):
+    """Return whether has reached project limit."""
     return GroupMembership.objects.filter(user=student).count() >= MAX_PROJECTS_PER_STUDENT
 
 def _pick_owner(students, rng):
@@ -83,7 +87,6 @@ def _pick_owner(students, rng):
 
 def _filter_seed_projects(allowed_codes, allowed_keys):
     """Return only projects that match the seeded specs."""
-
     return [
         project for project in GroupProject.objects.filter(course_code__in=allowed_codes)
         if (project.name, project.course_code) in allowed_keys
@@ -117,7 +120,6 @@ def _count_fixture_ownership(projects, targets):
 
 def _assign_fixture_owner(student, projects, target_module_codes, ownership_counts, rng):
     """Assign one more project to student as owner. Returns True if successful."""
-
     candidate = _pick_project_for_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)
     if not candidate:
         return False
@@ -132,7 +134,6 @@ def _assign_fixture_owner(student, projects, target_module_codes, ownership_coun
 
 def _top_up_fixture_owner(student, projects, target_module_codes, ownership_counts, rng):
     """Ensure student owns at least FIXTURE_OWNER_MIN_PROJECTS projects."""
-
     can_assign = True
     while can_assign and ownership_counts.get(student.id, 0) < FIXTURE_OWNER_MIN_PROJECTS:
         can_assign = _assign_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)
@@ -149,8 +150,6 @@ def _ensure_fixture_users_own_projects(student_modules, rng):
         _top_up_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)
 
 def create_group_projects(stdout):
-    """Create the seeded group projects."""
-
     now = timezone.now()
     rng = random.Random(PROJECT_OWNER_SEED)
     students = _get_student_pool()
@@ -172,8 +171,6 @@ def _run_membership_seeding(projects, students, showcase_student, student_module
     ensure_member_count_spread(projects, students, module_students, membership_counts, rng)
 
 def create_group_memberships(stdout):
-    """Create the seeded memberships for all seeded group projects."""
-
     rng = random.Random(PROJECT_MEMBER_SEED)
     context = _build_seed_project_context(timezone.now())
     students = context["students"]
@@ -192,8 +189,6 @@ def create_group_memberships(stdout):
         post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 
 def create_group_tasks(stdout):
-    """Create the seeded task sets for all seeded group projects."""
-
     now = timezone.now()
     context = _build_seed_project_context(now)
     projects = sorted(context["projects"], key=lambda project: (project.course_code, project.name))
@@ -210,7 +205,6 @@ def _seed_project_availability(project, now):
 
 def seed_group_availability(stdout):
     """Seed availability events and meeting suggestions for group projects."""
-
     now = timezone.now()
     context = _build_seed_project_context(now)
     for project in context["projects"]:

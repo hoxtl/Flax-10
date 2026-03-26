@@ -43,6 +43,7 @@ from .seed_helpers.calendar.attendance import seed_attendance
 from .seed_helpers.users.admin import seed_course_change_requests, seed_society_reports
 from .seed_helpers.users.usersettings import ensure_usersettings_seed_compatibility
 
+
 User = get_user_model()
 SOFT_TAG_COLORS = {
     "Lecture": "#C98C56",
@@ -67,14 +68,11 @@ SOFT_FALLBACK_TAG_COLORS = (
 def _seed_user_pool():
     return list(User.objects.filter(role__in=['student', 'teacher']))
 
-
 def _display_role(username, role):
     return 'admin/student' if username == 'johndoe' else role
 
-
 def _is_already_seeded():
     """Check if fixture users exist to detect prior seeding."""
-
     fixture_usernames = {'johndoe', 'janedoe', 'charlie', 'amiller'}
     existing = set(User.objects.filter(username__in=fixture_usernames).values_list('username', flat=True))
     return len(existing) >= 2
@@ -87,15 +85,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         """Register the optional teacher-count override for seed runs."""
-
         parser.add_argument(
             '--teacher-count', type=int, default=14,
             help='Target total number of teacher accounts.',
         )
 
     def handle(self, *args, **options):
-        """Seed the backend with the full development dataset."""
-
         if _is_already_seeded():
             self._print_already_seeded_warning()
             return
@@ -230,6 +225,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  \u2713  {'Categories':<16} {len(self.categories):,}")
 
     def _tag_color(self, name):
+        """Tag colour."""
         if name in SOFT_TAG_COLORS:
             return SOFT_TAG_COLORS[name]
         return SOFT_FALLBACK_TAG_COLORS[sum(ord(char) for char in name) % len(SOFT_FALLBACK_TAG_COLORS)]
@@ -296,8 +292,6 @@ class Command(BaseCommand):
             self.stdout.write(f"  {label:<16}{count:,}")
 
     def print_stats(self):
-        """Print a summary of all seeded data."""
-
         div = "\u2500" * 40
         self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))

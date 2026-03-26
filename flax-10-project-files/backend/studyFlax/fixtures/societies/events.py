@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from django.utils import timezone
 
+
 EVENT_TEMPLATES = {
     "sports": [
         ("Weekly Training", "Regular training session for all members.", 18, 90, "weekly", 2),
@@ -83,23 +84,17 @@ EVENT_TEMPLATES = {
 
 
 def get_events_for_category(category):
-    """Return the seeded event templates for one society category."""
-
     return EVENT_TEMPLATES.get(category, EVENT_TEMPLATES["social"])
-
 
 def build_event_datetime(hour, duration_mins, day_of_week=None):
     """Build aware start and end datetimes for a seeded society event."""
-
     base_date = get_next_occurrence(day_of_week)
     start = timezone.make_aware(datetime.combine(base_date, datetime.min.time().replace(hour=hour)))
     end = start + timedelta(minutes=duration_mins)
     return start, end
 
-
 def get_next_occurrence(day_of_week):
     """Return the next date matching the given weekday number."""
-
     today = timezone.now().date()
     if day_of_week is None:
         return today + timedelta(days=7)

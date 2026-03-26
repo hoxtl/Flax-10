@@ -12,6 +12,7 @@ from studyFlax.models.authentication.course_change_request_model import CourseCh
 from studyFlax.models.society.society_report_model import SocietyReport
 from studyFlax.models.society.society_model import Society
 
+
 User = get_user_model()
 
 FIXTURE_NAMES = {"janedoe", "johndoe", "charlie"}
@@ -41,10 +42,8 @@ def _non_fixture_users():
         User.objects.filter(role__in=["student", "teacher"]).exclude(username__in=FIXTURE_NAMES)
     )
 
-
 def _create_course_change_if_missing(user, rng):
     """Create a pending course change request if none exists. Returns True if created."""
-
     if CourseChangeRequest.objects.filter(user=user, status="pending").exists():
         return False
     current = rng.choice(COURSES)
@@ -59,7 +58,6 @@ def _create_course_change_if_missing(user, rng):
 
 def seed_course_change_requests(stdout):
     """Seed pending course-change requests for non-fixture users."""
-
     rng = random.Random("studyflax-course-changes-v1")
     pool = _non_fixture_users()
     if not pool:
@@ -69,10 +67,8 @@ def seed_course_change_requests(stdout):
     created = sum(1 for user in chosen if _create_course_change_if_missing(user, rng))
     stdout.write(f"  \u2713  {'Course changes':<14} {created} created")
 
-
 def _create_society_report_if_missing(society, reporter, reason, pairs_used):
     """Create a society report if not a duplicate pair. Returns True if created."""
-
     if (society.id, reporter.id) in pairs_used:
         return False
     pairs_used.add((society.id, reporter.id))
@@ -82,8 +78,6 @@ def _create_society_report_if_missing(society, reporter, reason, pairs_used):
     return True
 
 def seed_society_reports(stdout):
-    """Seed society reports for ratified societies."""
-
     rng = random.Random("studyflax-society-reports-v1")
     societies = list(Society.objects.filter(is_ratified=True))
     pool = _non_fixture_users()
