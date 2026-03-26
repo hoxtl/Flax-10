@@ -1,12 +1,7 @@
-/**
- * Covers ProfileModals visibility and interaction branches.
- */
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProfileModals, { SocietiesModal } from '../../../pages/Profile/ProfileModals';
 import { getModules } from '../../../api/moduleApi';
-
 import { createFnMap } from '../../utils/testBuilderUtils';
 
 vi.mock('../../../components/Dashboard/EditProfileModal', () => ({
@@ -110,7 +105,6 @@ describe('ProfileModals', () => {
 
     it('renders nothing when all modals closed', () => {
         const { container } = renderModals();
-        // EditProfileModal returns null when closed; no visible modals
         expect(screen.queryByTestId('edit-profile-modal')).toBeNull();
         expect(container.textContent).toBe('');
     });
@@ -179,7 +173,6 @@ describe('ProfileModals', () => {
     it('calls setEventRange when range button is clicked', () => {
         const setEventRange = vi.fn();
         renderModals({ state: { showEvents: true, setEventRange } });
-        // Click a specific range label button rather than the close button
         fireEvent.click(screen.getByText('Today'));
         expect(setEventRange).toHaveBeenCalledWith('today');
     });
@@ -268,7 +261,6 @@ describe('ProfileModals', () => {
         getSharingWith.mockRejectedValueOnce(new Error('fetch failed'));
         renderModals({ state: { showSharedWith: true } });
         await waitFor(() => expect(getSharingWith).toHaveBeenCalled());
-        // The hook silently handles errors by setting users to an empty array
     });
 
     it('events modal formats event without location', () => {
@@ -451,4 +443,5 @@ describe('ProfileModals', () => {
         fireEvent.click(screen.getByText('Film Club'));
         expect(onNavigate).toHaveBeenCalledWith('/societies?id=22');
     });
+
 });

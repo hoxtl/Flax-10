@@ -18,13 +18,17 @@ const BREAK_SUGGESTIONS = [
   'Do a quick breathing exercise',
 ];
 
-const ACTIVE_BREAK_OPTIONS = [
+export const ACTIVE_BREAK_OPTIONS = [
   { id: 'stretch', label: '5m Stretch', hint: 'Do a quick mobility reset.' },
   { id: 'hydrate', label: 'Hydrate', hint: 'Refill water before next focus block.' },
   { id: 'walk', label: 'Campus Walk', hint: 'Walk briefly and come back refreshed.' },
 ];
 
-function BreakOption({ option, selected, setSelected }) {
+export function getSelectedBreakLabel(selected) {
+  return ACTIVE_BREAK_OPTIONS.find((option) => option.id === selected)?.label || 'Break';
+}
+
+export function BreakOption({ option, selected, setSelected }) {
   const className = `${styles.activeBreakBtn} ${selected === option.id ? styles.activeBreakBtnSelected : ''}`;
 
   return (
@@ -38,7 +42,7 @@ function BreakOption({ option, selected, setSelected }) {
 export function BreakModal({ onAction }) {
   const tip = useMemo(() => BREAK_SUGGESTIONS[Math.floor(Math.random() * BREAK_SUGGESTIONS.length)], []);
   const [selected, setSelected] = useState(ACTIVE_BREAK_OPTIONS[0].id);
-  const selectedLabel = ACTIVE_BREAK_OPTIONS.find((option) => option.id === selected)?.label || 'Break';
+  const selectedLabel = getSelectedBreakLabel(selected);
 
   return (
     <StandardModal title="Focus session complete" onClose={onAction} size="sm" modalClassName={styles.modalContent}>

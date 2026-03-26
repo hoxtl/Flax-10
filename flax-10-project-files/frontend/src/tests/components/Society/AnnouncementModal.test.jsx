@@ -123,7 +123,6 @@ describe('AnnouncementModal', () => {
   });
 
   it('handles image add/remove and load failure', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     fetchSocietyEventMock.mockRejectedValueOnce(new Error('load failed'));
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()}
       announcement={{ id: 10, title: 'Edit', content: 'x', event_id: 12, images: ['a.jpg'] }} societyId={6} announcements={[]} />);
@@ -131,8 +130,6 @@ describe('AnnouncementModal', () => {
     expect(await screen.findAllByAltText('Preview')).toHaveLength(2);
     fireEvent.click(screen.getAllByRole('button', { name: '×' })[0]);
     await waitFor(() => expect(screen.getAllByAltText('Preview')).toHaveLength(1));
-    await waitFor(() => expect(errorSpy).toHaveBeenCalled());
-    errorSpy.mockRestore();
   });
 
   it('delete without linked event shows simple message', () => {

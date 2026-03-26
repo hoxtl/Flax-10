@@ -14,5 +14,11 @@ const testNegativeOvertime = () => {
 
 describe('TimerDisplay', () => {
     it('formats time correctly', testFormatCorrectly);
-    it('shows negative time for overtime', testNegativeOvertime);
+  it('shows negative time for overtime', testNegativeOvertime);
+
+  it('uses the compact font size for long times', () => {
+    const { container } = render(<TimerDisplay timeLeft={-6000} mode="work" isOvertime={true} />);
+    expect(screen.getByText('+100:00')).toBeInTheDocument();
+    expect(container.firstChild).toHaveStyle({ fontSize: '2.6rem' });
+  });
 });

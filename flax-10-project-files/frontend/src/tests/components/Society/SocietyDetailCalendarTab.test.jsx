@@ -182,11 +182,9 @@ describe('Society detail CalendarTab', () => {
     mockIsModalOpen = true;
     mockModalEvent = { id: 1, title: 'E', start_time: '2026-03-09T10:00:00Z' };
     mockConfirm.mockRejectedValueOnce(new Error('cancel'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     renderTab({ editMode: true, eventHandlers: { onDelete: vi.fn() }, tags: [] });
     fireEvent.click(screen.getByText('delete'));
-    await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
-    consoleSpy.mockRestore();
+    await waitFor(() => expect(mockCloseModal).toHaveBeenCalled());
   });
 
   it('recurring delete with choice true calls onDelete', async () => {

@@ -209,6 +209,24 @@ describe("GroupWork low coverage components", () => {
     expect(screen.queryByRole("button", { name: "Edit team" })).not.toBeInTheDocument();
   });
 
+  it("hides header metadata when module and teacher info are missing", () => {
+    render(
+      <MemoryRouter>
+        <ProjectHeaderMeta
+          project={{ id: 2, course_code: "", module_name: "", teacher_name: "" }}
+          members={[{ id: 1, user: 1, name: "Alex", role: "owner" }]}
+          teamMembers={[{ id: 1, user: 1, name: "Alex", role: "member" }]}
+          onMemberAdded={vi.fn()}
+          onMemberRemove={vi.fn()}
+          onDeleteProject={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole("link", { name: /Open .* module/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Open .*'s profile/i })).not.toBeInTheDocument();
+  });
+
   it("handles owner and non-owner delete actions", async () => {
     const onDelete = vi.fn().mockResolvedValue(true);
 

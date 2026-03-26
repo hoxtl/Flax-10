@@ -44,31 +44,15 @@ import { UserJourneySection } from "../../../components/campus_map/UserJourneySe
 import { TransportModesSection } from "../../../components/campus_map/TransportModesSection";
 import { CampusMapSidebar } from "../../../components/campus_map/CampusMapSidebar";
 
-function JourneyHarness({
-  initialStart = "",
-  initialDestination = "",
-  locating = false,
-  onCalculate = vi.fn(),
-  onClearAll = vi.fn(),
-  onGeolocateStart = vi.fn(),
-  onGeolocateDestination = vi.fn(),
-}) {
-  const [manualStart, setManualStart] = useState(initialStart);
-  const [manualDestination, setManualDestination] = useState(initialDestination);
-
-  return (
-    <UserJourneySection
-      manualStart={manualStart}
-      setManualStart={setManualStart}
-      manualDestination={manualDestination}
-      setManualDestination={setManualDestination}
-      onCalculate={onCalculate}
-      onClearAll={onClearAll}
-      onGeolocateStart={onGeolocateStart}
-      onGeolocateDestination={onGeolocateDestination}
-      locating={locating}
-    />
-  );
+function JourneyHarness(props) {
+  const [manualStart, setManualStart] = useState(props.initialStart || "");
+  const [manualDestination, setManualDestination] = useState(props.initialDestination || "");
+  const hProps = {
+    onCalculate: vi.fn(), onClearAll: vi.fn(),
+    onGeolocateStart: vi.fn(), onGeolocateDestination: vi.fn(),
+    ...props, manualStart, setManualStart, manualDestination, setManualDestination
+  };
+  return <UserJourneySection {...hProps} />;
 }
 
 describe("UserJourneySection", () => {

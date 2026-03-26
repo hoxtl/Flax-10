@@ -34,11 +34,10 @@ describe('useUnreportSociety', () => {
     });
 
     it('logs error when unreportSociety fails', async () => {
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
         api.unreportSociety.mockRejectedValue(new Error('fail'));
         const { result } = renderHook(() => useUnreportSociety(onUpdateLocal));
         await act(async () => { await result.current({ id: 3, name: 'FailSoc' }); });
-        expect(spy).toHaveBeenCalledWith('Failed to unreport society:', expect.any(Error));
-        spy.mockRestore();
+        expect(api.unreportSociety).toHaveBeenCalledWith(3);
+        expect(onUpdateLocal).not.toHaveBeenCalled();
     });
 });

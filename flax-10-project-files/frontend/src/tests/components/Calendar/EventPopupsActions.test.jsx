@@ -2,7 +2,6 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-// Hoisted mocks
 
 const {
     mockRefreshTags,
@@ -108,26 +107,11 @@ vi.mock('../../../context/ToastContext', () => ({
     useToast: () => mockToast,
 }));
 
-vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({
-    default: ({ title, warningText, onConfirm, onCancel }) => (
-        <div data-testid="hold-confirm-modal">
-            <span data-testid="hold-title">{title}</span>
-            <span data-testid="hold-warning">{warningText}</span>
-            <button onClick={onConfirm}>Confirm Hold</button>
-            <button onClick={onCancel}>Cancel Hold</button>
-        </div>
-    ),
-}));
-
-// Import under test (after mocks)
-
 import { EventPopups } from '../../../components/Calendar/EventPopups';
 import { useEventModal, useEventPopup, useEventDelete } from '../../../context/CalendarContext';
 import { getEventType, hasRecurrence } from '../../../components/Calendar/utils/eventUtils';
 import { unsyncCalendar } from '../../../api/societyApi';
 import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/Calendar/utils/formUtils';
-
-// Helpers
 
 function setupModalClosed() {
     useEventModal.mockReturnValue({
@@ -147,13 +131,10 @@ function setupPopupEvent(evt, extra = {}) {
     });
 }
 
-// Tests
-
 describe('EventPopups extra coverage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockConfirm.mockResolvedValue(true);
-        // Default: delete modal closed
         useEventDelete.mockReturnValue({
             openDelete: mockOpenDelete,
             isDeleteOpen: false,
@@ -162,8 +143,6 @@ describe('EventPopups extra coverage', () => {
             closeDelete: mockCloseDelete,
         });
     });
-
-    // getPopupActions – society events show only Unsync action
 
     it('returns only Unsync action for society events', () => {
         setupModalClosed();
@@ -175,9 +154,6 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
         expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     });
-
-});
-    // getPopupActions – non-personal, non-society returns null (no actions)
 
     it('returns no actions for timetable events', () => {
         setupModalClosed();
@@ -200,8 +176,6 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByText('Unsync')).not.toBeInTheDocument();
     });
 
-    // getPopupActions – readOnly popup returns null regardless of type
-
     it('returns no actions when popup is readOnly', () => {
         setupModalClosed();
         const evt = { id: 10, title: 'Read Only Event', source: 'personal' };
@@ -211,8 +185,6 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
         expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     });
-
-    // EventPopupContainer – tag_name on society event used as tag label
 
     it('uses tag_name and tag_color from society event as the tag prop', () => {
         setupModalClosed();
@@ -227,7 +199,6 @@ describe('EventPopups extra coverage', () => {
         setupPopupEvent(evt);
         getEventType.mockReturnValue('society');
         render(<EventPopups />);
-        // The mock EventPopover renders tag.label in a span
         expect(screen.getByTestId('popup-tag').textContent).toBe('Engineering');
     });
 
@@ -244,7 +215,6 @@ describe('EventPopups extra coverage', () => {
         setupPopupEvent(evt);
         getEventType.mockReturnValue('society');
         render(<EventPopups />);
-        // tag should still have the label
         expect(screen.getByTestId('popup-tag').textContent).toBe('Art');
     });
 
@@ -254,11 +224,8 @@ describe('EventPopups extra coverage', () => {
         setupPopupEvent(evt);
         getEventType.mockReturnValue('personal');
         render(<EventPopups />);
-        // getTag is mocked to return { label: 'TagLabel', color: '#aaa' }
         expect(screen.getByTestId('popup-tag').textContent).toBe('TagLabel');
     });
-
-    // EventPopupContainer – society event without tag_name uses getTag path
 
     it('uses getTag when society event has no tag_name', () => {
         setupModalClosed();
@@ -273,11 +240,8 @@ describe('EventPopups extra coverage', () => {
         setupPopupEvent(evt);
         getEventType.mockReturnValue('society');
         render(<EventPopups />);
-        // Falls through to getTag which returns { label: 'TagLabel' }
         expect(screen.getByTestId('popup-tag').textContent).toBe('TagLabel');
     });
-
-    // Unsync action – calls unsyncCalendar, refreshTags, loadEvents, toast
 
     it('Unsync action on society event without society_name uses "society" fallback', async () => {
         setupModalClosed();
@@ -303,8 +267,6 @@ describe('EventPopups extra coverage', () => {
         });
     });
 
-    // Edit action – opens modal and closes popup
-
     it('Edit action calls openModal and closePopup', () => {
         const mockClosePopup = vi.fn();
         const mockOpenModalFn = vi.fn();
@@ -323,8 +285,6 @@ describe('EventPopups extra coverage', () => {
         expect(mockOpenModalFn).toHaveBeenCalledWith(evt);
     });
 
-    // Delete action for non-recurring event – opens delete directly
-
     it('Delete action calls openDelete directly for non-recurring event', async () => {
         setupModalClosed();
         const evt = { id: 18, title: 'Task', source: 'personal', tag: null };
@@ -337,8 +297,6 @@ describe('EventPopups extra coverage', () => {
             expect(mockOpenDelete).toHaveBeenCalledWith(evt);
         });
     });
-
-    // EventPopupContainer – not rendered when modal open
 
     it('EventPopupContainer is not rendered when isModalOpen is true', () => {
         useEventModal.mockReturnValue({

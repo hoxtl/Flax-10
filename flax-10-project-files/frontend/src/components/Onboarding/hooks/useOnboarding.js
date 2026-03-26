@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { useTags } from "../../../context/TagContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -30,6 +31,7 @@ function useOnboardingState() {
 export default function useOnboarding() {
   const state = useOnboardingState();
   const { refreshProfile } = useAuth();
+  const { refreshTags } = useTags();
   const { year, major, confirmed, setMajor, setConfirmed, setLoading, setDone } = state;
   const handleMajorChange = (val) => { setMajor(val); setConfirmed(false); };
   const handleSubmit = async () => {
@@ -37,6 +39,7 @@ export default function useOnboarding() {
     setLoading(true);
     await submitOnboarding(year, major).catch(() => {});
     await refreshProfile().catch(() => {});
+    await refreshTags().catch(() => {});
     setLoading(false);
     setDone(true);
   };
