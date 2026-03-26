@@ -8,7 +8,7 @@ from rest_framework import status
 
 from ..base import BaseTestCase
 from studyFlax.models import Module, Enrollment, Reading, Task
-from studyFlax.views.modules.reading_view import (
+from studyFlax.views.modules.reading_task_service import (
     create_description,
     task_payload,
 )

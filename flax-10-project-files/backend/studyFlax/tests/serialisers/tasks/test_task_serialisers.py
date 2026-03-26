@@ -82,7 +82,7 @@ class TaskGroupProjectFilterTest(TestCase):
     """Tests for get_user_tasks group_project filter."""
 
     def test_filter_tasks_by_group_project(self):
-        from studyFlax.views.tasks.task_view import get_user_tasks
+        from studyFlax.views.tasks.task_view_service import get_user_tasks
         from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMembership
         user = make_user('gp_filter', 'gp_filter@e.com')
         project = GroupProject.objects.create(name='GP', owner=user)
