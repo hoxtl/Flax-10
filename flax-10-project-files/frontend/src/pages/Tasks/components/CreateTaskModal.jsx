@@ -143,7 +143,7 @@ function CreateTaskModalCategory({ form, categoryOptions, selectedListColor, han
         <span className={styles.listWrapLabel}>Category</span>
         {selectedListColor && <span className={styles.listDot} style={{ background: selectedListColor }} />}
         <div className={styles.listDropdownTriggerWrap}>
-          <AnimatedDropdown value={form.task_list ? String(form.task_list) : ""} onChange={handleCategoryChange} placeholder="Select list" options={categoryOptions} menuMaxHeight={420} className={styles.listAnimatedDropdown} />
+          <AnimatedDropdown value={form.task_list ? String(form.task_list) : ""} onChange={handleCategoryChange} placeholder="Select list" options={categoryOptions} menuMaxHeight={420} className={styles.listAnimatedDropdown} usePortal allowFlipUpward={false} />
         </div>
       </div>
     </div>
@@ -173,7 +173,7 @@ function CreateTaskModalModuleRow({ form, set, sortedModules }) {
       <div className={styles.listWrap}>
         <span className={styles.listWrapLabel}>Module</span>
         <div className={styles.listDropdownTriggerWrap}>
-          <AnimatedDropdown value={form.module ? String(form.module) : ""} onChange={(val) => set("module", val)} placeholder="No module" options={options} menuMaxHeight={420} className={styles.listAnimatedDropdown} />
+          <AnimatedDropdown value={form.module ? String(form.module) : ""} onChange={(val) => set("module", val)} placeholder="No module" options={options} menuMaxHeight={420} className={styles.listAnimatedDropdown} usePortal allowFlipUpward={false} />
         </div>
       </div>
     </div>

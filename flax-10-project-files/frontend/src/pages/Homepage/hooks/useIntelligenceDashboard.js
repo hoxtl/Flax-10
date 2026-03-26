@@ -107,7 +107,7 @@ function buildLiveSummary(props, tflDelays) {
   };
 }
 
-function countAcademicSessions(events = []) {
+function countAcademicSessions(events) {
   return events.filter(isAcademicSession).length;
 }
 

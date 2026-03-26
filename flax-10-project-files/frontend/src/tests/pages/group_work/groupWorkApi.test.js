@@ -61,6 +61,21 @@ describe("groupWorkApi", () => {
     expect(fetch).toHaveBeenCalledWith("/api/group-work/projects/1/", expect.objectContaining({ method: "DELETE" }));
   });
 
+  it("deletes project members with auth headers only", async () => {
+    localStorage.setItem("token", "member-token");
+    fetch.mockResolvedValueOnce({ ok: true });
+
+    await deleteProjectMember(5, 9);
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/group-work/projects/5/members/9/",
+      expect.objectContaining({
+        method: "DELETE",
+        headers: { Authorization: "Token member-token" },
+      }),
+    );
+  });
+
   it("sends create project and member management requests", async () => {
     fetch
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue({ id: 2 }) })

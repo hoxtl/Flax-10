@@ -115,6 +115,34 @@
     white-space: nowrap;
   }
   
+  .categoryChips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .categoryChip {
+    padding: 6px 16px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: transparent;
+    border: 1.5px solid var(--border, rgba(74, 52, 33, 0.12));
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .categoryChip:hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+  .categoryChipActive {
+    background: var(--primary, #7B6751);
+    color: var(--color-card, #fff);
+    border-color: var(--primary, #7B6751);
+    font-weight: 600;
+  }
+
   .footer {
     display: flex;
     justify-content: flex-end;

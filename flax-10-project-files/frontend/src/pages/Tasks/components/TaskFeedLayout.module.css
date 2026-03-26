@@ -142,7 +142,7 @@
   position: relative;
   z-index: 5;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   flex-shrink: 0;
   margin-bottom: 2px;

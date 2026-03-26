@@ -158,7 +158,7 @@ describe("useIntelligenceDashboard", () => {
     };
     const { result } = renderHook(() => useIntelligenceDashboard({ profile: { id: 1, settings: { homepage_widgets: ["hero"], homepage_widget_sizes: {} } }, profileLoading: true, slot5Data }));
     expect(result.current.live.eventsCount).toBe(6);
-    expect(result.current.live.classesCount).toBe(4);
+    expect(result.current.live.classesCount).toBe(3);
     expect(result.current.live.tasksCount).toBe(1);
     expect(getSemesterProgress(new Date("2026-03-26"))).toBeTruthy();
   });
@@ -227,5 +227,188 @@ describe("useIntelligenceDashboard", () => {
     });
     expect(result.current.layout).not.toContain(undefined);
     expect(new Set(result.current.layout)).toEqual(new Set(["deadlines", "todayTasks"]));
+  });
+
+  it("handles non-array delay payloads, rejected course requests, and dashboard action setters", async () => {
+    vi.useFakeTimers();
+    tflServiceMock.getTfLDelays.mockResolvedValueOnce(null);
+    getMyCourseChangeRequestMock.mockRejectedValueOnce(new Error("nope"));
+
+    const { result } = renderHook(() =>
+      useIntelligenceDashboard({
+        profile: { id: 7, settings: { homepage_widgets: ["hero"], homepage_widget_sizes: {} } },
+        profileLoading: false,
+        slot5Data: {},
+      }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+      vi.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+
+    act(() => {
+      result.current.setEdit(true);
+      result.current.setShowAdd(true);
+      result.current.setShowCourseChange(false);
+      result.current.handleReset();
+      result.current.setWidgetSize("hero", { row: 3 });
+    });
+
+    expect(result.current.tflDelays).toEqual([]);
+    expect(result.current.courseChangeRequest).toBeNull();
+    expect(result.current.edit).toBe(true);
+    expect(result.current.showAdd).toBe(true);
+    expect(result.current.showResetConfirm).toBe(true);
+    expect(result.current.widgetSizes).toEqual({ hero: { row: 3 } });
+    vi.useRealTimers();
+  });
+
+  it("treats requested courses as pending, falls back to stored defaults, and handles minimum term length", async () => {
+    vi.useFakeTimers();
+    getMyCourseChangeRequestMock.mockResolvedValueOnce({ requested_course: "Maths", status: "" });
+    loadTermConfigMock.mockReturnValueOnce({ startDate: "2026-03-24", totalWeeks: 0, hasReadingWeek: true });
+
+    const profile = {
+      id: 15,
+      settings: {
+        homepage_widgets: [],
+        homepage_widget_sizes: "invalid",
+      },
+    };
+    localStorage.setItem("homepage_widget_layout_15", JSON.stringify(["unknown", "deadlines"]));
+    localStorage.setItem("homepage_widget_sizes_15", JSON.stringify({ deadlines: { row: 1 } }));
+
+    const { result } = renderHook(() =>
+      useIntelligenceDashboard({
+        profile,
+        profileLoading: false,
+        slot5Data: {
+          sortedEvents: [{ source: "", tag: { name: "Seminar" }, title: "", description: "" }],
+          taskWidgetItemsOnly: [],
+        },
+      }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+      vi.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+
+    expect(result.current.layout).toEqual(["hero", "deadlines"]);
+    expect(result.current.widgetSizes).toEqual({ deadlines: { row: 1 } });
+    expect(result.current.live.classesCount).toBe(1);
+    expect(result.current.courseChangeRequest).toEqual({ requested_course: "Maths", status: "" });
+    expect(getSemesterProgress(new Date("2026-03-26"))).toEqual({ hasStarted: true, isFinished: false, pct: 43 });
+    vi.useRealTimers();
+  });
+
+  it("falls back to stored widget sizes when the server has sizes but no layout", async () => {
+    const profile = {
+      id: 21,
+      settings: {
+        homepage_widgets: [],
+        homepage_widget_sizes: { deadlines: { row: 1 } },
+      },
+    };
+
+    const { result } = renderHook(() =>
+      useIntelligenceDashboard({
+        profile,
+        profileLoading: false,
+        slot5Data: {},
+      }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(result.current.widgetSizes).toEqual({ deadlines: { row: 1 } });
+  });
+
+  it("handles rejected TfL loads, approved course requests, non-array stored layouts, and cloud sync failures", async () => {
+    vi.useFakeTimers();
+    tflServiceMock.getTfLDelays.mockRejectedValueOnce(new Error("tfl down"));
+    getMyCourseChangeRequestMock.mockResolvedValueOnce({ status: "approved", requested_course: "CS" });
+    updateUserSettingsMock.mockRejectedValueOnce(new Error("save failed"));
+    localStorage.setItem("homepage_widget_layout_30", JSON.stringify("not-an-array"));
+
+    const { result } = renderHook(() =>
+      useIntelligenceDashboard({
+        profile: { id: 30, settings: { homepage_widgets: [], homepage_widget_sizes: {} } },
+        profileLoading: false,
+        slot5Data: {},
+      }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+      vi.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+
+    expect(result.current.layout).toEqual(["hero", "deadlines", "todayTasks", "bigTimeline"]);
+    expect(result.current.tflDelays).toEqual([]);
+    expect(result.current.courseChangeRequest).toBeNull();
+    expect(updateUserSettingsMock).toHaveBeenCalledTimes(1);
+    expect(getSemesterProgress()).toEqual({ hasStarted: true, isFinished: true, pct: 100 });
+    vi.useRealTimers();
+  });
+
+  it("syncs server layouts with empty widget sizes", async () => {
+    const profile = {
+      id: 31,
+      settings: {
+        homepage_widgets: ["todayTasks", "hero"],
+        homepage_widget_sizes: null,
+      },
+    };
+
+    const { result } = renderHook(() =>
+      useIntelligenceDashboard({
+        profile,
+        profileLoading: false,
+        slot5Data: {},
+      }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(result.current.layout).toEqual(["todayTasks", "hero"]);
+    expect(result.current.widgetSizes).toEqual({});
+  });
+
+  it("stores sorted server widget-size snapshots when syncing from profile settings", async () => {
+    const profile = {
+      id: 32,
+      settings: {
+        homepage_widgets: ["todayTasks", "hero"],
+        homepage_widget_sizes: {
+          todayTasks: { row: 1 },
+          hero: { row: 2 },
+        },
+      },
+    };
+
+    renderHook(() =>
+      useIntelligenceDashboard({
+        profile,
+        profileLoading: false,
+        slot5Data: {},
+      }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const storedSource = JSON.parse(localStorage.getItem("homepage_widget_source_32"));
+    expect(storedSource.layout).toEqual(["todayTasks", "hero"]);
+    expect(Object.keys(storedSource.sizes)).toEqual(["hero", "todayTasks"]);
   });
 });

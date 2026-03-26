@@ -8,6 +8,7 @@ import { AnimatePresence, motion as Motion } from "framer-motion";
 
 import TaskCard from "./TaskCard";
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
+import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState.jsx";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
 import { isReadingList } from "../utils/readingListUtils";
@@ -64,10 +65,13 @@ function SectionHeader({ title, emoji, isOverdue, collapsed, tasks, completedCou
   );
 }
 
-function SectionEmptyState({ sectionType, emptyMessage, emptySub, emptyCardProps }) {
+function SectionEmptyState({ sectionType, emptyMessage, emptySub, emptyCardProps, useSearchEmpty }) {
   const emoji = (sectionType === "all" || sectionType === "overdue") ? "🗂️" : "✨";
   if (emptyCardProps) {
     return <AllTasksCompleteCard emoji="🎉" message={emptyCardProps.message} sub={emptyCardProps.sub} ctaLabel={emptyCardProps.ctaLabel} onCtaClick={emptyCardProps.onCtaClick} />;
+  }
+  if (useSearchEmpty) {
+    return <SearchEmptyState query="" itemLabel="tasks" title="No tasks yet" hint="Add one above or use Full Planning." />;
   }
   return (
     <div className={styles.sectionEmptyState}>
@@ -132,8 +136,8 @@ function useTaskSectionState(props) {
   const visibleTasks = props.applyLimit && !showAll ? sorted.slice(0, SECTION_SHOW_LIMIT) : sorted;
   const hiddenCount = props.applyLimit ? Math.max(0, sorted.length - SECTION_SHOW_LIMIT) : 0;
   const isEmpty = props.tasks.length === 0;
-  const showEmptyState = isEmpty && (props.emptyMessage != null || props.emptyCardProps != null);
-  const emptyState = showEmptyState ? <SectionEmptyState sectionType={props.sectionType} emptyMessage={props.emptyMessage} emptySub={props.emptySub} emptyCardProps={props.emptyCardProps} /> : null;
+  const showEmptyState = isEmpty && (props.emptyMessage != null || props.emptyCardProps != null || props.useSearchEmptyState);
+  const emptyState = showEmptyState ? <SectionEmptyState sectionType={props.sectionType} emptyMessage={props.emptyMessage} emptySub={props.emptySub} emptyCardProps={props.emptyCardProps} useSearchEmpty={props.useSearchEmptyState} /> : null;
   const sectionTaskRowProps = { listMap: props.listMap, lists: props.lists, onToggleComplete: props.onToggleComplete, onDeleteTask: props.onDeleteTask, onEditTask: props.onEditTask, hideDueBadge: props.hideDueBadge, hideListBadge: props.hideListBadge, isOverdueSection: props.isOverdueSection, searchQuery: props.searchQuery, onToggleShowAll: () => setShowAll((v) => !v) };
   return { collapsed, setCollapsed, showAll, totalInGroup, progressPct, visibleTasks, hiddenCount, isEmpty, showEmptyState, emptyState, sectionTaskRowProps };
 }

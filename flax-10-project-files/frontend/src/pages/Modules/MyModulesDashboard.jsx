@@ -4,12 +4,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { AlertCircle } from "lucide-react";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import { getSuggestedReadings } from "../../api/readingApi";
 import { UpcomingDeadlinesWidget } from "../../components/modules/deadlines/UpcomingDeadlinesWidget";
 import { isEnrolledIn } from "../../components/modules/utils/moduleUtils";
 import StatStrip from "../../components/common/stat_strip/StatStrip";
 import { useCountUp } from "../../hooks/useCountUp";
+import EmptyStateCard from "../homepage/components/EmptyStateCard";
 import ReadingsPanel from "./ReadingsPanel";
 import SmartNudge from "./SmartNudge";
 import styles from "./MyModulesDashboard.module.css";
@@ -45,15 +47,24 @@ function handleReadingAdded(setReadings, readingId) {
   setReadings((items) => items.filter((item) => item.id !== readingId));
 }
 
-export default function MyModulesDashboard({ modules, enrollments }) {
+function DeadlinesEmptyState() {
+  return <EmptyStateCard icon={AlertCircle} message="No upcoming deadlines" sub="You're all caught up — enjoy the calm." />;
+}
+
+export default function MyModulesDashboard({ modules, enrollments, onViewModule }) {
   const { deadlines, readings, setReadings } = useDashboardData();
   const statItems = useStatItems(modules, enrollments, deadlines, readings);
+  const handleModuleCodeClick = (moduleCode) => {
+    if (!onViewModule) return;
+    const module = (modules || []).find((m) => m.module_code === moduleCode);
+    if (module) onViewModule(module);
+  };
   return (
     <motion.div className={styles.dashboard} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
       <SmartNudge deadlines={deadlines} readings={readings} onReadingAdded={(id) => handleReadingAdded(setReadings, id)} />
       <StatStrip items={statItems} />
       <div className={styles.widgetRow}>
-        <UpcomingDeadlinesWidget deadlines={deadlines} initialShown={4} />
+        <UpcomingDeadlinesWidget deadlines={deadlines} initialShown={4} renderEmpty={() => <DeadlinesEmptyState />} onModuleCodeClick={handleModuleCodeClick} />
         <ReadingsPanel readings={readings} onReadingAdded={(id) => handleReadingAdded(setReadings, id)} />
       </div>
     </motion.div>
