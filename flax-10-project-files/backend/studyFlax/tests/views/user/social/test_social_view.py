@@ -16,10 +16,10 @@ from studyFlax.serialisers.social.social_serialisers import (
     CalendarShareUserSerialiser,
 )
 
+
 User = get_user_model()
 
 class CalendarShareViewTests(APITestCase):
-
     """Tests for calendar share view."""
 
     def setUp(self):
@@ -223,7 +223,7 @@ class SocialAndCategoryCoverageTest(TestCase):
 
 
 class CommonSerialiserHelpersTest(TestCase):
-
+    """Tests common serialiser helpers."""
     def test_build_profile_photo_url_returns_photo_str_for_http_url(self):
         from studyFlax.serialisers.common import build_profile_photo_url
         result = build_profile_photo_url('https://example.com/photo.jpg', None)

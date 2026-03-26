@@ -14,6 +14,7 @@ from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.authentication.user_settings_model import UserSettings
 
+
 User = get_user_model()
 
 
