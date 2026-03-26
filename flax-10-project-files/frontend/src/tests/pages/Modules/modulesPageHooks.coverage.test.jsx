@@ -162,37 +162,36 @@ describe("modulesPageHooks coverage", () => {
     expect(useModuleSortingMock).toHaveBeenCalledWith(hook.modules);
   });
 
+  const setupTestState = (current) => act(() => {
+    current.setShowForm(true);
+    current.setEditingModule({ id: 2 });
+    current.setViewingModule({ id: 1 });
+    current.setDeadlineModule({ id: 1 });
+    current.setReadingModule({ id: 1 });
+    current.setSearchQuery("AA200");
+    current.setFilterMode("enrolled");
+  });
+
+  const verifyResetState = (current) => {
+    expect(current.showForm).toBeNull();
+    expect(current.editingModule).toBeNull();
+    expect(current.viewingModule).toBeNull();
+    expect(current.deadlineModule).toBeNull();
+    expect(current.readingModule).toBeNull();
+    expect(current.searchQuery).toBe("");
+    expect(current.filterMode).toBe("all");
+  };
+
   it("resets module page state when the show-all event fires", async () => {
     localStorage.setItem("user", JSON.stringify({ role: "teacher" }));
-
     const { result } = renderHook(() => useModulesPageState("", false), {
       wrapper: routerWrapper("/modules?filter=enrolled"),
     });
 
     await waitFor(() => expect(result.current.filterMode).toBe("enrolled"));
+    setupTestState(result.current);
+    act(() => window.dispatchEvent(new Event("modules:show-all")));
 
-    act(() => {
-      result.current.setShowForm(true);
-      result.current.setEditingModule({ id: 2 });
-      result.current.setViewingModule({ id: 1 });
-      result.current.setDeadlineModule({ id: 1 });
-      result.current.setReadingModule({ id: 1 });
-      result.current.setSearchQuery("AA200");
-      result.current.setFilterMode("enrolled");
-    });
-
-    act(() => {
-      window.dispatchEvent(new Event("modules:show-all"));
-    });
-
-    await waitFor(() => {
-      expect(result.current.showForm).toBeNull();
-      expect(result.current.editingModule).toBeNull();
-      expect(result.current.viewingModule).toBeNull();
-      expect(result.current.deadlineModule).toBeNull();
-      expect(result.current.readingModule).toBeNull();
-      expect(result.current.searchQuery).toBe("");
-      expect(result.current.filterMode).toBe("all");
-    });
+    await waitFor(() => verifyResetState(result.current));
   });
 });
