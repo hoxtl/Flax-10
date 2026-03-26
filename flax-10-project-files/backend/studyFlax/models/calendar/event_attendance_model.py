@@ -7,8 +7,9 @@ from django.db import models
 from ..authentication.user_model import User
 from .calendar_event_model import CalendarEvent
 
+
 class EventAttendance(models.Model):
-    """One record per user per timetable event: did they attend?"""
+    """One record per user per timetable event: did they attend?."""
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(CalendarEvent, on_delete=models.CASCADE)
@@ -16,6 +17,7 @@ class EventAttendance(models.Model):
     recorded_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        """Metadata for event attendance."""
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "event"],
