@@ -1,7 +1,7 @@
 export { default as AppPage } from "./app_page/AppPage";
 export { default as BackToTop } from "./back_to_top/BackToTop";
 export { default as Badge } from "./Badge/Badge";
-export { default as Card } from "./card/Card";
+export { default as Card } from "./Card/Card";
 export { default as ConfirmModal } from "./confirm_modal/ConfirmModal";
 export { default as EmptyState } from "./empty_state/EmptyState";
 export { default as FormField } from "./form_field/FormField";

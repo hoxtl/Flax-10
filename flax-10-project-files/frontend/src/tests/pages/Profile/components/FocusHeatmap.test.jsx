@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const studyHeatmapMock = vi.fn();
 
-vi.mock("../../../../components/common/card/Card", () => ({
+vi.mock("../../../../components/common/Card/Card", () => ({
   default: ({ children, ...props }) => <div data-testid="card" {...props}>{children}</div>,
 }));
 
