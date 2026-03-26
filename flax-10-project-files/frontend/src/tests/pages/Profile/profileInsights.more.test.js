@@ -84,37 +84,28 @@ describe("profile insights more", () => {
     expect(result.current).toEqual({ score: 7 });
   });
 
-  it("does not submit suggestions without a target id and ignores duplicate sends", async () => {
-    const { result: emptyTarget } = renderHook(() => useSuggestionState(null));
-    await act(async () => {
-      await emptyTarget.current.submit();
-    });
-    expect(emptyTarget.current.state).toBe("idle");
+  it("does not submit without target id", async () => {
+    const { result } = renderHook(() => useSuggestionState(null));
+    await act(async () => { await result.current.submit(); });
+    expect(result.current.state).toBe("idle");
     expect(fetchApiMock).not.toHaveBeenCalled();
-
-    let resolveRequest;
-    fetchApiMock.mockReturnValueOnce(new Promise((resolve) => {
-      resolveRequest = resolve;
-    }));
-    const { result: sending } = renderHook(() => useSuggestionState(42));
-
-    act(() => {
-      sending.current.submit();
-    });
-
-    expect(sending.current.state).toBe("sending");
+  });
+  it("prevents double submission", async () => {
+    fetchApiMock.mockReturnValueOnce(new Promise(() => {}));
+    const { result } = renderHook(() => useSuggestionState(42));
+    act(() => { result.current.submit(); });
+    expect(result.current.state).toBe("sending");
     expect(fetchApiMock).toHaveBeenCalledTimes(1);
-
-    act(() => {
-      sending.current.submit();
-    });
+    act(() => { result.current.submit(); });
     expect(fetchApiMock).toHaveBeenCalledTimes(1);
-
-    await act(async () => {
-      resolveRequest({});
-      await Promise.resolve();
-    });
-    expect(sending.current.state).toBe("sent");
+  });
+  it("updates state on successful send", async () => {
+    let resolve;
+    fetchApiMock.mockReturnValueOnce(new Promise(r => { resolve = r; }));
+    const { result } = renderHook(() => useSuggestionState(42));
+    act(() => { result.current.submit(); });
+    await act(async () => { resolve({}); await Promise.resolve(); });
+    expect(result.current.state).toBe("sent");
   });
 
   it("marks suggestion submission errors", async () => {

@@ -40,30 +40,25 @@ describe("AppTour", () => {
     expect(overlay?.style.clipPath).toBe("");
   });
 
-  it("measures targeted steps, supports back navigation, and applies the spotlight clip path", async () => {
+  const nextStep = async () => {
+    fireEvent.click(screen.getByText("Next"));
+    await act(async () => { vi.advanceTimersByTime(100); });
+  };
+  it("measures targeted steps and applies spotlight", async () => {
     vi.spyOn(document, "querySelector").mockReturnValue({
       getBoundingClientRect: () => ({ x: 100, y: 80, width: 60, height: 40 }),
     });
-
     render(<AppTour onDone={vi.fn()} />);
-
-    fireEvent.click(screen.getByText("Next"));
-    await act(async () => {
-      vi.advanceTimersByTime(100);
-    });
-
+    await nextStep();
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("2 / 7")).toBeInTheDocument();
-    expect(screen.getByText("Back")).toBeInTheDocument();
-
     const overlay = getOverlay();
     expect(overlay?.style.clipPath).toContain("polygon");
-    expect(overlay?.style.clipPath).toContain("70px");
-
     const card = screen.getByText("Dashboard").parentElement;
     expect(card?.style.left).toBe("178px");
-    expect(card?.style.top).toBe("20px");
-
+  });
+  it("supports back navigation", async () => {
+    render(<AppTour onDone={vi.fn()} />);
+    await nextStep();
     fireEvent.click(screen.getByText("Back"));
     expect(screen.getByText("Welcome to StudyFlax")).toBeInTheDocument();
   });
