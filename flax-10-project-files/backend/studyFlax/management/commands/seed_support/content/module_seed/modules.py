@@ -30,16 +30,20 @@ def _create_module(code, name, description, teacher, recurrence_rule, department
     Module.objects.update_or_create(module_code=code, defaults=payload)
 
 
+def _seed_single_spec(spec, department_to_pool, recurrence_rule, teacher_load, department_cursor, stdout):
+    teacher = teacher_for_spec(spec, department_to_pool, department_cursor, teacher_load, stdout)
+    if not teacher:
+        return
+    code, name, description, department, course = spec
+    _create_module(code, name, description, teacher, recurrence_rule, department, course)
+    teacher_load[teacher.id] += 1
+
+
 def _seed_modules_by_specs(specs, department_to_pool, recurrence_rule, stdout):
     teacher_load = defaultdict(int)
     department_cursor = defaultdict(int)
     for spec in specs:
-        teacher = teacher_for_spec(spec, department_to_pool, department_cursor, teacher_load, stdout)
-        if not teacher:
-            continue
-        code, name, description, department, course = spec
-        _create_module(code, name, description, teacher, recurrence_rule, department, course)
-        teacher_load[teacher.id] += 1
+        _seed_single_spec(spec, department_to_pool, recurrence_rule, teacher_load, department_cursor, stdout)
 
 
 def create_modules(stdout):
@@ -57,4 +61,3 @@ def create_modules(stdout):
 
 
 __all__ = ["create_deadlines", "create_enrollments", "create_modules"]
-

@@ -63,17 +63,19 @@ def _create_module_task(user, task_list, module, template, index, now):
     )
 
 
+def _seed_tasks_for_enrolment(user, enrolment, lists_by_module, now):
+    task_list = lists_by_module.get(enrolment.module.id)
+    if not task_list:
+        return 0
+    templates = _get_templates_for_module(enrolment.module)
+    for index, template in enumerate(templates):
+        _create_module_task(user, task_list, enrolment.module, template, index, now)
+    return len(templates)
+
+
 def _seed_module_tasks(user, lists_by_module, now):
-    enrolled = list(Enrollment.objects.filter(student=user).select_related("module"))
-    total = 0
-    for enrollment in enrolled:
-        task_list = lists_by_module.get(enrollment.module.id)
-        if not task_list:
-            continue
-        for index, template in enumerate(_get_templates_for_module(enrollment.module)):
-            _create_module_task(user, task_list, enrollment.module, template, index, now)
-            total += 1
-    return total
+    enrolled = Enrollment.objects.filter(student=user).select_related("module")
+    return sum(_seed_tasks_for_enrolment(user, enrolment, lists_by_module, now) for enrolment in enrolled)
 
 
 def _seed_personal_tasks(user, lists_by_name, personal_list, now):

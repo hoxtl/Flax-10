@@ -22,6 +22,8 @@ def _prefix_to_course_map():
 
 
 PREFIX_TO_COURSE = _prefix_to_course_map()
+EXTRA_MODULE_BASE_NUMBERS = [4606, 4707, 4808]
+EXTRA_MODULE_NAMES = ["Advanced Topics", "Applied Practice", "Research Project"]
 
 
 def get_module_prefix(module_code):
@@ -49,15 +51,16 @@ def _build_single_extra(prefix, base_number, extra_name, existing_codes):
     return code, name, description
 
 
+def _candidate_extra_entries(prefix, existing_codes, target_count):
+    limit = min(target_count, len(EXTRA_MODULE_BASE_NUMBERS))
+    return [
+        _build_single_extra(prefix, EXTRA_MODULE_BASE_NUMBERS[index], EXTRA_MODULE_NAMES[index], existing_codes)
+        for index in range(limit)
+    ]
+
+
 def _build_extra_module_entries(prefix, existing_codes, target_count):
-    base_numbers = [4606, 4707, 4808]
-    extra_names = ["Advanced Topics", "Applied Practice", "Research Project"]
-    entries = []
-    for index in range(min(target_count, len(base_numbers))):
-        entry = _build_single_extra(prefix, base_numbers[index], extra_names[index], existing_codes)
-        if entry is not None:
-            entries.append(entry)
-    return entries
+    return [entry for entry in _candidate_extra_entries(prefix, existing_codes, target_count) if entry is not None]
 
 
 def _expand_prefix_group(prefix, entries, target_count):
