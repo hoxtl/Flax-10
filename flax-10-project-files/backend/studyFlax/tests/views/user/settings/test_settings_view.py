@@ -11,8 +11,9 @@ from studyFlax.models.authentication.user_settings_model import UserSettings
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.views.user.settings_view import user_settings_view as legacy_user_settings_view
-from studyFlax.tests.helpers.factories import make_user, make_module
+from studyFlax.tests.helpers.test_model_builders import make_user, make_module
 from rest_framework.test import force_authenticate
+
 
 class UserSettingsViewTest(TestCase):
     """Tests for user_settings_view (GET/PATCH /api/settings/)."""
@@ -194,8 +195,6 @@ class LegacyUserSettingsViewTests(TestCase):
         self.user = make_user()
 
     def call_legacy_view(self, method, url, data=None, format=None):
-        """Call legacy view for tests."""
-
         kwargs = {}
         if data is not None:
             kwargs['data'] = data
@@ -299,7 +298,7 @@ class UserSettingsSerializerTests(TestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         updated = serializer.save()
         self.assertEqual(updated.preferred_study_minutes_per_day, 180)
-        
+
     def test_patch_updates_preferred_study_minutes(self):
         response = self.client.patch(
             '/api/settings/',

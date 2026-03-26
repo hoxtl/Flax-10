@@ -7,10 +7,10 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
 
+
 User = get_user_model()
 
 class SleepSettingsViewTest(TestCase):
-
     """Tests for sleep settings view."""
 
     def setUp(self):
@@ -23,14 +23,11 @@ class SleepSettingsViewTest(TestCase):
 
     def get_sleep(self, response):
         """Extract sleep_time from either flat or nested response."""
-
         if 'settings' in response.data:
             return response.data['settings']['sleep_time']
         return response.data['sleep_time']
 
     def get_wake(self, response):
-        """Return wake for tests."""
-
         if 'settings' in response.data:
             return response.data['settings']['wake_time']
         return response.data['wake_time']
