@@ -64,6 +64,12 @@ const baseAnnouncementPayload = {
   endTime: '10:00',
 };
 
+const removeEventPayload = { title: 'A', content: 'B', addAsEvent: false, event_id: 99, tag: 'x' };
+const updateEventPayload = { title: 'B', content: 'C', addAsEvent: true, event_id: 99, tag: '', start_time: '2026-03-12T10:00', end_time: '2026-03-12T11:00' };
+const legacyEventPayload = { title: 'Legacy Event', description: 'legacy', location: 'Room 1', date: '2026-03-13', time: '08:00', endTime: '09:30', allDay: true, tag: 'abc', recurrence: 'weekly' };
+const isoEventPayload = { title: 'ISO Event', description: 'iso', location: 'Room 2', start_time: '2026-03-13T10:00', end_time: new Date('2026-03-13T11:00:00.000Z'), all_day: false, tag: '3', recurrence: { frequency: 'daily', end_date: '2026-04-01' } };
+const updatedSocietyEvent = { title: 'Updated', date: '2026-03-14', time: '11:00' };
+
 const withLoadedSociety = async () => {
   const { result } = renderHook(() => useSocietyDetail(5));
   await waitFor(() => expect(result.current.loading).toBe(false));
@@ -95,57 +101,22 @@ const runAnnouncementOperations = async (result) => {
 const runEventOperations = async (result) => {
   api.updateAnnouncement.mockResolvedValueOnce({ id: 10, title: 'A', event_id: 99 });
   await act(async () => {
-    await result.current.updateAnnouncement(
-      10,
-      { title: 'A', content: 'B', addAsEvent: false, event_id: 99, tag: 'x' },
-      true,
-    );
+    await result.current.updateAnnouncement(10, removeEventPayload, true);
   });
   expect(api.deleteSocietyEvent).toHaveBeenCalledWith(5, 99, true);
 
   api.updateAnnouncement.mockResolvedValueOnce({ id: 10, title: 'B', event_id: 99 });
   await act(async () => {
-    await result.current.updateAnnouncement(
-      10,
-      {
-        title: 'B',
-        content: 'C',
-        addAsEvent: true,
-        event_id: 99,
-        tag: '',
-        start_time: '2026-03-12T10:00',
-        end_time: '2026-03-12T11:00',
-      },
-      false,
-    );
+    await result.current.updateAnnouncement(10, updateEventPayload, false);
   });
   expect(api.updateSocietyEvent).toHaveBeenCalledWith(5, 99, expect.objectContaining({ tag: null }), true);
 };
 
 const runCoreEventOperations = async (result) => {
   await act(async () => {
-    await result.current.addEvent({
-      title: 'Legacy Event',
-      description: 'legacy',
-      location: 'Room 1',
-      date: '2026-03-13',
-      time: '08:00',
-      endTime: '09:30',
-      allDay: true,
-      tag: 'abc',
-      recurrence: 'weekly',
-    });
-    await result.current.addEvent({
-      title: 'ISO Event',
-      description: 'iso',
-      location: 'Room 2',
-      start_time: '2026-03-13T10:00',
-      end_time: new Date('2026-03-13T11:00:00.000Z'),
-      all_day: false,
-      tag: '3',
-      recurrence: { frequency: 'daily', end_date: '2026-04-01' },
-    });
-    await result.current.updateEvent(99, { title: 'Updated', date: '2026-03-14', time: '11:00' }, true);
+    await result.current.addEvent(legacyEventPayload);
+    await result.current.addEvent(isoEventPayload);
+    await result.current.updateEvent(99, updatedSocietyEvent, true);
     await result.current.deleteEvent(99, true);
     await result.current.addException(99, '2026-03-20', true);
     await result.current.deleteAnnouncement(10, true);
