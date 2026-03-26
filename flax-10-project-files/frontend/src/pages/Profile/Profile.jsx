@@ -3,17 +3,11 @@
  */
 
 import { useEffect } from "react";
-<<<<<<< HEAD
-import BackButton from "../../components/common/BackButton/BackButton.jsx";
-import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
-import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
-=======
 import BackButton from "../../components/common/back_button/BackButton.jsx";
+import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import EmptyState from "../../components/common/empty_state/EmptyState";
 import ScrollToTop from "../../components/common/scroll_to_top/ScrollToTop";
->>>>>>> origin/main
+import PrimaryButton from "../../components/common/primary_button/PrimaryButton";
 import { useAuth } from "../../context/AuthContext";
 import AchievementsModal from "./AchievementsModal";
 import { ProfileCalendar } from "./ProfileCalendar";

@@ -19,10 +19,7 @@
 
 .card {
   position: fixed;
-<<<<<<< HEAD
   width: 280px;
-=======
->>>>>>> origin/main
   background: var(--surface-card, #fff);
   border: var(--card-border, 1px solid #e5e7eb);
   border-radius: var(--card-radius-token, 12px);
@@ -32,18 +29,6 @@
   z-index: 9001;
 }
 
-<<<<<<< HEAD
-.cardCentered {
-  inset: 50% auto auto 50%;
-  transform: translate(-50%, -50%);
-}
-
-.cardPositioned {
-  transform: none;
-}
-
-=======
->>>>>>> origin/main
 .cardHeader {
   display: flex;
   justify-content: space-between;

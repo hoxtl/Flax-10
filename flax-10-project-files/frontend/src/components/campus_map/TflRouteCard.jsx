@@ -5,6 +5,7 @@
 import baseStyles from "../../pages/campus_map/CampusMap.module.css";
 import routeStyles from "../../pages/campus_map/routes.module.css";
 import { getLegIcon, getLegLabel } from "./mapUtils";
+import ExpandablePillButton from "../common/expandable_pill_button/ExpandablePillButton";
 
 const styles = { ...baseStyles, ...routeStyles };
 
@@ -60,7 +61,7 @@ function getLinesSummary(legs) {
 function TflRouteDetails({ instructionMode, onToggleInstructions, tflRouteInfo }) {
   const linesSummary = getLinesSummary(tflRouteInfo.legs || []);
   return (
-    <div className={styles.modeCard}><div className={styles.modeCardHeader}><span className={styles.modeIcon}>🚇</span><div className={styles.modeInfo}><span className={styles.modeName}>Public Transport</span><span className={styles.modeBadge}>{linesSummary}</span></div></div><div className={styles.modeStats}><div className={styles.modeStat}><span className={styles.modeStatValue}>{tflRouteInfo.duration} min</span><span className={styles.modeStatLabel}>Duration</span></div><div className={styles.modeStatDivider} /><div className={styles.modeStat}><span className={styles.modeStatValue}>{tflRouteInfo.legs.length}</span><span className={styles.modeStatLabel}>Stops</span></div></div><button className={styles.stepsToggle} onClick={onToggleInstructions}>{instructionMode ? "Hide" : "Show"} step-by-step directions <span>{instructionMode ? "▲" : "▼"}</span></button>{instructionMode && <div className={styles.tflJourneySteps}>{tflRouteInfo.legs.map((leg, index) => <TflLegItem key={index} leg={leg} />)}</div>}</div>
+    <div className={styles.modeCard}><div className={styles.modeCardHeader}><span className={styles.modeIcon}>🚇</span><div className={styles.modeInfo}><span className={styles.modeName}>Public Transport</span><span className={styles.modeBadge}>{linesSummary}</span></div></div><div className={styles.modeStats}><div className={styles.modeStat}><span className={styles.modeStatValue}>{tflRouteInfo.duration} min</span><span className={styles.modeStatLabel}>Duration</span></div><div className={styles.modeStatDivider} /><div className={styles.modeStat}><span className={styles.modeStatValue}>{tflRouteInfo.legs.length}</span><span className={styles.modeStatLabel}>Stops</span></div></div><ExpandablePillButton expanded={instructionMode} onToggle={onToggleInstructions} collapsedLabel="Show step-by-step directions" expandedLabel="Hide step-by-step directions" />{instructionMode && <div className={styles.tflJourneySteps}>{tflRouteInfo.legs.map((leg, index) => <TflLegItem key={index} leg={leg} />)}</div>}</div>
   );
 }
 
