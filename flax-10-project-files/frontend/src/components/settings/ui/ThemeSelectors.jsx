@@ -2,11 +2,7 @@
  * Theme-selection controls used by settings preferences.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Settings/ui/ThemeSelectors.jsx
-import styles from "../../../pages/Settings/Settings.module.css";
-=======
 import styles from "../../../pages/settings/Settings.module.css";
->>>>>>> origin/main:flax-10-project-files/frontend/src/components/settings/ui/ThemeSelectors.jsx
 import { THEME_GROUPS } from "../../../context/ThemeConstants";
 
 const MODE_OPTIONS = [

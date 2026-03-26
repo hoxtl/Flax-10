@@ -2,11 +2,7 @@
  * SocietyBrowseResults renders paginated browse results and empty states.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/Societies/SocietyBrowseResults.jsx
-import SocietyCard from "../../components/Society/SocietyCard";
-=======
 import SocietyCard from "../../components/society/SocietyCard";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/societies/SocietyBrowseResults.jsx
 import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import EmptyState from "../../components/common/empty_state/EmptyState";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState";

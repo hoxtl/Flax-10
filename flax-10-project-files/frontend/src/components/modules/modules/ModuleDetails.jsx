@@ -6,11 +6,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Modules/Modules/ModuleDetails.jsx
-import { formatDate } from '../../Calendar/utils/dateUtils.js';
-=======
 import { formatDate } from '../../calendar/utils/dateUtils.js';
->>>>>>> origin/main:flax-10-project-files/frontend/src/components/modules/modules/ModuleDetails.jsx
 import { getInitials } from '../../Auth/utils/userUtils.js';
 import { useAuth } from '../../../context/AuthContext.jsx';
 import Badge from '../../common/Badge/Badge.jsx';

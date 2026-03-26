@@ -2,11 +2,6 @@
  * GroupWork project row info section.
  */
 
-<<<<<<< HEAD
-=======
-import { Link } from "react-router-dom";
-import Badge from "../../../components/common/Badge/Badge";
->>>>>>> origin/main
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import GroupWorkProjectModuleBadge from "./ProjectModuleBadge";

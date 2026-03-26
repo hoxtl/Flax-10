@@ -4,11 +4,7 @@
 
 import { useState } from "react";
 import { ArrowUpRight, KeyRound, Shield } from "lucide-react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/Admin/AdminPage.jsx
-import { BackToTop } from "../../components/Pagination/Pagination";
-=======
 import { BackToTop } from "../../components/pagination/Pagination";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/admin/AdminPage.jsx
 import Tooltip from "../../components/common/Tooltip/Tooltip";
 import Tabs from "../../components/common/Tabs/Tabs";
 import AppPage from "../../components/common/app_page/AppPage";

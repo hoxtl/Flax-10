@@ -5,17 +5,10 @@
 
 import { useEffect, useState } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/Profile/ProfileCalendar.jsx
-import { addMonths, formatMonthYear, isSameMonth } from "../../components/Calendar/utils/dateUtils";
-import { CalendarNav } from "../../components/Calendar/header/CalendarHeaderUtils";
-import { MonthView } from "../../components/Calendar/month_view/MonthView";
-import { EventPopups } from "../../components/Calendar/EventPopups";
-=======
 import { addMonths, formatMonthYear, isSameMonth } from "../../components/calendar/utils/dateUtils";
 import { CalendarNav } from "../../components/calendar/header/CalendarHeaderUtils";
 import { MonthView } from "../../components/calendar/month_view/MonthView";
 import { EventPopups } from "../../components/calendar/EventPopups";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/profile/ProfileCalendar.jsx
 import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
 import { EventsSummaryModal } from "../../components/Calendar/events_summary_modal/EventsSummaryModal";
 import "../../components/Calendar/calendar-header.css";

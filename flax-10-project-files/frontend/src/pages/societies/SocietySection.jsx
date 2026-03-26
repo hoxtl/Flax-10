@@ -5,17 +5,10 @@
 
 import styles from "./SocietiesPage.module.css";
 import gridStyles from "../../components/common/Card/CardGrid.module.css";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/Societies/SocietySection.jsx
-import SocietyCard from "../../components/Society/SocietyCard";
-import BrowseCard from "../../components/Society/BrowseCard";
-import CreateCard from "../../components/Society/CreateCard";
-import { Pagination } from "../../components/Pagination/Pagination";
-=======
 import SocietyCard from "../../components/society/SocietyCard";
 import BrowseCard from "../../components/society/BrowseCard";
 import CreateCard from "../../components/society/CreateCard";
 import { Pagination } from "../../components/pagination/Pagination";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/societies/SocietySection.jsx
 
 /** Displays a titled collection of societies with optional pagination. */
 

@@ -21,14 +21,9 @@ import {
 import {
     WidgetHeader,
     ShowMoreButton,
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/Modules/ReadingsPanel.jsx
-} from '../../components/Modules/shared/widgetParts.jsx';
-import { TaskInfoModal } from '../Tasks/components/TaskInfoModal';
-=======
 } from '../../components/modules/shared/widgetParts.jsx';
 import { TaskInfoModal } from '../tasks/components/TaskInfoModal';
 import EmptyStateCard from '../homepage/components/EmptyStateCard';
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/modules/ReadingsPanel.jsx
 import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 

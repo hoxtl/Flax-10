@@ -3,11 +3,7 @@
  */
 
 import { useState } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/AddCollaboratorModal.jsx
-import UserSearch from "../Social/UserSearch";
-=======
 import UserSearch from "../social/UserSearch";
->>>>>>> origin/main:flax-10-project-files/frontend/src/components/society/AddCollaboratorModal.jsx
 import Badge from "../common/Badge/Badge";
 import PrimaryButton from "../common/primary_button/PrimaryButton";
 import SearchEmptyState from "../common/search_empty_state/SearchEmptyState";

@@ -3,11 +3,7 @@
  */
 
 import { useEffect, useState } from "react";
-<<<<<<< HEAD
-import { LocationAutocomplete } from "../Calendar/event_modal/components/LocationAutoComplete";
-=======
 import { LocationAutocomplete } from "../calendar/event_modal/components/LocationAutoComplete";
->>>>>>> origin/main
 import Tooltip from "../common/Tooltip/Tooltip";
 import { geocodeAddress } from "../../api/geocodeApi";
 import styles from "./UserJourneySection.module.css";

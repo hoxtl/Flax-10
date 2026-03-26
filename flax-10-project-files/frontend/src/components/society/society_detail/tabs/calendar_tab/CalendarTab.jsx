@@ -3,21 +3,12 @@
  */
 
 import { useState } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tabs/calendar_tab/CalendarTab.jsx
-import styles from "../Tabs.module.css";
-import { MonthView } from "../../../../Calendar/month_view/MonthView";
-import { CalendarNav } from "../../../../Calendar/header/CalendarHeaderUtils";
-import { addMonths, formatMonthYear, isSameMonth } from "../../../../Calendar/utils/dateUtils";
-import { expandRecurringEvents } from "../../../../Calendar/utils/recurrenceUtils";
-import { hasRecurrence, extractBaseEventId } from "../../../../Calendar/utils/eventUtils";
-=======
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../calendar/month_view/MonthView";
 import { CalendarNav } from "../../../../calendar/header/CalendarHeaderUtils";
 import { addMonths, formatMonthYear, isSameMonth } from "../../../../calendar/utils/dateUtils";
 import { expandRecurringEvents } from "../../../../calendar/utils/recurrenceUtils";
 import { hasRecurrence, extractBaseEventId } from "../../../../calendar/utils/eventUtils";
->>>>>>> origin/main:flax-10-project-files/frontend/src/components/society/society_detail/tabs/calendar_tab/CalendarTab.jsx
 import { CalendarProvider, useEventModal } from "../../../../../context/CalendarContext";
 import { EventModal } from "../../../../Calendar/event_modal/EventModal";
 import TagFilterBar from "../../Tags/TagFilterBar";

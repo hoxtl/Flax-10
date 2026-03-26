@@ -1,9 +1,5 @@
 import Card from "../../../../components/common/Card/Card";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/Profile/components/widgets/FocusHeatmap.jsx
-import StudyHeatmap from "../../../../components/Analytics/StudyHeatmap";
-=======
 import StudyHeatmap from "../../../../components/analytics/StudyHeatmap";
->>>>>>> origin/main:flax-10-project-files/frontend/src/pages/profile/components/widgets/FocusHeatmap.jsx
 import widgetStyles from "./ProfileWidgets.module.css";
 import attendanceStyles from "./ProfileAttendance.module.css";
 import { buildButtonActionProps, buildNavigateAction } from "./widgetActionProps";

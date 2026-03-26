@@ -3,11 +3,7 @@
  */
 
 import { useState } from 'react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Timer/sections/RightPanel.jsx
-import styles from '../../../pages/Timer/TimerPage.module.css';
-=======
 import styles from '../../../pages/timer/TimerPage.module.css';
->>>>>>> origin/main:flax-10-project-files/frontend/src/components/timer/sections/RightPanel.jsx
 import Tabs from '../../common/Tabs/Tabs';
 import InlineSoundPanel from '../InlineSoundPanel';
 import RightRailHistoryPanel from '../RightRailHistoryPanel';
