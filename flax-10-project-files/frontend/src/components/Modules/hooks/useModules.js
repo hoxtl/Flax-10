@@ -68,12 +68,17 @@ function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule,
     .finally(() => setLoading(false));
 }
 
+async function safeRefreshTags(refreshTags) {
+  if (!refreshTags) return;
+  await refreshTags().catch(() => {});
+}
+
 async function handleEnrollment(module, setEnrollments, notify, refreshTags) {
   try {
     const new_enrollment = await enrollInModule(module.id);
     setEnrollments(prev => [...prev, new_enrollment]);
     notify(`Successfully enrolled in ${module.module_name}! Check your calendar for any updates.`, 'success');
-    if (refreshTags) await refreshTags().catch(() => {});
+    await safeRefreshTags(refreshTags);
   } catch (err) {
     notify(err.message, 'error');
   }
@@ -93,7 +98,7 @@ async function handleDisenrol(module, enrollments, setEnrollments, notify, refre
     await disenrolFromModule(enrollment_id);
     setEnrollments(prev => prev.filter(e => e.id !== enrollment_id));
     notify(`Unenrolled from ${module.module_name}!`, 'success');
-    if (refreshTags) await refreshTags().catch(() => {});
+    await safeRefreshTags(refreshTags);
   } catch (err) {
     handleDisenrolError(err, module, setEnrollments, notify);
   }
