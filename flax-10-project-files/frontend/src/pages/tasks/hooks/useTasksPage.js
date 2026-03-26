@@ -20,8 +20,9 @@ function useTasksPageState(searchParams, setSearchParams) {
   const [toastUndo, setToastUndo] = useState(null);
   const [toastDelete, setToastDelete] = useState(false);
   const [toastInfo, setToastInfo] = useState(null);
+  const [toastError, setToastError] = useState(null);
   const openedFullPlanningFromUrl = useRef(false);
-  return { activeListId, setActiveListId, filterListIds, setFilterListIds, activeFilter, setActiveFilter, showTaskModal, setShowTaskModal, taskModalDueDate, setTaskModalDueDate, showListModal, setShowListModal, showCreateListFromTask, setShowCreateListFromTask, lastCreatedListId, setLastCreatedListId, toastUndo, setToastUndo, toastDelete, setToastDelete, toastInfo, setToastInfo, openedFullPlanningFromUrl, searchParams, setSearchParams };
+  return { activeListId, setActiveListId, filterListIds, setFilterListIds, activeFilter, setActiveFilter, showTaskModal, setShowTaskModal, taskModalDueDate, setTaskModalDueDate, showListModal, setShowListModal, showCreateListFromTask, setShowCreateListFromTask, lastCreatedListId, setLastCreatedListId, toastUndo, setToastUndo, toastDelete, setToastDelete, toastInfo, setToastInfo, toastError, setToastError, openedFullPlanningFromUrl, searchParams, setSearchParams };
 }
 
 function useListParamEffect(searchParams, setActiveListId) {

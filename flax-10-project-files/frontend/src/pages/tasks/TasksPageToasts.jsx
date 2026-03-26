@@ -36,12 +36,18 @@ function InfoToastItem(props) {
   return <AppToast message={props.toastInfo} onClose={() => props.setToastInfo(null)} variant={getToastVariant(props.toastInfo)} />;
 }
 
+function ErrorToastItem(props) {
+  if (!props.toastError) return null;
+  return <AppToast message={props.toastError} onClose={() => props.setToastError(null)} variant="error" />;
+}
+
 export default function TasksPageToasts(props) {
   return (
     <AnimatePresence initial={false}>
       <UndoToastItem key="undo" {...props} />
       <DeleteToastItem key="delete" {...props} />
       <InfoToastItem key="info" {...props} />
+      <ErrorToastItem key="error" {...props} />
     </AnimatePresence>
   );
 }

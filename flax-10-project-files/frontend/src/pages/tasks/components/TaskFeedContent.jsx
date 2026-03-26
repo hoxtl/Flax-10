@@ -22,6 +22,7 @@ function FeedSubHeader({ props, vm }) {
       activeFilter={props.activeFilter}
       defaultDueDateForNewTask={props.defaultDueDateForNewTask}
       onAddTask={props.onAddTask}
+      onListError={props.onListError}
       onCreateTask={props.onCreateTask}
       onOpenLists={() => vm.setShowMobileLists(true)}
       onSelectFilter={props.onSelectFilter || vm.sidebarProps.onSelectFilter}

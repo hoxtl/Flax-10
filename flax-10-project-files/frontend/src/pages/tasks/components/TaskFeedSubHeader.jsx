@@ -95,6 +95,7 @@ function CreateBar(props) {
         defaultListId={props.activeListId}
         defaultDueDate={props.defaultDueDateForNewTask}
         onAddTask={props.onAddTask}
+        onError={props.onListError}
       />
     </div>
   );

@@ -88,13 +88,13 @@ function useClickOutsideEffect(inputFocused, cardRef, inputRef, externalInputRef
   }, [inputFocused, cardRef, inputRef, externalInputRef, setInputFocused]);
 }
 
-function useCreateTaskBarHandlers(state, onAddTask) {
+function useCreateTaskBarHandlers(state, onAddTask, onError) {
   const doAdd = (taskTitle) => runQuickAdd(state, onAddTask, taskTitle);
   const handleSubmit = async (event) => {
     event?.preventDefault();
     const title = state.title.trim();
     if (!title || state.saving || !onAddTask) return;
-    if (!state.taskListId) { state.setListError(true); return; }
+    if (!state.taskListId) { state.setListError(true); onError?.("Please select a list before adding a task."); return; }
     state.setListError(false);
     if (state.defaultDueDate) state.checkSleepAndRun(state.defaultDueDate, () => doAdd(title));
     else await doAdd(title);
@@ -138,13 +138,13 @@ function useCreateTaskBarOptions(state) {
 }
 
 export default function useCreateTaskBar(props) {
-  const { lists = [], defaultListId, defaultDueDate, onAddTask, inputRef: externalInputRef } = props;
+  const { lists = [], defaultListId, defaultDueDate, onAddTask, onError, inputRef: externalInputRef } = props;
   const state = useCreateTaskBarFormState(lists, defaultListId, defaultDueDate);
   useEnrolledModulesEffect(state.setEnrolledModules);
   useSleepSettingsEffect(state.setSleepSettings);
   useTaskListIdSync(state.defaultListId, state.sortedLists, state.setTaskListId, state.setListError);
   useClickOutsideEffect(state.inputFocused, state.cardRef, state.inputRef, externalInputRef, state.setInputFocused);
-  const { handleSubmit } = useCreateTaskBarHandlers(state, onAddTask);
+  const { handleSubmit } = useCreateTaskBarHandlers(state, onAddTask, onError);
   const { handleInputBlur, handleInputKeyDown } = useCreateTaskBarInputHandlers(state);
   const { moduleOptions, listOptions } = useCreateTaskBarOptions(state);
   const selectedList = state.sortedLists.find(l => String(l.id) === (state.taskListId));  
