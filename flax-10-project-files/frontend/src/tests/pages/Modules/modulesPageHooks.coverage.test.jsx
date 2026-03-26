@@ -1,3 +1,7 @@
+/**
+ * Covers state syncing and reset paths for module page hooks.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -31,6 +35,30 @@ function wrapper({ children }) {
 function routerWrapper(initialEntry) {
   return ({ children }) => <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>;
 }
+
+function seedModulePageState(result) {
+  act(() => {
+    result.current.setShowForm(true);
+    result.current.setEditingModule({ id: 2 });
+    result.current.setViewingModule({ id: 1 });
+    result.current.setDeadlineModule({ id: 1 });
+    result.current.setReadingModule({ id: 1 });
+    result.current.setSearchQuery("AA200");
+    result.current.setFilterMode("enrolled");
+  });
+}
+
+function expectResetModuleState(state) {
+  expect(state.showForm).toBeNull();
+  expect(state.editingModule).toBeNull();
+  expect(state.viewingModule).toBeNull();
+  expect(state.deadlineModule).toBeNull();
+  expect(state.readingModule).toBeNull();
+  expect(state.searchQuery).toBe("");
+  expect(state.filterMode).toBe("all");
+}
+
+const dispatchShowAll = () => window.dispatchEvent(new Event("modules:show-all"));
 
 describe("modulesPageHooks coverage", () => {
   beforeEach(() => {
@@ -187,11 +215,9 @@ describe("modulesPageHooks coverage", () => {
     const { result } = renderHook(() => useModulesPageState("", false), {
       wrapper: routerWrapper("/modules?filter=enrolled"),
     });
-
     await waitFor(() => expect(result.current.filterMode).toBe("enrolled"));
-    setupTestState(result.current);
-    act(() => window.dispatchEvent(new Event("modules:show-all")));
-
-    await waitFor(() => verifyResetState(result.current));
+    seedModulePageState(result);
+    act(dispatchShowAll);
+    await waitFor(() => expectResetModuleState(result.current));
   });
 });

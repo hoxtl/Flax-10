@@ -9,9 +9,10 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 
-from ..base import BaseTestCase
+from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Module, Enrollment, CalendarEvent, Deadline, User
 from studyFlax.models.auth.user_settings_model import UserSettings
+
 
 class EnrollmentViewTests(BaseTestCase):
     """Tests for enrollment views."""
@@ -47,13 +48,13 @@ class EnrollmentViewTests(BaseTestCase):
         self.user.save()
         response=self.client.post('/api/enrollments/', {'module': self.module.id}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_list_enrollments(self):
         Enrollment.objects.create(student=self.user, module=self.module)
         response = self.client.get('/api/enrollments/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-    
+
     def test_student_can_disenroll(self):
         enrollment = Enrollment.objects.create(student=self.user, module=self.module)
         response = self.client.delete(f'/api/enrollments/{enrollment.id}/')

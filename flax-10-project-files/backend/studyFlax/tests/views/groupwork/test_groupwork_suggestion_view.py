@@ -1,3 +1,7 @@
+"""
+Tests for groupwork suggestion views.
+"""
+
 from datetime import timedelta
 
 from django.utils import timezone
@@ -8,8 +12,8 @@ from studyFlax.models.groupwork.groupwork_model import (
     GroupProject,
     MeetingSuggestion,
 )
-from studyFlax.tests.helpers.base import BaseTestCase
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
+from studyFlax.tests.helpers.test_model_builders import make_user
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -19,6 +23,7 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 
 class SuggestionViewTests(BaseTestCase):
+    """Tests suggestion view."""
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)

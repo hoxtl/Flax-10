@@ -1,6 +1,12 @@
+/**
+ * Covers ProfileModals visibility and interaction branches.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProfileModals from '../../../pages/Profile/ProfileModals';
+
+import { createFnMap } from '../../utils/testBuilderUtils';
 
 vi.mock('../../../components/Dashboard/EditProfileModal', () => ({
     default: ({ isOpen, onClose }) =>
@@ -33,25 +39,21 @@ vi.mock('../../../api/socialApi', () => ({
     getSharedWithMe: vi.fn().mockResolvedValue([]),
 }));
 
+const modalStateDefaults = {
+    showEditProfile: false,
+    profileData: { id: 1 },
+    showModules: false,
+    showTasks: false,
+    showSharedWith: false,
+    showSharedBy: false,
+    showEvents: false,
+    eventRange: 'week',
+};
+
 function makeState(overrides = {}) {
     return {
-        showEditProfile: false,
-        setShowEditProfile: vi.fn(),
-        handleSaveProfile: vi.fn(),
-        profileData: { id: 1 },
-        showModules: false,
-        setShowModules: vi.fn(),
-        showTasks: false,
-        setShowTasks: vi.fn(),
-        showSharedWith: false,
-        setShowSharedWith: vi.fn(),
-        showSharedBy: false,
-        setShowSharedBy: vi.fn(),
-        showEvents: false,
-        setShowEvents: vi.fn(),
-        eventRange: 'week',
-        setEventRange: vi.fn(),
-        reload: vi.fn(),
+        ...modalStateDefaults,
+        ...createFnMap(['setShowEditProfile', 'handleSaveProfile', 'setShowModules', 'setShowTasks', 'setShowSharedWith', 'setShowSharedBy', 'setShowEvents', 'setEventRange', 'reload']),
         ...overrides,
     };
 }

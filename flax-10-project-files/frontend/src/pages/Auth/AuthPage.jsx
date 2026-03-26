@@ -6,7 +6,7 @@ import styles from "./AuthPage.module.css";
 import { useAuthPage } from "./hooks/useAuthPage";
 import { useAuthPageScroll } from "./hooks/useAuthPageScroll";
 import { useAuthLandingSections } from "./hooks/useAuthLandingSections";
-import { AuthFooter } from "../../components/Authentication/AuthBranding";
+import { AuthFooter } from "../../components/Auth/AuthBranding";
 import StudyFlaxLandingPage from "../../components/ui/landing-page";
 import { PageTransition } from "../../components/common";
 

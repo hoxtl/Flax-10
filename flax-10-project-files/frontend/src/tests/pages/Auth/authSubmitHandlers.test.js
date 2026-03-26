@@ -16,7 +16,7 @@ const {
 }));
 
 vi.mock("../../../api/authApi", () => ({ authService }));
-vi.mock("../../../components/Authentication/utils/authHelpers", () => ({
+vi.mock("../../../components/Auth/utils/authHelpers", () => ({
   getErrorMessage,
   saveUserData,
   validatePasswords,

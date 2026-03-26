@@ -9,12 +9,12 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory
 
-from ..base import BaseTestCase
+from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Enrollment, Module, Notification, User
 from studyFlax.serialisers import ModuleSerialiser
 
-class ModuleViewTests(BaseTestCase):
 
+class ModuleViewTests(BaseTestCase):
     """Tests for module view."""
 
     def setUp(self):
@@ -186,6 +186,8 @@ class ModuleSerialiserTests(TestCase):
         serializer = ModuleSerialiser()
 
         class FakeModule:
+            """Fake module stub."""
+
             @property
             def created_by(self):
                 raise Exception("RelatedObjectDoesNotExist")
@@ -197,6 +199,8 @@ class ModuleSerialiserTests(TestCase):
         serializer = ModuleSerialiser()
 
         class FakeModule:
+            """Fake module stub."""
+
             @property
             def created_by(self):
                 raise Exception("RelatedObjectDoesNotExist")

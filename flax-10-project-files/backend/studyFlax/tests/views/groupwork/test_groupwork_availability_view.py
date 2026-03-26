@@ -1,7 +1,11 @@
+"""
+Tests for groupwork availability views.
+"""
+
 from rest_framework import status
 
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
-from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -11,6 +15,7 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 
 class GroupAvailabilityTests(BaseTestCase):
+    """Tests group availability."""
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -38,7 +43,7 @@ class GroupAvailabilityTests(BaseTestCase):
 
 
 class AvailabilityViewHelperTest(BaseTestCase):
-
+    """Tests availability view helper."""
     def test_get_profile_photo_url_returns_none_on_exception(self):
         from studyFlax.views.groupwork.availability_view import _get_profile_photo_url
         from unittest.mock import MagicMock, PropertyMock

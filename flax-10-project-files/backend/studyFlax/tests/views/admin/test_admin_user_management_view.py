@@ -7,12 +7,14 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
+from studyFlax.tests.helpers.test_model_builders import make_user, make_superuser, authed_client
+
 
 User = get_user_model()
 
 
 class AdminUserListTest(TestCase):
+    """Tests admin user list."""
     def setUp(self):
         self.admin = make_superuser()
         self.url = '/api/admin/users/'
@@ -46,6 +48,7 @@ class AdminUserListTest(TestCase):
 
 
 class AdminBanUserTest(TestCase):
+    """Tests admin ban user."""
     def setUp(self):
         self.admin = make_superuser()
         self.target = make_user('target')

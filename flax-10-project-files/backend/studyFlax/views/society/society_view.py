@@ -19,6 +19,7 @@ from .helpers import (
 )
 from .notification_helpers import build_update_notification
 
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def society_list(request):
@@ -29,6 +30,7 @@ def society_list(request):
 def get_societies(request):
     societies = Society.objects.all()
     data = build_society_list_data(societies, request)
+
     return Response(data)
 
 def build_society_list_data(societies, request):
@@ -38,15 +40,16 @@ def build_society_list_data(societies, request):
         membership = get_membership(request.user, society)
         society_data['is_member'] = membership is not None
         society_data['is_admin'] = membership.is_admin if membership else False
+
         result.append(society_data)
     return result
 
 def create_society(request):
     payload, errors, status_code = create_society_result(request)
+
     if errors:
         return Response(errors, status=status_code)
     return Response(payload, status=status_code)
-
 
 def create_society_result(request):
     data = request.data.copy()
@@ -55,6 +58,7 @@ def create_society_result(request):
     serialiser = SocietyListSerialiser(data=data, context={'request': request})
     if not serialiser.is_valid():
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
+
     society = serialiser.save()
     handle_image_urls(society, request.data)
     SocietyMembership.objects.create(user=request.user, society=society, role='admin')
@@ -65,18 +69,18 @@ def create_society_result(request):
 def publish_changes(request, society_id):
     society = get_society_or_404(society_id)
     if not society:
+
         return society_not_found_response()
     permission_response = _publish_permission_error(request.user, society)
     if permission_response:
         return permission_response
-    return Response(_publish_changes_result(society, request.data))
 
+    return Response(_publish_changes_result(society, request.data))
 
 def _publish_permission_error(user, society):
     if is_society_admin(user, society):
         return None
     return permission_denied_response()
-
 
 def _publish_changes_result(society, changes):
     notification = build_update_notification(society, changes)

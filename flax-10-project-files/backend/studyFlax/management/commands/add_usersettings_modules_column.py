@@ -1,15 +1,11 @@
 """
-Add UserSettings.modules column if missing.
-
-Use when the DB is missing the column (e.g. migration 0005 was recorded but not applied).
-Uses the same database as runserver. Run from backend dir:
-
-    python manage.py add_usersettings_modules_column
+Management command for adding the UserSettings modules column.
 """
 
 from django.core.management.base import BaseCommand
 from django.db import connection
 from studyFlax.models.auth.user_settings_model import UserSettings
+
 
 def _column_exists(cursor, table):
     cursor.execute(
@@ -34,6 +30,8 @@ def _apply_migration(cursor, table, stdout, style):
     stdout.write(style.SUCCESS(f"Added column {table}.modules."))
 
 class Command(BaseCommand):
+    """Add the missing `modules` column to `UserSettings` when needed."""
+
     help = "Add studyFlax_usersettings.modules column if missing (safe to run multiple times)."
 
     def handle(self, *args, **options):

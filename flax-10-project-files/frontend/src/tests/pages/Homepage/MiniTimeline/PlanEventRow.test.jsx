@@ -1,5 +1,10 @@
+/**
+ * Covers PlanEventRow interactions and display states.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { createFnMap } from '../../../utils/testBuilderUtils';
 
 vi.mock('react-router-dom', () => ({
     Link: ({ children, to }) => <a href={to}>{children}</a>,
@@ -72,32 +77,39 @@ const baseRow = {
     endMins: 600,
 };
 
+const rowActionNames = [
+    'setConflictPopoverRowId',
+    'onConflictAutoMove',
+    'onPushTomorrow',
+    'onEdit',
+    'onCardClick',
+    'onEventContextMenu',
+    'onTaskToggle',
+    'onToggleComplete',
+    'onReschedule',
+];
+
+const baseRenderProps = {
+    row: baseRow,
+    rows: [baseRow],
+    conflictPopoverRowId: null,
+    conflictPopoverRef: { current: null },
+    completedEventIds: [],
+    selectedDate: new Date('2024-03-04'),
+    isToday: true,
+    getTag: vi.fn(() => null),
+    styles: mockStyles,
+    sleepWindow: null,
+};
+
+const buildRowProps = (overrides = {}) => ({
+    ...baseRenderProps,
+    ...createFnMap(rowActionNames),
+    ...overrides,
+});
+
 function renderRow(props = {}) {
-    return render(
-        <PlanEventRow
-            row={baseRow}
-            rows={[baseRow]}
-            taskLists={[]}
-            conflictPopoverRowId={null}
-            conflictPopoverRef={{ current: null }}
-            setConflictPopoverRowId={vi.fn()}
-            onConflictAutoMove={vi.fn()}
-            onPushTomorrow={vi.fn()}
-            onEdit={vi.fn()}
-            onCardClick={vi.fn()}
-            onEventContextMenu={vi.fn()}
-            onTaskToggle={vi.fn()}
-            onToggleComplete={vi.fn()}
-            onReschedule={vi.fn()}
-            completedEventIds={[]}
-            selectedDate={new Date('2024-03-04')}
-            isToday={true}
-            getTag={vi.fn(() => null)}
-            styles={mockStyles}
-            sleepWindow={null}
-            {...props}
-        />
-    );
+    return render(<PlanEventRow taskLists={[]} {...buildRowProps(props)} />);
 }
 
 describe('PlanEventRow', () => {

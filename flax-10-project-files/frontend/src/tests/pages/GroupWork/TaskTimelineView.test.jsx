@@ -1,3 +1,7 @@
+/**
+ * Exercises TaskTimelineView cards and drag-and-drop state wiring.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
@@ -55,6 +59,19 @@ const members = [
 ];
 
 const createTransfer = () => ({ setData: vi.fn() });
+const dayMs = 86400000;
+const timelineWeeks = [
+  { id: "wk-1", label: "Week 1 (1 Mar - 6 Mar)", startTs: 1000 },
+  { id: "wk-2", label: "Week 2 (8 Mar - 13 Mar)", startTs: 2000 },
+  { id: "wk-3", label: "Week 3 (15 Mar - 20 Mar)", startTs: 3000 },
+  { id: "wk-4", label: "Later", startTs: 4000 },
+];
+const placedTasks = {
+  "wk-1": [[], [{ id: 11, title: "Timeline task", priority: "urgent", assignees_info: [] }], [], [], [], []],
+  "wk-2": [[], [], [], [], [], []],
+  "wk-3": [[], [], [], [], [], []],
+  "wk-4": [[], [], [], [], [], []],
+};
 
 const buildTimelineTask = () => ({ id: 7, title: "Write essay", priority: "high" });
 
@@ -96,43 +113,26 @@ const renderUnscheduledCard = (props = {}) => {
   return { onUpdate, onDelete };
 };
 
+const visibleWeeks = (page) => (page === 0 ? timelineWeeks.slice(0, 3) : timelineWeeks.slice(3));
+
+const buildTimelineState = (page) => ({
+  dayMs,
+  placed: placedTasks,
+  unscheduled: page === 0 ? [{ id: 12, title: "Loose task", assignees_info: [] }] : [],
+  visible: visibleWeeks(page),
+  weeks: timelineWeeks,
+});
+
 const setupTimelineMocks = () => {
   const handlers = {
-    dayMs: 86400000,
+    dayMs,
     onDragLeave: vi.fn(),
     onDragOver: vi.fn(),
     onDrop: vi.fn(),
     onDropWidget: vi.fn(),
   };
   useDragHandlersMock.mockReturnValue(handlers);
-  useTaskTimelineStateMock.mockImplementation((tasks, page) => {
-    const weeks = [
-      { id: "wk-1", label: "Week 1 (1 Mar - 6 Mar)", startTs: 1000 },
-      { id: "wk-2", label: "Week 2 (8 Mar - 13 Mar)", startTs: 2000 },
-      { id: "wk-3", label: "Week 3 (15 Mar - 20 Mar)", startTs: 3000 },
-      { id: "wk-4", label: "Later", startTs: 4000 },
-    ];
-    const visible = page === 0 ? weeks.slice(0, 3) : weeks.slice(3);
-    return {
-      dayMs: 86400000,
-      placed: {
-        "wk-1": [
-          [],
-          [{ id: 11, title: "Timeline task", priority: "urgent", assignees_info: [] }],
-          [],
-          [],
-          [],
-          [],
-        ],
-        "wk-2": [[], [], [], [], [], []],
-        "wk-3": [[], [], [], [], [], []],
-        "wk-4": [[], [], [], [], [], []],
-      },
-      unscheduled: page === 0 ? [{ id: 12, title: "Loose task", assignees_info: [] }] : [],
-      visible,
-      weeks,
-    };
-  });
+  useTaskTimelineStateMock.mockImplementation((_tasks, page) => buildTimelineState(page));
   return handlers;
 };
 

@@ -6,7 +6,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.tests.helpers.factories import make_task, make_user
+from studyFlax.tests.helpers.test_model_builders import make_task, make_user
 
 
 class LogTaskTimeViewTest(TestCase):

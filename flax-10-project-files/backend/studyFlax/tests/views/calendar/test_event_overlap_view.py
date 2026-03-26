@@ -3,8 +3,8 @@ Backend tests for event overlap constraints.
 """
 
 from rest_framework import status
-from ..base import BaseEventTestCase
-from ..fixtures import get_datetime_str
+from ...helpers.test_case_support import BaseEventTestCase
+from ...helpers.test_fixture_builders import get_datetime_str
 
 
 class EventCreateOverlapLimitTests(BaseEventTestCase):

@@ -1,6 +1,13 @@
+/**
+ * Verifies the modal props forwarded by SocietyDetailPage.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+
+import { mergeNested } from "../utils/testBuilderUtils";
+import { buildPageData } from "./societyDetailPageTestUtils";
 
 const useSocietyPageDataMock = vi.fn();
 
@@ -77,67 +84,29 @@ vi.mock("../../components/common/BackButton/BackButton.jsx", () => ({
 
 import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
+const modalDataDefaults = {
+  society: {
+    name: "Drama Society",
+    role: "editor",
+    is_admin: true,
+    images: [{ url: "cover-1" }, { url: "cover-2" }],
+    tags: ["arts", "events"],
+    ratification_status: "pending",
+    is_ratified: false,
+  },
+  members: [{ id: 1 }, { id: 2 }],
+  modals: {
+    showSettings: true,
+    showReportModal: true,
+    galleryOpen: { index: 1 },
+    showCoverModal: true,
+    showMembersModal: true,
+    editingAnnouncement: { id: 9 },
+  },
+};
+
 function buildData(overrides = {}) {
-  return {
-    loading: false,
-    society: {
-      id: 1,
-      name: "Drama Society",
-      role: "editor",
-      is_admin: true,
-      has_reported: false,
-      images: [{ url: "cover-1" }, { url: "cover-2" }],
-      announcements: [],
-      tags: ["arts", "events"],
-      ratification_status: "pending",
-      is_ratified: false,
-      ...overrides.society,
-    },
-    members: [{ id: 1 }, { id: 2 }],
-    page: { activeTab: "calendar", handleTabChange: vi.fn(), focusAnnouncementId: null },
-    modals: {
-      showSettings: true,
-      setShowSettings: vi.fn(),
-      showReportModal: true,
-      setShowReportModal: vi.fn(),
-      galleryOpen: { index: 1 },
-      setGalleryOpen: vi.fn(),
-      showCoverModal: true,
-      setShowCoverModal: vi.fn(),
-      showMembersModal: true,
-      setShowMembersModal: vi.fn(),
-      editingAnnouncement: { id: 9 },
-      setEditingAnnouncement: vi.fn(),
-      editMode: false,
-      setEditMode: vi.fn(),
-      ...overrides.modals,
-    },
-    subscription: { isSubscribed: false, toggleSubscription: vi.fn() },
-    tracker: { hasChanges: vi.fn(() => false), getChangeSummary: vi.fn(() => []), resetChanges: vi.fn() },
-    updateSociety: vi.fn(),
-    updateLocalSociety: vi.fn(),
-    fetchMembers: vi.fn(),
-    removeMember: vi.fn(),
-    deleteSociety: vi.fn(),
-    updateAnnouncement: vi.fn(),
-    addAnnouncement: vi.fn(),
-    deleteAnnouncement: vi.fn(),
-    addCollaborator: vi.fn(),
-    requestRatification: vi.fn(),
-    updateMemberRole: vi.fn(),
-    publishChanges: vi.fn(),
-    addEvent: vi.fn(),
-    updateEvent: vi.fn(),
-    deleteEvent: vi.fn(),
-    addException: vi.fn(),
-    onAddTag: vi.fn(),
-    onDeleteTag: vi.fn(),
-    onUpdateTag: vi.fn(),
-    joinSociety: vi.fn(),
-    leaveSociety: vi.fn(),
-    handleUnreport: vi.fn(),
-    ...overrides,
-  };
+  return buildPageData(mergeNested(modalDataDefaults, overrides, ["society", "modals"]));
 }
 
 describe("SocietyDetailPage modal props", () => {

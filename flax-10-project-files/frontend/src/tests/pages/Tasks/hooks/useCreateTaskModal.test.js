@@ -1,3 +1,7 @@
+/**
+ * Covers create-task modal defaults, async loading, and save guards.
+ */
+
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -25,20 +29,28 @@ import { getEnrollments, getModules } from "../../../../api/moduleApi";
 import { getUserSettings } from "../../../../api/userApi";
 import { runCreateTaskSave } from "../../../../pages/Tasks/utils/createTaskModalUtils";
 
+const defaultLists = [
+  { id: 1, name: "Inbox" },
+  { id: 2, name: "CS101 - Systems" },
+];
+
+const defaultModules = [
+  { id: 22, module_code: "KCL2", module_name: "Beta" },
+  { id: 11, module_code: "KCL1", module_name: "Alpha" },
+];
+
+const baseModalProps = {
+  lists: defaultLists,
+  modules: defaultModules,
+  defaultListId: "1",
+  defaultDueDate: "2026-03-08T12:00",
+  mode: "create",
+  showAddToScheduleToggle: true,
+};
+
 function buildProps(overrides = {}) {
   return {
-    lists: [
-      { id: 1, name: "Inbox" },
-      { id: 2, name: "CS101 - Systems" },
-    ],
-    modules: [
-      { id: 22, module_code: "KCL2", module_name: "Beta" },
-      { id: 11, module_code: "KCL1", module_name: "Alpha" },
-    ],
-    defaultListId: "1",
-    defaultDueDate: "2026-03-08T12:00",
-    mode: "create",
-    showAddToScheduleToggle: true,
+    ...baseModalProps,
     onSave: vi.fn().mockResolvedValue({ id: 9 }),
     onClose: vi.fn(),
     onOpenCreateList: vi.fn(),

@@ -9,6 +9,7 @@ from .society_event_model import SocietyEvent, RECURRENCE_CHOICES
 from .society_calendar_sync_model import SocietyCalendarSync
 from .society_report_model import SocietyReport
 
+
 _ = (
     Society,
     SocietyMembership,

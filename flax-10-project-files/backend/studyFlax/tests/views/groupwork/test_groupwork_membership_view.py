@@ -1,3 +1,7 @@
+"""
+Tests for groupwork membership views.
+"""
+
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -8,8 +12,8 @@ from studyFlax.models.groupwork.groupwork_model import (
     GroupMembership,
     GroupProject,
 )
-from studyFlax.tests.helpers.base import BaseTestCase
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
+from studyFlax.tests.helpers.test_model_builders import make_user
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -19,6 +23,7 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 
 class GroupProjectMembersTests(BaseTestCase):
+    """Tests group project members."""
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -59,6 +64,7 @@ class GroupProjectMembersTests(BaseTestCase):
 
 
 class GroupProjectMemberDetailTests(BaseTestCase):
+    """Tests group project member detail."""
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)

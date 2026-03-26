@@ -10,6 +10,7 @@ from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSer
 from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
 from studyFlax.views.user.settings_view import get_or_create_user_settings
 
+
 def update_user_name(user, data):
     if 'first_name' in data:
         user.first_name = data['first_name']

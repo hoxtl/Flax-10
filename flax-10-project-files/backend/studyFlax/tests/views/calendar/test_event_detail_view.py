@@ -3,8 +3,8 @@ Tests for event detail view edge cases: locked events, overlap limits, and CRUD.
 """
 
 from rest_framework import status
-from studyFlax.tests.helpers.base import BaseEventTestCase
-from studyFlax.tests.helpers.fixtures import create_simple_event, get_datetime_str
+from studyFlax.tests.helpers.test_case_support import BaseEventTestCase
+from studyFlax.tests.helpers.test_fixture_builders import create_simple_event, get_datetime_str
 
 
 class LockedEventUpdateTests(BaseEventTestCase):

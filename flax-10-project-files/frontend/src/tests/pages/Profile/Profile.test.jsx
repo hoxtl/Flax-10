@@ -7,6 +7,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Profile from '../../../pages/Profile/Profile';
 
+import { createFnMap } from '../../utils/testBuilderUtils';
+
 // Mock hooks
 vi.mock('../../../pages/Profile/hooks/useProfile', () => ({
   useProfileState: vi.fn(),
@@ -80,28 +82,23 @@ const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 
 const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', year: 'Year 2', major: 'Physics', module_count: 3 };
 const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones', year: 'Year 3', major: 'Chemistry' };
 
-const makeProfileState = (overrides = {}) => ({
+const profileStateDefaults = {
   loading: false,
   profileData: defaultProfileData,
   events: [],
   viewedUserId: 1,
-  onNavChange: vi.fn(),
   showEditProfile: false,
-  setShowEditProfile: vi.fn(),
   showModules: false,
-  setShowModules: vi.fn(),
   showTasks: false,
-  setShowTasks: vi.fn(),
   showSharedWith: false,
-  setShowSharedWith: vi.fn(),
   showSharedBy: false,
-  setShowSharedBy: vi.fn(),
   showEvents: false,
-  setShowEvents: vi.fn(),
   eventRange: 'week',
-  setEventRange: vi.fn(),
-  reload: vi.fn(),
-  handleSaveProfile: vi.fn(),
+};
+
+const makeProfileState = (overrides = {}) => ({
+  ...profileStateDefaults,
+  ...createFnMap(['onNavChange', 'setShowEditProfile', 'setShowModules', 'setShowTasks', 'setShowSharedWith', 'setShowSharedBy', 'setShowEvents', 'setEventRange', 'reload', 'handleSaveProfile']),
   ...overrides,
 });
 

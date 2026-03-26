@@ -2,7 +2,7 @@
 /**
  * Code Quality Checker - BAND V COMPLIANCE
  * Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file
- * Test files: ≤25 lines for test functions | ≤1 nesting
+ * Test helpers: ≤20 lines | Test functions: ≤25 lines | ≤1 nesting
  */
 
 const fs = require("fs");
@@ -23,7 +23,7 @@ function printHeader() {
   console.log(`${Colors.BOLD}${Colors.MAGENTA}${"BAND V CODE QUALITY REPORT - JAVASCRIPT".padStart(50)}${Colors.END}`);
   console.log("=".repeat(75));
   console.log("Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file");
-  console.log("Test files: ≤25 lines for test functions | ≤1 nesting\n");
+  console.log("Test helpers: ≤20 lines | test functions: ≤25 lines | ≤1 nesting\n");
 }
 
 function printSection(number, title) {
@@ -44,26 +44,30 @@ function isTestFile(filePath) {
   return (
     filePath.includes("/__tests__/") ||
     filePath.includes("/tests/") ||
-    /\.(test|spec)\.(js|jsx)$/.test(filePath)
+    /\.(test|spec)\.(js|jsx|ts|tsx)$/.test(filePath)
   );
 }
 
+function getCallbackCalleeName(fnPath) {
+  if (fnPath.parent.type !== "CallExpression") return null;
+  const { callee } = fnPath.parent;
+  if (callee.type === "Identifier") return callee.name;
+  if (callee.type === "MemberExpression" && callee.object.type === "Identifier") {
+    return callee.object.name;
+  }
+  return null;
+}
+
 function isOrganizationalCallback(fnPath) {
-  if (fnPath.parent.type !== "CallExpression") return false;
-  const callee = fnPath.parent.callee;
   const orgFns = ["describe", "beforeEach", "afterEach", "beforeAll", "afterAll", "context"];
-  if (callee.type === "Identifier" && orgFns.includes(callee.name)) return true;
-  if (callee.type === "MemberExpression" && callee.object.type === "Identifier" && orgFns.includes(callee.object.name)) return true;
-  return false;
+  const calleeName = getCallbackCalleeName(fnPath);
+  return calleeName ? orgFns.includes(calleeName) : false;
 }
 
 function shouldCheckTestCallback(fnPath) {
-  if (fnPath.parent.type !== "CallExpression") return false;
-  const callee = fnPath.parent.callee;
   const testFns = ["it", "test"];
-  if (callee.type === "Identifier" && testFns.includes(callee.name)) return true;
-  if (callee.type === "MemberExpression" && callee.object.type === "Identifier" && testFns.includes(callee.object.name)) return true;
-  return false;
+  const calleeName = getCallbackCalleeName(fnPath);
+  return calleeName ? testFns.includes(calleeName) : false;
 }
 
 function countFunctionLines(node) {
@@ -97,6 +101,14 @@ function getFunctionName(fnPath, node) {
   if (fnPath.parent.type === "Property" && fnPath.parent.key.name) return fnPath.parent.key.name;
   if (fnPath.parent.type === "MethodDefinition" && fnPath.parent.key.name) return fnPath.parent.key.name;
   return "anonymous";
+}
+
+function isNamedHelperFunction(fnPath, node) {
+  if (node.id && node.id.name) return true;
+  if (fnPath.parent.type === "VariableDeclarator" && fnPath.parent.id.name) return true;
+  if (fnPath.parent.type === "Property" && fnPath.parent.key.name) return true;
+  if (fnPath.parent.type === "MethodDefinition" && fnPath.parent.key.name) return true;
+  return false;
 }
 
 function getNestingLevel(fnPath, level = 0) {
@@ -139,18 +151,26 @@ function parseFile(filePath) {
 function checkFunctionLength(targetDir) {
   const violations = [];
   walkDir(targetDir, (filePath) => {
-    if (!/\.(js|jsx)$/.test(filePath)) return;
+    if (!/\.(js|jsx|ts|tsx)$/.test(filePath)) return;
     const isTest = isTestFile(filePath);
-    const limit = isTest ? 25 : 20;
     try {
       const ast = parseFile(filePath);
       traverse(ast, {
         "FunctionDeclaration|FunctionExpression|ArrowFunctionExpression"(fnPath) {
+          const isTestFunction = shouldCheckTestCallback(fnPath);
           if (isTest && isOrganizationalCallback(fnPath)) return;
-          if (isTest && !shouldCheckTestCallback(fnPath)) return;
+          if (isTest && !isTestFunction && !isNamedHelperFunction(fnPath, fnPath.node)) return;
+          const limit = isTestFunction ? 25 : 20;
           const lines = countFunctionLines(fnPath.node);
           if (lines > limit) {
-            violations.push({ file: shortenPath(filePath), name: getFunctionName(fnPath, fnPath.node), lines, limit, is_test: isTest });
+            violations.push({
+              file: shortenPath(filePath),
+              name: getFunctionName(fnPath, fnPath.node),
+              lines,
+              limit,
+              is_test: isTest,
+              is_test_function: isTestFunction,
+            });
           }
         },
       });
@@ -164,7 +184,7 @@ function checkFunctionLength(targetDir) {
 function checkFileLength(targetDir) {
   const violations = [];
   walkDir(targetDir, (filePath) => {
-    if (!/\.(js|jsx|css)$/.test(filePath)) return;
+    if (!/\.(js|jsx|ts|tsx|css)$/.test(filePath)) return;
     try {
       const lines = fs.readFileSync(filePath, "utf-8").split("\n").length;
       if (lines > 400) violations.push({ file: shortenPath(filePath), lines, over: lines - 400 });
@@ -176,7 +196,7 @@ function checkFileLength(targetDir) {
 function checkNesting(targetDir) {
   const violations = [];
   walkDir(targetDir, (filePath) => {
-    if (!/\.(js|jsx)$/.test(filePath)) return;
+    if (!/\.(js|jsx|ts|tsx)$/.test(filePath)) return;
     const isTest = isTestFile(filePath);
     const limit = 1; // ≤1 for both regular and test files
     try {
@@ -204,7 +224,8 @@ function main() {
   printSection("1", "FUNCTION LENGTH");
   const funcViolations = checkFunctionLength(target);
   const regularFunc = funcViolations.filter((v) => !v.is_test);
-  const testFunc = funcViolations.filter((v) => v.is_test);
+  const testHelpers = funcViolations.filter((v) => v.is_test && !v.is_test_function);
+  const testFunc = funcViolations.filter((v) => v.is_test_function);
 
   printSubsection("Regular Files (≤20 lines)");
   if (regularFunc.length > 0) {
@@ -217,7 +238,18 @@ function main() {
     console.log("\n✅ All regular functions within 20 lines\n");
   }
 
-  printSubsection("Test Files (≤25 lines for it()/test() callbacks)");
+  printSubsection("Test Helpers (≤20 lines)");
+  if (testHelpers.length > 0) {
+    console.log(`\n${Colors.RED}❌ ${testHelpers.length} VIOLATION(S)${Colors.END}\n`);
+    testHelpers.sort((a, b) => b.lines - a.lines).forEach((v) => {
+      console.log(`${Colors.BOLD}${v.file}${Colors.END}`);
+      console.log(`  ${v.name}() → ${Colors.RED}${v.lines} lines${Colors.END} (limit: ${v.limit})\n`);
+    });
+  } else {
+    console.log("\n✅ All test helpers within 20 lines\n");
+  }
+
+  printSubsection("Test Functions (≤25 lines for it()/test() callbacks)");
   if (testFunc.length > 0) {
     console.log(`\n${Colors.RED}❌ ${testFunc.length} VIOLATION(S)${Colors.END}\n`);
     testFunc.sort((a, b) => b.lines - a.lines).forEach((v) => {
@@ -274,7 +306,7 @@ function main() {
   console.log(`${Colors.BOLD}${Colors.YELLOW}SUMMARY${Colors.END}`);
   console.log("─".repeat(75) + "\n");
   const totalViolations = funcViolations.length + fileViolations.length + nestViolations.length;
-  console.log(`Function Length:  ${funcViolations.length > 0 ? "❌" : "✅"} ${funcViolations.length} violation(s) (${regularFunc.length} regular, ${testFunc.length} test)`);
+  console.log(`Function Length:  ${funcViolations.length > 0 ? "❌" : "✅"} ${funcViolations.length} violation(s) (${regularFunc.length} regular, ${testHelpers.length} test helper, ${testFunc.length} test)`);
   console.log(`File Length:      ${fileViolations.length > 0 ? "❌" : "✅"} ${fileViolations.length} violation(s)`);
   console.log(`Nesting Depth:    ${nestViolations.length > 0 ? "❌" : "✅"} ${nestViolations.length} violation(s) (${regularNest.length} regular, ${testNest.length} test)`);
   console.log("\n" + "=".repeat(75));

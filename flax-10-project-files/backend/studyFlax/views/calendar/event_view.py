@@ -24,6 +24,7 @@ from .society_sync_service import get_synced_society_events
 import logging
 import sys
 
+
 logger = logging.getLogger(__name__)
 
 def _is_running_tests():

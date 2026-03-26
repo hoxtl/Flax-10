@@ -1,5 +1,10 @@
+/**
+ * Covers list sidebar sections, menus, and archive flows.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const sidebarStateMock = vi.hoisted(() => vi.fn());
 const authMock = vi.hoisted(() => vi.fn());
@@ -92,25 +97,33 @@ function buildState(overrides = {}) {
   };
 }
 
+const listSidebarActionNames = [
+  "onSelectList",
+  "onSelectFilter",
+  "onNewList",
+  "onDeleteList",
+  "onRenameList",
+  "onUnarchiveList",
+  "onPermanentlyDeleteList",
+];
+
+const baseSidebarProps = {
+  lists: [
+    { id: 1, name: "Teaching - Seminar Prep" },
+    { id: 2, name: "Reading List - History" },
+    { id: 3, name: "Inbox" },
+    { id: 4, name: "Teaching - Lectures" },
+  ],
+  tasks: [],
+  activeListId: 2,
+  activeFilter: "all",
+  archivedLists: [{ id: 9, name: "Archived list" }],
+};
+
 function buildProps(overrides = {}) {
   return {
-    lists: [
-      { id: 1, name: "Teaching - Seminar Prep" },
-      { id: 2, name: "Reading List - History" },
-      { id: 3, name: "Inbox" },
-      { id: 4, name: "Teaching - Lectures" },
-    ],
-    tasks: [],
-    activeListId: 2,
-    activeFilter: "all",
-    onSelectList: vi.fn(),
-    onSelectFilter: vi.fn(),
-    onNewList: vi.fn(),
-    onDeleteList: vi.fn(),
-    onRenameList: vi.fn(),
-    onUnarchiveList: vi.fn(),
-    onPermanentlyDeleteList: vi.fn(),
-    archivedLists: [{ id: 9, name: "Archived list" }],
+    ...baseSidebarProps,
+    ...createFnMap(listSidebarActionNames),
     ...overrides,
   };
 }

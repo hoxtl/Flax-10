@@ -1,3 +1,7 @@
+/**
+ * Covers GroupWork hook combinations through a small test harness.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 
@@ -32,6 +36,40 @@ vi.mock("../../../pages/GroupWork/api/groupWorkApi", () => ({
   deleteGroupProject: (...args) => deleteGroupProjectMock(...args),
 }));
 
+function HookHarnessView({ values, actions }) {
+  return <div>
+    {values.map(([id, value]) => <div key={id} data-testid={id}>{typeof value === "string" ? value : JSON.stringify(value)}</div>)}
+    {actions.map(({ label, onClick }) => <button key={label} onClick={onClick}>{label}</button>)}
+  </div>;
+}
+
+function buildHookValues(projectsState, sortState, selectedProjectId, selectedTab, projectState, membersState, detailState) {
+  return [
+    ["projects", projectsState.projects],
+    ["projects-loading", String(projectsState.loading)],
+    ["sort", sortState.sortBy],
+    ["selected-project-id", selectedProjectId],
+    ["selected-tab", selectedTab],
+    ["project", projectState.project],
+    ["project-loading", String(projectState.loading)],
+    ["members", membersState.members],
+    ["detail-tab", detailState.activeTab],
+    ["detail-task-stats", detailState.taskStats],
+    ["detail-members", detailState.members],
+  ];
+}
+
+function buildHookActions(sortState, actionState, detailState) {
+  return [
+    { label: "change sort", onClick: () => sortState.setSortBy("name") },
+    { label: "patch", onClick: () => actionState.patchProject({ title: "Patched" }) },
+    { label: "remove member", onClick: () => actionState.handleRemoveMember(2) },
+    { label: "delete project", onClick: () => actionState.handleDeleteProject() },
+    { label: "add detail member", onClick: () => detailState.onAdded({ id: 9, name: "New member" }) },
+    { label: "set detail tab", onClick: () => detailState.setActiveTab("members") },
+  ];
+}
+
 function HookHarness({ projectId = 12, onBack = vi.fn(), onDelete = vi.fn(), onUpdate = vi.fn() }) {
   const projectsState = useGroupProjects();
   const sortState = useGroupProjectSort("priority");
@@ -41,28 +79,7 @@ function HookHarness({ projectId = 12, onBack = vi.fn(), onDelete = vi.fn(), onU
   const membersState = useProjectMembers(projectId);
   const actionState = useProjectActions(projectId, projectState.setProject, membersState.setMembers, onBack, onDelete, onUpdate);
   const detailState = useProjectDetail(projectId, onBack, onDelete, onUpdate);
-
-  return (
-    <div>
-      <div data-testid="projects">{JSON.stringify(projectsState.projects)}</div>
-      <div data-testid="projects-loading">{String(projectsState.loading)}</div>
-      <div data-testid="sort">{sortState.sortBy}</div>
-      <button onClick={() => sortState.setSortBy("name")}>change sort</button>
-      <div data-testid="selected-project-id">{selectedProjectId}</div>
-      <div data-testid="selected-tab">{selectedTab}</div>
-      <div data-testid="project">{JSON.stringify(projectState.project)}</div>
-      <div data-testid="project-loading">{String(projectState.loading)}</div>
-      <div data-testid="members">{JSON.stringify(membersState.members)}</div>
-      <button onClick={() => actionState.patchProject({ title: "Patched" })}>patch</button>
-      <button onClick={() => actionState.handleRemoveMember(2)}>remove member</button>
-      <button onClick={() => actionState.handleDeleteProject()}>delete project</button>
-      <button onClick={() => detailState.onAdded({ id: 9, name: "New member" })}>add detail member</button>
-      <div data-testid="detail-tab">{detailState.activeTab}</div>
-      <button onClick={() => detailState.setActiveTab("members")}>set detail tab</button>
-      <div data-testid="detail-task-stats">{JSON.stringify(detailState.taskStats)}</div>
-      <div data-testid="detail-members">{JSON.stringify(detailState.members)}</div>
-    </div>
-  );
+  return <HookHarnessView values={buildHookValues(projectsState, sortState, selectedProjectId, selectedTab, projectState, membersState, detailState)} actions={buildHookActions(sortState, actionState, detailState)} />;
 }
 
 describe("groupWorkHooks", () => {

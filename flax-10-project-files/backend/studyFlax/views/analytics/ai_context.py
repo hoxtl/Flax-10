@@ -20,7 +20,6 @@ def fetch_study_data(user, days):
     themes = ThemeSession.objects.filter(user=user, started_at__gte=start)
     return sessions, themes
 
-
 def compute_session_stats(sessions):
     total_study = sum(item.duration for item in sessions)
     total_break = sum(item.break_duration for item in sessions)
@@ -30,18 +29,15 @@ def compute_session_stats(sessions):
     overtime = sessions.filter(status='Overtime').count()
     return total_study, total_break, total_pause, count, average, overtime
 
-
 def get_theme_minutes(themes):
     dark = sum(item.duration_minutes for item in themes if item.theme == 'dark')
     light = sum(item.duration_minutes for item in themes if item.theme == 'light')
     return dark, light
 
-
 def compute_theme_pct(themes):
     dark, light = get_theme_minutes(themes)
     total = dark + light
     return round(dark / total * 100) if total else 0
-
 
 def format_upcoming_events(user):
     upcoming = CalendarEvent.objects.filter(
@@ -53,11 +49,9 @@ def format_upcoming_events(user):
         return '  None scheduled'
     return '\n'.join(format_event_line(item) for item in upcoming)
 
-
 def format_event_line(event):
     date_text = event.start_time.strftime('%A %d %b at %H:%M')
     return f"  - {event.title} on {date_text}"
-
 
 def build_stats_summary(sessions, themes):
     total_study, total_break, total_pause, count, average, overtime = compute_session_stats(sessions)
@@ -67,11 +61,9 @@ def build_stats_summary(sessions, themes):
     peak_hour = compute_peak_hour(session_list)
     return total_study, total_break, total_pause, count, average, overtime, dark_pct, current_streak, peak_hour
 
-
 def build_stats_lines(sessions, themes):
     stats = build_stats_summary(sessions, themes)
     return '\n'.join(build_stat_lines(stats))
-
 
 def build_stat_lines(stats):
     total_study, total_break, total_pause, count, average, overtime, dark_pct, current_streak, peak_hour = stats
@@ -87,7 +79,6 @@ def build_stat_lines(stats):
         f"- Peak study hour: {fmt_hour(peak_hour)}",
         f"- Dark mode usage: {dark_pct}% ({owl_label})",
     ]
-
 
 def build_user_context(user, days=30):
     sessions, themes = fetch_study_data(user, days)

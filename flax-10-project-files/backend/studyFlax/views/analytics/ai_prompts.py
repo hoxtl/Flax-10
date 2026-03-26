@@ -37,13 +37,11 @@ def build_insight_messages(context):
         {'role': 'user', 'content': INSIGHT_PROMPT_TEMPLATE.format(context=context)},
     ]
 
-
 def build_schedule_messages(reply_text, today_str):
     return [
         {'role': 'system', 'content': SCHEDULE_EXTRACTION_PROMPT},
         {'role': 'user', 'content': f"Today is {today_str}.\n\n{reply_text}"},
     ]
-
 
 def sanitise_messages(messages):
     return [{'role': item['role'], 'content': item['content']} for item in messages if 'role' in item and 'content' in item]

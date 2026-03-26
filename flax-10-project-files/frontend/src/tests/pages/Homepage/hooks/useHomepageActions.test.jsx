@@ -1,3 +1,7 @@
+/**
+ * Covers task completion, popup, and edit handlers for the Homepage.
+ */
+
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -22,31 +26,35 @@ function buildProps(overrides = {}) {
   };
 }
 
+const createAudioNode = () => ({
+  connect: vi.fn(),
+  frequency: {
+    setValueAtTime: vi.fn(),
+    exponentialRampToValueAtTime: vi.fn(),
+  },
+  start: vi.fn(),
+  stop: vi.fn(),
+});
+
+const createAudioGain = () => ({
+  connect: vi.fn(),
+  gain: {
+    setValueAtTime: vi.fn(),
+    exponentialRampToValueAtTime: vi.fn(),
+  },
+});
+
+const createAudioContextApi = () => ({
+  currentTime: 0,
+  destination: {},
+  createOscillator: createAudioNode,
+  createGain: createAudioGain,
+});
+
 describe("useHomepageActions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    window.AudioContext = vi.fn(function AudioContext() {
-      return {
-        currentTime: 0,
-        destination: {},
-        createOscillator: () => ({
-          connect: vi.fn(),
-          frequency: {
-            setValueAtTime: vi.fn(),
-            exponentialRampToValueAtTime: vi.fn(),
-          },
-          start: vi.fn(),
-          stop: vi.fn(),
-        }),
-        createGain: () => ({
-          connect: vi.fn(),
-          gain: {
-            setValueAtTime: vi.fn(),
-            exponentialRampToValueAtTime: vi.fn(),
-          },
-        }),
-      };
-    });
+    window.AudioContext = vi.fn(() => createAudioContextApi());
     window.webkitAudioContext = undefined;
   });
 

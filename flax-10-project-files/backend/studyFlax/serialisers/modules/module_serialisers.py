@@ -15,18 +15,14 @@ def _created_by(obj):
     except Exception:
         return None
 
-
 def _created_by_email(obj):
     return getattr(_created_by(obj), "email", None)
-
 
 def _created_by_username(obj):
     return getattr(_created_by(obj), "username", None)
 
-
 def _created_by_profile_photo(obj):
     return getattr(_created_by(obj), "profile_photo", None)
-
 
 def _profile_photo_url(photo, request):
     if not photo:
@@ -35,6 +31,7 @@ def _profile_photo_url(photo, request):
 
 
 class ModuleSerialiser(serializers.ModelSerializer):
+    """Serialiser for module."""
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=True)
     deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
@@ -44,6 +41,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
     readings = ReadingSummarySerialiser(many=True, read_only=True)
 
     class Meta:
+        """Metadata for module serialiser."""
         model = Module
         fields = ['id', 'module_code', 'module_name', 'description', 'department',
                   'course', 'created_by', 'created_by_name', 'start_time', 'end_time',
@@ -58,7 +56,6 @@ class ModuleSerialiser(serializers.ModelSerializer):
 
     def _create(self, validated_data):
         """Create a module, attaching a weekly recurrence rule if requested."""
-
         is_recurring = validated_data.pop('is_recurring', True)
         if is_recurring:
             from studyFlax.models import RecurrenceRule

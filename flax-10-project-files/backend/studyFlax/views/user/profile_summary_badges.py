@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from studyFlax.views.analytics.session_analytics_service import compute_peak_hour, compute_recent_active_days, compute_streaks
 
+
 PERSONAS = [
     {'id': 'night_owl', 'label': 'Night Owl', 'emoji': '🦉', 'description': 'You come alive after dark. Your best thinking happens when the world goes quiet.'},
     {'id': 'early_bird', 'label': 'Early Bird', 'emoji': '🌅', 'description': 'You front-load your day and hit the ground running. Morning hours are your superpower.'},
@@ -38,54 +39,43 @@ def derive_persona(sessions):
         return PERSONAS[2]
     return PERSONAS[4] if avg_duration <= SPRINT_SESSION_SECONDS else PERSONAS[5] if avg_duration >= MARATHON_SESSION_SECONDS else PERSONAS[2]
 
-
 def collect_session_stats(sessions):
     peak_hour = compute_peak_hour(sessions)
     avg_duration = sum(session.duration for session in sessions) / len(sessions) if sessions else 0
     return peak_hour, avg_duration, compute_recent_active_days(sessions, 7) >= 5
 
-
 def filter_complete(sessions):
     return [session for session in sessions if session.status != 'Incomplete']
-
 
 def session_totals(sessions):
     total_seconds = sum(session.duration for session in sessions)
     return total_seconds, total_seconds / SECONDS_PER_HOUR, len(sessions)
 
-
 def active_days_last_30(sessions_90):
     cutoff = timezone.now() - timedelta(days=30)
     return len({session.end_time.date() for session in sessions_90 if session.end_time >= cutoff})
 
-
 def badge(badge_id, label, emoji, description, tier='bronze'):
     return {'id': badge_id, 'label': label, 'emoji': emoji, 'description': description, 'tier': tier}
 
-
 def badges_for_thresholds(value, thresholds):
     return [badge(badge_id, label, emoji, description, tier) for threshold, badge_id, label, emoji, description, tier in thresholds if value >= threshold]
-
 
 def hour_badges(total_hours):
     thresholds = [(1, '1hr', 'First Hour', '⏱️', 'Studied for 1 hour total', 'bronze'), (10, '10hr', 'Getting Started', '📖', 'Studied for 10 hours total', 'bronze'), (50, '50hr', 'Dedicated', '🔥', 'Studied for 50 hours total', 'silver'), (100, '100hr', 'Century', '💯', '100 hours of focused study', 'gold'), (250, '250hr', 'Scholar', '🎓', '250 hours of focused study', 'gold'), (500, '500hr', 'Legend', '👑', '500 hours — you are a legend', 'gold')]
     return badges_for_thresholds(total_hours, thresholds)
 
-
 def session_count_badges(count):
     thresholds = [(1, 'sessions_1', 'First Step', '🎯', 'Completed your first study session', 'bronze'), (10, 'sessions_10', 'Regular', '🎖️', 'Completed 10 study sessions', 'bronze'), (50, 'sessions_50', 'Committed', '🏅', '50 sessions completed', 'silver'), (100, 'sessions_100', 'Veteran', '🏆', '100 sessions completed', 'gold')]
     return badges_for_thresholds(count, thresholds)
-
 
 def streak_badges(longest_streak):
     thresholds = [(3, 'streak_3', 'On a Roll', '🔥', 'Studied 3 days in a row', 'bronze'), (7, 'streak_7', 'Week Warrior', '⚔️', '7-day study streak', 'silver'), (14, 'streak_14', 'Fortnight', '🏆', '14-day study streak', 'gold'), (30, 'streak_30', 'Iron Will', '💎', '30-day study streak', 'gold')]
     return badges_for_thresholds(longest_streak, thresholds)
 
-
 def consistency_badges(active_days_30):
     thresholds = [(10, 'consistent_10', 'Steady Pace', '📅', 'Active 10 days this month', 'bronze'), (20, 'consistent_20', 'Month Grind', '🌟', 'Active 20 days this month', 'silver'), (28, 'consistent_28', 'Perfectionist', '✨', 'Active 28 days this month', 'gold')]
     return badges_for_thresholds(active_days_30, thresholds)
-
 
 def time_of_day_badges(sessions_all, session_count):
     if session_count == 0:
@@ -94,7 +84,6 @@ def time_of_day_badges(sessions_all, session_count):
     late = sum(1 for session in sessions_all if session.end_time.hour >= 20)
     afternoon = sum(1 for session in sessions_all if 12 <= session.end_time.hour < 17)
     return build_time_of_day_badges(early, late, afternoon, session_count)
-
 
 def build_time_of_day_badges(early, late, afternoon, session_count):
     earned = []
@@ -106,12 +95,10 @@ def build_time_of_day_badges(early, late, afternoon, session_count):
         earned.append(badge('afternoon_peak', 'Afternoon Peak', '⚡', 'Over half your sessions 12–5pm'))
     return earned
 
-
 def session_length_badges(sessions_all):
     short_sessions = sum(1 for session in sessions_all if session.duration <= SHORT_SESSION_SECONDS)
     long_sessions = sum(1 for session in sessions_all if session.duration >= LONG_SESSION_SECONDS)
     return build_session_length_badges(short_sessions, long_sessions)
-
 
 def build_session_length_badges(short_sessions, long_sessions):
     earned = []
@@ -121,7 +108,6 @@ def build_session_length_badges(short_sessions, long_sessions):
         earned.append(badge('deep_focus', 'Deep Focus', '🧠', '10+ sessions over 90 minutes', 'silver'))
     return earned
 
-
 def module_badges(module_count):
     earned = []
     if module_count >= 3:
@@ -130,13 +116,11 @@ def module_badges(module_count):
         earned.append(badge('breadth', 'Breadth', '🌐', 'Enrolled in 5 or more modules', 'silver'))
     return earned
 
-
 def weekly_goal_badges(sessions_all, user):
     now = timezone.now()
     weekly_goal = user.weekly_goal_hours or 20
     week_minutes = sum(session.duration for session in sessions_all if session.end_time >= now - timedelta(days=7))
     return build_weekly_goal_badges(sessions_all, now, weekly_goal, week_minutes)
-
 
 def build_weekly_goal_badges(sessions_all, now, weekly_goal, week_minutes):
     earned = []
@@ -146,26 +130,21 @@ def build_weekly_goal_badges(sessions_all, now, weekly_goal, week_minutes):
         earned.append(badge('consistent_goals', 'Consistent Goals', '📆', 'Hit your weekly goal 4 weeks running', 'gold'))
     return earned
 
-
 def week_minutes(sessions, week_start, week_end):
     return sum(session.duration for session in sessions if week_start <= session.end_time < week_end)
-
 
 def week_hours_for_offset(sessions, now, offset):
     week_start = now - timedelta(days=7 * (offset + 1))
     week_end = now - timedelta(days=7 * offset)
     return week_minutes(sessions, week_start, week_end) / 3600
 
-
 def hit_goal_four_weeks(sessions, now, goal):
     return all(week_hours_for_offset(sessions, now, offset) >= goal for offset in range(4))
-
 
 def _badge_groups(sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user):
     return _core_badge_groups(total_hours, session_count, longest_streak, active_days) + _activity_badge_groups(
         sessions_all, session_count, module_count, user
     )
-
 
 def _core_badge_groups(total_hours, session_count, longest_streak, active_days):
     return [
@@ -175,7 +154,6 @@ def _core_badge_groups(total_hours, session_count, longest_streak, active_days):
         consistency_badges(active_days),
     ]
 
-
 def _activity_badge_groups(sessions_all, session_count, module_count, user):
     return [
         time_of_day_badges(sessions_all, session_count),
@@ -183,7 +161,6 @@ def _activity_badge_groups(sessions_all, session_count, module_count, user):
         module_badges(module_count),
         weekly_goal_badges(sessions_all, user),
     ]
-
 
 def collect_all_badges(sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user):
     earned = []
@@ -193,7 +170,6 @@ def collect_all_badges(sessions_all, session_count, total_hours, longest_streak,
         earned.extend(badge_group)
     return earned
 
-
 def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, user):
     complete_sessions = filter_complete(sessions_all)
     recent_complete_sessions = filter_complete(sessions_90)
@@ -201,7 +177,6 @@ def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, u
     _, total_hours, session_count = session_totals(complete_sessions)
     active_days = active_days_last_30(recent_complete_sessions)
     return collect_all_badges(complete_sessions, session_count, total_hours, longest_streak, active_days, module_count, user)
-
 
 def get_weekly_study_hours(sessions_all):
     week_ago = timezone.now() - timedelta(days=7)

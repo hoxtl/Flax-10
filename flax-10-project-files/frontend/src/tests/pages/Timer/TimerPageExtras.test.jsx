@@ -1,6 +1,11 @@
+/**
+ * Covers Timer page controller state and content branches.
+ */
+
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+import { createFnMap } from "../../utils/testBuilderUtils";
 
 const useBreakpoint = vi.fn();
 const useNotificationPermission = vi.fn();
@@ -115,26 +120,34 @@ const buildTimerFlags = () => ({
   setDismissedWarning: vi.fn(),
 });
 
-const buildTimerState = (overrides = {}) => ({
+const timerStateActionNames = [
+  "request",
+  "setFocusMode",
+  "setShowShortcuts",
+  "setDismissedWarning",
+  "setStreakData",
+  "openFocusMode",
+  "setShowHistory",
+];
+
+const baseTimerState = {
   permission: "default",
-  request: vi.fn(),
   fromTaskPlay: true,
   showFocusTransition: true,
   showPageSkeleton: true,
   focusAccent: "#09f",
   focusMode: true,
-  setFocusMode: vi.fn(),
   showShortcuts: true,
-  setShowShortcuts: vi.fn(),
   streakData: { current_streak_days: 4, total_sessions: 0 },
   dismissedWarning: false,
-  setDismissedWarning: vi.fn(),
-  setStreakData: vi.fn(),
   t: { isActive: true, isPaused: false },
   isMobile: false,
-  openFocusMode: vi.fn(),
   showHistory: true,
-  setShowHistory: vi.fn(),
+};
+
+const buildTimerState = (overrides = {}) => ({
+  ...baseTimerState,
+  ...createFnMap(timerStateActionNames),
   ...overrides,
 });
 

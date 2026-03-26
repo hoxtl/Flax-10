@@ -1,6 +1,12 @@
+/**
+ * Covers Task bar and toolbar rendering paths.
+ */
+
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { renderHook, act } from "@testing-library/react";
+
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const taskBarHookMock = vi.hoisted(() => vi.fn());
 
@@ -47,32 +53,29 @@ import {
 } from "../../../../pages/Tasks/components/TaskFeedToolbarParts";
 import useTaskFeedResponsive from "../../../../pages/Tasks/components/useTaskFeedResponsive";
 
+const taskBarDefaults = {
+  title: "",
+  saving: false,
+  showOptions: true,
+  estimatedMinutes: 25,
+  moduleId: "",
+  taskListId: "",
+  sortedLists: [{ id: "1", name: "Inbox" }],
+  moduleOptions: [{ value: "", label: "None" }],
+  listOptions: [{ value: "1", label: "Inbox" }],
+  sleepWarning: false,
+  sleepWarningProps: {},
+};
+
 function buildTaskBarState(overrides = {}) {
   return {
-    cardRef: { current: null },
     handleSubmit: vi.fn((event) => event.preventDefault()),
-    handleInputBlur: vi.fn(),
-    handleInputKeyDown: vi.fn(),
+    cardRef: { current: null },
     inputRef: { current: null },
-    sleepWarning: true,
-    sleepWarningProps: {},
-    title: "Read chapter",
-    setTitle: vi.fn(),
-    saving: false,
-    setInputFocused: vi.fn(),
-    showOptions: true,
-    estimatedBlocks: 1,
-    setEstimatedBlocks: vi.fn(),
-    moduleId: "11",
-    setModuleId: vi.fn(),
-    taskListId: "2",
-    setTaskListId: vi.fn(),
-    sortedLists: [{ id: "1", name: "Inbox" }],
-    moduleOptions: [{ value: "11", label: "KCL1" }],
-    listOptions: [{ value: "2", label: "Coursework" }],
-    isReadingList: true,
+    isReadingList: false,
     pageCount: 12,
-    setPageCount: vi.fn(),
+    ...taskBarDefaults,
+    ...createFnMap(["handleInputBlur", "handleInputKeyDown", "setTitle", "setInputFocused", "setEstimatedMinutes", "setModuleId", "setTaskListId", "setPageCount"]),
     ...overrides,
   };
 }

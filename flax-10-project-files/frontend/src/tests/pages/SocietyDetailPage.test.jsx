@@ -1,6 +1,13 @@
+/**
+ * Covers SocietyDetailPage rendering and state-driven interactions.
+ */
+
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+
+import { mergeNested } from "../utils/testBuilderUtils";
+import { buildPageData } from "./societyDetailPageTestUtils";
 
 const useSocietyPageDataMock = vi.fn();
 const useSocietyInitMock = vi.fn();
@@ -110,107 +117,13 @@ vi.mock("../../pages/Societies/SocietySkeletons", () => ({
 
 import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
-function buildPageData(overrides = {}) {
-  const {
-    society: societyOverrides = {},
-    page: pageOverrides = {},
-    modals: modalOverrides = {},
-    subscription: subscriptionOverrides = {},
-    tracker: trackerOverrides = {},
-    ...rest
-  } = overrides;
-  return {
-    loading: false,
-    society: {
-      id: 1,
-      name: "Robotics Society",
-      role: "admin",
-      is_admin: true,
-      has_reported: false,
-      images: [],
-      announcements: [],
-      tags: [],
-      ratification_status: "approved",
-      is_ratified: true,
-      ...societyOverrides,
-    },
-    page: {
-      activeTab: "calendar",
-      handleTabChange: vi.fn(),
-      focusAnnouncementId: null,
-      ...pageOverrides,
-    },
-    modals: {
-      showSettings: false,
-      setShowSettings: vi.fn(),
-      showReportModal: false,
-      setShowReportModal: vi.fn(),
-      galleryOpen: false,
-      setGalleryOpen: vi.fn(),
-      showCoverModal: false,
-      setShowCoverModal: vi.fn(),
-      showMembersModal: false,
-      setShowMembersModal: vi.fn(),
-      editingAnnouncement: null,
-      setEditingAnnouncement: vi.fn(),
-      editMode: false,
-      setEditMode: vi.fn(),
-      ...modalOverrides,
-    },
-    subscription: {
-      isSubscribed: false,
-      toggleSubscription: vi.fn(),
-      ...subscriptionOverrides,
-    },
-    tracker: {
-      hasChanges: vi.fn(() => false),
-      getChangeSummary: vi.fn(() => []),
-      resetChanges: vi.fn(),
-      ...trackerOverrides,
-    },
-    members: [],
-    updateSociety: vi.fn(),
-    updateLocalSociety: vi.fn(),
-    fetchMembers: vi.fn(),
-    removeMember: vi.fn(),
-    deleteSociety: vi.fn().mockResolvedValue({}),
-    updateAnnouncement: vi.fn(),
-    addAnnouncement: vi.fn(),
-    deleteAnnouncement: vi.fn(),
-    addCollaborator: vi.fn(),
-    requestRatification: vi.fn(),
-    updateMemberRole: vi.fn(),
-    publishChanges: vi.fn().mockResolvedValue({}),
-    addEvent: vi.fn(),
-    updateEvent: vi.fn(),
-    deleteEvent: vi.fn(),
-    addException: vi.fn(),
-    onAddTag: vi.fn(),
-    onDeleteTag: vi.fn(),
-    onUpdateTag: vi.fn(),
-    joinSociety: vi.fn(),
-    leaveSociety: vi.fn(),
-    handleUnreport: vi.fn(),
-    ...rest,
-  };
-}
-
 function renderPage(ui, { routeState } = {}) {
   const initialEntries = routeState ? [{ pathname: "/societies/1", state: routeState }] : ["/societies/1"];
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 }
 
 function renderDetailPageWithData(overrides = {}, props = {}) {
-  const base = buildPageData();
-  const data = {
-    ...base,
-    ...overrides,
-    modals: { ...base.modals, ...overrides.modals },
-    society: { ...base.society, ...overrides.society },
-    page: { ...base.page, ...overrides.page },
-    subscription: { ...base.subscription, ...overrides.subscription },
-    tracker: { ...base.tracker, ...overrides.tracker },
-  };
+  const data = mergeNested(buildPageData(), overrides, ["modals", "society", "page", "subscription", "tracker"]);
   useSocietyPageDataMock.mockReturnValue(data);
   renderPage(<SocietyDetailPage societyId={1} {...props} />);
   return data;

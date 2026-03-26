@@ -1,4 +1,6 @@
-"""Tests for availability helper branches."""
+"""
+Tests for task availability helpers.
+"""
 
 from datetime import timedelta
 from unittest.mock import MagicMock
@@ -11,8 +13,8 @@ from studyFlax.models.groupwork.groupwork_model import (
     MeetingResponse,
     MeetingSuggestion,
 )
-from studyFlax.tests.helpers.base import BaseTestCase
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.test_case_support import BaseTestCase
+from studyFlax.tests.helpers.test_model_builders import make_user
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):

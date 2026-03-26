@@ -1,4 +1,6 @@
-"""Tests for society event endpoints."""
+"""
+Tests for society event views.
+"""
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -7,12 +9,14 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from studyFlax.models.society.society_event_model import SocietyEvent
-from studyFlax.tests.helpers.factories import make_society, make_society_admin, make_society_member
+from studyFlax.tests.helpers.test_model_builders import make_society, make_society_admin, make_society_member
+
 
 User = get_user_model()
 
 
 class SocietyEventViewTest(TestCase):
+    """Tests society event view."""
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username="admin", email="admin@example.com", password="pass")

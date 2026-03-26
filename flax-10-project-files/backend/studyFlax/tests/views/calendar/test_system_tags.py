@@ -6,7 +6,8 @@ from django.test import TestCase
 from studyFlax.models import Tag, CalendarEvent
 from django.utils import timezone
 from datetime import timedelta
-from studyFlax.tests.helpers.factories import make_user
+from studyFlax.tests.helpers.test_model_builders import make_user
+
 
 class GetSystemTagTest(TestCase):
     """Tests for get_system_tag and related helpers."""

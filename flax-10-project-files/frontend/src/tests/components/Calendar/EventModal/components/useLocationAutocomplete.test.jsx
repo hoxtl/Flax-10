@@ -1,8 +1,31 @@
+/**
+ * Covers autocomplete loading, selection, and dismissal behaviour.
+ */
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 
 import { useLocationAutocomplete } from "../../../../../components/Calendar/EventModal/components/useLocationAutocomplete";
+
+function AutocompleteState({ autocomplete }) {
+  return (
+    <div>
+      <div data-testid="show-state">{String(autocomplete.show)}</div>
+      <div data-testid="loading-state">{String(autocomplete.isLoading)}</div>
+      <div data-testid="suggestion-count">{autocomplete.suggestions.length}</div>
+    </div>
+  );
+}
+
+function AutocompleteInput({ autocomplete, value }) {
+  return (
+    <div ref={autocomplete.wrapperRef} data-testid="wrapper">
+      <button type="button" onClick={() => autocomplete.handleSelect({ place_name: "King's Building" })}>select-location</button>
+      <input aria-label="location-input" value={value} onChange={autocomplete.handleInputChange} onFocus={autocomplete.handleInputFocus} />
+    </div>
+  );
+}
 
 function LocationAutocompleteHarness({ onChangeSpy }) {
   const [value, setValue] = useState("");
@@ -13,20 +36,8 @@ function LocationAutocompleteHarness({ onChangeSpy }) {
 
   return (
     <div>
-      <div data-testid="show-state">{String(autocomplete.show)}</div>
-      <div data-testid="loading-state">{String(autocomplete.isLoading)}</div>
-      <div data-testid="suggestion-count">{autocomplete.suggestions.length}</div>
-      <div ref={autocomplete.wrapperRef} data-testid="wrapper">
-        <button type="button" onClick={() => autocomplete.handleSelect({ place_name: "King's Building" })}>
-          select-location
-        </button>
-        <input
-          aria-label="location-input"
-          value={value}
-          onChange={autocomplete.handleInputChange}
-          onFocus={autocomplete.handleInputFocus}
-        />
-      </div>
+      <AutocompleteState autocomplete={autocomplete} />
+      <AutocompleteInput autocomplete={autocomplete} value={value} />
     </div>
   );
 }
