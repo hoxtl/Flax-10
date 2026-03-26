@@ -34,7 +34,7 @@ vi.mock('../../../pages/group_work/components/TaskBoardView.module.css', () => (
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-// ─── availabilityUtils ───────────────────────────────────────────────────────
+// availabilityUtils
 
 describe('availabilityUtils – formatSuggestionDateLabel', () => {
   it('returns a GB-locale date/time string for a valid ISO timestamp', () => {
@@ -95,7 +95,7 @@ describe('availabilityUtils – getSuggestionCount', () => {
   });
 });
 
-// ─── memberAvatarUtils ───────────────────────────────────────────────────────
+// memberAvatarUtils
 
 describe('memberAvatarUtils – getPhotoUrl', () => {
   it('calls getResolvedUserPhoto with the member fields', async () => {
@@ -137,7 +137,7 @@ describe('memberAvatarUtils – getPhotoUrl', () => {
 
 describe('memberAvatarUtils – getInitials', () => {
   it('uses first_name only when last_name is absent but first_name present', () => {
-    // first_name + last_name branch: both present → AB
+    // When both name fields are present, the initials should be AB.
     expect(getInitials({ first_name: 'Alice', last_name: 'Brown' })).toBe('AB');
   });
 
@@ -193,7 +193,7 @@ describe('memberAvatarUtils – getStoredViewer (error branch)', () => {
   });
 });
 
-// ─── taskUtils ───────────────────────────────────────────────────────────────
+// taskUtils
 
 describe('taskUtils – formatTaskDueDate', () => {
   it('formats a valid ISO date as DD/MM/YYYY', () => {
@@ -263,7 +263,7 @@ describe('taskUtils – sortTasks', () => {
       { completed: false, priority: 'bogus', created_at: '2026-01-01' },
       { completed: false, priority: 'low', created_at: '2026-01-01' },
     ];
-    // bogus → weight 0, low → weight 1 → low sorts first (higher weight = earlier)
+    // Unknown priority uses the default weight, so low priority sorts first.
     const sorted = sortTasks(tasks);
     expect(sorted[0].priority).toBe('low');
   });

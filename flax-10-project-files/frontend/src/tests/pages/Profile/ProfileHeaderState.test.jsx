@@ -30,9 +30,7 @@ vi.mock('../../../api/client', () => ({
 import ProfileHeader from '../../../pages/profile/components/ProfileHeader';
 import { useProfileHeaderState } from '../../../pages/profile/useProfileHeaderState';
 
-// ---------------------------------------------------------------------------
 // ProfileHeader component tests – part 2
-// ---------------------------------------------------------------------------
 
 describe('ProfileHeader – Part 2', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -90,9 +88,7 @@ describe('ProfileHeader – Part 2', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // useProfileHeaderState – edge cases
-// ---------------------------------------------------------------------------
 
 describe('useProfileHeaderState – edge cases', () => {
   beforeEach(() => {
