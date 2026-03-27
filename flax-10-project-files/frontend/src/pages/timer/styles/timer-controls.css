@@ -2,6 +2,8 @@
  * Timer page styles chunk.
  */
 
+@import "./timer-goal-and-overtime.css";
+
 .button {
     padding: 0.6rem 2rem;
     font-size: 1rem;
@@ -303,72 +305,10 @@
 
 .overtime {
     color: #f59e0b;
-    /* Amber */
-}
-
-.overtimePopup {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--surface-card);
-    border: 2px solid #f59e0b;
-    border-radius: var(--radius-lg);
-    padding: 1rem 2rem;
-    box-shadow: var(--shadow-lg);
-    z-index: 10;
-    animation: slideUp 0.3s ease-out;
-    width: 90%;
-    max-width: 300px;
-}
-
-.overtimeContent h3 {
-    margin: 0 0 0.5rem 0;
-    color: #f59e0b;
-    font-size: 1.2rem;
-}
-
-.overtimeTime {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #f59e0b;
-    margin: 0.5rem 0 1rem;
-    font-variant-numeric: tabular-nums;
-}
-
-.overtimeActionBtn {
-    min-width: 184px;
-    justify-content: center;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translate(-50%, 100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translate(-50%, 0);
-        opacity: 1;
-    }
 }
 
 .hidden {
     display: none !important;
-}
-
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(2px);
 }
 
 .modalContent {
@@ -382,29 +322,10 @@
     animation: fadeIn 0.2s ease-out;
 }
 
-.modalTitle {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 0.5rem;
-}
-
 .modalMessage {
     color: var(--muted);
     margin-bottom: 1.5rem;
     line-height: 1.5;
-}
-
-.leaveBtnExit {
-    background-color: color-mix(in srgb, var(--danger) 12%, transparent);
-    color: var(--danger);
-    border: none;
-}
-
-.leaveBtnCancel {
-    background-color: var(--hover);
-    color: var(--text);
-    border: none;
 }
 
 @keyframes fadeIn {
@@ -417,70 +338,4 @@
         opacity: 1;
         transform: scale(1);
     }
-}
-
-.summaryText {
-    margin-bottom: 1.5rem;
-}
-
-.summaryContainer {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.summaryItem {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.summaryLabel {
-    font-size: 0.9rem;
-    color: var(--muted);
-}
-
-.summaryPill {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-weight: 700;
-}
-
-.pillSessions {
-    background-color: #e0e7ff;
-    color: #3730a3;
-}
-
-.pillFocus {
-    background-color: #fee2e2;
-    color: #991b1b;
-}
-
-.pillBreak {
-    background-color: #dcfce7;
-    color: #166534;
-}
-
-/* === Today's Focus Banner === */
-
-.todayBanner {
-    width: 100%;
-    background: var(--surface-card);
-    border: var(--card-border);
-    border-radius: var(--card-radius-token);
-    box-shadow: var(--card-shadow-rest);
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.85rem;
-    flex-wrap: wrap;
-}
-
-.todayBannerStats {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
 }
