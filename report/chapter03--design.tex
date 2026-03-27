@@ -77,9 +77,10 @@ Registration creates a \texttt{User} record and returns a DRF auth token in the 
 
 The backend exposes a set of admin-only API endpoints under \texttt{/api/admin/}, restricted to users with the \texttt{staff} role. These allow administrators to manage user accounts, oversee registered societies, and access platform-wide analytics without going through Django's built-in \texttt{/admin/} panel. Django's default \texttt{/admin/} interface is also available for direct database-level inspection and management during development. Role-based access is enforced at the view level using a custom permission check against the \texttt{is\_staff} flag on the \texttt{User} model.
 
+\clearpage
 \section{UML Component Diagrams}
 
-The system architecture is illustrated across two component diagrams below. Figure~\ref{fig:component_frontend} shows the frontend architecture, including the browser routing layer, state management contexts, page components, and API service layer. Figure~\ref{fig:component_backend} shows the backend architecture, including the Django REST Framework views, signal handlers, serialisers, ORM layer, PostgreSQL database, and external service integrations.
+The system's architecture is illustrated across the two component diagrams below. Figure~\ref{fig:component_frontend} shows the frontend architecture, including the browser routing layer, state management contexts, page components, and API service layer. Figure~\ref{fig:component_backend} observes the backend architecture, including the Django REST Framework views, signal handlers, serialisers, ORM layer, PostgreSQL database, and external service integrations.
 
 \FloatBarrier
 
@@ -106,6 +107,56 @@ The system architecture is illustrated across two component diagrams below. Figu
     \vspace{-0.5cm}
     \caption{Component Diagram --- Backend \& Infrastructure Architecture}
     \label{fig:component_backend}
+\end{figure}
+\end{landscape}
+
+\FloatBarrier
+
+\section{Entity Relationship Diagrams}
+
+This section explores a system data model represented using a set of Entity Relationship (ER) diagrams. The diagrams illustrate how data are structured, stored, and related across the system.
+
+The data model has been decomposed into three focused sub-diagrams to facilitate both comprehension and readability of each functionality.
+
+Figure~\ref{fig:er_core} explores the core user and academic data model, delving into models representative of users, modules, and associated academic entities. Figure~\ref{fig:er_productivity} observes functionalities involving productivity and scheduling, with features such as calendar events and study sessions. Figure~\ref{fig:er_social} illustrates the social aspect of the system, observing the presence of societies, group projects, and meeting coordination.
+
+\FloatBarrier
+
+\begin{figure}[!h]
+    \centering
+    \adjustbox{max width=\linewidth, max totalheight=0.56\textheight}{%
+        \includegraphics{figures/er_diagram_1.png}%
+    }
+    \caption{ER Diagram - User and Academics}
+    \label{fig:er_core}
+\end{figure}
+\clearpage
+
+\FloatBarrier
+
+\begin{landscape}
+\begin{figure}[!htbp]
+    \centering
+    \adjustbox{max width=\linewidth, max totalheight=\textheight-2cm}{%
+        \includegraphics{figures/er_diagram_2.png}%
+    }
+    \vspace{-0.5cm}
+    \caption{ER Diagram - Productivity and Scheduling}
+    \label{fig:er_productivity}
+\end{figure}
+\end{landscape}
+
+\FloatBarrier
+
+\begin{landscape}
+\begin{figure}[!htbp]
+    \centering
+    \adjustbox{max width=\linewidth, max totalheight=\textheight-2cm}{%
+        \includegraphics{figures/er_diagram_3.png}%
+    }
+    \vspace{-0.5cm}
+    \caption{ER Diagram - Social and Collaboration}
+    \label{fig:er_social}
 \end{figure}
 \end{landscape}
 
