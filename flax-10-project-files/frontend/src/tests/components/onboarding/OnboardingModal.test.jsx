@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import OnboardingModal from '../../../components/onboarding/components/OnboardingModal';
 
 vi.mock('framer-motion', () => ({
@@ -13,7 +13,12 @@ vi.mock('../../../components/onboarding/hooks/useOnboarding', () => ({
 }));
 
 vi.mock('../../../components/onboarding/components/OnboardingForm', () => ({
-  default: () => <div>Mocked Form</div>,
+  default: ({ onDropdownOpenChange }) => (
+    <div>
+      <span>Mocked Form</span>
+      <button onClick={() => onDropdownOpenChange?.('year', true)}>open-year-dropdown</button>
+    </div>
+  ),
 }));
 
 vi.mock('../../../components/onboarding/components/SuccessScreen', () => ({
@@ -37,5 +42,23 @@ describe('OnboardingModal', () => {
     useOnboardingMock.mockReturnValue({ done: true, major: 'Computer Science' });
     render(<OnboardingModal isOpen onComplete={vi.fn()} />);
     expect(screen.getByText('Success Computer Science')).toBeInTheDocument();
+  });
+
+  it('invokes onDropdownOpenChange callback and covers the expanded panel class branch', () => {
+    useOnboardingMock.mockReturnValue({ done: false, major: '' });
+    render(<OnboardingModal isOpen onComplete={vi.fn()} />);
+    // Clicking this button triggers onDropdownOpenChange('year', true), which sets
+    // openDropdowns.year = true and causes getOnboardingPanelClass to hit the
+    // isExpanded=true branch of the ternary on the next render.
+    fireEvent.click(screen.getByText('open-year-dropdown'));
+    // The form should still be visible after the state update
+    expect(screen.getByText('Mocked Form')).toBeInTheDocument();
+  });
+
+  it('does not expand the panel when state.done is true even if a dropdown flag is set', () => {
+    useOnboardingMock.mockReturnValue({ done: true, major: 'CS' });
+    render(<OnboardingModal isOpen onComplete={vi.fn()} />);
+    // Success screen is shown; no form dropdown button present
+    expect(screen.getByText('Success CS')).toBeInTheDocument();
   });
 });

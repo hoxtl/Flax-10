@@ -48,7 +48,7 @@ describe('estTimeHelpBannerUtils', () => {
   });
 
   it('returns false when reading from storage throws', () => {
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation(() => {
       throw new Error('read fail');
     });
 
@@ -62,7 +62,7 @@ describe('estTimeHelpBannerUtils', () => {
     persistDismissedState(true);
     expect(localStorage.getItem(STORAGE_KEY)).toBe('1');
 
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
       throw new Error('write fail');
     });
 
