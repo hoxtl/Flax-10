@@ -225,13 +225,11 @@ def serialised_project(project, context):
 
 def _removal_permission_error(is_owner, is_self):
     """Return an HTTP error status if the removal is not permitted, else None."""
-    if is_self:
-        if is_owner:
-            return status.HTTP_400_BAD_REQUEST
-        return status.HTTP_403_FORBIDDEN
-    if not is_owner:
-        return status.HTTP_403_FORBIDDEN
-    return None
+    if not is_self and is_owner:
+        return None
+    if is_self and is_owner:
+        return status.HTTP_400_BAD_REQUEST
+    return status.HTTP_403_FORBIDDEN
 
 def remove_project_member(project, user, membership_id):
     membership = get_object_or_404(GroupMembership.objects.filter(project=project), id=membership_id)
