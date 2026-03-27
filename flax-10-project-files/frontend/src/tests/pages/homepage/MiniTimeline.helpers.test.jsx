@@ -216,12 +216,17 @@ describe("MiniTimeline helpers and parts", () => {
 
     it("formats gap durations, heights, and labels", () => {
       expect(formatGapDuration(130)).toBe("2h 10m");
+      expect(formatGapDuration(120)).toBe("2h");
       expect(formatGapDuration(45)).toBe("45m");
       expect(getGapMinHeight(90, 30)).toBeGreaterThanOrEqual(56);
+      expect(getGapMinHeight(0, 30)).toBe(56);
+      expect(getGapMinHeight(500, 0)).toBe(260);
       expect(getTinyGapMinHeight(10)).toBeGreaterThanOrEqual(24);
+      expect(getTinyGapMinHeight(0)).toBe(24);
       expect(getGapTimeLabel(60)).toBeTruthy();
       expect(getTinyGapTimeLabel(5)).toMatch(/^\d{2}:\d{2}$/);
       expect(getGapRecommendationTitle({ title: "Read chapter" })).toBe("Read chapter");
+      expect(getGapRecommendationTitle(null)).toBe("");
       expect(getConflictTimeLabel({ startMins: 30 })).toBeTruthy();
     });
   });
