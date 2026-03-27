@@ -25,7 +25,7 @@ describe("TaskFilterPanel", () => {
   it("renders Lists and Modules tabs", () => {
     render(<TaskFilterPanel {...defaultProps} />);
     expect(screen.getByRole("button", { name: /Lists/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Modules/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /modules/i })).toBeInTheDocument();
   });
 
   it("renders search input", () => {
@@ -40,7 +40,7 @@ describe("TaskFilterPanel", () => {
 
   it("calls onTabChange when Modules tab clicked", () => {
     render(<TaskFilterPanel {...defaultProps} />);
-    fireEvent.click(screen.getByRole("button", { name: /Modules/i }));
+    fireEvent.click(screen.getByRole("button", { name: /modules/i }));
     expect(defaultProps.onTabChange).toHaveBeenCalledWith("modules");
   });
 

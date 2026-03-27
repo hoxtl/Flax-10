@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import UserModuleDropdown from "../../../components/modules/UserModuleDropdown";
-import TravelTimeIndicator from "../../../components/modules/Modules/TravelTimeIndicator";
-import { useModuleTravelTime } from "../../../components/modules/Modules/useModuleTravelTime";
-import { useModuleCourseFilterState } from "../../../components/modules/Modules/useModuleCourseFilterState";
+import TravelTimeIndicator from "../../../components/modules/modules/TravelTimeIndicator";
+import { useModuleTravelTime } from "../../../components/modules/modules/useModuleTravelTime";
+import { useModuleCourseFilterState } from "../../../components/modules/modules/useModuleCourseFilterState";
 
 const useModulesMock = vi.fn();
 const getHomeAddressMock = vi.fn();

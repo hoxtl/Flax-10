@@ -20,7 +20,7 @@ vi.mock('../../../components/modules/utils/moduleHelpers', () => ({
     updateForm: vi.fn((field, value, form) => ({ ...form, [field]: value })),
 }));
 
-import ModuleForm from '../../../components/modules/Modules/ModuleForm';
+import ModuleForm from '../../../components/modules/modules/ModuleForm';
 import { createModule, updateModule } from '../../../api/moduleApi';
 import { validateForm } from '../../../components/modules/utils/moduleHelpers';
 

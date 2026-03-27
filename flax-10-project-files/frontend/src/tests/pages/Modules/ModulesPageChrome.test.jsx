@@ -19,7 +19,7 @@ vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: (props) => <div data-testid="skeleton-block" {...props} />,
 }));
 
-vi.mock("../../../components/modules/Modules/ModuleForm.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleForm.jsx", () => ({
   default: ({ onSuccess, onCancel, module }) => (
     <div>
       <div>{module ? "Editing module" : "New module"}</div>
@@ -30,7 +30,7 @@ vi.mock("../../../components/modules/Modules/ModuleForm.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/modules/Modules/ModuleDetails.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleDetails.jsx", () => ({
   default: ({ module, onBack, onEnroll, onUnenroll }) => (
     <div>
       <div>{module.module_code}</div>

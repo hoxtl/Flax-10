@@ -8,7 +8,7 @@ import InlineTitleField, { useInlineEdit } from "../../../components/common/inli
 import TaskPriorityPill from "../../../components/common/task_priority_pill/TaskPriorityPill";
 import DeadlineCountdown from "../../../components/common/deadline_countdown/DeadlineCountdown";
 import urgentGlowStyles from "../../../components/common/urgent_glow/UrgentGlow.module.css";
-import rowStyles from "../../Modules/DashboardRows.module.css";
+import rowStyles from "../../modules/DashboardRows.module.css";
 
 function getRowClassName(isOverdue, urgentGlow) {
   const base = rowStyles.deadlineRow;

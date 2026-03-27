@@ -27,7 +27,7 @@ vi.mock('../../components/modules/utils/moduleUtils', () => ({
     getDepartments: vi.fn(() => []),
     normaliseModuleCode: vi.fn((code) => String(code || '').toUpperCase().replace(/\s+/g, '')),
 }));
-vi.mock('../../components/modules/Modules/ModuleGrid', () => ({
+vi.mock('../../components/modules/modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (
         <div>
             <span>ModuleGrid</span>
@@ -36,7 +36,7 @@ vi.mock('../../components/modules/Modules/ModuleGrid', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/modules/Modules/ModuleForm', () => ({
+vi.mock('../../components/modules/modules/ModuleForm', () => ({
     default: ({ onCancel, onSuccess }) => (
         <div>
             <span>ModuleForm</span>
@@ -46,7 +46,7 @@ vi.mock('../../components/modules/Modules/ModuleForm', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/modules/Modules/ModuleDetails', () => ({
+vi.mock('../../components/modules/modules/ModuleDetails', () => ({
     default: ({ onBack }) => <div><button onClick={onBack}>Back</button></div>,
 }));
 vi.mock('../../components/modules/Deadlines/DeadlineModal', () => ({

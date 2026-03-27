@@ -21,7 +21,7 @@ vi.mock("../../../components/Auth/utils/userUtils.js", () => ({
   getInitials: (name) => (name ? name.split(" ").map((part) => part[0]).join("") : "T"),
 }));
 
-vi.mock("../../../components/modules/Modules/moduleTutorUtils", () => ({
+vi.mock("../../../components/modules/modules/moduleTutorUtils", () => ({
   getModuleTutorPhoto: () => "https://example.com/tutor.jpg",
   hideBrokenTutorImage: (event) => {
     event.currentTarget.style.display = "none";
@@ -63,10 +63,10 @@ vi.mock("../../../components/modules/shared/moduleCardActions", () => ({
   ),
 }));
 
-vi.mock("../../../components/modules/Modules/ModulesCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
+vi.mock("../../../components/modules/modules/ModulesCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
 vi.mock("../../../components/modules/Deadlines/DeadlineCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
 
-import ModulesCard from "../../../components/modules/Modules/ModulesCard";
+import ModulesCard from "../../../components/modules/modules/ModulesCard";
 import ReadingCard from "../../../components/modules/Readings/ReadingCard";
 
 describe("module card branch coverage", () => {

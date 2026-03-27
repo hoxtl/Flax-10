@@ -9,7 +9,7 @@ import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from '../hooks/useCalendarEvents';
 import { getInitialForm, validateAndSubmit } from '../utils/formUtils';
 import { getUserSettings } from '../../../api/userApi';
-import { isDuringSleepWindow } from '../../Settings/hooks/useSleepWarning';
+import { isDuringSleepWindow } from '../../settings/hooks/useSleepWarning';
 import { useToast } from '../../../context/ToastContext';
 
 async function fetchSleepSettings() {

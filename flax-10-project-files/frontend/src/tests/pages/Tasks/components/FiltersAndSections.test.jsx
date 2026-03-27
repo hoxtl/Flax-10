@@ -76,7 +76,7 @@ describe("Filters and sections coverage", () => {
       />,
     );
 
-    expect(screen.queryByRole("button", { name: /Modules/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /modules/i })).not.toBeInTheDocument();
     expect(screen.getByPlaceholderText("Search lists...")).toBeInTheDocument();
   });
 

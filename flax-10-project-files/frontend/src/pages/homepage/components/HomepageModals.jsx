@@ -4,9 +4,9 @@
 
 import { extractBaseEventId } from "../../../components/calendar/utils/eventUtils";
 import { isToday } from "../../../components/calendar/utils/dateUtils";
-import CreateTaskModal from "../../Tasks/components/CreateTaskModal";
-import CreateListModal from "../../Tasks/components/CreateListModal";
-import { EditTaskModal } from "../../Tasks/components/TaskCard";
+import CreateTaskModal from "../../tasks/components/CreateTaskModal";
+import CreateListModal from "../../tasks/components/CreateListModal";
+import { EditTaskModal } from "../../tasks/components/TaskCard";
 import { PlanReadDetailModal } from "./PlanReadDetailModal";
 
 function findRoutineTag(tags, title) {

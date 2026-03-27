@@ -1,15 +1,15 @@
 import { useState } from "react";
 import Card from "../../../../components/common/Card/Card";
 import ProfileWidget from "./ProfileWidget";
-import AttendanceCharts from "./Attendance/AttendanceCharts";
+import AttendanceCharts from "./attendance/AttendanceCharts";
 import {
   AttendanceWarningBadge,
   CompactAttHeader,
   CompactByTypeDonut,
   CompactOverallDonut,
   SegmentDetailPanelWrapper,
-} from "./Attendance/AttendanceShared";
-import { useAttendanceWidgetData } from "./Attendance/useAttendanceWidgetData";
+} from "./attendance/AttendanceShared";
+import { useAttendanceWidgetData } from "./attendance/useAttendanceWidgetData";
 import widgetStyles from "./ProfileWidgets.module.css";
 import attendanceStyles from "./ProfileAttendance.module.css";
 

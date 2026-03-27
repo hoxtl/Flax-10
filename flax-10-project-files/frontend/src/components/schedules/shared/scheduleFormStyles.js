@@ -2,6 +2,6 @@
  * Shared schedule form styles.
  */
 
-import styles from '../../Dashboard/QuickAddModal.module.css';
+import styles from '../../dashboard/QuickAddModal.module.css';
 
 export default styles;

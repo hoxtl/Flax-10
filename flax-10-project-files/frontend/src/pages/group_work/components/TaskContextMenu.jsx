@@ -5,7 +5,7 @@
 import { createPortal } from "react-dom";
 import { useEffect } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import ctxStyles from "../../Tasks/components/TaskCardContextMenu.module.css";
+import ctxStyles from "../../tasks/components/TaskCardContextMenu.module.css";
 
 function ContextMenuPortal({ pos, task, onDelete, onClose, onEditStart }) {
     const menuPos = { '--ctx-top': `${pos.y}px`, '--ctx-left': `${pos.x}px` };

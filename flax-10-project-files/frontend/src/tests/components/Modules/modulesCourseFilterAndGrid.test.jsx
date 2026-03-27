@@ -1,5 +1,5 @@
 /**
- * Extra coverage tests for Modules/Modules/ components and hooks that are
+ * Extra coverage tests for Modules/modules/ components and hooks that are
  * not already fully exercised by existing test files.
  *
  * Targets:
@@ -17,7 +17,7 @@ import { renderHook, act } from '@testing-library/react';
 
 // CSS module mocks
 
-vi.mock('../../../components/modules/Modules/ModuleCourseFilter.module.css', () => ({
+vi.mock('../../../components/modules/modules/ModuleCourseFilter.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 vi.mock('../../../components/common/Card/CardGrid.module.css', () => ({
@@ -72,15 +72,15 @@ vi.mock('../../../lib/kclCourses', () => ({
 }));
 
 // ModuleGrid dependency: ModulesCard mock
-vi.mock('../../../components/modules/Modules/ModulesCard.jsx', () => ({
+vi.mock('../../../components/modules/modules/ModulesCard.jsx', () => ({
   default: ({ module }) => <div data-testid="modules-card">{module.module_name}</div>,
 }));
 
 // Imports under test
 
-import { useModuleCourseFilterState } from '../../../components/modules/Modules/useModuleCourseFilterState';
-import ModuleCourseFilter from '../../../components/modules/Modules/ModuleCourseFilter';
-import ModuleGrid from '../../../components/modules/Modules/ModuleGrid';
+import { useModuleCourseFilterState } from '../../../components/modules/modules/useModuleCourseFilterState';
+import ModuleCourseFilter from '../../../components/modules/modules/ModuleCourseFilter';
+import ModuleGrid from '../../../components/modules/modules/ModuleGrid';
 
 
 // useModuleCourseFilterState

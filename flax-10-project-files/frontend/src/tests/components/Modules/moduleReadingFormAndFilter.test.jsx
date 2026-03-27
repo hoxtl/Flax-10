@@ -77,7 +77,7 @@ vi.mock("../../../components/common/hooks/useClickOutside", () => ({
   useClickOutside: (...args) => useClickOutside(...args),
 }));
 
-vi.mock("../../../components/modules/Modules/useModuleCourseFilterState", () => ({
+vi.mock("../../../components/modules/modules/useModuleCourseFilterState", () => ({
   useModuleCourseFilterState: () => ({
     isOpen: true,
     setIsOpen: vi.fn(),
@@ -98,7 +98,7 @@ vi.mock("../../../lib/kclCourses", () => ({
 
 import ReadingForm from "../../../components/modules/Readings/ReadingForm";
 import ReadingModal from "../../../components/modules/Readings/ReadingModal";
-import ModuleCourseFilter from "../../../components/modules/Modules/ModuleCourseFilter";
+import ModuleCourseFilter from "../../../components/modules/modules/ModuleCourseFilter";
 
 describe("module reading and filter extras", () => {
   beforeEach(() => {

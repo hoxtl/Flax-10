@@ -10,7 +10,7 @@ import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { ConfirmModal } from "../../../components/common";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { MiniTimeline } from "./mini_timeline";
-import widgetStyles from "../../Modules/DashboardWidgets.module.css";
+import widgetStyles from "../../modules/DashboardWidgets.module.css";
 
 const SECTION_ANIMATION = { opacity: 0, y: 30 };
 const SECTION_VISIBLE = { opacity: 1, y: 0 };

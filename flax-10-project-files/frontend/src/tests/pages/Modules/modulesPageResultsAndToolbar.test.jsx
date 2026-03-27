@@ -99,11 +99,11 @@ vi.mock("../../../components/pagination/Pagination.jsx", () => ({
   BackToTop: () => <div>BackToTop</div>,
 }));
 
-vi.mock("../../../components/modules/Modules/ModuleCourseFilter", () => ({
+vi.mock("../../../components/modules/modules/ModuleCourseFilter", () => ({
   default: () => <div>CourseFilter</div>,
 }));
 
-vi.mock("../../../components/modules/Modules/ModuleGrid.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleGrid.jsx", () => ({
   default: ({ modules, onDelete, onEdit, onViewModule }) => (
     <div data-testid="module-grid">
       {modules.map((module) => (

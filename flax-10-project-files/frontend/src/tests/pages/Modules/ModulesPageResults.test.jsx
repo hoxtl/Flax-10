@@ -3,11 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../../components/modules/Modules/ModuleGrid.jsx", () => ({
+vi.mock("../../../components/modules/modules/ModuleGrid.jsx", () => ({
   default: ({ modules }) => <div data-testid="module-grid">{modules.map(m => <div key={m.id}>{m.module_code}</div>)}</div>,
 }));
 
-vi.mock("../../../components/modules/Modules/ModuleCourseFilter", () => ({
+vi.mock("../../../components/modules/modules/ModuleCourseFilter", () => ({
   default: () => <div>CourseFilter</div>,
 }));
 

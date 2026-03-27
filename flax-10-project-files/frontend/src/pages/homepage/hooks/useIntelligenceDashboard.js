@@ -11,7 +11,7 @@ import { getAttendancePercentage } from "../../../components/analytics/attendanc
 import { loadTermConfig } from "../../../lib/termConfig";
 import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/IntelligenceUtils";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
-import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
+import useAnalyticsOverview from "../../analytics/hooks/useAnalyticsOverview";
 
 export const CATALOGUE = [
   { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 1, minRow: 1, maxRow: 1, section: "Essentials" },
