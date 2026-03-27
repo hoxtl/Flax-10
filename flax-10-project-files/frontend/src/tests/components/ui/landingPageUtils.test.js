@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
   buildTransform,
@@ -18,6 +18,26 @@ import {
 } from "../../../components/ui/landing_page/landingPageUtils";
 
 describe("landingPageUtils", () => {
+  let originalWindow;
+  let originalDocument;
+
+  beforeEach(() => {
+    originalWindow = globalThis.window;
+    originalDocument = globalThis.document;
+    globalThis.window = { pageYOffset: 0, innerHeight: 0 };
+    globalThis.document = {
+      documentElement: {
+        scrollTop: 0,
+        scrollHeight: 0,
+      },
+    };
+  });
+
+  afterEach(() => {
+    globalThis.window = originalWindow;
+    globalThis.document = originalDocument;
+  });
+
   it("covers the basic numeric helpers", () => {
     expect(lerp(0, 10, 0.25)).toBe(2.5);
     expect(cx("alpha", "", null, "beta")).toBe("alpha beta");
@@ -26,9 +46,9 @@ describe("landingPageUtils", () => {
 
   it("reads scroll positions and dimensions for window and element targets", () => {
     Object.defineProperty(window, "pageYOffset", { configurable: true, value: 90, writable: true });
-    Object.defineProperty(window, "innerHeight", { configurable: true, value: 600 });
-    Object.defineProperty(document.documentElement, "scrollTop", { configurable: true, value: 45 });
-    Object.defineProperty(document.documentElement, "scrollHeight", { configurable: true, value: 1500 });
+    Object.defineProperty(window, "innerHeight", { configurable: true, value: 600, writable: true });
+    Object.defineProperty(document.documentElement, "scrollTop", { configurable: true, value: 45, writable: true });
+    Object.defineProperty(document.documentElement, "scrollHeight", { configurable: true, value: 1500, writable: true });
 
     const element = { scrollTop: 30, scrollHeight: 700, clientHeight: 200 };
 

@@ -49,6 +49,25 @@ import {
     getTaskDurationLabel,
 } from '../../../components/timer/task_input/taskInputUtils';
 
+beforeEach(async () => {
+    vi.clearAllMocks();
+    const { normalizeModuleCode, getModuleCodePrefix } = await import('../../../utils/moduleCodeUtils');
+    const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
+    const { compareTaskDue, compareTaskEstimatedTime, compareTaskPriority, getTaskDurationMinutes } = await import('../../../lib/focusPlanner');
+
+    normalizeModuleCode.mockImplementation((code) => (code ? String(code).toUpperCase().trim() : null));
+    getModuleCodePrefix.mockImplementation((code) => (code ? String(code).slice(0, 2) : ''));
+    isEnrolledIn.mockImplementation((id, enrollments) => enrollments.some((e) => e.module_id === id || e === id));
+    compareTaskDue.mockImplementation((a, b) => {
+        const da = a.due_date ? new Date(a.due_date).getTime() : Infinity;
+        const db = b.due_date ? new Date(b.due_date).getTime() : Infinity;
+        return da - db;
+    });
+    compareTaskEstimatedTime.mockImplementation((a, b) => (a.estimated_blocks || 1) - (b.estimated_blocks || 1));
+    compareTaskPriority.mockImplementation(() => 0);
+    getTaskDurationMinutes.mockImplementation((task) => (task.estimated_blocks || 1) * 25);
+});
+
 describe('getTaskUrgencyTone', () => {
     it('returns "cool" when no due date', () => {
         expect(getTaskUrgencyTone({})).toBe('cool');
