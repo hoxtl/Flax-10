@@ -32,17 +32,17 @@ function GroupWorkPageSubtitle() {
     return <>Keep <em>shared project work</em>, <em>module context</em>, <em>team planning</em>, and <em>deadlines</em> in one calm place.</>;
 }
 
+function getUrgentProjectDays(project) {
+    const days = getDaysLeft(getProjectDate(project.deadline));
+    return days !== null && days >= 0 && days <= 7 ? days : null;
+}
+
 function getMostUrgentProject(projects) {
-    let best = null;
-    let bestDays = Infinity;
-    for (const p of projects || []) {
-        const days = getDaysLeft(getProjectDate(p.deadline));
-        if (days !== null && days >= 0 && days <= 7 && days < bestDays) {
-            best = p;
-            bestDays = days;
-        }
-    }
-    return best ? { project: best, daysLeft: bestDays } : null;
+    const ranked = (projects || [])
+        .map((project) => ({ project, daysLeft: getUrgentProjectDays(project) }))
+        .filter(({ daysLeft }) => daysLeft !== null)
+        .sort((a, b) => a.daysLeft - b.daysLeft);
+    return ranked[0] || null;
 }
 
 function deadlineBannerLabel(daysLeft) {
