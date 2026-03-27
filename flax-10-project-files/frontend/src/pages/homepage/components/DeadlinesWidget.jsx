@@ -1,6 +1,6 @@
 import { AlarmClock } from "lucide-react";
 import { Link } from "react-router-dom";
-import { UpcomingDeadlinesWidget } from '../../../components/modules/Deadlines/UpcomingDeadlinesWidget';
+import { UpcomingDeadlinesWidget } from '../../../components/modules/deadlines/UpcomingDeadlinesWidget';
 import EmptyStateCard from "./EmptyStateCard";
 import taskStyles from "../styles/TaskWidget.module.css";
 

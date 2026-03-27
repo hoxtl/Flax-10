@@ -41,7 +41,7 @@ vi.mock("../../../components/modules/modules/ModuleDetails.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/modules/Deadlines/DeadlineModal.jsx", () => ({
+vi.mock("../../../components/modules/deadlines/DeadlineModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Deadline ${module.module_code}`}</div>
@@ -50,7 +50,7 @@ vi.mock("../../../components/modules/Deadlines/DeadlineModal.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/modules/Readings/ReadingModal.jsx", () => ({
+vi.mock("../../../components/modules/readings/ReadingModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Reading ${module.module_code}`}</div>

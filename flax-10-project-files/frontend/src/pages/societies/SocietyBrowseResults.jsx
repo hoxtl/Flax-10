@@ -3,7 +3,7 @@
  */
 
 import SocietyCard from "../../components/society/SocietyCard";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
+import gridStyles from "../../components/common/card/CardGrid.module.css";
 import EmptyState from "../../components/common/empty_state/EmptyState";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState";
 import { Pagination } from "../../components/pagination/Pagination";

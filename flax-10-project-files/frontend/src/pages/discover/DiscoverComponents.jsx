@@ -3,8 +3,8 @@
  */
 
 import { SegmentedControl } from "../../components/common";
-import GridCard from "../../components/common/Card/GridCard";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
+import GridCard from "../../components/common/card/GridCard";
+import gridStyles from "../../components/common/card/CardGrid.module.css";
 import EmptyState from "../../components/common/empty_state/EmptyState";
 import EntityLinkChip from "../../components/common/entity_link_chip/EntityLinkChip";
 import PageToolbar, { ToolbarSortControl } from "../../components/common/page_toolbar/PageToolbar";

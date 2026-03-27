@@ -53,7 +53,7 @@ vi.mock("../../../components/modules/hooks/useReadingModal", () => ({
   useReadingModal: (...args) => useReadingModal(...args),
 }));
 
-vi.mock("../../../components/modules/Readings/ReadingCard", () => ({
+vi.mock("../../../components/modules/readings/ReadingCard", () => ({
   default: ({ reading, onEdit, onDelete }) => (
     <div>
       <span>{reading.title}</span>
@@ -96,8 +96,8 @@ vi.mock("../../../lib/kclCourses", () => ({
   },
 }));
 
-import ReadingForm from "../../../components/modules/Readings/ReadingForm";
-import ReadingModal from "../../../components/modules/Readings/ReadingModal";
+import ReadingForm from "../../../components/modules/readings/ReadingForm";
+import ReadingModal from "../../../components/modules/readings/ReadingModal";
 import ModuleCourseFilter from "../../../components/modules/modules/ModuleCourseFilter";
 
 describe("module reading and filter extras", () => {

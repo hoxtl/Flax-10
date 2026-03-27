@@ -53,7 +53,7 @@ vi.mock("../../../components/common/search_bar/SearchBar.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/Tabs/Tabs", () => ({
+vi.mock("../../../components/common/tabs/Tabs", () => ({
   default: ({ tabs, activeTab, onTabChange }) => (
     <div>
       {tabs.map((tab) => (

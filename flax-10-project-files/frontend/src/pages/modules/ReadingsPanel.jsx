@@ -10,7 +10,7 @@ import urgentGlowStyles from '../../components/common/urgent_glow/UrgentGlow.mod
 import {
     TIER_ACCENT,
     getUrgencyTier,
-} from '../../components/modules/Deadlines/upcomingDeadlinesUtils';
+} from '../../components/modules/deadlines/upcomingDeadlinesUtils';
 import { AddReadingToTasksButton } from '../../components/modules/shared/taskButtons.jsx';
 import {
     containerVariants,

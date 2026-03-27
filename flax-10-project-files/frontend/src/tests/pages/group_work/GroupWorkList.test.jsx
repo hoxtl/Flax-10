@@ -16,7 +16,7 @@ vi.mock("../../../pages/group_work/utils/taskUtils", () => ({
   filterVisibleAssignees: vi.fn((a) => a),
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 

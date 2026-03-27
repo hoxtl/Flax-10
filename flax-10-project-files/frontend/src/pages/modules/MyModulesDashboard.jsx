@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import { getSuggestedReadings } from "../../api/readingApi";
-import { UpcomingDeadlinesWidget } from "../../components/modules/Deadlines/UpcomingDeadlinesWidget";
+import { UpcomingDeadlinesWidget } from "../../components/modules/deadlines/UpcomingDeadlinesWidget";
 import { isEnrolledIn } from "../../components/modules/utils/moduleUtils";
 import StatStrip from "../../components/common/stat_strip/StatStrip";
 import { useCountUp } from "../../hooks/useCountUp";

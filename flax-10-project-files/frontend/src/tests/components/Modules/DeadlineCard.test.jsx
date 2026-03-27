@@ -5,7 +5,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import DeadlineCard from '../../../components/modules/Deadlines/DeadlineCard';
+import DeadlineCard from '../../../components/modules/deadlines/DeadlineCard';
 
 vi.mock('../../../components/modules/utils/deadlineUtils', () => ({
     getDeadlineCountdown: vi.fn(() => '5 days remaining'),
@@ -16,7 +16,7 @@ vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     formatFullDateTime: vi.fn(() => 'Friday, 6 March 2026, 10:00'),
 }));
 
-vi.mock('../../../components/modules/Deadlines/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
+vi.mock('../../../components/modules/deadlines/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
 
 import { getDeadlineCountdown } from '../../../components/modules/utils/deadlineUtils';
 

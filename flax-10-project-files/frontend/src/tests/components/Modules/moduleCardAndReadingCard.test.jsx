@@ -28,7 +28,7 @@ vi.mock("../../../components/modules/modules/moduleTutorUtils", () => ({
   },
 }));
 
-vi.mock("../../../components/common/Card/GridCard", () => ({
+vi.mock("../../../components/common/card/GridCard", () => ({
   default: ({ children, onClick, className, style }) => (
     <div role="button" tabIndex={0} onClick={onClick} className={className} style={style}>
       {children}
@@ -64,10 +64,10 @@ vi.mock("../../../components/modules/shared/moduleCardActions", () => ({
 }));
 
 vi.mock("../../../components/modules/modules/ModulesCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
-vi.mock("../../../components/modules/Deadlines/DeadlineCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
+vi.mock("../../../components/modules/deadlines/DeadlineCard.module.css", () => ({ default: new Proxy({}, { get: (_, key) => key }) }));
 
 import ModulesCard from "../../../components/modules/modules/ModulesCard";
-import ReadingCard from "../../../components/modules/Readings/ReadingCard";
+import ReadingCard from "../../../components/modules/readings/ReadingCard";
 
 describe("module card branch coverage", () => {
   beforeEach(() => {

@@ -6,7 +6,7 @@ const getDayCountMock = vi.fn();
 const addDeadlineAddedMock = vi.fn();
 const addReadingAddedMock = vi.fn();
 
-vi.mock("../../../components/modules/Deadlines/upcomingDeadlinesUtils", () => ({
+vi.mock("../../../components/modules/deadlines/upcomingDeadlinesUtils", () => ({
   getDayCount: (...args) => getDayCountMock(...args),
 }));
 

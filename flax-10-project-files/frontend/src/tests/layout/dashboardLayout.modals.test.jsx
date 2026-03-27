@@ -7,10 +7,10 @@ vi.mock("../../components/calendar/event_modal/EventModal", () => ({
 vi.mock("../../components/society/CreateSocietyModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/modules/Deadlines/DeadlineModal", () => ({
+vi.mock("../../components/modules/deadlines/DeadlineModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/modules/Readings/ReadingModal", () => ({
+vi.mock("../../components/modules/readings/ReadingModal", () => ({
   default: () => null,
 }));
 vi.mock("../../components/dashboard/QuickAddModal", () => ({

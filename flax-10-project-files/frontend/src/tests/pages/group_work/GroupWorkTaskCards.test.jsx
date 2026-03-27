@@ -54,7 +54,7 @@ vi.mock("../../../pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 

@@ -80,11 +80,11 @@ vi.mock("../../components/society/CreateSocietyModal", async () => {
   const { CreateSocietyMock } = await import("./dashboardMocks");
   return { default: CreateSocietyMock };
 });
-vi.mock("../../components/modules/Deadlines/DeadlineModal", async () => {
+vi.mock("../../components/modules/deadlines/DeadlineModal", async () => {
   const { DeadlineModalMock } = await import("./dashboardMocks");
   return { default: DeadlineModalMock };
 });
-vi.mock("../../components/modules/Readings/ReadingModal", async () => {
+vi.mock("../../components/modules/readings/ReadingModal", async () => {
   const { ReadingModalMock } = await import("./dashboardMocks");
   return { default: ReadingModalMock };
 });

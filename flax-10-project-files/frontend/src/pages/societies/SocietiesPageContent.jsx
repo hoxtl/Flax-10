@@ -7,7 +7,7 @@ import { useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import AppPage from "../../components/common/app_page/AppPage";
 import PageTransition from "../../components/common/page_transition/PageTransition";
-import Tabs from "../../components/common/Tabs/Tabs";
+import Tabs from "../../components/common/tabs/Tabs";
 import SearchBar from "../../components/common/search_bar/SearchBar";
 import { BackToTop } from "../../components/pagination/Pagination";
 import { usePagination } from "../../hooks/usePagination";

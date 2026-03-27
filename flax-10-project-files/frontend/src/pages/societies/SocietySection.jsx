@@ -4,7 +4,7 @@
  */
 
 import styles from "./SocietiesPage.module.css";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
+import gridStyles from "../../components/common/card/CardGrid.module.css";
 import SocietyCard from "../../components/society/SocietyCard";
 import BrowseCard from "../../components/society/BrowseCard";
 import CreateCard from "../../components/society/CreateCard";

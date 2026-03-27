@@ -28,7 +28,7 @@ vi.mock("../../../components/timer/TimerCircle", () => ({
   TimerRing: () => <div>Timer ring</div>,
 }));
 
-vi.mock("../../../components/common/Tabs/Tabs", () => ({
+vi.mock("../../../components/common/tabs/Tabs", () => ({
   default: ({ tabs, activeTab, onTabChange }) => (
     <div>
       <div>Active tab: {activeTab}</div>

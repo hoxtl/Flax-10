@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import DeadlineForm from '../../../components/modules/Deadlines/DeadlineForm';
+import DeadlineForm from '../../../components/modules/deadlines/DeadlineForm';
 
 vi.mock('../../../components/modules/utils/deadlineUtils', () => ({
     DEADLINE_TYPES: [
@@ -42,7 +42,7 @@ vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
     ),
 }));
 
-vi.mock('../../../components/modules/Deadlines/DeadlineForm.module.css', () => ({ default: {} }));
+vi.mock('../../../components/modules/deadlines/DeadlineForm.module.css', () => ({ default: {} }));
 
 describe('DeadlineForm', () => {
     it('should render the title and type field', () => {

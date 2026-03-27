@@ -49,7 +49,7 @@ vi.mock('../../components/modules/modules/ModuleForm', () => ({
 vi.mock('../../components/modules/modules/ModuleDetails', () => ({
     default: ({ onBack }) => <div><button onClick={onBack}>Back</button></div>,
 }));
-vi.mock('../../components/modules/Deadlines/DeadlineModal', () => ({
+vi.mock('../../components/modules/deadlines/DeadlineModal', () => ({
     default: ({ onClose }) => <div><button onClick={onClose}>CloseModal</button></div>,
 }));
 vi.mock('../../pages/modules/ModulesPage.module.css', () => ({ default: {} }));

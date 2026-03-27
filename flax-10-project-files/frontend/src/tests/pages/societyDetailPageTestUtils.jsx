@@ -202,12 +202,12 @@ vi.mock("../../pages/societies/useSocietyDetailPageState", () => ({
 
 vi.mock("../../components/society/SocietyDetail/SocietyHero", () => ({ default: SocietyHeroMock }));
 vi.mock("../../components/society/SocietyDetail/SocietyInfo", () => ({ default: SocietyInfoMock }));
-vi.mock("../../components/society/SocietyDetail/Tabs/SocietyTabs", () => ({ default: SocietyTabsMock }));
+vi.mock("../../components/society/SocietyDetail/tabs/SocietyTabs", () => ({ default: SocietyTabsMock }));
 vi.mock("../../components/society/SocietyDetail/SocietySidebar", () => ({ default: SocietySidebarMock }));
 vi.mock("../../components/society/SocietyDetail/imageHandlers/CoverImageModal", () => ({ default: CoverImageModalMock }));
 vi.mock("../../components/society/SocietyDetail/imageHandlers/ImageGalleryModal", () => ({ default: ImageGalleryModalMock }));
 vi.mock("../../components/society/SocietyDetail/SettingsModal", () => ({ default: SettingsModalMock }));
-vi.mock("../../components/society/SocietyDetail/Tabs/announcementTab/AnnouncementModal", () => ({ default: AnnouncementModalMock }));
+vi.mock("../../components/society/SocietyDetail/tabs/announcementTab/AnnouncementModal", () => ({ default: AnnouncementModalMock }));
 vi.mock("../../components/society/SocietyDetail/ReportSocietyModal", () => ({ default: ReportSocietyModalMock }));
 vi.mock("../../components/society/SocietyDetail/MemberDirectoryModal", () => ({ default: MemberDirectoryModalMock }));
 vi.mock("../../components/common/BackButton/BackButton.jsx", () => ({ default: BackButtonMock }));

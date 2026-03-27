@@ -4,14 +4,14 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ReadingModal from '../../../components/modules/Readings/ReadingModal';
+import ReadingModal from '../../../components/modules/readings/ReadingModal';
 import { useReadingModal } from '../../../components/modules/hooks/useReadingModal';
 
 vi.mock('../../../components/modules/hooks/useReadingModal', () => ({
     useReadingModal: vi.fn(),
 }));
 
-vi.mock('../../../components/modules/Readings/ReadingForm', () => ({
+vi.mock('../../../components/modules/readings/ReadingForm', () => ({
     default: ({ onCancel}) => (
         <div>
             <span>ReadingForm</span>
@@ -20,7 +20,7 @@ vi.mock('../../../components/modules/Readings/ReadingForm', () => ({
     ),
 }));
 
-vi.mock('../../../components/modules/Readings/ReadingCard', () => ({
+vi.mock('../../../components/modules/readings/ReadingCard', () => ({
     default: ({ reading }) => (
         <div> {reading.title} </div>
     ),

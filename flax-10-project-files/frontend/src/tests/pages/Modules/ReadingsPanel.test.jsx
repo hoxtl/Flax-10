@@ -35,7 +35,7 @@ vi.mock("../../../components/common/urgent_glow/UrgentGlow.module.css", () => ({
   },
 }));
 
-vi.mock("../../../components/modules/Deadlines/upcomingDeadlinesUtils", () => ({
+vi.mock("../../../components/modules/deadlines/upcomingDeadlinesUtils", () => ({
   TIER_ACCENT: {
     overdue: "#f00",
     critical: "#c00",

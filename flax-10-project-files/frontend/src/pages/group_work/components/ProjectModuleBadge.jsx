@@ -4,7 +4,7 @@
 
 import { BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import Badge from "../../../components/common/Badge/Badge";
+import Badge from "../../../components/common/badge/Badge";
 
 export default function GroupWorkProjectModuleBadge({ project, linkClassName, badgeClassName, codeClassName }) {
   const code = project?.course_code;
