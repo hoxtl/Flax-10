@@ -1,15 +1,102 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { resolveQuickAddModal } from "../../layout/dashboard_layout/dashboardLayoutActions";
-import { formatUserYear } from "../../layout/dashboard_layout/dashboardLayoutUser";
+vi.mock("../../api/authApi", () => ({
+  authService: {
+    logout: vi.fn(),
+  },
+}));
+
+vi.mock("../../components/Auth/utils/authHelpers", () => ({
+  clearUserData: vi.fn(),
+}));
+
+import {
+  handleLogoutClick,
+  handlePendingAction,
+  resolveQuickAddModal,
+  shouldBlockTimerNavigation,
+  shouldShowBackToTop,
+} from "../../layout/dashboard_layout/dashboardLayoutActions";
+import {
+  formatUserYear,
+  getStoredUser,
+  parseStoredUser,
+} from "../../layout/dashboard_layout/dashboardLayoutUser";
 
 describe("dashboard layout helpers", () => {
-  it("formats non-numeric years without forcing a Year prefix", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  it("formats years across empty, numeric, and prefixed cases", () => {
+    expect(formatUserYear("")).toBe("Year: ");
+    expect(formatUserYear(" 3 ")).toBe("Year 3");
     expect(formatUserYear("Foundation")).toBe("Foundation");
     expect(formatUserYear("Year 4")).toBe("Year 4");
   });
 
-  it("routes add_reading quick-add actions to the reading modal handler", () => {
+  it("parses stored users and falls back cleanly", () => {
+    expect(
+      parseStoredUser({
+        first_name: "Ada",
+        last_name: "Lovelace",
+        year: "2",
+        major: "",
+        email: "ada@example.com",
+        username: "ada",
+        is_superuser: 1,
+        role: "teacher",
+      }),
+    ).toEqual({
+      name: "Ada Lovelace",
+      year: "Year 2",
+      major: "Major: ",
+      email: "ada@example.com",
+      username: "ada",
+      isAdmin: true,
+      role: "teacher",
+    });
+
+    localStorage.setItem("user", JSON.stringify({ username: "sam", year: "Foundation", email: "s@example.com" }));
+    expect(getStoredUser()).toMatchObject({ name: "sam", year: "Foundation" });
+
+    localStorage.setItem("user", "{bad json");
+    expect(getStoredUser()).toBeUndefined();
+    localStorage.removeItem("user");
+    expect(getStoredUser()).toBeUndefined();
+  });
+
+  it("handles logout, pending actions, back-to-top visibility, and timer blocking", async () => {
+    const { authService } = await import("../../api/authApi");
+    const { clearUserData } = await import("../../components/Auth/utils/authHelpers");
+
+    await handleLogoutClick();
+    expect(authService.logout).toHaveBeenCalled();
+    expect(clearUserData).toHaveBeenCalled();
+
+    authService.logout.mockRejectedValueOnce(new Error("boom"));
+    await handleLogoutClick();
+    expect(clearUserData).toHaveBeenCalledTimes(2);
+
+    expect(shouldShowBackToTop("settings")).toBe(true);
+    expect(shouldShowBackToTop("group-work")).toBe(false);
+
+    expect(shouldBlockTimerNavigation("timer", { isActive: true, isPaused: false, mode: "work" })).toBe(true);
+    expect(shouldBlockTimerNavigation("timer", { isActive: true, isPaused: true, mode: "work" })).toBe(false);
+    expect(shouldBlockTimerNavigation("timer", { isActive: true, isPaused: false, mode: "break" })).toBe(false);
+    expect(shouldBlockTimerNavigation("calendar", { isActive: true, isPaused: false })).toBe(false);
+
+    const setShowQuickAdd = vi.fn();
+    const onNavChange = vi.fn();
+    handlePendingAction("QUICK_ADD", setShowQuickAdd, onNavChange);
+    expect(setShowQuickAdd).toHaveBeenCalledWith(true);
+    handlePendingAction("settings", setShowQuickAdd, onNavChange);
+    expect(onNavChange).toHaveBeenCalledWith("settings");
+    expect(handlePendingAction("profile", setShowQuickAdd)).toBeUndefined();
+  });
+
+  it("routes each quick-add action to the right handler", () => {
     const actions = {
       openSociety: vi.fn(),
       openTask: vi.fn(),
@@ -20,9 +107,18 @@ describe("dashboard layout helpers", () => {
     };
     const module = { module_code: "CS102" };
 
+    resolveQuickAddModal("society", module, actions);
+    resolveQuickAddModal("task", module, actions);
+    resolveQuickAddModal("create_module", module, actions);
+    resolveQuickAddModal("add_deadline", module, actions);
     resolveQuickAddModal("add_reading", module, actions);
+    resolveQuickAddModal("meeting", module, actions);
 
+    expect(actions.openSociety).toHaveBeenCalled();
+    expect(actions.openTask).toHaveBeenCalled();
+    expect(actions.openModuleCreator).toHaveBeenCalled();
+    expect(actions.openDeadline).toHaveBeenCalledWith(module);
     expect(actions.openReading).toHaveBeenCalledWith(module);
-    expect(actions.openCalendar).not.toHaveBeenCalled();
+    expect(actions.openCalendar).toHaveBeenCalledWith("meeting");
   });
 });
