@@ -34,14 +34,17 @@ def _pick_badge(username):
         return _FIXTURE_PINNED[username]
     return _BADGE_IDS[_stable_hash(username) % len(_BADGE_IDS)]
 
+def _users_without_pinned_badges():
+    return [user for user in User.objects.all() if not user.pinned_badge_id]
+
+def _assign_pinned_badges(users):
+    for user in users:
+        user.pinned_badge_id = _pick_badge(user.username)
+    return users
+
 def seed_pinned_badges(stdout):
     """Assign a deterministic pinned badge to every user that has none."""
-    users = list(User.objects.all())
-    to_update = []
-    for user in users:
-        if not user.pinned_badge_id:
-            user.pinned_badge_id = _pick_badge(user.username)
-            to_update.append(user)
+    to_update = _assign_pinned_badges(_users_without_pinned_badges())
     if to_update:
         User.objects.bulk_update(to_update, ["pinned_badge_id"])
     stdout.write(f"  \u2713  {'Pinned badges':<14} {len(to_update)}")
