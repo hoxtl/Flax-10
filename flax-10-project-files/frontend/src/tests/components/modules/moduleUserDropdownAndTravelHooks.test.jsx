@@ -17,9 +17,11 @@ vi.mock("../../../components/modules/hooks/useModules", () => ({
 }));
 
 vi.mock("../../../components/common/animated_dropdown/AnimatedDropdown", () => ({
-  default: ({ options, placeholder, onChange, value }) => (
+  default: ({ options, placeholder, onChange, value, className, triggerClassName }) => (
     <div>
-      <div>{placeholder}</div>
+      <div data-testid="placeholder">{placeholder}</div>
+      <div data-testid="className">{className || ""}</div>
+      <div data-testid="triggerClassName">{triggerClassName || ""}</div>
       <div>{options.map((option) => option.label).join("|")}</div>
       <button onClick={() => onChange?.("CS101")}>{value || "change"}</button>
     </div>
@@ -66,6 +68,33 @@ describe("Module extras", () => {
     useModulesMock.mockReturnValueOnce({ enrollments: null, loading: true });
     render(<UserModuleDropdown value="" onChange={onChange} />);
     expect(screen.getByText("Loading modules...")).toBeInTheDocument();
+  });
+
+  it("supports none option, custom placeholder, and label fallbacks", () => {
+    const onChange = vi.fn();
+    useModulesMock.mockReturnValueOnce({
+      enrollments: [
+        { module_code: "CS101" },
+        { module_name: "History of Art" },
+      ],
+      loading: false,
+    });
+
+    render(
+      <UserModuleDropdown
+        value=""
+        onChange={onChange}
+        allowNone={true}
+        placeholder="Pick one"
+        className="outer-shell"
+        triggerClassName="trigger-shell"
+      />,
+    );
+
+    expect(screen.getByText("None|CS101|History of Art")).toBeInTheDocument();
+    expect(screen.getByTestId("placeholder")).toHaveTextContent("Pick one");
+    expect(screen.getByTestId("className")).toHaveTextContent("outer-shell");
+    expect(screen.getByTestId("triggerClassName")).toHaveTextContent("trigger-shell");
   });
 
   it("renders travel time indicator and travel/filter hooks", async () => {

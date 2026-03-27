@@ -41,11 +41,14 @@ describe("landingPageUtils", () => {
 
     window.pageYOffset = 0;
     expect(getScrollTop(window)).toBe(45);
+    document.documentElement.scrollTop = 0;
+    expect(getScrollTop(window)).toBe(0);
   });
 
   it("clamps scroll progress and chooses the nearest section", () => {
     expect(getScrollProgress(-10, { scrollHeight: 500, clientHeight: 100 })).toBe(0);
     expect(getScrollProgress(999, { scrollHeight: 500, clientHeight: 100 })).toBe(1);
+    expect(getScrollProgress(0.5, { scrollHeight: 1, clientHeight: 10 })).toBe(0.5);
 
     const refs = [
       { getBoundingClientRect: () => ({ top: 0, height: 100 }) },

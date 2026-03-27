@@ -56,6 +56,18 @@ describe("LocationLink", () => {
         expect(navigateMock).toHaveBeenCalledWith("/custom", { replace: false });
     });
 
+    it("passes the original click event to the optional onClick handler", () => {
+        const onClick = vi.fn();
+        render(<LocationLink location="Somerset House" onClick={onClick} />);
+
+        const button = screen.getByRole("button", { name: "Open UniMap for Somerset House" });
+        fireEvent.click(button);
+
+        expect(onClick).toHaveBeenCalledTimes(1);
+        expect(onClick.mock.calls[0][0]).toBeInstanceOf(MouseEvent);
+        expect(navigateMock).toHaveBeenCalledWith("/map?destination=Somerset%20House", { replace: false });
+    });
+
     it("uses the default icon size and class names when optional props are omitted", () => {
         render(<LocationLink location="Strand Campus" />);
 

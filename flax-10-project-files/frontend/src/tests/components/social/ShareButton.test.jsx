@@ -55,6 +55,33 @@ describe('ShareButton', () => {
         expect(screen.getByText('Shared')).toBeTruthy();
     });
 
+    it('renders custom variants and labels based on the sharing state', () => {
+        const { rerender } = render(
+            <ShareButton
+                userId={1}
+                initialIsSharing={false}
+                shareVariant="ghost"
+                sharedVariant="success"
+                shareLabel="Start Sharing"
+                sharedLabel="Already Shared"
+            />
+        );
+
+        expect(screen.getByText('Start Sharing')).toBeTruthy();
+
+        rerender(
+            <ShareButton
+                userId={1}
+                initialIsSharing={true}
+                shareVariant="ghost"
+                sharedVariant="success"
+                shareLabel="Start Sharing"
+                sharedLabel="Already Shared"
+            />
+        );
+        expect(screen.getByText('Already Shared')).toBeTruthy();
+    });
+
     it('shows "..." and is disabled when loading', async () => {
         shareCalendar.mockImplementation(() => new Promise(() => {}));
         render(<ShareButton userId={1} initialIsSharing={false} />);
@@ -89,5 +116,14 @@ describe('ShareButton', () => {
         await waitFor(() => expect(screen.getByText('...')).toBeTruthy());
         fireEvent.click(screen.getByRole('button'));
         expect(shareCalendar).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call onToggle when the API request fails', async () => {
+        const onToggle = vi.fn();
+        shareCalendar.mockRejectedValueOnce(new Error('network error'));
+        render(<ShareButton userId={1} initialIsSharing={false} onToggle={onToggle} />);
+        fireEvent.click(screen.getByRole('button'));
+        await waitFor(() => expect(screen.getByText('Share Calendar')).toBeTruthy());
+        expect(onToggle).not.toHaveBeenCalled();
     });
 });
