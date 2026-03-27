@@ -5,15 +5,9 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import styles from '../../../pages/timer/TimerPage.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
+import { TASK_CARD_MOTION_PROPS } from '../../common/dropdownMotion';
 import { TaskPickerModal } from '../task_input/TaskPickerModal';
 import { useTaskPickerData } from '../task_input/useTaskPickerData';
-
-const TASK_CARD_MOTION = {
-  initial: { opacity: 0, y: -10, scale: 0.97 },
-  animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -8, scale: 0.97 },
-  transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-};
 
 export function openPicker(state) {
   if (!state.open) state.loadTasks();
@@ -56,7 +50,7 @@ function CurrentTaskCard({ value, onClearTask }) {
   return (
     <AnimatePresence initial={false}>
       {value && (
-        <motion.div key="task-card" {...TASK_CARD_MOTION}>
+        <motion.div key="task-card" {...TASK_CARD_MOTION_PROPS}>
           <CurrentTaskCardInner value={value} onClearTask={onClearTask} />
         </motion.div>
       )}
