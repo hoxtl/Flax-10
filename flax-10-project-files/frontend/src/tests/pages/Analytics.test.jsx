@@ -167,4 +167,14 @@ describe('AnalyticsPage', () => {
             detail: 'timer',
         }));
     });
+
+    it('treats missing summary totals as empty analytics data', async () => {
+        analyticsService.getSummary.mockResolvedValueOnce({ period_days: 30 });
+        analyticsService.getProgress.mockResolvedValueOnce({});
+        analyticsService.getThemeStats.mockResolvedValueOnce({});
+
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
+
+        await waitFor(() => expect(screen.getByText('No study data yet')).toBeTruthy());
+    });
 });
