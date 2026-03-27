@@ -11332,7 +11332,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/GridCard.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/GridCard.jsx": {
             "lines": 0,
             "tokens": 29,
             "sources": 1,
@@ -11344,7 +11344,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/Card.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/Card.jsx": {
             "lines": 4,
             "tokens": 52,
             "sources": 1,
@@ -28388,7 +28388,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/GridCard.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/GridCard.jsx": {
             "lines": 14,
             "tokens": 102,
             "sources": 1,
@@ -28400,7 +28400,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/Card.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/Card.jsx": {
             "lines": 22,
             "tokens": 188,
             "sources": 1,
@@ -35344,7 +35344,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/GridCard.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/GridCard.module.css": {
             "lines": 15,
             "tokens": 113,
             "sources": 1,
@@ -35356,7 +35356,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/CardGrid.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/CardGrid.module.css": {
             "lines": 16,
             "tokens": 91,
             "sources": 1,
@@ -35368,7 +35368,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/Card.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/Card.module.css": {
             "lines": 42,
             "tokens": 254,
             "sources": 1,

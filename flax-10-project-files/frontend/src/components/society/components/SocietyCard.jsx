@@ -3,7 +3,7 @@
  */
 
 import styles from '../styles/SocietyCard.module.css';
-import GridCard from '../../common/Card/GridCard';
+import GridCard from '../../common/card/GridCard';
 import { Flag, BadgeCheck } from "lucide-react";
 import { SocietyCardContent } from "./SocietyCardContent";
 
