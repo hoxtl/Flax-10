@@ -7,7 +7,11 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+<<<<<<< HEAD
 import SessionDots, { LiveStatsRow, ProgressStrip } from '../../../components/timer/components/SessionDots';
+=======
+import SessionDots, { LiveStatsRow, ProgressStrip } from '../../../components/timer/SessionDots';
+>>>>>>> main
 
 // SessionDots
 

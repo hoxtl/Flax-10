@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import { LeaveTimerModal, EndEarlyModal } from '../../../components/timer/components/TimerPopups';
+=======
+import { LeaveTimerModal, EndEarlyModal } from '../../../components/timer/TimerPopups';
+>>>>>>> main
 
 describe('LeaveTimerModal', () => {
     it('renders title and message', () => {

@@ -6,8 +6,13 @@ import { useEffect, useMemo, useState } from "react";
 import { tflService } from "../../../api/tflApi";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import { updateUserSettings } from "../../../api/userApi";
+<<<<<<< HEAD
 import useAttendanceStats from "../../../components/analytics/hooks/useAttendanceStats";
 import { getAttendancePercentage } from "../../../components/analytics/utils/attendanceChartConfig";
+=======
+import useAttendanceStats from "../../../components/analytics/useAttendanceStats";
+import { getAttendancePercentage } from "../../../components/analytics/attendanceChartConfig";
+>>>>>>> main
 import { loadTermConfig } from "../../../lib/termConfig";
 import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/IntelligenceUtils";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";

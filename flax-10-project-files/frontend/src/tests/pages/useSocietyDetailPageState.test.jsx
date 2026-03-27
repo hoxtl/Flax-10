@@ -24,15 +24,24 @@ vi.mock("../../components/society/hooks/useUnreportSociety", () => ({
   useUnreportSociety: (...args) => useUnreportSocietyMock(...args),
 }));
 
+<<<<<<< HEAD
 vi.mock("../../pages/societies/utils/societyDetailPageUtils", async () => {
   const actual = await vi.importActual("../../pages/Societies/societyDetailPageUtils");
+=======
+vi.mock("../../pages/societies/SocietyDetailPageUtils", async () => {
+  const actual = await vi.importActual("../../pages/societies/societyDetailPageUtils");
+>>>>>>> main
   return {
     ...actual,
     scrollContentToTop: (...args) => scrollContentToTopMock(...args),
   };
 });
 
+<<<<<<< HEAD
 import { useSocietyInit, useSocietyPageData } from "../../pages/societies/hooks/useSocietyDetailPageState";
+=======
+import { useSocietyInit, useSocietyPageData } from "../../pages/societies/useSocietyDetailPageState";
+>>>>>>> main
 
 function createWrapper(entry) {
   return function Wrapper({ children }) {

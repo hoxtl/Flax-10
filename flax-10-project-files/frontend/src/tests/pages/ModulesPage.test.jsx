@@ -52,8 +52,13 @@ vi.mock('../../components/modules/modules/ModuleDetails', () => ({
 vi.mock('../../components/modules/deadlines/DeadlineModal', () => ({
     default: ({ onClose }) => <div><button onClick={onClose}>CloseModal</button></div>,
 }));
+<<<<<<< HEAD
 vi.mock('../../pages/modules/styles/ModulesPage.module.css', () => ({ default: {} }));
 vi.mock('../../pages/modules/components/MyModulesDashboard', () => ({
+=======
+vi.mock('../../pages/modules/ModulesPage.module.css', () => ({ default: {} }));
+vi.mock('../../pages/modules/MyModulesDashboard', () => ({
+>>>>>>> main
     default: () => <div>Upcoming assignment deadlines</div>,
 }));
 

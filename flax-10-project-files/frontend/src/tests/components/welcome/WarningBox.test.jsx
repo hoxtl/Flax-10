@@ -11,7 +11,11 @@ vi.mock('framer-motion', () => ({
     }),
 }));
 
+<<<<<<< HEAD
 import WarningBox from '../../../components/onboarding/components/WarningBox';
+=======
+import WarningBox from '../../../components/onboarding/WarningBox';
+>>>>>>> main
 
 describe('WarningBox', () => {
     it('renders warning message with major name', () => {

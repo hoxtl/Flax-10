@@ -18,7 +18,7 @@ vi.mock("../../../components/calendar/event_modal/components/LocationAutoComplet
   ),
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 

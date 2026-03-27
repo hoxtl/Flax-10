@@ -10,14 +10,23 @@ import urgentGlowStyles from '../../../components/common/urgent_glow/UrgentGlow.
 import {
     TIER_ACCENT,
     getUrgencyTier,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/modules/components/ReadingsPanel.jsx
 } from '../../../components/modules/deadlines/upcomingDeadlinesUtils';
 import { AddReadingToTasksButton } from '../../../components/modules/shared/taskButtons.jsx';
+=======
+} from '../../components/modules/deadlines/upcomingDeadlinesUtils';
+import { AddReadingToTasksButton } from '../../components/modules/shared/taskButtons.jsx';
+>>>>>>> main:flax-10-project-files/frontend/src/pages/modules/ReadingsPanel.jsx
 import {
     containerVariants,
     expandBodyVariants,
     itemVariants,
     listVariants,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/modules/components/ReadingsPanel.jsx
 } from '../../../components/modules/shared/widgetVariants.js';
+=======
+} from '../../components/modules/shared/widgetVariants.js';
+>>>>>>> main:flax-10-project-files/frontend/src/pages/modules/ReadingsPanel.jsx
 import {
     WidgetHeader,
     ShowMoreButton,

@@ -4,10 +4,17 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+<<<<<<< HEAD
 import { MainSection, PopupSection } from '../../../components/timer/components/WrapperComponents';
 
 vi.mock('../../../components/timer/components/TreeAnimation', () => ({ default: () => <div data-testid="tree" /> }));
 vi.mock('../../../components/timer/components/TaskInput', () => ({
+=======
+import { MainSection, PopupSection } from '../../../components/timer/WrapperComponents';
+
+vi.mock('../../../components/timer/TreeAnimation', () => ({ default: () => <div data-testid="tree" /> }));
+vi.mock('../../../components/timer/TaskInput', () => ({
+>>>>>>> main
   TaskInput: ({ onTaskSelect, onOpenFocus, onClearTask }) => (
     <div data-testid="task-input">
       <button type="button" onClick={() => onTaskSelect?.({ id: 1, title: 'Task', estimated_blocks: 4, list_color: '#ccc' })}>Choose a task to focus</button>
@@ -25,20 +32,32 @@ vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
     return <button {...safeProps}>{props.children}</button>;
   },
 }));
+<<<<<<< HEAD
 vi.mock('../../../components/timer/components/TimerComponents', () => ({
+=======
+vi.mock('../../../components/timer/TimerComponents', () => ({
+>>>>>>> main
   TimerDisplay: () => <div data-testid="timer-display" />,
   ModeIndicator: () => <div data-testid="mode-indicator" />,
   SessionStatus: () => <div data-testid="session-status" />,
   TimerControls: () => <div data-testid="timer-controls" />,
   TimerSettings: () => <div data-testid="timer-settings" />,
 }));
+<<<<<<< HEAD
 vi.mock('../../../components/timer/components/TimerPopups', () => ({
+=======
+vi.mock('../../../components/timer/TimerPopups', () => ({
+>>>>>>> main
   OvertimePopup: () => <div data-testid="overtime-popup" />,
   GoalModal: () => <div data-testid="goal-modal" />,
   BreakModal: () => <div data-testid="break-modal" />,
   EndEarlyModal: () => <div data-testid="end-early-modal" />,
 }));
+<<<<<<< HEAD
 vi.mock('../../../components/timer/components/HistoryModal', () => ({ default: () => <div data-testid="history-modal" /> }));
+=======
+vi.mock('../../../components/timer/HistoryModal', () => ({ default: () => <div data-testid="history-modal" /> }));
+>>>>>>> main
 vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: { header: '', title: '', historyButton: '', mobileHistoryBtn: '' } }));
 
 const baseT = {

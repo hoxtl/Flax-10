@@ -2,7 +2,11 @@
  * Section heading block used in settings forms.
  */
 
+<<<<<<< HEAD
 import styles from "../../../pages/settings/styles/Settings.module.css";
+=======
+import styles from "../../../pages/settings/Settings.module.css";
+>>>>>>> main
 
 export default function SectionHeader({ title, description }) {
   return (

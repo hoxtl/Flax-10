@@ -78,7 +78,11 @@ import {
   ModulesPageModals,
   ModulesSkeleton,
   TestModeContent,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/ModulesPageChrome.test.jsx
 } from "../../../pages/modules/components/ModulesPageChrome";
+=======
+} from "../../../pages/modules/ModulesPageChrome";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/ModulesPageChrome.test.jsx
 
 const buildHookState = (overrides = {}) => ({
   enrollments: [],

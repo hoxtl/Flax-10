@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import { OvertimePopup } from '../../../components/timer/components/TimerPopups';
+=======
+import { OvertimePopup } from '../../../components/timer/TimerPopups';
+>>>>>>> main
 
 const testWorkMode = () => {
     const onAction = vi.fn();

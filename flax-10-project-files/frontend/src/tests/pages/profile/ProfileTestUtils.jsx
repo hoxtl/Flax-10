@@ -34,7 +34,11 @@ export const mockProfileHelpers = () => {
 };
 
 export const mockSocialComponents = () => {
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/ProfileTestUtils.jsx
   vi.mock('../../../components/social/components/ShareButton', () => ({
+=======
+  vi.mock('../../../components/social/ShareButton', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/ProfileTestUtils.jsx
     default: ({ userId, onToggle, initialIsSharing }) => (
       <button data-testid="share-btn" onClick={() => onToggle?.(!initialIsSharing)}>
         Share {userId}

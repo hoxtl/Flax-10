@@ -2,7 +2,11 @@
  * GroupWork add member form.
  */
 
+<<<<<<< HEAD
 import UserSearch from "../../../components/social/components/UserSearch";
+=======
+import UserSearch from "../../../components/social/UserSearch";
+>>>>>>> main
 import { addProjectMember } from "../api/groupWorkApi";
 import GroupWorkUserSearchEmptyState from "./GroupWorkUserSearchEmptyState";
 import styles from "./AddMemberForm.module.css";

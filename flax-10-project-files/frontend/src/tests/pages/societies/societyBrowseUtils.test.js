@@ -1,10 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/societies/societyBrowseUtils.test.js
 vi.mock("../../../pages/societies/utils/societyFilters", () => ({
   matchesCategory: (society, categoryId) => society.categories?.includes(categoryId) || society.category === categoryId,
 }));
 
 import { countForFilter, filterAndSort } from "../../../pages/societies/utils/societyBrowseUtils";
+=======
+vi.mock("../../../pages/societies/societyFilters", () => ({
+  matchesCategory: (society, categoryId) => society.categories?.includes(categoryId) || society.category === categoryId,
+}));
+
+import { countForFilter, filterAndSort } from "../../../pages/societies/societyBrowseUtils";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Societies/societyBrowseUtils.test.js
 
 const societies = [
   { id: 1, name: "Alpha", is_ratified: true, member_count: 0, categories: ["arts"] },

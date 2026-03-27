@@ -3,10 +3,17 @@
  */
 
 import { useEffect, useState } from "react";
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/campus_map/components/UserJourneySection.jsx
 import { LocationAutocomplete } from "../../calendar/event_modal/components/LocationAutoComplete";
 import Tooltip from "../../common/Tooltip/Tooltip";
 import { geocodeAddress } from "../../../api/geocodeApi";
 import styles from "../styles/UserJourneySection.module.css";
+=======
+import { LocationAutocomplete } from "../calendar/event_modal/components/LocationAutoComplete";
+import Tooltip from "../common/tooltip/Tooltip";
+import { geocodeAddress } from "../../api/geocodeApi";
+import styles from "./UserJourneySection.module.css";
+>>>>>>> main:flax-10-project-files/frontend/src/components/campus_map/UserJourneySection.jsx
 
 function handleGeocode(trimmedValue, setCoords, active) {
   const parsedCoords = parseCoordinateInput(trimmedValue);

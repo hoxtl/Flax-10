@@ -84,7 +84,11 @@ vi.mock("../../../pages/tasks/components/TaskInfoModal", () => ({
   ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/ReadingsPanel.test.jsx
 import ReadingsPanel from "../../../pages/modules/components/ReadingsPanel.jsx";
+=======
+import ReadingsPanel from "../../../pages/modules/ReadingsPanel.jsx";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/ReadingsPanel.test.jsx
 
 const readings = [
   {

@@ -7,7 +7,11 @@ vi.mock("../../../../pages/profile/utils/profileHelpers", () => ({
   buildFullName: (user) => user?.name || `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "Guest",
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/components/ProfileHeader.shared.test.jsx
 vi.mock("../../../../components/social/components/ShareButton", () => ({
+=======
+vi.mock("../../../../components/social/ShareButton", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/components/ProfileHeader.shared.test.jsx
   default: ({ onToggle }) => <button data-testid="share-toggle" onClick={() => onToggle?.(true)}>Share</button>,
 }));
 

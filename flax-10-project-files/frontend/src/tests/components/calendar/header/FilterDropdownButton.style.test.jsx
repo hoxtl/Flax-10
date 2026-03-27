@@ -16,7 +16,11 @@ vi.mock("../../../../components/common/tags_selector/TagsSelector", () => ({
   TagsSelector: () => <div data-testid="tags-selector" />,
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/calendar/header/FilterDropdownButton.style.test.jsx
 vi.mock("../../../../components/tags/components/TagManagerModal", () => ({
+=======
+vi.mock("../../../../components/tags/TagManagerModal", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Calendar/header/FilterDropdownButton.style.test.jsx
   default: () => <div data-testid="tag-manager-modal" />,
 }));
 

@@ -2,7 +2,11 @@
  * Shared form controls for settings inputs and selects.
  */
 
+<<<<<<< HEAD
 import styles from "../../../pages/settings/styles/Settings.module.css";
+=======
+import styles from "../../../pages/settings/Settings.module.css";
+>>>>>>> main
 import AnimatedDropdown from "../../common/animated_dropdown";
 import FormTextInput from "./FormTextInput";
 

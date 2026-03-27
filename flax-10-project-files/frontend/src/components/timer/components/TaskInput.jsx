@@ -3,10 +3,17 @@
  */
 
 import { AnimatePresence, motion } from 'framer-motion';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/TaskInput.jsx
 import styles from '../../../pages/timer/TimerPage.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import { TaskPickerModal } from '../task_input/TaskPickerModal';
 import { useTaskPickerData } from '../task_input/useTaskPickerData';
+=======
+import styles from '../../pages/timer/TimerPage.module.css';
+import PrimaryButton from '../common/primary_button/PrimaryButton';
+import { TaskPickerModal } from './task_input/TaskPickerModal';
+import { useTaskPickerData } from './task_input/useTaskPickerData';
+>>>>>>> main:flax-10-project-files/frontend/src/components/timer/TaskInput.jsx
 
 const TASK_CARD_MOTION = {
   initial: { opacity: 0, y: -10, scale: 0.97 },

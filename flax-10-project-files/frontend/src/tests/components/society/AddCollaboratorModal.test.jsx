@@ -1,8 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/AddCollaboratorModal.test.jsx
 import AddCollaboratorModal from '../../../components/society/components/AddCollaboratorModal';
 
 vi.mock('../../../components/social/components/UserSearch', () => ({
+=======
+import AddCollaboratorModal from '../../../components/society/AddCollaboratorModal';
+
+vi.mock('../../../components/social/UserSearch', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/AddCollaboratorModal.test.jsx
     default: ({ onUserSelect, filterUsers, renderEmptyState }) => {
         // Expose a way to test the filter
         const dummyResults = [

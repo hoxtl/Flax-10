@@ -7,7 +7,11 @@ const dismissAttendancePromptMock = vi.fn();
 const submitAttendancePromptAnswerMock = vi.fn();
 const candidateState = { setValue: vi.fn(), value: null };
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/AttendancePromptBindings.test.jsx
 vi.mock("../../../components/attendance/components/AttendancePromptModal", () => ({
+=======
+vi.mock("../../../components/attendance/AttendancePromptModal", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/AttendancePromptBindings.test.jsx
   default: ({ onAnswer, onDismiss }) => (
     <div>
       <button type="button" onClick={() => onAnswer(true, { closeDelayMs: 0 })}>
@@ -20,7 +24,11 @@ vi.mock("../../../components/attendance/components/AttendancePromptModal", () =>
   ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/AttendancePromptBindings.test.jsx
 vi.mock("../../../components/attendance/utils/attendancePromptActions", () => ({
+=======
+vi.mock("../../../components/attendance/attendancePromptActions", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/AttendancePromptBindings.test.jsx
   dismissAttendancePrompt: (...args) => dismissAttendancePromptMock(...args),
   submitAttendancePromptAnswer: (...args) => submitAttendancePromptAnswerMock(...args),
 }));
@@ -29,7 +37,11 @@ vi.mock("../../../components/attendance/hooks/useCandidateEvent", () => ({
   useCandidateEvent: () => [candidateState.value, candidateState.setValue],
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/AttendancePromptBindings.test.jsx
 import AttendancePrompt from "../../../components/attendance/components/AttendancePrompt";
+=======
+import AttendancePrompt from "../../../components/attendance/AttendancePrompt";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/AttendancePromptBindings.test.jsx
 
 describe("AttendancePrompt bindings", () => {
   beforeEach(() => {

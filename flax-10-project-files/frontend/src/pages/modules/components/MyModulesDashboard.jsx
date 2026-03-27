@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/modules/components/MyModulesDashboard.jsx
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getSuggestedReadings } from "../../../api/readingApi";
 import { UpcomingDeadlinesWidget } from "../../../components/modules/deadlines/UpcomingDeadlinesWidget";
@@ -12,6 +13,15 @@ import { isEnrolledIn } from "../../../components/modules/utils/moduleUtils";
 import StatStrip from "../../../components/common/stat_strip/StatStrip";
 import { useCountUp } from "../../../hooks/useCountUp";
 import EmptyStateCard from "../../homepage/components/EmptyStateCard";
+=======
+import { getUpcomingDeadlines } from "../../api/deadlineApi";
+import { getSuggestedReadings } from "../../api/readingApi";
+import { UpcomingDeadlinesWidget } from "../../components/modules/deadlines/UpcomingDeadlinesWidget";
+import { isEnrolledIn } from "../../components/modules/utils/moduleUtils";
+import StatStrip from "../../components/common/stat_strip/StatStrip";
+import { useCountUp } from "../../hooks/useCountUp";
+import EmptyStateCard from "../homepage/components/EmptyStateCard";
+>>>>>>> main:flax-10-project-files/frontend/src/pages/modules/MyModulesDashboard.jsx
 import ReadingsPanel from "./ReadingsPanel";
 import SmartNudge from "./SmartNudge";
 import styles from "../styles/MyModulesDashboard.module.css";

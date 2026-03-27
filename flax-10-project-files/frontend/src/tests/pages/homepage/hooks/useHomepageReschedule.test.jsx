@@ -9,7 +9,11 @@ const conflictMocks = vi.hoisted(() => ({
   buildConflictResolutionToastMessage: vi.fn(),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/hooks/useHomepageReschedule.test.jsx
 vi.mock("../../../../pages/homepage/utils", () => ({
+=======
+vi.mock("../../../../pages/homepage/utils/index", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/hooks/useHomepageReschedule.test.jsx
   formatTime: vi.fn(() => "09:00"),
   getAllFreeWindowsToday: vi.fn(() => []),
   getNextFreeSlotToday: vi.fn(() => null),

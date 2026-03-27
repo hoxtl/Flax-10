@@ -10,7 +10,11 @@ import {
   FormInput,
   FormSelect,
   ThemeSelector,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/SettingsUI.test.jsx
 } from "../../../components/settings/components/SettingsUI";
+=======
+} from "../../../components/settings/SettingsUI";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/SettingsUI.test.jsx
 
 vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options, placeholder, grouped }) => {

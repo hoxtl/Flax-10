@@ -16,16 +16,28 @@ vi.mock("../../../components/common/inline_alert/InlineAlert", () => ({
   default: ({ message, variant }) => <div>{variant}:{message}</div>,
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/HomeAddressFormLayout.test.jsx
 vi.mock("../../../components/settings/components/SettingsContextCard", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
 vi.mock("../../../components/settings/components/SettingsUI", () => ({
+=======
+vi.mock("../../../components/settings/SettingsContextCard", () => ({
+  default: ({ title }) => <div>{title}</div>,
+}));
+
+vi.mock("../../../components/settings/SettingsUI", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/HomeAddressFormLayout.test.jsx
   SectionHeader: ({ title }) => <div>{title}</div>,
   SubmitButton: ({ label }) => <button type="submit">{label}</button>,
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/HomeAddressFormLayout.test.jsx
 import HomeAddressFormLayout from "../../../components/settings/components/HomeAddressFormLayout";
+=======
+import HomeAddressFormLayout from "../../../components/settings/HomeAddressFormLayout";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/HomeAddressFormLayout.test.jsx
 
 describe("HomeAddressFormLayout", () => {
   it("renders without an inline alert when there is no error", () => {

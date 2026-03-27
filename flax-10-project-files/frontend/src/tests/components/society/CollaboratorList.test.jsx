@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/CollaboratorList.test.jsx
 import CollaboratorList from '../../../components/society/components/CollaboratorList';
+=======
+import CollaboratorList from '../../../components/society/CollaboratorList';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/CollaboratorList.test.jsx
 
 vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (

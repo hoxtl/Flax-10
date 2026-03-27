@@ -6,7 +6,7 @@ vi.mock("../../../pages/campus_map/styles/routes.module.css", () => ({ default: 
 vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/routes.module.css", () => ({ default: {} }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 

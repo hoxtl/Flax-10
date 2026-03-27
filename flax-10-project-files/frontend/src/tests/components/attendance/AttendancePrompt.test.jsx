@@ -25,22 +25,39 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/AttendancePrompt.test.jsx
 import AttendancePrompt from "../../../components/attendance/components/AttendancePrompt";
 import AttendancePromptModal from "../../../components/attendance/components/AttendancePromptModal";
 import {
   dismissAttendancePrompt,
   submitAttendancePromptAnswer,
 } from "../../../components/attendance/utils/attendancePromptActions";
+=======
+import AttendancePrompt from "../../../components/attendance/AttendancePrompt";
+import AttendancePromptModal from "../../../components/attendance/AttendancePromptModal";
+import {
+  dismissAttendancePrompt,
+  submitAttendancePromptAnswer,
+} from "../../../components/attendance/attendancePromptActions";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/AttendancePrompt.test.jsx
 import {
   isInPromptWindow,
   getDateRangeForPrompt,
   findCandidateEvent,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/AttendancePrompt.test.jsx
 } from "../../../components/attendance/utils/attendancePromptUtils";
+=======
+} from "../../../components/attendance/attendancePromptUtils";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/AttendancePrompt.test.jsx
 import {
   getPromptedIds,
   getSessionDismissedIds,
   setPromptedId,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/AttendancePrompt.test.jsx
 } from "../../../components/attendance/utils/attendancePromptStorage";
+=======
+} from "../../../components/attendance/attendancePromptStorage";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/AttendancePrompt.test.jsx
 
 const attendanceStatsState = { overall: { attended: 0, missed: 0 } };
 
@@ -281,7 +298,7 @@ describe("Attendance prompt", () => {
       end_time: "2026-03-01T11:00:00Z",
     };
     getEventsMock.mockResolvedValue([candidate]);
-    const { useCandidateEvent } = await vi.importActual("../../../components/Attendance/hooks/useCandidateEvent");
+    const { useCandidateEvent } = await vi.importActual("../../../components/attendance/hooks/useCandidateEvent");
 
     const { result } = renderHook(() => useCandidateEvent());
     await act(async () => {

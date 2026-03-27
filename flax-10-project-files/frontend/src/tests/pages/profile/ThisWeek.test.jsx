@@ -10,7 +10,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../components/common/Card/Card', () => ({
+vi.mock('../../../components/common/card/Card', () => ({
   default: ({ children, className, variant }) => (
     <div className={className} data-variant={variant} data-testid="card">{children}</div>
   ),

@@ -1,9 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-vi.mock("../../components/common/Card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
+vi.mock("../../components/common/card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
 
+<<<<<<< HEAD
 vi.mock("../../components/society/components/SocietyCard", () => ({
+=======
+vi.mock("../../components/society/SocietyCard", () => ({
+>>>>>>> main
   default: ({ society, onClick, onReport, onUnreport }) => (
     <div>
       <button onClick={() => onClick?.(society.id)}>{society.name}</button>
@@ -50,7 +54,11 @@ vi.mock("../../hooks/usePagination", () => ({
   usePagination: (...args) => paginationMock(...args),
 }));
 
+<<<<<<< HEAD
 import { SocietyBrowseResults } from "../../pages/societies/components/SocietyBrowseResults";
+=======
+import { SocietyBrowseResults } from "../../pages/societies/SocietyBrowseResults";
+>>>>>>> main
 
 describe("SocietyBrowseResults", () => {
   beforeEach(() => {

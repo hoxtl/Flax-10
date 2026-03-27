@@ -3,6 +3,7 @@
  */
 
 import { AnimatePresence } from "framer-motion";
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/modules/components/ModulesPageChrome.jsx
 import { BackToTop } from "../../../components/pagination/Pagination.jsx";
 import ModuleForm from "../../../components/modules/modules/ModuleForm.jsx";
 import ModuleDetails from "../../../components/modules/modules/ModuleDetails.jsx";
@@ -13,6 +14,18 @@ import PageTransition from "../../../components/common/page_transition/PageTrans
 import SkeletonBlock from "../../../components/common/loading_state/SkeletonBlock";
 import { isEnrolledIn } from "../../../components/modules/utils/moduleUtils.js";
 import styles from "../styles/ModulesPage.module.css";
+=======
+import { BackToTop } from "../../components/pagination/Pagination.jsx";
+import ModuleForm from "../../components/modules/modules/ModuleForm.jsx";
+import ModuleDetails from "../../components/modules/modules/ModuleDetails.jsx";
+import StandardModal from "../../components/common/standard_modal/StandardModal.jsx";
+import DeadlineModal from "../../components/modules/deadlines/DeadlineModal.jsx";
+import ReadingModal from "../../components/modules/readings/ReadingModal.jsx";
+import PageTransition from "../../components/common/page_transition/PageTransition.jsx";
+import SkeletonBlock from "../../components/common/loading_state/SkeletonBlock";
+import { isEnrolledIn } from "../../components/modules/utils/moduleUtils.js";
+import styles from "./ModulesPage.module.css";
+>>>>>>> main:flax-10-project-files/frontend/src/pages/modules/ModulesPageChrome.jsx
 
 function SkeletonHeader() {
   return (

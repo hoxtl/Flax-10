@@ -26,7 +26,11 @@ vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/social/UserSearch.items.test.jsx
 import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/social/components/UserSearch';
+=======
+import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/social/UserSearch';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Social/UserSearch.items.test.jsx
 
 describe('UserResultItem', () => {
     it('renders user name and handle', () => {

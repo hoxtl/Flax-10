@@ -3,7 +3,11 @@
  */
 
 import { useCallback, useState } from "react";
+<<<<<<< HEAD
 import { formatTime, getNextFreeSlotToday } from "../utils";
+=======
+import { formatTime, getNextFreeSlotToday } from "../utils/index";
+>>>>>>> main
 import { buildScheduleAutoForm } from "../utils/scheduleAutoForm";
 import { overlapsDay, isToday } from "../../../components/calendar/utils/dateUtils";
 import { extractBaseEventId } from "../../../components/calendar/utils/eventUtils";

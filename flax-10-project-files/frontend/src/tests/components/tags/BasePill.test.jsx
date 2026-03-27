@@ -1,8 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/tags/BasePill.test.jsx
 import BasePill from '../../../components/tags/components/BasePill';
 
 vi.mock('../../../components/tags/styles/PillFilters.module.css', () => ({ default: { pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' } }));
+=======
+import BasePill from '../../../components/tags/BasePill';
+
+vi.mock('../../../components/tags/PillFilters.module.css', () => ({ default: { pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' } }));
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Tags/BasePill.test.jsx
 
 describe('BasePill', () => {
   it('renders label and calls onClick when clicked', () => {

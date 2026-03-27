@@ -36,7 +36,11 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/modules/ReadingModal.test.jsx
 vi.mock('../../../components/modules/deadlines/DeadlineModal.module.css', () => ({ default: {} }));
+=======
+vi.mock('../../../components/modules/DeadlineModal.module.css', () => ({ default: {} }));
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Modules/ReadingModal.test.jsx
 
 const module = { id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering' };
 

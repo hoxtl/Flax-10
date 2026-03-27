@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/SleepSchedulePanel.test.jsx
 import { SleepSchedulePanel } from '../../../components/settings/components/SleepSchedulePanel';
+=======
+import { SleepSchedulePanel } from '../../../components/settings/SleepSchedulePanel';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/SleepSchedulePanel.test.jsx
 
 vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn(),

@@ -1,8 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/social/UserListModal.test.jsx
 import UserListModal from '../../../components/social/components/UserListModal';
 
 vi.mock('../../../components/social/components/ShareButton', () => ({
+=======
+import UserListModal from '../../../components/social/UserListModal';
+
+vi.mock('../../../components/social/ShareButton', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Social/UserListModal.test.jsx
   default: ({ userId, onToggle }) => (
     <button data-testid={`share-${userId}`} onClick={() => onToggle?.(userId, true)}>
       Share

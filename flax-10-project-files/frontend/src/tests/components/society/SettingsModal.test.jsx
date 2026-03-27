@@ -13,7 +13,11 @@ vi.mock('../../../components/society/society_detail/SettingsModal.module.css', (
 }));
 import styles from '../../../components/society/society_detail/SettingsModal.module.css';
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/SettingsModal.test.jsx
 vi.mock('../../../components/society/components/AddCollaboratorModal', () => ({
+=======
+vi.mock('../../../components/society/AddCollaboratorModal', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/SettingsModal.test.jsx
   default: ({ onClose, onAdd, existingUsernames }) => (
     <div>
       <div data-testid="existing-users">{existingUsernames.join(',')}</div>
@@ -23,7 +27,11 @@ vi.mock('../../../components/society/components/AddCollaboratorModal', () => ({
   ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/SettingsModal.test.jsx
 vi.mock('../../../components/society/components/CollaboratorList', () => ({
+=======
+vi.mock('../../../components/society/CollaboratorList', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/SettingsModal.test.jsx
   default: ({ collaborators, onRoleChange, onRemove }) => (
     <div>
       <div data-testid="collab-count">{collaborators.length}</div>

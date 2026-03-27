@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useState } from "react";
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/settings/components/PreferencesPanel.jsx
 import { useTheme } from "../../../context/ThemeContext";
 import SectionSkeleton from "../../common/loading_state/SectionSkeleton";
 import styles from "../../../pages/settings/styles/Settings.module.css";
@@ -11,6 +12,16 @@ import SleepSection from "../preferences/SleepSection";
 import useSleepScheduleSettings from "../preferences/useSleepScheduleSettings";
 import { SchedulingPanel, StudyTimeSection, WeekPreferenceSection, WorktimePreferenceSection } from "../scheduling/SchedulingSection";
 import useSchedulingState from "../scheduling/useSchedulingState";
+=======
+import { useTheme } from "../../context/ThemeContext";
+import SectionSkeleton from "../common/loading_state/SectionSkeleton";
+import styles from "../../pages/settings/Settings.module.css";
+import AppearanceSection from "./preferences/AppearanceSection";
+import SleepSection from "./preferences/SleepSection";
+import useSleepScheduleSettings from "./preferences/useSleepScheduleSettings";
+import { SchedulingPanel, StudyTimeSection, WeekPreferenceSection, WorktimePreferenceSection } from "./scheduling/SchedulingSection";
+import useSchedulingState from "./scheduling/useSchedulingState";
+>>>>>>> main:flax-10-project-files/frontend/src/components/settings/PreferencesPanel.jsx
 
 function hasAppearanceChanges(current, saved) {
   return current.mode !== saved.mode || current.theme !== saved.theme;

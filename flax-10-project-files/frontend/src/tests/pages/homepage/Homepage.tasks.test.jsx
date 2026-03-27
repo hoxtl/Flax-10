@@ -20,7 +20,11 @@ vi.mock('../../../components/calendar/utils/dateUtils', () => ({
   overlapsDay: vi.fn((s, e, day) => { const ds = new Date(day); ds.setHours(0,0,0,0); const de = new Date(ds); de.setDate(de.getDate()+1); return s < de && e > ds; }),
 }));
 vi.mock('../../../components/calendar/utils/eventUtils', () => ({ extractBaseEventId: vi.fn((id) => (typeof id === 'string' && id.includes('_') ? id.split('_')[0] : id)) }));
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/Homepage.tasks.test.jsx
 vi.mock('../../../pages/homepage/utils', () => ({
+=======
+vi.mock('../../../pages/homepage/utils/index', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/Homepage.tasks.test.jsx
   formatTime: vi.fn((d) => new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
   isNow: vi.fn(() => false), isRoutineEvent: vi.fn(() => false), isRoutineOrEventTask: vi.fn(() => false),
   getNavigatorContext: vi.fn(() => ({ state: 'gap', nextItem: null, gapMins: 30, overlaps: [], conflictAt: null })),
@@ -71,9 +75,15 @@ vi.mock('../../../pages/homepage/components/DeadlinesWidget', async () => {
 vi.mock('../../../pages/homepage/components/SleepBanner', () => ({ __esModule: true, default: () => <div data-testid="sleep-banner">sleep</div> }));
 vi.mock('../../../components/calendar/EventPopups', () => ({ EventPopups: () => <div data-testid="event-popups" /> }));
 vi.mock('../../../components/common/back_to_top/BackToTop', () => ({ __esModule: true, default: () => <div data-testid="back-to-top" /> }));
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/Homepage.tasks.test.jsx
 vi.mock('../../../components/tags/components/PillFilters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
 vi.mock('../../../pages/tasks/components/TaskCard', async () => {
   const actual = await vi.importActual('../../../pages/Tasks/components/TaskCard');
+=======
+vi.mock('../../../components/tags/pill_filters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
+vi.mock('../../../pages/tasks/components/TaskCard', async () => {
+  const actual = await vi.importActual('../../../pages/tasks/components/TaskCard');
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/Homepage.tasks.test.jsx
   const { EditTaskModalMock } = await import('./homepageMocks');
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });
@@ -123,7 +133,11 @@ beforeEach(() => {
 
 describe('Homepage – tasks, re-plan & misc', () => {
   it('handleReschedule moves event to next free slot and shows toast', async () => {
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/Homepage.tasks.test.jsx
     const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils');
+=======
+    const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils/index');
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/Homepage.tasks.test.jsx
     getNextFreeSlotToday.mockReturnValue({ start: new Date(), end: new Date(Date.now() + 25 * 60000) });
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('reschedule'));
@@ -133,7 +147,11 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('handleReschedule falls back to tomorrow when no slot and shows toast', async () => {
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/Homepage.tasks.test.jsx
     const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils');
+=======
+    const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils/index');
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/Homepage.tasks.test.jsx
     getNextFreeSlotToday.mockReturnValue(null);
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('reschedule'));
@@ -142,7 +160,11 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('handleReschedule rollback on editEvent fail', async () => {
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/Homepage.tasks.test.jsx
     const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils');
+=======
+    const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils/index');
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/Homepage.tasks.test.jsx
     getNextFreeSlotToday.mockReturnValue({ start: new Date(), end: new Date(Date.now() + 25 * 60000) });
     mockEditEvent.mockRejectedValueOnce(new Error('fail'));
     render(<MemoryRouter><Homepage /></MemoryRouter>);
@@ -179,7 +201,11 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('handleRescheduleTomorrow shows error toast when addEvent fails', async () => {
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/Homepage.tasks.test.jsx
     const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils');
+=======
+    const { getNextFreeSlotToday } = await import('../../../pages/homepage/utils/index');
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/Homepage.tasks.test.jsx
     getNextFreeSlotToday.mockReturnValue(null);
     mockAddEvent.mockRejectedValueOnce(new Error('fail'));
     render(<MemoryRouter><Homepage /></MemoryRouter>);

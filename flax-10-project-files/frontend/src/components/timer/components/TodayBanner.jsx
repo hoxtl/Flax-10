@@ -2,10 +2,17 @@
  * Today banner for timer progress.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/TodayBanner.jsx
 import styles from '../../../pages/timer/TimerPage.module.css';
 import StatStrip from '../../common/stat_strip/StatStrip';
 import { useCountUp } from '../../../hooks/useCountUp';
 import { useTodayBannerData } from '../today_banner/useTodayBannerData';
+=======
+import styles from '../../pages/timer/TimerPage.module.css';
+import StatStrip from '../common/stat_strip/StatStrip';
+import { useCountUp } from '../../hooks/useCountUp';
+import { useTodayBannerData } from './today_banner/useTodayBannerData';
+>>>>>>> main:flax-10-project-files/frontend/src/components/timer/TodayBanner.jsx
 
 function buildStreakItem(state, streakRef) {
   return { key: 'streak', label: 'Current streak', value: state.streak, valueRef: streakRef, suffix: 'd', tone: state.streak > 0 ? 'success' : undefined };

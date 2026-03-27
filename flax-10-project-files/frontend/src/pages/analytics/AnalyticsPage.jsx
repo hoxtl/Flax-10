@@ -11,9 +11,15 @@ import getAnalyticsTabs from './components/AnalyticsPageTabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import EmptyState from '../../components/common/empty_state/EmptyState';
 import { BackToTop } from '../../components/pagination/Pagination';
+<<<<<<< HEAD
 import { PERIODS } from './utils/pageConfig';
 import { useAnalyticsPageState } from './hooks/pageState';
 import styles from './styles/AnalyticsPage.module.css';
+=======
+import { PERIODS } from './pageConfig';
+import { useAnalyticsPageState } from './pageState';
+import styles from './AnalyticsPage.module.css';
+>>>>>>> main
 
 const analyticsSubtitle = (
   <>

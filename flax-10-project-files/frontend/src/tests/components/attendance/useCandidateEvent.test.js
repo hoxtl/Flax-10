@@ -7,23 +7,39 @@ import {
   getLastPromptShownAt,
   getSkippedIds,
   setLastPromptShownAt,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/useCandidateEvent.test.js
 } from "../../../components/attendance/utils/attendancePromptStorage";
 import {
   findCandidateEvent,
   getDateRangeForPrompt,
 } from "../../../components/attendance/utils/attendancePromptUtils";
+=======
+} from "../../../components/attendance/attendancePromptStorage";
+import {
+  findCandidateEvent,
+  getDateRangeForPrompt,
+} from "../../../components/attendance/attendancePromptUtils";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/useCandidateEvent.test.js
 
 vi.mock("../../../api/eventApi", () => ({
   getEvents: vi.fn(),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/useCandidateEvent.test.js
 vi.mock("../../../components/attendance/utils/attendancePromptStorage", () => ({
+=======
+vi.mock("../../../components/attendance/attendancePromptStorage", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/useCandidateEvent.test.js
   getLastPromptShownAt: vi.fn(),
   getSkippedIds: vi.fn(),
   setLastPromptShownAt: vi.fn(),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/useCandidateEvent.test.js
 vi.mock("../../../components/attendance/utils/attendancePromptUtils", () => ({
+=======
+vi.mock("../../../components/attendance/attendancePromptUtils", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/useCandidateEvent.test.js
   findCandidateEvent: vi.fn(),
   getDateRangeForPrompt: vi.fn(),
 }));

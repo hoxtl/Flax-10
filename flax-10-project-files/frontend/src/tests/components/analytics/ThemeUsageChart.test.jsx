@@ -7,7 +7,11 @@ vi.mock('@mui/x-charts/PieChart', () => ({
     ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/ThemeUsageChart.test.jsx
 import ThemeUsageChart from '../../../components/analytics/components/ThemeUsageChart';
+=======
+import ThemeUsageChart from '../../../components/analytics/ThemeUsageChart';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/ThemeUsageChart.test.jsx
 
 describe('ThemeUsageChart', () => {
     it('shows Night Owl badge when dark >= 60%', () => {

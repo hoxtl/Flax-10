@@ -4,8 +4,13 @@ import { CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import WidgetHeader from "../../../components/common/widget_header/WidgetHeader";
+<<<<<<< HEAD
 import widgetStyles from "../../modules/styles/DashboardWidgets.module.css";
 import rowStyles from "../../modules/styles/DashboardRows.module.css";
+=======
+import widgetStyles from "../../modules/DashboardWidgets.module.css";
+import rowStyles from "../../modules/DashboardRows.module.css";
+>>>>>>> main
 import { TaskContextMenu } from "../../tasks/components/TaskCard";
 import { TaskWidgetRow } from "./TaskWidgetRow";
 import { TaskWidgetAllDone, TaskWidgetCompletedSection, TaskWidgetEmpty } from "./TaskWidgetSections";

@@ -3,7 +3,11 @@
  */
 
 import styles from '../../../pages/timer/TimerPage.module.css';
+<<<<<<< HEAD
 import treeStyles from '../styles/TreeAnimation.module.css';
+=======
+import treeStyles from '../TreeAnimation.module.css';
+>>>>>>> main
 import { FOLIAGE_POINTS, FRUIT_POINTS, POT_POINTS, SOIL_POINTS, TRUNK_POINTS } from './treePixels';
 
 function Pixel({ x, y, cls }) {

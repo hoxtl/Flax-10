@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/HomeAddressForm.test.jsx
 import HomeAddressForm from '../../../components/settings/components/HomeAddressForm';
+=======
+import HomeAddressForm from '../../../components/settings/HomeAddressForm';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/HomeAddressForm.test.jsx
 
 vi.mock('../../../api/userApi', () => ({
     getHomeAddress: vi.fn(),

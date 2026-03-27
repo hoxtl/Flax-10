@@ -4,8 +4,13 @@
 
 import styles from '../styles/MiniTimer.module.css';
 import { formatTime } from './TimerComponents';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/MiniTimer.jsx
 import { useTimerContext } from '../../../context/TimerContext';
 import Tooltip from '../../common/Tooltip/Tooltip';
+=======
+import { useTimerContext } from '../../context/TimerContext';
+import Tooltip from '../common/tooltip/Tooltip';
+>>>>>>> main:flax-10-project-files/frontend/src/components/timer/MiniTimer.jsx
 
 export default function MiniTimer({ onNavigate, activeNav }) {
   const { isActive, isPaused, timeLeft, totalPaused, mode, isOvertime, isBreakOvertime } = useTimerContext();

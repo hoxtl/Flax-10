@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
+<<<<<<< HEAD
 import { SocietiesSkeleton, SocietyDetailSkeleton } from '../../pages/societies/components/SocietySkeletons';
+=======
+import { SocietiesSkeleton, SocietyDetailSkeleton } from '../../pages/societies/SocietySkeletons';
+>>>>>>> main
 
 describe('SocietiesSkeleton', () => {
     it('renders the page skeleton with 8 card placeholders', () => {

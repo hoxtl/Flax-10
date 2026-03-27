@@ -3,6 +3,7 @@
  * Includes hero visuals, detailed info, event calendars, and administration tools.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/societies/components/SocietyDetailPage.jsx
 import styles from "../styles/SocietyDetailPage.module.css";
 import SocietyHero from "../../../components/society/society_detail/SocietyHero";
 import SocietyInfo from "../../../components/society/society_detail/SocietyInfo";
@@ -14,13 +15,31 @@ import SettingsModal from "../../../components/society/society_detail/SettingsMo
 import AnnouncementModal from "../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal";
 import ReportSocietyModal from "../../../components/society/society_detail/ReportSocietyModal";
 import MemberDirectoryModal from "../../../components/society/society_detail/MemberDirectoryModal";
+=======
+import styles from "./SocietyDetailPage.module.css";
+import SocietyHero from "../../components/society/society_detail/SocietyHero";
+import SocietyInfo from "../../components/society/society_detail/SocietyInfo";
+import SocietyTabs from "../../components/society/society_detail/tabs/SocietyTabs";
+import SocietySidebar from "../../components/society/society_detail/SocietySidebar";
+import CoverImageModal from "../../components/society/society_detail/image_handlers/CoverImageModal";
+import ImageGalleryModal from "../../components/society/society_detail/image_handlers/ImageGalleryModal";
+import SettingsModal from "../../components/society/society_detail/SettingsModal";
+import AnnouncementModal from "../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal";
+import ReportSocietyModal from "../../components/society/society_detail/ReportSocietyModal";
+import MemberDirectoryModal from "../../components/society/society_detail/MemberDirectoryModal";
+>>>>>>> main:flax-10-project-files/frontend/src/pages/societies/SocietyDetailPage.jsx
 import { Flag } from "lucide-react";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import BackButton from "../../../components/common/back_button/BackButton.jsx";
 import Breadcrumb from "../../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { useLocation } from "react-router-dom";
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/societies/components/SocietyDetailPage.jsx
 import { useSocietyInit, useSocietyPageData } from "../hooks/useSocietyDetailPageState";
 import { getImageUrls } from "../utils/societyDetailPageUtils";
+=======
+import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
+import { getImageUrls } from "./societyDetailPageUtils";
+>>>>>>> main:flax-10-project-files/frontend/src/pages/societies/SocietyDetailPage.jsx
 
 function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;

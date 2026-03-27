@@ -5,20 +5,32 @@ import {
   getBreakdownColors,
   getBreakdownSeries,
   getChartMargin as getDailyBreakdownMargin,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/analyticsChartConfigHelpers.test.js
 } from '../../../components/analytics/utils/dailyBreakdownChartConfig';
+=======
+} from '../../../components/analytics/dailyBreakdownChartConfig';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/analyticsChartConfigHelpers.test.js
 import {
   formatDate,
   getChartMargin as getStudyHoursMargin,
   getStudyHoursAxis,
   getStudyHoursSeries,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/analyticsChartConfigHelpers.test.js
 } from '../../../components/analytics/utils/studyHoursChartConfig';
+=======
+} from '../../../components/analytics/studyHoursChartConfig';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/analyticsChartConfigHelpers.test.js
 import {
   DARK_COLOR,
   LIGHT_COLOR,
   formatPercentage,
   getBadge,
   getPieSeries,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/analyticsChartConfigHelpers.test.js
 } from '../../../components/analytics/utils/themeUsageChartData';
+=======
+} from '../../../components/analytics/themeUsageChartData';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/analyticsChartConfigHelpers.test.js
 
 describe('Analytics helper coverage extras', () => {
   it('covers daily breakdown config branches and fallback values', () => {

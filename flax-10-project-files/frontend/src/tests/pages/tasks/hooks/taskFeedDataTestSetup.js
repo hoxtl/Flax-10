@@ -19,7 +19,11 @@ vi.mock("../../../../api/moduleApi", () => ({
   getModules: (...args) => hoistedMocks.getModulesMock(...args),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/tasks/hooks/taskFeedDataTestSetup.js
 vi.mock("../../../../components/timer/task_input/taskInputUtils", () => ({
+=======
+vi.mock("../../../../components/timer/taskInput/taskInputUtils", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Tasks/hooks/taskFeedDataTestSetup.js
   buildListItems: (lists = []) => lists.map((list) => ({ value: list.id, label: list.name })),
   filterListItems: (items) => items,
   groupModuleItems: (items) => ({ All: items }),

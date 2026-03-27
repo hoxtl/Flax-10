@@ -2,8 +2,13 @@
  * Presentational layout for the password form.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/settings/components/SecurityFormLayout.jsx
 import PasswordStrength from "../../common/password_strength";
 import styles from "../../../pages/settings/styles/Settings.module.css";
+=======
+import PasswordStrength from "../common/password_strength";
+import styles from "../../pages/settings/Settings.module.css";
+>>>>>>> main:flax-10-project-files/frontend/src/components/settings/SecurityFormLayout.jsx
 import SettingsContextCard from "./SettingsContextCard";
 import { ErrorMessage, FormInput, SectionHeader, SubmitButton } from "./SettingsUI";
 

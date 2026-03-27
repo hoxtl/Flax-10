@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Filter } from "lucide-react";
+<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/societies/components/AllSocieties.jsx
 import styles from "../styles/SocietiesPage.module.css";
 import { ToolbarSortControl } from "../../../components/common/page_toolbar/PageToolbar";
 import SearchBar from "../../../components/common/search_bar";
@@ -12,6 +13,15 @@ import AnimatedDropdown from "../../../components/common/animated_dropdown";
 import { TagsSelector } from "../../../components/common/tags_selector/TagsSelector";
 import { BackToTop } from "../../../components/pagination/Pagination";
 import BackButton from "../../../components/common/back_button/BackButton.jsx";
+=======
+import styles from "./SocietiesPage.module.css";
+import { ToolbarSortControl } from "../../components/common/page_toolbar/PageToolbar";
+import SearchBar from "../../components/common/search_bar";
+import AnimatedDropdown from "../../components/common/animated_dropdown";
+import { TagsSelector } from "../../components/common/tags_selector/TagsSelector";
+import { BackToTop } from "../../components/pagination/Pagination";
+import BackButton from "../../components/common/back_button/BackButton.jsx";
+>>>>>>> main:flax-10-project-files/frontend/src/pages/societies/AllSocieties.jsx
 import { SocietyBrowseResults } from "./SocietyBrowseResults";
 import { RATIFICATION_FILTERS, SOCIETY_CATEGORIES } from "../utils/societyFilters";
 import { useSocietyBrowseFilters } from "../hooks/useSocietyBrowseFilters";

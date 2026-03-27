@@ -7,7 +7,11 @@ import FormField from "../../../components/common/form_field/FormField";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import { TagsSelector } from "../../../components/common/tags_selector/TagsSelector";
+<<<<<<< HEAD
 import UserSearch from "../../../components/social/components/UserSearch";
+=======
+import UserSearch from "../../../components/social/UserSearch";
+>>>>>>> main
 import { CreateProjectInputs } from "./CreateProjectInputs";
 import GroupWorkUserSearchEmptyState from "./GroupWorkUserSearchEmptyState";
 import { getStoredViewer } from "../utils/memberAvatarUtils";

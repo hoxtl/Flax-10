@@ -15,7 +15,11 @@ vi.mock("../../../context/ThemeContext", () => ({
   useTheme: () => mockUseTheme(),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/AttendanceChart.test.jsx
 vi.mock("../../../components/analytics/hooks/useAttendanceStats", () => ({
+=======
+vi.mock("../../../components/analytics/useAttendanceStats", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/AttendanceChart.test.jsx
   default: () => mockUseAttendanceStats(),
 }));
 
@@ -23,11 +27,19 @@ vi.mock("../../../components/analytics/utils/chartColors", () => ({
   getChartColors: (...args) => mockGetChartColors(...args),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/AttendanceChart.test.jsx
 vi.mock("../../../components/analytics/components/AttendanceSummary", () => ({
   default: ({ pct }) => <div data-testid="attendance-summary">pct:{pct}</div>,
 }));
 
 vi.mock("../../../components/analytics/components/AttendanceBarChart", () => ({
+=======
+vi.mock("../../../components/analytics/AttendanceSummary", () => ({
+  default: ({ pct }) => <div data-testid="attendance-summary">pct:{pct}</div>,
+}));
+
+vi.mock("../../../components/analytics/AttendanceBarChart", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/AttendanceChart.test.jsx
   default: ({ types, isMobile, gridColor, textColor }) => (
     <div data-testid="attendance-bar-chart">
       {types.join(",")}|{String(isMobile)}|{gridColor}|{textColor}
@@ -35,7 +47,11 @@ vi.mock("../../../components/analytics/components/AttendanceBarChart", () => ({
   ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/AttendanceChart.test.jsx
 import AttendanceChart from "../../../components/analytics/components/AttendanceChart";
+=======
+import AttendanceChart from "../../../components/analytics/AttendanceChart";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/AttendanceChart.test.jsx
 
 function renderChart() {
   return render(

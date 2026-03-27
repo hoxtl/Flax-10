@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
+<<<<<<< HEAD
 import { TaskInput } from '../../../components/timer/components/TimerComponents';
+=======
+import { TaskInput } from '../../../components/timer/TimerComponents';
+>>>>>>> main
 
 // Keep dropdowns testable (native controls)
 vi.mock('../../../components/common/animated_dropdown', () => ({

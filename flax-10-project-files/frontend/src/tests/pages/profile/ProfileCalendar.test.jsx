@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/ProfileCalendar.test.jsx
 import { ProfileCalendar } from '../../../pages/profile/components/ProfileCalendar';
+=======
+import { ProfileCalendar } from '../../../pages/profile/ProfileCalendar';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/ProfileCalendar.test.jsx
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 import { isSameMonth } from '../../../components/calendar/utils/dateUtils';
 

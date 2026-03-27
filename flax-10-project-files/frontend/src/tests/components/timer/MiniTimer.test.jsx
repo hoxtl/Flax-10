@@ -1,12 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import MiniTimer from '../../../components/timer/components/MiniTimer';
+=======
+import MiniTimer from '../../../components/timer/MiniTimer';
+>>>>>>> main
 
 vi.mock('../../../context/TimerContext', () => ({
     useTimerContext: vi.fn(),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/timer/components/TimerComponents', () => ({
+=======
+vi.mock('../../../components/timer/TimerComponents', () => ({
+>>>>>>> main
     formatTime: vi.fn((s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`),
 }));
 

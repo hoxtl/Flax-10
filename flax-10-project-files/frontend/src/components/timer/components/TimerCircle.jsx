@@ -2,7 +2,11 @@
  * Circular timer views.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/TimerCircle.jsx
 import styles from '../../../pages/timer/TimerPage.module.css';
+=======
+import styles from '../../pages/timer/TimerPage.module.css';
+>>>>>>> main:flax-10-project-files/frontend/src/components/timer/TimerCircle.jsx
 import FocusAnimation from './FocusAnimation';
 import { TimerDisplay } from './TimerComponents';
 

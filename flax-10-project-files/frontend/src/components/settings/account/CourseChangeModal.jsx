@@ -4,7 +4,11 @@
 
 import { useState } from "react";
 import { requestCourseChange } from "../../../api/adminApi";
+<<<<<<< HEAD
 import styles from "../../../pages/settings/styles/Settings.module.css";
+=======
+import styles from "../../../pages/settings/Settings.module.css";
+>>>>>>> main
 import AnimatedDropdown from "../../common/animated_dropdown/AnimatedDropdown";
 import InlineAlert from "../../common/inline_alert/InlineAlert";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";

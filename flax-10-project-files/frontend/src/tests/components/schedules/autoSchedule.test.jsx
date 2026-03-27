@@ -1,7 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/schedules/autoSchedule.test.jsx
 import { ScheduleAutoForm, ScheduleManualForm } from "../../../components/schedules/components/ScheduleForms";
+=======
+import { ScheduleAutoForm, ScheduleManualForm } from "../../../components/schedules/ScheduleForms";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Schedules/autoSchedule.test.jsx
 import { AutoScheduleForm } from "../../../components/schedules/auto/AutoScheduleForm";
 
 const submitAutoSchedule = vi.fn();

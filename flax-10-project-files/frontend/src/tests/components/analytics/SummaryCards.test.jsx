@@ -11,7 +11,11 @@ vi.mock('framer-motion', () => ({
     }),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/SummaryCards.test.jsx
 import SummaryCards from '../../../components/analytics/components/SummaryCards';
+=======
+import SummaryCards from '../../../components/analytics/SummaryCards';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/SummaryCards.test.jsx
 
 const mockData = {
     summary: {

@@ -10,7 +10,11 @@ vi.mock("../../../api/userApi", () => ({
   searchUsers: (...args) => searchUsersMock(...args),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/discover/discoverHelpers.test.js
 vi.mock("../../../components/social/components/UserSearch", () => ({
+=======
+vi.mock("../../../components/social/UserSearch", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Discover/discoverHelpers.test.js
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),
   useClickOutside: (...args) => useClickOutsideMock(...args),
@@ -24,8 +28,13 @@ import {
   getRoleLabel,
   sortDiscoverUsers,
   USERS_PER_PAGE,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/discover/discoverHelpers.test.js
 } from "../../../pages/discover/utils/discoverHelpers";
 import { useDiscoverFetch, useDiscoverSearch } from "../../../pages/discover/hooks/discoverHooks";
+=======
+} from "../../../pages/discover/discoverHelpers";
+import { useDiscoverFetch, useDiscoverSearch } from "../../../pages/discover/discoverHooks";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Discover/discoverHelpers.test.js
 
 describe("discover helpers", () => {
   beforeEach(() => {

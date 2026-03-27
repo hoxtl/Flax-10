@@ -4,7 +4,11 @@
 
 import styles from "./DashboardLayout.module.css";
 import QuickCommandBar from "../components/common/quick_command_bar/QuickCommandBar";
+<<<<<<< HEAD
 import FloatingChat from "../components/floating_chat/components/FloatingChat";
+=======
+import FloatingChat from "../components/FloatingChat";
+>>>>>>> main
 import { BackToTop } from "../components/pagination/Pagination";
 import { handleLogoutClick, shouldBlockTimerNavigation, shouldShowBackToTop } from "./dashboard_layout/dashboardLayoutActions";
 import { useDashboardState } from "./dashboard_layout/dashboardLayoutHooks";

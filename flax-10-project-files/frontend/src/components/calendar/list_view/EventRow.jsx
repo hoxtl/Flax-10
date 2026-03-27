@@ -7,7 +7,7 @@ import { getEventType, isReadOnlyEvent, isAllDay } from '../utils/eventUtils';
 import { useEventPopup } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
-import Badge from '../../common/Badge/Badge';
+import Badge from '../../common/badge/Badge';
 import styles from './ListView.module.css';
 
 export function formatEventTime(event) {

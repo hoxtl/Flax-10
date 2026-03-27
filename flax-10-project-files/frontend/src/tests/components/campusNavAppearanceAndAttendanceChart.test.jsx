@@ -3,7 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 
 const barChartSpy = vi.fn();
 
+<<<<<<< HEAD
 vi.mock("../../components/settings/components/SettingsContextCard", () => ({
+=======
+vi.mock("../../components/settings/SettingsContextCard", () => ({
+>>>>>>> main
   default: ({ emoji, title, items }) => (
     <div data-testid="context-card">
       <span>{emoji}</span>
@@ -13,7 +17,11 @@ vi.mock("../../components/settings/components/SettingsContextCard", () => ({
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock("../../components/settings/components/SettingsUI", () => ({
+=======
+vi.mock("../../components/settings/SettingsUI", () => ({
+>>>>>>> main
   SectionHeader: ({ title }) => <div>{title}</div>,
   SubmitButton: ({ label }) => <button type="button">{label}</button>,
   ThemeGridSelector: ({ value, onChange }) => (
@@ -35,13 +43,22 @@ vi.mock("../../components/analytics/utils/chartColors", () => ({
   getChartSx: (...args) => ({ mockSx: args }),
 }));
 
+<<<<<<< HEAD
 vi.mock("../../components/analytics/utils/attendanceChartConfig", () => ({
+=======
+vi.mock("../../components/analytics/attendanceChartConfig", () => ({
+>>>>>>> main
   getAttendanceMargin: (isMobile) => ({ mobile: isMobile }),
   getAttendanceSeries: (types, byType) => [{ types, byType }],
 }));
 
+<<<<<<< HEAD
 import { CampusQuickNav } from "../../components/campus_map/components/CampusQuickNav";
 import AttendanceBarChart from "../../components/analytics/components/AttendanceBarChart";
+=======
+import { CampusQuickNav } from "../../components/campus_map/CampusQuickNav";
+import AttendanceBarChart from "../../components/analytics/AttendanceBarChart";
+>>>>>>> main
 import AppearanceSection from "../../components/settings/preferences/AppearanceSection";
 import RequestDecisionNotice from "../../components/settings/ui/RequestDecisionNotice";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";

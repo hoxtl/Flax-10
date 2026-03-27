@@ -7,7 +7,11 @@ import {
   getAttendanceMargin,
   getAttendancePercentage,
   getAttendanceSeries,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/attendanceChartConfig.test.js
 } from "../../../components/analytics/utils/attendanceChartConfig";
+=======
+} from "../../../components/analytics/attendanceChartConfig";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/attendanceChartConfig.test.js
 
 describe("attendanceChartConfig", () => {
   it("returns mobile and desktop margins", () => {

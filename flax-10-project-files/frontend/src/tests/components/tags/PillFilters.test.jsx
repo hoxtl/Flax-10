@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/tags/PillFilters.test.jsx
 import PillFilters from '../../../components/tags/components/PillFilters';
+=======
+import PillFilters from '../../../components/tags/PillFilters';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Tags/PillFilters.test.jsx
 
 const mockTags = [
     { id: 1, label: 'Work', color: '#ff0000', icon: '💼' },
@@ -8,7 +12,11 @@ const mockTags = [
 ];
 
 // Mock CSS modules
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/tags/PillFilters.test.jsx
 vi.mock('../../../components/tags/styles/PillFilters.module.css', () => ({
+=======
+vi.mock('../../../components/tags/PillFilters.module.css', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Tags/PillFilters.test.jsx
     default: { row: 'row', pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' },
 }));
 
@@ -16,7 +24,11 @@ vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({ tags: mockTags })),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/tags/PillFilters.test.jsx
 vi.mock('../../../components/tags/components/TagManagerModal', () => ({
+=======
+vi.mock('../../../components/tags/TagManagerModal', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Tags/PillFilters.test.jsx
     default: ({ onClose }) => (
         <div data-testid="tag-manager-modal">
             <button onClick={onClose}>Close Modal</button>

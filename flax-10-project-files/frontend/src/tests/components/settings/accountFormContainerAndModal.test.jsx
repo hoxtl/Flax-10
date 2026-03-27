@@ -87,12 +87,20 @@ vi.mock("../../../components/common/request_status_card/RequestStatusCard", () =
   ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/accountFormContainerAndModal.test.jsx
 vi.mock("../../../components/settings/components/SettingsUI", () => ({
+=======
+vi.mock("../../../components/settings/SettingsUI", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/accountFormContainerAndModal.test.jsx
   SectionHeader: ({ title }) => <h3>{title}</h3>,
   SubmitButton: ({ label }) => <button type="submit">{label}</button>,
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/accountFormContainerAndModal.test.jsx
 vi.mock("../../../components/settings/components/SettingsContextCard", () => ({
+=======
+vi.mock("../../../components/settings/SettingsContextCard", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/accountFormContainerAndModal.test.jsx
   default: ({ title }) => <div>{title}</div>,
 }));
 
@@ -110,7 +118,7 @@ import AccountFormLayout from "../../../components/settings/account/AccountFormL
 import CourseDisplay from "../../../components/settings/account/CourseDisplay";
 import CourseChangeModal from "../../../components/settings/account/CourseChangeModal";
 
-const { default: RealAccountFormLayout } = await vi.importActual("../../../components/Settings/account/AccountFormLayout");
+const { default: RealAccountFormLayout } = await vi.importActual("../../../components/settings/account/AccountFormLayout");
 
 describe("Account form extras", () => {
   beforeEach(() => {

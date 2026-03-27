@@ -2,8 +2,13 @@
  * Session progress dots and live stats.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/SessionDots.jsx
 import styles from '../../../pages/timer/TimerPage.module.css';
 import { fmtDuration } from '../utils/timerFormatters';
+=======
+import styles from '../../pages/timer/TimerPage.module.css';
+import { fmtDuration } from './utils/timerFormatters';
+>>>>>>> main:flax-10-project-files/frontend/src/components/timer/SessionDots.jsx
 
 function getDotState(index, completedSessions, isActive, isPaused) {
   if (index < completedSessions) return { className: styles.sessionDotDone, label: '✓' };

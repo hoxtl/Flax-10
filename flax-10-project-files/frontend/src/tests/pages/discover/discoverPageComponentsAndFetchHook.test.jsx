@@ -53,7 +53,11 @@ const useSearchInitMock = vi.fn();
 const useFilterStateMock = vi.fn();
 const useClickOutsideMock = vi.fn();
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/discover/discoverPageComponentsAndFetchHook.test.jsx
 vi.mock("../../../components/social/components/UserSearch", () => ({
+=======
+vi.mock("../../../components/social/UserSearch", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Discover/discoverPageComponentsAndFetchHook.test.jsx
   FilterSection: () => <div data-testid="filter-section" />,
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),
@@ -90,7 +94,7 @@ vi.mock("../../../components/common/user_avatar/UserAvatar", () => ({
   default: () => <div data-testid="user-avatar" />,
 }));
 
-vi.mock("../../../components/common/Card/GridCard", () => ({
+vi.mock("../../../components/common/card/GridCard", () => ({
   default: ({ children, onClick }) => (
     <div data-testid="grid-card" onClick={onClick}>
       {children}
@@ -151,8 +155,13 @@ import {
   DiscoverSkeleton,
   DiscoverToolbar,
   UsersGrid,
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/discover/discoverPageComponentsAndFetchHook.test.jsx
 } from "../../../pages/discover/components/DiscoverComponents";
 import { useDiscoverFetch } from "../../../pages/discover/hooks/discoverHooks";
+=======
+} from "../../../pages/discover/DiscoverComponents";
+import { useDiscoverFetch } from "../../../pages/discover/discoverHooks";
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Discover/discoverPageComponentsAndFetchHook.test.jsx
 
 // ── Helpers for filter state mock ────────────────────────────────────────────
 function makeFilterState(overrides = {}) {

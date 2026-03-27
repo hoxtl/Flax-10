@@ -2,10 +2,17 @@
  * Study heatmap chart.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/analytics/components/StudyHeatmap.jsx
 import styles from '../styles/Charts.module.css';
 import { useTheme } from '../../../context/ThemeContext';
 import Tooltip from '../../common/Tooltip/Tooltip';
 import heatmapColors from '../utils/heatmapColorConstants.json';
+=======
+import styles from './Charts.module.css';
+import { useTheme } from '../../context/ThemeContext';
+import Tooltip from '../common/tooltip/Tooltip';
+import heatmapColors from './utils/heatmapColorConstants.json';
+>>>>>>> main:flax-10-project-files/frontend/src/components/analytics/StudyHeatmap.jsx
 
 const LEGEND_INTENSITIES = [0, 0.25, 0.5, 0.75, 1];
 

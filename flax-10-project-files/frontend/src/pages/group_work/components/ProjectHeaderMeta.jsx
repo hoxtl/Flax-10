@@ -5,8 +5,8 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
-import Badge from "../../../components/common/Badge/Badge";
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import Badge from "../../../components/common/badge/Badge";
+import Tooltip from "../../../components/common/tooltip/Tooltip";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
 import { getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";

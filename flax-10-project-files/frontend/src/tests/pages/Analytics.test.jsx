@@ -31,6 +31,7 @@ vi.mock('../../api/analyticsApi', () => ({
     },
 }));
 
+<<<<<<< HEAD
 vi.mock('../../components/analytics/components/SummaryCards', () => ({
     default: ({ data }) => <div data-testid="summary-cards">{data ? 'loaded' : 'no-data'}</div>,
 }));
@@ -68,6 +69,45 @@ vi.mock('../../components/analytics/components/AIInsightsTab', () => ({
 }));
 
 vi.mock('../../components/analytics/components/InsightCards', () => ({
+=======
+vi.mock('../../components/analytics/SummaryCards', () => ({
+    default: ({ data }) => <div data-testid="summary-cards">{data ? 'loaded' : 'no-data'}</div>,
+}));
+
+vi.mock('../../components/analytics/ProductivityCards', () => ({
+    default: () => <div data-testid="productivity-cards" />,
+}));
+
+vi.mock('../../components/analytics/StudyHoursChart', () => ({
+    default: () => <div data-testid="study-hours-chart" />,
+}));
+
+vi.mock('../../components/analytics/DailyBreakdownChart', () => ({
+    default: () => <div data-testid="daily-breakdown-chart" />,
+}));
+
+vi.mock('../../components/analytics/StudyHeatmap', () => ({
+    default: () => <div data-testid="study-heatmap" />,
+}));
+
+vi.mock('../../components/analytics/AttendanceChart', () => ({
+    default: () => <div data-testid="attendance-chart" />,
+}));
+
+vi.mock('../../components/analytics/PlannedVsActualChart', () => ({
+    default: () => <div data-testid="planned-vs-actual-chart" />,
+}));
+
+vi.mock('../../components/analytics/ThemeUsageChart', () => ({
+    default: () => <div data-testid="theme-usage-chart" />,
+}));
+
+vi.mock('../../components/analytics/AIInsightsTab', () => ({
+    default: () => <div data-testid="ai-insights-tab" />,
+}));
+
+vi.mock('../../components/analytics/InsightCards', () => ({
+>>>>>>> main
     ConsistencyScore: () => <div data-testid="consistency-score" />,
     PeakHoursCard: () => <div data-testid="peak-hours-card" />,
 }));

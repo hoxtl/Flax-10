@@ -8,7 +8,11 @@ vi.mock('../../../context/ThemeContext', () => ({
     })),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/ThemeToggle.test.jsx
 import ThemeToggle from '../../../components/dashboard/components/ThemeToggle';
+=======
+import ThemeToggle from '../../../components/dashboard/ThemeToggle';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/ThemeToggle.test.jsx
 import { useTheme } from '../../../context/ThemeContext';
 
 describe('ThemeToggle', () => {

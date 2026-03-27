@@ -6,7 +6,11 @@ import {
   societyDetailPageStateMocks,
 } from "./societyDetailPageTestUtils.jsx";
 
+<<<<<<< HEAD
 import SocietyDetailPage from "../../pages/societies/components/SocietyDetailPage";
+=======
+import SocietyDetailPage from "../../pages/societies/SocietyDetailPage";
+>>>>>>> main
 
 function clickByText(text) {
   fireEvent.click(screen.getByText(text));

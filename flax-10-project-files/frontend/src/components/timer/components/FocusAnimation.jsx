@@ -2,9 +2,15 @@
  * Focus tree animation with selectable visual mode.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/FocusAnimation.jsx
 import styles from '../../../pages/timer/TimerPage.module.css';
 import { TreeScene } from '../focus_animation/TreeScene';
 import { useFocusCanvasAnimation } from '../focus_animation/useFocusCanvasAnimation';
+=======
+import styles from '../../pages/timer/TimerPage.module.css';
+import { TreeScene } from './focus_animation/TreeScene';
+import { useFocusCanvasAnimation } from './focus_animation/useFocusCanvasAnimation';
+>>>>>>> main:flax-10-project-files/frontend/src/components/timer/FocusAnimation.jsx
 
 const ANIMATION_TYPES = [
   { key: 'tree', title: 'Tree' },

@@ -41,11 +41,19 @@ vi.mock("../../../../api/userApi", () => ({
   updateUserSettings: (...args) => updateUserSettingsMock(...args),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/hooks/useIntelligenceDashboard.test.jsx
 vi.mock("../../../../components/analytics/hooks/useAttendanceStats", () => ({
   default: () => useAttendanceStatsMock(),
 }));
 
 vi.mock("../../../../components/analytics/utils/attendanceChartConfig", () => ({
+=======
+vi.mock("../../../../components/analytics/useAttendanceStats", () => ({
+  default: () => useAttendanceStatsMock(),
+}));
+
+vi.mock("../../../../components/analytics/attendanceChartConfig", () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/hooks/useIntelligenceDashboard.test.jsx
   getAttendancePercentage: (...args) => getAttendancePercentageMock(...args),
 }));
 

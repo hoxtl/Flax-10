@@ -2,9 +2,15 @@
  * Presentational layout for the home-address form.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/settings/components/HomeAddressFormLayout.jsx
 import { LocationAutocomplete } from "../../calendar/event_modal/components/LocationAutoComplete";
 import InlineAlert from "../../common/inline_alert/InlineAlert";
 import styles from "../../../pages/settings/styles/Settings.module.css";
+=======
+import { LocationAutocomplete } from "../calendar/event_modal/components/LocationAutoComplete";
+import InlineAlert from "../common/inline_alert/InlineAlert";
+import styles from "../../pages/settings/Settings.module.css";
+>>>>>>> main:flax-10-project-files/frontend/src/components/settings/HomeAddressFormLayout.jsx
 import SettingsContextCard from "./SettingsContextCard";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
 

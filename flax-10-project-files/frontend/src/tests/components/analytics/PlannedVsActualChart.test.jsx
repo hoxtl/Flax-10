@@ -11,7 +11,11 @@ vi.mock('../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/PlannedVsActualChart.test.jsx
 import PlannedVsActualChart from '../../../components/analytics/components/PlannedVsActualChart';
+=======
+import PlannedVsActualChart from '../../../components/analytics/PlannedVsActualChart';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/PlannedVsActualChart.test.jsx
 
 const mockData = [
     { date: '2024-03-01', planned_hours: 2, actual_hours: 1.5 },

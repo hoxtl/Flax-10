@@ -3,9 +3,15 @@
  * for classifying societies into predefined categories.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/society/components/CategorySelector.jsx
 import styles from "../styles/CategorySelector.module.css";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../../pages/societies/utils/societyFilters";
 import AnimatedDropdown from "../../common/animated_dropdown";
+=======
+import styles from "./CategorySelector.module.css";
+import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/societies/societyFilters";
+import AnimatedDropdown from "../common/animated_dropdown";
+>>>>>>> main:flax-10-project-files/frontend/src/components/society/CategorySelector.jsx
 
 const CATEGORY_DROPDOWN_OPTIONS = [
     { value: '', label: 'Select a category' },

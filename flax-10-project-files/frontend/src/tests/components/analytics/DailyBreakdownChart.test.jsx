@@ -11,7 +11,11 @@ vi.mock('../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/DailyBreakdownChart.test.jsx
 import DailyBreakdownChart from '../../../components/analytics/components/DailyBreakdownChart';
+=======
+import DailyBreakdownChart from '../../../components/analytics/DailyBreakdownChart';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/DailyBreakdownChart.test.jsx
 
 const mockData = [
     { date: '2024-03-01', work: 90, break: 20 },

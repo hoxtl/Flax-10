@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/onboarding/OnboardingModal.test.jsx
 import OnboardingModal from '../../../components/onboarding/components/OnboardingModal';
+=======
+import OnboardingModal from '../../../components/onboarding/OnboardingModal';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Onboarding/OnboardingModal.test.jsx
 
 vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...props }) => <div {...props}>{children}</div> },
@@ -12,11 +16,19 @@ vi.mock('../../../components/onboarding/hooks/useOnboarding', () => ({
   default: useOnboardingMock,
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/onboarding/OnboardingModal.test.jsx
 vi.mock('../../../components/onboarding/components/OnboardingForm', () => ({
   default: () => <div>Mocked Form</div>,
 }));
 
 vi.mock('../../../components/onboarding/components/SuccessScreen', () => ({
+=======
+vi.mock('../../../components/onboarding/OnboardingForm', () => ({
+  default: () => <div>Mocked Form</div>,
+}));
+
+vi.mock('../../../components/onboarding/SuccessScreen', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Onboarding/OnboardingModal.test.jsx
   default: ({ major }) => <div>{`Success ${major}`}</div>,
 }));
 

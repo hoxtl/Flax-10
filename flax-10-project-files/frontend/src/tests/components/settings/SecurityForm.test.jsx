@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/SecurityForm.test.jsx
 import SecurityForm from '../../../components/settings/components/SecurityForm';
+=======
+import SecurityForm from '../../../components/settings/SecurityForm';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/SecurityForm.test.jsx
 
 describe('SecurityForm', () => {
     it('renders password fields', () => {

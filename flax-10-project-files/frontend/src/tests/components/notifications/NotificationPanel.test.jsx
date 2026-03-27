@@ -1,6 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/notifications/NotificationPanel.test.jsx
 import { NotificationPanel } from '../../../components/notifications/components/NotificationPanel';
+=======
+import { NotificationPanel } from '../../../components/notifications/NotificationPanel';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Notifications/NotificationPanel.test.jsx
 
 const useNotificationsMock = vi.fn();
 const executeNotificationActionMock = vi.fn();

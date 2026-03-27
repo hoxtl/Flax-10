@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/onboarding/SuccessScreen.test.jsx
 import SuccessScreen from '../../../components/onboarding/components/SuccessScreen';
+=======
+import SuccessScreen from '../../../components/onboarding/SuccessScreen';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Onboarding/SuccessScreen.test.jsx
 
 vi.mock('framer-motion', () => ({
   motion: {

@@ -2,7 +2,11 @@
  * Shared context card used across settings panels.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/settings/components/SettingsContextCard.jsx
 import styles from "../../../pages/settings/styles/Settings.module.css";
+=======
+import styles from "../../pages/settings/Settings.module.css";
+>>>>>>> main:flax-10-project-files/frontend/src/components/settings/SettingsContextCard.jsx
 
 export default function SettingsContextCard({
   emoji,

@@ -1,6 +1,10 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/notifications/NotificationToast.test.jsx
 import { NotificationToast, showNextToast } from '../../../components/notifications/components/NotificationToast';
+=======
+import { NotificationToast, showNextToast } from '../../../components/notifications/NotificationToast';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Notifications/NotificationToast.test.jsx
 
 const useNotificationsMock = vi.fn();
 const playNotificationSoundMock = vi.fn();

@@ -5,10 +5,17 @@
 import { useCallback } from 'react';
 import { motion } from 'framer-motion';
 import styles from '../../../pages/timer/TimerPage.module.css';
+<<<<<<< HEAD
 import SessionDots, { LiveStatsRow } from '../components/SessionDots';
 import { TaskInput } from '../components/TaskInput';
 import { TimerRing } from '../components/TimerCircle';
 import { TimerControls } from '../components/TimerComponents';
+=======
+import SessionDots, { LiveStatsRow } from '../SessionDots';
+import { TaskInput } from '../TaskInput';
+import { TimerRing } from '../TimerCircle';
+import { TimerControls } from '../TimerComponents';
+>>>>>>> main
 import { useSuggestedTimerTask } from '../hooks/useSuggestedTimerTask';
 import { clearManualTask, startManualTask } from '../utils/timerTaskActions';
 import { applyTaskToTimer } from '../utils/presetUtils';

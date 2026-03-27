@@ -2,9 +2,15 @@
  * Loading skeleton for the campus map page.
  */
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/campus_map/components/CampusMapSkeleton.jsx
 import SkeletonBlock from '../../common/loading_state/SkeletonBlock';
 import baseStyles from '../../../pages/campus_map/styles/CampusMap.module.css';
 import sidebarStyles from '../../../pages/campus_map/styles/sidebar.module.css';
+=======
+import SkeletonBlock from '../common/loading_state/SkeletonBlock';
+import baseStyles from '../../pages/campus_map/CampusMap.module.css';
+import sidebarStyles from '../../pages/campus_map/sidebar.module.css';
+>>>>>>> main:flax-10-project-files/frontend/src/components/campus_map/CampusMapSkeleton.jsx
 const styles = { ...baseStyles, ...sidebarStyles };
 
 function SkeletonSectionList() {

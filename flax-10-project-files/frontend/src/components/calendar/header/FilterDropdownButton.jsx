@@ -6,7 +6,11 @@
 import { Tag } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TagsSelector } from "../../common/tags_selector/TagsSelector";
+<<<<<<< HEAD
 import TagManagerModal from "../../tags/components/TagManagerModal";
+=======
+import TagManagerModal from "../../tags/TagManagerModal";
+>>>>>>> main
 import styles from "./CalendarHeaderUtils.module.css";
 import { useFilterDropdownState } from "./useFilterDropdownState";
 

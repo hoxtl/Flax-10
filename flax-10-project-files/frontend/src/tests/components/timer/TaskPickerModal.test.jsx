@@ -50,7 +50,11 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../pages/tasks/components/TaskFeedToolbarFilter', () => ({
+=======
+vi.mock('../../../pages/tasks/components/TaskFeedFilterPanel', () => ({
+>>>>>>> main
   default: () => <div data-testid="filter-panel" />,
 }));
 

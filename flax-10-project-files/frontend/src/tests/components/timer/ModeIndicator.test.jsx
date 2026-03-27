@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+<<<<<<< HEAD
 import { ModeIndicator } from '../../../components/timer/components/TimerComponents';
+=======
+import { ModeIndicator } from '../../../components/timer/TimerComponents';
+>>>>>>> main
 
 const testModes = () => {
     const { rerender } = render(<ModeIndicator mode="work" isOvertime={false} />);

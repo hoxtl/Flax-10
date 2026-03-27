@@ -1,8 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import TopBar from '../../components/dashboard/components/Topbar';
 
 vi.mock('../../components/dashboard/components/ProfileDropdown', () => ({
+=======
+import TopBar from '../../components/dashboard/Topbar';
+
+vi.mock('../../components/dashboard/ProfileDropdown', () => ({
+>>>>>>> main
   default: ({ onSettingsClick, onLogoutClick, onProfileClick }) => (
     <div>
       <button onClick={onSettingsClick}>settings</button>
@@ -12,7 +18,11 @@ vi.mock('../../components/dashboard/components/ProfileDropdown', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../components/dashboard/components/ExpandableTabs', () => ({
+=======
+vi.mock('../../components/dashboard/ExpandableTabs', () => ({
+>>>>>>> main
   ExpandableTabs: ({ tabs = [], onChange }) => (
     <div>
       <button data-testid={`tab-${tabs[0]?.title || 'unknown'}`} onClick={() => onChange(0)}>
@@ -23,12 +33,21 @@ vi.mock('../../components/dashboard/components/ExpandableTabs', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../components/dashboard/components/ThemeToggle', () => ({ default: () => <button>theme</button> }));
 vi.mock('../../components/timer/components/MiniTimer', () => ({ default: () => <div>timer</div> }));
 vi.mock('../../context/NotificationContext', () => ({
   useNotifications: vi.fn(() => ({ togglePanel: vi.fn(), notifications: [] })),
 }));
 vi.mock('../../components/notifications/components/NotificationPanel', () => ({
+=======
+vi.mock('../../components/dashboard/ThemeToggle', () => ({ default: () => <button>theme</button> }));
+vi.mock('../../components/timer/MiniTimer', () => ({ default: () => <div>timer</div> }));
+vi.mock('../../context/NotificationContext', () => ({
+  useNotifications: vi.fn(() => ({ togglePanel: vi.fn(), notifications: [] })),
+}));
+vi.mock('../../components/notifications/NotificationPanel', () => ({
+>>>>>>> main
   NotificationPanel: () => <div>notifications</div>
 }));
 

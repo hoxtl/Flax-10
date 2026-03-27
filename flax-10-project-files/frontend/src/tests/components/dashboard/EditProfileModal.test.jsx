@@ -1,6 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/EditProfileModal.test.jsx
 import EditProfileModal from '../../../components/dashboard/components/EditProfileModal';
+=======
+import EditProfileModal from '../../../components/dashboard/EditProfileModal';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/EditProfileModal.test.jsx
 
 const updateUserProfileMock = vi.fn();
 

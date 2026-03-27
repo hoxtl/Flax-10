@@ -24,7 +24,11 @@ vi.mock("../../components/society/hooks/useUnreportSociety", () => ({
   useUnreportSociety: (...args) => useUnreportSocietyMock(...args),
 }));
 
+<<<<<<< HEAD
 import { useSocietiesPage } from "../../pages/societies/hooks/societiesPageState";
+=======
+import { useSocietiesPage } from "../../pages/societies/societiesPageState";
+>>>>>>> main
 
 describe("useSocietiesPage", () => {
   beforeEach(() => {

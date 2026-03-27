@@ -1,8 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/CreateSocietyModal.test.jsx
 vi.mock('../../../components/society/styles/CreateSocietyModal.module.css', () => ({ default: {} }));
 vi.mock('../../../components/society/components/AddCollaboratorModal', () => ({
+=======
+vi.mock('../../../components/society/CreateSocietyModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/society/AddCollaboratorModal', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/CreateSocietyModal.test.jsx
     default: ({ onClose, onAdd }) => (
         <div data-testid="collab-modal">
             <button onClick={onClose}>CloseCollab</button>
@@ -10,7 +15,11 @@ vi.mock('../../../components/society/components/AddCollaboratorModal', () => ({
         </div>
     ),
 }));
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/CreateSocietyModal.test.jsx
 vi.mock('../../../components/society/components/CollaboratorList', () => ({
+=======
+vi.mock('../../../components/society/CollaboratorList', () => ({
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/CreateSocietyModal.test.jsx
     default: ({ collaborators, onRoleChange, onRemove, emptyMessage }) => (
         <div data-testid="collab-list">
             <span>{emptyMessage}</span>
@@ -58,7 +67,11 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     ),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/CreateSocietyModal.test.jsx
 import CreateSocietyModal from '../../../components/society/components/CreateSocietyModal';
+=======
+import CreateSocietyModal from '../../../components/society/CreateSocietyModal';
+>>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/CreateSocietyModal.test.jsx
 
 describe('CreateSocietyModal', () => {
     let onClose;
