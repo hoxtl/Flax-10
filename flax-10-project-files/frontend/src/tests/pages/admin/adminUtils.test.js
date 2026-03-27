@@ -41,16 +41,28 @@ describe('adminMotion', () => {
 
 describe('adminNavigation', () => {
   let dispatchedEvents;
+  let originalWindow;
+  let originalCustomEvent;
 
   beforeEach(() => {
     dispatchedEvents = [];
-    vi.spyOn(window, 'dispatchEvent').mockImplementation((event) => {
+    originalWindow = globalThis.window;
+    originalCustomEvent = globalThis.CustomEvent;
+    globalThis.window = { dispatchEvent: vi.fn((event) => {
       dispatchedEvents.push(event);
-    });
+    }) };
+    globalThis.CustomEvent = class MockCustomEvent {
+      constructor(type, init) {
+        this.type = type;
+        this.detail = init?.detail;
+      }
+    };
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    globalThis.window = originalWindow;
+    globalThis.CustomEvent = originalCustomEvent;
   });
 
   it('emitAdminNavigation dispatches a navigate custom event with the given detail', () => {

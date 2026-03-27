@@ -7,12 +7,14 @@ import {
 
 // Mock taskUtils so tests are isolated from focusPlanner internals
 
+const { getTasksThatFitGapMock, taskDurationMinsMock } = vi.hoisted(() => ({
+  getTasksThatFitGapMock: vi.fn(),
+  taskDurationMinsMock: vi.fn(),
+}));
+
 vi.mock("../../../../../pages/homepage/utils/taskUtils", () => ({
-  taskDurationMins: (task) => (task?.estimated_blocks ?? 1) * 25,
-  getTasksThatFitGap: (tasks, gapMinutes) => {
-    const fits = tasks.filter((t) => (t?.estimated_blocks ?? 1) * 25 <= gapMinutes);
-    return { suggested: fits[0] ?? null };
-  },
+  taskDurationMins: (...args) => taskDurationMinsMock(...args),
+  getTasksThatFitGap: (...args) => getTasksThatFitGapMock(...args),
 }));
 
 // Fixtures
@@ -38,6 +40,14 @@ const TASK_COMPLETED = { id: "t4", title: "Done task", priority: "low", estimate
 // deriveBestFreeRowId
 
 describe("deriveBestFreeRowId", () => {
+  beforeEach(() => {
+    taskDurationMinsMock.mockImplementation((task) => (task?.estimated_blocks ?? 1) * 25);
+    getTasksThatFitGapMock.mockImplementation((tasks, gapMinutes) => {
+      const fits = tasks.filter((task) => (task?.estimated_blocks ?? 1) * 25 <= gapMinutes);
+      return { suggested: fits[0] ?? null };
+    });
+  });
+
   it("returns null when rows is empty", () => {
     expect(deriveBestFreeRowId([], [], NOW)).toBeNull();
   });
@@ -89,6 +99,26 @@ describe("deriveBestFreeRowId", () => {
     const result = deriveBestFreeRowId([FREE_ROW_B, FREE_ROW_A], [mediumTask, urgentTask], NOW);
     expect(result).toBe("row-a");
   });
+
+  it("applies the high-priority gap boost when the best suggestion is high but not urgent", () => {
+    const highTask = {
+      id: "high-boost",
+      title: "High boost task",
+      priority: "high",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: "2024-05-20T00:00:00Z",
+    };
+
+    const result = deriveBestFreeRowId([{ id: "row-high", type: "free", minutes: 40 }], [highTask], NOW);
+    expect(result).toBe("row-high");
+  });
+
+  it("keeps the first free row when scores tie and handles rows without minutes", () => {
+    const rowWithoutMinutes = { id: "row-zero", type: "free" };
+    const result = deriveBestFreeRowId([rowWithoutMinutes, FREE_ROW_B], null, NOW);
+    expect(result).toBe("row-b");
+  });
 });
 
 // deriveAssignedGapTasks
@@ -97,6 +127,14 @@ describe("deriveAssignedGapTasks", () => {
   const emptySlottedIds = new Set();
   const emptySlottedTitles = new Set();
   const emptySkipped = {};
+
+  beforeEach(() => {
+    taskDurationMinsMock.mockImplementation((task) => (task?.estimated_blocks ?? 1) * 25);
+    getTasksThatFitGapMock.mockImplementation((tasks, gapMinutes) => {
+      const fits = tasks.filter((task) => (task?.estimated_blocks ?? 1) * 25 <= gapMinutes);
+      return { suggested: fits[0] ?? null };
+    });
+  });
 
   it("returns empty map and nextMap when rows is empty", () => {
     const result = deriveAssignedGapTasks([], [TASK_LOW], NOW, emptySkipped, emptySlottedIds, emptySlottedTitles);
@@ -278,6 +316,195 @@ describe("deriveAssignedGapTasks", () => {
 
     expect(result.map["row-a"]).toMatchObject({ id: "long-1" });
   });
+
+  it("keeps a stable choice when candidate ranks are identical", () => {
+    const twinA = {
+      id: "twin-a",
+      title: "Twin A",
+      priority: "medium",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: "2024-06-20T00:00:00Z",
+    };
+    const twinB = {
+      id: "twin-b",
+      title: "Twin B",
+      priority: "medium",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: "2024-06-20T00:00:00Z",
+    };
+
+    const result = deriveAssignedGapTasks(
+      [{ id: "row-start-only", type: "free", startMins: 500, minutes: 30 }],
+      [twinA, twinB],
+      NOW,
+      { "row-start-only": new Set(["not-used"]) },
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result.map["row-start-only"]).toMatchObject({ id: "twin-a" });
+  });
+
+  it("uses fallback ranking values when tasks have no due date or unknown priority", () => {
+    const unknownPriority = {
+      id: "unknown-priority",
+      title: "Unknown priority",
+      priority: "someday",
+      estimated_blocks: 1,
+      completed: false,
+    };
+    const lowPriority = {
+      id: "known-low",
+      title: "Known low",
+      priority: "low",
+      estimated_blocks: 1,
+      completed: false,
+    };
+
+    const result = deriveAssignedGapTasks(
+      [{ id: "row-no-times", type: "free", minutes: 30 }],
+      [unknownPriority, lowPriority],
+      NOW,
+      {},
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result.map["row-no-times"]).toMatchObject({ id: "unknown-priority" });
+  });
+
+  it("sorts queue correctly when the second task uses the unknown-priority fallback", () => {
+    const knownMedium = {
+      id: "known-medium",
+      title: "Known medium",
+      priority: "medium",
+      estimated_blocks: 1,
+      completed: false,
+    };
+    const unknownPriority = {
+      id: "unknown-second",
+      title: "Unknown second",
+      priority: "mystery",
+      estimated_blocks: 1,
+      completed: false,
+    };
+
+    const result = deriveAssignedGapTasks(
+      [FREE_ROW_B],
+      [knownMedium, unknownPriority],
+      NOW,
+      {},
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result.map["row-b"]).toMatchObject({ id: "known-medium" });
+  });
+
+  it("handles undefined gap minutes by falling back to zero in ranking math", () => {
+    taskDurationMinsMock.mockImplementation((task) => task.estimated_blocks ?? 0);
+    getTasksThatFitGapMock.mockImplementation((tasks) => ({ suggested: tasks[0] ?? null }));
+
+    const zeroDurationTask = {
+      id: "zero-task",
+      title: "Zero task",
+      priority: "medium",
+      estimated_blocks: 0,
+      completed: false,
+    };
+
+    const result = deriveAssignedGapTasks(
+      [{ id: "row-no-minutes", type: "free", startMins: 540 }],
+      [zeroDurationTask],
+      NOW,
+      {},
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result.map["row-no-minutes"]).toMatchObject({ id: "zero-task" });
+  });
+
+  it("handles an explicit zero-minute gap by using the same zero fallback", () => {
+    taskDurationMinsMock.mockImplementation((task) => task.estimated_blocks ?? 0);
+    getTasksThatFitGapMock.mockImplementation((tasks) => ({ suggested: tasks[0] ?? null }));
+
+    const zeroDurationTask = {
+      id: "zero-gap-task",
+      title: "Zero gap task",
+      priority: "medium",
+      estimated_blocks: 0,
+      completed: false,
+    };
+    const zeroDurationTaskB = {
+      id: "zero-gap-task-b",
+      title: "Zero gap task B",
+      priority: "medium",
+      estimated_blocks: 0,
+      completed: false,
+    };
+
+    const result = deriveAssignedGapTasks(
+      [{ id: "row-zero-gap", type: "free", minutes: 0 }],
+      [zeroDurationTask, zeroDurationTaskB],
+      NOW,
+      {},
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result.map["row-zero-gap"]).toMatchObject({ id: "zero-gap-task" });
+  });
+
+  it("sorts free rows using gapStartMins, then startMins, then zero fallback", () => {
+    const tasks = [
+      { id: "first", title: "First", priority: "medium", estimated_blocks: 1, completed: false },
+      { id: "second", title: "Second", priority: "medium", estimated_blocks: 1, completed: false },
+      { id: "third", title: "Third", priority: "medium", estimated_blocks: 1, completed: false },
+    ];
+
+    const rows = [
+      { id: "row-default-zero", type: "free", minutes: 30 },
+      { id: "row-start", type: "free", startMins: 120, minutes: 30 },
+      { id: "row-gap", type: "free", gapStartMins: 60, minutes: 30 },
+    ];
+
+    const result = deriveAssignedGapTasks(rows, tasks, NOW, {}, emptySlottedIds, emptySlottedTitles);
+
+    expect(Object.keys(result.map)).toEqual(["row-default-zero", "row-gap", "row-start"]);
+  });
+
+  it("handles row sorting when every timing fallback path is compared in reverse order", () => {
+    const rows = [
+      { id: "row-gap-late", type: "free", gapStartMins: 90, minutes: 30 },
+      { id: "row-zero", type: "free", minutes: 30 },
+      { id: "row-start-mid", type: "free", startMins: 45, minutes: 30 },
+    ];
+    const tasks = [
+      { id: "a", title: "A", priority: "medium", estimated_blocks: 1, completed: false },
+      { id: "b", title: "B", priority: "medium", estimated_blocks: 1, completed: false },
+      { id: "c", title: "C", priority: "medium", estimated_blocks: 1, completed: false },
+    ];
+
+    const result = deriveAssignedGapTasks(rows, tasks, NOW, {}, emptySlottedIds, emptySlottedTitles);
+
+    expect(Object.keys(result.map)).toEqual(["row-zero", "row-start-mid", "row-gap-late"]);
+  });
+
+  it("returns an empty assignment map when suggestable tasks are null", () => {
+    const result = deriveAssignedGapTasks(
+      [FREE_ROW_A],
+      null,
+      NOW,
+      {},
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result).toEqual({ map: {}, nextMap: {} });
+  });
 });
 
 // deriveGapDeadlineFallbacks
@@ -378,5 +605,27 @@ describe("deriveGapDeadlineFallbacks", () => {
 
     expect(result["row-a"]).toEqual(SUGGESTION_A);
     expect(result["row-b"]).toBeUndefined();
+  });
+
+  it("returns an empty map when deadline suggestions are null", () => {
+    const result = deriveGapDeadlineFallbacks(
+      [{ id: "row-start-only", type: "free", startMins: 510 }],
+      { map: {} },
+      null,
+      new Set(),
+    );
+
+    expect(result).toEqual({});
+  });
+
+  it("skips suggestions whose revision title is missing entirely", () => {
+    const result = deriveGapDeadlineFallbacks(
+      [{ id: "row-no-times", type: "free" }],
+      { map: {} },
+      [{}],
+      new Set(["Revision: undefined"]),
+    );
+
+    expect(result["row-no-times"]).toBeUndefined();
   });
 });
