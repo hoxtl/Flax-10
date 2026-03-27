@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import AvailabilityTab from "../../../pages/group_work/AvailabilityTab";
+import AvailabilityTab from "../../../pages/group_work/components/AvailabilityTab";
 
 const useAvailabilityMock = vi.fn();
 const useConfirmMock = vi.fn();
@@ -40,7 +40,7 @@ vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => 
   default: ({ title, hint }) => <div>{title} {hint}</div>,
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 

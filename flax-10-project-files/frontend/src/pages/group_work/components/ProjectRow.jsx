@@ -52,6 +52,7 @@ function useProjectRowViewModel(project, onClick) {
   return { data, isOwner, label, handleKeyDown, containerClassName };
 }
 
+/** Clickable row for a single group work project. */
 export default function ProjectRow({ project, onClick }) {
   const { data, isOwner, label, handleKeyDown, containerClassName } = useProjectRowViewModel(
     project,
@@ -82,7 +83,7 @@ function ProjectRowCard({ project, onClick, data, isOwner, label, handleKeyDown,
 
 function buildProjectRowArticleProps(onClick, handleKeyDown, label, containerClassName) {
   return {
-    className: `${containerClassName} ${styles.projectRowInteractive}`,
+    className: containerClassName,
     role: "button",
     tabIndex: 0,
     onClick,

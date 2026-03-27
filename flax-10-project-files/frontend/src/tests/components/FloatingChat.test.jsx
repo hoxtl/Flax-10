@@ -25,7 +25,7 @@ vi.mock('../../api/analyticsApi', () => ({
     },
 }));
 
-import FloatingChat from '../../components/FloatingChat';
+import FloatingChat from '../../components/floating_chat/components/FloatingChat';
 import analyticsService from '../../api/analyticsApi';
 
 describe('FloatingChat', () => {

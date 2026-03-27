@@ -2,7 +2,7 @@
  * Aggregates counts for tag-based filtering.
  */
 
-import { getEffectiveTagName } from "../../Calendar/utils/eventUtils";
+import { getEffectiveTagName } from "../../calendar/utils/eventUtils";
 
 export function countByType(items = []) {
   const counts = { all: items.length };

@@ -8,7 +8,7 @@ import {
     getRangeLabel,
     buildInitials,
     buildFullName,
-} from '../../pages/Profile/utils/profileHelpers';
+} from '../../pages/profile/utils/profileHelpers';
 
 vi.mock('../../components/Auth/utils/userUtils', () => ({
     getInitials: vi.fn((name) => name.split(' ').map(p => p[0]).join('')),

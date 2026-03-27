@@ -13,7 +13,7 @@ from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.management.commands.seed_helpers.groupwork.projects import (
     _build_module_project_specs,
 )
-from studyFlax.views.groupwork.groupwork_limits import MAX_GROUP_PROJECTS_PER_USER
+
 
 
 DEMO_USERNAMES = ["janedoe", "johndoe", "charlie"]
@@ -74,10 +74,7 @@ def _add_demo_members(project, owner, demo_users):
     for member in _selected_demo_members(demo_users, owner):
         GroupMembership.objects.get_or_create(project=project, user=member, defaults={"role": "member"})
 
-def _remaining_project_slots(user):
-    """Return how many more projects the user can join."""
-    existing_count = GroupMembership.objects.filter(user=user).count()
-    return MAX_GROUP_PROJECTS_PER_USER - existing_count
+
 
 def _enrolled_modules(user):
     enrollments = Enrollment.objects.filter(student=user).select_related("module")
@@ -98,19 +95,14 @@ def _seed_project_for_module(module, user, now, demo_users):
         _add_demo_members(project, user, demo_users)
     return created
 
-def _seed_projects_for_modules(user, modules, now, demo_users, remaining_slots):
-    """Seed projects until the remaining slot limit is reached."""
-    count = 0
-    for module in modules[:remaining_slots]:
-        count += int(_seed_project_for_module(module, user, now, demo_users))
-    return count
-
 def seed_new_user_projects(user, now=None):
     """Seed starter projects for a newly registered user."""
-    remaining_slots = _remaining_project_slots(user)
-    if remaining_slots <= 0:
-        return 0
     modules = _enrolled_modules(user)
     if not modules:
         return 0
-    return _seed_projects_for_modules(user, modules, now or timezone.now(), _get_demo_users(), remaining_slots)
+    now = now or timezone.now()
+    demo_users = _get_demo_users()
+    count = 0
+    for module in modules:
+        count += int(_seed_project_for_module(module, user, now, demo_users))
+    return count

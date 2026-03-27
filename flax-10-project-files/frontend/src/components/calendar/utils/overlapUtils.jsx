@@ -16,6 +16,13 @@ export function findOverlappingEvents(event, allEvents) {
     return allEvents.filter(e => eventsOverlap(event, e));
 }
 
+/**
+ * Returns true if the event can be saved (no overlaps, or the user confirmed).
+ * @param {object} event - The event being saved (must have start_time, end_time).
+ * @param {object[]} allEvents - All existing events to check against.
+ * @param {(opts: { title: string, message: React.ReactNode, confirmText: string }) => Promise<boolean>} confirmFn
+ *   Called with a conflict dialog descriptor; resolves true if the user accepts.
+ */
 export async function checkOverlapWithConfirm(event, allEvents, confirmFn) {
     const overlapping = findOverlappingEvents(event, allEvents);
     if (overlapping.length === 0) return true;

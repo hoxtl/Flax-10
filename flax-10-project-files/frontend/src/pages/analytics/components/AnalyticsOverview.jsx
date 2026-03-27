@@ -5,18 +5,18 @@
 import { motion } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import AttendanceChart from '../../../components/Analytics/AttendanceChart';
-import DailyBreakdownChart from '../../../components/Analytics/DailyBreakdownChart';
-import { ConsistencyScore, PeakHoursCard } from '../../../components/Analytics/InsightCards';
-import PlannedVsActualChart from '../../../components/Analytics/PlannedVsActualChart';
-import ProductivityCards from '../../../components/Analytics/ProductivityCards';
-import StudyHeatmap from '../../../components/Analytics/StudyHeatmap';
-import StudyHoursChart from '../../../components/Analytics/StudyHoursChart';
-import SummaryCards from '../../../components/Analytics/SummaryCards';
-import ThemeUsageChart from '../../../components/Analytics/ThemeUsageChart';
+import AttendanceChart from '../../../components/analytics/components/AttendanceChart';
+import DailyBreakdownChart from '../../../components/analytics/components/DailyBreakdownChart';
+import { ConsistencyScore, PeakHoursCard } from '../../../components/analytics/components/InsightCards';
+import PlannedVsActualChart from '../../../components/analytics/components/PlannedVsActualChart';
+import ProductivityCards from '../../../components/analytics/components/ProductivityCards';
+import StudyHeatmap from '../../../components/analytics/components/StudyHeatmap';
+import StudyHoursChart from '../../../components/analytics/components/StudyHoursChart';
+import SummaryCards from '../../../components/analytics/components/SummaryCards';
+import ThemeUsageChart from '../../../components/analytics/components/ThemeUsageChart';
 import EmptyState from '../../../components/common/empty_state/EmptyState';
-import { fadeUp } from '../pageConfig';
-import styles from '../AnalyticsPage.module.css';
+import { fadeUp } from '../utils/pageConfig';
+import styles from '../styles/AnalyticsPage.module.css';
 
 const MotionDiv = motion.div;
 const MotionSection = motion.section;
@@ -58,7 +58,7 @@ function InsightsSection({ data, progressData }) {
     <MotionDiv className={styles.twoCol} custom={1} variants={fadeUp} initial="hidden" animate="visible">
       <div className={styles.card}>
         <p className={styles.cardLabel}>Productivity</p>
-        <ProductivityCards data={data} progressData={progressData} />
+        <ProductivityCards balanced data={data} progressData={progressData} />
       </div>
       <div className={styles.card}>
         <p className={styles.cardLabel}>Insights</p>

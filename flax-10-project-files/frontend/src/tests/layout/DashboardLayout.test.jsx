@@ -46,7 +46,7 @@ describe("DashboardLayout", () => {
 
   it("handles logout flow", async () => {
     const { authService } = await import("../../api/authApi");
-    const { clearUserData } = await import("../../components/Authentication/utils/authHelpers");
+    const { clearUserData } = await import("../../components/Auth/utils/authHelpers");
     renderDashboardLayout();
     fireEvent.click(screen.getByText("Logout"));
     expect(authService.logout).toHaveBeenCalled();
@@ -195,7 +195,7 @@ describe("DashboardLayout", () => {
 
   it("handleLogoutClick clears user data even when logout throws", async () => {
     const { authService } = await import("../../api/authApi");
-    const { clearUserData } = await import("../../components/Authentication/utils/authHelpers");
+    const { clearUserData } = await import("../../components/Auth/utils/authHelpers");
     authService.logout.mockRejectedValueOnce(new Error("network error"));
     renderDashboardLayout();
     fireEvent.click(screen.getByText("Logout"));

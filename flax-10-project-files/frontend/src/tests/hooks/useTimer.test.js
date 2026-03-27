@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useTimer } from '../../components/Timer/hooks/useTimer';
+import { useTimer } from '../../components/timer/hooks/useTimer';
 
 describe('useTimer', () => {
     beforeEach(() => {

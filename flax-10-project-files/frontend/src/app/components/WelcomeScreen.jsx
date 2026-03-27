@@ -1,4 +1,4 @@
-import WelcomeLanding from "../../pages/Welcome/WelcomeLanding";
+import WelcomeLanding from "../../pages/welcome/WelcomeLanding";
 import { onExplore, onBackToAuth } from "../navigation/helpers";
 import { ScreenWrap } from "./ScreenWrap";
 

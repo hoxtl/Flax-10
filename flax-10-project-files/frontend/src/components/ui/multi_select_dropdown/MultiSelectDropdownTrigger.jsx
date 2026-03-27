@@ -5,7 +5,7 @@
 import { motion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import dropdownStyles from "../../common/animated_dropdown/AnimatedDropdown.module.css";
-import pillStyles from "../MultiSelectDropdown.module.css";
+import pillStyles from "../styles/MultiSelectDropdown.module.css";
 import { getOptionLabel } from "./multiSelectDropdownUtils";
 
 const MotionButton = motion.button;

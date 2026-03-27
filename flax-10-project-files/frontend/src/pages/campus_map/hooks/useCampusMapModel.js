@@ -14,7 +14,7 @@ import { useCampusMapState } from "./useCampusMapState";
 import { useDisruptions } from "./useDisruptions";
 import { useHomeAddress } from "./useHomeAddress";
 import { useResponsiveCampusMap } from "./useResponsiveCampusMap";
-import { clearRouteSource, cleanupMap, createMapClickHandler, displayRoute, fetchWalkingRoute, getEffectiveDestination, handleMapLoad, parseRouteInfo, syncHomeMarker, syncSelectedCampusPopup, syncStartMarker } from "../mapHelpers";
+import { clearRouteSource, cleanupMap, createMapClickHandler, displayRoute, fetchWalkingRoute, getEffectiveDestination, handleMapLoad, parseRouteInfo, syncHomeMarker, syncSelectedCampusPopup, syncStartMarker } from "../utils/mapHelpers";
 
 const GEOLOCATION_TARGET_START = "start";
 const GEOLOCATION_TARGET_DESTINATION = "destination";

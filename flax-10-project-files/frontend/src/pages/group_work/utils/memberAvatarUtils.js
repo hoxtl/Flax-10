@@ -111,3 +111,12 @@ export function getStoredViewer() {
     return {};
   }
 }
+
+/** Returns the member object for the currently authenticated viewer within a member list. */
+
+export function getCurrentMember(members = []) {
+  const viewer = getStoredViewer();
+  const viewerId = String(viewer.id ?? viewer.user ?? "");
+  if (!viewerId) return null;
+  return members.find((m) => String(m.user ?? m.id ?? "") === viewerId) || null;
+}

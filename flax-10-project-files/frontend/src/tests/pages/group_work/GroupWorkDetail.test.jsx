@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import GroupProjectDetail from '../../../pages/group_work/GroupWorkDetail';
+import GroupProjectDetail from '../../../pages/group_work/components/GroupWorkDetail';
 
 vi.mock('../../../pages/group_work/hooks/groupWorkHooks', () => ({
   useProjectDetail: vi.fn(),

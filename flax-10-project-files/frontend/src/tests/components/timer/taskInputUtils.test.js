@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies before importing
-vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({
+vi.mock('../../../pages/tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF3333'],
 }));
 
@@ -10,7 +10,7 @@ vi.mock('../../../utils/moduleCodeUtils', () => ({
     getModuleCodePrefix: vi.fn((code) => (code ? String(code).slice(0, 2) : '')),
 }));
 
-vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
+vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn((id, enrollments) => enrollments.some((e) => e.module_id === id || e === id)),
 }));
 
@@ -25,7 +25,7 @@ vi.mock('../../../lib/focusPlanner', () => ({
     getTaskDurationMinutes: vi.fn((task) => (task.estimated_blocks || 1) * 25),
 }));
 
-vi.mock('../../../components/Timer/task_input/taskInputConstants', () => ({
+vi.mock('../../../components/timer/task_input/taskInputConstants', () => ({
     SORT_ALPHA: 'alpha',
     SORT_ALPHA_DESC: 'alpha_desc',
     SORT_DATE_ADDED: 'date_added',
@@ -47,7 +47,7 @@ import {
     getRecommendedTask,
     mapEnrolledModules,
     getTaskDurationLabel,
-} from '../../../components/Timer/task_input/taskInputUtils';
+} from '../../../components/timer/task_input/taskInputUtils';
 
 describe('getTaskUrgencyTone', () => {
     it('returns "cool" when no due date', () => {
@@ -355,7 +355,7 @@ describe('mapEnrolledModules', () => {
     });
 
     it('filters modules by enrollment and maps correctly', async () => {
-        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
+        const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
         isEnrolledIn.mockImplementation((id, enrollments) => enrollments.includes(id));
 
         const allModules = [
@@ -370,7 +370,7 @@ describe('mapEnrolledModules', () => {
     });
 
     it('filters out modules with no code', async () => {
-        const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
+        const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValue(true);
         const { normalizeModuleCode } = await import('../../../utils/moduleCodeUtils');
         normalizeModuleCode.mockReturnValue(null);

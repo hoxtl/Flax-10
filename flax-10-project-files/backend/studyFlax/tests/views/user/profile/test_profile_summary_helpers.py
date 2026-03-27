@@ -175,13 +175,18 @@ class ProfileSummaryHelpersTest(TestCase):
         ids = [badge['id'] for badge in badges]
         self.assertIn('breadth', ids)
 
+    def _make_four_week_sessions(self):
+        """Return one session per weekday across four weeks."""
+        return [
+            self._make_session(week * 7 + day + 1, duration=3600)
+            for week in range(4)
+            for day in range(5)
+        ]
+
     def test_compute_badges_consistent_goals_for_four_weeks(self):
         from studyFlax.views.user.profile_summary_badges import compute_badges
 
-        sessions = []
-        for week in range(4):
-            for day in range(5):
-                sessions.append(self._make_session(week * 7 + day + 1, duration=3600))
+        sessions = self._make_four_week_sessions()
         self.user.weekly_goal_hours = 1
         self.user.save()
         badges = compute_badges(sessions, sessions, 0, 0, 0, self.user)

@@ -3,12 +3,12 @@ import {
   isNightSlot,
   getNextFreeSlotToday,
   getAllFreeWindowsToday,
-} from '../../pages/Homepage/utils/slotUtils';
+} from '../../pages/homepage/utils/slotUtils';
 
 const mockIsToday = vi.fn();
 const mockOverlapsDay = vi.fn();
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../components/calendar/utils/dateUtils', () => ({
   isToday: (d) => mockIsToday(d),
   overlapsDay: (start, end, day) => mockOverlapsDay(start, end, day),
 }));

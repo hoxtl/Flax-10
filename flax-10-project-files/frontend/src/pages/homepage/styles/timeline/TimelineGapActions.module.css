@@ -245,6 +245,41 @@
   opacity: 1;
 }
 
+@media (max-width: 640px) {
+  .planTimelineGapDeadlineRow {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .planTimelineGapDeadlineTitle,
+  .planTimelineNowStripTask {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
+  }
+
+  .planTimelineGapDeadlineBtn,
+  .planTimelineGapStartBtn,
+  .planTimelineGapStartBtnSm {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .planTimelineNowStrip {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px 8px;
+    padding: 8px 10px;
+  }
+
+  .planTimelineNowStripTimer {
+    margin-left: auto;
+  }
+}
+
 /* Dark Mode Overrides for MiniTimeline */
 [data-mode="dark"] .timelineBox {
   background: linear-gradient(

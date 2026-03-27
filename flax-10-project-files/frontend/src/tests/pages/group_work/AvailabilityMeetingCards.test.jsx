@@ -1,7 +1,7 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import AvailabilityTab from "../../../pages/group_work/AvailabilityTab";
+import AvailabilityTab from "../../../pages/group_work/components/AvailabilityTab";
 
 const useAvailabilityMock = vi.fn();
 const confirmHook = vi.fn();
@@ -14,7 +14,7 @@ vi.mock("../../../pages/group_work/hooks/useAvailability", () => ({
   useAvailability: (...args) => useAvailabilityMock(...args),
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div title={content}>{children}</div>,
 }));
 

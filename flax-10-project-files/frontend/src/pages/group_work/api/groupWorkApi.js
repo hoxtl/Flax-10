@@ -76,7 +76,12 @@ export async function createGroupProject(project) {
     headers: getJsonHeaders(),
     body: JSON.stringify(project),
   });
-  return parseJsonResponse(response);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const message = errorData.detail || errorData.message || Object.values(errorData).flat()[0];
+    throw new Error(message || "We couldn't create that project.");
+  }
+  return response.json();
 }
 
 /** Adds a user to a project as a member and returns the membership, or null on failure. */
@@ -87,5 +92,10 @@ export async function addProjectMember(projectId, userId) {
     headers: getJsonHeaders(),
     body: JSON.stringify({ user: userId, role: "member" }),
   });
-  return parseJsonResponse(response);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const message = errorData.detail || errorData.message || Object.values(errorData).flat()[0];
+    throw new Error(message || "We couldn't add that teammate.");
+  }
+  return response.json();
 }

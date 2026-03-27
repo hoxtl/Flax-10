@@ -7,7 +7,7 @@ import {
     getCourse, getDepartment, isEnrolledIn, getEnrollmentId, normaliseModuleCode, serialiseModule,
     formatWeekdayTime, formatFullDateTime, formatTime, formatDuration,
     formatForInput, filterModules, getDepartments, sortModules, applyFiltersAndSort
-} from '../../components/Modules/utils/moduleUtils';
+} from '../../components/modules/utils/moduleUtils';
 
 const modules = [
     { id: 1, module_code: 'CS1000', module_name: 'Intro to CS', deadlines: [1, 2] },

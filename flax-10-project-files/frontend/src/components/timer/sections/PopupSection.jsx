@@ -2,14 +2,14 @@
  * Timer modal and popup rendering.
  */
 
-import HistoryModal from '../HistoryModal';
+import HistoryModal from '../components/HistoryModal';
 import {
   OvertimePopup,
   GoalModal,
   BreakModal,
   EndEarlyModal,
   BreakStartedPopup,
-} from '../TimerPopups';
+} from '../components/TimerPopups';
 import { AUTOSTART_KEY } from '../utils/presetUtils';
 import { useTimerPopupEffects } from '../hooks/useTimerPopupEffects';
 

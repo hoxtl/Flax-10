@@ -103,8 +103,9 @@ async function updateProject(projectId, patch, setProject, onUpdate) {
 
 async function removeProjectMember(projectId, membershipId, setMembers) {
   const response = await deleteProjectMember(projectId, membershipId);
-  if (!response.ok) return;
+  if (!response.ok) return false;
   setMembers((prev) => prev.filter((item) => item.id !== membershipId));
+  return true;
 }
 
 async function deleteProject(projectId, onDelete, onBack) {
@@ -138,5 +139,5 @@ function useProjectState(projectId, onBack, onDelete, onUpdate) {
   const { members, setMembers } = useProjectMembers(projectId);
   const actions = useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate);
   const onAdded = (member) => addMemberIfMissing(member, setMembers);
-  return { project, loading, members, onAdded, onBack, ...actions };
+  return { project, setProject, loading, members, onAdded, onBack, ...actions };
 }

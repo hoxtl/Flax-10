@@ -2,15 +2,15 @@
  * Timer task picker modal.
  */
 
-import styles from '../../../pages/Timer/TimerPage.module.css';
+import styles from '../../../pages/timer/TimerPage.module.css';
 import SearchBar from '../../common/search_bar/SearchBar';
 import SearchEmptyState from '../../common/search_empty_state/SearchEmptyState';
 import SkeletonBlock from '../../common/loading_state/SkeletonBlock';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import StandardModal from '../../common/standard_modal/StandardModal';
 import AnimatedDropdown from '../../common/animated_dropdown';
-import ToolbarFilterPanel from '../../../pages/Tasks/components/TaskFeedToolbarFilter';
-import taskToolbarStyles from '../../../pages/Tasks/components/TaskFeedToolbar.module.css';
+import ToolbarFilterPanel from '../../../pages/tasks/components/TaskFeedToolbarFilter';
+import taskToolbarStyles from '../../../pages/tasks/components/TaskFeedToolbar.module.css';
 import { SORT_OPTIONS } from './taskInputConstants';
 import { TaskPickItem } from './TaskPickItem';
 

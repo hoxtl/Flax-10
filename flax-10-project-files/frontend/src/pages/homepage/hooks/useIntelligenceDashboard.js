@@ -6,12 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import { tflService } from "../../../api/tflApi";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import { updateUserSettings } from "../../../api/userApi";
-import useAttendanceStats from "../../../components/Analytics/useAttendanceStats";
-import { getAttendancePercentage } from "../../../components/Analytics/attendanceChartConfig";
+import useAttendanceStats from "../../../components/analytics/hooks/useAttendanceStats";
+import { getAttendancePercentage } from "../../../components/analytics/utils/attendanceChartConfig";
 import { loadTermConfig } from "../../../lib/termConfig";
 import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/IntelligenceUtils";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
-import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
+import useAnalyticsOverview from "../../analytics/hooks/useAnalyticsOverview";
 
 export const CATALOGUE = [
   { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 1, minRow: 1, maxRow: 1, section: "Essentials" },
@@ -115,10 +115,10 @@ function isAcademicSession(event) {
   const source = String(event?.source || "");
   if (source === "society") return false;
   const tagName = String(event?.tag_name || event?.tag?.name || "").toLowerCase();
-  const combinedCopy = `${event?.title || ""} ${event?.description || ""}`.toLowerCase();
+  const titleCopy = String(event?.title || "").toLowerCase();
   return source === "timetable"
     || source.startsWith("module_")
-    || ["lecture", "tutorial", "seminar", "practical", "lab", "small group", "smg", "lgt"].some((token) => tagName.includes(token) || combinedCopy.includes(token));
+    || ["lecture", "tutorial", "seminar", "practical", "lab", "small group", "smg", "lgt"].some((token) => tagName.includes(token) || titleCopy.includes(token));
 }
 
 function getStorageKeys(userId) {

@@ -3,7 +3,7 @@
  */
 
 import { Filter } from "lucide-react";
-import styles from "../PillFilters.module.css";
+import styles from "../styles/PillFilters.module.css";
 
 export function FilterTriggerButton({ label }) {
   return (

@@ -13,7 +13,7 @@ import {
     DAY_START_HOUR,
     DAY_END_HOUR,
     GAP_CARD_THRESHOLD_MINS,
-} from '../../pages/Homepage/utils/timelineUtils';
+} from '../../pages/homepage/utils/timelineUtils';
 
 describe('getDailyEnergyPercent', () => {
     it('returns a number between 0 and 100', () => {

@@ -3,7 +3,7 @@
  * society events by their assigned category/tags.
  */
 
-import BasePill from "../../../Tags/BasePill";
+import BasePill from "../../../tags/components/BasePill";
 import styles from "./TagFilterBar.module.css";
 
 export default function TagFilterBar({ tags, activeFilters = [], onFilterChange }) {

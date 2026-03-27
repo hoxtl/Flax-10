@@ -44,7 +44,7 @@ function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions, 
       <span className={s.optionsRowDivider} aria-hidden />
       <span className={s.optionsRowLabel}>List <span className={s.requiredMark}>*</span></span>
       <div className={`${s.dropdownWrap} ${s.listDropdownWrap} ${listError ? s.listDropdownError : ""}`}>
-        <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || "")} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+        <AnimatedDropdown value={String(taskListId ?? "")} onChange={(v) => setTaskListId(v !== "" ? v : (sortedLists?.[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
       </div>
     </>
   );
@@ -72,15 +72,7 @@ function CreateTaskBarOptions(props) {
     <div className={props.styles.optionsRowWrapper}>
       <AnimatePresence initial={false}>
         {props.showOptions && (
-          <motion.div
-            key="options-panel"
-            variants={optionsPanelVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            style={{ overflow: "visible" }}
-          >
+          <motion.div key="options-panel" variants={optionsPanelVariants} initial="hidden" animate="visible" exit="hidden" transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }} style={{ overflow: "visible" }}>
             <OptionsRowContent {...props} />
           </motion.div>
         )}

@@ -4,7 +4,7 @@
 
 import FormField from "../../../components/common/form_field/FormField";
 import TextInput from "../../../components/common/text_input/TextInput";
-import UserModuleDropdown from "../../../components/Modules/UserModuleDropdown";
+import UserModuleDropdown from "../../../components/modules/components/UserModuleDropdown";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import styles from "./CreateProjectForm.module.css";
 
@@ -37,6 +37,7 @@ function ProjectModuleField({ value, onChange, error }) {
         triggerClassName={styles.dropdownTrigger}
         usePortal
         allowFlipUpward={false}
+        allowNone
       />
     </FormField>
   );

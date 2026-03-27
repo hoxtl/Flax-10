@@ -1,0 +1,122 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { SleepSchedulePanel } from '../../../components/settings/components/SleepSchedulePanel';
+
+vi.mock('../../../api/userApi', () => ({
+    getUserSettings: vi.fn(),
+}));
+
+vi.mock('../../../pages/tasks/components/DateTimePicker', () => ({
+    default: ({ value, onChange, placeholder }) => (
+        <input
+            data-testid={placeholder}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+        />
+    ),
+}));
+
+import { getUserSettings } from '../../../api/userApi';
+
+describe('SleepSchedulePanel', () => {
+    beforeEach(() => {
+        getUserSettings.mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' });
+    });
+
+    it('shows loading initially', () => {
+        getUserSettings.mockReturnValueOnce(new Promise(() => {}));
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        expect(screen.getByLabelText('Loading sleep schedule')).toBeTruthy();
+    });
+
+    it('renders sleep schedule form after loading', async () => {
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        await waitFor(() => {
+            expect(screen.getByText('Sleep Schedule')).toBeTruthy();
+        });
+    });
+
+    it('renders Bedtime and Wake up labels', async () => {
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        await waitFor(() => {
+            expect(screen.getByText('Bedtime')).toBeTruthy();
+            expect(screen.getByText('Wake up')).toBeTruthy();
+        });
+    });
+
+    it('shows sleep duration', async () => {
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        await waitFor(() => {
+            expect(screen.getByText('8h')).toBeTruthy();
+        });
+    });
+
+    it('shows sleep duration in minutes', async () => {
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        await waitFor(() => {
+            expect(screen.getByText('480 minutes total')).toBeTruthy();
+        });
+    });
+
+    it('calculates duration across midnight', async () => {
+        getUserSettings.mockResolvedValueOnce({ sleep_time: '23:00:00', wake_time: '06:30:00' });
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        await waitFor(() => {
+            expect(screen.getByText('7h 30m')).toBeTruthy();
+        });
+    });
+
+    it('calls onSave with sleep and wake times on submit', async () => {
+        const onSave = vi.fn().mockResolvedValue(true);
+        const { container } = render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
+        await waitFor(() => screen.getByText('Sleep Schedule'));
+        fireEvent.submit(container.querySelector('form'));
+        expect(onSave).toHaveBeenCalledWith({ sleep_time: '23:00', wake_time: '07:00' });
+    });
+
+    it('renders Save button', async () => {
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: 'Save Sleep Schedule' })).toBeTruthy();
+        });
+    });
+
+    it('uses defaults when getUserSettings returns no times', async () => {
+        getUserSettings.mockResolvedValueOnce({});
+        render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
+        await waitFor(() => {
+            expect(screen.getByText('Sleep Schedule')).toBeTruthy();
+        });
+    });
+
+    it('shows saved tick after a successful sleep save', async () => {
+        const onSave = vi.fn().mockResolvedValue(true);
+        render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
+        const bedtimeInput = await screen.findByTestId('Pick bedtime');
+        fireEvent.change(bedtimeInput, { target: { value: '22:30' } });
+        fireEvent.submit(bedtimeInput.closest('form'));
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy();
+        });
+    });
+
+    it('falls back to default bedtime when the picker clears its value', async () => {
+        const onSave = vi.fn().mockResolvedValue(true);
+        render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
+        const bedtimeInput = await screen.findByTestId('Pick bedtime');
+        fireEvent.change(bedtimeInput, { target: { value: '' } });
+        fireEvent.submit(bedtimeInput.closest('form'));
+        expect(onSave).toHaveBeenCalledWith({ sleep_time: '23:00', wake_time: '07:00' });
+    });
+
+    it('does not mark the panel as saved when onSave resolves false', async () => {
+        const onSave = vi.fn().mockResolvedValue(false);
+        render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
+        const bedtimeInput = await screen.findByTestId('Pick bedtime');
+        fireEvent.change(bedtimeInput, { target: { value: '22:45' } });
+        fireEvent.submit(bedtimeInput.closest('form'));
+        await waitFor(() => expect(onSave).toHaveBeenCalledWith({ sleep_time: '22:45', wake_time: '07:00' }));
+        expect(screen.queryByRole('button', { name: /saved!/i })).toBeNull();
+        expect(screen.getByRole('button', { name: 'Save Sleep Schedule' })).toBeTruthy();
+    });
+});

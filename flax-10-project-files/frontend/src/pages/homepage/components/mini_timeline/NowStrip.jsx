@@ -4,7 +4,7 @@
 
 import { formatTime } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
-import { doesEventOverlapSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
+import { doesEventOverlapSleepWindow } from "../../../../components/settings/hooks/useSleepWarning";
 
 function formatTimer(timeLeft = 0) {
   return `${String(Math.floor(timeLeft / 60)).padStart(2, "0")}:${String(timeLeft % 60).padStart(2, "0")}`;

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '../../utils/testUtils';
-import useOnboarding from '../../components/Onboarding/hooks/useOnboarding';
+import useOnboarding from '../../components/onboarding/hooks/useOnboarding';
 
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);

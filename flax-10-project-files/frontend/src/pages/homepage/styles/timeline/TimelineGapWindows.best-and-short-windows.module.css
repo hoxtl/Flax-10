@@ -263,3 +263,15 @@
   flex-shrink: 0;
   padding-left: 8px;
 }
+
+@media (max-width: 640px) {
+  .planTimelineGapActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+    width: 100%;
+    padding-left: 0;
+  }
+}

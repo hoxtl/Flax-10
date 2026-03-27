@@ -30,6 +30,8 @@ AFTERNOON_SLOTS = [
     (21, 0, 30, "Plan tomorrow"),
 ]
 
+SEEDED_DEADLINE_LATEST_START_HOUR = 22
+
 MEAL_SPECS = [
     ("Breakfast", breakfast_fixtures, 8, 0, 8, 30),
     ("Lunch", lunch_fixtures, 12, 30, 13, 15),
@@ -239,7 +241,9 @@ def _get_random_offset(used_offsets, index=None):
 
 def _deadline_timing(deadline_type, now, day_offset):
 
-    hour = 23 if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
+    # Keep seeded deadlines out of the 11 PM slot because the late-night row
+    # renders differently in the calendar UI for demo users.
+    hour = SEEDED_DEADLINE_LATEST_START_HOUR if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
     start = now.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
     end = start + timedelta(hours=2) if deadline_type in ("exam", "presentation") else None
     location = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None

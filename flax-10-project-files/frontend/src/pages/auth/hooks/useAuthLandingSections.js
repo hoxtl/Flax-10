@@ -3,7 +3,7 @@
  */
 
 import { useMemo } from "react";
-import styles from "../AuthPage.module.css";
+import styles from "../styles/AuthPage.module.css";
 import { buildAuthLandingSections } from "../content/authLandingSections";
 
 export function useAuthLandingSections(state, actions) {

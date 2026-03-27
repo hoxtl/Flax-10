@@ -6,11 +6,11 @@ import { motion as Motion } from "framer-motion";
 import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { ConfirmModal } from "../../../components/common";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { MiniTimeline } from "./mini_timeline";
-import widgetStyles from "../../Modules/DashboardWidgets.module.css";
+import widgetStyles from "../../modules/styles/DashboardWidgets.module.css";
 
 const SECTION_ANIMATION = { opacity: 0, y: 30 };
 const SECTION_VISIBLE = { opacity: 1, y: 0 };
@@ -42,9 +42,11 @@ function TimelineContent(props) {
 
 function TimelineHeader(props) {
   return (
-    <div className={widgetStyles.widgetHeader}>
-      <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
-      <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
+    <div className={props.styles.timelineHeader}>
+      <div className={props.styles.timelineHeaderLeft}>
+        <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
+        <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
+      </div>
       <div className={props.styles.timelineHeaderRight}>
         <CalendarLink styles={props.styles} />
         <AutoScheduleButton {...props} />

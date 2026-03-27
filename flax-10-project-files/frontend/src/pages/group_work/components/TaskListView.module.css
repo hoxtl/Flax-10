@@ -277,6 +277,10 @@
 }
 
 @media (max-width: 900px) {
+  .headerRow {
+    display: none;
+  }
+
   .taskRow {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -312,10 +316,28 @@
     border-radius: 12px;
     margin-bottom: 10px;
     background: var(--card-bg);
+    gap: 8px;
   }
 
   .taskRow:last-child {
     margin-bottom: 0;
+  }
+
+  .taskMainCell {
+    gap: 10px;
+  }
+
+  .dateLabel {
+    width: auto;
+    max-width: 100%;
+    white-space: normal;
+    justify-content: flex-start;
+    padding: 6px 10px;
+  }
+
+  .assignClickTarget {
+    padding: 4px 0;
+    min-height: 32px;
   }
 
   .assignPopup {

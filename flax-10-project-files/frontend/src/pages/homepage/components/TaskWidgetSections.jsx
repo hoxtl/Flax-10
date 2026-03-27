@@ -4,7 +4,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
+import AllTasksCompleteCard from "../../tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import ExpandablePillButton from "../../../components/common/expandable_pill_button/ExpandablePillButton";
 import EmptyStateCard from "./EmptyStateCard";
@@ -12,7 +12,7 @@ import EmptyStateCard from "./EmptyStateCard";
 export function TaskWidgetAllDone({ itemCount, styles }) {
   return (
     <motion.div key="all-done" className={styles.taskWidgetSlotAllDoneWrap} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}>
-      <AllTasksCompleteCard emoji="🎉" message={getClearMessage()} sub={buildDoneCopy(itemCount)}>
+      <AllTasksCompleteCard className={styles.taskWidgetAllDoneCard} emoji="🎉" message={getClearMessage()} sub={buildDoneCopy(itemCount)}>
         <Link to="/tasks?open=fullPlanning" className={styles.taskWidgetPlanTomorrowPill}>Plan tomorrow →</Link>
       </AllTasksCompleteCard>
     </motion.div>

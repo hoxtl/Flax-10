@@ -127,10 +127,14 @@ function InfoModalHeader({ onClose }) {
   );
 }
 
-function InfoModalFooter({ onClose }) {
+function InfoModalFooter({ onClose, isReadingTask }) {
   return (
     <div className={styles.infoModalFooter}>
-      <span className={styles.infoHint}><MousePointer2 size={12} strokeWidth={2} /> Right-click the task to edit or delete</span>
+      {!isReadingTask && (
+        <span className={styles.infoHint}>
+          <MousePointer2 size={12} strokeWidth={2} /> Right-click the task to edit or delete
+        </span>
+      )}
       <PrimaryButton variant="ghost" pill onClick={onClose}>Close</PrimaryButton>
     </div>
   );
@@ -149,12 +153,13 @@ function useReadingSpeedData(task, listName) {
 
 export function TaskInfoModal({ task, listName, onClose }) {
   const speedData = useReadingSpeedData(task, listName);
+  const isReading = isReadingListName(listName);
   return (
     <StandardModal onClose={onClose} hideHeader size="md" modalClassName={styles.infoModal} contentClassName={styles.infoModalContent} backdropClassName={styles.modalBackdrop}>
       <div className={styles.infoModalAccent} aria-hidden />
       <InfoModalHeader onClose={onClose} />
       <InfoModalBody task={task} listName={listName} speedData={speedData} />
-      <InfoModalFooter onClose={onClose} />
+      <InfoModalFooter onClose={onClose} isReadingTask={isReading} />
     </StandardModal>
   );
 }

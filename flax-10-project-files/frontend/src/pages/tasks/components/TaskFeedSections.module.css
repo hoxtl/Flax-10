@@ -95,6 +95,13 @@
   background: var(--card-bg);
   transform: scale(1.02);
 }
+
+.chipExtra {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
 .sectionRing {
   flex-shrink: 0;
 }
@@ -259,6 +266,10 @@
   flex-direction: column;
   gap: 0;
   padding: 2px 0 4px;
+}
+
+.collapsibleBody {
+  overflow: hidden;
 }
 
 .taskRow {

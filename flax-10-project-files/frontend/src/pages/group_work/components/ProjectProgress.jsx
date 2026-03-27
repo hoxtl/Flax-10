@@ -6,7 +6,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import StatStrip from "../../../components/common/stat_strip/StatStrip";
 import { useCountUp } from "../../../hooks/useCountUp";
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import Tooltip from "../../../components/common/tooltip/Tooltip";
 import styles from "./ProjectProgress.module.css";
 
 function buildSegmentStyle(segment, hoveredSeg, hoveredKey) {

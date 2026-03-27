@@ -147,9 +147,9 @@ def _should_enroll(user, module):
     """Return whether a user still needs this module enrolment."""
     return not Enrollment.objects.filter(student=user, module=module).exists()
 
-def _process_single_module(user, module, tags, now, deadlines_by_module):
+def _process_single_module(user, module, tags, now, deadlines_by_module, is_core=False):
     """Build enrolment and events for a single module."""
-    enrollment = Enrollment(student=user, module=module) if _should_enroll(user, module) else None
+    enrollment = Enrollment(student=user, module=module, is_core=is_core) if _should_enroll(user, module) else None
     session_events = _build_user_session_events(user, module, tags, now)
     deadline_events = _build_user_deadline_events(user, module, tags, deadlines_by_module)
     return enrollment, session_events + deadline_events
@@ -164,8 +164,11 @@ def build_user_module_events(user, modules, tags, now, deadlines_by_module, base
     """Build all enrolments and events for one user's modules."""
     core, extras = get_user_modules(user, modules)
     enrollments, events = [], []
-    for module in core + extras:
-        enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module)
+    for module in core:
+        enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module, is_core=True)
+        _collect_module_result(enrollment, module_events, enrollments, events)
+    for module in extras:
+        enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module, is_core=False)
         _collect_module_result(enrollment, module_events, enrollments, events)
     return enrollments, _rebalance_seeded_fixed_events(events, baseline_events=baseline_events)
 

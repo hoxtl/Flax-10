@@ -5,8 +5,8 @@
 
 import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
-import AddCollaboratorModal from "../AddCollaboratorModal";
-import CollaboratorList from "../CollaboratorList";
+import AddCollaboratorModal from "../components/AddCollaboratorModal";
+import CollaboratorList from "../components/CollaboratorList";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import SectionHeader from "../../common/section_header/SectionHeader";
 import StandardModal from "../../common/standard_modal/StandardModal";

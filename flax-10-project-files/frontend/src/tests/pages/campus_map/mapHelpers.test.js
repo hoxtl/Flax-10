@@ -74,7 +74,7 @@ import {
   syncHomeMarker,
   syncSelectedCampusPopup,
   syncStartMarker,
-} from "../../../pages/campus_map/mapHelpers";
+} from "../../../pages/campus_map/utils/mapHelpers";
 
 const createMapMock = () => ({
   addLayer: vi.fn(),

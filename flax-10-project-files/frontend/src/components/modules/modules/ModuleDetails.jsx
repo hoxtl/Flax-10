@@ -9,12 +9,12 @@ import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.
 import { formatDate } from '../../calendar/utils/dateUtils.js';
 import { getInitials } from '../../Auth/utils/userUtils.js';
 import { useAuth } from '../../../context/AuthContext.jsx';
-import Badge from '../../common/Badge/Badge.jsx';
-import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
+import Badge from '../../common/badge/Badge.jsx';
 import { getUrgencyTier } from '../../common/deadline_countdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/back_button/BackButton.jsx';
+import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
 import PrimaryButton from '../../common/primary_button/PrimaryButton.jsx';
-import Tooltip from '../../common/Tooltip/Tooltip.jsx';
+import Tooltip from '../../common/tooltip/Tooltip.jsx';
 import LocationLink from '../../common/location_link/LocationLink.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
@@ -74,21 +74,25 @@ function TutorPhoto({ photo, name }) {
     return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={(event) => hideBrokenTutorImage(event, "inline-flex")} />;
 }
 
-function TutorName({ id, name }) {
-    if (id) return <EntityLinkChip to={`/profile/${id}`} className={heroStyles.heroMetaValue}>{name || "Unknown"}</EntityLinkChip>;
-    return <span className={heroStyles.heroMetaValue}>{name || "Unknown"}</span>;
+function TutorPillInner({ photo, name }) {
+    return (
+        <div className={heroStyles.tutorInline}>
+            <TutorPhoto photo={photo} name={name} />
+            <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(name)}</span>
+            <span className={heroStyles.heroMetaValue}>{name}</span>
+        </div>
+    );
 }
 
 function TutorMetaItem({ module, photo }) {
     const tutorName = module.created_by_name || "Unknown";
+    const tutorId = module.created_by;
     return (
         <div className={heroStyles.heroMetaItem}>
             <span className={heroStyles.heroMetaLabel}>Tutor</span>
-            <div className={heroStyles.tutorInline}>
-                <TutorPhoto photo={photo} name={tutorName} />
-                <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(tutorName)}</span>
-                <TutorName id={module.created_by} name={tutorName} />
-            </div>
+            {tutorId
+                ? <Link to={`/profile/${tutorId}`} className={heroStyles.tutorPillLink}><TutorPillInner photo={photo} name={tutorName} /></Link>
+                : <TutorPillInner photo={photo} name={tutorName} />}
         </div>
     );
 }

@@ -31,7 +31,7 @@ vi.mock("../../../pages/campus_map/hooks/useHomeAddress", () => ({
 vi.mock("../../../pages/campus_map/hooks/useResponsiveCampusMap", () => ({
   useResponsiveCampusMap: (...args) => responsiveMock(...args),
 }));
-vi.mock("../../../pages/campus_map/mapHelpers", () => ({
+vi.mock("../../../pages/campus_map/utils/mapHelpers", () => ({
   cleanupMap: (...args) => cleanupMapMock(...args),
   clearRouteSource: vi.fn(),
   createMapClickHandler: (...args) => createMapClickHandlerMock(...args),

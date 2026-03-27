@@ -1,17 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-vi.mock("../../pages/CampusMap/status.module.css", () => ({ default: {} }));
-vi.mock("../../pages/CampusMap/routes.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/status.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/routes.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/routes.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/routes.module.css", () => ({ default: {} }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-import { TflRouteCard } from "../../../components/campus_map/TflRouteCard";
-import { WalkingRouteCard } from "../../../components/campus_map/WalkingRouteCard";
+import { TflRouteCard } from "../../../components/campus_map/components/TflRouteCard";
+import { WalkingRouteCard } from "../../../components/campus_map/components/WalkingRouteCard";
 
 describe("TflRouteCard", () => {
   it("renders loading and error states", () => {

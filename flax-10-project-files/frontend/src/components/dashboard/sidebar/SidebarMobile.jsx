@@ -5,8 +5,8 @@
 import { AnimatePresence } from "framer-motion";
 import { motion as Motion } from "framer-motion";
 
-import mobileStyles from "../SidebarMobile.module.css";
-import sharedStyles from "../SidebarShell.module.css";
+import mobileStyles from "../styles/SidebarMobile.module.css";
+import sharedStyles from "../styles/SidebarShell.module.css";
 import { getSidebarRoutes } from "./sidebarUtils";
 
 function MobileNavIcon({ item, isActive, onClick }) {

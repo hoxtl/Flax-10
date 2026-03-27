@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
-import styles from "../TagManagerModal.module.css";
+import styles from "../styles/TagManagerModal.module.css";
 import { validateTagForm } from "./tagManagerUtils";
 
 export default function TagForm({ initialData, isProtected = false, onCancel, onSave }) {

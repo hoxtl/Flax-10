@@ -2,8 +2,8 @@
  * Event conflict resolution planning utilities.
  */
 
-import { overlapsDay } from "../../Calendar/utils/dateUtils";
-import { extractBaseEventId, isReadOnlyEvent } from "../../Calendar/utils/eventUtils";
+import { overlapsDay } from "../../calendar/utils/dateUtils";
+import { extractBaseEventId, isReadOnlyEvent } from "../../calendar/utils/eventUtils";
 
 const DAY_START_HOUR = 7;
 const TOMORROW_START_HOUR = 9;

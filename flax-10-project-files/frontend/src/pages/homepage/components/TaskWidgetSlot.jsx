@@ -4,17 +4,18 @@ import { CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import WidgetHeader from "../../../components/common/widget_header/WidgetHeader";
-import widgetStyles from "../../Modules/DashboardWidgets.module.css";
-import rowStyles from "../../Modules/DashboardRows.module.css";
-import { TaskContextMenu } from "../../Tasks/components/TaskCard";
+import widgetStyles from "../../modules/styles/DashboardWidgets.module.css";
+import rowStyles from "../../modules/styles/DashboardRows.module.css";
+import { TaskContextMenu } from "../../tasks/components/TaskCard";
 import { TaskWidgetRow } from "./TaskWidgetRow";
 import { TaskWidgetAllDone, TaskWidgetCompletedSection, TaskWidgetEmpty } from "./TaskWidgetSections";
-import { ShowMoreButton } from "../../../components/Modules/shared/widgetParts.jsx";
+import { isReadingList } from "../../tasks/utils/readingListUtils";
+import { ShowMoreButton } from "../../../components/modules/shared/widgetParts.jsx";
 import { useTaskWidgetState } from "./useTaskWidgetState";
 import {
   expandBodyVariants,
   listVariants,
-} from "../../../components/Modules/shared/widgetVariants.js";
+} from "../../../components/modules/shared/widgetVariants.js";
 
 const styles = { ...widgetStyles, ...rowStyles };
 
@@ -112,9 +113,12 @@ function TaskWidgetList(props) {
 
 function TaskListRow(props) {
   const isLeadTask = props.index === 0;
+  const list = (props.taskLists || []).find((l) => String(l.id) === String(props.task.task_list));
+  const isReading = list && isReadingList(list);
   return (
     <TaskWidgetRow
       {...props}
+      isReadingTask={isReading}
       isOverdue={props.task.taskWidgetStatus === "overdue"}
       rowAccent={getRowAccent(props.task, isLeadTask)}
       urgentGlow={isLeadTask || props.task.taskWidgetUrgentGlow}
@@ -131,6 +135,8 @@ function getRowAccent(task, isLeadTask = false) {
 
 function TaskWidgetMenu({ ctxMenu, onDeleteTask, onEditTask, onInlineTaskEdit, setCtxMenu, taskLists }) {
   if (!ctxMenu) return null;
+  const list = (taskLists || []).find((l) => String(l.id) === String(ctxMenu.task.task_list));
+  const isReading = list && isReadingList(list);
   return (
     <TaskContextMenu
       task={ctxMenu.task}
@@ -140,6 +146,7 @@ function TaskWidgetMenu({ ctxMenu, onDeleteTask, onEditTask, onInlineTaskEdit, s
       onEditOpen={() => openEdit(ctxMenu, onEditTask, setCtxMenu)}
       onDelete={() => deleteTask(ctxMenu, onDeleteTask, setCtxMenu)}
       onEdit={(patch) => onInlineTaskEdit?.(ctxMenu.task, patch)}
+      isReadingTask={isReading}
     />
   );
 }

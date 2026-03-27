@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { DailyGoalWidget } from '../../../components/Timer/presets/DailyGoalWidget';
+import { DailyGoalWidget } from '../../../components/timer/presets/DailyGoalWidget';
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
 
-vi.mock('../../../components/Timer/utils/timerFormatters', () => ({
+vi.mock('../../../components/timer/utils/timerFormatters', () => ({
   fmtDuration: (secs) => `${Math.floor(secs / 3600)}h ${Math.floor((secs % 3600) / 60)}m`,
 }));
 

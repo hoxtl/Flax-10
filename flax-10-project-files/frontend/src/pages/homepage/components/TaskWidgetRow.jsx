@@ -3,12 +3,12 @@
  */
 
 import { motion as Motion } from "framer-motion";
-import { itemVariants } from "../../../components/Modules/shared/widgetVariants.js";
+import { itemVariants } from "../../../components/modules/shared/widgetVariants.js";
 import InlineTitleField, { useInlineEdit } from "../../../components/common/inline_title_field/InlineTitleField";
 import TaskPriorityPill from "../../../components/common/task_priority_pill/TaskPriorityPill";
 import DeadlineCountdown from "../../../components/common/deadline_countdown/DeadlineCountdown";
 import urgentGlowStyles from "../../../components/common/urgent_glow/UrgentGlow.module.css";
-import rowStyles from "../../Modules/DashboardRows.module.css";
+import rowStyles from "../../modules/styles/DashboardRows.module.css";
 
 function getRowClassName(isOverdue, urgentGlow) {
   const base = rowStyles.deadlineRow;
@@ -68,7 +68,9 @@ function TaskRowRight({ task }) {
 }
 
 export function TaskWidgetRow(props) {
-  const edit = useInlineEdit(props.task.title, (title) => props.onInlineTaskEdit?.(props.task, { title }));
+  const onSave = (title) => props.onInlineTaskEdit?.(props.task, { title });
+  const edit = useInlineEdit(props.task.title, onSave);
+  const start = props.isReadingTask ? undefined : edit.start;
   return (
     <Motion.div
       className={getRowClassName(props.isOverdue, props.urgentGlow)}
@@ -77,7 +79,7 @@ export function TaskWidgetRow(props) {
       onContextMenu={(event) => openContextMenu(event, props)}
     >
       <TaskCheckbox handleTaskWidgetComplete={props.handleTaskWidgetComplete} task={props.task} />
-      <TaskRowLeft edit={edit} task={props.task} />
+      <TaskRowLeft edit={{ ...edit, start }} task={props.task} />
       <TaskRowRight task={props.task} />
     </Motion.div>
   );

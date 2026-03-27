@@ -29,20 +29,26 @@ function CategorySelector({ category, setCategory }) {
   );
 }
 
+function ListColorPicker({ color, setColor }) {
+  return (
+    <div className={styles.fieldRow}>
+      <span className={styles.fieldLabel}>COLOUR</span>
+      <div className={styles.colorGrid}>
+        {FOCUS_BLOCK_PALETTE.map((c) => (
+          <button key={c.hex} type="button" className={`${styles.colorSwatch} ${color === c.hex ? styles.colorSwatchActive : ""}`} style={{ background: c.hex }} onClick={() => setColor(c.hex)} title={c.label} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function CreateListModalBody({ name, setName, color, setColor, category, setCategory, onEnter }) {
   return (
     <div className={styles.body}>
       <p className={styles.subtitle}>Choose a name, section, and accent colour for your list.</p>
       <input className={styles.nameInput} placeholder="List name…" value={name} onChange={(e) => setName(e.target.value)} autoFocus onKeyDown={(e) => e.key === "Enter" && onEnter()} />
       <CategorySelector category={category} setCategory={setCategory} />
-      <div className={styles.fieldRow}>
-        <span className={styles.fieldLabel}>COLOUR</span>
-        <div className={styles.colorGrid}>
-          {FOCUS_BLOCK_PALETTE.map((c) => (
-            <button key={c.hex} type="button" className={`${styles.colorSwatch} ${color === c.hex ? styles.colorSwatchActive : ""}`} style={{ background: c.hex }} onClick={() => setColor(c.hex)} title={c.label} />
-          ))}
-        </div>
-      </div>
+      <ListColorPicker color={color} setColor={setColor} />
       <div className={styles.preview} style={{ "--list-color": color }}>
         <span className={styles.previewDot} style={{ background: color }} />
         <span className={styles.previewName}>{name || "List name"}</span>

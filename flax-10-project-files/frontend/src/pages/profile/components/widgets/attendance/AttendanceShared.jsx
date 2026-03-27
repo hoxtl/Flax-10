@@ -2,7 +2,7 @@
  * Shared attendance widget primitives.
  */
 
-import SegmentDetailPanel from "../../../../Attendance/components/SegmentDetailPanel";
+import SegmentDetailPanel from "../../../../attendance/components/SegmentDetailPanel";
 import { PieChart } from "@mui/x-charts/PieChart";
 import widgetStyles from "../ProfileWidgets.module.css";
 import attendanceStyles from "../ProfileAttendance.module.css";
@@ -82,7 +82,7 @@ export function CompactOverallDonut({ overallData, onSegmentClick }) {
   if (!overallData.length) return (
     <div className={styles.compactAttendanceEmptyWrap}>
       <span className={styles.compactAttendanceEmptyIcon} aria-hidden="true">📊</span>
-      <p className={styles.compactAttendanceEmpty}>No attendance yet</p>
+      <p className={styles.compactAttendanceEmpty}>No attendance records yet.</p>
       <p className={styles.compactAttendanceEmptyHint}>Mark events as attended or missed to see your stats here.</p>
     </div>
   );

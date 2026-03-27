@@ -2,9 +2,9 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { AUTH_WRAP_STYLE, AUTH_MOTION } from "../constants";
 import { ScreenWrap } from "./ScreenWrap";
-import AuthPage from "../../pages/Auth/AuthPage";
-import PasswordResetRequest from "../../pages/Auth/PasswordResetRequest";
-import PasswordResetConfirm from "../../pages/Auth/PasswordResetConfirm";
+import AuthPage from "../../pages/auth/AuthPage";
+import PasswordResetRequest from "../../pages/auth/PasswordResetRequest";
+import PasswordResetConfirm from "../../pages/auth/PasswordResetConfirm";
 
 function AuthRoutes({ location }) {
   return (

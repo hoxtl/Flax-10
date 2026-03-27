@@ -2,11 +2,11 @@
  * GroupWork project row info section.
  */
 
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import Tooltip from "../../../components/common/tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import GroupWorkProjectModuleBadge from "./ProjectModuleBadge";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
-import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
+import { getDisplayName, openMemberProfile, getMemberKey } from "../utils/memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
 export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null, onProjectNavigate, isOwner = false }) {
@@ -67,29 +67,30 @@ export function ProjectModuleBadge({ project }) {
 }
 
 function AvatarStack({ members, totalMembers }) {
-  if (!members.length && !totalMembers) return null;
+  const count = totalMembers || members.length;
+  if (!count) return null;
+  const limit = 10;
+  const hasMore = count > limit;
+  const visible = hasMore ? members.slice(0, limit - 1) : members;
+  const moreCount = count - (limit - 1);
   return (
     <div className={styles.avatarStack}>
-      {members.map((member, index) => (
-        <AvatarItem key={member.id ?? member.user ?? member.user_name ?? index} member={member} index={index} />
-      ))}
-      <span className={styles.avatarCountLabel}>
-        {totalMembers || members.length} member{(totalMembers || members.length) === 1 ? "" : "s"}
-      </span>
+      <div className={styles.avatarCluster}>
+        {visible.map((member, i) => (
+          <AvatarItem key={getMemberKey(member) || i} member={member} index={i} total={visible.length + (hasMore ? 1 : 0)} />
+        ))}
+        {hasMore && <div className={styles.moreBadge}>+{moreCount}</div>}
+      </div>
+      <span className={styles.avatarCountLabel}>{count} member{count === 1 ? "" : "s"}</span>
     </div>
   );
 }
 
-function AvatarItem({ member, index }) {
+function AvatarItem({ member, index, total }) {
+  const label = `Open ${getDisplayName(member)} profile`;
   return (
     <Tooltip content={getDisplayName(member)} wrapperClassName={styles.avatarTooltipWrap}>
-      <button
-        type="button"
-        className={styles.avatarWrapper}
-        style={{ zIndex: 10 - index }}
-        aria-label={`Open ${getDisplayName(member)} profile`}
-        onClick={(event) => openMemberProfile(event, member)}
-      >
+      <button type="button" className={styles.avatarWrapper} style={{ zIndex: total - index }} aria-label={label} onClick={(e) => openMemberProfile(e, member)}>
         <MemberAvatar member={member} size={24} />
       </button>
     </Tooltip>

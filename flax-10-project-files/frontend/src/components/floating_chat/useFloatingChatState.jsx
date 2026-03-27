@@ -5,8 +5,8 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import StudyCoachPanel from "../StudyCoachPanel";
-import styles from "../FloatingChat.module.css";
+import StudyCoachPanel from "../study_coach/components/StudyCoachPanel";
+import styles from "./styles/FloatingChat.module.css";
 
 const MotionDiv = motion.div;
 const HIDDEN_PROMPT = { show: false, message: "", text: "" };
