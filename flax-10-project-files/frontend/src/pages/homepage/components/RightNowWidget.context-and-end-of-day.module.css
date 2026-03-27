@@ -302,3 +302,40 @@
   font-weight: 400;
   color: var(--widget-text-tertiary);
 }
+
+@media (max-width: 767px) {
+  .timerBlock,
+  .endOfDayTopRow,
+  .tomorrowSection,
+  .suggestionBlock {
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 12px;
+  }
+
+  .endOfDayTopRow {
+    gap: 10px;
+  }
+
+  .tomorrowFirstTitle,
+  .upNextTitle,
+  .upNextDetails,
+  .suggestionText,
+  .suggestionSub,
+  .emptyDayTomorrow,
+  .emptyDaySubtitle,
+  .nowEmpty {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
+  }
+
+  .emptyDay {
+    padding: 18px 4px;
+  }
+
+  .sectionDivider {
+    margin: 0 4px;
+  }
+}

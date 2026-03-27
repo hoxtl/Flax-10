@@ -255,7 +255,7 @@
     left: 0;
     width: 100% !important;
     max-width: none;
-    height: 85vh;
+    height: min(82vh, 720px);
     z-index: 100;
     border-radius: 20px 20px 0 0;
     border-right: none;
@@ -288,5 +288,25 @@
 
   .sidebarHeader {
     padding-top: 5px;
+  }
+}
+
+@media (max-width: 560px) {
+  .sidebar {
+    height: min(78vh, 680px);
+    border-radius: 18px 18px 0 0;
+  }
+
+  .sidebarHeader {
+    padding: 6px 14px 10px;
+  }
+
+  .section {
+    padding: 14px;
+    gap: 8px;
+  }
+
+  .sidebarFooter {
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
   }
 }

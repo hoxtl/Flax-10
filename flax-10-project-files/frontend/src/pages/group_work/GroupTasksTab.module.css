@@ -52,3 +52,40 @@
 .tabBody {
     margin-top: 1.5rem;
 }
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px 14px;
+    border-radius: 16px;
+    margin-top: 12px;
+  }
+
+  .headerRow {
+    margin-bottom: 14px;
+  }
+
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
+  .taskSearch {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .addBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .viewToggleControl {
+    margin-left: 0;
+  }
+
+  .tabBody {
+    margin-top: 1rem;
+  }
+}

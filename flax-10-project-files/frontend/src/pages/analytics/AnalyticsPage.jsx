@@ -59,7 +59,15 @@ function AnalyticsContent({ tabs, activeTab, handleTabChange, error, loading, ha
     <>
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
+      <Tabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        layoutId="analyticsTab"
+        tabVariant="heading"
+        className={styles.analyticsTabs}
+        tabClassName={styles.analyticsTabButton}
+      />
       <BackToTop />
     </>
   );

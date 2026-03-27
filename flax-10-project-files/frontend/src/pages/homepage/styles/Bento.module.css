@@ -2,6 +2,12 @@
     padding: 0 18px 12px;
     width: 100%;
   }
+
+  @media (max-width: 767px) {
+    .intelligenceRowWrap {
+      padding: 0 0 10px;
+    }
+  }
   /* Dashboard grid: strict 3-column bento — left (25%), center (50%), right (25%) */
   .bentoGrid {
     display: grid;

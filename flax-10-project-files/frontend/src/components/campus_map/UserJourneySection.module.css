@@ -149,3 +149,14 @@
   text-transform: uppercase;
   color: var(--muted, rgba(var(--brown-text), 0.5));
 }
+
+@media (max-width: 560px) {
+  .manualButtonGroup {
+    flex-direction: column;
+  }
+
+  .goButton,
+  .clearManualButton {
+    width: 100%;
+  }
+}
