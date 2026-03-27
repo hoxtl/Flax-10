@@ -28,7 +28,7 @@ function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
 }
 
-function getNextDeadline(deadlines = []) {
+function getNextDeadline(deadlines) {
     const now = new Date();
     const sorted = getSortedDeadlines(deadlines);
     return sorted.find((d) => new Date(d.start_due_date) >= now) || sorted[0] || null;
@@ -49,7 +49,7 @@ function getUrgencyText(kind) {
     return "Later";
 }
 
-function getTimelineProgress(deadlines = []) {
+function getTimelineProgress(deadlines) {
     if (deadlines.length < 2) return null;
     const dates = deadlines.map((d) => new Date(d.start_due_date)).filter((d) => !Number.isNaN(d.getTime()));
     if (dates.length < 2) return null;

@@ -137,7 +137,7 @@ function CardHeader({ module, enrolled, isCore }) {
     const course = getCourse(module.module_code, module.course);
     return (
         <div className={styles.cardHeader}>
-            {enrolled && <EnrolledBadge enrolled={enrolled} isCore={isCore} />}
+            <EnrolledBadge enrolled={enrolled} isCore={isCore} />
             <div className={styles.headerChipsRow}>
                 <HeaderChips course={course} department={department} />
                 <TutorAvatar module={module} />
