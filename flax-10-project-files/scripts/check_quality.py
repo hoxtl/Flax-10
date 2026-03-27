@@ -93,6 +93,11 @@ def is_test_file(file_path: str) -> bool:
     )
 
 
+def should_skip_file_length(file_path: str) -> bool:
+    normalized = file_path.replace("\\", "/")
+    return "/htmlcov/" in normalized or "/migrations/" in normalized
+
+
 def walk_dir(directory: str, callback: Callable[[str], None]) -> None:
     ignored = {"node_modules", "coverage", "build", "dist", ".git", "__pycache__", ".venv", "venv"}
     for root, dirs, files in os.walk(directory):
@@ -228,6 +233,8 @@ def check_file_length(target_dir: str) -> List[FileViolation]:
 
     def process(file_path: str) -> None:
         if not re.search(r"\.(py|css|js|jsx)$", file_path):
+            return
+        if should_skip_file_length(file_path):
             return
         try:
             with open(file_path, "r", encoding="utf-8") as f:
