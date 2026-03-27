@@ -3,9 +3,9 @@ import {
     getImageUrls, getAvailablePhotos, scrollContentToTop,
     wrapAddEvent, wrapUpdateEvent, wrapDeleteEvent,
     wrapAddAnnouncement, wrapUpdateAnnouncement, wrapDeleteAnnouncement
-} from '../../pages/societies/SocietyDetailPageUtils';
+} from '../../pages/societies/societyDetailPageUtils';
 
-describe('SocietyDetailPageUtils', () => {
+describe('societyDetailPageUtils', () => {
     it('getImageUrls handles various inputs', () => {
         expect(getImageUrls([{ url: 'u1' }, 'u2'])).toEqual(['u1', 'u2']);
         expect(getImageUrls(null)).toEqual([]);

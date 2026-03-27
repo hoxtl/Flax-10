@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import Globe from "../globe";
+import Globe from "../Globe";
 import { cx } from "./landingPageUtils";
 import LandingGlobe from "./LandingGlobe";
 import LandingProgress from "./LandingProgress";

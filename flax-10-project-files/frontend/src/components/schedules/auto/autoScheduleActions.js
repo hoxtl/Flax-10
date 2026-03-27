@@ -5,7 +5,7 @@
 import { createSchedule } from "../../../api/scheduleApi";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getUserSettings } from "../../../api/userApi";
-import { buildScheduleAutoForm } from "../../../pages/homepage/utils/ScheduleAutoForm";
+import { buildScheduleAutoForm } from "../../../pages/homepage/utils/scheduleAutoForm";
 
 const EMPTY_DEADLINE_ERROR = "No upcoming deadlines to auto-schedule.";
 const OVERWRITE_MESSAGE = "A schedule with this name existed and was replaced.";

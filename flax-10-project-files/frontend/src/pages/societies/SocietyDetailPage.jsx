@@ -20,7 +20,7 @@ import BackButton from "../../components/common/back_button/BackButton.jsx";
 import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { useLocation } from "react-router-dom";
 import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
-import { getImageUrls } from "./SocietyDetailPageUtils";
+import { getImageUrls } from "./societyDetailPageUtils";
 
 function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;

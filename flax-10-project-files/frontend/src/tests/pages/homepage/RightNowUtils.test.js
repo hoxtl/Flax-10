@@ -21,7 +21,7 @@ import {
   getNextEvent,
   getTimeLeftBand,
   hasCampusCommute,
-} from "../../../pages/homepage/components/RightNowUtils";
+} from "../../../pages/homepage/components/rightNowUtils";
 
 describe("RightNowUtils", () => {
   beforeEach(() => {

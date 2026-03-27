@@ -14,7 +14,7 @@ vi.mock("../../../../pages/homepage/utils/index", () => ({
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
 }));
 
-vi.mock("../../../../pages/homepage/utils/ScheduleAutoForm", () => ({
+vi.mock("../../../../pages/homepage/utils/scheduleAutoForm", () => ({
   buildScheduleAutoForm: (...args) => buildScheduleAutoFormMock(...args),
 }));
 

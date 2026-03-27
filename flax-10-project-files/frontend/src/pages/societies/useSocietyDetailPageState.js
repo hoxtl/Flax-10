@@ -8,7 +8,7 @@ import { useChangeTracker } from "../../components/society/hooks/useChangeTracke
 import { useSocietyDetail } from "../../components/society/hooks/useSocietyDetail";
 import { useSocietySubscription } from "../../components/society/hooks/useSocietySubscription";
 import { useUnreportSociety } from "../../components/society/hooks/useUnreportSociety";
-import { scrollContentToTop, wrapAddAnnouncement, wrapAddEvent, wrapDeleteAnnouncement, wrapDeleteEvent, wrapUpdateAnnouncement, wrapUpdateEvent } from "./SocietyDetailPageUtils";
+import { scrollContentToTop, wrapAddAnnouncement, wrapAddEvent, wrapDeleteAnnouncement, wrapDeleteEvent, wrapUpdateAnnouncement, wrapUpdateEvent } from "./societyDetailPageUtils";
 
 function usePageState(initialTab, location) {
   const [params, setParams] = useSearchParams();

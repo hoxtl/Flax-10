@@ -3,7 +3,7 @@
  */
 
 import styles from "../../../pages/settings/Settings.module.css";
-import { THEME_GROUPS } from "../../../context/ThemeConstants";
+import { THEME_GROUPS } from "../../../context/themeConstants";
 
 const MODE_OPTIONS = [
   { id: "light", label: "Light" },

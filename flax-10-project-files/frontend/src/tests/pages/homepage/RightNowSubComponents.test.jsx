@@ -21,7 +21,7 @@ vi.mock("lucide-react", () => ({
   ArrowUpRight: () => <svg aria-hidden="true" />,
 }));
 
-vi.mock("../../../pages/homepage/components/RightNowUtils", () => ({
+vi.mock("../../../pages/homepage/components/rightNowUtils", () => ({
   getJourneySummary: vi.fn((journey) => journey),
   getTimeLeftBand: vi.fn((minutes) => {
     if (minutes == null) return null;

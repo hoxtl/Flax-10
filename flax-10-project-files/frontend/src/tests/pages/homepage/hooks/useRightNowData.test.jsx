@@ -25,7 +25,7 @@ vi.mock("../../../../lib/kclCampuses", () => ({
   resolveCampusFromText: (...args) => resolveCampusFromTextMock(...args),
 }));
 
-vi.mock("../../../../pages/homepage/components/RightNowUtils", () => ({
+vi.mock("../../../../pages/homepage/components/rightNowUtils", () => ({
   formatTimeLeft: (...args) => formatTimeLeftMock(...args),
   getCurrentBlock: (...args) => getCurrentBlockMock(...args),
   getLeaveByInfo: (...args) => getLeaveByInfoMock(...args),

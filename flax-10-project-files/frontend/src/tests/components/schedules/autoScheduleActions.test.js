@@ -24,7 +24,7 @@ vi.mock("../../../api/userApi", () => ({
   getUserSettings: getUserSettingsMock,
 }));
 
-vi.mock("../../../pages/homepage/utils/ScheduleAutoForm", () => ({
+vi.mock("../../../pages/homepage/utils/scheduleAutoForm", () => ({
   buildScheduleAutoForm: buildScheduleAutoFormMock,
 }));
 
