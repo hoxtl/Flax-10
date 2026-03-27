@@ -43,22 +43,30 @@ def _single_member_assignments(members, completed_indexes):
     """Assign the same member list to each completed task."""
     return {index: list(members) for index in completed_indexes}
 
-def _completed_pick_count(members, rng):
-    """Return the number of members to assign to a completed task."""
-    return rng.randint(1, min(3, len(members)))
-
 def _multi_member_assignments(members, completed_indexes, rng):
-    """Assign varied members to completed tasks with uneven distribution."""
+    """Assign 80-100% of members across completed tasks with varied contribution."""
     assignments = {index: [] for index in completed_indexes}
     shuffled = list(members)
     rng.shuffle(shuffled)
-    n_leads = max(1, len(shuffled) // 4)
-    for task_pos, task_index in enumerate(completed_indexes):
-        lead = shuffled[task_pos % n_leads]
-        assignments[task_index].append(lead)
-        remaining = [m for m in shuffled if m not in assignments[task_index]]
-        n_support = min(rng.randint(1, 2), len(remaining))
-        assignments[task_index].extend(rng.sample(remaining, n_support))
+    n = len(shuffled)
+    n_tasks = len(completed_indexes)
+
+    # Target ~85% coverage so most members appear in the progress bar
+    target = max(2, round(n * 0.85))
+    active = shuffled[:target]
+
+    # Top quarter are leads — appear in every completed task (higher credit)
+    n_leads = max(1, len(active) // 4)
+    leads = active[:n_leads]
+    regulars = active[n_leads:]
+
+    for task_index in completed_indexes:
+        assignments[task_index].extend(leads)
+
+    # Distribute regulars round-robin so each gets one task
+    for i, member in enumerate(regulars):
+        assignments[completed_indexes[i % n_tasks]].append(member)
+
     return assignments
 
 def _build_completed_task_assignments(members, status_pattern, rng):
