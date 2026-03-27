@@ -16,7 +16,6 @@ import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
 import PrimaryButton from '../../common/primary_button/PrimaryButton.jsx';
 import Tooltip from '../../common/tooltip/Tooltip.jsx';
 import LocationLink from '../../common/location_link/LocationLink.jsx';
-import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
