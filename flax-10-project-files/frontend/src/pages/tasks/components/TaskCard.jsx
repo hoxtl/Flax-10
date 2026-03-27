@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft } from "lucide-react";
 
+import { useToast } from "../../../context/ToastContext";
 import { useTimerContext } from "../../../context/TimerContext";
 import { isReadingList } from "../utils/readingListUtils";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
@@ -93,12 +94,14 @@ function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView, is
 }
 
 function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
+  const showToast = useToast();
   const fromListName = lists.find((x) => String(x.id) === String(task.task_list))?.name;
   const options = lists.map(l => ({ value: String(l.id), label: l.name }));
   const handleMove = (listId) => {
     const l = lists.find(x => String(x.id) === listId);
     if (!l) return;
     onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName });
+    showToast(`Moved to "${l.name}"`);
     onClose();
   };
   return (
