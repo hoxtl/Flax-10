@@ -110,35 +110,44 @@ function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
   );
 }
 
-function ContextMenuDueView({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun, setView }) {
-  const [pending, setPending] = useState(dueValue);
-  const [changed, setChanged] = useState(false);
-  const handlePickerChange = (val) => {
-    if (!val) {
-      setPending(null);
-      setDueValue(null);
-      onEdit({ due_date: null }, { source: "context-menu", action: "set-due-date", dueDate: null });
-      onClose();
-      return;
-    }
-    setPending(val);
-    setChanged(true);
-  };
-  const handleConfirm = () => {
-    if (!pending) return;
-    setDueValue(pending);
-    checkSleepAndRun(pending, () => { onEdit({ due_date: pending }, { source: "context-menu", action: "set-due-date", dueDate: pending }); onClose(); });
-  };
+function DueViewHeader({ setView }) {
   return (
     <>
       <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
       <div className={styles.ctxDivider} />
-      <div className={styles.ctxDateWrap}><DateTimePicker value={pending} onChange={handlePickerChange} placeholder="Pick date & time" /></div>
+    </>
+  );
+}
+
+function useDueViewHandlers({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun }) {
+  const [pending, setPending] = useState(dueValue);
+  const [changed, setChanged] = useState(false);
+  const onPicker = (val) => {
+    if (!val) {
+      setDueValue(null);
+      onEdit({ due_date: null }, { source: "context-menu", action: "set-due-date", dueDate: null });
+      return onClose();
+    }
+    setPending(val); setChanged(true);
+  };
+  const onConfirm = () => {
+    if (!pending) return;
+    checkSleepAndRun(pending, () => {
+      onEdit({ due_date: pending }, { source: "context-menu", action: "set-due-date", dueDate: pending });
+      onClose();
+    });
+  };
+  return { pending, changed, onPicker, onConfirm };
+}
+
+function ContextMenuDueView(props) {
+  const { pending, changed, onPicker, onConfirm } = useDueViewHandlers(props);
+  return (
+    <>
+      <DueViewHeader setView={props.setView} />
+      <div className={styles.ctxDateWrap}><DateTimePicker value={pending} onChange={onPicker} placeholder="Pick date & time" /></div>
       {changed && pending && (
-        <>
-          <div className={styles.ctxDivider} />
-          <button className={styles.ctxItem} onClick={handleConfirm}>Set date</button>
-        </>
+        <><div className={styles.ctxDivider} /><button className={styles.ctxItem} onClick={onConfirm}>Set date</button></>
       )}
     </>
   );

@@ -44,13 +44,13 @@ function DangerActionButton({ isOwner, onClick }) {
 function useProjectHeaderActionHandler({ isOwner, onDelete, onMemberRemove, currentMember, onBack, showToast, setShowModal }) {
     return async () => {
         setShowModal(false);
-        if (isOwner) {
-            if (await onDelete()) showToast("Project deleted.");
-        } else if (currentMember) {
-            if (await onMemberRemove(currentMember.id)) {
-                showToast("You left the project.");
-                onBack?.();
-            }
+        if (isOwner && await onDelete()) {
+            showToast("Project deleted.");
+            return;
+        }
+        if (currentMember && await onMemberRemove(currentMember.id)) {
+            showToast("You left the project.");
+            onBack?.();
         }
     };
 }

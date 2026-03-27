@@ -40,8 +40,7 @@ function useGroupTaskHandlers(showToast, taskActions, setFilterUsers) {
     const handleDelete = (id) => {
         taskActions.deleteTask(id);
         showToast("Task deleted", {
-            variant: "error",
-            icon: "🗑️",
+            variant: "success",
             actionLabel: "Undo",
             onAction: () => taskActions.undoDelete(id),
         });

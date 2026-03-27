@@ -13,14 +13,15 @@ function createSubmitHandler({ project, form, setErrorMessage, setIsSubmitting, 
         const error = validateForm(form);
         if (error) return setErrorMessage(error);
         setIsSubmitting(true);
+        let res;
         try {
-            const res = await patchGroupProject(project.id, form);
-            if (res) onUpdated?.(res);
+            res = await patchGroupProject(project.id, form);
         } catch (err) {
             setErrorMessage(err.message || "Failed to update project.");
         } finally {
             setIsSubmitting(false);
         }
+        if (res) onUpdated?.(res);
     };
 }
 
