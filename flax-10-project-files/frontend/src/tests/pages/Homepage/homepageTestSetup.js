@@ -65,7 +65,7 @@ vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => (typeof id === "string" && id.includes("_") ? id.split("_")[0] : id)),
 }));
 
-vi.mock("../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../pages/homepage/utils", () => ({
   formatTime: vi.fn((date) => new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
   isNow: vi.fn(() => false),
   isRoutineEvent: vi.fn(() => false),

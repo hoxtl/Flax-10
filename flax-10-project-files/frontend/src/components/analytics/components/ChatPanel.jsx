@@ -2,7 +2,7 @@
  * Analytics wrapper for the study coach panel.
  */
 
-import StudyCoachPanel from '../../StudyCoachPanel';
+import StudyCoachPanel from '../../study_coach/components/StudyCoachPanel';
 import styles from '../styles/AIInsightsTab.module.css';
 
 export function ChatPanel({ period }) {

@@ -4,15 +4,15 @@
 
 import { useState } from "react";
 import { CalendarPlus, Check } from "lucide-react";
-import { createEvent } from "../../api/eventApi";
-import { useCalendarDispatch } from "../../context/CalendarContext";
+import { createEvent } from "../../../api/eventApi";
+import { useCalendarDispatch } from "../../../context/CalendarContext";
 import {
   formatEventTime,
   getPendingImports,
   resetStatuses,
   updateStatusAtIndex,
-} from "./studyCoachHelpers";
-import styles from "./studyCoachStyles";
+} from "../utils/studyCoachHelpers";
+import styles from "../styles/studyCoachStyles";
 
 export default function ScheduleImportPanel({ events }) {
   const calendarDispatch = useCalendarDispatch();

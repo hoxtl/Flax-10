@@ -6,12 +6,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import ScheduleImportPanel from "./ScheduleImportPanel";
-import { STUDY_COACH_MARKDOWN } from "./studyCoachMarkdown.jsx";
-import { STUDY_COACH_SUGGESTIONS, TEACHER_COACH_SUGGESTIONS } from "./studyCoachSuggestions";
+import { STUDY_COACH_MARKDOWN } from "../utils/studyCoachMarkdown.jsx";
+import { STUDY_COACH_SUGGESTIONS, TEACHER_COACH_SUGGESTIONS } from "../utils/studyCoachSuggestions";
 import TypingIndicator from "./TypingIndicator";
-import styles from "./studyCoachStyles";
+import styles from "../styles/studyCoachStyles";
 
 const MotionDiv = motion.div;
 

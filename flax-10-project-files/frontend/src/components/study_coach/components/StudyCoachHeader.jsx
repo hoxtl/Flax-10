@@ -3,7 +3,7 @@
  */
 
 import { Sparkles, X } from "lucide-react";
-import styles from "./studyCoachStyles";
+import styles from "../styles/studyCoachStyles";
 
 export default function StudyCoachHeader({ title, subtitle, hasMessages, onClear, onClose }) {
   return (

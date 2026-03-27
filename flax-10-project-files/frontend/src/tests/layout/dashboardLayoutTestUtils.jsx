@@ -98,7 +98,7 @@ vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
 });
 
 vi.mock("../../components/dashboard/components/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
-vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
+vi.mock("../../components/floating_chat/components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: hoistedMocks.authService }));
 vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: hoistedMocks.clearUserData }));

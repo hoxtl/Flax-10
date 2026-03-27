@@ -3,7 +3,7 @@
  */
 
 import { isToday, overlapsDay } from "../../../components/calendar/utils/dateUtils";
-import { getAllFreeWindowsToday, getNavigatorContext, isNow, isRoutineOrEventTask } from "./index";
+import { getAllFreeWindowsToday, getNavigatorContext, isNow, isRoutineOrEventTask } from ".";
 
 const MEAL_TITLES = ["breakfast", "lunch", "dinner"];
 const SYSTEM_EVENT_SOURCES = ["module_deadline", "module_enrollment"];

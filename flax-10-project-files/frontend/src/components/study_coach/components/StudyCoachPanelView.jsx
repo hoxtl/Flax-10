@@ -5,8 +5,8 @@
 import StudyCoachComposer from "./StudyCoachComposer";
 import StudyCoachHeader from "./StudyCoachHeader";
 import StudyCoachMessages from "./StudyCoachMessages";
-import styles from "./studyCoachStyles";
-import { useStudyCoachPanel } from "./useStudyCoachPanel";
+import styles from "../styles/studyCoachStyles";
+import { useStudyCoachPanel } from "../hooks/useStudyCoachPanel";
 
 export default function StudyCoachPanelView({
   period = 30,

@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const extractBaseEventIdMock = vi.fn((id) => id);
 const getNextFreeSlotTodayMock = vi.fn(() => null);
-vi.mock("../../../../pages/homepage/utils/index", () => ({ formatTime: vi.fn(), getAllFreeWindowsToday: vi.fn(() => []), getNextFreeSlotToday: (...a) => getNextFreeSlotTodayMock(...a), isRoutineEvent: vi.fn(() => false) }));
+vi.mock("../../../../pages/homepage/utils", () => ({ formatTime: vi.fn(), getAllFreeWindowsToday: vi.fn(() => []), getNextFreeSlotToday: (...a) => getNextFreeSlotTodayMock(...a), isRoutineEvent: vi.fn(() => false) }));
 vi.mock("../../../../components/calendar/utils/eventUtils", () => ({ extractBaseEventId: (...a) => extractBaseEventIdMock(...a) }));
 const conflictMocks = vi.hoisted(() => ({ applyConflictResolutionPlan: vi.fn(), buildConflictResolutionPlan: vi.fn(), buildConflictResolutionToastMessage: vi.fn() }));
 vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => conflictMocks);

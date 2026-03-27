@@ -9,7 +9,7 @@ const isTodayMock = vi.fn(() => false);
 const loadScheduleSettingsMock = vi.fn();
 const submitAutoScheduleWithPrefsMock = vi.fn();
 
-vi.mock("../../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../../pages/homepage/utils", () => ({
   formatTime: (...args) => formatTimeMock(...args),
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
 }));

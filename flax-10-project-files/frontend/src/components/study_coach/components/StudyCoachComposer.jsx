@@ -3,7 +3,7 @@
  */
 
 import { ArrowUp } from "lucide-react";
-import styles from "./studyCoachStyles";
+import styles from "../styles/studyCoachStyles";
 
 export default function StudyCoachComposer({ input, loading, onChange, onKeyDown, onSend, placeholder }) {
   return (

@@ -49,20 +49,20 @@ vi.mock("lucide-react", () => ({
   MessageCircle: () => <span>message-icon</span>,
 }));
 
-vi.mock("../../../components/study_coach/studyCoachMarkdown.jsx", () => ({
+vi.mock("../../../components/study_coach/utils/studyCoachMarkdown.jsx", () => ({
   STUDY_COACH_MARKDOWN: {},
 }));
 
-vi.mock("../../../components/study_coach/studyCoachSuggestions", () => ({
+vi.mock("../../../components/study_coach/utils/studyCoachSuggestions", () => ({
   STUDY_COACH_SUGGESTIONS: ["Help me plan", "What should I revise?"],
   TEACHER_COACH_SUGGESTIONS: ["Plan my next lesson", "Help me prep a lecture"],
 }));
 
-vi.mock("../../../components/study_coach/TypingIndicator", () => ({
+vi.mock("../../../components/study_coach/components/TypingIndicator", () => ({
   default: () => <div>typing-indicator</div>,
 }));
 
-vi.mock("../../../components/study_coach/StudyCoachHeader", () => ({
+vi.mock("../../../components/study_coach/components/StudyCoachHeader", () => ({
   default: ({ onClear, onClose, title, subtitle, hasMessages }) => (
     <div>
       <span>{title}</span>
@@ -74,7 +74,7 @@ vi.mock("../../../components/study_coach/StudyCoachHeader", () => ({
   ),
 }));
 
-vi.mock("../../../components/study_coach/StudyCoachComposer", () => ({
+vi.mock("../../../components/study_coach/components/StudyCoachComposer", () => ({
   default: ({ input, onChange, onKeyDown, onSend, placeholder, loading }) => (
     <div>
       <input aria-label={placeholder} value={input} onChange={onChange} onKeyDown={onKeyDown} />
@@ -84,9 +84,9 @@ vi.mock("../../../components/study_coach/StudyCoachComposer", () => ({
   ),
 }));
 
-import ScheduleImportPanel from "../../../components/study_coach/ScheduleImportPanel";
-import StudyCoachMessages from "../../../components/study_coach/StudyCoachMessages";
-import StudyCoachPanelView from "../../../components/study_coach/StudyCoachPanelView";
+import ScheduleImportPanel from "../../../components/study_coach/components/ScheduleImportPanel";
+import StudyCoachMessages from "../../../components/study_coach/components/StudyCoachMessages";
+import StudyCoachPanelView from "../../../components/study_coach/components/StudyCoachPanelView";
 import {
   STUDY_COACH_ERROR,
   buildNextMessages,
@@ -97,8 +97,8 @@ import {
   resetStatuses,
   trimMessage,
   updateStatusAtIndex,
-} from "../../../components/study_coach/studyCoachHelpers";
-import { useStudyCoachPanel } from "../../../components/study_coach/useStudyCoachPanel";
+} from "../../../components/study_coach/utils/studyCoachHelpers";
+import { useStudyCoachPanel } from "../../../components/study_coach/hooks/useStudyCoachPanel";
 
 describe("StudyCoach extras", () => {
   beforeEach(() => {

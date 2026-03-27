@@ -3,13 +3,13 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import analyticsService from "../../api/analyticsApi";
+import analyticsService from "../../../api/analyticsApi";
 import {
   buildNextMessages,
   createAssistantMessage,
   STUDY_COACH_ERROR,
   trimMessage,
-} from "./studyCoachHelpers";
+} from "../utils/studyCoachHelpers";
 
 export function useStudyCoachPanel(initialMessage, period) {
   const state = useStudyCoachState(initialMessage);

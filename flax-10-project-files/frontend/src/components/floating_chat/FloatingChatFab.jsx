@@ -4,7 +4,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle, X } from "lucide-react";
-import styles from "../FloatingChat.module.css";
+import styles from "./styles/FloatingChat.module.css";
 
 const MotionButton = motion.button;
 const MotionSpan = motion.span;

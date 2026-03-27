@@ -2,7 +2,7 @@
  * Typing state bubble for the study coach.
  */
 
-import styles from "./studyCoachStyles";
+import styles from "../styles/studyCoachStyles";
 
 export default function TypingIndicator() {
   return (

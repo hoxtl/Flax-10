@@ -23,7 +23,7 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-vi.mock("../../../components/StudyCoachPanel", () => ({
+vi.mock("../../../components/study_coach/components/StudyCoachPanel", () => ({
   default: ({ initialMessage, onClose }) => (
     <div>
       <span data-testid="initial-message">{initialMessage}</span>
@@ -33,7 +33,7 @@ vi.mock("../../../components/StudyCoachPanel", () => ({
 }));
 
 // FloatingChat.module.css — avoid CSS module resolution issues in tests
-vi.mock("../../../components/FloatingChat.module.css", () => ({ default: {} }));
+vi.mock("../../../components/floating_chat/styles/FloatingChat.module.css", () => ({ default: {} }));
 
 import { useFloatingChatState } from "../../../components/floating_chat/useFloatingChatState";
 
