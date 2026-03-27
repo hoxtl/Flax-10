@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styles from './styles/PasswordReset.module.css';
 import PasswordResetPageLayout from './components/PasswordResetPageLayout';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 function useResetForm() {
   const [email, setEmail] = useState('');
