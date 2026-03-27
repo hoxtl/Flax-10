@@ -6,9 +6,11 @@ import {
   getMemberKey,
   buildMemberColorMap,
   getMemberColor,
+  getPhotoUrl,
   getProfileNavTarget,
   openMemberProfile,
   getStoredViewer,
+  getCurrentMember,
 } from '../../../pages/group_work/utils/memberAvatarUtils';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 
@@ -49,6 +51,11 @@ describe('memberAvatarUtils – getDisplayName', () => {
   it('falls back to user_name', () => {
     expect(getDisplayName({ user_name: 'alice_b' })).toBe('alice_b');
   });
+
+  it('falls back to name and then an empty string', () => {
+    expect(getDisplayName({ name: 'Alice Brown' })).toBe('Alice Brown');
+    expect(getDisplayName({})).toBe('');
+  });
 });
 
 describe('memberAvatarUtils – getMemberKey', () => {
@@ -59,6 +66,13 @@ describe('memberAvatarUtils – getMemberKey', () => {
   it('falls back to id when user is absent', () => {
     expect(getMemberKey({ id: 9 })).toBe('9');
   });
+
+  it('falls back through username fields and handles missing values', () => {
+    expect(getMemberKey({ user_name: 'alice' })).toBe('alice');
+    expect(getMemberKey({ username: 'bob' })).toBe('bob');
+    expect(getMemberKey({ name: 'Chris' })).toBe('Chris');
+    expect(getMemberKey({})).toBe('');
+  });
 });
 
 describe('memberAvatarUtils – buildMemberColorMap', () => {
@@ -67,6 +81,14 @@ describe('memberAvatarUtils – buildMemberColorMap', () => {
     const map = buildMemberColorMap(members);
     expect(map['1']).not.toBe(map['2']);
   });
+
+  it('skips duplicate and empty member keys', () => {
+    const map = buildMemberColorMap([{ user: 1 }, { user: 1 }, {}, { id: 2 }]);
+    expect(map).toEqual({
+      '1': MEMBER_PALETTE[0],
+      '2': MEMBER_PALETTE[1],
+    });
+  });
 });
 
 describe('memberAvatarUtils – getMemberColor', () => {
@@ -74,6 +96,42 @@ describe('memberAvatarUtils – getMemberColor', () => {
     const members = [{ user: 1 }];
     const colour = getMemberColor({ user: 1 }, members);
     expect(MEMBER_PALETTE).toContain(colour);
+  });
+
+  it('falls back to the first palette entry when the member has no key or is missing from the map', () => {
+    expect(getMemberColor({}, [{ user: 1 }])).toBe(MEMBER_PALETTE[0]);
+    expect(getMemberColor({ user: 99 }, [{ user: 1 }])).toBe(MEMBER_PALETTE[0]);
+  });
+});
+
+describe('memberAvatarUtils – getPhotoUrl', () => {
+  it('passes normalized member data to the tutor photo fallback helper', () => {
+    const member = {
+      user: 7,
+      user_name: 'ava',
+      first_name: 'Ava',
+      last_name: 'Stone',
+      role: 'lead',
+      profile_photo_url: '/avatar.png',
+      profile_photo: '/avatar-full.png',
+      avatar: '/avatar-fallback.png',
+    };
+
+    expect(getPhotoUrl(member)).toBe('https://example.com/photo.jpg');
+    expect(getResolvedUserPhoto).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 7,
+        username: 'ava',
+        first_name: 'Ava',
+        last_name: 'Stone',
+        name: 'Ava Stone',
+        role: 'lead',
+        profile_photo_url: '/avatar.png',
+        profile_photo: '/avatar-full.png',
+        avatar: '/avatar-fallback.png',
+      }),
+      { seed: 'ava', allowGeneric: true },
+    );
   });
 });
 
@@ -103,6 +161,11 @@ describe('memberAvatarUtils – openMemberProfile', () => {
     openMemberProfile({ stopPropagation: vi.fn() }, { user: 5 });
     expect(dispatched[0].detail).toBe('profile_5');
   });
+
+  it('does nothing when there is no profile target', () => {
+    openMemberProfile(null, {});
+    expect(dispatched).toEqual([]);
+  });
 });
 
 describe('memberAvatarUtils – getStoredViewer', () => {
@@ -114,6 +177,26 @@ describe('memberAvatarUtils – getStoredViewer', () => {
   it('returns parsed user when localStorage has a user', () => {
     window.localStorage.setItem('user', JSON.stringify({ id: 1, username: 'alice' }));
     expect(getStoredViewer()).toEqual({ id: 1, username: 'alice' });
+  });
+
+  it('returns empty object for invalid localStorage JSON', () => {
+    window.localStorage.setItem('user', '{bad json');
+    expect(getStoredViewer()).toEqual({});
+  });
+});
+
+describe('memberAvatarUtils – getCurrentMember', () => {
+  it('returns the member matching the stored viewer id', () => {
+    window.localStorage.setItem('user', JSON.stringify({ id: 2 }));
+    expect(getCurrentMember([{ user: 1 }, { user: 2, name: 'Ava' }])).toEqual({ user: 2, name: 'Ava' });
+  });
+
+  it('returns null when there is no stored viewer id or no match', () => {
+    window.localStorage.setItem('user', JSON.stringify({}));
+    expect(getCurrentMember([{ user: 1 }])).toBeNull();
+
+    window.localStorage.setItem('user', JSON.stringify({ id: 9 }));
+    expect(getCurrentMember([{ user: 1 }])).toBeNull();
   });
 });
 
