@@ -1,5 +1,5 @@
 /**
- * Extra coverage tests for Modules/Modules/ components and hooks that are
+ * Extra coverage tests for Modules/modules/ components and hooks that are
  * not already fully exercised by existing test files.
  *
  * Targets:

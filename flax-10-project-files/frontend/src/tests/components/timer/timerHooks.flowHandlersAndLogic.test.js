@@ -279,10 +279,10 @@ function createRerender(renderState) {
 }
 
 function unmockTimerLogicModules() {
-  vi.doUnmock("../../../components/Notifications/hooks/useNotify");
-  vi.doUnmock("../../../components/Timer/hooks/useTimer");
-  vi.doUnmock("../../../components/Timer/hooks/useTimerFlow");
-  vi.doUnmock("../../../components/Timer/hooks/useTimerHandlers");
+  vi.doUnmock("../../../components/notifications/hooks/useNotify");
+  vi.doUnmock("../../../components/timer/hooks/useTimer");
+  vi.doUnmock("../../../components/timer/hooks/useTimerFlow");
+  vi.doUnmock("../../../components/timer/hooks/useTimerHandlers");
 }
 
 async function mockTimerLogic() {
