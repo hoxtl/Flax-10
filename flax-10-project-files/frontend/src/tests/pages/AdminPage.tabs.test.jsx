@@ -222,15 +222,15 @@ describe("AdminPage – Reported Societies tab", () => {
       { id: 20, society_id: 55, society_name: "Bad Club", reporter_username: "alice", reason: "Spam" },
     ]);
     api.banReportedSociety.mockResolvedValue({});
-    vi.spyOn(window, "prompt").mockReturnValue("Policy breach");
     render(<AdminPage />);
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => screen.getByText("Bad Club"));
     fireEvent.click(screen.getByText("Ban"));
+    fireEvent.change(screen.getByLabelText(/Optional note to the society creator/i), { target: { value: "Policy breach" } });
+    fireEvent.click(screen.getByRole("button", { name: /Ban Society/i }));
     await waitFor(() =>
       expect(api.banReportedSociety).toHaveBeenCalledWith(20, "Policy breach"),
     );
-    window.prompt.mockRestore();
   });
 
   it("removes all reports for banned society", async () => {
@@ -239,13 +239,12 @@ describe("AdminPage – Reported Societies tab", () => {
       { id: 21, society_id: 55, society_name: "Bad Club", reporter_username: "bob", reason: "Abuse" },
     ]);
     api.banReportedSociety.mockResolvedValue({});
-    vi.spyOn(window, "prompt").mockReturnValue("Policy breach");
     render(<AdminPage />);
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => screen.getAllByText("Bad Club"));
     fireEvent.click(screen.getAllByText("Ban")[0]);
+    fireEvent.click(screen.getByRole("button", { name: /Ban Society/i }));
     await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
-    window.prompt.mockRestore();
   });
 
   it("emits navigate event for specific society when report row is clicked", async () => {

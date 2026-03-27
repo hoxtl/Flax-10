@@ -68,6 +68,7 @@ const selfAnalyticsSummary = {
   persona: { emoji: '🦉', label: 'Night Owl', description: 'You work best late.' },
   badges: [{ id: 1, tier: 'gold', label: 'Focus Hero', emoji: '🏅', description: 'desc' }],
   weekly: { percentage: 45, hours_studied: 9, goal_hours: 20 }, streaks: { current: 2, longest: 5 },
+  session_count: 1,
 };
 const renderProfile = (props = {}) => render(
   <MemoryRouter><Profile user={defaultUser} viewedUserId={1} onNavigate={vi.fn()} {...props}/></MemoryRouter>

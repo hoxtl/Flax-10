@@ -12,6 +12,8 @@ const useAuthMock = vi.hoisted(() => vi.fn(() => ({ profile: null })));
 vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
+    getDepartment: vi.fn(() => 'Natural, Mathematical & Engineering Sciences'),
+    getCourse: vi.fn(() => 'Computer Science'),
 }));
 
 vi.mock('../../../components/modules/modules/ModuleDetails.module.css', () => ({ default: {} }));

@@ -123,11 +123,6 @@ export function TestModeContent({ state, MainView }) {
   );
 }
 
-function TransitionPane({ active, viewKey, children }) {
-  if (!active) return null;
-  return <PageTransition key={viewKey}>{children}</PageTransition>;
-}
-
 function handleFormModalClose(state) {
   state.setShowForm(false);
   state.setEditingModule(null);
@@ -169,11 +164,13 @@ function CreateModuleModal({ state }) {
 
 export function AnimatedContent({ state, viewKey, MainView }) {
   const isFormModal = state.showForm;
+  const animatedView = !isFormModal
+    ? (state.viewingModule ? <DetailsView state={state} /> : <MainView state={state} />)
+    : null;
   return (
     <>
       <AnimatePresence mode="wait" initial={false}>
-        <TransitionPane active={!isFormModal && Boolean(state.viewingModule)} viewKey={viewKey}><DetailsView state={state} /></TransitionPane>
-        <TransitionPane active={!isFormModal && !state.viewingModule} viewKey={viewKey}><MainView state={state} /></TransitionPane>
+        {animatedView ? <PageTransition key={viewKey}>{animatedView}</PageTransition> : null}
       </AnimatePresence>
       {isFormModal && Boolean(state.editingModule) && <EditModuleModal state={state} />}
       {isFormModal && !state.editingModule && <CreateModuleModal state={state} />}

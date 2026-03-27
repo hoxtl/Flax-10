@@ -82,7 +82,7 @@ export function CompactOverallDonut({ overallData, onSegmentClick }) {
   if (!overallData.length) return (
     <div className={styles.compactAttendanceEmptyWrap}>
       <span className={styles.compactAttendanceEmptyIcon} aria-hidden="true">📊</span>
-      <p className={styles.compactAttendanceEmpty}>No attendance yet</p>
+      <p className={styles.compactAttendanceEmpty}>No attendance records yet.</p>
       <p className={styles.compactAttendanceEmptyHint}>Mark events as attended or missed to see your stats here.</p>
     </div>
   );

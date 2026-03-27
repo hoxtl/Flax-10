@@ -27,7 +27,7 @@ describe('RecurrenceField', () => {
     it('should render default state', () => {
         render(<RecurrenceField value={{}} onChange={mockOnChange} />);
         expect(screen.getByText('Repeat')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('None')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('Does not repeat')).toBeInTheDocument();
         expect(screen.queryByText('Every')).not.toBeInTheDocument();
     });
 
@@ -38,7 +38,7 @@ describe('RecurrenceField', () => {
 
     it('should call onChange when frequency changes', () => {
         render(<RecurrenceField value={{}} onChange={mockOnChange} />);
-        const frequencySelect = screen.getByDisplayValue('None');
+        const frequencySelect = screen.getByDisplayValue('Does not repeat');
         fireEvent.change(frequencySelect, { target: { value: 'daily' } });
 
         expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ frequency: 'daily' }));

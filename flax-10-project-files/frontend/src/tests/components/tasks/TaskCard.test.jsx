@@ -33,6 +33,7 @@ vi.mock('../../../lib/completionMessages', () => ({
 vi.mock('../../../api/userApi', () => ({
     getUserSettings: (...args) => getUserSettingsMock(...args),
 }));
+vi.mock('../../../context/ToastContext', () => ({ useToast: vi.fn(() => vi.fn()) }));
 vi.mock('../../../api/readingApi', () => ({
     getReadingSpeed: (...args) => getReadingSpeedMock(...args),
 }));

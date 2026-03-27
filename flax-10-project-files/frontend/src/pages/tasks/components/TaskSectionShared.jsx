@@ -4,6 +4,7 @@
 
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import TaskCard from "./TaskCard";
+import { isReadingList } from "../utils/readingListUtils";
 import styles from "./TaskFeedSections.module.css";
 
 function CollapsibleChipExtra({ collapsed, extraContent }) {
@@ -56,27 +57,31 @@ export function CollapsibleSectionBody({ collapsed, bodyKey, children }) {
   );
 }
 
-function getTaskCardListMeta(task, listMap) {
+function getTaskCardListEntry(task, listMap) {
   const listKey = String(task.task_list ?? task.list_id ?? "");
-  const listEntry = listKey ? listMap?.[listKey] : null;
+  return listKey ? listMap?.[listKey] : null;
+}
+
+function getTaskCardListMeta(task, listEntry) {
   return {
     listColor: listEntry?.color ?? null,
     listName: task.list_name ?? listEntry?.name ?? null,
   };
 }
 
-function buildTaskCardHandlers(task, onToggleComplete, onDeleteTask, onEditTask) {
+function buildTaskCardHandlers(task, onToggleComplete, onDeleteTask, onEditTask, listEntry) {
   return {
     onDelete: onDeleteTask ? () => onDeleteTask(task.id) : undefined,
-    onEdit: onEditTask ? (data) => onEditTask(task.id, data) : undefined,
+    onEdit: onEditTask && !isReadingList(listEntry) ? (data, meta) => onEditTask(task.id, data, meta) : undefined,
     onToggle: onToggleComplete ? () => onToggleComplete(task.id) : undefined,
   };
 }
 
 /** Task card row that resolves list metadata before rendering. */
 export function TaskCardRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask, cardProps = {} }) {
-  const listMeta = getTaskCardListMeta(task, listMap);
-  const handlers = buildTaskCardHandlers(task, onToggleComplete, onDeleteTask, onEditTask);
+  const listEntry = getTaskCardListEntry(task, listMap);
+  const listMeta = getTaskCardListMeta(task, listEntry);
+  const handlers = buildTaskCardHandlers(task, onToggleComplete, onDeleteTask, onEditTask, listEntry);
   return (
     <TaskCard
       task={task}

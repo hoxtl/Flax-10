@@ -8,6 +8,7 @@ import { createRejectablePromise } from "../hooks/taskHookTestUtils";
 const sleepWarningHookMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
+vi.mock("../../../../context/ToastContext", () => ({ useToast: vi.fn(() => vi.fn()) }));
 vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({ useSleepWarning: sleepWarningHookMock }));
 vi.mock("../../../../components/common/sleep_warning_modal", () => ({ SleepWarningModal: () => <div data-testid="sleep-warning" /> }));
 vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({

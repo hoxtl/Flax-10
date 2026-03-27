@@ -46,11 +46,11 @@ vi.mock("../../../../api/userApi", () => ({
   updateUserSettings: (...args) => updateUserSettingsMock(...args),
 }));
 
-vi.mock("../../../../components/analytics/useAttendanceStats", () => ({
+vi.mock("../../../../components/analytics/hooks/useAttendanceStats", () => ({
   default: () => useAttendanceStatsMock(),
 }));
 
-vi.mock("../../../../components/analytics/attendanceChartConfig", () => ({
+vi.mock("../../../../components/analytics/utils/attendanceChartConfig", () => ({
   getAttendancePercentage: (...args) => getAttendancePercentageMock(...args),
 }));
 
