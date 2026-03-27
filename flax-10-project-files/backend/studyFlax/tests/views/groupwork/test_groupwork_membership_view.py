@@ -87,6 +87,16 @@ class GroupProjectMemberDetailTests(BaseTestCase):
         res = self.client.delete(url)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_non_owner_cannot_remove_different_member(self):
+        other = make_user("other_member", "other@e.com")
+        other_membership = GroupMembership.objects.create(
+            project=self.project, user=other, role="member"
+        )
+        self.client.force_authenticate(user=self.member)
+        url = f"/api/group-work/projects/{self.project.id}/members/{other_membership.id}/"
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_cannot_remove_owner(self):
         owner_membership = GroupMembership.objects.get(
             project=self.project, user=self.user
