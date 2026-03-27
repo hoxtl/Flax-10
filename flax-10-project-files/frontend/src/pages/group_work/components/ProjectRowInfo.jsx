@@ -2,7 +2,7 @@
  * GroupWork project row info section.
  */
 
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import Tooltip from "../../../components/common/tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import GroupWorkProjectModuleBadge from "./ProjectModuleBadge";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";

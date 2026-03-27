@@ -6,7 +6,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getModules } from "../../../api/moduleApi";
 import { normalizeModuleCode } from "../../../utils/moduleCodeUtils";
-import { buildListItems, groupModuleItems, filterListItems } from "../../../components/Timer/task_input/taskInputUtils";
+import { buildListItems, groupModuleItems, filterListItems } from "../../../components/timer/task_input/taskInputUtils";
 import { getHeaderTitle } from "../utils/taskFeedUtils";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { isReadingList, getReadingListLabel } from "../utils/readingListUtils";

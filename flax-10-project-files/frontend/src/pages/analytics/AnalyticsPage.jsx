@@ -10,7 +10,7 @@ import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import getAnalyticsTabs from './components/AnalyticsPageTabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import EmptyState from '../../components/common/empty_state/EmptyState';
-import { BackToTop } from '../../components/Pagination/Pagination';
+import { BackToTop } from '../../components/pagination/Pagination';
 import { PERIODS } from './pageConfig';
 import { useAnalyticsPageState } from './pageState';
 import styles from './AnalyticsPage.module.css';

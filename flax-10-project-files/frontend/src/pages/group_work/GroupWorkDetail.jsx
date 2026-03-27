@@ -11,7 +11,7 @@ import ProjectHeader from "./components/ProjectHeader";
 import TabsSection from "./components/TabsSection";
 import BackButton from "../../components/common/back_button/BackButton.jsx";
 import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
-import { BackToTop } from "../../components/Pagination/Pagination";
+import { BackToTop } from "../../components/pagination/Pagination";
 import { getVisibleMembers } from "./utils/projectRowUtils";
 import styles from "./GroupWorkDetail.module.css";
 

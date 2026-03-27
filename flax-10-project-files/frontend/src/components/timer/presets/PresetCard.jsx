@@ -2,7 +2,7 @@
  * Preset button.
  */
 
-import styles from '../../../pages/Timer/TimerPage.module.css';
+import styles from '../../../pages/timer/TimerPage.module.css';
 import { getPresetDurationTag, getPresetIcon, isPresetActive } from '../utils/presetUtils';
 
 function getTooltipText(preset) {

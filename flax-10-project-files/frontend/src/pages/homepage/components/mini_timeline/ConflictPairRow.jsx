@@ -2,8 +2,8 @@
  * Grouped row for overlapping events in the mini timeline.
  */
 
-import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
-import { doesEventOverlapSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
+import { isReadOnlyEvent } from "../../../../components/calendar/utils/eventUtils";
+import { doesEventOverlapSleepWindow } from "../../../../components/settings/hooks/useSleepWarning";
 import { isLecture } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { getConflictTimeLabel } from "./helpers/conflictRowUtils";

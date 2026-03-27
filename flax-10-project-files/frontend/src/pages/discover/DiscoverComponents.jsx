@@ -3,8 +3,8 @@
  */
 
 import { SegmentedControl } from "../../components/common";
-import GridCard from "../../components/common/Card/GridCard";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
+import GridCard from "../../components/common/card/GridCard";
+import gridStyles from "../../components/common/card/CardGrid.module.css";
 import EmptyState from "../../components/common/empty_state/EmptyState";
 import EntityLinkChip from "../../components/common/entity_link_chip/EntityLinkChip";
 import PageToolbar, { ToolbarSortControl } from "../../components/common/page_toolbar/PageToolbar";
@@ -12,8 +12,8 @@ import PrimaryButton from "../../components/common/primary_button/PrimaryButton"
 import SearchBar from "../../components/common/search_bar/SearchBar";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState";
 import UserAvatar from "../../components/common/user_avatar/UserAvatar";
-import { FilterSection } from "../../components/Social/UserSearch";
-import { BackToTop, Pagination } from "../../components/Pagination/Pagination";
+import { FilterSection } from "../../components/social/UserSearch";
+import { BackToTop, Pagination } from "../../components/pagination/Pagination";
 import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 import { filterVisibleUsers, getDiscoverSortOptions, getDisplayName, getRoleLabel } from "./discoverHelpers";
 import styles from "./Discover.module.css";

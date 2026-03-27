@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useSocietyCalendarSync } from '../../components/Society/hooks/useSocietyCalendarSync';
+import { useSocietyCalendarSync } from '../../components/society/hooks/useSocietyCalendarSync';
 
 const getSyncStatusMock = vi.fn();
 const syncCalendarMock = vi.fn();
@@ -14,7 +14,7 @@ vi.mock('../../api/societyApi', () => ({
   unsyncCalendar: (...args) => unsyncCalendarMock(...args),
 }));
 
-vi.mock('../../components/Notifications/hooks/useNotify', () => ({
+vi.mock('../../components/notifications/hooks/useNotify', () => ({
   useNotify: () => useNotifyMock(),
 }));
 

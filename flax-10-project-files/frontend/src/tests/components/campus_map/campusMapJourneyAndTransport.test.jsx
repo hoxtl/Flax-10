@@ -12,13 +12,13 @@ vi.mock("../../../api/geocodeApi", () => ({
   geocodeAddress: (...args) => geocodeAddressMock(...args),
 }));
 
-vi.mock("../../../components/Calendar/event_modal/components/LocationAutoComplete", () => ({
+vi.mock("../../../components/calendar/event_modal/components/LocationAutoComplete", () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
   ),
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 

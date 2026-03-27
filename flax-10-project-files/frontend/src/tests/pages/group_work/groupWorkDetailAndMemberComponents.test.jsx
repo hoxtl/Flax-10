@@ -65,7 +65,7 @@ vi.mock("../../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label }) => <button onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../components/Pagination/Pagination", () => ({
+vi.mock("../../../components/pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 

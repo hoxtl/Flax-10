@@ -5,18 +5,18 @@ import {
     executeDelete,
     deleteRecurrenceOccurrence,
     isRecurringEvent,
-} from '../../components/Calendar/utils/formUtils';
+} from '../../components/calendar/utils/formUtils';
 
-vi.mock('../../components/Calendar/utils/overlapUtils', () => ({
+vi.mock('../../components/calendar/utils/overlapUtils', () => ({
     checkOverlapWithConfirm: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../components/calendar/utils/eventUtils', () => ({
     extractBaseEventId: vi.fn((id) => typeof id === 'string' && id.includes('_') ? id.split('_')[0] : id),
     hasRecurrence: vi.fn((event) => !!(event?.recurrence_rule || event?.recurrence_details)),
 }));
 
-vi.mock('../../components/Calendar/utils/dateValidation', () => ({
+vi.mock('../../components/calendar/utils/dateValidation', () => ({
     validateDateRange: vi.fn().mockReturnValue(null),
 }));
 
@@ -24,8 +24,8 @@ vi.mock('../../api/geocodeApi', () => ({
     geocodeAddress: vi.fn(),
 }));
 
-import { checkOverlapWithConfirm } from '../../components/Calendar/utils/overlapUtils';
-import { extractBaseEventId, hasRecurrence } from '../../components/Calendar/utils/eventUtils';
+import { checkOverlapWithConfirm } from '../../components/calendar/utils/overlapUtils';
+import { extractBaseEventId, hasRecurrence } from '../../components/calendar/utils/eventUtils';
 import { geocodeAddress } from '../../api/geocodeApi';
 
 describe('getInitialForm', () => {

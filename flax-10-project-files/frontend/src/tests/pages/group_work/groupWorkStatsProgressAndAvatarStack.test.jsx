@@ -27,7 +27,7 @@ vi.mock("../../../components/common/stat_strip/StatStrip", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 

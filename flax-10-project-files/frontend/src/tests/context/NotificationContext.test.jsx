@@ -19,12 +19,12 @@ vi.mock('../../api/notificationApi', () => ({
     clearAllNotifications: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/browserNotification', () => ({
+vi.mock('../../components/notifications/utils/browserNotification', () => ({
     requestPermission: vi.fn(),
     sendBrowserNotification: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/notificationSound', () => ({
+vi.mock('../../components/notifications/utils/notificationSound', () => ({
     playNotificationSound: vi.fn(),
 }));
 
@@ -215,7 +215,7 @@ describe('NotificationContext', () => {
     });
 
     it('should process new notifications from poll and notify user', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         vi.useFakeTimers();
         api.fetchNotifications.mockResolvedValueOnce([]);
         render(
@@ -236,7 +236,7 @@ describe('NotificationContext', () => {
     });
 
     it('should not send browser notification for reminder type from poll', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         sendBrowserNotification.mockClear();
         vi.useFakeTimers();
         api.fetchNotifications.mockResolvedValueOnce([]);

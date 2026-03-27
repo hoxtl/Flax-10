@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import styles from '../../../pages/Timer/TimerPage.module.css';
+import styles from '../../../pages/timer/TimerPage.module.css';
 import { fmtDuration } from '../utils/timerFormatters';
 
 function loadDailyGoalHours() {

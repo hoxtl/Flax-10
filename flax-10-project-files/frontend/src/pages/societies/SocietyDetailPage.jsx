@@ -4,23 +4,23 @@
  */
 
 import styles from "./SocietyDetailPage.module.css";
-import SocietyHero from "../../components/Society/society_detail/SocietyHero";
-import SocietyInfo from "../../components/Society/society_detail/SocietyInfo";
-import SocietyTabs from "../../components/Society/society_detail/tabs/SocietyTabs";
-import SocietySidebar from "../../components/Society/society_detail/SocietySidebar";
-import CoverImageModal from "../../components/Society/society_detail/image_handlers/CoverImageModal";
-import ImageGalleryModal from "../../components/Society/society_detail/image_handlers/ImageGalleryModal";
-import SettingsModal from "../../components/Society/society_detail/SettingsModal";
-import AnnouncementModal from "../../components/Society/society_detail/tabs/announcement_tab/AnnouncementModal";
-import ReportSocietyModal from "../../components/Society/society_detail/ReportSocietyModal";
-import MemberDirectoryModal from "../../components/Society/society_detail/MemberDirectoryModal";
+import SocietyHero from "../../components/society/society_detail/SocietyHero";
+import SocietyInfo from "../../components/society/society_detail/SocietyInfo";
+import SocietyTabs from "../../components/society/society_detail/tabs/SocietyTabs";
+import SocietySidebar from "../../components/society/society_detail/SocietySidebar";
+import CoverImageModal from "../../components/society/society_detail/image_handlers/CoverImageModal";
+import ImageGalleryModal from "../../components/society/society_detail/image_handlers/ImageGalleryModal";
+import SettingsModal from "../../components/society/society_detail/SettingsModal";
+import AnnouncementModal from "../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal";
+import ReportSocietyModal from "../../components/society/society_detail/ReportSocietyModal";
+import MemberDirectoryModal from "../../components/society/society_detail/MemberDirectoryModal";
 import { Flag } from "lucide-react";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import BackButton from "../../components/common/back_button/BackButton.jsx";
 import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { useLocation } from "react-router-dom";
 import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
-import { getImageUrls } from "./SocietyDetailPageUtils";
+import { getImageUrls } from "./societyDetailPageUtils";
 
 function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;

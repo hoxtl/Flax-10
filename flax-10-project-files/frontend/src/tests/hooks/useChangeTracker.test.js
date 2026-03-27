@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useChangeTracker } from '../../components/Society/hooks/useChangeTracker';
+import { useChangeTracker } from '../../components/society/hooks/useChangeTracker';
 
 describe('useChangeTracker', () => {
     it('initializes with empty changes', () => {

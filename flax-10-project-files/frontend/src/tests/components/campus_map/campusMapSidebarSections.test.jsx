@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-vi.mock("../../pages/CampusMap/Sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../pages/campus_map/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../pages/CampusMap/status.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/Sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/status.module.css", () => ({ default: {} }));
 
 vi.mock("framer-motion", () => ({

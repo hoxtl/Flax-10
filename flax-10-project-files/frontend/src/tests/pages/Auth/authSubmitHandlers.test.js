@@ -22,7 +22,7 @@ vi.mock("../../../components/Auth/utils/authHelpers", () => ({
   validatePasswords,
 }));
 
-import { submitSignIn, submitSignUp } from "../../../pages/Auth/utils/authSubmitHandlers";
+import { submitSignIn, submitSignUp } from "../../../pages/auth/utils/authSubmitHandlers";
 
 describe("authSubmitHandlers", () => {
   beforeEach(() => {

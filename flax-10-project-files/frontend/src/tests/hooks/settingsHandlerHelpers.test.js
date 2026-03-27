@@ -15,8 +15,8 @@ import {
   saveWeekPreference,
   saveWorktimePreference,
   showTemporaryMessage,
-} from "../../components/Settings/hooks/settingsHandlerHelpers";
-import { useSleepWarning } from "../../components/Settings/hooks/useSleepWarning";
+} from "../../components/settings/hooks/settingsHandlerHelpers";
+import { useSleepWarning } from "../../components/settings/hooks/useSleepWarning";
 
 vi.mock("../../api/settingsApi", () => ({
   clearAuthAndRedirect: vi.fn(),
@@ -34,12 +34,12 @@ vi.mock("../../api/geocodeApi", () => ({
   geocodeAddress: vi.fn(),
 }));
 
-vi.mock("../../components/Settings/sleep/sleepWarningUtils", () => ({
+vi.mock("../../components/settings/sleep/sleepWarningUtils", () => ({
   doesEventOverlapSleepWindow: vi.fn(() => false),
   isDuringSleepWindow: vi.fn(),
 }));
 
-import { isDuringSleepWindow } from "../../components/Settings/sleep/sleepWarningUtils";
+import { isDuringSleepWindow } from "../../components/settings/sleep/sleepWarningUtils";
 
 function buildActions() {
   return {

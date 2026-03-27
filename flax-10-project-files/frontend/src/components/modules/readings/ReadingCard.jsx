@@ -3,8 +3,8 @@
  */
 
 import { useState } from 'react';
-import styles from '../Deadlines/DeadlineCard.module.css';
-import {formatDate} from '../../Calendar/utils/dateUtils';
+import styles from '../deadlines/DeadlineCard.module.css';
+import {formatDate} from '../../calendar/utils/dateUtils';
 import { ModuleItemCardActions, ModuleItemDeleteDialog } from '../shared/moduleCardActions';
 
 function ReadingCardHeader({ reading }) {

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../components/Timer/sound_panel/MusicStations", () => ({
+vi.mock("../../../components/timer/sound_panel/MusicStations", () => ({
   MusicStations: ({ activeStation, closeStation, toggleStation }) => (
     <div>
       <div>Music & Streams</div>
@@ -19,7 +19,7 @@ vi.mock("../../../components/Timer/sound_panel/MusicStations", () => ({
   ),
 }));
 
-import InlineSoundPanel from "../../../components/Timer/InlineSoundPanel";
+import InlineSoundPanel from "../../../components/timer/InlineSoundPanel";
 
 describe("InlineSoundPanel", () => {
   it("shows the music widget and toggles stations on and off", () => {

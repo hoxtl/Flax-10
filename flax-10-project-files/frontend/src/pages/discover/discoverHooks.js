@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { searchUsers } from "../../api/userApi";
-import { useClickOutside, useFilterState, useSearchInit } from "../../components/Social/UserSearch";
+import { useClickOutside, useFilterState, useSearchInit } from "../../components/social/UserSearch";
 import { sortDiscoverUsers, USERS_PER_PAGE } from "./discoverHelpers";
 
 async function loadUsers(query, filters, page, setUsers, setTotalPages, setLoading, sortBy) {

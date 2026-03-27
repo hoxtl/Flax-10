@@ -60,46 +60,46 @@ vi.mock("../../context/CalendarContext", () => ({
   useEventModal: hoistedMocks.useEventModal,
 }));
 
-vi.mock("../../components/Dashboard/sidebar", async () => {
+vi.mock("../../components/dashboard/sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });
-vi.mock("../../components/Dashboard/Topbar", async () => {
+vi.mock("../../components/dashboard/Topbar", async () => {
   const { TopbarMock } = await import("./dashboardMocks");
   return { default: TopbarMock };
 });
-vi.mock("../../components/Dashboard/QuickAddModal", async () => {
+vi.mock("../../components/dashboard/QuickAddModal", async () => {
   const { QuickAddMock } = await import("./dashboardMocks");
   return { default: QuickAddMock };
 });
-vi.mock("../../components/Calendar/EventModal/EventModal", async () => {
+vi.mock("../../components/calendar/EventModal/EventModal", async () => {
   const { EventModalMock } = await import("./dashboardMocks");
   return { EventModal: EventModalMock };
 });
-vi.mock("../../components/Society/CreateSocietyModal", async () => {
+vi.mock("../../components/society/CreateSocietyModal", async () => {
   const { CreateSocietyMock } = await import("./dashboardMocks");
   return { default: CreateSocietyMock };
 });
-vi.mock("../../components/Modules/Deadlines/DeadlineModal", async () => {
+vi.mock("../../components/modules/deadlines/DeadlineModal", async () => {
   const { DeadlineModalMock } = await import("./dashboardMocks");
   return { default: DeadlineModalMock };
 });
-vi.mock("../../components/Modules/Readings/ReadingModal", async () => {
+vi.mock("../../components/modules/readings/ReadingModal", async () => {
   const { ReadingModalMock } = await import("./dashboardMocks");
   return { default: ReadingModalMock };
 });
-vi.mock("../../components/Timer/TimerPopups", async () => {
+vi.mock("../../components/timer/TimerPopups", async () => {
   const { LeaveTimerMock } = await import("./dashboardMocks");
   return { LeaveTimerModal: LeaveTimerMock };
 });
-vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
+vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
   const { CreateTaskMock } = await import("./dashboardMocks");
   return { default: CreateTaskMock };
 });
 
-vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
+vi.mock("../../components/dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
-vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: hoistedMocks.authService }));
 vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: hoistedMocks.clearUserData }));
 vi.mock("react-router-dom", () => ({ useLocation: hoistedMocks.useLocation }));
@@ -114,7 +114,7 @@ vi.mock("../../api/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]),
   getEnrollments: vi.fn().mockResolvedValue([]),
 }));
-vi.mock("../../components/Modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
+vi.mock("../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
 
 import DashboardLayout from "../../layout/DashboardLayout";
 vi.stubGlobal("localStorage", {

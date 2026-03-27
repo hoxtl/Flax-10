@@ -2,7 +2,7 @@
  * CommonGroundSection widget – shared modules and societies between two users.
  */
 
-import Card from "../../../../components/common/Card/Card";
+import Card from "../../../../components/common/card/Card";
 import compatStyles from "./ProfileCompat.module.css";
 
 const COMMON_GROUND_COLORS = {

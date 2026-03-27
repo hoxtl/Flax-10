@@ -7,7 +7,7 @@ import styles from "./GroupWorkIndexPage.module.css";
 import { useGroupProjects, useGroupProjectSort, useSelectedProjectId } from "./hooks/groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
 import AppPage from "../../components/common/app_page/AppPage";
-import { BackToTop } from "../../components/Pagination/Pagination";
+import { BackToTop } from "../../components/pagination/Pagination";
 import GroupWorkStats from "./components/GroupWorkStats";
 import GroupWorkIndexSkeleton from "./components/GroupWorkIndexSkeleton";
 import GroupWorkContent from "./components/GroupWorkContent";

@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { FocusOverlayContent } from '../../../components/Timer/WrapperComponents';
+import { FocusOverlayContent } from '../../../components/timer/WrapperComponents';
 
 const timerCircleSpy = vi.fn();
 
-vi.mock('../../../components/Timer/TimerCircle', () => ({
+vi.mock('../../../components/timer/TimerCircle', () => ({
   default: (props) => {
     timerCircleSpy(props);
     return <div data-testid="timer-circle" />;
@@ -21,7 +21,7 @@ vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   },
 }));
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: {
     focusOverlayFrame: 'focusOverlayFrame',
     focusOverlayExitBtn: 'focusOverlayExitBtn',

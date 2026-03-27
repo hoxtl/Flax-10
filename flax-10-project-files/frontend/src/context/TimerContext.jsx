@@ -3,7 +3,7 @@
  */
 
 import { createContext, useContext, useState } from 'react';
-import { useTimerLogic } from '../components/Timer/hooks/useTimerLogic';
+import { useTimerLogic } from '../components/timer/hooks/useTimerLogic';
 
 const TimerContext = createContext();
 

@@ -5,9 +5,9 @@
 
 import { useState } from "react";
 import styles from "./SocietySidebar.module.css";
-import AnnouncementModal from "./Tabs/announcement_tab/AnnouncementModal";
-import { EventModal } from "../../Calendar/event_modal/EventModal";
-import { formatDateTime } from "../../Calendar/utils/dateUtils";
+import AnnouncementModal from "./tabs/announcement_tab/AnnouncementModal";
+import { EventModal } from "../../calendar/event_modal/EventModal";
+import { formatDateTime } from "../../calendar/utils/dateUtils";
 
 /** Secondary column for highlights and quick actions. */
 

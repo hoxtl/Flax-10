@@ -4,11 +4,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '../../../utils/testUtils';
-import { TaskPickerModal } from '../../../components/Timer/task_input/TaskPickerModal';
+import { TaskPickerModal } from '../../../components/timer/task_input/TaskPickerModal';
 
 import { createFnMap } from '../../utils/testBuilderUtils';
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
 
 vi.mock('../../../components/common/search_bar/SearchBar', () => ({
   default: ({ value, onChange, placeholder }) => (
@@ -50,11 +50,11 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
   ),
 }));
 
-vi.mock('../../../pages/Tasks/components/TaskFeedFilterPanel', () => ({
+vi.mock('../../../pages/tasks/components/TaskFeedFilterPanel', () => ({
   default: () => <div data-testid="filter-panel" />,
 }));
 
-vi.mock('../../../components/Timer/task_input/TaskPickItem', () => ({
+vi.mock('../../../components/timer/task_input/TaskPickItem', () => ({
   TaskPickItem: ({ task, onSelect }) => (
     <button data-testid={`task-item-${task.id}`} onClick={() => onSelect(task)}>
       {task.title}
@@ -62,7 +62,7 @@ vi.mock('../../../components/Timer/task_input/TaskPickItem', () => ({
   ),
 }));
 
-vi.mock('../../../components/Timer/task_input/taskInputConstants', () => ({
+vi.mock('../../../components/timer/task_input/taskInputConstants', () => ({
   SORT_OPTIONS: [
     { value: 'urgency', label: 'Urgency' },
     { value: 'due', label: 'Due date' },
