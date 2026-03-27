@@ -6,16 +6,22 @@ import { useState } from 'react';
 import { getTflLinePillStyle } from '../../../pages/homepage/utils/kclTflMapping';
 import baseStyles from '../../../pages/campus_map/styles/CampusMap.module.css';
 import statusStyles from '../../../pages/campus_map/styles/status.module.css';
+
 const styles = { ...baseStyles, ...statusStyles };
 
-function DisruptionCard({ disruption }) {
+function getDisruptionBadgeStyle(disruption) {
   const pillStyle = getTflLinePillStyle(disruption.lineName);
+  return {
+    '--line-badge-bg': pillStyle.bg || disruption.color,
+    '--line-badge-text': pillStyle.text,
+  };
+}
+
+function DisruptionCard({ disruption }) {
+  const badgeStyle = getDisruptionBadgeStyle(disruption);
   return (
     <div className={styles.disruptionCard}>
-      <div
-        className={styles.disruptionBadge}
-        style={{ '--line-badge-bg': pillStyle.bg || disruption.color, '--line-badge-text': pillStyle.text }}
-      >
+      <div className={styles.disruptionBadge} style={badgeStyle}>
         <span className={styles.disruptionBadgeDot} aria-hidden="true" />
         {disruption.lineName}
       </div>

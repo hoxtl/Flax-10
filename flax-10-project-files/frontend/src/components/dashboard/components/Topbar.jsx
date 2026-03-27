@@ -26,7 +26,7 @@ import { useState, useRef } from "react";
 
 function BrandLogo({ onNavChange }) {
   return (
-    <div data-tour="home" className={styles.brandContainer} onClick={() => onNavChange?.("home")} style={{ cursor: "pointer" }}>
+    <div data-tour="home" className={styles.brandContainer} onClick={() => onNavChange?.("home")}>
       <Motion.div className={styles.logoMark} whileHover={{ rotate: 8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
       <span className={styles.brandName}>StudyFlax</span>
     </div>
@@ -114,9 +114,9 @@ function NavSectionItem({ title, ids, tourIds = [], routes, activeNav, onNavChan
   if (sub.length === 0) return null;
   const change = (v) => onOpenChange(title, v);
   return (
-    <div data-tour={tourIds[0] || undefined} style={{ position: "relative" }} onMouseEnter={() => onEnter(title)}>
+    <div data-tour={tourIds[0] || undefined} className={styles.tourAnchor} onMouseEnter={() => onEnter(title)}>
       {tourIds.slice(1).map((tid) => (
-        <span key={tid} data-tour={tid} aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
+        <span key={tid} data-tour={tid} aria-hidden="true" className={styles.tourProxy} />
       ))}
       <NavDropdown title={displayTitle} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
         isOpen={activeMenu === title} onOpenChange={change} usePortal={true} user={user} />

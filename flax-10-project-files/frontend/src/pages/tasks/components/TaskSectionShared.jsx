@@ -12,7 +12,7 @@ function CollapsibleChipExtra({ collapsed, extraContent }) {
     <AnimatePresence initial={false}>
       <Motion.span
         key="extra"
-        style={{ display: "inline-flex", alignItems: "center", gap: 6, overflow: "hidden" }}
+        className={styles.chipExtra}
         initial={{ opacity: 0, width: 0 }}
         animate={{ opacity: 1, width: "auto" }}
         exit={{ opacity: 0, width: 0 }}
@@ -43,11 +43,11 @@ export function CollapsibleSectionBody({ collapsed, bodyKey, children }) {
       {!collapsed ? (
         <Motion.div
           key={bodyKey}
+          className={styles.collapsibleBody}
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-          style={{ overflow: "hidden" }}
         >
           {children}
         </Motion.div>

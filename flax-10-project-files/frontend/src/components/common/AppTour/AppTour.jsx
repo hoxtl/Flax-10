@@ -67,15 +67,12 @@ const CARD_W = 310;
 
 function useTargetRect(tourId) {
   const [rect, setRect] = useState(null);
-
   useEffect(() => {
     if (!tourId) return setRect(null);
-
     const measure = () => {
       const element = document.querySelector(`[data-tour="${tourId}"]`);
       if (element) setRect(element.getBoundingClientRect());
     };
-
     measure();
     const timeoutId = setTimeout(measure, 120);
     window.addEventListener("resize", measure);
@@ -152,22 +149,34 @@ function buildCardClasses(arrowSide) {
   ].filter(Boolean).join(" ");
 }
 
+function getOverlayStyle(clipPath) {
+  return { clipPath };
+}
+
+function getSpotlightRingStyle(rect) {
+  const { x, y, width, height } = rect;
+  return { left: x - PAD, top: y - PAD, width: width + PAD * 2, height: height + PAD * 2 };
+}
+
+function getTourCardStyle(stylePos, isWelcome) {
+  return { ...stylePos, width: isWelcome ? 340 : CARD_W };
+}
+
 function SpotlightOverlay({ rect }) {
   if (!rect) return <div className={styles.overlay} />;
 
   const { x, y, width, height } = rect;
   const clipPath = `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% ${y - PAD}px, ${x - PAD}px ${y - PAD}px, ${x - PAD}px ${y + height + PAD}px, ${x + width + PAD}px ${y + height + PAD}px, ${x + width + PAD}px ${y - PAD}px, 0% ${y - PAD}px)`;
-  return <div className={styles.overlay} style={{ clipPath }} />;
+  return <div className={styles.overlay} style={getOverlayStyle(clipPath)} />;
 }
 
 function SpotlightRing({ rect }) {
   if (!rect) return null;
 
-  const { x, y, width, height } = rect;
   return (
     <Motion.div
       className={styles.spotlightRing}
-      style={{ left: x - PAD, top: y - PAD, width: width + PAD * 2, height: height + PAD * 2 }}
+      style={getSpotlightRingStyle(rect)}
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.92 }}
@@ -206,27 +215,16 @@ function ProgressDots({ total, current, onJump }) {
   );
 }
 
+function buildTourCardContent({ isWelcome, step, stepIndex, total, onJump, onNext, onPrev, onSkip }) {
+  if (isWelcome) return <WelcomeTourContent step={step} stepIndex={stepIndex} total={total} onNext={onNext} onJump={onJump} />;
+  return <GuidedTourContent step={step} stepIndex={stepIndex} total={total} onJump={onJump} onNext={onNext} onPrev={onPrev} onSkip={onSkip} />;
+}
+
 function TourCard({ step, stepIndex, total, onNext, onPrev, onSkip, onJump, rect }) {
   const isWelcome = step.placement === "center";
   const { arrowSide, ...stylePos } = getCardPosition(rect, step.placement);
-
-  return (
-    <TourCardShell stepIndex={stepIndex} isWelcome={isWelcome} stylePos={stylePos} arrowSide={arrowSide}>
-      {isWelcome ? (
-        <WelcomeTourContent step={step} stepIndex={stepIndex} total={total} onNext={onNext} onJump={onJump} />
-      ) : (
-        <GuidedTourContent
-          step={step}
-          stepIndex={stepIndex}
-          total={total}
-          onJump={onJump}
-          onNext={onNext}
-          onPrev={onPrev}
-          onSkip={onSkip}
-        />
-      )}
-    </TourCardShell>
-  );
+  const content = buildTourCardContent({ isWelcome, step, stepIndex, total, onJump, onNext, onPrev, onSkip });
+  return <TourCardShell stepIndex={stepIndex} isWelcome={isWelcome} stylePos={stylePos} arrowSide={arrowSide}>{content}</TourCardShell>;
 }
 
 function TourCardShell({ stepIndex, isWelcome, stylePos, arrowSide, children }) {
@@ -234,7 +232,7 @@ function TourCardShell({ stepIndex, isWelcome, stylePos, arrowSide, children }) 
     <Motion.div
       key={stepIndex}
       className={buildCardClasses(arrowSide)}
-      style={{ ...stylePos, width: isWelcome ? 340 : CARD_W }}
+      style={getTourCardStyle(stylePos, isWelcome)}
       initial={{ opacity: 0, scale: 0.9, y: 6 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, y: 6 }}
@@ -256,10 +254,10 @@ function WelcomeTourContent({ step, stepIndex, total, onNext, onJump }) {
       >
         <span className={styles.welcomeIcon} aria-hidden="true">{step.emoji}</span>
       </Motion.div>
-      <h2 className={styles.cardTitle} style={{ fontSize: "1.15rem", textAlign: "center" }}>{step.title}</h2>
-      <p className={styles.cardDescription} style={{ textAlign: "center" }}>{step.description}</p>
-      <div className={styles.cardActions} style={{ justifyContent: "center" }}>
-        <button className={styles.nextBtn} style={{ padding: "0.5rem 2rem" }} onClick={onNext}>Start tour</button>
+      <h2 className={`${styles.cardTitle} ${styles.welcomeTitle}`}>{step.title}</h2>
+      <p className={`${styles.cardDescription} ${styles.welcomeDescription}`}>{step.description}</p>
+      <div className={`${styles.cardActions} ${styles.cardActionsCentered}`}>
+        <button className={`${styles.nextBtn} ${styles.welcomeStartBtn}`} onClick={onNext}>Start tour</button>
       </div>
       <ProgressDots total={total} current={stepIndex} onJump={onJump} />
     </div>
@@ -359,18 +357,5 @@ export default function AppTour({ onDone }) {
   const rect = useTargetRect(currentStep?.tourId);
   const { next, prev } = useTourActions(step, setStep, onDone);
   useTourKeyboardNavigation(next, prev, onDone);
-
-  return (
-    <div className={styles.root} role="dialog" aria-modal="true" aria-label="App tour">
-      <TourFrame
-        step={currentStep}
-        stepIndex={step}
-        rect={rect}
-        onNext={next}
-        onPrev={prev}
-        onSkip={onDone}
-        onJump={setStep}
-      />
-    </div>
-  );
+  return <div className={styles.root} role="dialog" aria-modal="true" aria-label="App tour"><TourFrame step={currentStep} stepIndex={step} rect={rect} onNext={next} onPrev={prev} onSkip={onDone} onJump={setStep} /></div>;
 }
