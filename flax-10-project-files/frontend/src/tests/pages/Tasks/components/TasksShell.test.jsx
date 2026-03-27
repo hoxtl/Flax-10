@@ -1,26 +1,26 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import TasksPageContent from "../../../../pages/Tasks/TasksPageContent";
-import TasksPageToasts from "../../../../pages/Tasks/TasksPageToasts";
+import TasksPageContent from "../../../../pages/tasks/TasksPageContent";
+import TasksPageToasts from "../../../../pages/tasks/TasksPageToasts";
 
-vi.mock("../../../../pages/Tasks/components/ListSidebar", () => ({
+vi.mock("../../../../pages/tasks/components/ListSidebar", () => ({
   default: () => <div data-testid="list-sidebar" />,
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeed", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeed", () => ({
   default: () => <div data-testid="task-feed" />,
 }));
 
-vi.mock("../../../../pages/Tasks/components/CreateTaskModal", () => ({
+vi.mock("../../../../pages/tasks/components/CreateTaskModal", () => ({
   default: () => <div data-testid="create-task-modal" />,
 }));
 
-vi.mock("../../../../pages/Tasks/components/CreateListModal", () => ({
+vi.mock("../../../../pages/tasks/components/CreateListModal", () => ({
   default: () => <div data-testid="create-list-modal" />,
 }));
 
-vi.mock("../../../../components/Pagination/Pagination", () => ({
+vi.mock("../../../../components/pagination/Pagination", () => ({
   BackToTop: () => <div data-testid="back-to-top" />,
 }));
 

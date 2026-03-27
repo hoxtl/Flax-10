@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import AttendancePage from "../../../pages/Attendance/AttendancePage";
+import AttendancePage from "../../../pages/attendance/AttendancePage";
 
 const useAttendancePageModelMock = vi.fn();
 
-vi.mock("../../../pages/Attendance/hooks/useAttendancePageModel", () => ({
+vi.mock("../../../pages/attendance/hooks/useAttendancePageModel", () => ({
   useAttendancePageModel: () => useAttendancePageModelMock(),
 }));
 
@@ -19,15 +19,15 @@ vi.mock("../../../components/common/app_page/AppPage", () => ({
   ),
 }));
 
-vi.mock("../../../components/Pagination/Pagination", () => ({
+vi.mock("../../../components/pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 
-vi.mock("../../../pages/Attendance/components/AttendancePageStatus", () => ({
+vi.mock("../../../pages/attendance/components/AttendancePageStatus", () => ({
   default: ({ loading, error }) => <div>Status: {String(loading)} / {String(error)}</div>,
 }));
 
-vi.mock("../../../pages/Attendance/components/AttendancePageBody", () => ({
+vi.mock("../../../pages/attendance/components/AttendancePageBody", () => ({
   default: ({ model }) => <div>Body: {model.summary?.pct}</div>,
 }));
 

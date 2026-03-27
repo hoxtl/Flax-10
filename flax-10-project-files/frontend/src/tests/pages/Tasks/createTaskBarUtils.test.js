@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { buildQuickAddPayload, runQuickAdd } from "../../../pages/Tasks/utils/createTaskBarUtils";
+import { buildQuickAddPayload, runQuickAdd } from "../../../pages/tasks/utils/createTaskBarUtils";
 
 describe("createTaskBarUtils", () => {
   describe("buildQuickAddPayload", () => {

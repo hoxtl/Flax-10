@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies before importing
-vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({
+vi.mock('../../../pages/tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF3333'],
 }));
 

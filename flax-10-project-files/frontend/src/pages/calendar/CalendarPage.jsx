@@ -10,7 +10,7 @@ import { Calendar } from "../../components/calendar/Calendar";
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
 import SkeletonBlock from "../../components/common/loading_state/SkeletonBlock";
 import BackButton from "../../components/common/back_button/BackButton";
-import { BackToTop } from "../../components/Pagination/Pagination";
+import { BackToTop } from "../../components/pagination/Pagination";
 import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/calendar/CalendarHeader";
 import { EventPopups } from "../../components/calendar/EventPopups";

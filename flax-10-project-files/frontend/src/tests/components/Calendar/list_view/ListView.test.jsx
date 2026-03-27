@@ -23,7 +23,7 @@ vi.mock('../../../../components/calendar/list_view/EventRow', () => ({
     ConflictRow: ({ events }) => <div data-testid="conflict-row">{events.map((event) => event.title).join(', ')}</div>,
 }));
 
-vi.mock('../../../../components/Pagination/Pagination', () => ({
+vi.mock('../../../../components/pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages }) => <div data-testid="pagination">{currentPage}/{totalPages}</div>,
     BackToTop: () => <div data-testid="back-to-top" />,
 }));

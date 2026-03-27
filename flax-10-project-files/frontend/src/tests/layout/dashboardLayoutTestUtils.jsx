@@ -60,15 +60,15 @@ vi.mock("../../context/CalendarContext", () => ({
   useEventModal: hoistedMocks.useEventModal,
 }));
 
-vi.mock("../../components/Dashboard/sidebar", async () => {
+vi.mock("../../components/dashboard/sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });
-vi.mock("../../components/Dashboard/Topbar", async () => {
+vi.mock("../../components/dashboard/Topbar", async () => {
   const { TopbarMock } = await import("./dashboardMocks");
   return { default: TopbarMock };
 });
-vi.mock("../../components/Dashboard/QuickAddModal", async () => {
+vi.mock("../../components/dashboard/QuickAddModal", async () => {
   const { QuickAddMock } = await import("./dashboardMocks");
   return { default: QuickAddMock };
 });
@@ -92,14 +92,14 @@ vi.mock("../../components/timer/TimerPopups", async () => {
   const { LeaveTimerMock } = await import("./dashboardMocks");
   return { LeaveTimerModal: LeaveTimerMock };
 });
-vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
+vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
   const { CreateTaskMock } = await import("./dashboardMocks");
   return { default: CreateTaskMock };
 });
 
-vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
+vi.mock("../../components/dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
-vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: hoistedMocks.authService }));
 vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: hoistedMocks.clearUserData }));
 vi.mock("react-router-dom", () => ({ useLocation: hoistedMocks.useLocation }));

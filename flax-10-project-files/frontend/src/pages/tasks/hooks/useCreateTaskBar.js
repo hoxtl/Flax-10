@@ -5,7 +5,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/modules/utils/moduleUtils";
-import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+import { useSleepWarning } from "../../../components/settings/hooks/useSleepWarning";
 import { getUserSettings } from "../../../api/userApi";
 import { POMODORO_BLOCK_MINUTES, runQuickAdd } from "../utils/createTaskBarUtils";
 import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";

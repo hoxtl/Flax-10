@@ -26,7 +26,7 @@ vi.mock('../../../components/timer/utils/historyEvents', () => ({
   listenToTimerHistoryEvents: () => () => {},
 }));
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: {
     todayMetricBanner: 'todayMetricBanner',
   },

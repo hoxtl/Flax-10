@@ -73,7 +73,7 @@ vi.mock("../../../components/modules/shared/widgetParts.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
+vi.mock("../../../pages/tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: ({ task, onClose }) => (
     <div data-testid="task-info-modal">
       <div>{task.title}</div>
@@ -84,7 +84,7 @@ vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
   ),
 }));
 
-import ReadingsPanel from "../../../pages/Modules/ReadingsPanel.jsx";
+import ReadingsPanel from "../../../pages/modules/ReadingsPanel.jsx";
 
 const readings = [
   {

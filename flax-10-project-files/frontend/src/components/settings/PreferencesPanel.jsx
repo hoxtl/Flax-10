@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import SectionSkeleton from "../common/loading_state/SectionSkeleton";
-import styles from "../../pages/Settings/Settings.module.css";
+import styles from "../../pages/settings/Settings.module.css";
 import AppearanceSection from "./preferences/AppearanceSection";
 import SleepSection from "./preferences/SleepSection";
 import useSleepScheduleSettings from "./preferences/useSleepScheduleSettings";

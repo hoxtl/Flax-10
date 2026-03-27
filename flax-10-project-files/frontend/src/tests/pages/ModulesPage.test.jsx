@@ -5,7 +5,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import ModulesPage from '../../pages/Modules/ModulesPage';
+import ModulesPage from '../../pages/modules/ModulesPage';
 
 const mockHook = {
     loading: false,
@@ -52,8 +52,8 @@ vi.mock('../../components/modules/Modules/ModuleDetails', () => ({
 vi.mock('../../components/modules/Deadlines/DeadlineModal', () => ({
     default: ({ onClose }) => <div><button onClick={onClose}>CloseModal</button></div>,
 }));
-vi.mock('../../pages/Modules/ModulesPage.module.css', () => ({ default: {} }));
-vi.mock('../../pages/Modules/MyModulesDashboard', () => ({
+vi.mock('../../pages/modules/ModulesPage.module.css', () => ({ default: {} }));
+vi.mock('../../pages/modules/MyModulesDashboard', () => ({
     default: () => <div>Upcoming assignment deadlines</div>,
 }));
 

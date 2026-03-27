@@ -13,10 +13,10 @@ vi.mock("../../components/modules/Deadlines/DeadlineModal", () => ({
 vi.mock("../../components/modules/Readings/ReadingModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/Dashboard/QuickAddModal", () => ({
+vi.mock("../../components/dashboard/QuickAddModal", () => ({
   default: () => null,
 }));
-vi.mock("../../pages/Tasks/components/CreateTaskModal", () => ({
+vi.mock("../../pages/tasks/components/CreateTaskModal", () => ({
   default: () => null,
 }));
 vi.mock("../../api/societyApi", () => ({

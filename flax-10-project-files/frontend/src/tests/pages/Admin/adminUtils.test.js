@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fadeUp, rowAnim, stagger } from '../../../pages/Admin/utils/adminMotion';
-import { emitAdminNavigation, navigateToSociety, navigateToProfile } from '../../../pages/Admin/utils/adminNavigation';
+import { fadeUp, rowAnim, stagger } from '../../../pages/admin/utils/adminMotion';
+import { emitAdminNavigation, navigateToSociety, navigateToProfile } from '../../../pages/admin/utils/adminNavigation';
 import {
   toggleArrayValue,
   createEmptyUserFilters,
@@ -14,9 +14,9 @@ import {
   matchesAllUserFilters,
   matchesUserSearch,
   filterUsers,
-} from '../../../pages/Admin/utils/userFilters';
-import { banUserState, unbanUserState } from '../../../pages/Admin/utils/userState';
-import { isProtectedFixtureUser } from '../../../pages/Admin/utils/protectedUsers';
+} from '../../../pages/admin/utils/userFilters';
+import { banUserState, unbanUserState } from '../../../pages/admin/utils/userState';
+import { isProtectedFixtureUser } from '../../../pages/admin/utils/protectedUsers';
 
 describe('adminMotion', () => {
   it('fadeUp has correct initial, animate, exit, and transition values', () => {

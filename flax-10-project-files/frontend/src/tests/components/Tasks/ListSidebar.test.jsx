@@ -1,9 +1,9 @@
 /* Tests for ListSidebar component rendering, selection, and list management */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '../../../utils/testUtils';
-import ListSidebar from '../../../pages/Tasks/components/ListSidebar';
+import ListSidebar from '../../../pages/tasks/components/ListSidebar';
 
-vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({
+vi.mock('../../../pages/tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#ff0000', '#00ff00', '#0000ff'],
 }));
 

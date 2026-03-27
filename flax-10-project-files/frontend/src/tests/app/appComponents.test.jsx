@@ -13,7 +13,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("../../pages/Banned/BannedPage", () => ({
+vi.mock("../../pages/banned/BannedPage", () => ({
   default: ({ reason }) => <div>{`Banned:${reason}`}</div>,
 }));
 

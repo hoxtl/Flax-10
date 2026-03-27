@@ -1,4 +1,4 @@
-import Settings from "../../pages/Settings/Settings";
+import Settings from "../../pages/settings/Settings";
 import Profile from "../../pages/profile/Profile";
 import { resolveRouteContent } from "../navigation/helpers";
 

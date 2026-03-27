@@ -2,7 +2,7 @@
  * Music station buttons and embed panel.
  */
 
-import styles from '../../../pages/Timer/TimerPage.module.css';
+import styles from '../../../pages/timer/TimerPage.module.css';
 import { MUSIC_STATIONS } from './soundPanelData';
 import { MusicEmbed } from './MusicEmbed';
 import { ProviderIcon } from './SoundIcons';

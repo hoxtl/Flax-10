@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import CreateListModal from "../../../../pages/Tasks/components/CreateListModal";
+import CreateListModal from "../../../../pages/tasks/components/CreateListModal";
 
 vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, pill, variant, ...props }) => <button {...props}>{children}</button>,

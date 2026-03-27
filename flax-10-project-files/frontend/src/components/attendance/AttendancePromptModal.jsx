@@ -7,8 +7,8 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle } from "lucide-react";
 import PrimaryButton from "../common/primary_button/PrimaryButton";
-import { useAttendanceStats } from "../../pages/Attendance/hooks/useAttendanceStats";
-import { computeAttendancePct } from "../../pages/Attendance/utils/attendanceSummary";
+import { useAttendanceStats } from "../../pages/attendance/hooks/useAttendanceStats";
+import { computeAttendancePct } from "../../pages/attendance/utils/attendanceSummary";
 import styles from "./AttendancePromptModal.module.css";
 
 function KclLogo() {

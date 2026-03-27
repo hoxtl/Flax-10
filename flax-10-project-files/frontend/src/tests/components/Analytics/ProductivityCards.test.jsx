@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import ProductivityCards from '../../../components/Analytics/ProductivityCards';
+import ProductivityCards from '../../../components/analytics/ProductivityCards';
 
 const mockData = {
     summary: {

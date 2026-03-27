@@ -53,7 +53,7 @@ vi.mock("../../components/common/search_bar/SearchBar", () => ({
   ),
 }));
 
-vi.mock("../../components/Pagination/Pagination", () => ({
+vi.mock("../../components/pagination/Pagination", () => ({
   BackToTop: () => <div data-testid="back-to-top" />,
 }));
 

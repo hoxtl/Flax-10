@@ -25,7 +25,7 @@ vi.mock("../../../../lib/kclCampuses", () => ({
   resolveCampusFromText: (...args) => resolveCampusFromTextMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/components/RightNowUtils", () => ({
+vi.mock("../../../../pages/homepage/components/RightNowUtils", () => ({
   formatTimeLeft: (...args) => formatTimeLeftMock(...args),
   getCurrentBlock: (...args) => getCurrentBlockMock(...args),
   getLeaveByInfo: (...args) => getLeaveByInfoMock(...args),
@@ -33,11 +33,11 @@ vi.mock("../../../../pages/Homepage/components/RightNowUtils", () => ({
   hasCampusCommute: (...args) => hasCampusCommuteMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/useCountdown", () => ({
+vi.mock("../../../../pages/homepage/hooks/useCountdown", () => ({
   useCountdown: (...args) => useCountdownMock(...args),
 }));
 
-import { useRightNowData } from "../../../../pages/Homepage/hooks/useRightNowData.js";
+import { useRightNowData } from "../../../../pages/homepage/hooks/useRightNowData.js";
 
 describe("useRightNowData", () => {
   beforeEach(() => {

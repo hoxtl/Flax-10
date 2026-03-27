@@ -7,7 +7,7 @@ vi.mock("../../../../pages/profile/utils/profileHelpers", () => ({
   buildFullName: (user) => user?.name || `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "Guest",
 }));
 
-vi.mock("../../../../components/Social/ShareButton", () => ({
+vi.mock("../../../../components/social/ShareButton", () => ({
   default: ({ onToggle }) => <button data-testid="share-toggle" onClick={() => onToggle?.(true)}>Share</button>,
 }));
 

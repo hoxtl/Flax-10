@@ -1,19 +1,19 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
-vi.mock('../../../../pages/Homepage/utils/dateFormatUtils', () => ({
+vi.mock('../../../../pages/homepage/utils/dateFormatUtils', () => ({
     formatTime: vi.fn(),
     formatTime12h: vi.fn(),
     fmtDurationShort: vi.fn(),
 }));
-vi.mock('../../../../pages/Homepage/utils/eventUtils', () => ({
+vi.mock('../../../../pages/homepage/utils/eventUtils', () => ({
     stripEmojiFromTitle: vi.fn(t => t),
 }));
-vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../../components/settings/hooks/useSleepWarning', () => ({
     doesEventOverlapSleepWindow: vi.fn(() => false),
 }));
 
-import { PlanEventRow } from '../../../../pages/Homepage/components/mini_timeline/PlanEventRow';
+import { PlanEventRow } from '../../../../pages/homepage/components/mini_timeline/PlanEventRow';
 
 const baseRow = {
     id: 'row-1',

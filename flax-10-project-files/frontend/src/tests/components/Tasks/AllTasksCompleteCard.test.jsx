@@ -1,7 +1,7 @@
 /* Tests for AllTasksCompleteCard component rendering and interactions */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import AllTasksCompleteCard from '../../../pages/Tasks/components/AllTasksCompleteCard';
+import AllTasksCompleteCard from '../../../pages/tasks/components/AllTasksCompleteCard';
 
 describe('AllTasksCompleteCard', () => {
     it('renders message text', () => {

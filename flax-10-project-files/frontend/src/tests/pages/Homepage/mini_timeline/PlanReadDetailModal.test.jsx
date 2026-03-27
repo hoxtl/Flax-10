@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PlanReadDetailModal } from '../../../../pages/Homepage/components/PlanReadDetailModal';
+import { PlanReadDetailModal } from '../../../../pages/homepage/components/PlanReadDetailModal';
 
 const mockStyles = {
     actionHubReadOverlay: 'overlay',

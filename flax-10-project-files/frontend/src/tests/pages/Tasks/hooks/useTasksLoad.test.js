@@ -4,7 +4,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 
 vi.mock("../../../../api/taskApi", () => ({ fetchTasks: vi.fn() }));
 
-import useTasksLoad from "../../../../pages/Tasks/hooks/useTasksLoad";
+import useTasksLoad from "../../../../pages/tasks/hooks/useTasksLoad";
 import { fetchTasks } from "../../../../api/taskApi";
 
 describe("useTasksLoad", () => {

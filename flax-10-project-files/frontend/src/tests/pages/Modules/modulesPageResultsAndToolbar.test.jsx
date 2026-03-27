@@ -89,7 +89,7 @@ vi.mock("../../../components/common/search_empty_state/SearchEmptyState.jsx", ()
   ),
 }));
 
-vi.mock("../../../components/Pagination/Pagination.jsx", () => ({
+vi.mock("../../../components/pagination/Pagination.jsx", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) => (
     <div>
       <div>{`Page ${currentPage} / ${totalPages}`}</div>
@@ -128,15 +128,15 @@ vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-vi.mock("../../../pages/Modules/MyModulesDashboard.jsx", () => ({
+vi.mock("../../../pages/modules/MyModulesDashboard.jsx", () => ({
   default: () => <div>MyModulesDashboard</div>,
 }));
 
-vi.mock("../../../pages/Modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
   useMainModuleView: (...args) => useMainModuleViewMock(...args),
 }));
 
-import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/Modules/ModulesPageResults.jsx";
+import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/modules/ModulesPageResults.jsx";
 
 function buildSorting(overrides = {}) {
   return {

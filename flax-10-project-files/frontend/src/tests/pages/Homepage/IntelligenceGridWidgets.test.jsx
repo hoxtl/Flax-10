@@ -6,13 +6,13 @@ import {
   AddWidgetSlot,
   GridWidgetList,
   HeroWidget,
-} from "../../../pages/Homepage/components/IntelligenceGridWidgets";
+} from "../../../pages/homepage/components/IntelligenceGridWidgets";
 
 vi.mock("../../../components/ui/BentoGrid", () => ({
   BentoCard: ({ children }) => <div data-testid="bento-card">{children}</div>,
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceGridControls", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceGridControls", () => ({
   DeleteButton: ({ onClick }) => <button type="button" onClick={onClick}>Delete widget</button>,
   GridGrip: () => <div>Grip</div>,
   ResizeControls: ({ id, col, row, onResize }) => (

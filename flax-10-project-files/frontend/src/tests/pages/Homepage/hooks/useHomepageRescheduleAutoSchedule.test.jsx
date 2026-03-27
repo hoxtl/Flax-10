@@ -27,7 +27,7 @@ vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => id),
 }));
 
-vi.mock("../../../../components/Schedules/auto/autoScheduleActions", () => ({
+vi.mock("../../../../components/schedules/auto/autoScheduleActions", () => ({
   loadScheduleSettings: (...args) => loadScheduleSettingsMock(...args),
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefsMock(...args),
 }));

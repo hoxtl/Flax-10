@@ -7,7 +7,7 @@ import { formatTime, getNextFreeSlotToday } from "../utils/index";
 import { buildScheduleAutoForm } from "../utils/ScheduleAutoForm";
 import { overlapsDay, isToday } from "../../../components/calendar/utils/dateUtils";
 import { extractBaseEventId } from "../../../components/calendar/utils/eventUtils";
-import { loadScheduleSettings, submitAutoScheduleWithPrefs } from "../../../components/Schedules/auto/autoScheduleActions";
+import { loadScheduleSettings, submitAutoScheduleWithPrefs } from "../../../components/schedules/auto/autoScheduleActions";
 import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage } from "../../../components/common/reschedule_events/rescheduleEventConflicts";
 
 export function useHomepageReschedule(props) {

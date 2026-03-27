@@ -30,8 +30,8 @@ vi.mock("../../api/analyticsApi", () => ({
 
 import { resolveRouteContent } from "../../app/navigation/helpers";
 import { useNavHandler } from "../../app/navigation/useNavHandler";
-import { fadeUp } from "../../pages/Analytics/pageConfig";
-import useAnalyticsOverview from "../../pages/Analytics/hooks/useAnalyticsOverview";
+import { fadeUp } from "../../pages/analytics/pageConfig";
+import useAnalyticsOverview from "../../pages/analytics/hooks/useAnalyticsOverview";
 
 describe("navigation and analytics extras", () => {
   function deferred() {

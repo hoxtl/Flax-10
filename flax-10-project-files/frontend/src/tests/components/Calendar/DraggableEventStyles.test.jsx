@@ -78,7 +78,7 @@ vi.mock('../../../components/calendar/utils/eventStyleUtils', () => ({
 }));
 
 // CSS module mock
-vi.mock('../../../pages/Tasks/components/TaskCardContextMenu.module.css', () => ({
+vi.mock('../../../pages/tasks/components/TaskCardContextMenu.module.css', () => ({
     default: {
         ctxMenu: 'ctxMenu',
         ctxItem: 'ctxItem',

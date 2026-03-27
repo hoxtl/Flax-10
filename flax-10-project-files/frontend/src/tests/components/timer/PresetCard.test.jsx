@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { PresetCard } from '../../../components/timer/presets/PresetCard';
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: {
     presetListItem: 'presetListItem',
     presetListItemActive: 'presetListItemActive',

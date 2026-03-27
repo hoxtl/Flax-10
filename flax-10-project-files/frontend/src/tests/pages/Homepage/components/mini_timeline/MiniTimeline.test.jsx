@@ -5,7 +5,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MiniTimeline } from '../../../../../pages/Homepage/components/mini_timeline/MiniTimeline';
+import { MiniTimeline } from '../../../../../pages/homepage/components/mini_timeline/MiniTimeline';
 import { isToday } from '../../../../../components/calendar/utils/dateUtils';
 
 import { createFnMap } from '../../../../utils/testBuilderUtils';
@@ -35,11 +35,11 @@ vi.mock('../../../../../components/calendar/utils/dateUtils', () => ({
   isToday: vi.fn(() => true),
 }));
 
-vi.mock('../../../../../pages/Homepage/utils/planTimelineRows', () => ({
+vi.mock('../../../../../pages/homepage/utils/planTimelineRows', () => ({
   computePlanTimelineRows: () => mockRows,
 }));
 
-vi.mock('../../../../../pages/Homepage/utils/taskUtils', () => ({
+vi.mock('../../../../../pages/homepage/utils/taskUtils', () => ({
   getTasksThatFitGap: (tasks, mins) => {
     const t = (tasks || []).find(Boolean) || null;
     return { suggested: t && mins > 0 ? t : null };
@@ -47,22 +47,22 @@ vi.mock('../../../../../pages/Homepage/utils/taskUtils', () => ({
   taskDurationMins: (task) => ((task?.estimated_blocks || 1) * 25),
 }));
 
-vi.mock('../../../../../pages/Homepage/utils/eventUtils', () => ({
+vi.mock('../../../../../pages/homepage/utils/eventUtils', () => ({
   stripEmojiFromTitle: (t) => String(t || '').replace(/[^\p{L}\p{N}\p{P}\p{Z}]/gu, '').trim(),
   isNow: () => true,
 }));
 
-vi.mock('../../../../../pages/Homepage/components/mini_timeline/HourMarkRow', () => ({
+vi.mock('../../../../../pages/homepage/components/mini_timeline/HourMarkRow', () => ({
   HourMarkRow: ({ row }) => <div>HOUR:{row.id}</div>,
 }));
-vi.mock('../../../../../pages/Homepage/components/mini_timeline/TinyGapRow', () => ({
+vi.mock('../../../../../pages/homepage/components/mini_timeline/TinyGapRow', () => ({
   TinyGapRow: ({ row }) => <div>TINY:{row.id}</div>,
 }));
-vi.mock('../../../../../pages/Homepage/components/mini_timeline/NowRow', () => ({
+vi.mock('../../../../../pages/homepage/components/mini_timeline/NowRow', () => ({
   NowRow: ({ nowRowRef }) => <div ref={nowRowRef}>NOW_ROW</div>,
 }));
 
-vi.mock('../../../../../pages/Homepage/components/mini_timeline/PlanFreeRow', () => ({
+vi.mock('../../../../../pages/homepage/components/mini_timeline/PlanFreeRow', () => ({
   PlanFreeRow: ({ row, isBestGap, assignedTask, setSlotPopoverRowId, slotPopoverRowId, slotPopoverRef, onQuickStart }) => (
     <div>
       <div>FREE:{row.id}{isBestGap ? ':BEST' : ''}{assignedTask ? `:${assignedTask.title}` : ''}</div>
@@ -75,7 +75,7 @@ vi.mock('../../../../../pages/Homepage/components/mini_timeline/PlanFreeRow', ()
   ),
 }));
 
-vi.mock('../../../../../pages/Homepage/components/mini_timeline/PlanEventRow', () => ({
+vi.mock('../../../../../pages/homepage/components/mini_timeline/PlanEventRow', () => ({
   PlanEventRow: ({ row, conflictPopoverRowId, conflictPopoverRef, setConflictPopoverRowId, onEventContextMenu }) => (
     <div>
       <div>EVENT:{row.id}</div>
@@ -88,7 +88,7 @@ vi.mock('../../../../../pages/Homepage/components/mini_timeline/PlanEventRow', (
   ),
 }));
 
-vi.mock('../../../../../pages/Homepage/components/mini_timeline/ConflictPairRow', () => ({
+vi.mock('../../../../../pages/homepage/components/mini_timeline/ConflictPairRow', () => ({
   ConflictPairRow: ({ row, onEventContextMenu }) => (
     <div>
       <div>GROUP:{row.id}</div>
@@ -97,7 +97,7 @@ vi.mock('../../../../../pages/Homepage/components/mini_timeline/ConflictPairRow'
   ),
 }));
 
-vi.mock('../../../../../pages/Homepage/components/mini_timeline/EventContextMenu', () => ({
+vi.mock('../../../../../pages/homepage/components/mini_timeline/EventContextMenu', () => ({
   EventContextMenu: ({ eventItem, onClose, onDelete, onEdit }) => (
     <div data-testid="ctx">
       <div>CTX:{eventItem?.id}</div>

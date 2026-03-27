@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { submitAttendancePromptAnswer } from "../../../components/attendance/attendancePromptActions";
-import { useAttendanceResource } from "../../../pages/Attendance/hooks/useAttendanceResource";
+import { useAttendanceResource } from "../../../pages/attendance/hooks/useAttendanceResource";
 import { ATTENDANCE_UPDATED_EVENT } from "../../../lib/attendanceEvents";
 import { recordAttendance } from "../../../api/attendanceApi";
 import { setPromptedId } from "../../../components/attendance/attendancePromptStorage";

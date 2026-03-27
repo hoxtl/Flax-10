@@ -50,7 +50,7 @@ vi.mock("../../../../../components/common/reschedule_events/rescheduleEventConfl
   undoConflictResolutionPlan: vi.fn(),
 }));
 
-vi.mock("../../../../../components/Schedules/auto/autoScheduleActions", () => ({
+vi.mock("../../../../../components/schedules/auto/autoScheduleActions", () => ({
   loadUpcomingDeadlineItems: (...args) => loadUpcomingDeadlineItems(...args),
   loadScheduleSettings: (...args) => loadScheduleSettings(...args),
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefs(...args),

@@ -12,7 +12,7 @@ import {
   getAllFreeWindowsToday,
   getNextFreeSlotToday,
   isNightSlot,
-} from "../../../pages/Homepage/utils/slotUtils";
+} from "../../../pages/homepage/utils/slotUtils";
 
 describe("homepageSlotUtils", () => {
   beforeEach(() => {

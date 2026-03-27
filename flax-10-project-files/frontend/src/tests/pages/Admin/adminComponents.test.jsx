@@ -4,12 +4,12 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { FilterToggleGroup } from '../../../pages/Admin/components/AdminFilters';
-import { AnimatedList, ListRow, ListInfo, ListActions } from '../../../pages/Admin/components/AdminList';
-import { SectionCard, CardHeader, LoadingSpinner, EmptyMessage, ErrorMessage } from '../../../pages/Admin/components/AdminSurface';
+import { FilterToggleGroup } from '../../../pages/admin/components/AdminFilters';
+import { AnimatedList, ListRow, ListInfo, ListActions } from '../../../pages/admin/components/AdminList';
+import { SectionCard, CardHeader, LoadingSpinner, EmptyMessage, ErrorMessage } from '../../../pages/admin/components/AdminSurface';
 import HoldConfirmModal from '../../../components/common/hold_confirm_modal/HoldConfirmModal';
 
-vi.mock('../../../pages/Admin/styles', () => ({
+vi.mock('../../../pages/admin/styles', () => ({
   default: {
     filterGroup: 'filterGroup', filterButtons: 'filterButtons', filterPillButton: 'filterPillButton',
     filterPillBadge: 'filterPillBadge', filterPillBadgeActive: 'filterPillBadgeActive',
@@ -20,7 +20,7 @@ vi.mock('../../../pages/Admin/styles', () => ({
   },
 }));
 
-vi.mock('../../../pages/Admin/utils/adminMotion', () => ({
+vi.mock('../../../pages/admin/utils/adminMotion', () => ({
   stagger: { animate: { transition: { staggerChildren: 0.055 } } },
   rowAnim: { initial: { opacity: 0, x: -10 }, animate: { opacity: 1, x: 0 } },
   fadeUp: { initial: { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 } },

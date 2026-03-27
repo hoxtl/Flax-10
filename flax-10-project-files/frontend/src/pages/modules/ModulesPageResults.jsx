@@ -12,7 +12,7 @@ import PageTransition from "../../components/common/page_transition/PageTransiti
 import SearchBar from "../../components/common/search_bar/SearchBar.jsx";
 import Tabs from "../../components/common/Tabs/Tabs";
 import { SegmentedControl } from "../../components/common/segmented_control/SegmentedControl";
-import { Pagination, BackToTop } from "../../components/Pagination/Pagination.jsx";
+import { Pagination, BackToTop } from "../../components/pagination/Pagination.jsx";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState.jsx";
 import ModuleGrid from "../../components/modules/Modules/ModuleGrid.jsx";
 import ModuleCourseFilter from "../../components/modules/Modules/ModuleCourseFilter";

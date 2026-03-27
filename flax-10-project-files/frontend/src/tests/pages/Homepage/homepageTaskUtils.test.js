@@ -14,7 +14,7 @@ import {
   isAutoPassedTask,
   isRoutineOrEventTask,
   taskDurationMins,
-} from "../../../pages/Homepage/utils/taskUtils";
+} from "../../../pages/homepage/utils/taskUtils";
 
 describe("homepageTaskUtils", () => {
   beforeEach(() => {

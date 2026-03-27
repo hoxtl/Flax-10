@@ -17,32 +17,32 @@ vi.mock("@mui/x-charts/PieChart", () => ({
   },
 }));
 
-vi.mock("../../../pages/Attendance/components/SegmentDetailPanel", () => ({
+vi.mock("../../../pages/attendance/components/SegmentDetailPanel", () => ({
   default: (props) => {
     segmentDetailPanelProps.push(props);
     return <div data-testid="segment-detail-panel">{props.segmentLabel}</div>;
   },
 }));
 
-vi.mock("../../../pages/Attendance/components/OverallAttendanceChart", () => ({
+vi.mock("../../../pages/attendance/components/OverallAttendanceChart", () => ({
   default: (props) => {
     overallChartProps.push(props);
     return <div data-testid="overall-attendance-chart">overall chart</div>;
   },
 }));
 
-vi.mock("../../../pages/Attendance/components/ByTypeAttendanceChart", () => ({
+vi.mock("../../../pages/attendance/components/ByTypeAttendanceChart", () => ({
   default: (props) => {
     byTypeChartProps.push(props);
     return <div data-testid="by-type-attendance-chart">by-type chart</div>;
   },
 }));
 
-vi.mock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({
+vi.mock("../../../pages/attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: (...args) => useAttendanceStats(...args),
 }));
 
-vi.mock("../../../pages/Attendance/hooks/useAttendanceRecords", () => ({
+vi.mock("../../../pages/attendance/hooks/useAttendanceRecords", () => ({
   useAttendanceRecords: (...args) => useAttendanceRecords(...args),
 }));
 

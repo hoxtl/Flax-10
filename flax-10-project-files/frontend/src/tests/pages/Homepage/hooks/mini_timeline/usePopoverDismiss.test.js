@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { usePopoverDismiss } from "../../../../../pages/Homepage/hooks/mini_timeline/usePopoverDismiss";
+import { usePopoverDismiss } from "../../../../../pages/homepage/hooks/mini_timeline/usePopoverDismiss";
 
 // Helpers
 

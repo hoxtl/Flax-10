@@ -8,7 +8,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { createFnMap } from '../../utils/testBuilderUtils';
 
 // CSS module mocks
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 vi.mock('../../../components/timer/TreeAnimation.module.css', () => ({

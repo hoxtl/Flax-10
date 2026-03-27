@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HistoryRailSection } from '../../../../components/timer/history_panel/HistoryRailSection';
 
-vi.mock('../../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
 
 vi.mock('../../../../components/timer/utils/historyFormatter', () => ({
   formatDuration: (s) => (s ? `${Math.floor(s / 60)}m` : null),

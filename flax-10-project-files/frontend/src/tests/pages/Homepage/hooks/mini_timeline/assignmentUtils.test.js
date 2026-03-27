@@ -3,11 +3,11 @@ import {
   deriveBestFreeRowId,
   deriveAssignedGapTasks,
   deriveGapDeadlineFallbacks,
-} from "../../../../../pages/Homepage/hooks/mini_timeline/assignmentUtils";
+} from "../../../../../pages/homepage/hooks/mini_timeline/assignmentUtils";
 
 // Mock taskUtils so tests are isolated from focusPlanner internals
 
-vi.mock("../../../../../pages/Homepage/utils/taskUtils", () => ({
+vi.mock("../../../../../pages/homepage/utils/taskUtils", () => ({
   taskDurationMins: (task) => (task?.estimated_blocks ?? 1) * 25,
   getTasksThatFitGap: (tasks, gapMinutes) => {
     const fits = tasks.filter((t) => (t?.estimated_blocks ?? 1) * 25 <= gapMinutes);

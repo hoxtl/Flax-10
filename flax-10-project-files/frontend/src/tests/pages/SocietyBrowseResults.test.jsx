@@ -33,7 +33,7 @@ vi.mock("../../components/common/search_empty_state/SearchEmptyState", () => ({
   ),
 }));
 
-vi.mock("../../components/Pagination/Pagination", () => ({
+vi.mock("../../components/pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) => (
     <div data-testid="pagination">
       <span>

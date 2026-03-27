@@ -5,7 +5,7 @@ import {
   renderTaskFeedData,
   resetTaskFeedDataUtils,
 } from "./taskFeedDataTestSetup";
-import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
+import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
 
 const { navigateMock } = getTaskFeedDataMocks();
 

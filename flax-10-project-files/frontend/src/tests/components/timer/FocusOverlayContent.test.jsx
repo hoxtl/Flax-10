@@ -21,7 +21,7 @@ vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   },
 }));
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: {
     focusOverlayFrame: 'focusOverlayFrame',
     focusOverlayExitBtn: 'focusOverlayExitBtn',

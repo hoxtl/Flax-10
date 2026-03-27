@@ -14,49 +14,49 @@ vi.mock("framer-motion", () => ({
   }),
 }));
 
-vi.mock("../../../components/Analytics/AIInsightsTab", () => ({
+vi.mock("../../../components/analytics/AIInsightsTab", () => ({
   default: ({ period }) => <div data-testid="ai-insights-tab">{period}</div>,
 }));
 
-vi.mock("../../../components/Analytics/SummaryCards", () => ({
+vi.mock("../../../components/analytics/SummaryCards", () => ({
   default: ({ data }) => <div data-testid="summary-cards">{Boolean(data).toString()}</div>,
 }));
 
-vi.mock("../../../components/Analytics/ProductivityCards", () => ({
+vi.mock("../../../components/analytics/ProductivityCards", () => ({
   default: (props) => productivityCardsMock(props),
 }));
 
-vi.mock("../../../components/Analytics/InsightCards", () => ({
+vi.mock("../../../components/analytics/InsightCards", () => ({
   ConsistencyScore: () => <div data-testid="consistency-score" />,
   PeakHoursCard: () => <div data-testid="peak-hours-card" />,
 }));
 
-vi.mock("../../../components/Analytics/StudyHoursChart", () => ({
+vi.mock("../../../components/analytics/StudyHoursChart", () => ({
   default: () => <div data-testid="study-hours-chart" />,
 }));
 
-vi.mock("../../../components/Analytics/DailyBreakdownChart", () => ({
+vi.mock("../../../components/analytics/DailyBreakdownChart", () => ({
   default: () => <div data-testid="daily-breakdown-chart" />,
 }));
 
-vi.mock("../../../components/Analytics/PlannedVsActualChart", () => ({
+vi.mock("../../../components/analytics/PlannedVsActualChart", () => ({
   default: () => <div data-testid="planned-vs-actual-chart" />,
 }));
 
-vi.mock("../../../components/Analytics/StudyHeatmap", () => ({
+vi.mock("../../../components/analytics/StudyHeatmap", () => ({
   default: () => <div data-testid="study-heatmap" />,
 }));
 
-vi.mock("../../../components/Analytics/ThemeUsageChart", () => ({
+vi.mock("../../../components/analytics/ThemeUsageChart", () => ({
   default: () => <div data-testid="theme-usage-chart" />,
 }));
 
-vi.mock("../../../components/Analytics/AttendanceChart", () => ({
+vi.mock("../../../components/analytics/AttendanceChart", () => ({
   default: () => <div data-testid="attendance-chart" />,
 }));
 
-import getAnalyticsTabs from "../../../pages/Analytics/components/AnalyticsPageTabs";
-import AnalyticsOverview from "../../../pages/Analytics/components/AnalyticsOverview";
+import getAnalyticsTabs from "../../../pages/analytics/components/AnalyticsPageTabs";
+import AnalyticsOverview from "../../../pages/analytics/components/AnalyticsOverview";
 
 const analyticsData = {
   summary: { total_study_hours: 5 },

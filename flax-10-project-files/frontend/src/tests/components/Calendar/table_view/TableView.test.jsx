@@ -46,7 +46,7 @@ vi.mock('../../../../components/calendar/table_view/TableRow', () => ({
     ),
 }));
 
-vi.mock('../../../../components/Pagination/Pagination', () => ({
+vi.mock('../../../../components/pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages }) => <div data-testid="pagination">{currentPage}/{totalPages}</div>,
     BackToTop: () => <div data-testid="back-to-top" />,
 }));

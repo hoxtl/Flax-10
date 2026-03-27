@@ -8,7 +8,7 @@ import { TaskPickerModal } from '../../../components/timer/task_input/TaskPicker
 
 import { createFnMap } from '../../utils/testBuilderUtils';
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
 
 vi.mock('../../../components/common/search_bar/SearchBar', () => ({
   default: ({ value, onChange, placeholder }) => (
@@ -50,7 +50,7 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
   ),
 }));
 
-vi.mock('../../../pages/Tasks/components/TaskFeedFilterPanel', () => ({
+vi.mock('../../../pages/tasks/components/TaskFeedFilterPanel', () => ({
   default: () => <div data-testid="filter-panel" />,
 }));
 

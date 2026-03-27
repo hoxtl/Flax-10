@@ -19,7 +19,7 @@ import {
   getUrgencyLevel,
   groupOverlaps,
   minsFromDayStart,
-} from "../../../pages/Homepage/utils/timelineUtils";
+} from "../../../pages/homepage/utils/timelineUtils";
 
 describe("homepageTimelineUtils", () => {
   beforeEach(() => {

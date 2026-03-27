@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useEventForm } from '../../../../components/calendar/event_modal/useEventForm';
 import * as FormUtilsModule from '../../../../components/calendar/utils/formUtils';
 import * as UserServiceModule from '../../../../api/userApi';
-import * as SleepWarningModule from '../../../../components/Settings/hooks/useSleepWarning';
+import * as SleepWarningModule from '../../../../components/settings/hooks/useSleepWarning';
 
 const mockEvents = [];
 const mockActions = { addEvent: vi.fn(), editEvent: vi.fn(), removeEvent: vi.fn(), addException: vi.fn() };
@@ -44,7 +44,7 @@ vi.mock('../../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
-vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../../components/settings/hooks/useSleepWarning', () => ({
     isDuringSleepWindow: vi.fn(() => false),
 }));
 

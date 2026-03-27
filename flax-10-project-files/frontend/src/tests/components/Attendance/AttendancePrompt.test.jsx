@@ -61,7 +61,7 @@ vi.mock("../../../components/attendance/hooks/useCandidateEvent", () => ({
   useCandidateEvent: vi.fn(() => [candidateState.value, candidateState.setValue]),
 }));
 
-vi.mock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({
+vi.mock("../../../pages/attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: () => ({ refetch: vi.fn(), stats: attendanceStatsState }),
 }));
 

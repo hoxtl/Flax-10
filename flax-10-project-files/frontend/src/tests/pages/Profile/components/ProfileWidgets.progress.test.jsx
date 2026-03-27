@@ -21,7 +21,7 @@ vi.mock("@mui/x-charts/PieChart", () => ({
   PieChart: (props) => <div data-testid="pie-chart" data-hide-legend={props.hideLegend ? "true" : "false"} />,
 }));
 
-vi.mock("../../../../pages/Attendance/components/SegmentDetailPanel", () => ({
+vi.mock("../../../../pages/attendance/components/SegmentDetailPanel", () => ({
   default: () => <div data-testid="segment-detail-panel" />,
 }));
 

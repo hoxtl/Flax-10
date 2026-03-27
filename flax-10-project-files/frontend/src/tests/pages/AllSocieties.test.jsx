@@ -10,7 +10,7 @@ vi.mock('../../components/society/SocietyCard', () => ({
     ),
 }));
 
-vi.mock('../../components/Tags/BasePill', () => ({
+vi.mock('../../components/tags/BasePill', () => ({
     default: ({ label, isActive, onClick }) => (
         <button className={isActive ? 'active' : ''} onClick={onClick}>{label}</button>
     ),
@@ -48,7 +48,7 @@ vi.mock('framer-motion', () => {
     };
 });
 
-vi.mock('../../components/Pagination/Pagination', () => ({
+vi.mock('../../components/pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages, onPageChange }) => (
         <div data-testid="pagination">
             <span>Page {currentPage} of {totalPages}</span>

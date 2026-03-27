@@ -2,13 +2,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { TaskContextMenu } from "../../../../pages/Tasks/components/TaskCard";
+import { TaskContextMenu } from "../../../../pages/tasks/components/TaskCard";
 import { createRejectablePromise } from "../hooks/taskHookTestUtils";
 
 const sleepWarningHookMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
-vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({ useSleepWarning: sleepWarningHookMock }));
+vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({ useSleepWarning: sleepWarningHookMock }));
 vi.mock("../../../../components/common/sleep_warning_modal", () => ({ SleepWarningModal: () => <div data-testid="sleep-warning" /> }));
 vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
   default: ({ onChange }) => (<div><button onClick={() => onChange("2026-03-10T10:00")}>Set date</button><button onClick={() => onChange("")}>Clear date</button></div>)

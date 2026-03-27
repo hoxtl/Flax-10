@@ -7,7 +7,7 @@ describe("pillUtils extra coverage", () => {
   });
 
   it("supports the default empty items parameter", async () => {
-    const { countByType } = await import("../../components/Tags/utils/pillUtils");
+    const { countByType } = await import("../../components/tags/utils/pillUtils");
     expect(countByType()).toEqual({ all: 0 });
   });
 
@@ -16,7 +16,7 @@ describe("pillUtils extra coverage", () => {
       getEffectiveTagName: vi.fn(() => ""),
     }));
 
-    const { countByType } = await import("../../components/Tags/utils/pillUtils");
+    const { countByType } = await import("../../components/tags/utils/pillUtils");
     expect(countByType([{ id: 1 }])).toEqual({ all: 1 });
   });
 });

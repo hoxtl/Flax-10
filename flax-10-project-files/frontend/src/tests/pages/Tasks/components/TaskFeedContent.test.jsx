@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createFnMap } from "../../../utils/testBuilderUtils";
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedHeader", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedHeader", () => ({
   default: ({ title, subtitle, isReadingList }) => (
     <div data-testid="task-feed-header">
       <span>{title}</span>
@@ -17,7 +17,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedHeader", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedSubHeader", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedSubHeader", () => ({
   default: ({ onOpenLists, onSelectFilter, onSelectList }) => (
     <div data-testid="task-feed-subheader">
       <button type="button" onClick={onOpenLists}>open-lists</button>
@@ -27,7 +27,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedSubHeader", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedSections", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedSections", () => ({
   default: ({ taskCount, activeFilter, activeListId, readingList, activeList }) => (
     <div data-testid="task-feed-sections">
       <span>{taskCount}</span>
@@ -39,7 +39,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedSections", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedMobileLists", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedMobileLists", () => ({
   default: ({ showMobileLists, onClose, onSelectFilter, onSelectList }) => (
     <div data-testid="task-feed-mobile-lists">
       <span>{String(showMobileLists)}</span>
@@ -50,7 +50,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedMobileLists", () => ({
   ),
 }));
 
-import TaskFeedContent from "../../../../pages/Tasks/components/TaskFeedContent";
+import TaskFeedContent from "../../../../pages/tasks/components/TaskFeedContent";
 
 const taskActionNames = ["onAddTask", "onCreateTask", "onToggleComplete", "onDeleteTask", "onEditTask", "onReloadTasks"];
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import EmptyStateCard from '../../../pages/Homepage/components/EmptyStateCard';
+import EmptyStateCard from '../../../pages/homepage/components/EmptyStateCard';
 
 describe('EmptyStateCard', () => {
     it('renders default message', () => {

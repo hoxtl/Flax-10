@@ -9,19 +9,19 @@ const createCancelCourseRequestHandler = vi.fn();
 const createCourseRequestSuccessHandler = vi.fn();
 const requestCourseChange = vi.fn();
 
-vi.mock("../../../components/Settings/account/accountFormConfig", () => ({
+vi.mock("../../../components/settings/account/accountFormConfig", () => ({
   hasAccountChanges: (...args) => hasAccountChanges(...args),
 }));
 
-vi.mock("../../../components/Settings/account/useAccountFormState", () => ({
+vi.mock("../../../components/settings/account/useAccountFormState", () => ({
   default: (...args) => useAccountFormState(...args),
 }));
 
-vi.mock("../../../components/Settings/account/useCourseRequestFeedback", () => ({
+vi.mock("../../../components/settings/account/useCourseRequestFeedback", () => ({
   default: (...args) => useCourseRequestFeedback(...args),
 }));
 
-vi.mock("../../../components/Settings/account/useCourseRequestActions", () => ({
+vi.mock("../../../components/settings/account/useCourseRequestActions", () => ({
   createAccountSubmitHandler: (...args) => createAccountSubmitHandler(...args),
   createCancelCourseRequestHandler: (...args) => createCancelCourseRequestHandler(...args),
   createCourseRequestSuccessHandler: (...args) => createCourseRequestSuccessHandler(...args),
@@ -31,7 +31,7 @@ vi.mock("../../../api/adminApi", () => ({
   requestCourseChange: (...args) => requestCourseChange(...args),
 }));
 
-vi.mock("../../../components/Settings/account/AccountFormLayout", () => ({
+vi.mock("../../../components/settings/account/AccountFormLayout", () => ({
   default: (props) => (
     <div>
       <button type="button" onClick={() => props.onRequestClick()}>open-course-modal</button>
@@ -72,7 +72,7 @@ vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
   ),
 }));
 
-vi.mock("../../../components/Settings/ui/RequestDecisionNotice", () => ({
+vi.mock("../../../components/settings/ui/RequestDecisionNotice", () => ({
   default: () => <div>Decision notice</div>,
 }));
 
@@ -87,30 +87,30 @@ vi.mock("../../../components/common/request_status_card/RequestStatusCard", () =
   ),
 }));
 
-vi.mock("../../../components/Settings/SettingsUI", () => ({
+vi.mock("../../../components/settings/SettingsUI", () => ({
   SectionHeader: ({ title }) => <h3>{title}</h3>,
   SubmitButton: ({ label }) => <button type="submit">{label}</button>,
 }));
 
-vi.mock("../../../components/Settings/SettingsContextCard", () => ({
+vi.mock("../../../components/settings/SettingsContextCard", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
-vi.mock("../../../components/Settings/account/AccountInfoFields", () => ({
+vi.mock("../../../components/settings/account/AccountInfoFields", () => ({
   PersonalInfoFields: () => <div>Personal fields</div>,
   YearField: ({ value, onChange }) => <button type="button" onClick={() => onChange({ target: { value: "Year 3" } })}>{value}</button>,
 }));
 
-vi.mock("../../../components/Settings/account/accountCourseRequests", () => ({
+vi.mock("../../../components/settings/account/accountCourseRequests", () => ({
   groupedCourses: [{ label: "Science", options: [{ value: "Physics BSc", label: "Physics BSc" }] }],
 }));
 
-import AccountFormContainer from "../../../components/Settings/account/AccountFormContainer";
-import AccountFormLayout from "../../../components/Settings/account/AccountFormLayout";
-import CourseDisplay from "../../../components/Settings/account/CourseDisplay";
-import CourseChangeModal from "../../../components/Settings/account/CourseChangeModal";
+import AccountFormContainer from "../../../components/settings/account/AccountFormContainer";
+import AccountFormLayout from "../../../components/settings/account/AccountFormLayout";
+import CourseDisplay from "../../../components/settings/account/CourseDisplay";
+import CourseChangeModal from "../../../components/settings/account/CourseChangeModal";
 
-const { default: RealAccountFormLayout } = await vi.importActual("../../../components/Settings/account/AccountFormLayout");
+const { default: RealAccountFormLayout } = await vi.importActual("../../../components/settings/account/AccountFormLayout");
 
 describe("Account form extras", () => {
   beforeEach(() => {

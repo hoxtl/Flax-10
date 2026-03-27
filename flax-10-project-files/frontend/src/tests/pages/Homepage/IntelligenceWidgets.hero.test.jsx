@@ -17,7 +17,7 @@ vi.mock("framer-motion", () => ({
   }),
 }));
 
-vi.mock("../../../components/Welcome/WelcomeBackgroundPaths", () => ({
+vi.mock("../../../components/welcome/WelcomeBackgroundPaths", () => ({
   default: () => <div data-testid="hero-paths" />,
 }));
 
@@ -46,12 +46,12 @@ vi.mock("lucide-react", () => {
   };
 });
 
-vi.mock("../../../pages/Homepage/components/IntelligenceUtils", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceUtils", () => ({
   getGreeting: (name) => `Hello ${name || "there"}`,
   getTodayLabel: () => "MONDAY · 24 MAR",
 }));
 
-import { IntelligenceHero } from "../../../pages/Homepage/components/IntelligenceWidgets";
+import { IntelligenceHero } from "../../../pages/homepage/components/IntelligenceWidgets";
 
 describe("IntelligenceHero", () => {
   it("renders the greeting, live context, and basic stats", () => {

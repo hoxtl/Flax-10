@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MusicStations } from '../../../components/timer/sound_panel/MusicStations';
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
 
 vi.mock('../../../components/timer/sound_panel/soundPanelData', () => ({
   MUSIC_STATIONS: [

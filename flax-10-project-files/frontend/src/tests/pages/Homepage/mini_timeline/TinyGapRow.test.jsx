@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { TinyGapRow } from '../../../../pages/Homepage/components/mini_timeline/TinyGapRow';
+import { TinyGapRow } from '../../../../pages/homepage/components/mini_timeline/TinyGapRow';
 
 const mockStyles = {
     planTimelineRow: 'planTimelineRow',

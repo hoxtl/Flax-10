@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import CalendarPage from '../../pages/Calendar/CalendarPage';
+import CalendarPage from '../../pages/calendar/CalendarPage';
 
 const { mockEventPopups, mockGetAnotherUserProfile } = vi.hoisted(() => ({
     mockEventPopups: vi.fn(),

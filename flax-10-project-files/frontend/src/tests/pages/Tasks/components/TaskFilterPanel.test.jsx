@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "../../../../utils/testUtils";
-import TaskFilterPanel from "../../../../pages/Tasks/components/TaskFilterPanel";
+import TaskFilterPanel from "../../../../pages/tasks/components/TaskFilterPanel";
 
 describe("TaskFilterPanel", () => {
   const defaultProps = {

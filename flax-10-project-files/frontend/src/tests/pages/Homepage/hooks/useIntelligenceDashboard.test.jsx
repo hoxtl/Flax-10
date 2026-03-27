@@ -41,11 +41,11 @@ vi.mock("../../../../api/userApi", () => ({
   updateUserSettings: (...args) => updateUserSettingsMock(...args),
 }));
 
-vi.mock("../../../../components/Analytics/useAttendanceStats", () => ({
+vi.mock("../../../../components/analytics/useAttendanceStats", () => ({
   default: () => useAttendanceStatsMock(),
 }));
 
-vi.mock("../../../../components/Analytics/attendanceChartConfig", () => ({
+vi.mock("../../../../components/analytics/attendanceChartConfig", () => ({
   getAttendancePercentage: (...args) => getAttendancePercentageMock(...args),
 }));
 
@@ -64,7 +64,7 @@ vi.mock("../../../../pages/homepage/utils/kclTflMapping", () => ({
   isSevereDisruption: (...args) => isSevereDisruptionMock(...args),
 }));
 
-vi.mock("../../../../pages/Analytics/hooks/useAnalyticsOverview", () => ({
+vi.mock("../../../../pages/analytics/hooks/useAnalyticsOverview", () => ({
   default: (...args) => useAnalyticsOverviewMock(...args),
 }));
 

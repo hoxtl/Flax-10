@@ -7,7 +7,7 @@ import {
   GridActions,
   GridGrip,
   ResizeControls,
-} from "../../../pages/Homepage/components/IntelligenceGridControls";
+} from "../../../pages/homepage/components/IntelligenceGridControls";
 
 vi.mock("lucide-react", () => ({
   Check: () => <svg aria-hidden="true" />,

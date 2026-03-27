@@ -39,7 +39,7 @@ vi.mock('../../../components/timer/TimerPopups', () => ({
   EndEarlyModal: () => <div data-testid="end-early-modal" />,
 }));
 vi.mock('../../../components/timer/HistoryModal', () => ({ default: () => <div data-testid="history-modal" /> }));
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: { header: '', title: '', historyButton: '', mobileHistoryBtn: '' } }));
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({ default: { header: '', title: '', historyButton: '', mobileHistoryBtn: '' } }));
 
 const baseT = {
   task: '',

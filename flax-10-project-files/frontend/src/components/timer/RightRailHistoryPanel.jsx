@@ -2,7 +2,7 @@
  * Right rail timer history panel.
  */
 
-import styles from '../../pages/Timer/TimerPage.module.css';
+import styles from '../../pages/timer/TimerPage.module.css';
 import historyStyles from './HistoryModal.module.css';
 import PrimaryButton from '../common/primary_button/PrimaryButton';
 import HoldConfirmModal from '../common/hold_confirm_modal/HoldConfirmModal';

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const resolveRouteContentMock = vi.fn();
 
-vi.mock("../../pages/Settings/Settings", () => ({
+vi.mock("../../pages/settings/Settings", () => ({
   default: ({ user, onBack }) => (
     <div data-testid="settings-screen">
       <span>{user.name}</span>

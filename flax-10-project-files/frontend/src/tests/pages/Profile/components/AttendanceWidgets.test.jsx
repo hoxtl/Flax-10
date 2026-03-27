@@ -26,11 +26,11 @@ const useAttendanceStatsMock = vi.fn();
 const useAttendanceRecordsMock = vi.fn();
 const recordAttendanceMock = vi.fn();
 
-vi.mock("../../../../pages/Attendance/hooks/useAttendanceStats", () => ({
+vi.mock("../../../../pages/attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: (...args) => useAttendanceStatsMock(...args),
 }));
 
-vi.mock("../../../../pages/Attendance/hooks/useAttendanceRecords", () => ({
+vi.mock("../../../../pages/attendance/hooks/useAttendanceRecords", () => ({
   useAttendanceRecords: (...args) => useAttendanceRecordsMock(...args),
 }));
 
@@ -38,15 +38,15 @@ vi.mock("../../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendanceMock(...args),
 }));
 
-vi.mock("../../../../pages/Attendance/components/ByTypeAttendanceChart", () => ({
+vi.mock("../../../../pages/attendance/components/ByTypeAttendanceChart", () => ({
   default: ({ data, onSegmentClick }) => <button onClick={() => onSegmentClick?.("byType", data[0]?.label)}>ByType chart</button>,
 }));
 
-vi.mock("../../../../pages/Attendance/components/OverallAttendanceChart", () => ({
+vi.mock("../../../../pages/attendance/components/OverallAttendanceChart", () => ({
   default: ({ data, onSegmentClick }) => <button onClick={() => onSegmentClick?.("overall", data[0]?.label)}>Overall chart</button>,
 }));
 
-vi.mock("../../../../pages/Attendance/components/SegmentDetailPanel", () => ({
+vi.mock("../../../../pages/attendance/components/SegmentDetailPanel", () => ({
   default: ({ segmentLabel, onClose }) => <button onClick={onClose}>{segmentLabel}</button>,
 }));
 

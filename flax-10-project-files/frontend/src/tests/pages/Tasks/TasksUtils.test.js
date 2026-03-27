@@ -4,23 +4,23 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getListColor } from "../../../pages/Tasks/utils/listColorUtils";
-import { getCompletedDueLabel, splitEstimatedBlocks } from "../../../pages/Tasks/utils/taskCardUtils";
-import { getFilterHandlers, getCompletedWeekCount } from "../../../pages/Tasks/utils/taskFeedDataUtils";
-import { getHeaderTitle } from "../../../pages/Tasks/utils/taskFeedUtils";
+import { getListColor } from "../../../pages/tasks/utils/listColorUtils";
+import { getCompletedDueLabel, splitEstimatedBlocks } from "../../../pages/tasks/utils/taskCardUtils";
+import { getFilterHandlers, getCompletedWeekCount } from "../../../pages/tasks/utils/taskFeedDataUtils";
+import { getHeaderTitle } from "../../../pages/tasks/utils/taskFeedUtils";
 import {
   getReadingListLabel,
   matchesReadingList,
-} from "../../../pages/Tasks/utils/readingListUtils";
-import { sortTasks } from "../../../pages/Tasks/utils/taskSortUtils";
+} from "../../../pages/tasks/utils/readingListUtils";
+import { sortTasks } from "../../../pages/tasks/utils/taskSortUtils";
 import {
   addListImpl,
   mergeListColors,
-} from "../../../pages/Tasks/utils/useTaskListsUtils";
+} from "../../../pages/tasks/utils/useTaskListsUtils";
 import {
   buildTasksPageHandlers,
   buildTasksPageViewProps,
-} from "../../../pages/Tasks/utils/tasksPageUtils";
+} from "../../../pages/tasks/utils/tasksPageUtils";
 
 vi.mock("../../../api/taskApi", () => ({
   createTaskList: vi.fn(),

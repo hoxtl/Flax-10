@@ -19,7 +19,7 @@ vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   ),
 }));
 
-import { PeakHoursCard } from "../../../components/Analytics/PeakHoursCard";
+import { PeakHoursCard } from "../../../components/analytics/PeakHoursCard";
 
 describe("PeakHoursCard", () => {
   it("returns null when heatmap data is missing or malformed", () => {

@@ -1,8 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useCountdown } from "../../../../pages/Homepage/hooks/useCountdown";
-import { getSemesterProgress } from "../../../../pages/Homepage/hooks/useIntelligenceDashboard";
+import { useCountdown } from "../../../../pages/homepage/hooks/useCountdown";
+import { getSemesterProgress } from "../../../../pages/homepage/hooks/useIntelligenceDashboard";
 
 vi.mock("../../../../lib/termConfig", () => ({
   loadTermConfig: vi.fn(() => null),

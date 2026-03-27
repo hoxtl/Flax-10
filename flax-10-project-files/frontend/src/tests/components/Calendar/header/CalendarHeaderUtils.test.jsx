@@ -63,7 +63,7 @@ vi.mock('../../../../components/common/tags_selector/TagsSelector', () => ({
     ),
 }));
 
-vi.mock('../../../../components/Tags/TagManagerModal', () => ({
+vi.mock('../../../../components/tags/TagManagerModal', () => ({
     default: () => <div data-testid="tag-manager-modal" />,
 }));
 

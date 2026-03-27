@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TagManagerContent from '../../../components/Tags/tag_manager/TagManagerContent';
+import TagManagerContent from '../../../components/tags/tag_manager/TagManagerContent';
 
 vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   default: ({ children, onClick, ...props }) => (
@@ -13,7 +13,7 @@ vi.mock('lucide-react', () => ({
   Trash2: () => <svg data-testid="trash-icon" />,
 }));
 
-vi.mock('../../../components/Tags/TagManagerModal.module.css', () => ({
+vi.mock('../../../components/tags/TagManagerModal.module.css', () => ({
   default: {
     content: 'content', list: 'list', item: 'item', preview: 'preview',
     colorDot: 'colorDot', actions: 'actions', delete: 'delete',

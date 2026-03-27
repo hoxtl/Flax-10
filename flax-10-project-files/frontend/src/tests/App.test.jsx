@@ -30,7 +30,7 @@ vi.mock('../layout/DashboardLayout', () => ({
     default: ({ children }) => <div data-testid="dashboard-layout">{children}</div>,
 }));
 
-vi.mock('../pages/Welcome/WelcomeLanding', () => ({
+vi.mock('../pages/welcome/WelcomeLanding', () => ({
     default: ({ onExplore, onBackToAuth }) => (
         <div data-testid="welcome-landing">
             <button onClick={onExplore}>Explore</button>
@@ -39,19 +39,19 @@ vi.mock('../pages/Welcome/WelcomeLanding', () => ({
     ),
 }));
 
-vi.mock('../pages/Auth/AuthPage', () => ({
+vi.mock('../pages/auth/AuthPage', () => ({
     default: () => <div data-testid="auth-page">Auth</div>,
 }));
 
-vi.mock('../pages/Auth/PasswordResetRequest', () => ({
+vi.mock('../pages/auth/PasswordResetRequest', () => ({
     default: () => <div data-testid="password-reset-request">Reset</div>,
 }));
 
-vi.mock('../pages/Auth/PasswordResetConfirm', () => ({
+vi.mock('../pages/auth/PasswordResetConfirm', () => ({
     default: () => <div data-testid="password-reset-confirm">Confirm</div>,
 }));
 
-vi.mock('../pages/Settings/Settings', () => ({
+vi.mock('../pages/settings/Settings', () => ({
     default: () => <div data-testid="settings-page">Settings</div>,
 }));
 
@@ -63,7 +63,7 @@ vi.mock('../pages/societies/SocietyDetailPage', () => ({
     default: () => <div data-testid="society-detail-page">Society</div>,
 }));
 
-vi.mock('../components/Onboarding/OnboardingModal', () => ({
+vi.mock('../components/onboarding/OnboardingModal', () => ({
     default: ({ isOpen, onComplete }) => isOpen ? <div data-testid="onboarding-modal"><button onClick={onComplete}>Complete onboarding</button></div> : null,
 }));
 

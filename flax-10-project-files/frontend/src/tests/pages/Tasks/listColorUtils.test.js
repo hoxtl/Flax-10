@@ -1,7 +1,7 @@
 /* Tests for task list-colour resolution and fallbacks. */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getListColor } from "../../../pages/Tasks/utils/listColorUtils";
+import { getListColor } from "../../../pages/tasks/utils/listColorUtils";
 
 describe("listColorUtils", () => {
   const originalGetItem = globalThis.localStorage?.getItem;

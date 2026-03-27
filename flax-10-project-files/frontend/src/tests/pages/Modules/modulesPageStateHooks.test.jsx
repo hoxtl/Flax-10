@@ -26,7 +26,7 @@ vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-import { useMainModuleView, useModulesPageState } from "../../../pages/Modules/modulesPageHooks.js";
+import { useMainModuleView, useModulesPageState } from "../../../pages/modules/modulesPageHooks.js";
 
 function wrapper({ children }) {
   return <MemoryRouter>{children}</MemoryRouter>;

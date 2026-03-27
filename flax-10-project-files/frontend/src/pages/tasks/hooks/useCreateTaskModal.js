@@ -3,7 +3,7 @@
  */
 
 import { useState, useMemo, useEffect } from "react";
-import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+import { useSleepWarning } from "../../../components/settings/hooks/useSleepWarning";
 import { getUserSettings } from "../../../api/userApi";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/modules/utils/moduleUtils";

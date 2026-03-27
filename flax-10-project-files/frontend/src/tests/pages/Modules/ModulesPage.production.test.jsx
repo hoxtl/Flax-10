@@ -5,15 +5,15 @@ const useModulesPageStateMock = vi.fn();
 const getViewKeyMock = vi.fn(() => "details-key");
 const handleDirectDeleteModuleMock = vi.fn();
 
-vi.mock("../../../pages/Modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
   useModulesPageState: (...args) => useModulesPageStateMock(...args),
 }));
 
-vi.mock("../../../pages/Modules/ModulesPageResults.jsx", () => ({
+vi.mock("../../../pages/modules/ModulesPageResults.jsx", () => ({
   MainView: () => <div data-testid="main-view">main view</div>,
 }));
 
-vi.mock("../../../pages/Modules/ModulesPageChrome.jsx", () => ({
+vi.mock("../../../pages/modules/ModulesPageChrome.jsx", () => ({
   AnimatedContent: ({ state, viewKey }) => <div data-testid="animated-content">{`${viewKey}:${state.viewingModule?.module_code || "none"}`}</div>,
   getViewKey: (...args) => getViewKeyMock(...args),
   ModulesPageModals: ({ state }) => <div data-testid="page-modals">{state.readingModule ? "has-reading" : "no-reading"}</div>,
@@ -31,7 +31,7 @@ vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal.jsx", ()
   ),
 }));
 
-import ModulesPage from "../../../pages/Modules/ModulesPage.jsx";
+import ModulesPage from "../../../pages/modules/ModulesPage.jsx";
 
 describe("ModulesPage production branch", () => {
   const originalNodeEnv = process.env.NODE_ENV;

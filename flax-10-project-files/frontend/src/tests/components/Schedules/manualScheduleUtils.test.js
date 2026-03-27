@@ -3,7 +3,7 @@ import {
     filterScheduleEvents,
     toggleSelectedEventId,
     getManualScheduleError,
-} from '../../../components/Schedules/manual/manualScheduleUtils';
+} from '../../../components/schedules/manual/manualScheduleUtils';
 
 describe('filterScheduleEvents', () => {
     const events = [

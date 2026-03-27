@@ -2,7 +2,7 @@
  * Pixel tree scene for the focus animation.
  */
 
-import styles from '../../../pages/Timer/TimerPage.module.css';
+import styles from '../../../pages/timer/TimerPage.module.css';
 import treeStyles from '../TreeAnimation.module.css';
 import { FOLIAGE_POINTS, FRUIT_POINTS, POT_POINTS, SOIL_POINTS, TRUNK_POINTS } from './treePixels';
 
