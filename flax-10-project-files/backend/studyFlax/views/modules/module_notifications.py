@@ -2,7 +2,7 @@
 Module notification helpers for module lifecycle events.
 """
 
-from studyFlax.models import Enrollment
+from studyFlax.models import Enrollment, Module
 from studyFlax.models.notifications.notification_model import Notification
 
 
@@ -16,12 +16,17 @@ MODULE_FIELD_LABELS = {
     'year': 'year',
 }
 
+MODULE_MODEL_FIELD_NAMES = {
+    field.attname if hasattr(field, 'attname') else field.name
+    for field in Module._meta.concrete_fields
+}
+
 
 def get_changed_module_fields(module, validated_data):
     return [
         field_name
         for field_name, next_value in validated_data.items()
-        if getattr(module, field_name) != next_value
+        if field_name in MODULE_MODEL_FIELD_NAMES and getattr(module, field_name) != next_value
     ]
 
 def _get_enrollments(module):
