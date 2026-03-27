@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft } from "lucide-react";
 
 import { useTimerContext } from "../../../context/TimerContext";
+import { isReadingList } from "../utils/readingListUtils";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import { getUserSettings } from "../../../api/userApi";
@@ -77,12 +78,12 @@ function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
   }, [setSleepSettings]);
 }
 
-function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) {
+function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView, isReadingTask }) {
   return (
     <>
-      {onEditOpen && <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Edit</button>}
-      {lists?.length > 0 && <button className={styles.ctxItem} onClick={() => setView("move")}><FolderInput size={14} strokeWidth={2} /> Move to list</button>}
-      <button className={styles.ctxItem} onClick={() => setView("due")}><CalendarDays size={14} strokeWidth={2} /> Set due date</button>
+      {!isReadingTask && onEditOpen && <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Edit</button>}
+      {!isReadingTask && lists?.length > 0 && <button className={styles.ctxItem} onClick={() => setView("move")}><FolderInput size={14} strokeWidth={2} /> Move to list</button>}
+      {!isReadingTask && <button className={styles.ctxItem} onClick={() => setView("due")}><CalendarDays size={14} strokeWidth={2} /> Set due date</button>}
       <div className={styles.ctxDivider} />
       <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onClose(); onDelete(); }}><Trash2 size={14} strokeWidth={2} /> Delete</button>
     </>
@@ -143,7 +144,7 @@ function ContextMenuDueView({ dueValue, setDueValue, onEdit, onClose, checkSleep
   );
 }
 
-export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists = [], pos, onClose }) {
+export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists = [], pos, onClose, isReadingTask }) {
   const menuRef = useRef(null);
   const state = useTaskContextMenuState(task);
   useTaskContextMenuEffects(menuRef, onClose, state.setSleepSettings);
@@ -151,7 +152,7 @@ export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists = []
   const menu = (
     <>
       <div ref={menuRef} className={styles.ctxMenu} style={menuPos} onMouseDown={(e) => e.stopPropagation()}>
-        {state.view === "main" && <ContextMenuMainView onEditOpen={onEditOpen} onDelete={onDelete} onClose={onClose} lists={lists} setView={state.setView} />}
+        {state.view === "main" && <ContextMenuMainView onEditOpen={onEditOpen} onDelete={onDelete} onClose={onClose} lists={lists} setView={state.setView} isReadingTask={isReadingTask} />}
         {state.view === "move" && <ContextMenuMoveView task={task} lists={lists} onEdit={onEdit} onClose={onClose} setView={state.setView} />}
         {state.view === "due" && <ContextMenuDueView dueValue={state.dueValue} setDueValue={state.setDueValue} onEdit={onEdit} onClose={onClose} checkSleepAndRun={state.checkSleepAndRun} setView={state.setView} />}
       </div>
@@ -230,8 +231,10 @@ function useTaskCard(props) {
   const isActiveInTimer = activeTimerTaskId != null && String(task.id) === String(activeTimerTaskId);
   const { due, priorityKey, showPriorityText } = getTaskCardDerived(task);
   const { handleCheckClick, handleContextMenu } = useTaskCardHandlers({ task, due, isOverdue, onToggle, setCtxMenu, burstTimeoutRef, setBurstPop, setCheckBounce });
+  const list = (lists || []).find((l) => String(l.id) === String(task.task_list));
+  const isReadingTask = list && isReadingList(list);
   const accentCls = getTaskCardAccentClass(task);
-  return { task, listName, listColor, lists, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, showInfo, setShowInfo, showEdit, setShowEdit, ctxMenu, setCtxMenu, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, isOverdue, nav, setActiveTaskId, onDelete, onEdit };
+  return { task, listName, listColor, lists, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, showInfo, setShowInfo, showEdit, setShowEdit, ctxMenu, setCtxMenu, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, isOverdue, nav, setActiveTaskId, onDelete, onEdit, isReadingTask };
 }
 
 function CardTitleRow({ task, searchQuery, showPriorityText, priorityKey, hideDueBadge, due, isCompletedSection }) {
@@ -290,7 +293,7 @@ export default function TaskCard(props) {
   return (
     <>
       <TaskCardView {...card} />
-      {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={card.onEdit ? () => card.setShowEdit(true) : undefined} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
+      {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={card.onEdit ? () => card.setShowEdit(true) : undefined} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} isReadingTask={card.isReadingTask} />}
       {card.showInfo && <TaskInfoModal task={card.task} listName={card.listName} onClose={() => card.setShowInfo(false)} />}
       {card.showEdit && card.onEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
     </>
