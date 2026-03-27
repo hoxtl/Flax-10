@@ -82,7 +82,7 @@ describe("app state hooks coverage", () => {
   });
 
   it("keeps loading true while auth is still loading", () => {
-    useAuthMock.mockReturnValueOnce({
+    useAuthMock.mockReturnValue({
       authenticated: false,
       loading: true,
       profile: null,

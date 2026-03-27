@@ -51,11 +51,13 @@ function HourLabels({ displayHours }) {
 function HeatmapCell({ value, maxValue, day, hour, theme }) {
   const color = getHeatmapColor(value, maxValue, theme);
   const label = value > 0 ? `${day} ${formatHour(hour)}: ${value} min` : `${day} ${formatHour(hour)}: no study`;
+  const titleAttr = `${day} ${hour}:00 - ${value} minutes`;
   return (
     <Tooltip content={label} position="top">
       <div
         className={styles.gridCell}
         style={{ backgroundColor: color }}
+        title={titleAttr}
       >
         {value > 0 && value > maxValue * 0.3 && <span className={styles.cellValue}>{value}</span>}
       </div>

@@ -57,7 +57,7 @@ describe('animatedDropdownUtils', () => {
       shouldOpenUpward: false,
       coords: { top: 180, left: 10, width: 90 },
     });
-    expect(buildMenuStyle(false, false, null, undefined)).toEqual({});
+    expect(buildMenuStyle(false, false, null, undefined)).toEqual({ maxHeight: 260 });
 
     Object.defineProperty(window, 'innerHeight', { value: oldInnerHeight, configurable: true });
   });

@@ -112,7 +112,6 @@ describe("GroupWork timeline and lists", () => {
     fireEvent.click(screen.getAllByRole("button")[0]);
     expect(onToggle).toHaveBeenCalled();
     fireEvent.click(screen.getByTitle("Delete task"));
-    fireEvent.click(screen.getByText("confirm-hold"));
     expect(onDelete).toHaveBeenCalledWith(5);
   });
 

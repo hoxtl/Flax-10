@@ -82,12 +82,12 @@ describe('AnalyticsPage', () => {
 
     it('renders page title', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => expect(screen.getByText('Analytics')).toBeTruthy());
+        await waitFor(() => expect(screen.getAllByText('Analytics').length).toBeGreaterThan(0));
     });
 
     it('renders period toggle buttons', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => screen.getByText('Analytics'));
+        await waitFor(() => screen.getAllByText('Analytics'));
         expect(screen.getByText('7d')).toBeTruthy();
         expect(screen.getByText('30d')).toBeTruthy();
         expect(screen.getByText('90d')).toBeTruthy();
@@ -95,7 +95,7 @@ describe('AnalyticsPage', () => {
 
     it('renders tab buttons', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => screen.getByText('Analytics'));
+        await waitFor(() => screen.getAllByText('Analytics'));
         expect(screen.getByText(/Overview/)).toBeTruthy();
         expect(screen.getByText(/AI Insights/)).toBeTruthy();
     });

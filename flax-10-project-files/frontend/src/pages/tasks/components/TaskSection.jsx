@@ -37,17 +37,15 @@ function SectionStatsChip({ totalInGroup, progressPct, isOverdue, collapsed, tas
     ? <span className={`${styles.sectionCountDone} ${collapsed ? styles.sectionCountDoneMuted : ""}`}>· {completedCount} done</span>
     : null;
   return (
-    <CollapsibleCountChip
-      count={tasks.length}
-      label={`${tasks.length} tasks`}
-      collapsed={collapsed}
-      extraContent={
-        <>
-          {totalInGroup > 0 && <ProgressRing progressPct={progressPct} isOverdue={isOverdue} />}
-          {doneCount}
-        </>
-      }
-    />
+    <>
+      <CollapsibleCountChip
+        count={tasks.length}
+        label={`${tasks.length} tasks`}
+        collapsed={collapsed}
+        extraContent={totalInGroup > 0 ? <ProgressRing progressPct={progressPct} isOverdue={isOverdue} /> : null}
+      />
+      {doneCount}
+    </>
   );
 }
 

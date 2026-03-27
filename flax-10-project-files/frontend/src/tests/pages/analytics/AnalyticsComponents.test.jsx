@@ -133,7 +133,6 @@ describe("Analytics components", () => {
         data: analyticsData,
         progressData: { daily_progress: [1, 2] },
       }),
-      undefined,
     );
   });
 

@@ -53,7 +53,7 @@ describe("Tasks section coverage", () => {
 
     expect(onToggle).toHaveBeenCalledWith(1);
     expect(onDelete).toHaveBeenCalledWith(1);
-    expect(onEdit).toHaveBeenCalledWith(1, { title: "Renamed" });
+    expect(onEdit).toHaveBeenCalledWith(1, { title: "Renamed" }, { source: "test" });
 
     unmount();
     render(<CompletedTasksSection tasks={[{ id: 2, title: "Reading", task_list: 2, completed: true }]} sortBy="priority" listMap={{ "2": { idx: 1, name: "CS101 - Systems" } }} lists={[{ id: 2, name: "CS101 - Systems", color: "#eee" }]} onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />);

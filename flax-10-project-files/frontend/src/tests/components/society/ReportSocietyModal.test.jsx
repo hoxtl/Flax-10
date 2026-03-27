@@ -40,13 +40,16 @@ describe('ReportSocietyModal', () => {
 
     it('calls reportSociety and onReportSuccess on success', async () => {
         vi.mocked(societyApi.reportSociety).mockResolvedValue({});
-        render(<ReportSocietyModal society={society} onClose={onClose} onReportSuccess={onReportSuccess} />);
-        fireEvent.change(screen.getByPlaceholderText('Reason...'), { target: { value: 'Spam' } });
-        fireEvent.click(screen.getByText('Submit Report'));
-        await waitFor(() => expect(societyApi.reportSociety).toHaveBeenCalledWith(1, 'Spam'));
-        expect(onReportSuccess).toHaveBeenCalled();
-        expect(onClose).toHaveBeenCalled();
-    });
+    render(<ReportSocietyModal society={society} onClose={onClose} onReportSuccess={onReportSuccess} />);
+    fireEvent.change(screen.getByPlaceholderText('Reason...'), { target: { value: 'Spam' } });
+    fireEvent.click(screen.getByText('Submit Report'));
+    await waitFor(() => expect(societyApi.reportSociety).toHaveBeenCalledWith(1, 'Spam'));
+    expect(onReportSuccess).toHaveBeenCalled();
+    expect(await screen.findByText('Report submitted')).toBeTruthy();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText('Done'));
+    expect(onClose).toHaveBeenCalled();
+  });
 
     it('shows error message when reportSociety rejects', async () => {
         vi.mocked(societyApi.reportSociety).mockRejectedValue(new Error('fail'));

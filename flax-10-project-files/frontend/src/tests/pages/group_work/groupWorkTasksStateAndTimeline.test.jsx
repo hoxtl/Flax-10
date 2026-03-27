@@ -101,17 +101,26 @@ describe("group tasks state extras", () => {
     it("performs update, delete, and add actions", async () => {
       const { hook } = await renderTasksHook([
         mockJsonResponse({ id: 2, title: "Updated", assignees_info: [{ id: 4 }], status: "todo" }),
-        mockOkResponse(),
         mockJsonResponse({ id: 3, title: "New", assignees_info: [], status: "todo" }),
+        mockOkResponse(),
       ]);
-      await act(async () => {
-        await hook.result.current.taskActions.updateTask(2, { completed: true });
-        await hook.result.current.taskActions.deleteTask(2);
-        await hook.result.current.taskActions.addTask("New", { due_date: "2026-04-01", assigned_to: [4] });
-      });
-      expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "PATCH" }));
-      expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "DELETE" }));
-      expect(global.fetch).toHaveBeenCalledWith("/api/tasks/", expect.objectContaining({ method: "POST" }));
+      vi.useFakeTimers();
+      try {
+        await act(async () => {
+          await hook.result.current.taskActions.updateTask(2, { completed: true });
+          hook.result.current.taskActions.deleteTask(2);
+          await hook.result.current.taskActions.addTask("New", { due_date: "2026-04-01", assigned_to: [4] });
+        });
+        expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "PATCH" }));
+        expect(global.fetch).toHaveBeenCalledWith("/api/tasks/", expect.objectContaining({ method: "POST" }));
+        await act(async () => {
+          vi.advanceTimersByTime(3200);
+          await Promise.resolve();
+        });
+        expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "DELETE" }));
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("toggles filters, view, and modal state", async () => {

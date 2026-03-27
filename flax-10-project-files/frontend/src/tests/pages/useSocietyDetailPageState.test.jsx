@@ -25,7 +25,7 @@ vi.mock("../../components/society/hooks/useUnreportSociety", () => ({
 }));
 
 vi.mock("../../pages/societies/utils/societyDetailPageUtils", async () => {
-  const actual = await vi.importActual("../../pages/Societies/societyDetailPageUtils");
+  const actual = await vi.importActual("../../pages/societies/utils/societyDetailPageUtils");
   return {
     ...actual,
     scrollContentToTop: (...args) => scrollContentToTopMock(...args),

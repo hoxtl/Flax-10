@@ -5,9 +5,15 @@ import {
   dispatchAttendanceUpdated,
 } from "../../lib/attendanceEvents";
 
+const originalWindow = globalThis.window;
+
 describe("attendanceEvents", () => {
   afterEach(() => {
-    vi.unstubGlobal("window");
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      writable: true,
+      value: originalWindow,
+    });
     vi.restoreAllMocks();
   });
 

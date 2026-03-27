@@ -77,7 +77,7 @@ describe('EditProfileModal', () => {
 
     expect(await screen.findByRole('button', { name: '✓ Saved!' })).toBeTruthy();
     expect(screen.queryByText('Profile saved successfully!')).toBeNull();
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
   });
 
   it('supports photo upload/remove and shows server error', async () => {
@@ -101,7 +101,7 @@ describe('EditProfileModal', () => {
       expect(formData.get('remove_photo')).toBe('true');
     });
 
-    expect(await screen.findByText('Server exploded')).toBeTruthy();
+    expect(await screen.findByText('Failed to update profile')).toBeTruthy();
   });
 
   it('calls onClose when backdrop is clicked', () => {
@@ -131,7 +131,7 @@ describe('EditProfileModal', () => {
     updateUserProfileMock.mockRejectedValueOnce(new Error('network'));
     render(<EditProfileModal user={user} isOpen onClose={vi.fn()} onSave={vi.fn()} />);
     fireEvent.click(screen.getByText('Save Changes'));
-    expect(await screen.findByText('Failed to update profile')).toBeTruthy();
+    expect(await screen.findByText('network')).toBeTruthy();
   });
 
   it('uses username initials when user has no name', () => {

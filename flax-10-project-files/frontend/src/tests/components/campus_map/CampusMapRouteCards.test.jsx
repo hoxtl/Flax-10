@@ -30,7 +30,7 @@ describe("TflRouteCard", () => {
     const tflRouteInfo = { duration: 25, legs: [{ mode: "tube", routeOptions: [{ name: "Jubilee" }], departurePoint: "A", arrivalPoint: "B", duration: 10 }] };
     const onToggle = vi.fn();
     render(<TflRouteCard loading={false} tflRouteInfo={tflRouteInfo} instructionMode={false} onToggleInstructions={onToggle} />);
-    expect(screen.getByText("Public Transport")).toBeTruthy();
+    expect(screen.getAllByText("Public Transport")[0]).toBeTruthy();
     fireEvent.click(screen.getByText(/Show step-by-step directions/));
     expect(onToggle).toHaveBeenCalled();
   });

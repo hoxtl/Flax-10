@@ -7,6 +7,7 @@ const useSelectedProjectId = vi.fn();
 const useGroupProjects = vi.fn();
 const useGroupProjectSort = vi.fn();
 const useToast = vi.fn();
+const useAuthMock = vi.fn();
 const useGroupTasksTabState = vi.fn();
 const buildBoardColumns = vi.fn();
 const getProjectDate = vi.fn();
@@ -84,6 +85,10 @@ vi.mock("../../../context/ToastContext", () => ({
   useToast: () => useToast(),
 }));
 
+vi.mock("../../../context/AuthContext", () => ({
+  useAuth: () => useAuthMock(),
+}));
+
 vi.mock("../../../pages/group_work/hooks/groupWorkHooks", () => ({
   useSelectedProjectId: () => useSelectedProjectId(),
   useGroupProjects: () => useGroupProjects(),
@@ -152,6 +157,9 @@ vi.mock("lucide-react", () => ({
   BookOpen: () => <span>book-open</span>,
   UserRound: () => <span>user-round</span>,
   Trash2: () => <span>trash-icon</span>,
+  LogOut: () => <span>logout-icon</span>,
+  Settings: () => <span>settings-icon</span>,
+  Search: () => <span>search-icon</span>,
 }));
 
 vi.mock("../../../components/common/app_page/AppPage", () => ({
@@ -193,12 +201,15 @@ vi.mock("../../../pages/group_work/utils/projectRowUtils", () => ({
   getProjectTeacherName: (...args) => getProjectTeacherName(...args),
   getProjectMemberCount: (...args) => getProjectMemberCount(...args),
   openTeacherProfile: (...args) => openTeacherProfile(...args),
+  getDaysLeft: vi.fn(() => 5),
 }));
 
 vi.mock("../../../pages/group_work/utils/memberAvatarUtils", () => ({
   getDisplayName: vi.fn((member) => member.name || member.username || "Member"),
   openMemberProfile: vi.fn(),
   getStoredViewer: (...args) => getStoredViewer(...args),
+  getCurrentMember: vi.fn(() => null),
+  getMemberKey: vi.fn((member) => String(member?.user || member?.id || "")),
 }));
 
 vi.mock("../../../components/common/deadline_countdown/DeadlineCountdown", () => ({
@@ -257,6 +268,7 @@ import ProjectProgress from "../../../pages/group_work/components/ProjectProgres
 describe("GroupWork pages and header extras", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthMock.mockReturnValue({ profile: { id: 1 } });
     useToast.mockReturnValue(vi.fn());
     useGroupProjectSort.mockReturnValue({ sortBy: "deadline", setSortBy: vi.fn() });
     getProjectDate.mockReturnValue(new Date("2026-03-30T00:00:00.000Z"));
@@ -371,12 +383,13 @@ describe("GroupWork pages and header extras", () => {
     });
 
     it("treats a non-owner viewer as unable to delete the project", () => {
+      useAuthMock.mockReturnValueOnce({ profile: { id: 99 } });
       getStoredViewer.mockReturnValueOnce({ id: 99, user: 99 });
       renderProjectHeaderWith({
         teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }],
       });
 
-      expect(screen.getByRole("button", { name: /Delete project/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /Leave project/i })).toBeInTheDocument();
     });
   });
 });

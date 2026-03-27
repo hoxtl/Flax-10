@@ -105,7 +105,6 @@ describe("GroupWork task component - List", () => {
     );
 
     fireEvent.click(screen.getByTitle("Delete task"));
-    fireEvent.click(screen.getByText("confirm-hold"));
     expect(onDelete).toHaveBeenCalledWith(5);
   });
 

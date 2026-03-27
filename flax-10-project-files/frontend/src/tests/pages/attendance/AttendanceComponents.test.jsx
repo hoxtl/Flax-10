@@ -174,7 +174,7 @@ describe("Attendance components", () => {
         }}
       />,
     );
-    expect(screen.getByText("No marked events yet.")).toBeInTheDocument();
+    expect(screen.getByText("No marked events yet")).toBeInTheDocument();
     fireEvent.click(screen.getByText("record"));
     expect(showRecordTab).toHaveBeenCalled();
   });

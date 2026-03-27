@@ -89,6 +89,10 @@ vi.mock("../../components/attendance/components/AttendancePrompt", () => ({
   default: () => <div>AttendancePrompt</div>,
 }));
 
+vi.mock("../../app/hooks/useTourCheck", () => ({
+  useTourCheck: () => [false, vi.fn()],
+}));
+
 import { AppProviders } from "../../app/components/AppProviders";
 import { AppScreen } from "../../app/components/AppScreen";
 import { ScreenRouter } from "../../app/components/ScreenRouter";

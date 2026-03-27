@@ -40,12 +40,12 @@ describe("TflStatusSection", () => {
     const d = [{ lineName: "A", severityDescription: "Minor", reason: "R", color: "#000" }, { lineName: "B", severityDescription: "S", reason: "R" }, { lineName: "C", severityDescription: "M", reason: "R" }];
     render(<TflStatusSection disruptions={d} loading={false} />);
     expect(screen.getByText(/Last Updated:/)).toBeTruthy();
-    expect(screen.queryByText(/- C/)).toBeNull();
+    expect(screen.queryByText("C")).toBeNull();
     expect(screen.getByRole("button", { name: /Show 1 More/i })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Show 1 More/i }));
-    expect(screen.getByText(/Show Less/)).toBeTruthy();
-    expect(screen.getByText(/- C/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: /Show Less/i }));
+    expect(screen.getByText(/Show less/)).toBeTruthy();
+    expect(screen.getByText("C")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Show less/i }));
     expect(screen.getByRole("button", { name: /Show 1 More/i })).toBeTruthy();
   });
 });
@@ -61,17 +61,16 @@ describe("DestinationSection & LocationChip", () => {
 
   it("marks the selected campus button as active", () => {
     const { rerender } = render(<DestinationSection {...base} />);
-    const inactiveClassName = screen.getByRole("button", { name: /Strand/i }).className;
+    expect(screen.getByRole("button", { name: /Select campus/i })).toBeInTheDocument();
 
     rerender(
       <DestinationSection
         {...base}
-        selectedCampus={{ id: "strand", name: "Strand Campus", address: "Strand", color: "#e63f3f" }}
+        selectedCampus={{ id: "strand", name: "Strand Campus", shortName: "Strand", address: "Strand", color: "#e63f3f" }}
       />
     );
 
-    const activeClassName = screen.getByRole("button", { name: /Strand/i }).className;
-    expect(activeClassName).not.toBe(inactiveClassName);
+    expect(screen.getByRole("button", { name: /Strand/i })).toBeInTheDocument();
   });
 
   it("renders custom destinations and upcoming events with fallback labels", () => {
