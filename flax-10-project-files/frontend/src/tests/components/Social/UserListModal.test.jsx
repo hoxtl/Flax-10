@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import UserListModal from '../../../components/social/UserListModal';
+import UserListModal from '../../../components/Social/UserListModal';
 
-vi.mock('../../../components/social/ShareButton', () => ({
+vi.mock('../../../components/Social/ShareButton', () => ({
   default: ({ userId, onToggle }) => (
     <button data-testid={`share-${userId}`} onClick={() => onToggle?.(userId, true)}>
       Share

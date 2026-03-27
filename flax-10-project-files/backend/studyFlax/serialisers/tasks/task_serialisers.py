@@ -73,6 +73,7 @@ class TaskListSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for task list serialiser."""
+
         model = TaskList
         fields = ['id', 'name', 'category', 'archived', 'task_count', 'created_at', 'society_id', 'society_name']
 
@@ -103,6 +104,7 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for task serialiser."""
+
         model = Task
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code', 'module_name',

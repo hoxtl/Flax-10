@@ -9,6 +9,7 @@ from studyFlax.management.commands.seed_helpers.shared.helpers import CORE_WIDGE
 
 class SeedHomepageWidgetsTests(SimpleTestCase):
     """Tests seed homepage widgets."""
+
     def test_select_widgets_returns_only_core_widgets(self):
         self.assertEqual(CORE_WIDGETS, ["deadlines", "todayTasks", "bigTimeline"])
         self.assertEqual(_select_widgets(), CORE_WIDGETS)

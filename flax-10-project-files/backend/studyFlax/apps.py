@@ -7,6 +7,7 @@ from django.apps import AppConfig
 
 class StudyflaxConfig(AppConfig):
     """Configuration for studyflax."""
+
     name = 'studyFlax'
 
     def ready(self):

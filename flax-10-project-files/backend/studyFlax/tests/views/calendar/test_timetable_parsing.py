@@ -33,6 +33,7 @@ END:VCALENDAR"""
 
 class TimetableParsingTest(TestCase):
     """Tests timetable parsing."""
+
     def setUp(self):
         self.user = User.objects.create_user(
             username="ttparser", email="ttp@example.com", password="pass"

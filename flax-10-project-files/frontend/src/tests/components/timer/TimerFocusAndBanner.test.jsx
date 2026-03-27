@@ -4,8 +4,8 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
-import * as todayBannerDataModule from "../../../components/timer/today_banner/useTodayBannerData";
-import * as focusCanvasModule from "../../../components/timer/focus_animation/useFocusCanvasAnimation";
+import * as todayBannerDataModule from "../../../components/Timer/today_banner/useTodayBannerData";
+import * as focusCanvasModule from "../../../components/Timer/focus_animation/useFocusCanvasAnimation";
 
 const getSummary = vi.fn();
 const getNearestMilestone = vi.fn();
@@ -15,15 +15,15 @@ vi.mock("../../../api/analyticsApi", () => ({
   default: { getSummary: (...args) => getSummary(...args) },
 }));
 
-vi.mock("../../../components/Timer/utils/milestoneUtils", () => ({
+vi.mock("../../../components/timer/utils/milestoneUtils", () => ({
   getNearestMilestone: (...args) => getNearestMilestone(...args),
 }));
 
-vi.mock("../../../components/timer/utils/historyEvents", () => ({
+vi.mock("../../../components/Timer/utils/historyEvents", () => ({
   listenToTimerHistoryEvents: (...args) => listenToTimerHistoryEvents(...args),
 }));
 
-vi.mock("../../../components/timer/focus_animation/treePixels", () => ({
+vi.mock("../../../components/Timer/focus_animation/treePixels", () => ({
   BRANCH_TIPS: [
     { x: 10, y: 20 },
     { x: 20, y: 30 },
@@ -34,11 +34,11 @@ vi.mock("../../../components/timer/focus_animation/treePixels", () => ({
   ],
 }));
 
-vi.mock("../../../components/timer/focus_animation/focusCanvasColors.json", () => ({
+vi.mock("../../../components/Timer/focus_animation/focusCanvasColors.json", () => ({
   default: { glowBreakBase: "1,2,3", glowWorkBase: "4,5,6" },
 }));
 
-vi.mock("../../../components/timer/focus_animation/TreeScene", () => ({
+vi.mock("../../../components/Timer/focus_animation/TreeScene", () => ({
   TreeScene: ({ progress }) => <div>tree-scene-{progress}</div>,
 }));
 
@@ -46,10 +46,10 @@ vi.mock("../../../hooks/useCountUp", () => ({
   useCountUp: () => null,
 }));
 
-import { useFocusCanvasAnimation as useFocusCanvasAnimationImpl } from "../../../components/timer/focus_animation/useFocusCanvasAnimation";
-import { useTodayBannerData } from "../../../components/timer/today_banner/useTodayBannerData";
-import TodayBanner from "../../../components/timer/TodayBanner";
-import FocusAnimation from "../../../components/timer/FocusAnimation";
+import { useFocusCanvasAnimation as useFocusCanvasAnimationImpl } from "../../../components/Timer/focus_animation/useFocusCanvasAnimation";
+import { useTodayBannerData } from "../../../components/Timer/today_banner/useTodayBannerData";
+import TodayBanner from "../../../components/Timer/TodayBanner";
+import FocusAnimation from "../../../components/Timer/FocusAnimation";
 
 const canvasMethodNames = ["clearRect", "fillRect", "beginPath", "arc", "fill", "save", "restore", "translate", "rotate", "moveTo", "lineTo", "stroke"];
 

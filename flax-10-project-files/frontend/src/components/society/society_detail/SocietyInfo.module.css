@@ -220,3 +220,26 @@
 .bellInactive:hover {
     opacity: 1;
 }
+
+.locationRow {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 320px;
+}
+
+.locationIcon {
+    flex-shrink: 0;
+    color: var(--muted);
+    opacity: 0.8;
+}
+
+.locationText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

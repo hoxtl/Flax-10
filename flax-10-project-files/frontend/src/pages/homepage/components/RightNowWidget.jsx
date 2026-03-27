@@ -27,7 +27,7 @@ import {
   buildWidgetProps,
   formatTimerLabel,
   timerProgress,
-} from "./rightNowWidget.viewmodel.js";
+} from "./RightNowWidget.viewmodel.js";
 import styles from "./RightNowWidget.module.css";
 
 function useLiveClock() {

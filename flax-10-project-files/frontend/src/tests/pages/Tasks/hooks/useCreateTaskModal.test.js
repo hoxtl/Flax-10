@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const sleepWarningHookMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
+vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: sleepWarningHookMock,
 }));
 
@@ -20,14 +20,15 @@ vi.mock("../../../../api/moduleApi", () => ({
   getEnrollments: vi.fn(),
 }));
 
-vi.mock("../../../../pages/tasks/utils/createTaskModalUtils", () => ({
+vi.mock("../../../../pages/Tasks/utils/createTaskModalUtils", () => ({
   runCreateTaskSave: vi.fn(),
 }));
 
-import { useCreateTaskModal } from "../../../../pages/tasks/hooks/useCreateTaskModal";
+import { useCreateTaskModal } from "../../../../pages/Tasks/hooks/useCreateTaskModal";
 import { getEnrollments, getModules } from "../../../../api/moduleApi";
 import { getUserSettings } from "../../../../api/userApi";
-import { runCreateTaskSave } from "../../../../pages/tasks/utils/createTaskModalUtils";
+import { runCreateTaskSave } from "../../../../pages/Tasks/utils/createTaskModalUtils";
+import { createRejectablePromise } from "./taskHookTestUtils";
 
 const defaultLists = [
   { id: 1, name: "Inbox" },
@@ -242,12 +243,8 @@ describe("useCreateTaskModal coverage", () => {
   });
 
   it("ignores rejected sleep-setting results after unmount", async () => {
-    let rejectSettings;
-    getUserSettings.mockReturnValueOnce(
-      new Promise((_, reject) => {
-        rejectSettings = reject;
-      }),
-    );
+    const { promise, rejectPromise } = createRejectablePromise();
+    getUserSettings.mockReturnValueOnce(promise);
 
     const { unmount } = renderHook(() =>
       useCreateTaskModal(buildProps()),
@@ -256,7 +253,7 @@ describe("useCreateTaskModal coverage", () => {
     unmount();
 
     await act(async () => {
-      rejectSettings(new Error("late settings failure"));
+      rejectPromise(new Error("late settings failure"));
       await Promise.resolve();
     });
   });

@@ -2,8 +2,8 @@ import styles from "./WelcomeLanding.module.css";
 import { pickWelcomeQuoteByKey } from "../../lib/quotes";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { getGreeting } from "../../components/calendar/utils/dateUtils";
-import WelcomeBackgroundPaths from "../../components/welcome/WelcomeBackgroundPaths";
+import { getGreeting } from "../../components/Calendar/utils/dateUtils";
+import WelcomeBackgroundPaths from "../../components/Welcome/WelcomeBackgroundPaths";
 import PrimaryButton from "../../components/common/primary_button/PrimaryButton";
 
 function pad2(n) { return String(n).padStart(2, "0"); }

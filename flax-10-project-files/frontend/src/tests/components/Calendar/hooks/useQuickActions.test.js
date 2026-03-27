@@ -4,7 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useQuickActions } from '../../../../components/calendar/hooks/useQuickActions';
+import { useQuickActions } from '../../../../components/Calendar/hooks/useQuickActions';
 
 const mockLoadEvents = vi.fn();
 const mockRefreshTags = vi.fn();
@@ -12,10 +12,10 @@ const mockNotify = vi.fn();
 const mockUnsync = vi.fn().mockResolvedValue({});
 
 vi.mock('../../../../context/TagContext', () => ({ useTags: () => ({ refreshTags: mockRefreshTags }) }));
-vi.mock('../../../../components/notifications/hooks/useNotify', () => ({ useNotify: () => mockNotify }));
-vi.mock('../../../../components/calendar/hooks/useCalendarEvents', () => ({ useCalendarEvents: () => ({ loadEvents: mockLoadEvents }) }));
+vi.mock('../../../../components/Notifications/hooks/useNotify', () => ({ useNotify: () => mockNotify }));
+vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({ useCalendarEvents: () => ({ loadEvents: mockLoadEvents }) }));
 vi.mock('../../../../api/societyApi', () => ({ unsyncCalendar: (...args) => mockUnsync(...args) }));
-vi.mock('../../../../components/calendar/utils/eventUtils', () => ({ getEventType: (e) => e?.module ? 'module' : e?.society_id ? 'society' : 'personal' }));
+vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({ getEventType: (e) => e?.module ? 'module' : e?.society_id ? 'society' : 'personal' }));
 
 describe('useQuickActions', () => {
     beforeEach(() => vi.clearAllMocks());

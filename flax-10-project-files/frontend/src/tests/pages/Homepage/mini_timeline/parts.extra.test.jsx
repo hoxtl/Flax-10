@@ -12,12 +12,12 @@ vi.mock("lucide-react", () => ({
   RotateCw: () => <svg data-testid="rotate-icon" />,
 }));
 
-vi.mock("../../../pages/Homepage/utils/dateFormatUtils", () => ({
+vi.mock("../../../pages/homepage/utils/dateFormatUtils", () => ({
   fmtDurationShort: (value) => `${value}m`,
   formatTime: (value) => (value ? value.slice(11, 16) : ""),
 }));
 
-vi.mock("../../../pages/Homepage/utils/eventUtils", () => ({
+vi.mock("../../../pages/homepage/utils/eventUtils", () => ({
   stripEmojiFromTitle: (title) => String(title || "").replace("🔥 ", ""),
 }));
 
@@ -27,10 +27,10 @@ import {
   ConflictPopover,
   EventDuration,
   EventTagSlot,
-} from "../../../../pages/homepage/components/mini_timeline/parts/PlanEventRowParts";
-import { ConflictActions, ConflictCard } from "../../../../pages/homepage/components/mini_timeline/parts/ConflictPairParts";
-import { PlanFreeRowContent } from "../../../../pages/homepage/components/mini_timeline/parts/PlanFreeRowContent";
-import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "../../../../pages/homepage/components/mini_timeline/parts/TimelineRowLayout";
+} from "../../../../pages/Homepage/components/mini_timeline/parts/PlanEventRowParts";
+import { ConflictActions, ConflictCard } from "../../../../pages/Homepage/components/mini_timeline/parts/ConflictPairParts";
+import { PlanFreeRowContent } from "../../../../pages/Homepage/components/mini_timeline/parts/PlanFreeRowContent";
+import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "../../../../pages/Homepage/components/mini_timeline/parts/TimelineRowLayout";
 
 const conflictActionItems = [
   { id: "a", item: { title: "🔥 Lecture", tag: "x" }, isReadOnly: false },

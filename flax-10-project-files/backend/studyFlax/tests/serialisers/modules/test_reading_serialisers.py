@@ -42,6 +42,7 @@ def _make_reading(module, title="Chapter 1", start=1, end=20, deadline=None, est
 
 class ReadingSerialiserTests(BaseTestCase):
     """Tests reading serialiser."""
+
     def setUp(self):
         super().setUp()
         self.teacher = _make_teacher()
@@ -115,6 +116,7 @@ class ReadingSerialiserTests(BaseTestCase):
 
 class ReadingSummarySerialiserTest(BaseTestCase):
     """Tests reading summary serialiser."""
+
     def test_summary_page_count(self):
         teacher = _make_teacher()
         module = _make_module(teacher)

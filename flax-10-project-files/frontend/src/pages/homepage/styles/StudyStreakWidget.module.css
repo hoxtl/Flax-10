@@ -1,40 +1,9 @@
-/* StudyStreakWidget */
-
 .root {
   display: flex;
   flex-direction: column;
   gap: 10px;
   height: 100%;
   padding: 2px 0 4px;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.iconWrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--widget-icon-bg);
-  border: 1px solid var(--widget-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--widget-accent);
-}
-
-.label {
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--widget-text-primary);
 }
 
 /* ── Streak number ───────────────────────────────────────────── */

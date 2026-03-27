@@ -9,7 +9,7 @@ const mockUseTimeSlotDrop = vi.fn(() => ({
 
 const mockUseResizeHighlight = vi.fn(() => ({ resizeHighlight: null }));
 
-vi.mock('../../../../components/calendar/hooks/useTimeSlotDrop', () => ({
+vi.mock('../../../../components/Calendar/hooks/useTimeSlotDrop', () => ({
     useTimeSlotDrop: (...args) => mockUseTimeSlotDrop(...args),
 }));
 
@@ -17,17 +17,17 @@ vi.mock('../../../../context/ResizeHighlightContext', () => ({
     useResizeHighlight: () => mockUseResizeHighlight(),
 }));
 
-vi.mock('../../../../components/calendar/week_view/components/HighlightOverlay', () => ({
+vi.mock('../../../../components/Calendar/week_view/components/HighlightOverlay', () => ({
     HighlightOverlay: ({ quarter, type }) => (
         <div data-testid="highlight-overlay" data-quarter={quarter} data-type={type} />
     ),
 }));
 
-vi.mock('../../../../components/calendar/calendarConstants', () => ({
+vi.mock('../../../../components/Calendar/calendarConstants', () => ({
     SLOT_HEIGHT: 60,
 }));
 
-import { HourCell } from '../../../../components/calendar/week_view/components/HourCell';
+import { HourCell } from '../../../../components/Calendar/week_view/components/HourCell';
 
 const date = new Date('2024-03-04');
 

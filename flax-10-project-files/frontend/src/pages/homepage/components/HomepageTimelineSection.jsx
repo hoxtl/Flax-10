@@ -6,11 +6,11 @@ import { motion as Motion } from "framer-motion";
 import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { isToday } from "../../../components/calendar/utils/dateUtils";
+import { isToday } from "../../../components/Calendar/utils/dateUtils";
 import { ConfirmModal } from "../../../components/common";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { MiniTimeline } from "./mini_timeline";
-import widgetStyles from "../../modules/DashboardWidgets.module.css";
+import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 
 const SECTION_ANIMATION = { opacity: 0, y: 30 };
 const SECTION_VISIBLE = { opacity: 1, y: 0 };
@@ -67,22 +67,22 @@ function AutoScheduleButton({ handleAutoSchedule, autoScheduleLoading, styles })
   if (!handleAutoSchedule) return null;
   const label = autoScheduleLoading ? "Scheduling…" : "Auto schedule study time";
   return (
-    <Motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+    <AnimatedHeaderButton>
       <PrimaryButton size="small" pill className={styles.timelineHeaderButton} onClick={handleAutoSchedule} aria-label="Auto schedule study time" disabled={autoScheduleLoading}>
         {label}
       </PrimaryButton>
-    </Motion.div>
+    </AnimatedHeaderButton>
   );
 }
 
 function RescheduleEventsButton({ handleResolveTimelineConflicts, onOpenRescheduleConfirm, resolveConflictsLoading, selectedDate, styles }) {
   if (!isToday(selectedDate) || !handleResolveTimelineConflicts) return null;
   return (
-    <Motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+    <AnimatedHeaderButton>
       <PrimaryButton size="small" pill className={styles.timelineHeaderButton} onClick={onOpenRescheduleConfirm || handleResolveTimelineConflicts} aria-label="Reschedule my events" disabled={resolveConflictsLoading}>
         {resolveConflictsLoading ? "Rescheduling…" : "Reschedule my events"}
       </PrimaryButton>
-    </Motion.div>
+    </AnimatedHeaderButton>
   );
 }
 
@@ -108,6 +108,10 @@ async function confirmReschedule(props, setShowRescheduleConfirm) {
 
 function TimelineTrack({ children, styles }) {
   return <div className={styles.timelineTrack}><Motion.div className={styles.timelineTrackContent} layout initial={false} transition={{ type: "spring", stiffness: 400, damping: 35 }}>{children}</Motion.div></div>;
+}
+
+function AnimatedHeaderButton({ children }) {
+  return <Motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>{children}</Motion.div>;
 }
 
 function getMiniTimelineProps(props) {

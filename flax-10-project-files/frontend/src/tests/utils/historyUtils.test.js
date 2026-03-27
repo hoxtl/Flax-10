@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getHistory, saveSession, clearHistory } from '../../components/timer/utils/historyUtils';
+import { getHistory, saveSession, clearHistory } from '../../components/Timer/utils/historyUtils';
 import { fetchApi } from '../../api/client';
 
 vi.mock('../../api/client', () => ({

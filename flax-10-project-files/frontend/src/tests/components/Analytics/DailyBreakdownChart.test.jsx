@@ -11,7 +11,7 @@ vi.mock('../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-import DailyBreakdownChart from '../../../components/analytics/DailyBreakdownChart';
+import DailyBreakdownChart from '../../../components/Analytics/DailyBreakdownChart';
 
 const mockData = [
     { date: '2024-03-01', work: 90, break: 20 },

@@ -19,7 +19,7 @@ vi.mock("../../../components/common/inputs/DateTimePicker", () => ({
   ),
 }));
 
-vi.mock("../../../components/modules/shared/moduleFormParts", () => ({
+vi.mock("../../../components/Modules/shared/moduleFormParts", () => ({
   buildValidationState: (error, validate) => ({ error, validate }),
   failValidation: (setError, message) => {
     setError(message);
@@ -49,11 +49,11 @@ vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
   ),
 }));
 
-vi.mock("../../../components/modules/hooks/useReadingModal", () => ({
+vi.mock("../../../components/Modules/hooks/useReadingModal", () => ({
   useReadingModal: (...args) => useReadingModal(...args),
 }));
 
-vi.mock("../../../components/modules/readings/ReadingCard", () => ({
+vi.mock("../../../components/Modules/Readings/ReadingCard", () => ({
   default: ({ reading, onEdit, onDelete }) => (
     <div>
       <span>{reading.title}</span>
@@ -77,7 +77,7 @@ vi.mock("../../../components/common/hooks/useClickOutside", () => ({
   useClickOutside: (...args) => useClickOutside(...args),
 }));
 
-vi.mock("../../../components/modules/modules/useModuleCourseFilterState", () => ({
+vi.mock("../../../components/Modules/Modules/useModuleCourseFilterState", () => ({
   useModuleCourseFilterState: () => ({
     isOpen: true,
     setIsOpen: vi.fn(),
@@ -96,9 +96,9 @@ vi.mock("../../../lib/kclCourses", () => ({
   },
 }));
 
-import ReadingForm from "../../../components/modules/readings/ReadingForm";
-import ReadingModal from "../../../components/modules/readings/ReadingModal";
-import ModuleCourseFilter from "../../../components/modules/modules/ModuleCourseFilter";
+import ReadingForm from "../../../components/Modules/Readings/ReadingForm";
+import ReadingModal from "../../../components/Modules/Readings/ReadingModal";
+import ModuleCourseFilter from "../../../components/Modules/Modules/ModuleCourseFilter";
 
 describe("module reading and filter extras", () => {
   beforeEach(() => {

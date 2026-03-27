@@ -1,5 +1,5 @@
 import styles from './EditProfileModal.module.css';
-import { getInitials } from '../auth/utils/userUtils';
+import { getInitials } from '../Auth/utils/userUtils';
 import FormField from '../common/form_field/FormField';
 import PrimaryButton from '../common/primary_button/PrimaryButton';
 import StandardModal from '../common/standard_modal/StandardModal';
@@ -96,7 +96,7 @@ function ModalForm({ form, user, onClose, onSubmit }) {
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   const form = useEditProfileForm(user);
   if (!isOpen) return null;
-  const handleSubmit = buildEditProfileSubmitHandler(form, user, onSave);
+  const handleSubmit = buildEditProfileSubmitHandler(form, user, onSave, onClose);
   return (
     <StandardModal
       title="Edit Profile"

@@ -3,7 +3,7 @@
  */
 
 import { AnimatePresence, motion } from 'framer-motion';
-import styles from '../../pages/timer/TimerPage.module.css';
+import styles from '../../pages/Timer/TimerPage.module.css';
 import PrimaryButton from '../common/primary_button/PrimaryButton';
 import { TaskPickerModal } from './task_input/TaskPickerModal';
 import { useTaskPickerData } from './task_input/useTaskPickerData';

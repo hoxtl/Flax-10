@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { EventsSummaryModal } from '../../../components/calendar/events_summary_modal/EventsSummaryModal';
+import { EventsSummaryModal } from '../../../components/Calendar/events_summary_modal/EventsSummaryModal';
 
 const events = [
     { title: 'Morning Lecture', start_time: '2024-03-08T09:00:00Z', location: 'Room 101' },

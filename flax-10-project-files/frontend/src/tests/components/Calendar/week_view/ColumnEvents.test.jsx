@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('../../../../components/calendar/DraggableEvent', () => ({
+vi.mock('../../../../components/Calendar/DraggableEvent', () => ({
     DraggableEvent: ({ event, readOnly }) => (
         <div data-testid="draggable-event" data-readonly={String(readOnly)}>
             {event.title}
@@ -9,15 +9,15 @@ vi.mock('../../../../components/calendar/DraggableEvent', () => ({
     ),
 }));
 
-vi.mock('../../../../components/calendar/day_view/dayViewHelpers', () => ({
+vi.mock('../../../../components/Calendar/day_view/dayViewHelpers', () => ({
     calculateEventStyle: vi.fn(() => ({ top: 0, height: 60 })),
 }));
 
-vi.mock('../../../../components/calendar/calendarConstants', () => ({
+vi.mock('../../../../components/Calendar/calendarConstants', () => ({
     SLOT_HEIGHT: 60,
 }));
 
-import { ColumnEvents } from '../../../../components/calendar/week_view/components/ColumnEvents';
+import { ColumnEvents } from '../../../../components/Calendar/week_view/components/ColumnEvents';
 
 const date = new Date('2024-03-04');
 const events = [

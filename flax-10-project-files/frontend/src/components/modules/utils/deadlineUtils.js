@@ -27,7 +27,7 @@ export function formatDeadlineDateTime(dateStr) {
 }
 
 export function getDeadlineCountdown(dateStr) {
-    const diff = new Date(dateStr) - new Date();
+    const diff = getDeadlineDiff(dateStr);
     if (diff < 0) return 'Overdue';
     const days = Math.floor(diff / 86_400_000);
     if (days > 0) return `${days}d`;
@@ -38,13 +38,8 @@ export function getDeadlineCountdown(dateStr) {
 /** Time remaining as "14h 20m left" or "2d 5h left" for triage display. */
 
 export function getTimeRemainingCountdown(dateStr) {
-    const diff = new Date(dateStr) - new Date();
+    const { diff, days, hours, mins } = getRemainingTimeParts(dateStr);
     if (diff < 0) return 'Overdue';
-    const totalMins = Math.floor(diff / 60_000);
-    const days = Math.floor(totalMins / 1440);
-    const remainderMins = totalMins % 1440;
-    const hours = Math.floor(remainderMins / 60);
-    const mins = remainderMins % 60;
     if (days > 0) {
         return hours > 0 ? `${days}d ${hours}h left` : `${days}d left`;
     }
@@ -57,13 +52,8 @@ export function getTimeRemainingCountdown(dateStr) {
 /** "Due in 4 hours" style for high-contrast triage display. */
 
 export function getDueInPhrase(dateStr) {
-    const diff = new Date(dateStr) - new Date();
+    const { diff, days, hours, mins } = getRemainingTimeParts(dateStr);
     if (diff < 0) return 'Overdue';
-    const totalMins = Math.floor(diff / 60_000);
-    const days = Math.floor(totalMins / 1440);
-    const remainderMins = totalMins % 1440;
-    const hours = Math.floor(remainderMins / 60);
-    const mins = remainderMins % 60;
     if (days > 0) {
         return hours > 0 ? `Due in ${days}d ${hours}h` : `Due in ${days} day${days === 1 ? '' : 's'}`;
     }
@@ -74,7 +64,7 @@ export function getDueInPhrase(dateStr) {
 }
 
 export function getDeadlineUrgency(dateStr) {
-    const days = Math.floor((new Date(dateStr) - new Date()) / 86_400_000);
+    const days = Math.floor(getDeadlineDiff(dateStr) / 86_400_000);
     if (days < 3) return 'critical';
     if (days < 7) return 'urgent';
     return 'normal';
@@ -83,7 +73,7 @@ export function getDeadlineUrgency(dateStr) {
 /** For traffic-light dot: 'safe' (7+ days), 'caution' (3–7 days), 'critical' (< 3 days). */
 
 export function getDeadlineDotUrgency(dateStr) {
-    const days = Math.floor((new Date(dateStr) - new Date()) / 86_400_000);
+    const days = Math.floor(getDeadlineDiff(dateStr) / 86_400_000);
     if (days < 0) return 'critical';
     if (days < 3) return 'critical';
     if (days < 7) return 'caution';
@@ -111,13 +101,8 @@ export function getTimeRemainingMonospace(dateStr) {
 /** Cleaner countdown for triage: "7d 12h" or "14h 22m" (no colons, compact). */
 
 export function getTimeRemainingClean(dateStr) {
-    const diff = new Date(dateStr) - new Date();
+    const { diff, days, hours, mins } = getRemainingTimeParts(dateStr);
     if (diff < 0) return 'Overdue';
-    const totalMins = Math.floor(diff / 60_000);
-    const days = Math.floor(totalMins / 1440);
-    const remainderMins = totalMins % 1440;
-    const hours = Math.floor(remainderMins / 60);
-    const mins = remainderMins % 60;
     if (days > 0) {
         return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
     }
@@ -130,13 +115,8 @@ export function getTimeRemainingClean(dateStr) {
 /** Human-readable stamped countdown: { number, unit } for "8 Days left" (number in Mono, unit in Lexend). */
 
 export function getTimeRemainingStamped(dateStr) {
-    const diff = new Date(dateStr) - new Date();
+    const { diff, days, hours, mins } = getRemainingTimeParts(dateStr);
     if (diff < 0) return { number: null, unit: 'Overdue' };
-    const totalMins = Math.floor(diff / 60_000);
-    const days = Math.floor(totalMins / 1440);
-    const remainderMins = totalMins % 1440;
-    const hours = Math.floor(remainderMins / 60);
-    const mins = remainderMins % 60;
     if (days > 0) return { number: days, unit: days === 1 ? 'Day' : 'Days' };
     if (hours > 0) return { number: hours, unit: hours === 1 ? 'Hour' : 'Hours' };
     if (mins > 0) return { number: mins, unit: mins === 1 ? 'Minute' : 'Minutes' };
@@ -146,6 +126,20 @@ export function getTimeRemainingStamped(dateStr) {
 /** True if deadline is within 24 hours (for soft coral countdown styling). */
 
 export function isDeadlineUnder24h(dateStr) {
-    const diff = new Date(dateStr) - new Date();
+    const diff = getDeadlineDiff(dateStr);
     return diff >= 0 && diff < 24 * 60 * 60 * 1000;
+}
+
+function getDeadlineDiff(dateStr) {
+    return new Date(dateStr) - new Date();
+}
+
+function getRemainingTimeParts(dateStr) {
+    const diff = getDeadlineDiff(dateStr);
+    const totalMins = Math.floor(diff / 60_000);
+    const days = Math.floor(totalMins / 1440);
+    const remainderMins = totalMins % 1440;
+    const hours = Math.floor(remainderMins / 60);
+    const mins = remainderMins % 60;
+    return { diff, days, hours, mins };
 }

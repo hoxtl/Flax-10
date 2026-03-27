@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { ScheduleManagerButton } from "../../../../../components/calendar/header/schedule_manager/ScheduleManagerButton";
+import { ScheduleManagerButton } from "../../../../../components/Calendar/header/schedule_manager/ScheduleManagerButton";
 
 const showToast = vi.fn();
 const editEvent = vi.fn();
@@ -24,12 +24,12 @@ vi.mock("../../../../../context/ToastContext", () => ({
   useToast: () => showToast,
 }));
 
-vi.mock("../../../../../components/calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent }),
   useCalendarEvents: () => ({ loadEvents }),
 }));
 
-vi.mock("../../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("../../../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
@@ -50,7 +50,7 @@ vi.mock("../../../../../components/common/reschedule_events/rescheduleEventConfl
   undoConflictResolutionPlan: vi.fn(),
 }));
 
-vi.mock("../../../../../components/schedules/auto/autoScheduleActions", () => ({
+vi.mock("../../../../../components/Schedules/auto/autoScheduleActions", () => ({
   loadUpcomingDeadlineItems: (...args) => loadUpcomingDeadlineItems(...args),
   loadScheduleSettings: (...args) => loadScheduleSettings(...args),
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefs(...args),
@@ -61,14 +61,25 @@ describe("ScheduleManagerButton", () => {
     vi.clearAllMocks();
   });
 
+  function renderButton() {
+    render(<ScheduleManagerButton />);
+  }
+
+  function openRescheduleDialog() {
+    fireEvent.click(screen.getByLabelText("Reschedule my events"));
+    fireEvent.click(screen.getByText("Reschedule now"));
+  }
+
+  function openAutoScheduleDialog() {
+    fireEvent.click(screen.getByLabelText("Auto schedule study time"));
+  }
+
   it("shows a toast and skips edits when there is nothing to reschedule", async () => {
     buildConflictResolutionPlan.mockReturnValue({ operations: [] });
     buildConflictResolutionToastMessage.mockReturnValue("All clear");
 
-    render(<ScheduleManagerButton />);
-
-    fireEvent.click(screen.getByLabelText("Reschedule my events"));
-    fireEvent.click(screen.getByText("Reschedule now"));
+    renderButton();
+    openRescheduleDialog();
 
     await waitFor(() => expect(showToast).toHaveBeenCalledWith("All clear"));
     expect(applyConflictResolutionPlan).not.toHaveBeenCalled();
@@ -79,10 +90,8 @@ describe("ScheduleManagerButton", () => {
     buildConflictResolutionPlan.mockReturnValue({ operations: [{ id: "move-1" }] });
     applyConflictResolutionPlan.mockRejectedValue(new Error("boom"));
 
-    render(<ScheduleManagerButton />);
-
-    fireEvent.click(screen.getByLabelText("Reschedule my events"));
-    fireEvent.click(screen.getByText("Reschedule now"));
+    renderButton();
+    openRescheduleDialog();
 
     await waitFor(() => expect(applyConflictResolutionPlan).toHaveBeenCalledWith({ operations: [{ id: "move-1" }] }, editEvent));
     await waitFor(() => expect(showToast).toHaveBeenCalledWith("Couldn't reschedule your events. Try again."));
@@ -92,10 +101,8 @@ describe("ScheduleManagerButton", () => {
     buildConflictResolutionPlan.mockReturnValue({ operations: [{ id: "move-1" }] });
     applyConflictResolutionPlan.mockResolvedValue({ failures: [{ id: "move-1" }] });
 
-    render(<ScheduleManagerButton />);
-
-    fireEvent.click(screen.getByLabelText("Reschedule my events"));
-    fireEvent.click(screen.getByText("Reschedule now"));
+    renderButton();
+    openRescheduleDialog();
 
     await waitFor(() => expect(showToast).toHaveBeenCalledWith("Couldn't reschedule your events. Some conflicts are read-only."));
   });
@@ -105,10 +112,8 @@ describe("ScheduleManagerButton", () => {
     buildConflictResolutionToastMessage.mockReturnValue("Moved your events.");
     applyConflictResolutionPlan.mockResolvedValue({ failures: [{ id: "move-2" }] });
 
-    render(<ScheduleManagerButton />);
-
-    fireEvent.click(screen.getByLabelText("Reschedule my events"));
-    fireEvent.click(screen.getByText("Reschedule now"));
+    renderButton();
+    openRescheduleDialog();
 
     await waitFor(() => expect(showToast).toHaveBeenCalledWith("Moved your events. 1 couldn't be moved."));
   });
@@ -118,9 +123,8 @@ describe("ScheduleManagerButton", () => {
     loadScheduleSettings.mockResolvedValue({ dailyTarget: 2 });
     submitAutoScheduleWithPrefs.mockResolvedValue(undefined);
 
-    render(<ScheduleManagerButton />);
-
-    fireEvent.click(screen.getByLabelText("Auto schedule study time"));
+    renderButton();
+    openAutoScheduleDialog();
     fireEvent.click(screen.getByText("Auto schedule"));
 
     await waitFor(() => {
@@ -134,9 +138,8 @@ describe("ScheduleManagerButton", () => {
   });
 
   it("closes the auto-schedule dialog when cancelled", () => {
-    render(<ScheduleManagerButton />);
-
-    fireEvent.click(screen.getByLabelText("Auto schedule study time"));
+    renderButton();
+    openAutoScheduleDialog();
     expect(screen.getByText("Auto schedule study time")).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Not now"));

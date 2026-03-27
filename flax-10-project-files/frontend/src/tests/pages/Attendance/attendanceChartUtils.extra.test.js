@@ -4,7 +4,7 @@ import {
   buildDonutSeries,
   buildPieClickHandler,
   buildValueFormatter,
-} from "../../../pages/attendance/utils/attendanceChartUtils";
+} from "../../../pages/Attendance/utils/attendanceChartUtils";
 
 describe("attendanceChartUtils extra coverage", () => {
   it("formats from dataIndex, value objects, raw values, and invalid totals", () => {

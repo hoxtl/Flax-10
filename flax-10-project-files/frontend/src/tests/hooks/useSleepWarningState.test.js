@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import useSleepWarningState from "../../components/settings/hooks/useSleepWarningState";
+import useSleepWarningState from "../../components/Settings/hooks/useSleepWarningState";
 
 describe("useSleepWarningState", () => {
   it("starts closed and updates both warning state buckets", () => {

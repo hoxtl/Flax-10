@@ -24,6 +24,7 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 class GroupProjectMembersTests(BaseTestCase):
     """Tests group project members."""
+
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -65,6 +66,7 @@ class GroupProjectMembersTests(BaseTestCase):
 
 class GroupProjectMemberDetailTests(BaseTestCase):
     """Tests group project member detail."""
+
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)

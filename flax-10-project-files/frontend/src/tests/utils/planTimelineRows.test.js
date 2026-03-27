@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { computePlanTimelineRows } from '../../pages/homepage/utils/planTimelineRows';
+import { computePlanTimelineRows } from '../../pages/Homepage/utils/planTimelineRows';
 
-vi.mock('../../pages/homepage/utils/eventUtils', () => ({
+vi.mock('../../pages/Homepage/utils/eventUtils', () => ({
     isNow: vi.fn().mockReturnValue(false),
     extractModuleCode: vi.fn().mockReturnValue(null),
     isRoutineEvent: vi.fn().mockReturnValue(false),

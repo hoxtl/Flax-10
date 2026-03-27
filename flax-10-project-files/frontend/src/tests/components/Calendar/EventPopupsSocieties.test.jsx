@@ -6,17 +6,17 @@ vi.mock('../../../context/CalendarContext', () => ({
   useEventModal: vi.fn(() => ({ isModalOpen: false })), useEventPopup: vi.fn(), useCalendarDispatch: vi.fn(), useCalendar: vi.fn(() => ({})),
   useEventDelete: vi.fn(() => ({ isDeleteOpen: false }))
 }));
-vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: vi.fn(() => ({ loadEvents: vi.fn() })),
   useEventActions: vi.fn(() => ({ removeEvent: vi.fn(), addException: vi.fn() }))
 }));
 vi.mock('../../../context/TagContext', () => ({ useTags: vi.fn(() => ({ refreshTags: vi.fn(), getTag: vi.fn() })) }));
 vi.mock('../../../context/ToastContext', () => ({ useToast: vi.fn(() => vi.fn()) }));
 vi.mock('../../../api/societyApi', () => ({ unsyncCalendar: vi.fn() }));
-vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({ EventModal: () => <div data-testid="event-modal-mock" /> }));
-vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({ EventPopover: ({ event, actions, tag }) => (<div data-testid="event-popup"><span>{event?.title}</span>{tag && <span data-testid="popup-tag">{tag.label}</span>}{actions?.map((a, i) => (<button key={i} onClick={a.onClick}>{a.label}</button>))}</div>) }));
-vi.mock('../../../components/Calendar/utils/eventUtils', () => ({ getEventType: vi.fn(() => 'society'), hasRecurrence: vi.fn(() => false) }));
-import { EventPopups } from '../../../components/Calendar/EventPopups';
+vi.mock('../../../components/calendar/event_modal/EventModal', () => ({ EventModal: () => <div data-testid="event-modal-mock" /> }));
+vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({ EventPopover: ({ event, actions, tag }) => (<div data-testid="event-popup"><span>{event?.title}</span>{tag && <span data-testid="popup-tag">{tag.label}</span>}{actions?.map((a, i) => (<button key={i} onClick={a.onClick}>{a.label}</button>))}</div>) }));
+vi.mock('../../../components/calendar/utils/eventUtils', () => ({ getEventType: vi.fn(() => 'society'), hasRecurrence: vi.fn(() => false) }));
+import { EventPopups } from '../../../components/calendar/EventPopups';
 import { useEventPopup } from '../../../context/CalendarContext';
 import { useToast } from '../../../context/ToastContext';
 import { unsyncCalendar } from '../../../api/societyApi';

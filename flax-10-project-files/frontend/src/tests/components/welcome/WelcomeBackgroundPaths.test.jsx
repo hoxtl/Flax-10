@@ -1,6 +1,6 @@
 import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import WelcomeBackgroundPaths from "../../../components/welcome/WelcomeBackgroundPaths";
+import WelcomeBackgroundPaths from "../../../components/Welcome/WelcomeBackgroundPaths";
 
 let mockReducedMotion = false;
 let motionValueSets = [];

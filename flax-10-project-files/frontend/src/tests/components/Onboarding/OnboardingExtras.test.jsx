@@ -67,7 +67,7 @@ vi.mock("../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../components/onboarding/WarningBox", () => ({
+vi.mock("../../../components/Onboarding/WarningBox", () => ({
   default: ({ major, confirmed, onConfirm }) => (
     <div>
       <span>{`Warning for ${major}`}</span>
@@ -81,11 +81,10 @@ vi.mock("../../../components/onboarding/WarningBox", () => ({
   ),
 }));
 
-import SuccessScreen from "../../../components/onboarding/SuccessScreen";
-import WarningBox from "../../../components/onboarding/WarningBox";
-import OnboardingForm from "../../../components/onboarding/OnboardingForm";
+import SuccessScreen from "../../../components/Onboarding/SuccessScreen";
+import WarningBox from "../../../components/Onboarding/WarningBox";
+import OnboardingForm from "../../../components/Onboarding/OnboardingForm";
 
-// ─── SuccessScreen ────────────────────────────────────────────────────────────
 
 describe("SuccessScreen", () => {
   it("renders the celebration emoji", () => {
@@ -116,7 +115,6 @@ describe("SuccessScreen", () => {
   });
 });
 
-// ─── WarningBox ───────────────────────────────────────────────────────────────
 // WarningBox is mocked above so that OnboardingForm can use it.
 // The mock faithfully replicates the public API so we test via the mock import.
 
@@ -163,7 +161,6 @@ describe("WarningBox (via mock – tests public interface contract)", () => {
   });
 });
 
-// ─── OnboardingForm ───────────────────────────────────────────────────────────
 
 describe("OnboardingForm – submit button state", () => {
   const base = {
@@ -238,7 +235,6 @@ describe("OnboardingForm – submit button state", () => {
   });
 });
 
-// ─── WarningSection visibility ────────────────────────────────────────────────
 
 describe("WarningSection inside OnboardingForm", () => {
   const base = {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { SignUpForm } from '../../../components/auth/SignUpForm';
+import { SignUpForm } from '../../../components/Auth/SignUpForm';
 
 const defaultFormData = {
     first_name: '', last_name: '', username: '',

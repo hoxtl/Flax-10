@@ -1,123 +1,129 @@
-import { act, render, screen, fireEvent } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { clearTask, openPicker, pickRecommendedTask, selectTask } from "../../../components/timer/TaskInput";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
+import { TaskInput } from '../../../components/Timer/TimerComponents';
 
-const taskPickerState = {
-  open: false,
-  loadTasks: vi.fn(),
-  setOpen: vi.fn(),
-  setSelectedTaskId: vi.fn(),
-  setRecommendedTaskId: vi.fn(),
-  recommendedTask: null,
-};
-
-vi.mock("../../../components/timer/task_input/useTaskPickerData", () => ({
-  useTaskPickerData: vi.fn(() => ({
-    ref: { current: null },
-    filterWrapRef: { current: null },
-    ...taskPickerState,
-  })),
-}));
-
-vi.mock("../../../components/timer/task_input/TaskPickerModal", () => ({
-  TaskPickerModal: ({ onSelect, onPickForMe }) => (
-    <div>
-      <button onClick={() => onSelect({ id: 7, title: "Deep Work" })}>Pick task</button>
-      <button onClick={onPickForMe}>Smart Pick</button>
-    </div>
+// Keep dropdowns testable (native controls)
+vi.mock('../../../components/common/animated_dropdown', () => ({
+  default: ({ value, onChange, options }) => (
+    <select
+      role="combobox"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
   ),
 }));
 
-vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
-  default: ({ children, ...props }) => <button {...props}>{children}</button>,
+// TaskInput dynamically imports taskService, which calls fetchApi from api/client.js.
+// Mocking fetchApi avoids brittle dynamic-import module-id mocking.
+vi.mock('../../../api/client.js', () => ({
+  fetchApi: vi.fn(),
 }));
 
-vi.mock("framer-motion", () => ({
-  AnimatePresence: ({ children }) => <>{children}</>,
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-  },
-}));
+import { fetchApi } from '../../../api/client.js';
 
-import { TaskInput } from "../../../components/timer/TaskInput";
+const tasks = [
+  { id: 1, title: 'Urgent task', completed: false, priority: 'urgent', task_list: 1, due_date: '2026-03-10T10:00:00Z', estimated_blocks: 1, module_code: 'CS101' },
+  { id: 2, title: 'Low task', completed: false, priority: 'low', task_list: 2, due_date: null, estimated_blocks: 4, module_code: 'MA102' },
+  { id: 3, title: 'High task', completed: false, priority: 'high', task_list: 1, due_date: '2026-03-09T10:00:00Z', estimated_blocks: 2, module_code: 'CS101' },
+  { id: 4, title: 'Done task', completed: true, priority: 'medium', task_list: 1, due_date: null, estimated_blocks: 1, module_code: null },
+];
 
-describe("TaskInput coverage", () => {
+const lists = [
+  { id: 1, name: 'Work', color: '#111111' },
+  { id: 2, name: 'Personal', color: '#222222' },
+];
+
+function renderTaskInput(props = {}) {
+  const value = props.value ?? '';
+  const onChange = props.onChange ?? vi.fn();
+  const onTaskSelect = props.onTaskSelect ?? vi.fn();
+  return render(<TaskInput value={value} onChange={onChange} onTaskSelect={onTaskSelect} />);
+}
+
+describe('TaskInput', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
     vi.clearAllMocks();
-    taskPickerState.open = false;
-    taskPickerState.recommendedTask = null;
+    fetchApi.mockImplementation(async (url) => {
+      if (typeof url === 'string' && url.startsWith('/tasks/lists/')) return lists;
+      if (typeof url === 'string' && url.startsWith('/tasks/')) return tasks;
+      return null;
+    });
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+  it('opens task picker and loads tasks/lists', async () => {
+    renderTaskInput();
+    fireEvent.click(screen.getByText('Choose a task to focus'));
 
-  it("opens the picker lazily, selects tasks, and clears the current value", () => {
-    const onChange = vi.fn();
-    const onClearTask = vi.fn();
-    const onTaskSelect = vi.fn();
-
-    render(<TaskInput value="Essay" onChange={onChange} onClearTask={onClearTask} onTaskSelect={onTaskSelect} onOpenFocus={vi.fn()} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Clear task" }));
-    expect(onChange).toHaveBeenCalledWith("");
-    expect(onClearTask).toHaveBeenCalled();
-    expect(taskPickerState.setSelectedTaskId).toHaveBeenCalledWith(null);
-    expect(taskPickerState.setRecommendedTaskId).toHaveBeenCalledWith(null);
-
-    fireEvent.click(screen.getByRole("button", { name: "Change task" }));
-    expect(taskPickerState.loadTasks).toHaveBeenCalledTimes(1);
-    expect(taskPickerState.setOpen).toHaveBeenCalledWith(expect.any(Function));
-
-    fireEvent.click(screen.getByText("Pick task"));
-    expect(onChange).toHaveBeenCalledWith("Deep Work");
-    expect(onTaskSelect).toHaveBeenCalledWith({ id: 7, title: "Deep Work" });
-  });
-
-  it("runs the recommended-task path when a recommendation is available", async () => {
-    const onChange = vi.fn();
-    const onTaskSelect = vi.fn();
-    taskPickerState.recommendedTask = { id: 9, title: "Recommended" };
-
-    render(<TaskInput value="" onChange={onChange} onTaskSelect={onTaskSelect} />);
-
-    fireEvent.click(screen.getByText("Smart Pick"));
-    expect(taskPickerState.setRecommendedTaskId).toHaveBeenCalledWith(9);
-
-    await act(async () => {
-      vi.advanceTimersByTime(140);
+    await waitFor(() => {
+      expect(fetchApi).toHaveBeenCalled();
     });
 
-    expect(onChange).toHaveBeenCalledWith("Recommended");
-    expect(onTaskSelect).toHaveBeenCalledWith({ id: 9, title: "Recommended" });
+    expect(screen.getByText('Select a Task')).toBeTruthy();
+    expect(screen.getByText('Urgent task')).toBeTruthy();
+    expect(screen.getByText('High task')).toBeTruthy();
   });
 
-  it("opens the picker only when not already open", () => {
-    const s = { ...taskPickerState };
-    openPicker(s);
-    expect(s.loadTasks).toHaveBeenCalledTimes(1);
-    s.open = true;
-    openPicker(s);
-    expect(s.loadTasks).toHaveBeenCalledTimes(1);
+  it('search filters tasks by title', async () => {
+    renderTaskInput();
+    fireEvent.click(screen.getByText('Choose a task to focus'));
+    await waitFor(() => expect(fetchApi).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/Search tasks/i), { target: { value: 'urgent' } });
+    expect(screen.getByText('Urgent task')).toBeTruthy();
+    expect(screen.queryByText('Low task')).toBeNull();
   });
-  it("clears the current task and resets state", () => {
-    const s = { ...taskPickerState }, onChange = vi.fn(), onClear = vi.fn();
-    clearTask(s, onChange, onClear);
-    expect(s.setSelectedTaskId).toHaveBeenCalledWith(null);
-    expect(onChange).toHaveBeenCalledWith("");
-    expect(onClear).toHaveBeenCalled();
+
+  it('sort by due date prioritizes tasks with due_date', async () => {
+    renderTaskInput();
+    fireEvent.click(screen.getByText('Choose a task to focus'));
+    await waitFor(() => expect(fetchApi).toHaveBeenCalled());
+
+    const sortSelect = screen.getAllByRole('combobox')[0];
+    fireEvent.change(sortSelect, { target: { value: 'due' } });
+
+    await waitFor(() => {
+      const list = document.querySelector('[class*="taskPickList"]');
+      const items = Array.from(list.querySelectorAll('button')).map((button) => button.textContent);
+      expect(items[0]).toContain('High task');
+    });
   });
-  it("selects a task and triggers onChange", () => {
-    const s = { ...taskPickerState }, onChange = vi.fn(), onSelect = vi.fn();
-    selectTask({ id: 11, title: "Essay" }, s, onChange, onSelect);
-    expect(onChange).toHaveBeenCalledWith("Essay");
-    expect(onSelect).toHaveBeenCalledWith({ id: 11, title: "Essay" });
+
+  it('filters by list and module', async () => {
+    renderTaskInput();
+    fireEvent.click(screen.getByText('Choose a task to focus'));
+    await waitFor(() => expect(fetchApi).toHaveBeenCalled());
+
+    // Open filter panel
+    fireEvent.click(screen.getByText('Filter'));
+    await waitFor(() => expect(screen.getByRole('dialog', { name: 'Task filters' })).toBeTruthy());
+
+    // Filter list: Work (id 1)
+    fireEvent.click(screen.getByLabelText('Work'));
+    await waitFor(() => expect(screen.queryByText('Low task')).toBeNull());
+    expect(screen.getByText('Urgent task')).toBeTruthy();
+
+    // Filter module: CS101
+    fireEvent.click(screen.getByText('Modules'));
+    fireEvent.click(screen.getByLabelText('CS101'));
+    await waitFor(() => expect(screen.queryByText('Low task')).toBeNull());
+    expect(screen.getByText('Urgent task')).toBeTruthy();
   });
-  it("does nothing in pickRecommendedTask when no recommendation exists", async () => {
-    const s = { ...taskPickerState }, onChange = vi.fn(), onSelect = vi.fn();
-    pickRecommendedTask(s, onChange, onSelect);
-    await act(async () => { vi.advanceTimersByTime(150); });
-    expect(onSelect).not.toHaveBeenCalled();
+
+  it('selecting a task updates value and calls onTaskSelect', async () => {
+    const onChange = vi.fn();
+    const onTaskSelect = vi.fn();
+    renderTaskInput({ onChange, onTaskSelect });
+    fireEvent.click(screen.getByText('Choose a task to focus'));
+    await waitFor(() => expect(fetchApi).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByText('Urgent task'));
+    expect(onChange).toHaveBeenCalledWith('Urgent task');
+    expect(onTaskSelect).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 });

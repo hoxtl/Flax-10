@@ -2,7 +2,7 @@
  * Embedded music player card.
  */
 
-import styles from '../../../pages/timer/TimerPage.module.css';
+import styles from '../../../pages/Timer/TimerPage.module.css';
 import { ProviderIcon } from './SoundIcons';
 
 export function MusicEmbed({ station, onClose }) {
@@ -15,7 +15,7 @@ export function MusicEmbed({ station, onClose }) {
           <button type="button" className={styles.musicEmbedClose} onClick={onClose} title="Close player">✕</button>
         </div>
       </div>
-      <iframe className={styles.musicEmbedIframe} src={station.embedUrl} width="100%" height={station.provider === 'spotify' ? 152 : 168} frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title={station.label} />
+      <iframe className={styles.musicEmbedIframe} src={station.embedUrl} width="100%" height={station.provider === 'spotify' ? 152 : 168} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" loading="lazy" title={station.label} />
     </div>
   );
 }

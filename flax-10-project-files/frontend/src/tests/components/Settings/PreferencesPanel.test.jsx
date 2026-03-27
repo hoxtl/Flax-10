@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-import PreferencesPanel from '../../../components/settings/PreferencesPanel';
+import PreferencesPanel from '../../../components/Settings/PreferencesPanel';
 
 vi.mock('../../../context/ThemeContext', () => ({
   useTheme: vi.fn(() => ({
@@ -23,7 +23,7 @@ vi.mock('../../../api/userApi', () => ({
   }),
 }));
 
-vi.mock('../../../pages/tasks/components/DateTimePicker', () => ({
+vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
   default: ({ value, onChange, placeholder }) => <input data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />,
 }));
 

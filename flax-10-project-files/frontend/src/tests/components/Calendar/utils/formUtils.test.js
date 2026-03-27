@@ -9,19 +9,19 @@ import {
     executeDelete,
     deleteRecurrenceOccurrence,
     isRecurringEvent,
-} from '../../../../components/calendar/utils/formUtils';
+} from '../../../../components/Calendar/utils/formUtils';
 
 // Mock external dependencies
-vi.mock('../../../../components/calendar/utils/overlapUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/overlapUtils', () => ({
     checkOverlapWithConfirm: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
     extractBaseEventId: vi.fn((id) => typeof id === 'string' ? parseInt(id.split('_')[0]) || id : id),
     hasRecurrence: vi.fn((event) => !!event?.recurrence_details || !!event?.recurrence_rule || (typeof event?.recurrence === 'string' && event.recurrence !== 'none')),
 }));
 
-vi.mock('../../../../components/calendar/utils/dateValidation', () => ({
+vi.mock('../../../../components/Calendar/utils/dateValidation', () => ({
     validateDateRange: vi.fn((start, end) => {
         if (new Date(start) >= new Date(end)) return 'Start must be before end';
         return null;
@@ -40,8 +40,8 @@ vi.mock('../../../../utils/dateTimeInput', () => ({
     }),
 }));
 
-const { checkOverlapWithConfirm } = await import('../../../../components/calendar/utils/overlapUtils');
-const { extractBaseEventId, hasRecurrence } = await import('../../../../components/calendar/utils/eventUtils');
+const { checkOverlapWithConfirm } = await import('../../../../components/Calendar/utils/overlapUtils');
+const { extractBaseEventId, hasRecurrence } = await import('../../../../components/Calendar/utils/eventUtils');
 const { geocodeAddress } = await import('../../../../api/geocodeApi');
 
 const makeEvent = (overrides = {}) => ({

@@ -14,7 +14,7 @@ import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { useEventDelete, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { getEventTheme } from './utils/eventStyleUtils';
-import ctxStyles from '../../pages/tasks/components/TaskCardContextMenu.module.css';
+import ctxStyles from '../../pages/Tasks/components/TaskCardContextMenu.module.css';
 import './draggable-event.css';
 
 /** Main entry for an event block. Renders as personal (editable) or other (read-only). */

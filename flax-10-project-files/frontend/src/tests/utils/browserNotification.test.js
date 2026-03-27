@@ -21,7 +21,7 @@ const mockNotification = (permission = 'granted') => {
 describe('browserNotification: requestPermission', () => {
     beforeEach(async () => {
         vi.resetModules();
-        browserNotification = await import('../../components/notifications/utils/browserNotification');
+        browserNotification = await import('../../components/Notifications/utils/browserNotification');
     });
     afterEach(() => {
         vi.unstubAllGlobals();
@@ -53,7 +53,7 @@ describe('browserNotification: sendBrowserNotification', () => {
     beforeEach(async () => {
         vi.resetModules();
         localStorage.clear();
-        browserNotification = await import('../../components/notifications/utils/browserNotification');
+        browserNotification = await import('../../components/Notifications/utils/browserNotification');
     });
     afterEach(() => {
         vi.unstubAllGlobals();
@@ -89,11 +89,11 @@ describe('browserNotification: sendBrowserNotification', () => {
 
     it('calls window.focus and executeNotificationAction on notification click', async () => {
         vi.resetModules();
-        vi.mock('../../components/notifications/utils/notificationAction', () => ({
+        vi.mock('../../components/Notifications/utils/notificationAction', () => ({
             executeNotificationAction: vi.fn(),
         }));
-        browserNotification = await import('../../components/notifications/utils/browserNotification');
-        const { executeNotificationAction } = await import('../../components/notifications/utils/notificationAction');
+        browserNotification = await import('../../components/Notifications/utils/browserNotification');
+        const { executeNotificationAction } = await import('../../components/Notifications/utils/notificationAction');
 
         const Notif = mockNotification('granted');
         const focusSpy = vi.spyOn(window, 'focus').mockImplementation(() => {});

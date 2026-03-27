@@ -2,7 +2,7 @@
  * Account profile fields for personal details.
  */
 
-import styles from "../../../pages/settings/Settings.module.css";
+import styles from "../../../pages/Settings/Settings.module.css";
 import { FormInput, FormSelect } from "../SettingsUI";
 import { YEAR_OPTIONS } from "./accountFormConfig";
 

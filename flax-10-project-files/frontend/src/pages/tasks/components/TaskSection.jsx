@@ -3,16 +3,17 @@
  */
 
 import { useState, useMemo } from "react";
-import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 
-import TaskCard from "./TaskCard";
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState.jsx";
 import { sortTasks } from "../utils/taskSortUtils";
-import { getListColor } from "../utils/listColorUtils";
-import { isReadingList } from "../utils/readingListUtils";
-import { SECTION_SHOW_LIMIT, TASK_ROW_ANIM, SECTION_BODY_ANIM } from "../constants/taskAnimations";
+import { SECTION_SHOW_LIMIT, TASK_ROW_ANIM } from "../constants/taskAnimations";
+import {
+  CollapsibleCountChip,
+  CollapsibleSectionBody,
+  TaskCardRow,
+} from "./TaskSectionShared";
 
 import styles from "./TaskFeedSections.module.css";
 
@@ -32,21 +33,21 @@ function ProgressRing({ progressPct, isOverdue }) {
 }
 
 function SectionStatsChip({ totalInGroup, progressPct, isOverdue, collapsed, tasks, completedCount }) {
+  const doneCount = completedCount > 0
+    ? <span className={`${styles.sectionCountDone} ${collapsed ? styles.sectionCountDoneMuted : ""}`}>· {completedCount} done</span>
+    : null;
   return (
-    <span className={styles.sectionStatsChip}>
-      <span className={styles.sectionCountWrap}>
-        {totalInGroup > 0 && <ProgressRing progressPct={progressPct} isOverdue={isOverdue} />}
-        <span className={styles.sectionCountPill} aria-label={`${tasks.length} tasks`}>{tasks.length}</span>
-        {completedCount > 0 && (
-          <span className={`${styles.sectionCountDone} ${collapsed ? styles.sectionCountDoneMuted : ""}`}>· {completedCount} done</span>
-        )}
-      </span>
-      <span className={styles.sectionChevronBtn} aria-hidden>
-        <Motion.span className={styles.sectionChevron} animate={{ rotate: collapsed ? -90 : 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
-          <ChevronDown size={16} />
-        </Motion.span>
-      </span>
-    </span>
+    <CollapsibleCountChip
+      count={tasks.length}
+      label={`${tasks.length} tasks`}
+      collapsed={collapsed}
+      extraContent={
+        <>
+          {totalInGroup > 0 && <ProgressRing progressPct={progressPct} isOverdue={isOverdue} />}
+          {doneCount}
+        </>
+      }
+    />
   );
 }
 
@@ -83,22 +84,21 @@ function SectionEmptyState({ sectionType, emptyMessage, emptySub, emptyCardProps
 }
 
 function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask, hideDueBadge, hideListBadge, isOverdueSection, searchQuery }) {
-  const list = listMap[String(task.task_list)];
-  const editHandler = !isReadingList(list) && onEditTask ? (data, meta) => onEditTask(task.id, data, meta) : undefined;
   return (
-    <div className={styles.taskRow}>
-      <TaskCard
-        task={task}
-        listName={list?.name}
-        listColor={getListColor(list, list?.idx)}
-        lists={lists}
-        onToggle={() => onToggleComplete(task.id, task.completed)}
-        onDelete={() => onDeleteTask(task.id)}
-        onEdit={editHandler}
-        hideDueBadge={hideDueBadge} hideListBadge={hideListBadge}
-        isOverdue={isOverdueSection} searchQuery={searchQuery}
-      />
-    </div>
+    <TaskCardRow
+      task={task}
+      listMap={listMap}
+      lists={lists}
+      onToggleComplete={onToggleComplete}
+      onDeleteTask={onDeleteTask}
+      onEditTask={onEditTask}
+      cardProps={{
+        hideDueBadge,
+        hideListBadge,
+        isOverdue: isOverdueSection,
+        searchQuery,
+      }}
+    />
   );
 }
 
@@ -150,15 +150,11 @@ export default function TaskSection(props) {
   return (
     <div className={`${styles.section} ${accentCls} ${props.isOverdueSection ? styles.sectionOverdue : ""}`}>
       <SectionHeader title={props.title} emoji={props.emoji} isOverdue={props.isOverdueSection} collapsed={state.collapsed} tasks={props.tasks} completedCount={props.completedCount} totalInGroup={state.totalInGroup} progressPct={state.progressPct} onToggle={() => state.setCollapsed((c) => !c)} />
-      <AnimatePresence initial={false}>
-        {!state.collapsed && (
-          <Motion.div key="section-body" {...SECTION_BODY_ANIM} style={{ overflow: "hidden" }}>
-            <div className={styles.sectionBody}>
-              <SectionBody tasks={state.visibleTasks} showAll={state.showAll} applyLimit={props.applyLimit} hiddenCount={state.hiddenCount} emptyState={state.emptyState} sectionTaskRowProps={state.sectionTaskRowProps} />
-            </div>
-          </Motion.div>
-        )}
-      </AnimatePresence>
+      <CollapsibleSectionBody collapsed={state.collapsed} bodyKey="section-body">
+        <div className={styles.sectionBody}>
+          <SectionBody tasks={state.visibleTasks} showAll={state.showAll} applyLimit={props.applyLimit} hiddenCount={state.hiddenCount} emptyState={state.emptyState} sectionTaskRowProps={state.sectionTaskRowProps} />
+        </div>
+      </CollapsibleSectionBody>
     </div>
   );
 }

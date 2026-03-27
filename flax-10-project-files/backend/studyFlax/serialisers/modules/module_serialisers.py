@@ -32,6 +32,7 @@ def _profile_photo_url(photo, request):
 
 class ModuleSerialiser(serializers.ModelSerializer):
     """Serialiser for module."""
+
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=True)
     deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
@@ -42,6 +43,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for module serialiser."""
+
         model = Module
         fields = ['id', 'module_code', 'module_name', 'description', 'department',
                   'course', 'created_by', 'created_by_name', 'start_time', 'end_time',

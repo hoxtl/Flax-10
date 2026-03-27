@@ -1,4 +1,4 @@
-import Card from "../../../../components/common/card/Card";
+import Card from "../../../../components/common/Card/Card";
 import styles from "./ProfileWidgets.module.css";
 
 function PersonaHeader({ label, emoji, peakLabel }) {
@@ -15,6 +15,8 @@ function buildPeakLabel(peakHour) {
   if (peakHour == null) return null;
   return `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak`;
 }
+
+export { buildPeakLabel };
 
 export function PersonaCard({ persona, peakHour }) {
   if (!persona) return null;

@@ -61,7 +61,9 @@ function updateCompletedSession(state, t) {
   t.setCompletedSessions(next);
   resetBlockMetrics(t);
   if (next >= t.targetSessions) return showGoalModal(t, state.studyBlockId, state.setModal);
-  continueNextSession(t, state.modal);
+  const prevModal = state.modal;
+  state.setModal(null);
+  continueNextSession(t, prevModal);
 }
 
 function resetFlow(state, t) {

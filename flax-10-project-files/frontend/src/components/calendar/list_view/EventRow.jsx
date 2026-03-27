@@ -7,7 +7,7 @@ import { getEventType, isReadOnlyEvent, isAllDay } from '../utils/eventUtils';
 import { useEventPopup } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
-import Badge from '../../common/badge/Badge';
+import Badge from '../../common/Badge/Badge';
 import styles from './ListView.module.css';
 
 export function formatEventTime(event) {
@@ -55,13 +55,13 @@ function useEventRowData(event) {
     return { accentColor, badges: getTagBadges(event, accentColor), readOnly: isReadOnlyEvent(event) };
 }
 
-function ConflictEventCell({ event }) {
+function EventRowCell({ className, event }) {
     const ref = useRef(null);
     const { openPopup } = useEventPopup();
     const { accentColor, badges, readOnly } = useEventRowData(event);
     const onClick = () => openPopup(event, ref.current?.getBoundingClientRect());
     return (
-        <div ref={ref} className={`${styles.conflictCell} ${readOnly ? styles.readOnly : ''}`} data-event-id={event.id} onClick={onClick} style={accentColor ? { '--accent': accentColor } : undefined}>
+        <div ref={ref} className={`${className} ${readOnly ? styles.readOnly : ''}`} data-event-id={event.id} onClick={onClick} style={accentColor ? { '--accent': accentColor } : undefined}>
             <EventRowMain event={event} accentColor={accentColor} badges={badges} />
         </div>
     );
@@ -70,19 +70,11 @@ function ConflictEventCell({ event }) {
 export function ConflictRow({ events }) {
     return (
         <div className={styles.conflictRow}>
-            {events.map(event => <ConflictEventCell key={event.id} event={event} />)}
+            {events.map(event => <EventRowCell key={event.id} className={styles.conflictCell} event={event} />)}
         </div>
     );
 }
 
 export function EventRow({ event }) {
-    const ref = useRef(null);
-    const { openPopup } = useEventPopup();
-    const { accentColor, badges, readOnly } = useEventRowData(event);
-    const onClick = () => openPopup(event, ref.current?.getBoundingClientRect());
-    return (
-        <div ref={ref} className={`${styles.eventRow} ${readOnly ? styles.readOnly : ''}`} data-event-id={event.id} onClick={onClick} style={accentColor ? { '--accent': accentColor } : undefined}>
-            <EventRowMain event={event} accentColor={accentColor} badges={badges} />
-        </div>
-    );
+    return <EventRowCell className={styles.eventRow} event={event} />;
 }

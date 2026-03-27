@@ -2,8 +2,8 @@ import React from "react";
 import { act, render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import styles from "../../../../components/calendar/month_view/SwipeMonthView.module.css";
-import { SwipeMonthView } from "../../../../components/calendar/month_view/SwipeMonthView";
+import styles from "../../../../components/Calendar/month_view/SwipeMonthView.module.css";
+import { SwipeMonthView } from "../../../../components/Calendar/month_view/SwipeMonthView";
 
 let calendarState;
 const dispatch = vi.fn();
@@ -14,15 +14,15 @@ vi.mock("../../../../context/CalendarContext", () => ({
   useCalendarDispatch: () => dispatch,
 }));
 
-vi.mock("../../../../components/calendar/hooks/useSwipeNavigation", () => ({
+vi.mock("../../../../components/Calendar/hooks/useSwipeNavigation", () => ({
   useSwipeNavigation: (...args) => useSwipeNavigation(...args),
 }));
 
-vi.mock("../../../../components/calendar/month_view/WeekdayHeader", () => ({
+vi.mock("../../../../components/Calendar/month_view/WeekdayHeader", () => ({
   WeekdayHeader: () => <div>weekday-header</div>,
 }));
 
-vi.mock("../../../../components/calendar/month_view/WeekRow", () => ({
+vi.mock("../../../../components/Calendar/month_view/WeekRow", () => ({
   WeekRow: () => <div>week-row</div>,
 }));
 

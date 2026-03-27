@@ -4,11 +4,11 @@ const isNowMock = vi.fn();
 const getTflLinesForLocationMock = vi.fn();
 const isSevereDisruptionMock = vi.fn();
 
-vi.mock("../../../pages/homepage/utils/eventUtils", () => ({
+vi.mock("../../../pages/Homepage/utils/eventUtils", () => ({
   isNow: (...args) => isNowMock(...args),
 }));
 
-vi.mock("../../../pages/homepage/utils/kclTflMapping", () => ({
+vi.mock("../../../pages/Homepage/utils/kclTflMapping", () => ({
   getTflLinesForLocation: (...args) => getTflLinesForLocationMock(...args),
   isSevereDisruption: (...args) => isSevereDisruptionMock(...args),
 }));
@@ -21,7 +21,7 @@ import {
   getNextEvent,
   getTimeLeftBand,
   hasCampusCommute,
-} from "../../../pages/homepage/components/rightNowUtils";
+} from "../../../pages/Homepage/components/RightNowUtils";
 
 describe("RightNowUtils", () => {
   beforeEach(() => {

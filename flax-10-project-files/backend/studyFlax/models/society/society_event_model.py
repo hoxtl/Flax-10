@@ -20,6 +20,7 @@ RECURRENCE_CHOICES = [
 
 class SocietyEvent(models.Model):
     """Event organised by a society."""
+
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='events')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
@@ -38,6 +39,7 @@ class SocietyEvent(models.Model):
 
     class Meta:
         """Metadata for society event."""
+
         ordering = ['start_time']
 
     def __str__(self):

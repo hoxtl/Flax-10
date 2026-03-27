@@ -2,7 +2,7 @@
  * Loaded content layout for the tasks page.
  */
 
-import { BackToTop } from "../../components/pagination/Pagination";
+import { BackToTop } from "../../components/Pagination/Pagination";
 
 import CreateListModal from "./components/CreateListModal";
 import CreateTaskModal from "./components/CreateTaskModal";

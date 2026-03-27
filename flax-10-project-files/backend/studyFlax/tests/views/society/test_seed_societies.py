@@ -16,6 +16,7 @@ User = get_user_model()
 
 class NormalisePhraseBranchTest(TestCase):
     """Tests normalise phrase branch."""
+
     def test_empty_string_returns_empty(self):
         self.assertEqual(_normalise_phrase(""), "")
 
@@ -28,6 +29,7 @@ class NormalisePhraseBranchTest(TestCase):
 
 class JoinTagsBranchTest(TestCase):
     """Tests join tags branch."""
+
     def test_empty_list_returns_empty(self):
         self.assertEqual(_join_tags([]), "")
 
@@ -40,6 +42,7 @@ class JoinTagsBranchTest(TestCase):
 
 class SeedSocietyMembershipDefaultsTest(TestCase):
     """Tests seed society membership defaults."""
+
     def setUp(self):
         self.user = User.objects.create_user(
             username="seed_society_member",

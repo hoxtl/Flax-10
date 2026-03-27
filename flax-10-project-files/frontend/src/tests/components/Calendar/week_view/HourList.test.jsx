@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { HourList } from '../../../../components/calendar/week_view/components/HourList';
+import { HourList } from '../../../../components/Calendar/week_view/components/HourList';
 
-vi.mock('../../../../components/calendar/day_view/dayViewHelpers', () => ({
+vi.mock('../../../../components/Calendar/day_view/dayViewHelpers', () => ({
   getHoursOfDay: vi.fn(() => [8, 9]),
 }));
 
-vi.mock('../../../../components/calendar/week_view/components/HourCell', () => ({
+vi.mock('../../../../components/Calendar/week_view/components/HourCell', () => ({
   HourCell: ({ hour, date, readOnly }) => (
     <div data-testid="hour-cell">{`${hour}-${String(date)}-${String(readOnly)}`}</div>
   ),

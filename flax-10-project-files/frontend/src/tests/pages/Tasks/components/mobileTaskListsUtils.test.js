@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   getMobileListSectionProps,
   splitMobileLists,
-} from "../../../../pages/tasks/components/mobileTaskListsUtils";
+} from "../../../../pages/Tasks/components/mobileTaskListsUtils";
 
 describe("mobileTaskListsUtils", () => {
   it("splits reading and life lists from mixed input", () => {

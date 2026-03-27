@@ -10,7 +10,7 @@ import {
   isTeachingList,
   matchesReadingList,
   parseReadingListName,
-} from "../../../pages/tasks/utils/readingListUtils";
+} from "../../../pages/Tasks/utils/readingListUtils";
 
 describe("readingListUtils", () => {
   it("detects teaching lists and strips the teaching prefix", () => {

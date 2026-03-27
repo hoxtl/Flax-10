@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 
 class AttendanceViewTests(BaseTestCase):
     """Tests attendance view."""
+
     def _create_timetable_event(self, **overrides):
         defaults = {
             "user": self.user,
@@ -138,6 +139,7 @@ class AttendanceViewTests(BaseTestCase):
 
 class NormalizeEventTypeTests(BaseTestCase):
     """Tests normalize event type."""
+
     def test_none_returns_other(self):
         self.assertEqual(_normalize_event_type(None), "Other")
 
@@ -171,6 +173,7 @@ class NormalizeEventTypeTests(BaseTestCase):
 
 class InferTypeFromTitleAndDescTests(BaseTestCase):
     """Tests infer type from title and desc."""
+
     def _make_event(self, title="", description=""):
         mock = MagicMock()
         mock.title = title
@@ -210,6 +213,7 @@ class InferTypeFromTitleAndDescTests(BaseTestCase):
 
 class EventTypeFromRecordTests(BaseTestCase):
     """Tests event type from record."""
+
     def test_no_event_attr(self):
         record = MagicMock(spec=[])
         self.assertEqual(_event_type_from_record(record), "Other")
@@ -248,6 +252,7 @@ class EventTypeFromRecordTests(BaseTestCase):
 
 class BuildAttendanceStatsTests(BaseTestCase):
     """Tests build attendance stats."""
+
     def test_empty_records(self):
         result = build_attendance_stats([])
         self.assertEqual(result["overall"], {"attended": 0, "missed": 0})

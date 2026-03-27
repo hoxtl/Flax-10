@@ -13,7 +13,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("../../pages/banned/BannedPage", () => ({
+vi.mock("../../pages/Banned/BannedPage", () => ({
   default: ({ reason }) => <div>{`Banned:${reason}`}</div>,
 }));
 
@@ -81,11 +81,11 @@ vi.mock("../../context/TaskCompletionContext", () => ({
   TaskCompletionProvider: ({ children }) => <div data-testid="task-completion-provider">{children}</div>,
 }));
 
-vi.mock("../../components/notifications", () => ({
+vi.mock("../../components/Notifications", () => ({
   NotificationToast: () => <div>NotificationToast</div>,
 }));
 
-vi.mock("../../components/attendance/AttendancePrompt", () => ({
+vi.mock("../../components/Attendance/AttendancePrompt", () => ({
   default: () => <div>AttendancePrompt</div>,
 }));
 

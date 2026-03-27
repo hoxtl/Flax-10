@@ -2,7 +2,7 @@
  * Timer presets and configuration panels.
  */
 
-import styles from '../../pages/timer/TimerPage.module.css';
+import styles from '../../pages/Timer/TimerPage.module.css';
 import { TimerSettings } from './TimerComponents';
 import { AutoStartToggle } from './presets/AutoStartToggle';
 import { PresetCard } from './presets/PresetCard';
@@ -59,7 +59,9 @@ export function TimerConfigPanel({ t, embedded = false }) {
   const disabled = t.isActive && !t.isPaused;
   const content = (
     <div className={styles.configInsetPanel}>
+      <span className={styles.presetPanelLabel}>Custom Duration</span>
       <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} disabled={disabled} />
+      <div className={styles.timerSettingsDivider} />
       <QuickAdjustButtons disabled={disabled} t={t} />
       <AutoStartToggle />
     </div>

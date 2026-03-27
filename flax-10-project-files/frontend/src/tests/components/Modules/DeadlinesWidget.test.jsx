@@ -5,8 +5,8 @@
 import { MemoryRouter } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DeadlinesWidget } from '../../../pages/homepage/components/DeadlinesWidget';
-import { UpcomingDeadlinesWidget } from '../../../components/modules/deadlines/UpcomingDeadlinesWidget';
+import { DeadlinesWidget } from '../../../pages/Homepage/components/DeadlinesWidget';
+import { UpcomingDeadlinesWidget } from '../../../components/Modules/Deadlines/UpcomingDeadlinesWidget';
 
 const navigateMock = vi.fn();
 
@@ -15,7 +15,7 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => navigateMock };
 });
 
-vi.mock('../../../pages/homepage/components/DeadlinesWidget.module.css', () => ({ default: {} }));
+vi.mock('../../../pages/Homepage/components/DeadlinesWidget.module.css', () => ({ default: {} }));
 
 const deadlines = [
   { id: 1, title: 'Essay', module_code: 'CS101', module_id: 5, start_due_date: '2026-04-01T12:00:00Z', deadline_type: 'exam' },

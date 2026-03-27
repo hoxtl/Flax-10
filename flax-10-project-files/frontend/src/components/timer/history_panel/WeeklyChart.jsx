@@ -3,7 +3,7 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
-import styles from '../../../pages/timer/TimerPage.module.css';
+import styles from '../../../pages/Timer/TimerPage.module.css';
 
 const MotionSpan = motion.span;
 

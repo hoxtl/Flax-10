@@ -7,7 +7,7 @@ import {
   getPresetIcon,
   inferTaskType,
   isPresetActive,
-} from "../../../components/timer/utils/presetUtils";
+} from "../../../components/Timer/utils/presetUtils";
 
 describe("presetUtils", () => {
   beforeEach(() => {

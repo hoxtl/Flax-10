@@ -32,7 +32,7 @@ vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
   ),
 }));
 
-vi.mock("../../../components/settings/ui/RequestDecisionNotice", () => ({
+vi.mock("../../../components/Settings/ui/RequestDecisionNotice", () => ({
   default: () => <div>request-notice</div>,
 }));
 
@@ -47,16 +47,16 @@ vi.mock("../../../components/common/request_status_card/RequestStatusCard", () =
   ),
 }));
 
-vi.mock("../../../components/settings/SettingsContextCard", () => ({
+vi.mock("../../../components/Settings/SettingsContextCard", () => ({
   default: ({ title, items }) => <div>{title}:{items.join("|")}</div>,
 }));
 
-vi.mock("../../../components/settings/SettingsUI", () => ({
+vi.mock("../../../components/Settings/SettingsUI", () => ({
   SectionHeader: ({ title, description }) => <div>{title}:{description}</div>,
   SubmitButton: ({ label, savingLabel, isSaving }) => <button type="submit">{isSaving ? savingLabel : label}</button>,
 }));
 
-vi.mock("../../../components/settings/account/AccountInfoFields", () => ({
+vi.mock("../../../components/Settings/account/AccountInfoFields", () => ({
   PersonalInfoFields: ({ formData, onChange }) => (
     <div>
       <input aria-label="First name" value={formData.firstName} onChange={(event) => onChange({ target: { name: "firstName", value: event.target.value } })} />
@@ -65,7 +65,7 @@ vi.mock("../../../components/settings/account/AccountInfoFields", () => ({
   YearField: ({ value, onChange }) => <input aria-label="Year" value={value} onChange={onChange} />,
 }));
 
-vi.mock("../../../components/settings/account/accountCourseRequests", async (importOriginal) => {
+vi.mock("../../../components/Settings/account/accountCourseRequests", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -73,10 +73,10 @@ vi.mock("../../../components/settings/account/accountCourseRequests", async (imp
   };
 });
 
-import CourseChangeModal from "../../../components/settings/account/CourseChangeModal";
-import CourseDisplay from "../../../components/settings/account/CourseDisplay";
-import AccountFormLayout from "../../../components/settings/account/AccountFormLayout";
-import useAccountFormState from "../../../components/settings/account/useAccountFormState";
+import CourseChangeModal from "../../../components/Settings/account/CourseChangeModal";
+import CourseDisplay from "../../../components/Settings/account/CourseDisplay";
+import AccountFormLayout from "../../../components/Settings/account/AccountFormLayout";
+import useAccountFormState from "../../../components/Settings/account/useAccountFormState";
 
 const defaultExternalUser = { first_name: "Ava", last_name: "Ng", email: "ava@example.com", year: "Year 2", major: "Maths" };
 

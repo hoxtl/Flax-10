@@ -20,6 +20,7 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 class GroupMembershipSerialiserTests(BaseTestCase):
     """Tests group membership serialiser."""
+
     def test_profile_photo_url_none_when_no_photo(self):
         project = _make_project(self.user)
         membership = GroupMembership.objects.get(project=project, user=self.user)
@@ -29,6 +30,7 @@ class GroupMembershipSerialiserTests(BaseTestCase):
 
 class GroupProjectSerialiserPhotoTests(BaseTestCase):
     """Tests group project serialiser photo."""
+
     def test_tutor_photo_url_returns_http_url_unchanged(self):
         project = _make_project(self.user)
         project.module_tutor_profile_photo = 'https://cdn.example.com/photo.jpg'

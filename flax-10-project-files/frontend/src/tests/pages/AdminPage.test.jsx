@@ -40,9 +40,9 @@ vi.mock("../../api/adminApi", () => ({
   resolveCourseChangeRequest: vi.fn(),
 }));
 
-vi.mock("../../pages/admin/AdminPage.module.css", () => ({ default: {} }));
+vi.mock("../../pages/Admin/AdminPage.module.css", () => ({ default: {} }));
 
-vi.mock("../../components/pagination/Pagination", () => ({
+vi.mock("../../components/Pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) =>
     totalPages > 1 ? (
       <div>
@@ -65,7 +65,7 @@ vi.mock("../../components/pagination/Pagination", () => ({
 }));
 
 import * as api from "../../api/adminApi";
-import AdminPage from "../../pages/admin/AdminPage";
+import AdminPage from "../../pages/Admin/AdminPage";
 
 const USERS = [
   {

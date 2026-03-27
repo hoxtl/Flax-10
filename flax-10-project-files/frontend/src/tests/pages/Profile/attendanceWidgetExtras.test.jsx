@@ -17,32 +17,32 @@ vi.mock("@mui/x-charts/PieChart", () => ({
   },
 }));
 
-vi.mock("../../../pages/attendance/components/SegmentDetailPanel", () => ({
+vi.mock("../../../pages/Attendance/components/SegmentDetailPanel", () => ({
   default: (props) => {
     segmentDetailPanelProps.push(props);
     return <div data-testid="segment-detail-panel">{props.segmentLabel}</div>;
   },
 }));
 
-vi.mock("../../../pages/attendance/components/OverallAttendanceChart", () => ({
+vi.mock("../../../pages/Attendance/components/OverallAttendanceChart", () => ({
   default: (props) => {
     overallChartProps.push(props);
     return <div data-testid="overall-attendance-chart">overall chart</div>;
   },
 }));
 
-vi.mock("../../../pages/attendance/components/ByTypeAttendanceChart", () => ({
+vi.mock("../../../pages/Attendance/components/ByTypeAttendanceChart", () => ({
   default: (props) => {
     byTypeChartProps.push(props);
     return <div data-testid="by-type-attendance-chart">by-type chart</div>;
   },
 }));
 
-vi.mock("../../../pages/attendance/hooks/useAttendanceStats", () => ({
+vi.mock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: (...args) => useAttendanceStats(...args),
 }));
 
-vi.mock("../../../pages/attendance/hooks/useAttendanceRecords", () => ({
+vi.mock("../../../pages/Attendance/hooks/useAttendanceRecords", () => ({
   useAttendanceRecords: (...args) => useAttendanceRecords(...args),
 }));
 
@@ -50,15 +50,15 @@ vi.mock("../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendance(...args),
 }));
 
-import AttendanceCharts from "../../../pages/profile/components/widgets/attendance/AttendanceCharts";
+import AttendanceCharts from "../../../pages/Profile/components/widgets/attendance/AttendanceCharts";
 import {
   AttendanceWarningBadge,
   CompactAttHeader,
   CompactByTypeDonut,
   CompactOverallDonut,
   SegmentDetailPanelWrapper,
-} from "../../../pages/profile/components/widgets/attendance/AttendanceShared";
-import { useAttendanceWidgetData } from "../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData";
+} from "../../../pages/Profile/components/widgets/attendance/AttendanceShared";
+import { useAttendanceWidgetData } from "../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData";
 
 describe("attendance widget extras", () => {
   beforeEach(() => {

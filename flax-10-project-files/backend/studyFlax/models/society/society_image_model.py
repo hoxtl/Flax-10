@@ -9,6 +9,7 @@ from .society_model import Society
 
 class SocietyImage(models.Model):
     """Stored image belonging to a society."""
+
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='images')
     url = models.TextField()
     is_cover = models.BooleanField(default=False)

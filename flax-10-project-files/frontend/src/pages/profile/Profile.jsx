@@ -4,8 +4,10 @@
 
 import { useEffect } from "react";
 import BackButton from "../../components/common/back_button/BackButton.jsx";
+import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import EmptyState from "../../components/common/empty_state/EmptyState";
 import ScrollToTop from "../../components/common/scroll_to_top/ScrollToTop";
+import PrimaryButton from "../../components/common/primary_button/PrimaryButton";
 import { useAuth } from "../../context/AuthContext";
 import AchievementsModal from "./AchievementsModal";
 import { ProfileCalendar } from "./ProfileCalendar";
@@ -49,8 +51,25 @@ function SharedCalendarSection({ events }) {
   );
 }
 
+function ProfileNewUserBanner({ onNavigate }) {
+  return (
+    <EmptyState
+      icon="⏱"
+      title="Start your first focus session"
+      description="Use the Focus Timer to log study sessions. Your heatmap, streaks, study DNA, and weekly stats will all build up here as you go."
+      action={
+        <PrimaryButton pill onClick={() => onNavigate?.("timer")}>
+          Open Focus Timer
+        </PrimaryButton>
+      }
+    />
+  );
+}
+
 function SelfProfileColumns({ summary, analyticsData, onNavigate, onGoalSave, role }) {
   const isTeacher = role === "teacher";
+  const hasNoSessions = !isTeacher && Number(summary?.session_count ?? 0) === 0 && summary !== undefined && summary !== null;
+  if (hasNoSessions) return <ProfileNewUserBanner onNavigate={onNavigate} />;
   return (
     <div className={styles.leftCol}>
       <div className={isTeacher ? styles.leftTopMetricsRowTeacher : styles.leftTopMetricsRow}>
@@ -119,8 +138,9 @@ function ProfileHome(props) {
   const peakHour = usePeakHour(analyticsData?.heatmap?.data);
   const currentUserModules = currentUserProfile?.modules || [];
   const suggestion = useSuggestionState(viewedUserId);
+  const hasNoSessions = role !== 'teacher' && Number(summary?.session_count ?? 0) === 0 && summary !== undefined && summary !== null;
   useEffect(() => onBadgesReady?.(summary?.badges || []), [onBadgesReady, summary?.badges]);
-  useEffect(() => onPersonaReady?.(summary?.persona || null, peakHour), [onPersonaReady, peakHour, summary?.persona]);
+  useEffect(() => onPersonaReady?.(hasNoSessions ? null : (summary?.persona || null), peakHour), [onPersonaReady, peakHour, summary?.persona, hasNoSessions]);
   useEffect(() => onSocietiesReady?.(summary?.societies || []), [onSocietiesReady, summary?.societies]);
   if (loading) return <ProfileSkeleton blocks={<SkeletonGrid />} />;
   if (visibility.isSelf) return <SelfProfileColumns summary={summary} analyticsData={analyticsData} onNavigate={onNavigate} onGoalSave={(goal) => saveWeeklyGoal(goal, refetch)} role={role} />;
@@ -150,9 +170,14 @@ function ProfileBody({ user, state, visibility, onNavigate }) {
 function ProfileFrame({ user, state, visibility, onNavigate, backLabel, onBack }) {
   if (state.loading) return <ProfileSkeleton blocks={<SkeletonGrid />} />;
   if (!state.profileData && !user) return <EmptyState title="Profile unavailable" message="We couldn't load this profile right now." />;
+  const profileName = state.profileData?.display_name || state.profileData?.username || user?.display_name || user?.username;
+  const crumbs = onBack
+    ? [{ label: "Profiles", navKey: "profile" }, { label: profileName || "Profile" }]
+    : [{ label: "Profile" }];
   return (
     <div className={styles.container}>
       <ScrollToTop />
+      <Breadcrumb crumbs={crumbs} />
       {onBack && <div className={styles.backButtonWrapper}><BackButton label={backLabel} onClick={onBack} /></div>}
       <div className={styles.content}><ProfileBody user={user} state={state} visibility={visibility} onNavigate={onNavigate} /></div>
     </div>

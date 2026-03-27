@@ -6,15 +6,15 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppPage from "../../components/common/app_page/AppPage";
-import { Calendar } from "../../components/calendar/Calendar";
+import { Calendar } from "../../components/Calendar/Calendar";
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
 import SkeletonBlock from "../../components/common/loading_state/SkeletonBlock";
 import BackButton from "../../components/common/back_button/BackButton";
-import { BackToTop } from "../../components/pagination/Pagination";
+import { BackToTop } from "../../components/Pagination/Pagination";
 import styles from "./CalendarPage.module.css";
-import { CalendarHeader } from "../../components/calendar/CalendarHeader";
-import { EventPopups } from "../../components/calendar/EventPopups";
-import { useEventPopupListener } from "../../components/calendar/hooks/useEventPopupListener";
+import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
+import { EventPopups } from "../../components/Calendar/EventPopups";
+import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { getAnotherUserProfile } from "../../api/userApi";
 

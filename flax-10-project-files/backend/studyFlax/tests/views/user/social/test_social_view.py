@@ -224,6 +224,7 @@ class SocialAndCategoryCoverageTest(TestCase):
 
 class CommonSerialiserHelpersTest(TestCase):
     """Tests common serialiser helpers."""
+
     def test_build_profile_photo_url_returns_photo_str_for_http_url(self):
         from studyFlax.serialisers.common import build_profile_photo_url
         result = build_profile_photo_url('https://example.com/photo.jpg', None)

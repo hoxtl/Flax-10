@@ -5,11 +5,11 @@
 import { useState } from "react";
 import FormField from "../../../components/common/form_field/FormField";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
-import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import { TagsSelector } from "../../../components/common/tags_selector/TagsSelector";
-import UserSearch from "../../../components/social/UserSearch";
+import UserSearch from "../../../components/Social/UserSearch";
 import { CreateProjectInputs } from "./CreateProjectInputs";
+import GroupWorkUserSearchEmptyState from "./GroupWorkUserSearchEmptyState";
 import { getStoredViewer } from "../utils/memberAvatarUtils";
 import { useCreateProjectForm } from "./useCreateProjectForm";
 import styles from "./CreateProjectForm.module.css";
@@ -74,9 +74,14 @@ function closeModal(setIsOpen, reset) {
 
 function MemberSearchEmptyState({ query, clear }) {
   return (
-    <div className={styles.memberSearchEmpty}>
-      <SearchEmptyState query={query} itemLabel="users" title="No teammates found" hint="Try a different name or username." onClear={clear} className={styles.memberSearchEmptyCard} titleClassName={styles.memberSearchEmptyTitle} hintClassName={styles.memberSearchEmptyHint} />
-    </div>
+    <GroupWorkUserSearchEmptyState
+      query={query}
+      clear={clear}
+      wrapperClassName={styles.memberSearchEmpty}
+      className={styles.memberSearchEmptyCard}
+      titleClassName={styles.memberSearchEmptyTitle}
+      hintClassName={styles.memberSearchEmptyHint}
+    />
   );
 }
 

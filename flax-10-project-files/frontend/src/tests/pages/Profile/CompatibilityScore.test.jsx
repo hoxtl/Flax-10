@@ -1,7 +1,7 @@
 /* Tests for CompatibilityScore widget */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { CompatibilityScore } from '../../../pages/profile/components/widgets/CompatibilityScore';
+import { CompatibilityScore } from '../../../pages/Profile/components/widgets/CompatibilityScore';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -15,7 +15,7 @@ vi.mock('../../../hooks/useCountUp', () => ({
   useCountUp: () => ({ current: null }),
 }));
 
-vi.mock('../../../pages/profile/components/widgets/ProfileCompat.module.css', () => ({
+vi.mock('../../../pages/Profile/components/widgets/ProfileCompat.module.css', () => ({
   default: {},
 }), { virtual: true });
 

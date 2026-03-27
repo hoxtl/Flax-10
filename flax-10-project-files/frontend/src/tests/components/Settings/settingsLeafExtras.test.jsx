@@ -57,7 +57,7 @@ vi.mock("../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../context/themeConstants", () => ({
+vi.mock("../../../context/ThemeConstants", () => ({
   THEME_GROUPS: [
     {
       label: "Classic",
@@ -83,17 +83,17 @@ import {
   SuccessBanner,
   TabButton,
   ThemeGridSelector,
-} from "../../../components/settings/SettingsUI";
+} from "../../../components/Settings/SettingsUI";
 import {
   clearCachedPendingRequest,
   getCachedPendingRequest,
   normaliseCourseRequest,
   setCachedPendingRequest,
-} from "../../../components/settings/account/accountCourseRequests";
+} from "../../../components/Settings/account/accountCourseRequests";
 import {
   createCancelCourseRequestHandler,
   createCourseRequestSuccessHandler,
-} from "../../../components/settings/account/useCourseRequestActions";
+} from "../../../components/Settings/account/useCourseRequestActions";
 import {
   saveAccount,
   saveAddress,
@@ -105,8 +105,8 @@ import {
   saveWeekPreference,
   saveWorktimePreference,
   showTemporaryMessage,
-} from "../../../components/settings/hooks/settingsHandlerHelpers";
-import { getSleepDuration, getSleepMinutes, getSleepQuality } from "../../../components/settings/preferences/sleepUtils";
+} from "../../../components/Settings/hooks/settingsHandlerHelpers";
+import { getSleepDuration, getSleepMinutes, getSleepQuality } from "../../../components/Settings/preferences/sleepUtils";
 
 const renderSettingsUiShowcase = () => {
   const onChange = vi.fn();

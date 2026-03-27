@@ -3,12 +3,13 @@
  */
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import widgetStyles from "./widgets/ProfileWidgets.module.css";
 import headerStyles from "./ProfileHeader.module.css";
 import badgeStyles from "./ProfileHeaderBadges.module.css";
+import { buildPeakLabel } from "./widgets/PersonaCard";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
-import ShareButton from "../../../components/social/ShareButton";
+import ShareButton from "../../../components/Social/ShareButton";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };
@@ -51,7 +52,7 @@ function HeaderAction({ visibility, handlers, user, mobile = false }) {
   return <PrimaryButton className={mobile ? styles.mobileBtnEdit : styles.btnEdit} size="small" pill onClick={handlers.onEditProfile}>{mobile ? "Edit Profile" : "Edit profile"}</PrimaryButton>;
 }
 
-function SharedCalendarPill({ user, profileData, visibility, onNavigate }) {
+function SharedCalendarPill({ profileData, visibility, onNavigate }) {
   if (visibility.canEditProfile || !profileData?.is_shared_with_me || !onNavigate) return null;
   return (
     <span className={styles.sharedCalendarIndicator}>
@@ -62,11 +63,11 @@ function SharedCalendarPill({ user, profileData, visibility, onNavigate }) {
 
 function BadgeTooltip({ badge, canPin, pinned }) {
   return (
-    <motion.div className={styles.badgeTooltip} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }} transition={{ duration: 0.15 }}>
+    <Motion.div className={styles.badgeTooltip} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }} transition={{ duration: 0.15 }}>
       <span className={styles.badgeTooltipLabel}>{badge.label}</span>
       <span className={styles.badgeTooltipDesc}>{badge.description}</span>
       {canPin && <span className={styles.badgeTooltipPin}>{pinned ? "Tap to unpin" : "Tap to pin this badge"}</span>}
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -75,12 +76,12 @@ function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeav
   const animate = pinned ? { scale: [1, 1.4, 0.9, 1.05, 1] } : { scale: 1 };
   const transition = pinned ? { duration: 0.45, ease: "easeOut" } : { duration: 0.25, ease: "easeInOut" };
   return (
-    <motion.button type="button" className={className} onMouseEnter={() => onEnter(badge.id)} onMouseLeave={onLeave} onClick={() => canPin && onPinBadge?.(badge.id)} layout animate={animate} transition={transition} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}>
+    <Motion.button type="button" className={className} onMouseEnter={() => onEnter(badge.id)} onMouseLeave={onLeave} onClick={() => canPin && onPinBadge?.(badge.id)} layout animate={animate} transition={transition} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}>
       <span className={styles.headerBadgeEmoji}>{badge.emoji}</span>
       <AnimatePresence>
         {activeTooltip === badge.id && <BadgeTooltip badge={badge} canPin={canPin} pinned={pinned} />}
       </AnimatePresence>
-    </motion.button>
+    </Motion.button>
   );
 }
 
@@ -100,9 +101,9 @@ function FeaturedBadgeContent({ badge, canPin }) {
 function FeaturedBadgeCard({ badge, canPin, onPinBadge }) {
   if (!badge) return null;
   return (
-    <motion.button type="button" className={styles.featuredBadgeCard} onClick={() => canPin && onPinBadge?.(badge.id)} initial={{ opacity: 0, scale: 0.9, x: -8 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9, x: -8 }} transition={{ duration: 0.28, ease: "easeOut" }} whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} layout>
+    <Motion.button type="button" className={styles.featuredBadgeCard} onClick={() => canPin && onPinBadge?.(badge.id)} initial={{ opacity: 0, scale: 0.9, x: -8 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9, x: -8 }} transition={{ duration: 0.28, ease: "easeOut" }} whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} layout>
       <FeaturedBadgeContent badge={badge} canPin={canPin} />
-    </motion.button>
+    </Motion.button>
   );
 }
 
@@ -175,7 +176,6 @@ function ProfileStats({
   societyCount,
   onSocietiesClick,
 }) {
-  const { onModulesClick: om, onSharedWithClick: os } = handlers;
   return (
     <div className={styles.stats}>
       {visibility.canViewModules && visibility.canEditProfile && <StatItem value={profileData?.module_count || 0} label="modules" onClick={handlers.onModulesClick} />}
@@ -184,16 +184,6 @@ function ProfileStats({
       {visibility.canViewSharedWith && <StatItem value={profileData?.shared_by_count || 0} label="sharing with me" onClick={handlers.onSharedByClick} />}
     </div>
   );
-}
-
-function ContactEmail({ email }) {
-  if (!email) return null;
-  return <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>;
-}
-
-function buildPeakLabel(peakHour) {
-  if (peakHour == null) return null;
-  return `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak`;
 }
 
 function PersonaInlineChip({ persona, peakHour }) {
@@ -214,6 +204,15 @@ function PersonaInlineChip({ persona, peakHour }) {
 function ProfileBioSection({ bio }) {
   if (!bio) return null;
   return <div className={styles.bio}><div className={styles.reminder}>{bio}</div></div>;
+}
+
+function ContactEmail({ email }) {
+  if (!email) return null;
+  return (
+    <div className={styles.teacherEmail}>
+      <a href={`mailto:${email}`}>{email}</a>
+    </div>
+  );
 }
 
 function SharedPlanningTip() {
@@ -266,12 +265,35 @@ function HeaderMeta({ user, profileData, handlers, visibility, societies, onSoci
   );
 }
 
-function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, visibility }) {
-  if (!badges?.length && !persona) return null;
+function BadgePlaceholder() {
+  return (
+    <div className={styles.badgePlaceholder}>
+      <span className={styles.badgePlaceholderIcon} aria-hidden="true">🏅</span>
+      <span className={styles.badgePlaceholderText}>Earn badges by building study habits</span>
+    </div>
+  );
+}
+
+function HeaderInsightsEmptyState() {
   return (
     <div className={styles.headerBadgesPersonaRow}>
-      <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />
-      <PersonaInlineChip persona={persona} peakHour={peakHour} />
+      <BadgePlaceholder />
+    </div>
+  );
+}
+
+function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, visibility }) {
+  const hasBadges = badges?.length > 0;
+  const hasInsights = hasBadges || !!persona;
+
+  if (!hasInsights) {
+    return visibility.canEditProfile ? <HeaderInsightsEmptyState /> : null;
+  }
+
+  return (
+    <div className={styles.headerBadgesPersonaRow}>
+      {hasBadges && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}
+      {persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}
     </div>
   );
 }
@@ -303,7 +325,7 @@ function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto, 
         <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1>
         <p className={styles.mobileBio}>{description}</p>
         <span className={styles.mobileRolePill}>{roleLabel}</span>
-        <SharedCalendarPill user={user} profileData={profileData} visibility={visibility} onNavigate={onNavigate} />
+        <SharedCalendarPill profileData={profileData} visibility={visibility} onNavigate={onNavigate} />
         <div className={styles.mobileActions}><HeaderAction visibility={visibility} handlers={handlers} user={user} mobile /></div>
       </div>
       <MobileStats profileData={profileData} handlers={handlers} visibility={visibility} />

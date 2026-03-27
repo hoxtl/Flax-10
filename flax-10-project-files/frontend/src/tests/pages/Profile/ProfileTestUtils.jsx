@@ -21,7 +21,7 @@ export const mockFramerMotion = () => {
 };
 
 export const mockProfileHelpers = () => {
-  vi.mock('../../../pages/profile/utils/profileHelpers', () => ({
+  vi.mock('../../../pages/Profile/utils/profileHelpers', () => ({
     buildInitials: vi.fn((user) => {
       if (user?.first_name && user?.last_name) return `${user.first_name[0]}${user.last_name[0]}`;
       return '??';
@@ -34,7 +34,7 @@ export const mockProfileHelpers = () => {
 };
 
 export const mockSocialComponents = () => {
-  vi.mock('../../../components/social/ShareButton', () => ({
+  vi.mock('../../../components/Social/ShareButton', () => ({
     default: ({ userId, onToggle, initialIsSharing }) => (
       <button data-testid="share-btn" onClick={() => onToggle?.(!initialIsSharing)}>
         Share {userId}

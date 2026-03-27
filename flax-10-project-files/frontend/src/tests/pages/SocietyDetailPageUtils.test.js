@@ -3,7 +3,7 @@ import {
     getImageUrls, getAvailablePhotos, scrollContentToTop,
     wrapAddEvent, wrapUpdateEvent, wrapDeleteEvent,
     wrapAddAnnouncement, wrapUpdateAnnouncement, wrapDeleteAnnouncement
-} from '../../pages/societies/societyDetailPageUtils';
+} from '../../pages/Societies/SocietyDetailPageUtils';
 
 describe('SocietyDetailPageUtils', () => {
     it('getImageUrls handles various inputs', () => {

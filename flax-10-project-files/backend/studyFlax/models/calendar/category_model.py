@@ -9,6 +9,7 @@ from ..auth.user_model import User
 
 class Category(models.Model):
     """Colour category for calendar events."""
+
     name = models.CharField(max_length=100)
     color = models.CharField(max_length=7, default='#9E7E5D')
     is_default = models.BooleanField(default=False)
@@ -16,6 +17,7 @@ class Category(models.Model):
 
     class Meta:
         """Metadata for category."""
+
         verbose_name_plural = 'Categories'
 
     def __str__(self):

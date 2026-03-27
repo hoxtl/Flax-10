@@ -70,30 +70,7 @@
   display: inline-flex;
 }
 
-.projectPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  border: 1px solid;
-  white-space: nowrap;
-  line-height: 1.4;
-  letter-spacing: 0.01em;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  color: var(--primary);
-  background: var(--primary-light);
-  border-color: var(--primary-border);
-}
-
-.projectPillIcon {
-  flex-shrink: 0;
-  opacity: 0.8;
-}
-
+.projectPill,
 .societyPill,
 .peoplePill {
   display: inline-flex;
@@ -108,6 +85,22 @@
   white-space: nowrap;
   line-height: 1.4;
   letter-spacing: 0.01em;
+}
+
+.projectPill {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: var(--primary);
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+}
+
+.projectPillIcon {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.societyPill,
+.peoplePill {
   text-decoration: none;
 }
 

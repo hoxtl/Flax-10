@@ -29,6 +29,7 @@ def _add_members(project, count, prefix="member"):
 
 class GroupProjectListTests(BaseTestCase):
     """Tests group project list."""
+
     def test_create_project(self):
         teammates = [
             make_user(f"alpha_teammate_{index}", f"alpha_teammate_{index}@example.com")
@@ -201,6 +202,7 @@ class GroupProjectListTests(BaseTestCase):
 
 class GroupProjectDetailTests(BaseTestCase):
     """Tests group project detail."""
+
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -248,6 +250,7 @@ class GroupProjectDetailTests(BaseTestCase):
 
 class GroupProjectMembersTests(BaseTestCase):
     """Tests group project members."""
+
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -307,6 +310,7 @@ class GroupProjectMembersTests(BaseTestCase):
 
 class GroupProjectViewHelpersTest(BaseTestCase):
     """Tests group project view helpers."""
+
     def test_create_project_with_future_deadline_succeeds(self):
         future = (timezone.localdate() + timedelta(days=7)).isoformat()
         res = self.client.post(

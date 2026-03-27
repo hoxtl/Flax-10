@@ -5,19 +5,19 @@ const taskFeedDataMock = vi.hoisted(() => vi.fn());
 const responsiveMock = vi.hoisted(() => vi.fn());
 const subtitleMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../../pages/tasks/hooks/useTaskFeedData", () => ({
+vi.mock("../../../../pages/Tasks/hooks/useTaskFeedData", () => ({
   default: taskFeedDataMock,
 }));
 
-vi.mock("../../../../pages/tasks/components/useTaskFeedResponsive", () => ({
+vi.mock("../../../../pages/Tasks/components/useTaskFeedResponsive", () => ({
   default: responsiveMock,
 }));
 
-vi.mock("../../../../pages/tasks/components/TaskFeedSubtitle", () => ({
+vi.mock("../../../../pages/Tasks/components/TaskFeedSubtitle", () => ({
   getTaskFeedSubtitle: subtitleMock,
 }));
 
-vi.mock("../../../../pages/tasks/components/TaskFeedContent", () => ({
+vi.mock("../../../../pages/Tasks/components/TaskFeedContent", () => ({
   default: ({ vm }) => (
     <div>
       <span data-testid="subtitle">{vm.taskFeedSubtitle}</span>
@@ -29,7 +29,7 @@ vi.mock("../../../../pages/tasks/components/TaskFeedContent", () => ({
   ),
 }));
 
-import TaskFeed from "../../../../pages/tasks/components/TaskFeed";
+import TaskFeed from "../../../../pages/Tasks/components/TaskFeed";
 
 function buildFeedData() {
   return {

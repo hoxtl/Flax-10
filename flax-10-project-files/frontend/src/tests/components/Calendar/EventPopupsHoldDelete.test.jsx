@@ -2,9 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-// ---------------------------------------------------------------------------
 // Hoisted mocks
-// ---------------------------------------------------------------------------
 
 const {
     mockRefreshTags,
@@ -50,11 +48,11 @@ vi.mock('../../../context/TagContext', () => ({
     }),
 }));
 
-vi.mock('../../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../../components/Notifications/hooks/useNotify', () => ({
     useNotify: () => vi.fn(),
 }));
 
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
     useCalendarEvents: () => ({ loadEvents: mockLoadEvents }),
     useEventActions: () => ({
         removeEvent: mockRemoveEvent,
@@ -62,12 +60,12 @@ vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
     }),
 }));
 
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../components/Calendar/utils/eventUtils', () => ({
     getEventType: vi.fn(() => 'personal'),
     hasRecurrence: vi.fn(() => false),
 }));
 
-vi.mock('../../../components/calendar/utils/formUtils', () => ({
+vi.mock('../../../components/Calendar/utils/formUtils', () => ({
     executeDelete: vi.fn(() => Promise.resolve()),
     deleteRecurrenceOccurrence: vi.fn(() => Promise.resolve()),
 }));
@@ -76,7 +74,7 @@ vi.mock('../../../api/societyApi', () => ({
     unsyncCalendar: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../components/modules/hooks/useModuleDisenrollment', () => ({
+vi.mock('../../../components/Modules/hooks/useModuleDisenrollment', () => ({
     useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }),
 }));
 
@@ -99,9 +97,9 @@ vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => 
     ),
 }));
 
-import { EventPopups } from '../../../components/calendar/EventPopups';
+import { EventPopups } from '../../../components/Calendar/EventPopups';
 import { useEventModal, useEventPopup, useEventDelete } from '../../../context/CalendarContext';
-import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/calendar/utils/formUtils';
+import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/Calendar/utils/formUtils';
 
 function setupModalClosed() {
     useEventModal.mockReturnValue({

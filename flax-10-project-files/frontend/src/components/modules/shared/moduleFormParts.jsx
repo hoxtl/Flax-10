@@ -20,6 +20,15 @@ export function ModuleFormActions({ onCancel, isEditing, createLabel, styles }) 
   );
 }
 
+export function ModuleFormFooter({ createLabel, error, isEditing, onCancel, styles }) {
+  return (
+    <>
+      {error && <div className={styles.error}>{error}</div>}
+      <ModuleFormActions onCancel={onCancel} isEditing={isEditing} createLabel={createLabel} styles={styles} />
+    </>
+  );
+}
+
 export function finishValidation(setError) {
   setError("");
   return true;

@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useTimeSlotDrop } from '../../components/calendar/hooks/useTimeSlotDrop';
+import { useTimeSlotDrop } from '../../components/Calendar/hooks/useTimeSlotDrop';
 
 const useCalendarMock = vi.fn();
 const useEventModalMock = vi.fn();
@@ -17,12 +17,12 @@ vi.mock('../../context/CalendarContext', () => ({
   useEventModal: () => useEventModalMock(),
 }));
 vi.mock('../../context/ConfirmContext', () => ({ useConfirm: () => useConfirmMock() }));
-vi.mock('../../components/calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
-vi.mock('../../components/calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
-vi.mock('../../components/calendar/calendarConstants', () => ({ SLOT_HEIGHT: 80, getMinuteOffset: (...args) => getMinuteOffsetMock(...args) }));
-vi.mock('../../components/calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
+vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
+vi.mock('../../components/Calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
+vi.mock('../../components/Calendar/calendarConstants', () => ({ SLOT_HEIGHT: 80, getMinuteOffset: (...args) => getMinuteOffsetMock(...args) }));
+vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
 const isReadOnlyEventMock = vi.fn(() => false);
-vi.mock('../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../components/Calendar/utils/eventUtils', () => ({
   isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),
@@ -64,8 +64,18 @@ describe('useTimeSlotDrop', () => {
     currentTarget: { getBoundingClientRect: () => ({ top: 100 }) },
   });
 
+  function renderTimeSlotDrop(hour = 9, date = '2026-03-10T00:00:00Z') {
+    return renderHook(() => useTimeSlotDrop(hour, new Date(date)));
+  }
+
+  async function dropOnTimeSlot(data, type) {
+    await act(async () => {
+      await onDrop({ type, data }, makeDropEvent());
+    });
+  }
+
   it('returns merged props and opens modal on click', () => {
-    const { result } = renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
+    const { result } = renderTimeSlotDrop();
 
     expect(result.current.isOver).toBe(true);
     expect(result.current.highlightQuarter).toBeNull();
@@ -81,7 +91,7 @@ describe('useTimeSlotDrop', () => {
   });
 
   it('updates and clears highlight quarter via drag handlers', () => {
-    const { result } = renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
+    const { result } = renderTimeSlotDrop();
 
     act(() => {
       result.current.mergedProps.onDragOver({
@@ -102,11 +112,8 @@ describe('useTimeSlotDrop', () => {
   });
 
   it('creates event from tag payload when overlap check passes', async () => {
-    renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
-
-    await act(async () => {
-      await onDrop({ type: 'TAG', data: { name: 'Revision', default_duration: 30 } }, makeDropEvent());
-    });
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ name: 'Revision', default_duration: 30 }, 'TAG');
 
     expect(checkOverlapWithConfirmMock).toHaveBeenCalled();
     expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'Revision' }));
@@ -114,25 +121,16 @@ describe('useTimeSlotDrop', () => {
 
   it('does not create tag event when overlap check fails', async () => {
     checkOverlapWithConfirmMock.mockResolvedValue(false);
-    renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
-
-    await act(async () => {
-      await onDrop({ type: 'TAG', data: { name: 'Revision' } }, makeDropEvent());
-    });
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ name: 'Revision' }, 'TAG');
 
     expect(actions.addEvent).not.toHaveBeenCalled();
   });
 
   it('moves non-recurring event with editEvent', async () => {
     hasRecurrenceMock.mockReturnValue(false);
-    renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
-
-    await act(async () => {
-      await onDrop({
-        type: 'EVENT',
-        data: { id: 7, start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' },
-      }, makeDropEvent());
-    });
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ id: 7, start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' }, 'EVENT');
 
     expect(actions.editEvent).toHaveBeenCalledWith(7, expect.objectContaining({ start_time: expect.any(String) }));
   });
@@ -140,14 +138,8 @@ describe('useTimeSlotDrop', () => {
   it('moves all recurring events when confirm resolves true', async () => {
     hasRecurrenceMock.mockReturnValue(true);
     confirmFn.mockResolvedValue(true);
-    renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
-
-    await act(async () => {
-      await onDrop({
-        type: 'EVENT',
-        data: { id: '5-occ', start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' },
-      }, makeDropEvent());
-    });
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ id: '5-occ', start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' }, 'EVENT');
 
     expect(confirmFn).toHaveBeenCalled();
     expect(actions.editEvent).toHaveBeenCalledWith(5, expect.any(Object));
@@ -158,21 +150,15 @@ describe('useTimeSlotDrop', () => {
   it('moves a single recurring occurrence when confirm resolves false', async () => {
     hasRecurrenceMock.mockReturnValue(true);
     confirmFn.mockResolvedValue(false);
-    renderHook(() => useTimeSlotDrop(9, new Date('2026-03-10T00:00:00Z')));
-
-    await act(async () => {
-      await onDrop({
-        type: 'EVENT',
-        data: {
-          id: '6-occ',
-          title: 'Seminar',
-          description: '',
-          location: 'A1',
-          start_time: '2026-03-09T08:00:00Z',
-          end_time: '2026-03-09T09:00:00Z',
-        },
-      }, makeDropEvent());
-    });
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({
+      id: '6-occ',
+      title: 'Seminar',
+      description: '',
+      location: 'A1',
+      start_time: '2026-03-09T08:00:00Z',
+      end_time: '2026-03-09T09:00:00Z',
+    }, 'EVENT');
 
     expect(actions.addException).toHaveBeenCalledWith(6, '2026-03-09');
     expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'Seminar', location: 'A1' }));

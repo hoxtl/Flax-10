@@ -43,14 +43,14 @@
   --avatar-9: #859C67;
   --avatar-10: #B3915E;
 
-  /* Campus colour palette */
-  --campus-strand: #9E7E5D;
-  --campus-guys: #7A6048;
-  --campus-waterloo: #B8956A;
-  --campus-st-thomas: #6B7F6B;
-  --campus-denmark-hill: #7B6E9E;
-  --campus-bush-house: #6B7F6B;
-  --campus-franklin-wilkins: #7B6E9E;
+  /* Campus colour palette — distinct per campus */
+  --campus-strand: #2563EB;        /* Blue  — Strand, main hub */
+  --campus-guys: #16A34A;          /* Green — Guy's, medical sciences */
+  --campus-waterloo: #7C3AED;      /* Violet — Waterloo, arts & law */
+  --campus-st-thomas: #D97706;     /* Amber — St Thomas', hospital */
+  --campus-denmark-hill: #DC2626;  /* Red   — Denmark Hill, south campus */
+  --campus-bush-house: #2563EB;
+  --campus-franklin-wilkins: #7C3AED;
 
   /* Event accent colour palette */
   --event-accent-lecture: #7B9BAD;

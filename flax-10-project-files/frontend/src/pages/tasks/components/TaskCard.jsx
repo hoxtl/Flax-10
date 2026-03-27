@@ -13,7 +13,7 @@ import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import { getUserSettings } from "../../../api/userApi";
 import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
-import { useSleepWarning } from "../../../components/settings/hooks/useSleepWarning";
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import { CheckBurst } from "../../../components/task_celebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
@@ -65,7 +65,9 @@ function useTaskContextMenuState(task) {
 
 function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
   useEffect(() => {
-    const handler = () => { onClose(); };
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) onClose();
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [menuRef, onClose]);

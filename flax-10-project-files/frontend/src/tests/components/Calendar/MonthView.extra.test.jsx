@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { SwipeMonthView } from "../../../components/calendar/month_view/SwipeMonthView";
+import { SwipeMonthView } from "../../../components/Calendar/month_view/SwipeMonthView";
 
 const dispatchMock = vi.fn();
 const openPopupMock = vi.fn();
@@ -24,7 +24,7 @@ vi.mock("../../../context/CalendarContext", async () => {
   };
 });
 
-vi.mock("../../../components/calendar/hooks/useSwipeNavigation", () => ({
+vi.mock("../../../components/Calendar/hooks/useSwipeNavigation", () => ({
   useSwipeNavigation: (...args) => swipeNavigationMock(...args),
 }));
 
@@ -32,7 +32,7 @@ vi.mock("../../../context/TagContext", () => ({
   useTags: () => ({ tags: [], getTag: vi.fn(), getTagByName: vi.fn() }),
 }));
 
-vi.mock("../../../components/calendar/hooks/useDragDrop", () => ({
+vi.mock("../../../components/Calendar/hooks/useDragDrop", () => ({
   useDrag: vi.fn(() => ({ dragProps: { draggable: true }, isDragging: false })),
   useDrop: vi.fn(() => ({ dropProps: {}, isOver: false })),
 }));

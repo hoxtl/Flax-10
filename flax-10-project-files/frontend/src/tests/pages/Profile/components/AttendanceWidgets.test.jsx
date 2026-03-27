@@ -2,35 +2,35 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { renderHook, waitFor } from "@testing-library/react";
 
-import AttendanceCharts from "../../../../pages/profile/components/widgets/attendance/AttendanceCharts";
+import AttendanceCharts from "../../../../pages/Profile/components/widgets/attendance/AttendanceCharts";
 import {
   AttendanceWidget,
   CompactAttendanceTile,
   CompactStreakTile,
-} from "../../../../pages/profile/components/widgets/AttendanceWidgets";
+} from "../../../../pages/Profile/components/widgets/AttendanceWidgets";
 import {
   AttendanceWarningBadge,
   CompactOverallDonut,
   CompactByTypeDonut,
   CompactAttHeader,
   SegmentDetailPanelWrapper,
-} from "../../../../pages/profile/components/widgets/attendance/AttendanceShared";
-import { useAttendanceWidgetData } from "../../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData";
+} from "../../../../pages/Profile/components/widgets/attendance/AttendanceShared";
+import { useAttendanceWidgetData } from "../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData";
 import {
   buildMarkedEvents,
   buildSegmentEvents,
   computeAttendancePct,
-} from "../../../../pages/profile/components/widgets/attendance/attendanceWidgetUtils";
+} from "../../../../pages/Profile/components/widgets/attendance/attendanceWidgetUtils";
 
 const useAttendanceStatsMock = vi.fn();
 const useAttendanceRecordsMock = vi.fn();
 const recordAttendanceMock = vi.fn();
 
-vi.mock("../../../../pages/attendance/hooks/useAttendanceStats", () => ({
+vi.mock("../../../../pages/Attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: (...args) => useAttendanceStatsMock(...args),
 }));
 
-vi.mock("../../../../pages/attendance/hooks/useAttendanceRecords", () => ({
+vi.mock("../../../../pages/Attendance/hooks/useAttendanceRecords", () => ({
   useAttendanceRecords: (...args) => useAttendanceRecordsMock(...args),
 }));
 
@@ -38,15 +38,15 @@ vi.mock("../../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendanceMock(...args),
 }));
 
-vi.mock("../../../../pages/attendance/components/ByTypeAttendanceChart", () => ({
+vi.mock("../../../../pages/Attendance/components/ByTypeAttendanceChart", () => ({
   default: ({ data, onSegmentClick }) => <button onClick={() => onSegmentClick?.("byType", data[0]?.label)}>ByType chart</button>,
 }));
 
-vi.mock("../../../../pages/attendance/components/OverallAttendanceChart", () => ({
+vi.mock("../../../../pages/Attendance/components/OverallAttendanceChart", () => ({
   default: ({ data, onSegmentClick }) => <button onClick={() => onSegmentClick?.("overall", data[0]?.label)}>Overall chart</button>,
 }));
 
-vi.mock("../../../../pages/attendance/components/SegmentDetailPanel", () => ({
+vi.mock("../../../../pages/Attendance/components/SegmentDetailPanel", () => ({
   default: ({ segmentLabel, onClose }) => <button onClick={onClose}>{segmentLabel}</button>,
 }));
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { loadScheduleTaggedEvents } from '../../../components/schedules/manual/loadScheduleTaggedEvents';
+import { loadScheduleTaggedEvents } from '../../../components/Schedules/manual/loadScheduleTaggedEvents';
 
 vi.mock('../../../api/eventApi', () => ({
     getEvents: vi.fn(),

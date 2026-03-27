@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ManualScheduleFields } from '../../../components/schedules/manual/ManualScheduleFields';
+import { ManualScheduleFields } from '../../../components/Schedules/manual/ManualScheduleFields';
 
-vi.mock('../../../components/schedules/shared/scheduleFormStyles', () => ({
+vi.mock('../../../components/Schedules/shared/scheduleFormStyles', () => ({
     default: {
         fieldLabel: 'fieldLabel',
         input: 'input',

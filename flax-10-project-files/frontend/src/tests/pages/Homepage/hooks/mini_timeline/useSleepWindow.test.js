@@ -1,16 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
-// ---------------------------------------------------------------------------
 // Mock the API module before importing the hook
-// ---------------------------------------------------------------------------
 
 vi.mock("../../../../../api/userApi", () => ({
   getUserSettings: vi.fn(),
 }));
 
 import { getUserSettings } from "../../../../../api/userApi";
-import { useSleepWindow } from "../../../../../pages/homepage/hooks/mini_timeline/useSleepWindow";
+import { useSleepWindow } from "../../../../../pages/Homepage/hooks/mini_timeline/useSleepWindow";
 
 const DEFAULT_SLEEP_WINDOW = { sleepTime: "23:00", wakeTime: "07:00" };
 

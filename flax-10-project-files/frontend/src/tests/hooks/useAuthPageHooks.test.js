@@ -1,25 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 
-import { useAuthPage } from "../../pages/auth/hooks/useAuthPage";
-import { useAuthPageScroll } from "../../pages/auth/hooks/useAuthPageScroll";
-import { useAuthLandingSections } from "../../pages/auth/hooks/useAuthLandingSections";
+import { useAuthPage } from "../../pages/Auth/hooks/useAuthPage";
+import { useAuthPageScroll } from "../../pages/Auth/hooks/useAuthPageScroll";
+import { useAuthLandingSections } from "../../pages/Auth/hooks/useAuthLandingSections";
 
 const useAuthFormMock = vi.fn();
 const submitSignInMock = vi.fn();
 const submitSignUpMock = vi.fn();
 const buildAuthLandingSectionsMock = vi.fn();
 
-vi.mock("../../components/auth/hooks/useAuthForm", () => ({
+vi.mock("../../components/Auth/hooks/useAuthForm", () => ({
   useAuthForm: (...args) => useAuthFormMock(...args),
 }));
 
-vi.mock("../../pages/auth/utils/authSubmitHandlers", () => ({
+vi.mock("../../pages/Auth/utils/authSubmitHandlers", () => ({
   submitSignIn: (...args) => submitSignInMock(...args),
   submitSignUp: (...args) => submitSignUpMock(...args),
 }));
 
-vi.mock("../../pages/auth/content/authLandingSections", () => ({
+vi.mock("../../pages/Auth/content/authLandingSections", () => ({
   buildAuthLandingSections: (...args) => buildAuthLandingSectionsMock(...args),
 }));
 

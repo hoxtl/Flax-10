@@ -6,40 +6,40 @@ import {
   getTotalMarked,
   computeAttendancePct,
   buildAttendanceSummary,
-} from "../../../pages/attendance/utils/attendanceSummary";
+} from "../../../pages/Attendance/utils/attendanceSummary";
 import {
   buildSegmentEvents,
   buildSegmentLabel,
-} from "../../../pages/attendance/utils/attendanceSegments";
+} from "../../../pages/Attendance/utils/attendanceSegments";
 import {
   buildOverallChartData,
   getEventTypeLabel,
   buildByTypeChartData,
   withByTypeColors,
-} from "../../../pages/attendance/utils/attendanceChartData";
+} from "../../../pages/Attendance/utils/attendanceChartData";
 import {
   buildDonutSeries,
   buildValueFormatter,
   buildPieClickHandler,
-} from "../../../pages/attendance/utils/attendanceChartUtils";
+} from "../../../pages/Attendance/utils/attendanceChartUtils";
 import {
   formatAttendanceEventDate,
   formatAttendanceDetailDate,
   formatDateGroupHeader,
   formatEventTime,
   isEventInPast,
-} from "../../../pages/attendance/utils/attendanceEventDate";
+} from "../../../pages/Attendance/utils/attendanceEventDate";
 import {
   isTimetableEvent,
   buildTimetableDateRange,
-} from "../../../pages/attendance/utils/attendanceTimetable";
+} from "../../../pages/Attendance/utils/attendanceTimetable";
 import {
   buildRecordsByEventId,
   buildUnmarkedEvents,
   buildMarkedEvents,
   buildMarkedEventsFromRecords,
-} from "../../../pages/attendance/utils/attendanceRecords";
-import { buildAttendancePageModel } from "../../../pages/attendance/utils/attendancePageModel";
+} from "../../../pages/Attendance/utils/attendanceRecords";
+import { buildAttendancePageModel } from "../../../pages/Attendance/utils/attendancePageModel";
 
 const baseStatsState = {
   stats: { overall: { attended: 3, missed: 1 }, by_type: { lecture: { attended: 2, missed: 1 } } },

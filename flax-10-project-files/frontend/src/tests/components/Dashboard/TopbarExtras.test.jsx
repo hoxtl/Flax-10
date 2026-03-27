@@ -75,7 +75,7 @@ vi.mock("../../../lib/routes", () => ({
 }));
 
 // ── Dependency mocks ─────────────────────────────────────────────────────────
-vi.mock("../../../components/dashboard/ProfileDropdown", () => ({
+vi.mock("../../../components/Dashboard/ProfileDropdown", () => ({
   default: () => <div data-testid="profile-dropdown" />,
 }));
 
@@ -86,19 +86,19 @@ vi.mock("../../../context/NotificationContext", () => ({
   }),
 }));
 
-vi.mock("../../../components/notifications/NotificationPanel", () => ({
+vi.mock("../../../components/Notifications/NotificationPanel", () => ({
   NotificationPanel: () => <div data-testid="notification-panel" />,
 }));
 
-vi.mock("../../../components/dashboard/ExpandableTabs", () => ({
+vi.mock("../../../components/Dashboard/ExpandableTabs", () => ({
   ExpandableTabs: () => <div data-testid="expandable-tabs" />,
 }));
 
-vi.mock("../../../components/dashboard/ThemeToggle", () => ({
+vi.mock("../../../components/Dashboard/ThemeToggle", () => ({
   default: () => <div data-testid="theme-toggle" />,
 }));
 
-vi.mock("../../../components/timer/MiniTimer", () => ({
+vi.mock("../../../components/Timer/MiniTimer", () => ({
   default: () => <div data-testid="mini-timer" />,
 }));
 
@@ -140,9 +140,8 @@ vi.mock("../../../components/common", () => ({
 }));
 
 // ── Import the real TopBar component ─────────────────────────────────────────
-import TopBar from "../../../components/dashboard/Topbar";
+import TopBar from "../../../components/Dashboard/Topbar";
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 function renderTopBar(props = {}) {
   const defaults = {
@@ -217,7 +216,7 @@ describe("isRouteVisible through TopBarNav rendered output", () => {
       user: { role: "teacher", isAdmin: false },
     });
     // Explore still visible but societies / group-work filtered out
-    // Just confirm Study→Teaching conversion happened (teachers see Teaching label)
+    // Just confirm Study - Teaching conversion happened (teachers see Teaching label)
     expect(screen.getByText("Teaching")).toBeInTheDocument();
   });
 });

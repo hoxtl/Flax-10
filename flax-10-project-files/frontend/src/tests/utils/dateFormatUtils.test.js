@@ -5,7 +5,7 @@ import {
     fmtDurationShort,
     formatTime12h,
     formatHour12h,
-} from '../../pages/homepage/utils/dateFormatUtils';
+} from '../../pages/Homepage/utils/dateFormatUtils';
 
 describe('formatTime', () => {
     it('returns empty string for null or empty', () => {

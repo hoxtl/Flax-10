@@ -2,7 +2,7 @@
  * Today banner for timer progress.
  */
 
-import styles from '../../pages/timer/TimerPage.module.css';
+import styles from '../../pages/Timer/TimerPage.module.css';
 import StatStrip from '../common/stat_strip/StatStrip';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTodayBannerData } from './today_banner/useTodayBannerData';

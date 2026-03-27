@@ -11,6 +11,7 @@ from .user_model import User
 
 class ResetPasswordToken(models.Model):
     """Password reset token issued to a user."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reset_tokens')
     token = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,4 +27,5 @@ class ResetPasswordToken(models.Model):
 
     class Meta:
         """Metadata for reset password token."""
+
         db_table = 'reset_password_tokens'
