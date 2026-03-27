@@ -60,22 +60,11 @@ function DateCell({ task, onUpdate }) {
 }
 
 function ActionCell({ taskId, onDelete }) {
-  const [showConfirm, setShowConfirm] = useState(false);
   return (
     <div className={styles.actionCell}>
-      <button onClick={() => setShowConfirm(true)} className={styles.deleteBtn} title="Delete task">
+      <button onClick={() => onDelete(taskId)} className={styles.deleteBtn} title="Delete task">
         <Trash2 size={16} />
       </button>
-      {showConfirm && (
-        <HoldConfirmModal
-          title="Delete task"
-          warningText="Hold to permanently remove this task."
-          cancelLabel="Keep it"
-          holdLabel="Hold to delete"
-          onCancel={() => setShowConfirm(false)}
-          onConfirm={() => { setShowConfirm(false); onDelete(taskId); }}
-        />
-      )}
     </div>
   );
 }

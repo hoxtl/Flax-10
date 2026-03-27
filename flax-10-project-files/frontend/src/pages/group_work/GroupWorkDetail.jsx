@@ -52,7 +52,7 @@ function ProjectDetailContent({ detail, projectId, onBack }) {
             <AppPage className={styles.page} contentClassName={styles.pageContent}>
                 <div className={styles.surface}>
                     <Breadcrumb crumbs={crumbs} />
-                    <ProjectHeader project={detail.project} members={visibleMembers} teamMembers={detail.members} onMemberAdded={detail.onAdded} onMemberRemove={detail.handleRemoveMember} onDelete={detail.handleDeleteProject} onBack={onBack} />
+                    <ProjectHeader project={detail.project} members={visibleMembers} teamMembers={detail.members} onMemberAdded={detail.onAdded} onMemberRemove={detail.handleRemoveMember} onDelete={detail.handleDeleteProject} onUpdate={detail.setProject} onBack={onBack} />
                     <TabsSection activeTab={detail.activeTab} setActiveTab={detail.setActiveTab} projectId={projectId} members={detail.members} onStatsUpdate={detail.setTaskStats} taskStats={detail.taskStats} />
                 </div>
             </AppPage>

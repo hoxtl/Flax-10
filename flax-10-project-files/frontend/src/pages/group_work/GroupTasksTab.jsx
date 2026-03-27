@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { List, CalendarIcon, Square, Plus } from "lucide-react";
 import { useToast } from "../../context/ToastContext";
+import SearchBar from "../../components/common/search_bar/SearchBar";
 import PrimaryButton from "../../components/common/primary_button/PrimaryButton";
 import { SegmentedControl } from "../../components/common/segmented_control/SegmentedControl.jsx";
 import MemberFilter from "./components/MemberFilter";
@@ -36,20 +37,25 @@ function useGroupTaskHandlers(showToast, taskActions, setFilterUsers) {
         await taskActions.updateTask(id, { completed });
         if (completed) showToast("Task completed!", { icon: "🎉", variant: "success" });
     };
-    const handleDelete = async (id) => {
-        await taskActions.deleteTask(id);
-        showToast("Task deleted", { variant: "error", icon: "🗑️" });
+    const handleDelete = (id) => {
+        taskActions.deleteTask(id);
+        showToast("Task deleted", {
+            variant: "success",
+            actionLabel: "Undo",
+            onAction: () => taskActions.undoDelete(id),
+        });
     };
     const handleAdd = async ({ title, due_date, assigned_to }) => taskActions.addTask(title, { due_date, assigned_to });
     const toggleFilter = (userId) => setFilterUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
     return { handleToggle, handleDelete, handleAdd, toggleFilter };
 }
 
-function TasksTabHeader({ taskView, setTaskView, members, filterUsers, onToggle, onAddClick }) {
+function TasksTabHeader({ searchTerm, setSearchTerm, taskView, setTaskView, members, filterUsers, onToggle, onAddClick }) {
     return (
         <div className={styles.headerRow}>
             <TaskViewSwitcher currentView={taskView} setTaskView={setTaskView} />
             <div className={styles.headerActions}>
+                <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Search tasks..." className={styles.taskSearch} />
                 <PrimaryButton pill size="small" className={styles.addBtn} onClick={onAddClick}>
                     <Plus size={15} strokeWidth={2.5} />
                     Add new task
@@ -64,11 +70,11 @@ function TasksTabHeader({ taskView, setTaskView, members, filterUsers, onToggle,
 
 export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
     const showToast = useToast();
-    const { taskActions, filterUsers, setFilterUsers, taskView, setTaskView, showAddModal, setShowAddModal, sortedTasks } = useGroupTasksTabState(projectId, members, onStatsUpdate);
+    const { taskActions, filterUsers, setFilterUsers, searchTerm, setSearchTerm, taskView, setTaskView, showAddModal, setShowAddModal, sortedTasks } = useGroupTasksTabState(projectId, members, onStatsUpdate);
     const handlers = useGroupTaskHandlers(showToast, taskActions, setFilterUsers);
     return (
         <div className={styles.tabBody}>
-            <TasksTabHeader taskView={taskView} setTaskView={setTaskView} members={members} filterUsers={filterUsers} onToggle={handlers.toggleFilter} onAddClick={() => setShowAddModal(true)} />
+            <TasksTabHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} taskView={taskView} setTaskView={setTaskView} members={members} filterUsers={filterUsers} onToggle={handlers.toggleFilter} onAddClick={() => setShowAddModal(true)} />
             {taskActions.loading ? <p className={styles.loadingText}>Loading tasks...</p> : (
                 <TaskContent taskView={taskView} tasks={sortedTasks} members={members} onToggle={handlers.handleToggle} onUpdate={taskActions.updateTask} onDelete={handlers.handleDelete} onAddCol={(t, s) => taskActions.addTask(t, { status: s })} />
             )}

@@ -2,8 +2,10 @@
  * GroupWork project list content.
  */
 
+import { useState } from "react";
 import PageToolbar, { ToolbarSortControl } from "../../../components/common/page_toolbar/PageToolbar";
 import AnimatedDropdown from "../../../components/common/animated_dropdown";
+import SearchBar from "../../../components/common/search_bar/SearchBar";
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import CreateProjectForm from "./CreateProjectForm";
 import ProjectRow from "./ProjectRow";
@@ -28,40 +30,45 @@ function sortProjects(projects, sortBy) {
   return sorted;
 }
 
+function filterProjects(projects, searchTerm) {
+  if (!searchTerm) return projects;
+  const lower = searchTerm.toLowerCase();
+  return projects.filter((p) => (p.name || "").toLowerCase().includes(lower));
+}
+
+function EmptyState({ isSearching }) {
+  const title = isSearching ? "No projects match your search." : "No group projects yet.";
+  const hint = isSearching ? "Try searching for a different project name." : "Create a shared project linked to one of your modules and start planning time with your teammates.";
+  return <SearchEmptyState title={title} hint={hint} icon={null} className={styles.emptyStateCard} titleClassName={styles.emptyStateTitle} hintClassName={styles.emptyStateHint} />;
+}
+
 export default function GroupWorkContent({ projects, projectListProps, sortBy, setSortBy, onProjectCreated }) {
-  const sortedProjects = sortProjects(projects, sortBy);
+  const [searchTerm, setSearchTerm] = useState("");
+  const filtered = filterProjects(projects, searchTerm);
+  const sorted = sortProjects(filtered, sortBy);
   return (
     <div className={styles.projectsSection}>
-      <ProjectsHeader sortBy={sortBy} setSortBy={setSortBy} onProjectCreated={onProjectCreated} />
-      {sortedProjects.length === 0 ? (
-        <SearchEmptyState
-          title="No group projects yet."
-          hint="Create a shared project linked to one of your modules and start planning time with your teammates."
-          icon={null}
-          className={styles.emptyStateCard}
-          titleClassName={styles.emptyStateTitle}
-          hintClassName={styles.emptyStateHint}
-        />
-      ) : (
-        <ProjectList projects={sortedProjects} projectListProps={projectListProps} />
-      )}
+      <ProjectsHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} sortBy={sortBy} setSortBy={setSortBy} onProjectCreated={onProjectCreated} />
+      {sorted.length === 0 ? <EmptyState isSearching={!!searchTerm} /> : <ProjectList projects={sorted} projectListProps={projectListProps} />}
     </div>
   );
 }
 
-function ProjectsHeaderControls({ sortBy, setSortBy, onProjectCreated }) {
-    return (
-        <div className={styles.projectsHeaderActions}>
-            <ToolbarSortControl className={styles.sortControl}>
-                <AnimatedDropdown className={styles.sortDropdownWrap} value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} placeholder="Choose a sort" usePortal triggerClassName={styles.sortDropdownTrigger} />
-            </ToolbarSortControl>
-            <CreateProjectForm onCreated={onProjectCreated} size="small" className={styles.createButton} />
-        </div>
-    );
+function ProjectsHeaderControls({ searchTerm, setSearchTerm, sortBy, setSortBy, onProjectCreated }) {
+  return (
+    <div className={styles.projectsHeaderActions}>
+      <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Search projects..." className={styles.searchBar} />
+      <ToolbarSortControl className={styles.sortControl}>
+        <AnimatedDropdown className={styles.sortDropdownWrap} value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} placeholder="Choose a sort" usePortal triggerClassName={styles.sortDropdownTrigger} />
+      </ToolbarSortControl>
+      <CreateProjectForm onCreated={onProjectCreated} size="small" className={styles.createButton} />
+    </div>
+  );
 }
 
-function ProjectsHeader({ sortBy, setSortBy, onProjectCreated }) {
-    return <PageToolbar className={styles.projectsHeader} controlsSlot={<ProjectsHeaderControls sortBy={sortBy} setSortBy={setSortBy} onProjectCreated={onProjectCreated} />} />;
+function ProjectsHeader({ searchTerm, setSearchTerm, sortBy, setSortBy, onProjectCreated }) {
+  const controls = <ProjectsHeaderControls searchTerm={searchTerm} setSearchTerm={setSearchTerm} sortBy={sortBy} setSortBy={setSortBy} onProjectCreated={onProjectCreated} />;
+  return <PageToolbar className={styles.projectsHeader} controlsSlot={controls} />;
 }
 
 function ProjectList({ projects, projectListProps }) {

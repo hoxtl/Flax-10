@@ -72,15 +72,7 @@ function CreateTaskBarOptions(props) {
     <div className={props.styles.optionsRowWrapper}>
       <AnimatePresence initial={false}>
         {props.showOptions && (
-          <motion.div
-            key="options-panel"
-            variants={optionsPanelVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            style={{ overflow: "visible" }}
-          >
+          <motion.div key="options-panel" variants={optionsPanelVariants} initial="hidden" animate="visible" exit="hidden" transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }} style={{ overflow: "visible" }}>
             <OptionsRowContent {...props} />
           </motion.div>
         )}

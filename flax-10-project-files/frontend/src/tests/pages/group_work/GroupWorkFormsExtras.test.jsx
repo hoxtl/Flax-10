@@ -297,7 +297,7 @@ describe("useCreateProjectForm", () => {
   });
 
   it("rejects past deadlines and shows a fallback error when creation fails", async () => {
-    createGroupProject.mockResolvedValueOnce(null);
+    createGroupProject.mockRejectedValueOnce(new Error("API Error"));
     const { result } = renderHook(() => useCreateProjectForm());
 
     act(() => {
@@ -313,6 +313,17 @@ describe("useCreateProjectForm", () => {
     await act(async () => {
       await result.current.submit({ preventDefault: vi.fn() });
     });
-    expect(result.current.errorMessage).toBe("We couldn't create that project. Please try again.");
+    expect(result.current.errorMessage).toBe("API Error");
+  });
+
+  it("accepts today's date as a valid deadline", async () => {
+    const { result } = renderHook(() => useCreateProjectForm());
+    const todayStr = new Date().toISOString().split("T")[0];
+    
+    act(() => {
+      result.current.change("deadline", todayStr);
+    });
+    
+    expect(result.current.errors.deadline).toBe("");
   });
 });

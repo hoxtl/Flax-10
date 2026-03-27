@@ -37,6 +37,7 @@ function ProjectModuleField({ value, onChange, error }) {
         triggerClassName={styles.dropdownTrigger}
         usePortal
         allowFlipUpward={false}
+        allowNone
       />
     </FormField>
   );

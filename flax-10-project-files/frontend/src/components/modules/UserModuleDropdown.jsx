@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import AnimatedDropdown from "../common/animated_dropdown/AnimatedDropdown";
 import useModules from "./hooks/useModules";
 
-function getModuleOptions(enrollments) {
-  if (!enrollments) return [];
-  return enrollments.map((enrollment) => ({
+function getModuleOptions(enrollments, allowNone) {
+  const options = enrollments?.map((enrollment) => ({
     value: enrollment.module_code || enrollment.module?.module_code,
     label: buildModuleLabel(enrollment),
-  }));
+  })) || [];
+  return allowNone ? [{ value: "", label: "None" }, ...options] : options;
 }
 
 function getPlaceholder(loading, placeholder) {
@@ -15,9 +15,9 @@ function getPlaceholder(loading, placeholder) {
 }
 
 export default function UserModuleDropdown(props) {
-  const { value, onChange, placeholder = "Select a module...", className, triggerClassName, ...rest } = props;
+  const { value, onChange, placeholder = "Select a module...", className, triggerClassName, allowNone = false, ...rest } = props;
   const { enrollments, loading } = useModules();
-  const moduleOptions = useMemo(() => getModuleOptions(enrollments), [enrollments]);
+  const moduleOptions = useMemo(() => getModuleOptions(enrollments, allowNone), [enrollments, allowNone]);
   return (
     <AnimatedDropdown
       value={value}
