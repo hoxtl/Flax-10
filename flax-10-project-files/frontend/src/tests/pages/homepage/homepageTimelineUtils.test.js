@@ -143,6 +143,21 @@ describe("homepageTimelineUtils", () => {
     expect(timeline[1]).toMatchObject({ type: "gap", minutes: 90, isQuickWin: false, suggestedTask: { id: 103 } });
   });
 
+  it("builds gaps correctly when the next group is a cluster", () => {
+    const timeline = computeTimelineWithGaps(
+      [
+        { id: 30, start_time: "2026-03-24T09:00Z", end_time: "2026-03-24T10:00Z" },
+        { id: 31, start_time: "2026-03-24T10:45Z", end_time: "2026-03-24T11:30Z" },
+        { id: 32, start_time: "2026-03-24T11:00Z", end_time: "2026-03-24T11:45Z" },
+      ],
+      [{ id: 104, title: "Cluster gap task", estimated_blocks: 1 }],
+    );
+
+    expect(timeline[0]).toMatchObject({ type: "item" });
+    expect(timeline[1]).toMatchObject({ type: "gap", minutes: 45, isQuickWin: true, suggestedTask: { id: 104 } });
+    expect(timeline[2]).toMatchObject({ type: "cluster" });
+  });
+
   it("determines smart window labels by time of day appropriately", () => {
     expect(getSmartWindowLabel(new Date("2026-03-24T06:30:00.000Z")).variant).toBe("default");
     expect(getSmartWindowLabel(new Date("2026-03-24T09:00:00.000Z")).variant).toBe("morning");

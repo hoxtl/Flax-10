@@ -116,6 +116,24 @@ describe("profile hook extras", () => {
     });
   });
 
+  it("uses empty pinned badge ids when profile data or badge ids are missing", async () => {
+    const reload = vi.fn();
+    const { result } = renderHook(() =>
+      useProfileHeaderState(
+        null,
+        { canEditProfile: true },
+        reload,
+      ),
+    );
+
+    expect(result.current.pinnedBadgeId).toBe("");
+    await result.current.handlePinBadge(null);
+    expect(fetchApi).toHaveBeenCalledWith("/profile/", {
+      method: "PATCH",
+      body: JSON.stringify({ pinned_badge_id: "" }),
+    });
+  });
+
   it("loads profiles, events, and task counts across success and failure paths", async () => {
     getUserProfile.mockResolvedValue({ username: "ada" });
     getAnotherUserProfile.mockResolvedValue({ username: "grace" });
@@ -127,17 +145,28 @@ describe("profile hook extras", () => {
     getAnotherUserProfile.mockRejectedValueOnce(new Error("no profile"));
     await tryLoadProfile(setProfileData, setLoading, 5, false);
     expect(setLoading).toHaveBeenCalledWith(false);
+    expect(setProfileData).not.toHaveBeenCalledWith(undefined);
 
     getUserProfile.mockResolvedValueOnce({ username: "ada" });
     await tryLoadProfile(setProfileData, setLoading, null, true);
     expect(setProfileData).toHaveBeenCalledWith({ username: "ada" });
     expect(setLoading).toHaveBeenCalledTimes(1);
 
+    getUserProfile.mockResolvedValueOnce({ username: "ada-default" });
+    await tryLoadProfile(setProfileData, setLoading);
+    expect(setProfileData).toHaveBeenCalledWith({ username: "ada-default" });
+    expect(setLoading).toHaveBeenCalledTimes(2);
+
     const setAllEvents = vi.fn();
     getEvents.mockResolvedValueOnce([{ id: 1 }]);
     await tryLoadEvents(setAllEvents, 8);
     expect(getEvents).toHaveBeenCalledWith({ user_id: 8 });
     expect(setAllEvents).toHaveBeenCalledWith([{ id: 1 }]);
+
+    getEvents.mockResolvedValueOnce(null);
+    await tryLoadEvents(setAllEvents);
+    expect(getEvents).toHaveBeenCalledWith({});
+    expect(setAllEvents).toHaveBeenCalledWith([]);
 
     getEvents.mockRejectedValueOnce(new Error("events failed"));
     await tryLoadEvents(setAllEvents);
@@ -154,6 +183,10 @@ describe("profile hook extras", () => {
     fetchTasks.mockResolvedValueOnce({ results: [{ completed: false }, { completed: true }] });
     await loadTaskCount(setTaskCount);
     expect(setTaskCount).toHaveBeenCalledWith(1);
+
+    fetchTasks.mockResolvedValueOnce(null);
+    await loadTaskCount(setTaskCount);
+    expect(setTaskCount).toHaveBeenCalledWith(0);
 
     fetchTasks.mockRejectedValueOnce(new Error("tasks failed"));
     await loadTaskCount(setTaskCount);

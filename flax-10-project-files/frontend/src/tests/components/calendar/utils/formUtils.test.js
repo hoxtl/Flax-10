@@ -296,6 +296,46 @@ describe('validateAndSubmit', () => {
             location_validated: false,
         }));
     });
+
+    it('skips geocoding for blank locations and preserves explicit privacy flags', async () => {
+        hasRecurrence.mockReturnValue(false);
+        const actions = makeActions();
+        await validateAndSubmit(
+            null,
+            makeForm({ location: '   ', is_private: true }),
+            null,
+            actions,
+            vi.fn(),
+            vi.fn(),
+            vi.fn(),
+            [],
+        );
+
+        expect(geocodeAddress).not.toHaveBeenCalled();
+        expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({
+            is_private: true,
+            recurrence_rule: null,
+        }));
+    });
+
+    it('normalizes recurrence interval and end date fallbacks', async () => {
+        hasRecurrence.mockReturnValue(false);
+        const actions = makeActions();
+        await validateAndSubmit(
+            null,
+            makeForm({ recurrence: { frequency: 'daily', interval: '0', end_date: '' } }),
+            null,
+            actions,
+            vi.fn(),
+            vi.fn(),
+            vi.fn(),
+            [],
+        );
+
+        expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({
+            recurrence_rule: { frequency: 'daily', interval: 1, end_date: null },
+        }));
+    });
 });
 
 describe('executeDelete', () => {

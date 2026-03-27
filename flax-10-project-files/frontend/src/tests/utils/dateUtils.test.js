@@ -4,7 +4,7 @@ import {
     addDays, isSameDay, isSameMonth, addWeeks, addMonths, startOfDay, isToday,
     formatTime, formatDate, formatMonthYear, formatDayLabel, getGreeting,
     parseDateInput, formatDateTime, formatShortDate, formatDateWithYear,
-    formatDateRange, formatTimeRange, addHourToTime
+    formatDateRange, formatTimeRange, addHourToTime, getMonthWeeks
 } from '../../components/calendar/utils/dateUtils';
 
 describe('dateUtils', () => {
@@ -36,6 +36,16 @@ describe('dateUtils', () => {
             const last = days[days.length - 1];
             expect(last.getDate()).toBe(4);
             expect(last.getMonth()).toBe(3);
+        });
+    });
+
+    describe('getMonthWeeks', () => {
+        it('builds full calendar weeks for a month grid', () => {
+            const weeks = getMonthWeeks(new Date(2026, 2, 15));
+            expect(weeks.length).toBeGreaterThan(4);
+            expect(weeks[0]).toHaveLength(7);
+            expect(weeks[0][0].getDay()).toBe(0);
+            expect(weeks[weeks.length - 1][6].getDay()).toBe(6);
         });
     });
 

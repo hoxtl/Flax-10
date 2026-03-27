@@ -152,6 +152,12 @@ describe("homepageViewModel fallbacks", () => {
     const list = getTaskWidgetDisplayList([], now, [{ id: "u2", due_date: "2026-03-24T12:00Z", taskWidgetStatus: "upcoming" }, { id: "u1", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }, { id: "u3", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }]);
     expect(list.map(t => t.id)).toContain("u1");
     expect(getTaskWidgetDisplayList([], now, [{ id: "named", title: "Named", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }, { id: "untitled", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }]).map(t => t.id)).toContain("untitled");
+    expect(
+      getTaskWidgetDisplayList([], now, [
+        { id: "late-overdue", title: "Late", sortTime: new Date("2026-03-24T11:00:00.000Z"), taskWidgetStatus: "overdue", priority: "high" },
+        { id: "early-overdue", title: "Early", sortTime: new Date("2026-03-24T09:00:00.000Z"), taskWidgetStatus: "overdue", priority: "high" },
+      ]).map((t) => t.id),
+    ).toEqual(["early-overdue", "late-overdue"]);
   });
 
   it("calculates widget percentages and counts securely", () => {
@@ -174,5 +180,27 @@ describe("homepageViewModel fallbacks", () => {
     expect(getHomepageRecommendation([{ id: 10, title: "Empty key task", completed: false }], [{ id: 11, title: "Deadline only", start_due_date: "2026-03-28T20:00Z" }], null)).toEqual({ meta: "Module · due in 4d", taskTitle: "Empty key task", text: "Focus on Empty key task for Deadline only." });
     expect(getHomepageRecommendation([{ id: 11, title: "Sort deadlines", completed: false }], [{ id: 12, start_due_date: "2026-03-29T20:00Z" }, { id: 13, title: "Sooner deadline", start_due_date: "2026-03-25T20:00Z" }], null)).toEqual({ meta: "Module · due tomorrow", taskTitle: "Sort deadlines", text: "Focus on Sort deadlines for Sooner deadline." });
     expect(getHomepageRecommendation([{ id: 8, title: "No window yet", completed: false }], [], null)).toBeNull();
+    expect(
+      getHomepageRecommendation(
+        [{ id: 14, title: "Use free slot", completed: false }],
+        [],
+        "90m",
+      ),
+    ).toEqual({
+      meta: "Best task to move next",
+      taskTitle: "Use free slot",
+      text: "Use the 90m window to move Use free slot forward.",
+    });
+    expect(
+      getHomepageRecommendation(
+        [{ id: 15, title: "Fallback deadline task", completed: false }],
+        [{ id: 16, start_due_date: "2026-03-24T20:00:00.000Z" }],
+        null,
+      ),
+    ).toEqual({
+      meta: "Module · due today",
+      taskTitle: "Fallback deadline task",
+      text: "Focus on Fallback deadline task for upcoming deadline.",
+    });
   });
 });
