@@ -25,7 +25,13 @@ vi.mock("../../../../../context/ToastContext", () => ({
 }));
 
 vi.mock("../../../../../context/AuthContext", () => ({
+<<<<<<< HEAD
   useAuth: () => ({ profile: { id: 1, role: "student" } }),
+=======
+  useAuth: () => ({
+    profile: { role: "student" },
+  }),
+>>>>>>> 37d2b0dec (Write more tests)
 }));
 
 vi.mock("../../../../../components/calendar/hooks/useCalendarEvents", () => ({

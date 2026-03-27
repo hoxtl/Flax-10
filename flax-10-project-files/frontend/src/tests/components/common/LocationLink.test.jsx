@@ -61,12 +61,15 @@ describe("LocationLink", () => {
         render(<LocationLink location="Somerset House" onClick={onClick} />);
 
         const button = screen.getByRole("button", { name: "Open UniMap for Somerset House" });
-        fireEvent.click(button);
+    fireEvent.click(button);
 
-        expect(onClick).toHaveBeenCalledTimes(1);
-        expect(onClick.mock.calls[0][0]).toMatchObject({ nativeEvent: expect.any(MouseEvent) });
-        expect(navigateMock).toHaveBeenCalledWith("/map?destination=Somerset%20House", { replace: false });
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0]).toMatchObject({
+        type: "click",
+        target: button,
     });
+    expect(navigateMock).toHaveBeenCalledWith("/map?destination=Somerset%20House", { replace: false });
+  });
 
     it("uses the default icon size and class names when optional props are omitted", () => {
         render(<LocationLink location="Strand Campus" />);

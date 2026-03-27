@@ -39,7 +39,9 @@ vi.mock("react-router-dom", () => ({
 }));
 
 vi.mock("../../../context/AuthContext", () => ({
-  useAuth: () => ({ profile: { id: 1, role: "student" } }),
+  useAuth: () => ({
+    profile: { role: "student" },
+  }),
 }));
 
 vi.mock("../../../components/calendar/utils/dateUtils", () => ({
