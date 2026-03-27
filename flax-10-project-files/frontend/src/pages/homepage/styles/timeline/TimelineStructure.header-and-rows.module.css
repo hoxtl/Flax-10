@@ -98,6 +98,10 @@
   .scheduleActionGroup {
     display: none !important;
   }
+
+  .timelineSub {
+    font-size: 0.7rem;
+  }
 }
 
 .timelineHeaderSub {
@@ -236,4 +240,42 @@
   color: var(--muted);
   opacity: 0.5;
   margin-top: 2px;
+}
+
+@media (max-width: 767px) {
+  .timelineRow,
+  .gapRow,
+  .freeWindowRow {
+    grid-template-columns: 62px 1fr;
+    gap: 0 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .timelineTitle {
+    font-size: 11px;
+  }
+
+  .timelineHeaderActionLink {
+    font-size: 10px;
+    white-space: normal;
+  }
+
+  .timelineHeaderRight {
+    gap: 6px;
+  }
+
+  .headerGenerateBtn {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .timelineRow,
+  .gapRow,
+  .freeWindowRow {
+    grid-template-columns: 54px 1fr;
+    gap: 0 10px;
+  }
 }

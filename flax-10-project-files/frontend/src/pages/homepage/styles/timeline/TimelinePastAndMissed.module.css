@@ -326,3 +326,30 @@
     flex-shrink: 0;
   }
 
+@media (max-width: 640px) {
+  .planTimelineConflictPairActions {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 8px;
+  }
+
+  .planTimelineConflictPairLabelText {
+    white-space: normal;
+  }
+
+  .planTimelineConflictPillGroup {
+    flex-basis: 100%;
+    margin-left: 0;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .planTimelineConflictAutoBtn {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .planTimelineConflictItemBtn {
+    max-width: 100%;
+  }
+}

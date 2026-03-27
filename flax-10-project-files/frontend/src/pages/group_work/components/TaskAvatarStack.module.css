@@ -42,3 +42,21 @@
   margin-left: var(--avatar-ml);
   z-index: var(--avatar-z);
 }
+
+@media (max-width: 640px) {
+  .stack {
+    flex-wrap: nowrap;
+    max-width: 56px;
+    overflow: hidden;
+  }
+
+  .avatar {
+    border-width: 1px;
+  }
+
+  .more {
+    margin-left: 2px;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+}

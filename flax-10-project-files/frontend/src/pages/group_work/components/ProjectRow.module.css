@@ -273,14 +273,28 @@
 .avatarStack {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0.34rem;
+    flex-wrap: nowrap;
+    gap: 0.45rem;
     margin-top: 0.5rem;
     padding-left: 0;
+    min-width: 0;
+}
+
+.avatarCluster {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    flex-shrink: 1;
 }
 
 .avatarTooltipWrap {
     display: inline-flex;
+    margin-left: -6px;
+    flex-shrink: 0;
+}
+
+.avatarTooltipWrap:first-child {
+    margin-left: 0;
 }
 
 .avatarWrapper {
@@ -309,7 +323,9 @@
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-left: 0.12rem;
+    margin-left: 0.45rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .moreBadge {
@@ -327,6 +343,7 @@
     margin-left: -6px;
     position: relative;
     z-index: 1;
+    flex-shrink: 0;
 }
 
 :global([data-mode="dark"]) .moreBadge {
@@ -368,4 +385,53 @@
     color: #dc2626;
     border: 1px solid rgba(220, 38, 38, 0.24);
     flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+    .projectRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .projectInfoArea {
+        width: 100%;
+    }
+
+    .avatarStack {
+        max-width: 100%;
+        overflow: visible;
+    }
+
+    .avatarCluster {
+        overflow: hidden;
+    }
+
+    .avatarCountLabel {
+        margin-left: 0;
+        font-size: 0.72rem;
+        flex-shrink: 0;
+    }
+
+    .projectMetaArea {
+        width: 100%;
+        min-width: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .deadlineInfo {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .projectModuleLink {
+        max-width: 100%;
+    }
+
+    .projectModuleBadge {
+        max-width: 100%;
+    }
 }

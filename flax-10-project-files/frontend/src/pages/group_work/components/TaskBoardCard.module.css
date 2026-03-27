@@ -250,6 +250,16 @@
   .boardCard {
     padding: 12px;
   }
+
+  .cardFooter {
+    gap: 8px;
+  }
+
+  .assigneeFooterBtn {
+    max-width: 72px;
+    overflow: hidden;
+    justify-content: flex-end;
+  }
 }
 
 .prioritySelectColored { background-color: var(--ps-bg); color: var(--ps-text); }

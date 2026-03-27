@@ -195,4 +195,41 @@
     margin: 0 6px 8px;
     border-radius: 14px;
   }
+
+  .header-actions {
+    min-width: 0;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    justify-content: center;
+    padding-bottom: 2px;
+  }
+
+  .header-nav-row {
+    min-width: 0;
+  }
+
+  .date-strip-wrapper {
+    padding: 12px 10px 10px;
+  }
+
+  .date-strip {
+    gap: 6px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .date-card {
+    flex: 0 0 44px;
+    min-width: 44px;
+    height: 46px;
+    border-radius: 10px;
+  }
+
+  .day-name {
+    font-size: 0.62rem;
+  }
+
+  .day-number {
+    font-size: 0.92rem;
+  }
 }

@@ -174,11 +174,24 @@
 }
 
 @media (max-width: 520px) {
+  .boardContainer {
+    gap: 10px;
+    margin-inline: -2px;
+    padding-bottom: 8px;
+  }
+
   .column {
-    flex-basis: 260px;
+    flex-basis: min(82vw, 272px);
+    max-width: min(82vw, 272px);
+    border-radius: 14px;
+    max-height: 68vh;
   }
 
   .cardList {
-    padding: 10px;
+    padding: 8px;
+  }
+
+  .colHeader {
+    padding: 10px 12px;
   }
 }

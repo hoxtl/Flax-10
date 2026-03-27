@@ -42,9 +42,11 @@ function TimelineContent(props) {
 
 function TimelineHeader(props) {
   return (
-    <div className={widgetStyles.widgetHeader}>
-      <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
-      <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
+    <div className={props.styles.timelineHeader}>
+      <div className={props.styles.timelineHeaderLeft}>
+        <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
+        <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
+      </div>
       <div className={props.styles.timelineHeaderRight}>
         <CalendarLink styles={props.styles} />
         <AutoScheduleButton {...props} />

@@ -75,6 +75,9 @@
     min-width: 0;
   }
 
+  .headerRight {
+    padding-right: 0;
+  }
 }
 
 .headerLeft {
@@ -129,6 +132,7 @@
 
   .headerTitle {
     font-size: clamp(1.28rem, 5.1vw, 1.56rem);
+    line-height: 1.08;
   }
 
   .headerPlannerPanel {

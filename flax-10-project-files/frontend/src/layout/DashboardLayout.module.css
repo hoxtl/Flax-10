@@ -106,6 +106,16 @@
   }
 
   .content {
-    padding-bottom: 0;
+    padding: 0 0 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .main {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content {
+    padding: 0 0 8px;
   }
 }
