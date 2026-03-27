@@ -317,3 +317,4 @@ describe('EventPopups extra coverage', () => {
         expect(screen.queryByTestId('event-popup')).not.toBeInTheDocument();
     });
 
+});

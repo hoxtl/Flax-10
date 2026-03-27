@@ -19,7 +19,7 @@ vi.mock("../../../components/timer/sound_panel/MusicStations", () => ({
   ),
 }));
 
-import InlineSoundPanel from "../../../components/timer/InlineSoundPanel";
+import InlineSoundPanel from "../../../components/timer/components/InlineSoundPanel";
 
 describe("InlineSoundPanel", () => {
   it("shows the music widget and toggles stations on and off", () => {

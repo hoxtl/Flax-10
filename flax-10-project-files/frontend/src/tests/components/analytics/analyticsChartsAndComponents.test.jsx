@@ -63,18 +63,18 @@ vi.mock('../../../components/common/empty_state/EmptyState', () => ({
   default: (...args) => emptyStateMock(...args),
 }));
 
-import AnimatedList from '../../../components/analytics/AnimatedList';
-import AttendanceBarChart from '../../../components/analytics/AttendanceBarChart';
-import { ConsistencyScore } from '../../../components/analytics/ConsistencyScore';
-import PlannedVsActualChart from '../../../components/analytics/PlannedVsActualChart';
-import ProductivityCard from '../../../components/analytics/ProductivityCard';
-import ProductivityCards from '../../../components/analytics/ProductivityCards';
-import StudyHeatmap from '../../../components/analytics/StudyHeatmap';
-import StudyHoursChart from '../../../components/analytics/StudyHoursChart';
-import SummaryCards from '../../../components/analytics/SummaryCards';
-import ThemeUsageChart from '../../../components/analytics/ThemeUsageChart';
-import ThemeUsageLegend from '../../../components/analytics/ThemeUsageLegend';
-import useAttendanceStats from '../../../components/analytics/useAttendanceStats';
+import AnimatedList from '../../../components/analytics/components/AnimatedList';
+import AttendanceBarChart from '../../../components/analytics/components/AttendanceBarChart';
+import { ConsistencyScore } from '../../../components/analytics/components/ConsistencyScore';
+import PlannedVsActualChart from '../../../components/analytics/components/PlannedVsActualChart';
+import ProductivityCard from '../../../components/analytics/components/ProductivityCard';
+import ProductivityCards from '../../../components/analytics/components/ProductivityCards';
+import StudyHeatmap from '../../../components/analytics/components/StudyHeatmap';
+import StudyHoursChart from '../../../components/analytics/components/StudyHoursChart';
+import SummaryCards from '../../../components/analytics/components/SummaryCards';
+import ThemeUsageChart from '../../../components/analytics/components/ThemeUsageChart';
+import ThemeUsageLegend from '../../../components/analytics/components/ThemeUsageLegend';
+import useAttendanceStats from '../../../components/analytics/hooks/useAttendanceStats';
 
 describe('Analytics coverage extras', () => {
   beforeEach(() => {

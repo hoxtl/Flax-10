@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { SleepSchedulePanel } from '../../../components/settings/SleepSchedulePanel';
+import { SleepSchedulePanel } from '../../../components/settings/components/SleepSchedulePanel';
 
 vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn(),

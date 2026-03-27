@@ -128,15 +128,15 @@ vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-vi.mock("../../../pages/modules/MyModulesDashboard.jsx", () => ({
+vi.mock("../../../pages/modules/components/MyModulesDashboard.jsx", () => ({
   default: () => <div>MyModulesDashboard</div>,
 }));
 
-vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/modules/hooks/modulesPageHooks.js", () => ({
   useMainModuleView: (...args) => useMainModuleViewMock(...args),
 }));
 
-import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/modules/ModulesPageResults.jsx";
+import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/modules/components/ModulesPageResults.jsx";
 
 function buildSorting(overrides = {}) {
   return {

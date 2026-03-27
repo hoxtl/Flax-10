@@ -1,2 +1,2 @@
-export { NotificationPanel } from './NotificationPanel';
-export { NotificationToast } from './NotificationToast';
+export { NotificationPanel } from './components/NotificationPanel';
+export { NotificationToast } from './components/NotificationToast';

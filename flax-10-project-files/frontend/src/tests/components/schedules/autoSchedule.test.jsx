@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { ScheduleAutoForm, ScheduleManualForm } from "../../../components/schedules/ScheduleForms";
+import { ScheduleAutoForm, ScheduleManualForm } from "../../../components/schedules/components/ScheduleForms";
 import { AutoScheduleForm } from "../../../components/schedules/auto/AutoScheduleForm";
 
 const submitAutoSchedule = vi.fn();

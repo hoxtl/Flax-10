@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { NotificationPanel } from '../../../components/notifications/NotificationPanel';
+import { NotificationPanel } from '../../../components/notifications/components/NotificationPanel';
 
 const useNotificationsMock = vi.fn();
 const executeNotificationActionMock = vi.fn();

@@ -1,0 +1,9 @@
+/*
+ * Settings page stylesheet assembled from focused partials.
+ */
+@import "./layout.css";
+@import "./panels.css";
+@import "./scheduling.css";
+@import "./interactive.css";
+@import "./polish-core.css";
+@import "./polish-responsive.css";

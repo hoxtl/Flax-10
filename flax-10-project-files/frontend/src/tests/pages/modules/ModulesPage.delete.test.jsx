@@ -3,15 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const useModulesPageStateMock = vi.fn();
 
-vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/modules/hooks/modulesPageHooks.js", () => ({
   useModulesPageState: (...args) => useModulesPageStateMock(...args),
 }));
 
-vi.mock("../../../pages/modules/ModulesPageResults.jsx", () => ({
+vi.mock("../../../pages/modules/components/ModulesPageResults.jsx", () => ({
   MainView: () => <div>Main view</div>,
 }));
 
-vi.mock("../../../pages/modules/ModulesPageChrome.jsx", () => ({
+vi.mock("../../../pages/modules/components/ModulesPageChrome.jsx", () => ({
   AnimatedContent: () => <div>Animated content</div>,
   ModulesPageModals: () => <div>Page modals</div>,
   ModulesSkeleton: () => <div data-testid="modules-skeleton" />,

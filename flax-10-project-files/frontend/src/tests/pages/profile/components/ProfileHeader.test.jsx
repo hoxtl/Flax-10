@@ -17,7 +17,7 @@ vi.mock('../../../../pages/profile/utils/profileHelpers', () => ({
   }),
 }));
 
-vi.mock('../../../../components/social/ShareButton', () => ({
+vi.mock('../../../../components/social/components/ShareButton', () => ({
   default: ({ userId, initialIsSharing, onToggle }) => (
     <button data-testid="share-button" onClick={() => onToggle?.(!initialIsSharing)}>
       Share {userId}

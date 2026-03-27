@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import BrowseCard from '../../../components/society/BrowseCard';
+import BrowseCard from '../../../components/society/components/BrowseCard';
 
 describe('BrowseCard', () => {
     it('renders Find new society text', () => {

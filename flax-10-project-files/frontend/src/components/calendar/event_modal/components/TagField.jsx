@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTags } from '../../../../context/TagContext';
 import { TagsSelector } from '../../../common/tags_selector/TagsSelector';
-import TagManagerModal from '../../../tags/TagManagerModal';
+import TagManagerModal from '../../../tags/components/TagManagerModal';
 function getSelectionHandler(onChange) {
     return (s) => onChange({ target: { value: s.length ? s[s.length - 1].id : '' } });
 }

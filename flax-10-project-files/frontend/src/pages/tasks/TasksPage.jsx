@@ -3,8 +3,8 @@
  */
 
 import useTasksPage from "./hooks/useTasksPage";
-import TasksPageContent from "./TasksPageContent";
-import TasksPageSkeleton from "./TasksPageSkeleton";
+import TasksPageContent from "./components/TasksPageContent";
+import TasksPageSkeleton from "./components/TasksPageSkeleton";
 
 export default function TasksPage() {
   const page = useTasksPage();

@@ -12,7 +12,7 @@ vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   overlapsDay: (...args) => overlapsDayMock(...args),
 }));
 
-vi.mock("../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../pages/homepage/utils", () => ({
   getAllFreeWindowsToday: (...args) => getAllFreeWindowsTodayMock(...args),
   getNavigatorContext: (...args) => getNavigatorContextMock(...args),
   isNow: (...args) => isNowMock(...args),

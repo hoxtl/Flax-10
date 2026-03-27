@@ -9,7 +9,7 @@ const isTodayMock = vi.fn(() => false);
 const loadScheduleSettingsMock = vi.fn();
 const submitAutoScheduleWithPrefsMock = vi.fn();
 
-vi.mock("../../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../../pages/homepage/utils", () => ({
   formatTime: (...args) => formatTimeMock(...args),
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
 }));
@@ -32,7 +32,7 @@ vi.mock("../../../../components/schedules/auto/autoScheduleActions", () => ({
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefsMock(...args),
 }));
 
-vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => ({
+vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => ({
   applyConflictResolutionPlan: vi.fn(),
   buildConflictResolutionPlan: vi.fn(() => ({ operations: [], unresolved: [] })),
   buildConflictResolutionToastMessage: vi.fn(() => "No conflicts."),

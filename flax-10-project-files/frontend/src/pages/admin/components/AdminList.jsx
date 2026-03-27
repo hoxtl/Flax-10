@@ -3,7 +3,7 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../styles";
+import styles from "../styles/styles";
 import { rowAnim, stagger } from "../utils/adminMotion";
 import AdminDecisionButtons from "./AdminDecisionButtons";
 

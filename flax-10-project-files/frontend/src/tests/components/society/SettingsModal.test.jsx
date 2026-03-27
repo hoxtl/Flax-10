@@ -13,7 +13,7 @@ vi.mock('../../../components/society/society_detail/SettingsModal.module.css', (
 }));
 import styles from '../../../components/society/society_detail/SettingsModal.module.css';
 
-vi.mock('../../../components/society/AddCollaboratorModal', () => ({
+vi.mock('../../../components/society/components/AddCollaboratorModal', () => ({
   default: ({ onClose, onAdd, existingUsernames }) => (
     <div>
       <div data-testid="existing-users">{existingUsernames.join(',')}</div>
@@ -23,7 +23,7 @@ vi.mock('../../../components/society/AddCollaboratorModal', () => ({
   ),
 }));
 
-vi.mock('../../../components/society/CollaboratorList', () => ({
+vi.mock('../../../components/society/components/CollaboratorList', () => ({
   default: ({ collaborators, onRoleChange, onRemove }) => (
     <div>
       <div data-testid="collab-count">{collaborators.length}</div>

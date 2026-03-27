@@ -7,11 +7,11 @@ import { FocusOverlayContent } from "../../../components/timer/sections/FocusOve
 import { RightPanel } from "../../../components/timer/sections/RightPanel";
 import { MainSection } from "../../../components/timer/sections/MainSection";
 
-vi.mock("../../../components/timer/HistoryModal", () => ({
+vi.mock("../../../components/timer/components/HistoryModal", () => ({
   default: ({ onClose }) => <button onClick={onClose}>History modal</button>,
 }));
 
-vi.mock("../../../components/timer/TimerPopups", () => ({
+vi.mock("../../../components/timer/components/TimerPopups", () => ({
   OvertimePopup: ({ mode, onAction }) => <button onClick={onAction}>Overtime {mode}</button>,
   GoalModal: ({ onAction }) => <button onClick={onAction}>Goal modal</button>,
   BreakModal: ({ onAction }) => <button onClick={onAction}>Break modal</button>,
@@ -23,7 +23,7 @@ vi.mock("../../../components/timer/hooks/useTimerPopupEffects", () => ({
   useTimerPopupEffects: vi.fn(),
 }));
 
-vi.mock("../../../components/timer/TimerCircle", () => ({
+vi.mock("../../../components/timer/components/TimerCircle", () => ({
   default: () => <div>Timer circle</div>,
   TimerRing: () => <div>Timer ring</div>,
 }));
@@ -38,26 +38,26 @@ vi.mock("../../../components/common/tabs/Tabs", () => ({
   ),
 }));
 
-vi.mock("../../../components/timer/InlineSoundPanel", () => ({
+vi.mock("../../../components/timer/components/InlineSoundPanel", () => ({
   default: () => <div>Inline sound panel</div>,
 }));
 
-vi.mock("../../../components/timer/RightRailHistoryPanel", () => ({
+vi.mock("../../../components/timer/components/RightRailHistoryPanel", () => ({
   default: () => <div>Right rail history</div>,
 }));
 
-vi.mock("../../../components/timer/PresetPanel", () => ({
+vi.mock("../../../components/timer/components/PresetPanel", () => ({
   PresetPanel: () => <div>Preset panel</div>,
   TimerConfigPanel: () => <div>Config panel</div>,
 }));
 
-vi.mock("../../../components/timer/SessionDots", () => ({
+vi.mock("../../../components/timer/components/SessionDots", () => ({
   default: () => <div>Session dots</div>,
   LiveStatsRow: ({ onDistract }) => <button onClick={onDistract}>Distract</button>,
   ProgressStrip: () => <div>Progress strip</div>,
 }));
 
-vi.mock("../../../components/timer/TaskInput", () => ({
+vi.mock("../../../components/timer/components/TaskInput", () => ({
   TaskInput: ({ onClearTask, onJustStart, onOpenFocus }) => (
     <>
       <button onClick={onClearTask}>Clear task</button>
@@ -67,7 +67,7 @@ vi.mock("../../../components/timer/TaskInput", () => ({
   ),
 }));
 
-vi.mock("../../../components/timer/TimerComponents", () => ({
+vi.mock("../../../components/timer/components/TimerComponents", () => ({
   TimerControls: ({ onToggle, onPause, onReset, onEndEarly }) => (
     <>
       <button onClick={onToggle}>Toggle timer</button>

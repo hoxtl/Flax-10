@@ -18,8 +18,8 @@ import WidgetHeader from '../../common/widget_header/WidgetHeader';
 import {
   ShowMoreButton,
 } from '../shared/widgetParts.jsx';
-import widgetStyles from "../../../pages/modules/DashboardWidgets.module.css";
-import rowStyles from "../../../pages/modules/DashboardRows.module.css";
+import widgetStyles from "../../../pages/modules/styles/DashboardWidgets.module.css";
+import rowStyles from "../../../pages/modules/styles/DashboardRows.module.css";
 import {
   DEADLINE_TIER_ORDER,
   TIER_ACCENT,

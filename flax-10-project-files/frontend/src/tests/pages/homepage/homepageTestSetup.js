@@ -65,7 +65,7 @@ vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => (typeof id === "string" && id.includes("_") ? id.split("_")[0] : id)),
 }));
 
-vi.mock("../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../pages/homepage/utils", () => ({
   formatTime: vi.fn((date) => new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
   isNow: vi.fn(() => false),
   isRoutineEvent: vi.fn(() => false),
@@ -195,13 +195,13 @@ vi.mock("../../../components/common/back_to_top/BackToTop", () => ({
   default: () => <div data-testid="back-to-top" />,
 }));
 
-vi.mock("../../../components/tags/pill_filters", () => ({
+vi.mock("../../../components/tags/components/PillFilters", () => ({
   __esModule: true,
   default: () => <div data-testid="pill-filters" />,
 }));
 
 vi.mock("../../../pages/tasks/components/TaskCard", async () => {
-  const actual = await vi.importActual("../../../pages/tasks/components/TaskCard");
+  const actual = await vi.importActual("../../../pages/Tasks/components/TaskCard");
   return {
     ...actual,
     EditTaskModal: ({ task, onSave, onDelete, onClose }) => (

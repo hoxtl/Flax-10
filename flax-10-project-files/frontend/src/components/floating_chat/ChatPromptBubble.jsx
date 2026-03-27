@@ -5,7 +5,7 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import PrimaryButton from "../common/primary_button/PrimaryButton";
-import styles from "../FloatingChat.module.css";
+import styles from "./styles/FloatingChat.module.css";
 
 const MotionDiv = motion.div;
 

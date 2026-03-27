@@ -6,7 +6,7 @@ import { useState } from 'react';
 import styles from '../../../pages/timer/TimerPage.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import StandardModal from '../../common/standard_modal/StandardModal';
-import { formatTime } from '../TimerComponents';
+import { formatTime } from '../components/TimerComponents';
 
 const MOODS = [
   { key: 'hard', emoji: '😤', label: 'Hard' },

@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PasswordResetConfirm from '../../pages/auth/PasswordResetConfirm';
 
-vi.mock('../../components/Auth/AuthHeroGeometric', () => ({ default: () => <div /> }));
-vi.mock('../../components/Auth/AuthBranding', () => ({
+vi.mock('../../components/Auth/components/AuthHeroGeometric', () => ({ default: () => <div /> }));
+vi.mock('../../components/Auth/components/AuthBranding', () => ({
     AuthBrand: () => <div />,
     AuthFooter: () => <div />,
 }));

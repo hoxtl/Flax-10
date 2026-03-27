@@ -28,7 +28,7 @@ vi.mock('../../../api/client', () => ({
 }));
 
 import ProfileHeader from '../../../pages/profile/components/ProfileHeader';
-import { useProfileHeaderState } from '../../../pages/profile/useProfileHeaderState';
+import { useProfileHeaderState } from '../../../pages/profile/hooks/useProfileHeaderState';
 
 // ProfileHeader component tests – part 2
 

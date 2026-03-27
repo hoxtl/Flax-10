@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ProfileModals, { SocietiesModal } from '../../../pages/profile/ProfileModals';
+import ProfileModals, { SocietiesModal } from '../../../pages/profile/components/ProfileModals';
 import { getModules } from '../../../api/moduleApi';
 import { createFnMap } from '../../utils/testBuilderUtils';
 
-vi.mock('../../../components/dashboard/EditProfileModal', () => ({
+vi.mock('../../../components/dashboard/components/EditProfileModal', () => ({
     default: ({ isOpen, onClose }) =>
         isOpen ? <div data-testid="edit-profile-modal"><button onClick={onClose}>Close Edit</button></div> : null,
 }));
 
-vi.mock('../../../components/social/UserListModal', () => ({
+vi.mock('../../../components/social/components/UserListModal', () => ({
     default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
         <div data-testid="user-list-modal">
             <span>{title}</span>
@@ -44,7 +44,7 @@ vi.mock('../../../api/taskApi', () => ({
 }));
 
 vi.mock('../../../pages/profile/hooks/useProfileModalsData', async () => {
-    const actual = await vi.importActual('../../../pages/profile/hooks/useProfileModalsData');
+    const actual = await vi.importActual('../../../pages/Profile/hooks/useProfileModalsData');
     return {
         ...actual,
         useTasksModalData: vi.fn(() => ({ loading: false, tasks: [] })),

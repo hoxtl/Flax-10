@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import TodayBanner from '../../../components/timer/TodayBanner';
+import TodayBanner from '../../../components/timer/components/TodayBanner';
 import analyticsService from '../../../api/analyticsApi';
 
 const statStripSpy = vi.fn();

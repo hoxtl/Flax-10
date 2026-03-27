@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import PillFilters from '../../../components/tags/PillFilters';
+import PillFilters from '../../../components/tags/components/PillFilters';
 
 const mockTags = [
     { id: 1, label: 'Work', color: '#ff0000', icon: '💼' },
@@ -8,7 +8,7 @@ const mockTags = [
 ];
 
 // Mock CSS modules
-vi.mock('../../../components/tags/PillFilters.module.css', () => ({
+vi.mock('../../../components/tags/styles/PillFilters.module.css', () => ({
     default: { row: 'row', pill: 'pill', active: 'active', inactive: 'inactive', colorDot: 'dot', count: 'count' },
 }));
 
@@ -16,7 +16,7 @@ vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({ tags: mockTags })),
 }));
 
-vi.mock('../../../components/tags/TagManagerModal', () => ({
+vi.mock('../../../components/tags/components/TagManagerModal', () => ({
     default: ({ onClose }) => (
         <div data-testid="tag-manager-modal">
             <button onClick={onClose}>Close Modal</button>

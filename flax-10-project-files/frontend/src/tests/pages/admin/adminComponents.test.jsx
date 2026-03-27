@@ -9,7 +9,7 @@ import { AnimatedList, ListRow, ListInfo, ListActions } from '../../../pages/adm
 import { SectionCard, CardHeader, LoadingSpinner, EmptyMessage, ErrorMessage } from '../../../pages/admin/components/AdminSurface';
 import HoldConfirmModal from '../../../components/common/hold_confirm_modal/HoldConfirmModal';
 
-vi.mock('../../../pages/admin/styles', () => ({
+vi.mock('../../../pages/admin/styles/styles', () => ({
   default: {
     filterGroup: 'filterGroup', filterButtons: 'filterButtons', filterPillButton: 'filterPillButton',
     filterPillBadge: 'filterPillBadge', filterPillBadgeActive: 'filterPillBadgeActive',

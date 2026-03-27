@@ -4,7 +4,7 @@ const extractBaseEventIdMock = vi.fn((id) => id);
 const formatTimeMock = vi.fn(() => "10:00");
 const getNextFreeSlotTodayMock = vi.fn(() => null);
 
-vi.mock("../../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../../pages/homepage/utils", () => ({
   formatTime: (...args) => formatTimeMock(...args),
   getAllFreeWindowsToday: vi.fn(() => []),
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),

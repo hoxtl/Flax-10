@@ -2,7 +2,7 @@
  * Submit button with transient saved-state feedback.
  */
 
-import styles from "../../../pages/settings/Settings.module.css";
+import styles from "../../../pages/settings/styles/Settings.module.css";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import { useTransientSavedState } from "../../common/hooks/useTransientSavedState";
 

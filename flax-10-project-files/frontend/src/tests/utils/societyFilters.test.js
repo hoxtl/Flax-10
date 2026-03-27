@@ -6,7 +6,7 @@ import {
     getCategoryLabel,
     matchesCategory,
     countByCategory,
-} from '../../pages/societies/societyFilters';
+} from '../../pages/societies/utils/societyFilters';
 
 describe('SOCIETY_CATEGORIES', () => {
     it('is an array with at least 8 entries', () => {

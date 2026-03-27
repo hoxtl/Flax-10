@@ -16,7 +16,7 @@ vi.mock('../../../pages/group_work/hooks/groupWorkHooks', () => ({
   useSelectedProjectId: vi.fn(),
 }));
 
-vi.mock('../../../pages/group_work/GroupWorkDetail', () => ({
+vi.mock('../../../pages/group_work/components/GroupWorkDetail', () => ({
   default: () => <div data-testid="groupwork-detail" />,
 }));
 

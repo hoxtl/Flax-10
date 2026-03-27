@@ -23,7 +23,7 @@ vi.mock("../../../components/modules/shared/taskButtons.jsx", () => ({
   ),
 }));
 
-import SmartNudge from "../../../pages/modules/SmartNudge";
+import SmartNudge from "../../../pages/modules/components/SmartNudge";
 
 describe("ModulesPageNudges", () => {
   beforeEach(() => {

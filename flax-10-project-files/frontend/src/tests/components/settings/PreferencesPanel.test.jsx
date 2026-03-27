@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-import PreferencesPanel from '../../../components/settings/PreferencesPanel';
+import PreferencesPanel from '../../../components/settings/components/PreferencesPanel';
 
 vi.mock('../../../context/ThemeContext', () => ({
   useTheme: vi.fn(() => ({

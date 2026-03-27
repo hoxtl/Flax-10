@@ -5,7 +5,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
 import FilterCheckbox from "../../common/filter_checkbox/FilterCheckbox";
-import pillStyles from "../MultiSelectDropdown.module.css";
+import pillStyles from "../styles/MultiSelectDropdown.module.css";
 import { getItemClassName, getMenuClassName, getOptionState } from "./multiSelectDropdownUtils";
 
 const MotionButton = motion.button;

@@ -34,7 +34,7 @@ export const mockProfileHelpers = () => {
 };
 
 export const mockSocialComponents = () => {
-  vi.mock('../../../components/social/ShareButton', () => ({
+  vi.mock('../../../components/social/components/ShareButton', () => ({
     default: ({ userId, onToggle, initialIsSharing }) => (
       <button data-testid="share-btn" onClick={() => onToggle?.(!initialIsSharing)}>
         Share {userId}

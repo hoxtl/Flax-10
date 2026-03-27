@@ -9,7 +9,7 @@ import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import LocationLink from "../../common/location_link/LocationLink";
 import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
 import styles from "./SocietyInfo.module.css";
-import CategorySelector, { CategoryDisplay } from "../CategorySelector";
+import CategorySelector, { CategoryDisplay } from "../components/CategorySelector";
 
 /** Primary metadata and action row for the society detail page. */
 

@@ -7,7 +7,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 
-import MyModulesDashboard from "../../../pages/modules/MyModulesDashboard";
+import MyModulesDashboard from "../../../pages/modules/components/MyModulesDashboard";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getSuggestedReadings, convertReadingToTask } from "../../../api/readingApi";
 import { createTask } from "../../../api/taskApi";

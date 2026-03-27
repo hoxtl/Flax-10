@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import FocusAnimation from '../../../components/timer/FocusAnimation';
+import FocusAnimation from '../../../components/timer/components/FocusAnimation';
 
 vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
     default: new Proxy({}, { get: (_, key) => key }),
 }));
 
-vi.mock('../../../components/timer/TreeAnimation.module.css', () => ({
+vi.mock('../../../components/timer/styles/TreeAnimation.module.css', () => ({
     default: new Proxy({}, { get: (_, key) => key }),
 }));
 

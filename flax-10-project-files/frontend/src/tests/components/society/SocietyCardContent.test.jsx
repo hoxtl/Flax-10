@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 
 import { MemoryRouter } from "react-router-dom";
 
-import { SocietyCardContent } from "../../../components/society/SocietyCardContent";
+import { SocietyCardContent } from "../../../components/society/components/SocietyCardContent";
 
 function renderWithRouter(ui) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);

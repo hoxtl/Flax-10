@@ -20,7 +20,7 @@ import { useDisruptions } from "../../../pages/campus_map/hooks/useDisruptions";
 import { useHomeAddress } from "../../../pages/campus_map/hooks/useHomeAddress";
 import { useResponsiveCampusMap } from "../../../pages/campus_map/hooks/useResponsiveCampusMap";
 
-vi.mock("../../../components/campus_map/CampusMapShell", () => ({
+vi.mock("../../../components/campus_map/components/CampusMapShell", () => ({
   CampusMapShell: (props) => (
     <div>
       <span data-testid="model-prop">{String(typeof props.handleGeolocateStart === "function")}</span>

@@ -8,7 +8,7 @@ vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   ),
 }));
 
-vi.mock('../../../components/tags/TagManagerModal.module.css', () => ({
+vi.mock('../../../components/tags/styles/TagManagerModal.module.css', () => ({
   default: {
     content: 'content', form: 'form', error: 'error', colorRow: 'colorRow',
     formActions: 'formActions', formActionBtn: 'formActionBtn',

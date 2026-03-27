@@ -27,7 +27,7 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
     ),
 }));
 
-vi.mock('../../../components/ui/est_time_help_banner', () => ({
+vi.mock('../../../components/ui/components/EstTimeHelpBanner', () => ({
     default: () => <div data-testid="est-time-help" />,
 }));
 
