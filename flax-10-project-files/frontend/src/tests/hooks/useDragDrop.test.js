@@ -88,6 +88,20 @@ describe('useDrop', () => {
         expect(result.current.isOver).toBe(false);
     });
 
+    it('keeps isOver true while nested drags are still active', () => {
+        const { result } = renderHook(() => useDrop({ accept: 'event', onDrop: vi.fn() }));
+        act(() => {
+            result.current.dropProps.onDragEnter({ preventDefault: vi.fn() });
+            result.current.dropProps.onDragEnter({ preventDefault: vi.fn() });
+        });
+
+        act(() => {
+            result.current.dropProps.onDragLeave();
+        });
+
+        expect(result.current.isOver).toBe(true);
+    });
+
     it('calls onDrop with payload when drop occurs and payload is valid', () => {
         const onDrop = vi.fn();
         const { result } = renderHook(() => useDrop({ accept: 'event', onDrop }));

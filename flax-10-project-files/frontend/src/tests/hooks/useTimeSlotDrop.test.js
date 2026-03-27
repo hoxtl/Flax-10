@@ -111,6 +111,30 @@ describe('useTimeSlotDrop', () => {
     expect(result.current.highlightQuarter).toBeNull();
   });
 
+  it('handles drag highlight updates even when the drop target omits optional handlers', () => {
+    dropProps = {};
+    useDropMock.mockImplementation(({ onDrop: dropHandler }) => {
+      onDrop = dropHandler;
+      return { dropProps, isOver: false };
+    });
+    const { result } = renderTimeSlotDrop();
+
+    act(() => {
+      result.current.mergedProps.onDragOver({
+        clientY: 220,
+        currentTarget: { getBoundingClientRect: () => ({ top: 100 }) },
+      });
+    });
+
+    expect(result.current.highlightQuarter).toBe(3);
+
+    act(() => {
+      result.current.mergedProps.onDragLeave({});
+    });
+
+    expect(result.current.highlightQuarter).toBeNull();
+  });
+
   it('creates event from tag payload when overlap check passes', async () => {
     renderTimeSlotDrop();
     await dropOnTimeSlot({ name: 'Revision', default_duration: 30 }, 'TAG');
@@ -125,6 +149,15 @@ describe('useTimeSlotDrop', () => {
     await dropOnTimeSlot({ name: 'Revision' }, 'TAG');
 
     expect(actions.addEvent).not.toHaveBeenCalled();
+  });
+
+  it('ignores unsupported payload types', async () => {
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ name: 'Ignored' }, 'UNKNOWN');
+
+    expect(actions.addEvent).not.toHaveBeenCalled();
+    expect(actions.editEvent).not.toHaveBeenCalled();
+    expect(actions.addException).not.toHaveBeenCalled();
   });
 
   it('moves non-recurring event with editEvent', async () => {
@@ -162,5 +195,16 @@ describe('useTimeSlotDrop', () => {
 
     expect(actions.addException).toHaveBeenCalledWith(6, '2026-03-09');
     expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'Seminar', location: 'A1' }));
+  });
+
+  it('ignores read-only events before any move logic runs', async () => {
+    isReadOnlyEventMock.mockReturnValue(true);
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ id: 13, start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' }, 'EVENT');
+
+    expect(actions.addEvent).not.toHaveBeenCalled();
+    expect(actions.editEvent).not.toHaveBeenCalled();
+    expect(actions.addException).not.toHaveBeenCalled();
+    expect(confirmFn).not.toHaveBeenCalled();
   });
 });

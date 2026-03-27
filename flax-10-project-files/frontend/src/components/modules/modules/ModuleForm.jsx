@@ -11,6 +11,7 @@ import AnimatedDropdown from '../../common/animated_dropdown/AnimatedDropdown';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import styles from './ModuleForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
+import LocationAutocomplete from '../../common/inputs/LocationAutocomplete';
 
 function saveModule(is_editing, module, form_data) {
     const data = serialiseModule(form_data);
@@ -135,7 +136,7 @@ function DescriptionLocationFields({ form_data, onChange }) {
                 <textarea className={styles.textarea} value={form_data.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Brief description of the module..." rows={4} />
             </FormGroup>
             <FormGroup label="Location">
-                <input type="text" className={styles.input} value={form_data.location} onChange={(e) => onChange('location', e.target.value)} placeholder="e.g., Bush House, 2.09" />
+                <LocationAutocomplete value={form_data.location} onChange={(val) => onChange('location', val)} inputClassName={styles.input} />
             </FormGroup>
         </>
     );
@@ -148,7 +149,7 @@ function TimeFields({ form_data, errors, onChange }) {
                 <DateTimePicker value={form_data.start_time} onChange={val => onChange('start_time', val)} placeholder="Pick date & time" />
             </FormGroup>
             <FormGroup label="End date and end time of lecture" error={errors.end_time} required>
-                <DateTimePicker value={form_data.end_time} onChange={val => onChange('end_time', val)} placeholder="Pick date & time" />
+                <DateTimePicker value={form_data.end_time} onChange={val => onChange('end_time', val)} placeholder="Pick date & time" minDate={form_data.start_time ? new Date(form_data.start_time) : undefined} />
             </FormGroup>
         </>
     );

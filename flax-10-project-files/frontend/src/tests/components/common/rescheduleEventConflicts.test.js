@@ -157,14 +157,132 @@ describe("rescheduleEventConflicts", () => {
   it("returns empty plan for missing arguments", () => {
     expect(buildConflictResolutionPlan()).toEqual({ operations: [], unresolved: [] });
   });
+
+  it("treats null event input as an empty day", () => {
+    expect(buildConflictResolutionPlan(null, new Date("2026-03-23T00:00:00Z"))).toEqual({
+      operations: [],
+      unresolved: [],
+    });
+  });
+
+  it("uses the teacher-specific fixed-overlap toast copy", () => {
+    expect(buildConflictResolutionToastMessage({ operations: [], unresolved: [{ reason: "fixed" }] }, true)).toBe(
+      "These overlaps are fixed lectures or deadline items, so they stay in place.",
+    );
+  });
+
+  it("keeps plural no-slot copy grammatically correct", () => {
+    expect(buildConflictResolutionToastMessage({
+      operations: [{ event: { title: "Essay" }, movedToTomorrow: false }],
+      unresolved: [{ reason: "no-slot" }, { reason: "no-slot" }],
+    })).toBe("Cleared 1 conflict · 2 still need manual review.");
+  });
+
+  it("treats missing ids as non-movable while still resolving valid personal events", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const plan = buildConflictResolutionPlan([
+      { source: "personal", title: "No id", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T10:00:00Z") },
+      { id: "task-1", source: "personal", title: "Task", start_time: iso("2026-03-23T09:15:00Z"), end_time: iso("2026-03-23T10:15:00Z") },
+    ], selectedDate);
+
+    expect(plan.operations).toHaveLength(1);
+    expect(plan.operations[0].event.id).toBe("task-1");
+  });
+
+  it("uses the default 25-minute duration and original start as the fallback end time", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const plan = buildConflictResolutionPlan([
+      { id: "lecture-1", source: "timetable", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T10:00:00Z") },
+      { id: "task-1", source: "personal", title: "Task", start_time: iso("2026-03-23T09:15:00Z") },
+    ], selectedDate);
+
+    expect(plan.operations[0]).toMatchObject({
+      event: expect.objectContaining({ id: "task-1" }),
+      originalEnd: iso("2026-03-23T09:15:00Z"),
+    });
+    expect(plan.operations[0].start.toISOString()).toBe(iso("2026-03-23T10:00:00Z"));
+    expect(plan.operations[0].end.toISOString()).toBe(iso("2026-03-23T10:25:00Z"));
+  });
+
+  it("falls back to the anchor start time when the remaining fixed event has no end", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const plan = buildConflictResolutionPlan([
+      { id: "task-1", source: "personal", title: "Task", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T09:30:00Z") },
+      { id: "lecture-1", source: "timetable", title: "Lecture", start_time: iso("2026-03-23T09:15:00Z") },
+    ], selectedDate);
+
+    expect(plan.operations[0].start.toISOString()).toBe(iso("2026-03-23T09:15:00Z"));
+    expect(plan.operations[0].end.toISOString()).toBe(iso("2026-03-23T09:45:00Z"));
+  });
+
+  it("prefers shorter movable candidates when starts match", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const plan = buildConflictResolutionPlan([
+      { id: "lecture-1", source: "timetable", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T09:30:00Z") },
+      { id: "task-long", source: "personal", title: "Long", start_time: iso("2026-03-23T09:10:00Z"), end_time: iso("2026-03-23T10:10:00Z") },
+      { id: "task-short", source: "personal", title: "Short", start_time: iso("2026-03-23T09:10:00Z"), end_time: iso("2026-03-23T09:35:00Z") },
+    ], selectedDate);
+
+    expect(plan.operations[0].event.id).toBe("task-short");
+  });
+
+  it("breaks equal-duration ties by later end time and then by title", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const byEndTime = buildConflictResolutionPlan([
+      { id: "lecture-1", source: "timetable", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T09:30:00Z") },
+      { id: "task-early", source: "personal", title: "Early", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+      { id: "task-late", source: "personal", title: "Late", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:20:00Z") },
+    ], selectedDate);
+    expect(byEndTime.operations[0].event.id).toBe("task-late");
+
+    const byTitle = buildConflictResolutionPlan([
+      { id: "lecture-1", source: "timetable", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T09:30:00Z") },
+      { id: "task-zulu", source: "personal", title: "Zulu", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+      { id: "task-mango", source: "personal", title: "Mango", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+      { id: "task-alpha", source: "personal", title: "Alpha", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+    ], selectedDate);
+    expect(byTitle.operations[0].event.id).toBe("task-alpha");
+  });
+
+  it("falls back to blank titles when title tie-breaks compare otherwise identical candidates", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const plan = buildConflictResolutionPlan([
+      { id: "lecture-1", source: "timetable", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T09:30:00Z") },
+      { id: "task-untitled", source: "personal", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+      { id: "task-alpha", source: "personal", title: "Alpha", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+    ], selectedDate);
+
+    expect(plan.operations[0].event.id).toBe("task-untitled");
+  });
+
+  it("compares blank fallback titles consistently regardless of candidate order", () => {
+    const selectedDate = new Date("2026-03-23T00:00:00Z");
+    const plan = buildConflictResolutionPlan([
+      { id: "lecture-1", source: "timetable", start_time: iso("2026-03-23T09:00:00Z"), end_time: iso("2026-03-23T09:30:00Z") },
+      { id: "task-alpha", source: "personal", title: "Alpha", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+      { id: "task-untitled", source: "personal", start_time: iso("2026-03-23T09:05:00Z"), end_time: iso("2026-03-23T09:10:00Z") },
+    ], selectedDate);
+
+    expect(plan.operations[0].event.id).toBe("task-untitled");
+  });
+
   it("builds toast for simple or complex plans", () => {
     const solo = { operations: [{ event: { title: "Solo" }, movedToTomorrow: false }], unresolved: [] };
     expect(buildConflictResolutionToastMessage(solo)).toBe("Cleared 1 conflict.");
+    const pluralSolo = {
+      operations: [
+        { event: { title: "A" }, movedToTomorrow: false },
+        { event: { title: "B" }, movedToTomorrow: false },
+      ],
+      unresolved: [],
+    };
+    expect(buildConflictResolutionToastMessage(pluralSolo)).toBe("Cleared 2 conflicts.");
     const complex = {
       operations: [{ event: { title: "A" }, movedToTomorrow: true }, { event: { title: "B" }, movedToTomorrow: true }],
-      unresolved: [{ reason: "fixed" }, { reason: "no-slot" }],
+      unresolved: [{ reason: "fixed" }, { reason: "fixed" }, { reason: "no-slot" }],
     };
     expect(buildConflictResolutionToastMessage(complex)).toContain("2 moved to tomorrow");
+    expect(buildConflictResolutionToastMessage(complex)).toContain("2 fixed overlaps left in place");
   });
   it("reports operation failures", async () => {
     const editEvent = vi.fn().mockRejectedValue(new Error("fail"));

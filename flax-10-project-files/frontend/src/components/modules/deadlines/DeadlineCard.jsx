@@ -7,6 +7,7 @@ import { formatFullDateTime } from '../utils/moduleUtils';
 import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
 import { ModuleItemCardActions, ModuleItemDeleteDialog } from '../shared/moduleCardActions';
 import LocationLink from '../../common/location_link/LocationLink';
+import Badge from '../../common/badge/Badge';
 import styles from './DeadlineCard.module.css';
 
 export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete }) {
@@ -28,7 +29,7 @@ function DeadlineCardHeader({ deadline, countdown }) {
     return (
         <div className={styles.cardHeader}>
             <div className={styles.cardTitleRow}>
-                <span className={styles.typeBadge}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
+                <Badge tone="flax">{DEADLINE_LABELS[deadline.deadline_type]}</Badge>
                 <span className={styles.cardTitle}>{deadline.title}</span>
             </div>
             <span className={styles.countdown}>{countdown}</span>

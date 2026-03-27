@@ -6,12 +6,13 @@ import { useState } from 'react';
 import styles from '../deadlines/DeadlineCard.module.css';
 import {formatDate} from '../../calendar/utils/dateUtils';
 import { ModuleItemCardActions, ModuleItemDeleteDialog } from '../shared/moduleCardActions';
+import Badge from '../../common/badge/Badge';
 
 function ReadingCardHeader({ reading }) {
     return (
         <div className={styles.cardHeader}>
             <div className={styles.cardTitleRow}>
-                <span className={styles.typeBadge}>📖 Reading</span>
+                <Badge tone="flax">📖 Reading</Badge>
                 <span className={styles.cardTitle}>{reading.title}</span>
 
             </div>

@@ -222,9 +222,9 @@
     gap: 0.3rem;
     font-size: 0.68rem;
     font-weight: 600;
-    color: var(--text);
-    background: var(--modules-inline-surface);
-    border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
+    color: var(--primary-strong);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border: 0.5px solid color-mix(in srgb, var(--primary) 22%, transparent);
     padding: 0.18rem 0.5rem;
     white-space: nowrap;
     flex-shrink: 0;
@@ -303,6 +303,10 @@
     transition: all 0.2s cubic-bezier(.2, .9, .2, 1);
     border: none;
     min-width: 0;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
 }
 
 .editButton {
@@ -345,17 +349,18 @@
     font-size: 0.78rem;
     padding: 0.4rem 0.85rem;
     border-radius: 999px;
-    border: 0.5px solid var(--border);
+    border: 0.5px solid color-mix(in srgb, var(--primary) 30%, var(--border));
     background: transparent;
-    color: var(--text);
+    color: var(--primary-strong);
     cursor: pointer;
     font-weight: 600;
     transition: all 0.15s ease;
 }
 
 .deadlineButton:hover {
-    background: var(--text);
-    color: var(--modules-accent-on-solid);
+    background: var(--primary);
+    color: var(--c-white);
+    border-color: var(--primary);
 }
 
 .viewDetailsBtn {

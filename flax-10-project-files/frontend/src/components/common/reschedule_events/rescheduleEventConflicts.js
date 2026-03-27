@@ -20,10 +20,12 @@ function handleNoResolution(group, movableCandidates, lockedGroups, unresolved) 
 
 function applyResolution(resolution, workingEvents, tomorrowEvents, operations) {
   const target = workingEvents.find((event) => String(event.id) === String(resolution.movable.id));
+  const originalStart = target.start_time;
+  const originalEnd = target.end_time || target.start_time;
   target.start_time = resolution.slot.start.toISOString();
   target.end_time = resolution.slot.end.toISOString();
   if (resolution.slot.movedToTomorrow) tomorrowEvents.push(cloneEvent(target));
-  operations.push({ event: resolution.movable, start: resolution.slot.start, end: resolution.slot.end, movedToTomorrow: resolution.slot.movedToTomorrow, originalStart: resolution.movable.start_time, originalEnd: resolution.movable.end_time || resolution.movable.start_time });
+  operations.push({ event: resolution.movable, start: resolution.slot.start, end: resolution.slot.end, movedToTomorrow: resolution.slot.movedToTomorrow, originalStart, originalEnd });
 }
 
 function processOverlapGroup(ctx) {
@@ -167,7 +169,6 @@ function extendOverlapGroup(events, startIndex, group, maxEndRef) {
 
 function buildOverlapGroup(events, startIndex) {
   const seed = events[startIndex];
-  if (!seed) return [];
   const group = [seed];
   const maxEndRef = { value: getEndMs(seed) };
   extendOverlapGroup(events, startIndex, group, maxEndRef);
@@ -198,7 +199,7 @@ function tryResolveMovable(movable, group, workingEvents, selectedDate, tomorrow
   const anchor = getGroupAnchor(group, movable);
   const durationMs = getDurationMs(movable);
   const remainingEvents = workingEvents.filter((event) => String(event.id) !== String(movable.id));
-  const after = anchor ? new Date(anchor.end_time || anchor.start_time) : getDayStart(selectedDate);
+  const after = new Date(anchor.end_time || anchor.start_time);
   const slot = findAvailableDaySlot(remainingEvents, selectedDate, durationMs, after) || getTomorrowSlot(tomorrowCursor, tomorrowDate, tomorrowEvents, durationMs);
   return slot ? { movable, slot } : null;
 }
@@ -209,7 +210,6 @@ function buildGroupResolution(group, movableCandidates, workingEvents, selectedD
 
 function getGroupAnchor(group, movable) {
   const remaining = group.filter((event) => String(event.id) !== String(movable.id));
-  if (!remaining.length) return null;
   return [...remaining].sort((left, right) => getEndMs(right) - getEndMs(left))[0];
 }
 
@@ -247,7 +247,7 @@ function scanEventsForSlot(sorted, cursor, durationMs) {
 function findAvailableDaySlot(events, selectedDate, durationMs, after) {
   const dayStart = getDayStart(selectedDate);
   const dayEnd = getDayEnd(selectedDate);
-  const cursor = Math.max(dayStart.getTime(), after?.getTime?.() || dayStart.getTime());
+  const cursor = Math.max(dayStart.getTime(), after.getTime());
   const result = scanEventsForSlot([...events].sort(compareByStartTime), cursor, durationMs);
   if (result.slot) return result.slot;
   return dayEnd.getTime() - result.cursor >= durationMs ? buildSlot(result.cursor, durationMs, false) : null;
