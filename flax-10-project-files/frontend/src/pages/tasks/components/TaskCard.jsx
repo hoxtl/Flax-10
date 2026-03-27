@@ -93,17 +93,19 @@ function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView, is
   );
 }
 
+function moveTaskToList({ listId, lists, onEdit, onClose, task, fromListName, showToast }) {
+  const nextList = lists.find((list) => String(list.id) === listId);
+  if (!nextList) return;
+  onEdit({ task_list: nextList.id }, { source: "context-menu", action: "move-list", listId: nextList.id, listName: nextList.name, fromListId: task.task_list, fromListName });
+  showToast(`Moved to "${nextList.name}"`);
+  onClose();
+}
+
 function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
   const showToast = useToast();
   const fromListName = lists.find((x) => String(x.id) === String(task.task_list))?.name;
   const options = lists.map(l => ({ value: String(l.id), label: l.name }));
-  const handleMove = (listId) => {
-    const l = lists.find(x => String(x.id) === listId);
-    if (!l) return;
-    onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName });
-    showToast(`Moved to "${l.name}"`);
-    onClose();
-  };
+  const handleMove = (listId) => moveTaskToList({ listId, lists, onEdit, onClose, task, fromListName, showToast });
   return (
     <>
       <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
