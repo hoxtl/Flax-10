@@ -50,7 +50,7 @@ describe("ThisWeek", () => {
   it("opens goal editor and saves", () => {
     const onGoalSave = vi.fn();
     render(<ThisWeek weekly={{ percentage: 25, hours_studied: 5, goal_hours: 20 }} onGoalSave={onGoalSave} />);
-    fireEvent.click(screen.getByRole("button", { name: /5h\/20h/ }));
+    fireEvent.click(screen.getByRole("button", { name: /5h\s*\/20h/ }));
     expect(screen.getByText("tap to close")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Save goal" }));
     expect(onGoalSave).toHaveBeenCalledWith(20);
@@ -58,7 +58,7 @@ describe("ThisWeek", () => {
 
   it("goal editor slider updates temp goal and Cancel closes editor", () => {
     render(<ThisWeek weekly={{ percentage: 25, hours_studied: 5, goal_hours: 20 }} onGoalSave={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /5h\/20h/ }));
+    fireEvent.click(screen.getByRole("button", { name: /5h\s*\/20h/ }));
     const slider = document.querySelector('input[type="range"]');
     expect(slider).toBeTruthy();
     fireEvent.change(slider, { target: { value: "15" } });

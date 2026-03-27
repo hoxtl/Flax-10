@@ -4,7 +4,7 @@
 
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, act, renderHook } from "@testing-library/react";
+import { render, screen, waitFor, act, renderHook, fireEvent } from "@testing-library/react";
 
 // ── framer-motion mock ───────────────────────────────────────────────────────
 vi.mock("framer-motion", () => ({

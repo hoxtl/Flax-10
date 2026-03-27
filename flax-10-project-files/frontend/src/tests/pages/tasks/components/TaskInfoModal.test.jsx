@@ -105,7 +105,7 @@ describe("TaskInfoModal coverage", () => {
     );
 
     await waitFor(() => expect(getReadingSpeed).toHaveBeenCalled());
-    expect(screen.getByText("Speed")).toBeInTheDocument();
+    expect(await screen.findByText("Speed")).toBeInTheDocument();
     expect(screen.getByText("1.5 min/page")).toBeInTheDocument();
   });
 

@@ -99,8 +99,8 @@ describe("RightNowUtils", () => {
       [{ lineName: "Victoria", severityDescription: "Minor delays" }],
       new Date("2026-03-24T09:40:00.000Z").getTime(),
     );
-    expect(urgent).toMatchObject({ urgency: "urgent", hasSevere: false, lineName: "Victoria" });
-    expect(urgent.message).toContain("Leave in");
+    expect(urgent).toMatchObject({ urgency: "critical", hasSevere: false, lineName: "Victoria" });
+    expect(urgent.message).toContain("Leave now");
   });
 
   it("falls back to the default event title and journey mode formatting", () => {
