@@ -48,14 +48,17 @@ def _completed_pick_count(members, rng):
     return rng.randint(1, min(3, len(members)))
 
 def _multi_member_assignments(members, completed_indexes, rng):
-    """Assign varied members to completed tasks."""
+    """Assign varied members to completed tasks with uneven distribution."""
     assignments = {index: [] for index in completed_indexes}
-    for offset, member in enumerate(members):
-        assignments[completed_indexes[offset % len(completed_indexes)]].append(member)
-    for task_index in completed_indexes:
-        pool = [member for member in members if member not in assignments[task_index]]
-        extra_total = max(_completed_pick_count(members, rng) - len(assignments[task_index]), 0)
-        assignments[task_index].extend(rng.sample(pool, min(extra_total, len(pool))))
+    shuffled = list(members)
+    rng.shuffle(shuffled)
+    n_leads = max(1, len(shuffled) // 4)
+    for task_pos, task_index in enumerate(completed_indexes):
+        lead = shuffled[task_pos % n_leads]
+        assignments[task_index].append(lead)
+        remaining = [m for m in shuffled if m not in assignments[task_index]]
+        n_support = min(rng.randint(1, 2), len(remaining))
+        assignments[task_index].extend(rng.sample(remaining, n_support))
     return assignments
 
 def _build_completed_task_assignments(members, status_pattern, rng):
