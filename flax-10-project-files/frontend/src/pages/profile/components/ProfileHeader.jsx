@@ -209,10 +209,8 @@ function ProfileBioSection({ bio }) {
 function ContactEmail({ email }) {
   if (!email) return null;
   return (
-    <div className={styles.emailTipRow}>
-      <p className={styles.teacherEmail}>
-        <a href={`mailto:${email}`}>{email}</a>
-      </p>
+    <div className={styles.teacherEmail}>
+      <a href={`mailto:${email}`}>{email}</a>
     </div>
   );
 }

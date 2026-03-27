@@ -16,7 +16,10 @@ import { HomepageOverlays } from "./HomepageOverlays";
 import { HomepageSkeleton } from "./HomepageSkeleton";
 import taskWidgetStyles from "../styles/TaskWidget.module.css";
 import styles from "../Homepage.module.css";
+import timelineStyles from "../styles/timelineStyles";
 import { HomepageTimelineSection } from ".";
+
+const mergedTimelineStyles = { ...styles, ...timelineStyles };
 
 export function HomepageDashboard(props) {
   if (props.homeDataLoading) return <HomepageSkeleton />;
@@ -92,7 +95,7 @@ function getTaskSlotProps(props) {
 }
 
 function getTimelineProps(props) {
-  return { ...getTimelineCoreProps(props), ...getTimelineActionProps(props), styles };
+  return { ...getTimelineCoreProps(props), ...getTimelineActionProps(props), styles: mergedTimelineStyles };
 }
 
 function getModalProps(props) {
