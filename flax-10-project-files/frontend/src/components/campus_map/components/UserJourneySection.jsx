@@ -85,10 +85,13 @@ function JourneyField({ label, locating, onChange, onGeolocate, placeholder, val
   );
 }
 
-function JourneyActions({ hasValue, onClear }) {
-  if (!hasValue) return null;
+function JourneyActions({ canCalculate, hasValue, onCalculate, onClear }) {
+  if (!hasValue && !canCalculate) return null;
   return (
     <div className={styles.manualButtonGroup}>
+      <button type="button" className={styles.goButton} onClick={onCalculate} disabled={!canCalculate}>
+        Calculate route
+      </button>
       <button type="button" className={styles.clearManualButton} onClick={onClear}>Clear</button>
     </div>
   );
@@ -105,7 +108,7 @@ function SectionLabel() {
 
 function JourneyInputs({ props, startCoords, destCoords, setStartCoords, setDestCoords }) {
   const { manualStart, setManualStart, manualDestination, setManualDestination } = props;
-  const { onClearAll, onGeolocateStart, onGeolocateDestination, locating } = props;
+  const { onCalculate, onClearAll, onGeolocateStart, onGeolocateDestination, locating } = props;
   const handleClear = () => {
     setManualStart("");
     setManualDestination("");
@@ -113,11 +116,21 @@ function JourneyInputs({ props, startCoords, destCoords, setStartCoords, setDest
     setDestCoords(null);
     onClearAll?.();
   };
+  const canCalculate = Boolean(startCoords && destCoords);
+  const handleCalculate = () => {
+    if (!canCalculate) return;
+    onCalculate?.(startCoords, destCoords);
+  };
   return (
     <div className={styles.manualJourneyInputs}>
       <FromField value={manualStart} onChange={setManualStart} onGeolocate={onGeolocateStart} locating={locating} />
       <JourneyField label="To" value={manualDestination} onChange={setManualDestination} onGeolocate={onGeolocateDestination} locating={locating} placeholder="Enter a destination" />
-      <JourneyActions hasValue={manualStart || manualDestination} onClear={handleClear} />
+      <JourneyActions
+        canCalculate={canCalculate}
+        hasValue={manualStart || manualDestination}
+        onCalculate={handleCalculate}
+        onClear={handleClear}
+      />
     </div>
   );
 }
