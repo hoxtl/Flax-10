@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/BrowseCard.test.jsx
 import BrowseCard from '../../../components/society/components/BrowseCard';
-=======
-import BrowseCard from '../../../components/society/BrowseCard';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/BrowseCard.test.jsx
 
 describe('BrowseCard', () => {
     it('renders Find new society text', () => {

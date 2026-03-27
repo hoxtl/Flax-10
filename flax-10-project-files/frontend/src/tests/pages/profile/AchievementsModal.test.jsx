@@ -1,10 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/AchievementsModal.test.jsx
 import AchievementsModal from '../../../pages/profile/components/AchievementsModal';
-=======
-import AchievementsModal from '../../../pages/profile/AchievementsModal';
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/AchievementsModal.test.jsx
 
 describe('AchievementsModal', () => {
     const onClose = vi.fn();

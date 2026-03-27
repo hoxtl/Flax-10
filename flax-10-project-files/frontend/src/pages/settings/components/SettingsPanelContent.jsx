@@ -2,21 +2,12 @@
  * Panel header and body selection for the settings page.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/settings/components/SettingsPanelContent.jsx
 import styles from "../styles/Settings.module.css";
 import AccountForm from "../../../components/settings/components/AccountForm";
 import HomeAddressForm from "../../../components/settings/components/HomeAddressForm";
 import PreferencesPanel from "../../../components/settings/components/PreferencesPanel";
 import SecurityForm from "../../../components/settings/components/SecurityForm";
 import { PANEL_META, panelVariantClass } from "../utils/settingsPageConfig";
-=======
-import styles from "./Settings.module.css";
-import AccountForm from "../../components/settings/AccountForm";
-import HomeAddressForm from "../../components/settings/HomeAddressForm";
-import PreferencesPanel from "../../components/settings/PreferencesPanel";
-import SecurityForm from "../../components/settings/SecurityForm";
-import { PANEL_META, panelVariantClass } from "./settingsPageConfig";
->>>>>>> main:flax-10-project-files/frontend/src/pages/settings/SettingsPanelContent.jsx
 
 function PanelHeader({ tabId }) {
   const meta = PANEL_META[tabId];

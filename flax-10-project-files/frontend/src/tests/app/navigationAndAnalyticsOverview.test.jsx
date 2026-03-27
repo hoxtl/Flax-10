@@ -30,11 +30,7 @@ vi.mock("../../api/analyticsApi", () => ({
 
 import { resolveRouteContent } from "../../app/navigation/helpers";
 import { useNavHandler } from "../../app/navigation/useNavHandler";
-<<<<<<< HEAD
 import { fadeUp } from "../../pages/analytics/utils/pageConfig";
-=======
-import { fadeUp } from "../../pages/analytics/pageConfig";
->>>>>>> main
 import useAnalyticsOverview from "../../pages/analytics/hooks/useAnalyticsOverview";
 
 describe("navigation and analytics extras", () => {

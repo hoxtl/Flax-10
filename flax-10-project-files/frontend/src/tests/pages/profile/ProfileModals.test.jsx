@@ -1,27 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/ProfileModals.test.jsx
 import ProfileModals, { SocietiesModal } from '../../../pages/profile/components/ProfileModals';
 import { getModules } from '../../../api/moduleApi';
 import { createFnMap } from '../../utils/testBuilderUtils';
 
 vi.mock('../../../components/dashboard/components/EditProfileModal', () => ({
-=======
-import ProfileModals, { SocietiesModal } from '../../../pages/profile/ProfileModals';
-import { getModules } from '../../../api/moduleApi';
-import { createFnMap } from '../../utils/testBuilderUtils';
-
-vi.mock('../../../components/dashboard/EditProfileModal', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/ProfileModals.test.jsx
     default: ({ isOpen, onClose }) =>
         isOpen ? <div data-testid="edit-profile-modal"><button onClick={onClose}>Close Edit</button></div> : null,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/ProfileModals.test.jsx
 vi.mock('../../../components/social/components/UserListModal', () => ({
-=======
-vi.mock('../../../components/social/UserListModal', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/ProfileModals.test.jsx
     default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
         <div data-testid="user-list-modal">
             <span>{title}</span>
@@ -56,11 +44,7 @@ vi.mock('../../../api/taskApi', () => ({
 }));
 
 vi.mock('../../../pages/profile/hooks/useProfileModalsData', async () => {
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/ProfileModals.test.jsx
     const actual = await vi.importActual('../../../pages/Profile/hooks/useProfileModalsData');
-=======
-    const actual = await vi.importActual('../../../pages/profile/hooks/useProfileModalsData');
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/ProfileModals.test.jsx
     return {
         ...actual,
         useTasksModalData: vi.fn(() => ({ loading: false, tasks: [] })),

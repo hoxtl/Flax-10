@@ -3,11 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 const applyPresetMock = vi.fn();
 
-<<<<<<< HEAD
 vi.mock("../../../components/timer/components/TimerComponents", () => ({
-=======
-vi.mock("../../../components/timer/TimerComponents", () => ({
->>>>>>> main
   TimerSettings: ({ breakTime, disabled, sessions, work }) => (
     <div data-testid="timer-settings">{`${work}:${breakTime}:${sessions}:${disabled}`}</div>
   ),
@@ -26,22 +22,14 @@ vi.mock("../../../components/timer/presets/AutoStartToggle", () => ({
 }));
 
 vi.mock("../../../components/timer/utils/presetUtils", async () => {
-<<<<<<< HEAD
   const actual = await vi.importActual("../../../components/Timer/utils/presetUtils");
-=======
-  const actual = await vi.importActual("../../../components/timer/utils/presetUtils");
->>>>>>> main
   return {
     ...actual,
     applyPreset: (...args) => applyPresetMock(...args),
   };
 });
 
-<<<<<<< HEAD
 import { PresetPanel, TimerConfigPanel } from "../../../components/timer/components/PresetPanel";
-=======
-import { PresetPanel, TimerConfigPanel } from "../../../components/timer/PresetPanel";
->>>>>>> main
 
 function createTimer(overrides = {}) {
   return {

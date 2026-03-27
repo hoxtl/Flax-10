@@ -3,21 +3,12 @@
  * potentially including a specific "Browse" or "Create" action card.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/societies/components/SocietySection.jsx
 import styles from "../styles/SocietiesPage.module.css";
 import gridStyles from "../../../components/common/Card/CardGrid.module.css";
 import SocietyCard from "../../../components/society/components/SocietyCard";
 import BrowseCard from "../../../components/society/components/BrowseCard";
 import CreateCard from "../../../components/society/components/CreateCard";
 import { Pagination } from "../../../components/pagination/Pagination";
-=======
-import styles from "./SocietiesPage.module.css";
-import gridStyles from "../../components/common/card/CardGrid.module.css";
-import SocietyCard from "../../components/society/SocietyCard";
-import BrowseCard from "../../components/society/BrowseCard";
-import CreateCard from "../../components/society/CreateCard";
-import { Pagination } from "../../components/pagination/Pagination";
->>>>>>> main:flax-10-project-files/frontend/src/pages/societies/SocietySection.jsx
 
 /** Displays a titled collection of societies with optional pagination. */
 

@@ -18,11 +18,7 @@ vi.mock("../../../lib/kclCourses", () => ({
   },
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/AccountForm.test.jsx
 vi.mock("../../../components/settings/components/SettingsUI", () => ({
-=======
-vi.mock("../../../components/settings/SettingsUI", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/AccountForm.test.jsx
   FormInput: ({ label, name, value, onChange, type = "text", required }) => (
     <div>
       <label htmlFor={name}>{label}</label>
@@ -67,17 +63,10 @@ vi.mock("../../../components/settings/SettingsUI", () => ({
   ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/AccountForm.test.jsx
 vi.mock("../../../pages/settings/styles/Settings.module.css", () => ({ default: {} }));
 
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import AccountForm from "../../../components/settings/components/AccountForm";
-=======
-vi.mock("../../../pages/settings/Settings.module.css", () => ({ default: {} }));
-
-import { getMyCourseChangeRequest } from "../../../api/adminApi";
-import AccountForm from "../../../components/settings/AccountForm";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/AccountForm.test.jsx
 
 const baseUser = {
   first_name: "Alice",

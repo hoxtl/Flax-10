@@ -27,11 +27,7 @@ vi.mock('../../../components/calendar/utils/weekUtils', () => ({
     getWeekIndexForDate: vi.fn(() => 2),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/WeekBar.test.jsx
 import WeekBar from '../../../components/dashboard/components/WeekBar';
-=======
-import WeekBar from '../../../components/dashboard/WeekBar';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/WeekBar.test.jsx
 import { getWeekIndexForDate } from '../../../components/calendar/utils/weekUtils';
 
 describe('WeekBar', () => {

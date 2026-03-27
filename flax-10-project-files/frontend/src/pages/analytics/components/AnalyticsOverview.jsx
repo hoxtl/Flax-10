@@ -5,7 +5,6 @@
 import { motion } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-<<<<<<< HEAD
 import AttendanceChart from '../../../components/analytics/components/AttendanceChart';
 import DailyBreakdownChart from '../../../components/analytics/components/DailyBreakdownChart';
 import { ConsistencyScore, PeakHoursCard } from '../../../components/analytics/components/InsightCards';
@@ -15,17 +14,6 @@ import StudyHeatmap from '../../../components/analytics/components/StudyHeatmap'
 import StudyHoursChart from '../../../components/analytics/components/StudyHoursChart';
 import SummaryCards from '../../../components/analytics/components/SummaryCards';
 import ThemeUsageChart from '../../../components/analytics/components/ThemeUsageChart';
-=======
-import AttendanceChart from '../../../components/analytics/AttendanceChart';
-import DailyBreakdownChart from '../../../components/analytics/DailyBreakdownChart';
-import { ConsistencyScore, PeakHoursCard } from '../../../components/analytics/InsightCards';
-import PlannedVsActualChart from '../../../components/analytics/PlannedVsActualChart';
-import ProductivityCards from '../../../components/analytics/ProductivityCards';
-import StudyHeatmap from '../../../components/analytics/StudyHeatmap';
-import StudyHoursChart from '../../../components/analytics/StudyHoursChart';
-import SummaryCards from '../../../components/analytics/SummaryCards';
-import ThemeUsageChart from '../../../components/analytics/ThemeUsageChart';
->>>>>>> main
 import EmptyState from '../../../components/common/empty_state/EmptyState';
 import { fadeUp } from '../utils/pageConfig';
 import styles from '../styles/AnalyticsPage.module.css';

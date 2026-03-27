@@ -128,7 +128,6 @@ vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/modulesPageResultsAndToolbar.test.jsx
 vi.mock("../../../pages/modules/components/MyModulesDashboard.jsx", () => ({
   default: () => <div>MyModulesDashboard</div>,
 }));
@@ -138,17 +137,6 @@ vi.mock("../../../pages/modules/hooks/modulesPageHooks.js", () => ({
 }));
 
 import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/modules/components/ModulesPageResults.jsx";
-=======
-vi.mock("../../../pages/modules/MyModulesDashboard.jsx", () => ({
-  default: () => <div>MyModulesDashboard</div>,
-}));
-
-vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
-  useMainModuleView: (...args) => useMainModuleViewMock(...args),
-}));
-
-import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../pages/modules/ModulesPageResults.jsx";
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/modulesPageResultsAndToolbar.test.jsx
 
 function buildSorting(overrides = {}) {
   return {

@@ -2,11 +2,7 @@
  * Loaded content layout for the tasks page.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/tasks/components/TasksPageContent.jsx
 import { BackToTop } from "../../../components/pagination/Pagination";
-=======
-import { BackToTop } from "../../components/pagination/Pagination";
->>>>>>> main:flax-10-project-files/frontend/src/pages/tasks/TasksPageContent.jsx
 
 import CreateListModal from "./CreateListModal";
 import CreateTaskModal from "./CreateTaskModal";

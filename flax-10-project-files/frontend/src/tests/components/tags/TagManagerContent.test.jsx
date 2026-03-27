@@ -13,11 +13,7 @@ vi.mock('lucide-react', () => ({
   Trash2: () => <svg data-testid="trash-icon" />,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/tags/TagManagerContent.test.jsx
 vi.mock('../../../components/tags/styles/TagManagerModal.module.css', () => ({
-=======
-vi.mock('../../../components/tags/TagManagerModal.module.css', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Tags/TagManagerContent.test.jsx
   default: {
     content: 'content', list: 'list', item: 'item', preview: 'preview',
     colorDot: 'colorDot', actions: 'actions', delete: 'delete',

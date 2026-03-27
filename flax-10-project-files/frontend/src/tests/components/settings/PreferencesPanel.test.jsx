@@ -5,11 +5,7 @@
 import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/PreferencesPanel.test.jsx
 import PreferencesPanel from '../../../components/settings/components/PreferencesPanel';
-=======
-import PreferencesPanel from '../../../components/settings/PreferencesPanel';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/PreferencesPanel.test.jsx
 
 vi.mock('../../../context/ThemeContext', () => ({
   useTheme: vi.fn(() => ({

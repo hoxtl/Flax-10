@@ -11,30 +11,18 @@ import { createFnMap } from '../../utils/testBuilderUtils';
 vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
-<<<<<<< HEAD
 vi.mock('../../../components/timer/styles/TreeAnimation.module.css', () => ({
-=======
-vi.mock('../../../components/timer/TreeAnimation.module.css', () => ({
->>>>>>> main
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
 // Dependency mocks for TimerCircle
-<<<<<<< HEAD
 vi.mock('../../../components/timer/components/FocusAnimation', () => ({
-=======
-vi.mock('../../../components/timer/FocusAnimation', () => ({
->>>>>>> main
   default: ({ progress, mode, isActive, showPicker }) => (
     <div data-testid="focus-animation" data-progress={progress} data-mode={mode} data-active={String(isActive)} data-showpicker={String(showPicker)} />
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock('../../../components/timer/components/TimerComponents', () => ({
-=======
-vi.mock('../../../components/timer/TimerComponents', () => ({
->>>>>>> main
   TimerDisplay: ({ timeLeft, mode, isOvertime }) => (
     <div data-testid="timer-display" data-timeleft={timeLeft} data-mode={mode} data-overtime={String(isOvertime)} />
   ),
@@ -52,13 +40,8 @@ vi.stubGlobal('requestAnimationFrame', vi.fn(() => 0));
 vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
 // Imports under test
-<<<<<<< HEAD
 import TimerCircle, { TimerRing } from '../../../components/timer/components/TimerCircle';
 import FocusAnimation from '../../../components/timer/components/FocusAnimation';
-=======
-import TimerCircle, { TimerRing } from '../../../components/timer/TimerCircle';
-import FocusAnimation from '../../../components/timer/FocusAnimation';
->>>>>>> main
 
 // Helper timer state
 const timerActionNames = ['setIsActive', 'togglePause', 'resetTimer', 'setModal'];

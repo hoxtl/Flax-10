@@ -2,13 +2,8 @@
  * SocietyCard composes the interactive shell for a society browse card.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/society/components/SocietyCard.jsx
 import styles from '../styles/SocietyCard.module.css';
 import GridCard from '../../common/Card/GridCard';
-=======
-import styles from './SocietyCard.module.css';
-import GridCard from '../common/card/GridCard';
->>>>>>> main:flax-10-project-files/frontend/src/components/society/SocietyCard.jsx
 import { Flag, BadgeCheck } from "lucide-react";
 import { SocietyCardContent } from "./SocietyCardContent";
 

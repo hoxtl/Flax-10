@@ -2,15 +2,9 @@
  * GroupWork detail tabs.
  */
 
-<<<<<<< HEAD
 import Tabs from "../../../components/common/Tabs/Tabs";
 import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
-=======
-import Tabs from "../../../components/common/tabs/Tabs";
-import GroupTasksTab from "../GroupTasksTab";
-import AvailabilityTab from "../AvailabilityTab";
->>>>>>> main
 import ProjectProgress from "./ProjectProgress";
 import styles from "./TabsSection.module.css";
 

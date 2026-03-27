@@ -4,7 +4,6 @@
  */
 
 import { useEffect, useState } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/profile/components/ProfileCalendar.jsx
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../../context/CalendarContext";
 import { addMonths, formatMonthYear, isSameMonth } from "../../../components/calendar/utils/dateUtils";
 import { CalendarNav } from "../../../components/calendar/header/CalendarHeaderUtils";
@@ -14,17 +13,6 @@ import { ResizeHighlightProvider } from "../../../context/ResizeHighlightContext
 import { EventsSummaryModal } from "../../../components/calendar/events_summary_modal/EventsSummaryModal";
 import "../../../components/calendar/calendar-header.css";
 import "../../../components/calendar/calendar.css";
-=======
-import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
-import { addMonths, formatMonthYear, isSameMonth } from "../../components/calendar/utils/dateUtils";
-import { CalendarNav } from "../../components/calendar/header/CalendarHeaderUtils";
-import { MonthView } from "../../components/calendar/month_view/MonthView";
-import { EventPopups } from "../../components/calendar/EventPopups";
-import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
-import { EventsSummaryModal } from "../../components/calendar/events_summary_modal/EventsSummaryModal";
-import "../../components/calendar/calendar-header.css";
-import "../../components/calendar/calendar.css";
->>>>>>> main:flax-10-project-files/frontend/src/pages/profile/ProfileCalendar.jsx
 
 function useProfileCalendarMode(dispatch) {
   useEffect(() => {

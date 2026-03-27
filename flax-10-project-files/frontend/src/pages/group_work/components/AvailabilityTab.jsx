@@ -5,7 +5,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Clock3, Plus, Star, Trash2, X } from "lucide-react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/group_work/components/AvailabilityTab.jsx
 import ConfirmModal from "../../../components/common/confirm_modal/ConfirmModal";
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
@@ -15,17 +14,6 @@ import { useAvailability } from "../hooks/useAvailability";
 import { formatSuggestionDateLabel, getMemberStatuses, getTeamSize, getSuggestionCount, getCurrentUserStatus } from "../utils/availabilityUtils";
 import styles from "../styles/AvailabilityTab.module.css";
 import meetingStyles from "../styles/AvailabilityMeetingCards.module.css";
-=======
-import ConfirmModal from "../../components/common/confirm_modal/ConfirmModal";
-import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState";
-import Tooltip from "../../components/common/tooltip/Tooltip";
-import { useConfirm } from "../../context/ConfirmContext";
-import { getPhotoUrl } from "./utils/memberAvatarUtils";
-import { useAvailability } from "./hooks/useAvailability";
-import { formatSuggestionDateLabel, getMemberStatuses, getTeamSize, getSuggestionCount, getCurrentUserStatus } from "./utils/availabilityUtils";
-import styles from "./AvailabilityTab.module.css";
-import meetingStyles from "./AvailabilityMeetingCards.module.css";
->>>>>>> main:flax-10-project-files/frontend/src/pages/group_work/AvailabilityTab.jsx
 
 const RESPONSE_META = {
     accepted: { label: "Accepted", Icon: Check, countClassName: meetingStyles.acceptedCount, avatarClassName: meetingStyles.responseAccepted },

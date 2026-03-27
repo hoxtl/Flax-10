@@ -17,11 +17,7 @@ vi.mock('../../../../pages/profile/utils/profileHelpers', () => ({
   }),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/components/ProfileHeader.test.jsx
 vi.mock('../../../../components/social/components/ShareButton', () => ({
-=======
-vi.mock('../../../../components/social/ShareButton', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/components/ProfileHeader.test.jsx
   default: ({ userId, initialIsSharing, onToggle }) => (
     <button data-testid="share-button" onClick={() => onToggle?.(!initialIsSharing)}>
       Share {userId}

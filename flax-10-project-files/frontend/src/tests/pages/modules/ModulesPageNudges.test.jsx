@@ -23,11 +23,7 @@ vi.mock("../../../components/modules/shared/taskButtons.jsx", () => ({
   ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/ModulesPageNudges.test.jsx
 import SmartNudge from "../../../pages/modules/components/SmartNudge";
-=======
-import SmartNudge from "../../../pages/modules/SmartNudge";
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/ModulesPageNudges.test.jsx
 
 describe("ModulesPageNudges", () => {
   beforeEach(() => {

@@ -9,11 +9,7 @@ import headerStyles from "./ProfileHeader.module.css";
 import badgeStyles from "./ProfileHeaderBadges.module.css";
 import { buildPeakLabel } from "./widgets/PersonaCard";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
-<<<<<<< HEAD
 import ShareButton from "../../../components/social/components/ShareButton";
-=======
-import ShareButton from "../../../components/social/ShareButton";
->>>>>>> main
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };

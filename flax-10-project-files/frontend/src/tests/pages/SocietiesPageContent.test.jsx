@@ -8,13 +8,8 @@ import { MemoryRouter } from "react-router-dom";
 
 import { createFnMap } from "../utils/testBuilderUtils";
 
-<<<<<<< HEAD
 vi.mock("../../pages/societies/styles/SocietiesPage.module.css", () => ({ default: { container: "container", smallSearch: "smallSearch" } }));
 vi.mock("../../pages/societies/styles/SocietiesPageExtras.module.css", () => ({ default: {} }));
-=======
-vi.mock("../../pages/societies/SocietiesPage.module.css", () => ({ default: { container: "container", smallSearch: "smallSearch" } }));
-vi.mock("../../pages/societies/SocietiesPageExtras.module.css", () => ({ default: {} }));
->>>>>>> main
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -71,11 +66,7 @@ vi.mock("../../hooks/usePagination", () => ({
   }),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../components/society/components/CreateSocietyModal", () => ({
-=======
-vi.mock("../../components/society/CreateSocietyModal", () => ({
->>>>>>> main
   default: ({ onClose, onCreate }) => (
     <div data-testid="create-society-modal">
       <button onClick={onClose}>Close create modal</button>
@@ -94,11 +85,7 @@ vi.mock("../../components/society/society_detail/ReportSocietyModal", () => ({
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../pages/societies/components/AllSocieties", () => ({
-=======
-vi.mock("../../pages/societies/AllSocieties", () => ({
->>>>>>> main
   default: ({ onBack, onSelect, onReport, onUnreport, societies }) => (
     <div data-testid="all-societies">
       <button onClick={onBack}>Back from all</button>
@@ -109,11 +96,7 @@ vi.mock("../../pages/societies/AllSocieties", () => ({
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../pages/societies/components/SocietySection", () => ({
-=======
-vi.mock("../../pages/societies/SocietySection", () => ({
->>>>>>> main
   default: ({ items, type, onAction, onSelect, onReport, onUnreport }) => (
     <div data-testid={`section-${type}`}>
       <button onClick={onAction}>Action {type}</button>
@@ -128,11 +111,7 @@ vi.mock("../../pages/societies/SocietySection", () => ({
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../pages/societies/components/SocietyDetailPage", () => ({
-=======
-vi.mock("../../pages/societies/SocietyDetailPage", () => ({
->>>>>>> main
   default: ({ societyId, onBack, onDelete, onMembershipChange }) => (
     <div data-testid="society-detail">
       <span>{societyId}</span>
@@ -143,19 +122,11 @@ vi.mock("../../pages/societies/SocietyDetailPage", () => ({
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../pages/societies/components/SocietySkeletons", () => ({
   SocietiesSkeleton: () => <div>Societies loading</div>,
 }));
 
 import { SocietiesPageContent } from "../../pages/societies/components/SocietiesPageContent";
-=======
-vi.mock("../../pages/societies/SocietySkeletons", () => ({
-  SocietiesSkeleton: () => <div>Societies loading</div>,
-}));
-
-import { SocietiesPageContent } from "../../pages/societies/SocietiesPageContent";
->>>>>>> main
 
 function renderPage(ui, initialEntries = ["/"]) {
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);

@@ -26,11 +26,7 @@ vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/modulesPageStateHooks.test.jsx
 import { useMainModuleView, useModulesPageState } from "../../../pages/modules/hooks/modulesPageHooks.js";
-=======
-import { useMainModuleView, useModulesPageState } from "../../../pages/modules/modulesPageHooks.js";
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/modulesPageStateHooks.test.jsx
 
 function wrapper({ children }) {
   return <MemoryRouter>{children}</MemoryRouter>;

@@ -2,7 +2,6 @@
  * Right rail timer history panel.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/RightRailHistoryPanel.jsx
 import styles from '../../../pages/timer/TimerPage.module.css';
 import historyStyles from '../styles/HistoryModal.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
@@ -10,15 +9,6 @@ import HoldConfirmModal from '../../common/hold_confirm_modal/HoldConfirmModal';
 import { HistoryRailSection } from '../history_panel/HistoryRailSection';
 import { WeeklyChart } from '../history_panel/WeeklyChart';
 import { clearRightRailHistory, useRightRailHistory } from '../history_panel/useRightRailHistory';
-=======
-import styles from '../../pages/timer/TimerPage.module.css';
-import historyStyles from './HistoryModal.module.css';
-import PrimaryButton from '../common/primary_button/PrimaryButton';
-import HoldConfirmModal from '../common/hold_confirm_modal/HoldConfirmModal';
-import { HistoryRailSection } from './history_panel/HistoryRailSection';
-import { WeeklyChart } from './history_panel/WeeklyChart';
-import { clearRightRailHistory, useRightRailHistory } from './history_panel/useRightRailHistory';
->>>>>>> main:flax-10-project-files/frontend/src/components/timer/RightRailHistoryPanel.jsx
 
 function ClearHistoryAction({ setShowClearModal }) {
     return (

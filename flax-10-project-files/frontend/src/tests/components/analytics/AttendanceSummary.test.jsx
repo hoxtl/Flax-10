@@ -2,11 +2,7 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/AttendanceSummary.test.jsx
 import AttendanceSummary from "../../../components/analytics/components/AttendanceSummary";
-=======
-import AttendanceSummary from "../../../components/analytics/AttendanceSummary";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/AttendanceSummary.test.jsx
 
 describe("AttendanceSummary", () => {
   it("renders the attendance rate, counts, and navigation link", () => {

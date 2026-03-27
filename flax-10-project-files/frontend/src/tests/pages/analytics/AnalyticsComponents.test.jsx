@@ -14,7 +14,6 @@ vi.mock("framer-motion", () => ({
   }),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/analytics/AnalyticsComponents.test.jsx
 vi.mock("../../../components/analytics/components/AIInsightsTab", () => ({
   default: ({ period }) => <div data-testid="ai-insights-tab">{period}</div>,
 }));
@@ -28,26 +27,10 @@ vi.mock("../../../components/analytics/components/ProductivityCards", () => ({
 }));
 
 vi.mock("../../../components/analytics/components/InsightCards", () => ({
-=======
-vi.mock("../../../components/analytics/AIInsightsTab", () => ({
-  default: ({ period }) => <div data-testid="ai-insights-tab">{period}</div>,
-}));
-
-vi.mock("../../../components/analytics/SummaryCards", () => ({
-  default: ({ data }) => <div data-testid="summary-cards">{Boolean(data).toString()}</div>,
-}));
-
-vi.mock("../../../components/analytics/ProductivityCards", () => ({
-  default: (props) => productivityCardsMock(props),
-}));
-
-vi.mock("../../../components/analytics/InsightCards", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Analytics/AnalyticsComponents.test.jsx
   ConsistencyScore: () => <div data-testid="consistency-score" />,
   PeakHoursCard: () => <div data-testid="peak-hours-card" />,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/analytics/AnalyticsComponents.test.jsx
 vi.mock("../../../components/analytics/components/StudyHoursChart", () => ({
   default: () => <div data-testid="study-hours-chart" />,
 }));
@@ -69,29 +52,6 @@ vi.mock("../../../components/analytics/components/ThemeUsageChart", () => ({
 }));
 
 vi.mock("../../../components/analytics/components/AttendanceChart", () => ({
-=======
-vi.mock("../../../components/analytics/StudyHoursChart", () => ({
-  default: () => <div data-testid="study-hours-chart" />,
-}));
-
-vi.mock("../../../components/analytics/DailyBreakdownChart", () => ({
-  default: () => <div data-testid="daily-breakdown-chart" />,
-}));
-
-vi.mock("../../../components/analytics/PlannedVsActualChart", () => ({
-  default: () => <div data-testid="planned-vs-actual-chart" />,
-}));
-
-vi.mock("../../../components/analytics/StudyHeatmap", () => ({
-  default: () => <div data-testid="study-heatmap" />,
-}));
-
-vi.mock("../../../components/analytics/ThemeUsageChart", () => ({
-  default: () => <div data-testid="theme-usage-chart" />,
-}));
-
-vi.mock("../../../components/analytics/AttendanceChart", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Analytics/AnalyticsComponents.test.jsx
   default: () => <div data-testid="attendance-chart" />,
 }));
 

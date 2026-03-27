@@ -28,11 +28,7 @@ vi.mock('../../../api/client', () => ({
 }));
 
 import ProfileHeader from '../../../pages/profile/components/ProfileHeader';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/ProfileHeaderState.test.jsx
 import { useProfileHeaderState } from '../../../pages/profile/hooks/useProfileHeaderState';
-=======
-import { useProfileHeaderState } from '../../../pages/profile/useProfileHeaderState';
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/ProfileHeaderState.test.jsx
 
 // ProfileHeader component tests – part 2
 

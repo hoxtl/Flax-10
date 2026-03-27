@@ -42,11 +42,7 @@ vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/social/UserSearch.test.jsx
 import UserSearch, { useSearchInit, FilterSection } from '../../../components/social/components/UserSearch';
-=======
-import UserSearch, { useSearchInit, FilterSection } from '../../../components/social/UserSearch';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Social/UserSearch.test.jsx
 
 import { searchUsers } from '../../../api/userApi';
 import { fetchSocieties } from '../../../api/societyApi';

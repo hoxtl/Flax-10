@@ -65,11 +65,7 @@ vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => (typeof id === "string" && id.includes("_") ? id.split("_")[0] : id)),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/homepageTestSetup.js
 vi.mock("../../../pages/homepage/utils", () => ({
-=======
-vi.mock("../../../pages/homepage/utils/index", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/homepageTestSetup.js
   formatTime: vi.fn((date) => new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
   isNow: vi.fn(() => false),
   isRoutineEvent: vi.fn(() => false),
@@ -199,21 +195,13 @@ vi.mock("../../../components/common/back_to_top/BackToTop", () => ({
   default: () => <div data-testid="back-to-top" />,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/homepageTestSetup.js
 vi.mock("../../../components/tags/components/PillFilters", () => ({
-=======
-vi.mock("../../../components/tags/pill_filters", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/homepageTestSetup.js
   __esModule: true,
   default: () => <div data-testid="pill-filters" />,
 }));
 
 vi.mock("../../../pages/tasks/components/TaskCard", async () => {
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/homepageTestSetup.js
   const actual = await vi.importActual("../../../pages/Tasks/components/TaskCard");
-=======
-  const actual = await vi.importActual("../../../pages/tasks/components/TaskCard");
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/homepageTestSetup.js
   return {
     ...actual,
     EditTaskModal: ({ task, onSave, onDelete, onClose }) => (

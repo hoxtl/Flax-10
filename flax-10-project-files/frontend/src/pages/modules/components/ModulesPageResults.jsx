@@ -4,7 +4,6 @@
 
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/modules/components/ModulesPageResults.jsx
 import AppPage from "../../../components/common/app_page/AppPage";
 import EmptyState from "../../../components/common/empty_state/EmptyState";
 import PageToolbar, { ToolbarSortControl } from "../../../components/common/page_toolbar/PageToolbar";
@@ -19,22 +18,6 @@ import ModuleGrid from "../../../components/modules/modules/ModuleGrid.jsx";
 import ModuleCourseFilter from "../../../components/modules/modules/ModuleCourseFilter";
 import useModuleSorting from "../../../components/modules/hooks/useModuleSorting.js";
 import { filterModules } from "../../../components/modules/utils/moduleUtils.js";
-=======
-import AppPage from "../../components/common/app_page/AppPage";
-import EmptyState from "../../components/common/empty_state/EmptyState";
-import PageToolbar, { ToolbarSortControl } from "../../components/common/page_toolbar/PageToolbar";
-import PrimaryButton from "../../components/common/primary_button/PrimaryButton";
-import PageTransition from "../../components/common/page_transition/PageTransition.jsx";
-import SearchBar from "../../components/common/search_bar/SearchBar.jsx";
-import Tabs from "../../components/common/tabs/Tabs";
-import { SegmentedControl } from "../../components/common/segmented_control/SegmentedControl";
-import { Pagination, BackToTop } from "../../components/pagination/Pagination.jsx";
-import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState.jsx";
-import ModuleGrid from "../../components/modules/modules/ModuleGrid.jsx";
-import ModuleCourseFilter from "../../components/modules/modules/ModuleCourseFilter";
-import useModuleSorting from "../../components/modules/hooks/useModuleSorting.js";
-import { filterModules } from "../../components/modules/utils/moduleUtils.js";
->>>>>>> main:flax-10-project-files/frontend/src/pages/modules/ModulesPageResults.jsx
 import MyModulesDashboard from "./MyModulesDashboard.jsx";
 import styles from "../styles/ModulesPage.module.css";
 import { useMainModuleView } from "../hooks/modulesPageHooks.js";

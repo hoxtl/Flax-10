@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD
 import { ExpandableTabs } from '../../components/dashboard/components/ExpandableTabs';
-=======
-import { ExpandableTabs } from '../../components/dashboard/ExpandableTabs';
->>>>>>> main
 
 vi.mock('framer-motion', () => ({
   motion: {

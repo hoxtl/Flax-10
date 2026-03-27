@@ -5,7 +5,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/societies/components/SocietiesPageContent.jsx
 import AppPage from "../../../components/common/app_page/AppPage";
 import PageTransition from "../../../components/common/page_transition/PageTransition";
 import Tabs from "../../../components/common/Tabs/Tabs";
@@ -14,16 +13,6 @@ import { BackToTop } from "../../../components/pagination/Pagination";
 import { usePagination } from "../../../hooks/usePagination";
 import CreateSocietyModal from "../../../components/society/components/CreateSocietyModal";
 import ReportSocietyModal from "../../../components/society/society_detail/ReportSocietyModal";
-=======
-import AppPage from "../../components/common/app_page/AppPage";
-import PageTransition from "../../components/common/page_transition/PageTransition";
-import Tabs from "../../components/common/tabs/Tabs";
-import SearchBar from "../../components/common/search_bar/SearchBar";
-import { BackToTop } from "../../components/pagination/Pagination";
-import { usePagination } from "../../hooks/usePagination";
-import CreateSocietyModal from "../../components/society/CreateSocietyModal";
-import ReportSocietyModal from "../../components/society/society_detail/ReportSocietyModal";
->>>>>>> main:flax-10-project-files/frontend/src/pages/societies/SocietiesPageContent.jsx
 import AllSocieties from "./AllSocieties";
 import SocietySection from "./SocietySection";
 import SocietyDetailPage from "./SocietyDetailPage";

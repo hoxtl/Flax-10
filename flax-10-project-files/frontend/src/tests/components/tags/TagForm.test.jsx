@@ -8,11 +8,7 @@ vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/tags/TagForm.test.jsx
 vi.mock('../../../components/tags/styles/TagManagerModal.module.css', () => ({
-=======
-vi.mock('../../../components/tags/TagManagerModal.module.css', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Tags/TagForm.test.jsx
   default: {
     content: 'content', form: 'form', error: 'error', colorRow: 'colorRow',
     formActions: 'formActions', formActionBtn: 'formActionBtn',

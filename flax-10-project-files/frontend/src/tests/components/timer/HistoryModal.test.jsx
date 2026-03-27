@@ -1,10 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-<<<<<<< HEAD
 import HistoryModal from '../../../components/timer/components/HistoryModal';
-=======
-import HistoryModal from '../../../components/timer/HistoryModal';
->>>>>>> main
 import { ConfirmProvider } from '../../../context/ConfirmContext';
 import * as historyUtils from '../../../components/timer/utils/historyUtils';
 import {

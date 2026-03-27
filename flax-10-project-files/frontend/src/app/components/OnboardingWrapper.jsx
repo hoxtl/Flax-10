@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import OnboardingModal from "../../components/onboarding/components/OnboardingModal";
-=======
-import OnboardingModal from "../../components/onboarding/OnboardingModal";
->>>>>>> main
 import { useOnboardingCheck } from "../hooks/useOnboardingCheck";
 
 export function OnboardingWrapper() {

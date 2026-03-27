@@ -2,11 +2,7 @@
  * Course display and request-status UI for the account form.
  */
 
-<<<<<<< HEAD
 import styles from "../../../pages/settings/styles/Settings.module.css";
-=======
-import styles from "../../../pages/settings/Settings.module.css";
->>>>>>> main
 import RequestStatusCard from "../../common/request_status_card/RequestStatusCard";
 
 function PendingRequestSubtitle({ requestedCourse }) {

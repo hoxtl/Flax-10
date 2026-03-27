@@ -19,11 +19,7 @@ vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/PeakHoursCard.test.jsx
 import { PeakHoursCard } from "../../../components/analytics/components/PeakHoursCard";
-=======
-import { PeakHoursCard } from "../../../components/analytics/PeakHoursCard";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/PeakHoursCard.test.jsx
 
 describe("PeakHoursCard", () => {
   it("returns null when heatmap data is missing or malformed", () => {

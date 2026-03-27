@@ -67,11 +67,7 @@ vi.mock("../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/onboarding/onboardingSuccessWarningAndForm.test.jsx
 vi.mock("../../../components/onboarding/components/WarningBox", () => ({
-=======
-vi.mock("../../../components/onboarding/WarningBox", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Onboarding/onboardingSuccessWarningAndForm.test.jsx
   default: ({ major, confirmed, onConfirm }) => (
     <div>
       <span>{`Warning for ${major}`}</span>
@@ -85,15 +81,9 @@ vi.mock("../../../components/onboarding/WarningBox", () => ({
   ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/onboarding/onboardingSuccessWarningAndForm.test.jsx
 import SuccessScreen from "../../../components/onboarding/components/SuccessScreen";
 import WarningBox from "../../../components/onboarding/components/WarningBox";
 import OnboardingForm from "../../../components/onboarding/components/OnboardingForm";
-=======
-import SuccessScreen from "../../../components/onboarding/SuccessScreen";
-import WarningBox from "../../../components/onboarding/WarningBox";
-import OnboardingForm from "../../../components/onboarding/OnboardingForm";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Onboarding/onboardingSuccessWarningAndForm.test.jsx
 
 
 describe("SuccessScreen", () => {

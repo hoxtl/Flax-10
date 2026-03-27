@@ -59,19 +59,11 @@ vi.mock('../pages/profile/Profile', () => ({
     default: () => <div data-testid="profile-page">Profile</div>,
 }));
 
-<<<<<<< HEAD
 vi.mock('../pages/societies/components/SocietyDetailPage', () => ({
     default: () => <div data-testid="society-detail-page">Society</div>,
 }));
 
 vi.mock('../components/onboarding/components/OnboardingModal', () => ({
-=======
-vi.mock('../pages/societies/SocietyDetailPage', () => ({
-    default: () => <div data-testid="society-detail-page">Society</div>,
-}));
-
-vi.mock('../components/onboarding/OnboardingModal', () => ({
->>>>>>> main
     default: ({ isOpen, onComplete }) => isOpen ? <div data-testid="onboarding-modal"><button onClick={onComplete}>Complete onboarding</button></div> : null,
 }));
 
@@ -131,11 +123,7 @@ vi.mock('../lib/routes', () => {
     };
 });
 
-<<<<<<< HEAD
 import App from '../app.css';
-=======
-import App from '../App';
->>>>>>> main
 
 function renderApp(initialRoute = '/login') {
     return render(

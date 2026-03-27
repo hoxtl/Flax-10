@@ -12,11 +12,7 @@ vi.mock('framer-motion', () => ({
     useInView: vi.fn(() => true),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/AnimatedList.test.jsx
 import AnimatedList from '../../../components/analytics/components/AnimatedList';
-=======
-import AnimatedList from '../../../components/analytics/AnimatedList';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/AnimatedList.test.jsx
 
 describe('AnimatedList', () => {
     it('renders nothing when items is empty', () => {

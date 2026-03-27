@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/ProductivityCards.test.jsx
 import ProductivityCards from '../../../components/analytics/components/ProductivityCards';
-=======
-import ProductivityCards from '../../../components/analytics/ProductivityCards';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/ProductivityCards.test.jsx
 
 const mockData = {
     summary: {

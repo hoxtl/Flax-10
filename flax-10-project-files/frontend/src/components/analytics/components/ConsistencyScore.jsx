@@ -3,13 +3,8 @@
  */
 
 import { motion } from 'framer-motion';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/analytics/components/ConsistencyScore.jsx
 import Tooltip from '../../common/Tooltip/Tooltip';
 import styles from '../styles/InsightCards.module.css';
-=======
-import Tooltip from '../common/tooltip/Tooltip';
-import styles from './InsightCards.module.css';
->>>>>>> main:flax-10-project-files/frontend/src/components/analytics/ConsistencyScore.jsx
 
 const MotionCircle = motion.circle;
 const MotionSpan = motion.span;

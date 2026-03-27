@@ -3,11 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock CSS modules
-<<<<<<< HEAD
 vi.mock('../../pages/societies/styles/SocietiesPage.module.css', () => ({ default: {} }));
-=======
-vi.mock('../../pages/societies/SocietiesPage.module.css', () => ({ default: {} }));
->>>>>>> main
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -22,11 +18,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock Skeletons
-<<<<<<< HEAD
 vi.mock('../../pages/societies/components/SocietySkeletons', () => ({
-=======
-vi.mock('../../pages/societies/SocietySkeletons', () => ({
->>>>>>> main
     SocietiesSkeleton: () => <div>Loading...</div>
 }));
 
@@ -44,11 +36,7 @@ vi.mock('../../components/society/hooks/useSocieties', () => ({
 }));
 
 // Mock child components
-<<<<<<< HEAD
 vi.mock('../../pages/societies/components/AllSocieties', () => ({
-=======
-vi.mock('../../pages/societies/AllSocieties', () => ({
->>>>>>> main
     default: ({ onBack, onSelect, societies, onReport, onUnreport }) => (
         <div data-testid="all-societies">
             <button onClick={onBack}>BackFromAll</button>
@@ -63,11 +51,7 @@ vi.mock('../../pages/societies/AllSocieties', () => ({
     ),
 }));
 
-<<<<<<< HEAD
 vi.mock('../../pages/societies/components/SocietySection', () => ({
-=======
-vi.mock('../../pages/societies/SocietySection', () => ({
->>>>>>> main
     default: ({ title, type, onAction, onSelect, items, onReport }) => {
         const titleStr = title || (type === 'admin' ? 'Managed Societies' : 'My Memberships');
         return (
@@ -85,11 +69,7 @@ vi.mock('../../pages/societies/SocietySection', () => ({
     },
 }));
 
-<<<<<<< HEAD
 vi.mock('../../pages/societies/components/SocietyDetailPage', () => ({
-=======
-vi.mock('../../pages/societies/SocietyDetailPage', () => ({
->>>>>>> main
     default: ({ societyId, onBack }) => (
         <div data-testid="society-detail">
             <span>{societyId}</span>
@@ -98,11 +78,7 @@ vi.mock('../../pages/societies/SocietyDetailPage', () => ({
     ),
 }));
 
-<<<<<<< HEAD
 vi.mock('../../components/society/components/CreateSocietyModal', () => ({
-=======
-vi.mock('../../components/society/CreateSocietyModal', () => ({
->>>>>>> main
     default: ({ onClose, onCreate }) => (
         <div data-testid="create-society-modal">
             <button onClick={onClose}>CloseCreate</button>

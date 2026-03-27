@@ -3,11 +3,7 @@ import {
     getImageUrls, getAvailablePhotos, scrollContentToTop,
     wrapAddEvent, wrapUpdateEvent, wrapDeleteEvent,
     wrapAddAnnouncement, wrapUpdateAnnouncement, wrapDeleteAnnouncement
-<<<<<<< HEAD
 } from '../../pages/societies/utils/societyDetailPageUtils';
-=======
-} from '../../pages/societies/societyDetailPageUtils';
->>>>>>> main
 
 describe('societyDetailPageUtils', () => {
     it('getImageUrls handles various inputs', () => {

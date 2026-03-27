@@ -3,7 +3,6 @@
  */
 
 import { FolderOpen } from "lucide-react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/group_work/components/GroupWorkDetail.jsx
 import AppPage from "../../../components/common/app_page/AppPage";
 import EmptyState from "../../../components/common/empty_state/EmptyState";
 import { useProjectDetail } from "../hooks/groupWorkHooks";
@@ -15,19 +14,6 @@ import Breadcrumb from "../../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { BackToTop } from "../../../components/pagination/Pagination";
 import { getVisibleMembers } from "../utils/projectRowUtils";
 import styles from "../styles/GroupWorkDetail.module.css";
-=======
-import AppPage from "../../components/common/app_page/AppPage";
-import EmptyState from "../../components/common/empty_state/EmptyState";
-import { useProjectDetail } from "./hooks/groupWorkHooks";
-import GroupWorkDetailSkeleton from "./components/GroupWorkDetailSkeleton";
-import ProjectHeader from "./components/ProjectHeader";
-import TabsSection from "./components/TabsSection";
-import BackButton from "../../components/common/back_button/BackButton.jsx";
-import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
-import { BackToTop } from "../../components/pagination/Pagination";
-import { getVisibleMembers } from "./utils/projectRowUtils";
-import styles from "./GroupWorkDetail.module.css";
->>>>>>> main:flax-10-project-files/frontend/src/pages/group_work/GroupWorkDetail.jsx
 
 /** Detail page for a single group project, showing header, tabs, and tasks. */
 

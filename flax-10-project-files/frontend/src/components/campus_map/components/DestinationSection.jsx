@@ -2,15 +2,9 @@
  * Destination selection section.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/campus_map/components/DestinationSection.jsx
 import baseStyles from "../../../pages/campus_map/styles/CampusMap.module.css";
 import sidebarStyles from "../../../pages/campus_map/styles/sidebar.module.css";
 import { KCL_CAMPUSES } from "../../../lib/kclCampuses";
-=======
-import baseStyles from "../../pages/campus_map/CampusMap.module.css";
-import sidebarStyles from "../../pages/campus_map/sidebar.module.css";
-import { KCL_CAMPUSES } from "../../lib/kclCampuses";
->>>>>>> main:flax-10-project-files/frontend/src/components/campus_map/DestinationSection.jsx
 import { LocationChip } from "./LocationChip";
 import AnimatedDropdown from "../../common/animated_dropdown/AnimatedDropdown";
 

@@ -57,19 +57,11 @@ vi.mock("../../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>scroll-top</div>,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/timer/timerPageControllerAndContent.test.jsx
 vi.mock("../../../components/timer/components/TodayBanner", () => ({
   default: ({ onStreakData, isStudying }) => <button type="button" onClick={() => onStreakData?.({ current_streak_days: 3 })}>today-banner-{String(isStudying)}</button>,
 }));
 
 vi.mock("../../../components/timer/components/WrapperComponents", () => ({
-=======
-vi.mock("../../../components/timer/TodayBanner", () => ({
-  default: ({ onStreakData, isStudying }) => <button type="button" onClick={() => onStreakData?.({ current_streak_days: 3 })}>today-banner-{String(isStudying)}</button>,
-}));
-
-vi.mock("../../../components/timer/WrapperComponents", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Timer/timerPageControllerAndContent.test.jsx
   MainSection: ({ onOpenHistory, onOpenFocus }) => (
     <div>
       <button type="button" onClick={onOpenHistory}>open-history</button>

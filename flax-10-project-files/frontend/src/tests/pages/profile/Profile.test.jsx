@@ -42,7 +42,6 @@ vi.mock('../../../api/client', () => ({
   fetchApi: vi.fn(() => Promise.resolve({})),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/Profile.test.jsx
 vi.mock('../../../pages/profile/components/ProfileModals', () => ({
   default: () => <div data-testid="profile-modals" />,
 }));
@@ -56,21 +55,6 @@ vi.mock('../../../components/social/components/ShareButton', () => ({
 }));
 
 vi.mock('../../../pages/profile/components/AchievementsModal', () => ({
-=======
-vi.mock('../../../pages/profile/ProfileModals', () => ({
-  default: () => <div data-testid="profile-modals" />,
-}));
-
-vi.mock('../../../pages/profile/ProfileCalendar', () => ({
-  ProfileCalendar: () => <div data-testid="profile-calendar" />,
-}));
-
-vi.mock('../../../components/social/ShareButton', () => ({
-  default: () => <button data-testid="share-button">Share</button>,
-}));
-
-vi.mock('../../../pages/profile/AchievementsModal', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/Profile.test.jsx
   default: ({ onClose }) => <div data-testid="achievements-modal"><button onClick={onClose}>Close</button></div>,
 }));
 

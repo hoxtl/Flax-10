@@ -1,13 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/tasks/components/TasksShell.test.jsx
 import TasksPageContent from "../../../../pages/tasks/components/TasksPageContent";
 import TasksPageToasts from "../../../../pages/tasks/components/TasksPageToasts";
-=======
-import TasksPageContent from "../../../../pages/tasks/TasksPageContent";
-import TasksPageToasts from "../../../../pages/tasks/TasksPageToasts";
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Tasks/components/TasksShell.test.jsx
 
 vi.mock("../../../../pages/tasks/components/ListSidebar", () => ({
   default: () => <div data-testid="list-sidebar" />,

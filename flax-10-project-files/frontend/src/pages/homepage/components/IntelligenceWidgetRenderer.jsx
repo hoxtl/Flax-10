@@ -14,19 +14,11 @@ import SemesterOverviewWidget from "./SemesterOverviewWidget";
 import StudyStreakWidget from "./StudyStreakWidget";
 import WeeklyGoalWidget from "./WeeklyGoalWidget";
 import PhotoWidget from "./PhotoWidget";
-<<<<<<< HEAD
 import ProductivityCards from "../../../components/analytics/components/ProductivityCards";
 import DailyBreakdownChart from "../../../components/analytics/components/DailyBreakdownChart";
 import StudyHeatmap from "../../../components/analytics/components/StudyHeatmap";
 import AttendanceChart from "../../../components/analytics/components/AttendanceChart";
 import { ConsistencyScore, PeakHoursCard } from "../../../components/analytics/components/InsightCards";
-=======
-import ProductivityCards from "../../../components/analytics/ProductivityCards";
-import DailyBreakdownChart from "../../../components/analytics/DailyBreakdownChart";
-import StudyHeatmap from "../../../components/analytics/StudyHeatmap";
-import AttendanceChart from "../../../components/analytics/AttendanceChart";
-import { ConsistencyScore, PeakHoursCard } from "../../../components/analytics/InsightCards";
->>>>>>> main
 import { TinyTimelineWidget } from "./TinyTimelineWidget";
 
 export function renderIntelligenceWidget(id, props, size) {

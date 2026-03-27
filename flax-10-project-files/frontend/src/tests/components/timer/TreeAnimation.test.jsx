@@ -1,16 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-<<<<<<< HEAD
 import TreeAnimation from '../../../components/timer/components/TreeAnimation';
 
 // Mock the CSS module to avoid parsing errors in tests
 vi.mock('../../../components/timer/styles/TreeAnimation.module.css', () => ({
-=======
-import TreeAnimation from '../../../components/timer/TreeAnimation';
-
-// Mock the CSS module to avoid parsing errors in tests
-vi.mock('../../../components/timer/TreeAnimation.module.css', () => ({
->>>>>>> main
     default: {
         container: 'container',
         scene: 'scene',

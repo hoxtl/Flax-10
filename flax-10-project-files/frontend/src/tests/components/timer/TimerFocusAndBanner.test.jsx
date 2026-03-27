@@ -14,13 +14,6 @@ vi.mock("../../../api/analyticsApi", () => ({
   default: { getSummary: (...args) => getSummary(...args) },
 }));
 
-<<<<<<< HEAD
-=======
-vi.mock("../../../components/timer/utils/milestoneUtils", () => ({
-  getNearestMilestone: (...args) => getNearestMilestone(...args),
-}));
-
->>>>>>> main
 vi.mock("../../../components/timer/utils/historyEvents", () => ({
   listenToTimerHistoryEvents: (...args) => listenToTimerHistoryEvents(...args),
 }));
@@ -50,13 +43,8 @@ vi.mock("../../../hooks/useCountUp", () => ({
 
 import { useFocusCanvasAnimation as useFocusCanvasAnimationImpl } from "../../../components/timer/focus_animation/useFocusCanvasAnimation";
 import { useTodayBannerData } from "../../../components/timer/today_banner/useTodayBannerData";
-<<<<<<< HEAD
 import TodayBanner from "../../../components/timer/components/TodayBanner";
 import FocusAnimation from "../../../components/timer/components/FocusAnimation";
-=======
-import TodayBanner from "../../../components/timer/TodayBanner";
-import FocusAnimation from "../../../components/timer/FocusAnimation";
->>>>>>> main
 
 const canvasMethodNames = ["clearRect", "fillRect", "beginPath", "arc", "fill", "save", "restore", "translate", "rotate", "moveTo", "lineTo", "stroke"];
 

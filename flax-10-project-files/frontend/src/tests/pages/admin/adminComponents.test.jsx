@@ -9,11 +9,7 @@ import { AnimatedList, ListRow, ListInfo, ListActions } from '../../../pages/adm
 import { SectionCard, CardHeader, LoadingSpinner, EmptyMessage, ErrorMessage } from '../../../pages/admin/components/AdminSurface';
 import HoldConfirmModal from '../../../components/common/hold_confirm_modal/HoldConfirmModal';
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/admin/adminComponents.test.jsx
 vi.mock('../../../pages/admin/styles/styles', () => ({
-=======
-vi.mock('../../../pages/admin/styles', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Admin/adminComponents.test.jsx
   default: {
     filterGroup: 'filterGroup', filterButtons: 'filterButtons', filterPillButton: 'filterPillButton',
     filterPillBadge: 'filterPillBadge', filterPillBadgeActive: 'filterPillBadgeActive',

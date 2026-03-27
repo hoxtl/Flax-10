@@ -85,11 +85,7 @@ vi.mock("../../components/notifications", () => ({
   NotificationToast: () => <div>NotificationToast</div>,
 }));
 
-<<<<<<< HEAD
 vi.mock("../../components/attendance/components/AttendancePrompt", () => ({
-=======
-vi.mock("../../components/attendance/AttendancePrompt", () => ({
->>>>>>> main
   default: () => <div>AttendancePrompt</div>,
 }));
 

@@ -1,11 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 
-<<<<<<< HEAD
 import { useSocietyBrowseFilters } from "../../pages/societies/hooks/useSocietyBrowseFilters";
-=======
-import { useSocietyBrowseFilters } from "../../pages/societies/useSocietyBrowseFilters";
->>>>>>> main
 
 describe("useSocietyBrowseFilters", () => {
   it("updates search search and sort criteria", () => {

@@ -2,7 +2,6 @@
  * Profile feature modals.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/profile/components/ProfileModals.jsx
 import EditProfileModal from "../../../components/dashboard/components/EditProfileModal";
 import GenericSummaryModal from "../../../components/common/generic_summary_modal/GenericSummaryModal";
 import SummaryItem from "../../../components/common/generic_summary_modal/SummaryItem";
@@ -10,15 +9,6 @@ import { SegmentedControl } from "../../../components/common";
 import UserListModal from "../../../components/social/components/UserListModal";
 import { DATE_FORMAT, getRangeLabel, RANGE_OPTIONS, TIME_FORMAT } from "../utils/profileHelpers";
 import { socialDataFetchers, useModuleNameMap, useSocialUsers, useTasksModalData } from "../hooks/useProfileModalsData";
-=======
-import EditProfileModal from "../../components/dashboard/EditProfileModal";
-import GenericSummaryModal from "../../components/common/generic_summary_modal/GenericSummaryModal";
-import SummaryItem from "../../components/common/generic_summary_modal/SummaryItem";
-import { SegmentedControl } from "../../components/common";
-import UserListModal from "../../components/social/UserListModal";
-import { DATE_FORMAT, getRangeLabel, RANGE_OPTIONS, TIME_FORMAT } from "./utils/profileHelpers";
-import { socialDataFetchers, useModuleNameMap, useSocialUsers, useTasksModalData } from "./hooks/useProfileModalsData";
->>>>>>> main:flax-10-project-files/frontend/src/pages/profile/ProfileModals.jsx
 
 function formatEventMeta(event) {
   const date = new Date(event.start_time);

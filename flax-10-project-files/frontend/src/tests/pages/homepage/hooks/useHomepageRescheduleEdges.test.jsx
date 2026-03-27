@@ -4,11 +4,7 @@ const extractBaseEventIdMock = vi.fn((id) => id);
 const formatTimeMock = vi.fn(() => "10:00");
 const getNextFreeSlotTodayMock = vi.fn(() => null);
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/hooks/useHomepageRescheduleEdges.test.jsx
 vi.mock("../../../../pages/homepage/utils", () => ({
-=======
-vi.mock("../../../../pages/homepage/utils/index", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/hooks/useHomepageRescheduleEdges.test.jsx
   formatTime: (...args) => formatTimeMock(...args),
   getAllFreeWindowsToday: vi.fn(() => []),
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),

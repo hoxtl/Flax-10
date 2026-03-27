@@ -11,18 +11,13 @@ const { mockGetHistory } = vi.hoisted(() => ({
 }));
 
 vi.mock('../../components/timer/utils/historyUtils', async () => {
-<<<<<<< HEAD
     const actual = await vi.importActual('../../components/Timer/utils/historyUtils');
-=======
-    const actual = await vi.importActual('../../components/timer/utils/historyUtils');
->>>>>>> main
     return {
         ...actual,
         getHistory: mockGetHistory,
     };
 });
 
-<<<<<<< HEAD
 vi.mock('../../components/timer/components/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
 }));
@@ -32,17 +27,6 @@ vi.mock('../../components/timer/components/FocusAnimation', () => ({
 }));
 
 vi.mock('../../components/timer/components/TodayBanner', () => ({
-=======
-vi.mock('../../components/timer/TreeAnimation', () => ({
-    default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
-}));
-
-vi.mock('../../components/timer/FocusAnimation', () => ({
-    default: () => <div data-testid="focus-animation" />,
-}));
-
-vi.mock('../../components/timer/TodayBanner', () => ({
->>>>>>> main
     default: () => <div data-testid="today-banner" />,
 }));
 
@@ -79,11 +63,7 @@ vi.mock('react-router-dom', () => ({
 let mockNotificationPermission = 'granted';
 const mockRequestPermission = vi.fn();
 vi.mock('../../components/timer/utils/timerUtils', async () => {
-<<<<<<< HEAD
     const actual = await vi.importActual('../../components/Timer/utils/timerUtils');
-=======
-    const actual = await vi.importActual('../../components/timer/utils/timerUtils');
->>>>>>> main
     return {
         ...actual,
         useNotificationPermission: () => ({ permission: mockNotificationPermission, request: mockRequestPermission }),

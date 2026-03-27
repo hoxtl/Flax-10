@@ -29,11 +29,7 @@ vi.mock("../../../components/common/search_bar/SearchBar.jsx", () => ({
 import {
   EmptyResults,
   ModuleToolbar,
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/ModulesPageResults.test.jsx
 } from "../../../pages/modules/components/ModulesPageResults";
-=======
-} from "../../../pages/modules/ModulesPageResults";
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/ModulesPageResults.test.jsx
 
 describe("ModulesPageResults", () => {
   it("EmptyResults: handles various empty states", () => {

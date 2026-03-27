@@ -11,11 +11,7 @@ vi.mock('framer-motion', () => ({
     }),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/InsightCards.test.jsx
 import { ConsistencyScore, PeakHoursCard } from '../../../components/analytics/components/InsightCards';
-=======
-import { ConsistencyScore, PeakHoursCard } from '../../../components/analytics/InsightCards';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/InsightCards.test.jsx
 
 const mockData = {
     summary: {

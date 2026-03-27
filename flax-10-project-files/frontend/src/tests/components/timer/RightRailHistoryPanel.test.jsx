@@ -42,11 +42,7 @@ vi.mock("../../../components/timer/history_panel/WeeklyChart", () => ({
   ),
 }));
 
-<<<<<<< HEAD
 import RightRailHistoryPanel from "../../../components/timer/components/RightRailHistoryPanel";
-=======
-import RightRailHistoryPanel from "../../../components/timer/RightRailHistoryPanel";
->>>>>>> main
 
 describe("RightRailHistoryPanel", () => {
   beforeEach(() => {

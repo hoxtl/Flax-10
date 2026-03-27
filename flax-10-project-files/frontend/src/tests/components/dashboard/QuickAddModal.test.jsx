@@ -31,11 +31,7 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/QuickAddModal.test.jsx
 import QuickAddModal from '../../../components/dashboard/components/QuickAddModal';
-=======
-import QuickAddModal from '../../../components/dashboard/QuickAddModal';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/QuickAddModal.test.jsx
 
 function renderModal(props = {}) {
     return render(

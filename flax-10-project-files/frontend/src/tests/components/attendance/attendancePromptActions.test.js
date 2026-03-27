@@ -1,29 +1,17 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/attendancePromptActions.test.js
 import { submitAttendancePromptAnswer } from "../../../components/attendance/utils/attendancePromptActions";
 import { useAttendanceResource } from "../../../pages/attendance/hooks/useAttendanceResource";
 import { ATTENDANCE_UPDATED_EVENT } from "../../../lib/attendanceEvents";
 import { recordAttendance } from "../../../api/attendanceApi";
 import { setPromptedId } from "../../../components/attendance/utils/attendancePromptStorage";
-=======
-import { submitAttendancePromptAnswer } from "../../../components/attendance/attendancePromptActions";
-import { useAttendanceResource } from "../../../pages/attendance/hooks/useAttendanceResource";
-import { ATTENDANCE_UPDATED_EVENT } from "../../../lib/attendanceEvents";
-import { recordAttendance } from "../../../api/attendanceApi";
-import { setPromptedId } from "../../../components/attendance/attendancePromptStorage";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/attendancePromptActions.test.js
 
 vi.mock("../../../api/attendanceApi", () => ({
   recordAttendance: vi.fn(),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/attendance/attendancePromptActions.test.js
 vi.mock("../../../components/attendance/utils/attendancePromptStorage", () => ({
-=======
-vi.mock("../../../components/attendance/attendancePromptStorage", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Attendance/attendancePromptActions.test.js
   setPromptedId: vi.fn(),
   setSessionDismissedId: vi.fn(),
 }));

@@ -40,11 +40,7 @@ vi.mock("../../api/adminApi", () => ({
   resolveCourseChangeRequest: vi.fn(),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../pages/admin/styles/AdminPage.module.css", () => ({ default: {} }));
-=======
-vi.mock("../../pages/admin/AdminPage.module.css", () => ({ default: {} }));
->>>>>>> main
 
 vi.mock("../../components/pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) =>

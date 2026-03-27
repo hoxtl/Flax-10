@@ -1,11 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/modules/moduleUserDropdownAndTravelHooks.test.jsx
 import UserModuleDropdown from "../../../components/modules/components/UserModuleDropdown";
-=======
-import UserModuleDropdown from "../../../components/modules/UserModuleDropdown";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Modules/moduleUserDropdownAndTravelHooks.test.jsx
 import TravelTimeIndicator from "../../../components/modules/modules/TravelTimeIndicator";
 import { useModuleTravelTime } from "../../../components/modules/modules/useModuleTravelTime";
 import { useModuleCourseFilterState } from "../../../components/modules/modules/useModuleCourseFilterState";

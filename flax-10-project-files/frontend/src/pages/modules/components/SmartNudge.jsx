@@ -4,17 +4,10 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion as Motion } from 'framer-motion';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/modules/components/SmartNudge.jsx
 import { getDayCount } from '../../../components/modules/deadlines/upcomingDeadlinesUtils';
 import { AddDeadlineToTasksButton, AddReadingToTasksButton } from '../../../components/modules/shared/taskButtons.jsx';
 import widgetStyles from '../styles/DashboardWidgets.module.css';
 import rowStyles from '../styles/DashboardRows.module.css';
-=======
-import { getDayCount } from '../../components/modules/deadlines/upcomingDeadlinesUtils';
-import { AddDeadlineToTasksButton, AddReadingToTasksButton } from '../../components/modules/shared/taskButtons.jsx';
-import widgetStyles from './DashboardWidgets.module.css';
-import rowStyles from './DashboardRows.module.css';
->>>>>>> main:flax-10-project-files/frontend/src/pages/modules/SmartNudge.jsx
 
 const styles = { ...widgetStyles, ...rowStyles };
 

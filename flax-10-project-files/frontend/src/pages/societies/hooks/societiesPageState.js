@@ -4,13 +4,8 @@
 
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/societies/hooks/societiesPageState.js
 import { useSocieties } from "../../../components/society/hooks/useSocieties";
 import { useUnreportSociety } from "../../../components/society/hooks/useUnreportSociety";
-=======
-import { useSocieties } from "../../components/society/hooks/useSocieties";
-import { useUnreportSociety } from "../../components/society/hooks/useUnreportSociety";
->>>>>>> main:flax-10-project-files/frontend/src/pages/societies/societiesPageState.js
 
 export function useSocietiesPage() {
     const navigation = useSocietiesNavigation();

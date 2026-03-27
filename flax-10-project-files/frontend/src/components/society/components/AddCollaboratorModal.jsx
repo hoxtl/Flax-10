@@ -3,21 +3,12 @@
  */
 
 import { useState } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/society/components/AddCollaboratorModal.jsx
 import UserSearch from "../../social/components/UserSearch";
 import Badge from "../../common/Badge/Badge";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import SearchEmptyState from "../../common/search_empty_state/SearchEmptyState";
 import StandardModal from "../../common/standard_modal/StandardModal";
 import styles from "../styles/AddCollaboratorModal.module.css";
-=======
-import UserSearch from "../social/UserSearch";
-import Badge from "../common/badge/Badge";
-import PrimaryButton from "../common/primary_button/PrimaryButton";
-import SearchEmptyState from "../common/search_empty_state/SearchEmptyState";
-import StandardModal from "../common/standard_modal/StandardModal";
-import styles from "./AddCollaboratorModal.module.css";
->>>>>>> main:flax-10-project-files/frontend/src/components/society/AddCollaboratorModal.jsx
 
 function useCollaboratorSelection(existingUsernames, onAdd, onClose) {
   const [selected, setSelected] = useState([]);

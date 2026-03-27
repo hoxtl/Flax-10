@@ -4,11 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-<<<<<<< HEAD
 import { ErrorMessage, SettingsSidebar } from "../../components/settings/components/SettingsUI";
-=======
-import { ErrorMessage, SettingsSidebar } from "../../components/settings/SettingsUI";
->>>>>>> main
 import useSettingsHandlers from "../../components/settings/hooks/useSettingsHandlers";
 import AppPage from "../../components/common/app_page/AppPage";
 import styles from "./styles/Settings.module.css";

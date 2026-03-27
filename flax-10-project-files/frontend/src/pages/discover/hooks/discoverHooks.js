@@ -3,15 +3,9 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/discover/hooks/discoverHooks.js
 import { searchUsers } from "../../../api/userApi";
 import { useClickOutside, useFilterState, useSearchInit } from "../../../components/social/components/UserSearch";
 import { sortDiscoverUsers, USERS_PER_PAGE } from "../utils/discoverHelpers";
-=======
-import { searchUsers } from "../../api/userApi";
-import { useClickOutside, useFilterState, useSearchInit } from "../../components/social/UserSearch";
-import { sortDiscoverUsers, USERS_PER_PAGE } from "./discoverHelpers";
->>>>>>> main:flax-10-project-files/frontend/src/pages/discover/discoverHooks.js
 
 async function loadUsers(query, filters, page, setUsers, setTotalPages, setLoading, sortBy) {
     setLoading(true);

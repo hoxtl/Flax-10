@@ -1,11 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/TagFilterBar.test.jsx
 vi.mock('../../../components/tags/components/BasePill', () => ({
-=======
-vi.mock('../../../components/tags/BasePill', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/TagFilterBar.test.jsx
     default: ({ label, isActive, onClick }) => (
         <button
             data-testid={`pill-${label}`}

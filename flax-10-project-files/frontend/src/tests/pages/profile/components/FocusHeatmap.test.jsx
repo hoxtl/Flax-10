@@ -7,11 +7,7 @@ vi.mock("../../../../components/common/card/Card", () => ({
   default: ({ children, ...props }) => <div data-testid="card" {...props}>{children}</div>,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/profile/components/FocusHeatmap.test.jsx
 vi.mock("../../../../components/analytics/components/StudyHeatmap", () => ({
-=======
-vi.mock("../../../../components/analytics/StudyHeatmap", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Profile/components/FocusHeatmap.test.jsx
   default: (props) => {
     studyHeatmapMock(props);
     return <div data-testid="study-heatmap" />;

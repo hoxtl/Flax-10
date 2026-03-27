@@ -12,11 +12,7 @@ vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   overlapsDay: (...args) => overlapsDayMock(...args),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/homepageViewModelEdges.test.js
 vi.mock("../../../pages/homepage/utils", () => ({
-=======
-vi.mock("../../../pages/homepage/utils/index", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/homepageViewModelEdges.test.js
   getAllFreeWindowsToday: (...args) => getAllFreeWindowsTodayMock(...args),
   getNavigatorContext: (...args) => getNavigatorContextMock(...args),
   isNow: (...args) => isNowMock(...args),

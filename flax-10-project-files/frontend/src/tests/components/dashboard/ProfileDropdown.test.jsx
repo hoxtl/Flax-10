@@ -15,11 +15,7 @@ vi.mock('../../../context/AuthContext', () => ({
     }),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/ProfileDropdown.test.jsx
 import ProfileDropdown from '../../../components/dashboard/components/ProfileDropdown';
-=======
-import ProfileDropdown from '../../../components/dashboard/ProfileDropdown';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/ProfileDropdown.test.jsx
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
 

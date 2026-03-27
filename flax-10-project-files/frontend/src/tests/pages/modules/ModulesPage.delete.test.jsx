@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const useModulesPageStateMock = vi.fn();
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/ModulesPage.delete.test.jsx
 vi.mock("../../../pages/modules/hooks/modulesPageHooks.js", () => ({
   useModulesPageState: (...args) => useModulesPageStateMock(...args),
 }));
@@ -13,17 +12,6 @@ vi.mock("../../../pages/modules/components/ModulesPageResults.jsx", () => ({
 }));
 
 vi.mock("../../../pages/modules/components/ModulesPageChrome.jsx", () => ({
-=======
-vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
-  useModulesPageState: (...args) => useModulesPageStateMock(...args),
-}));
-
-vi.mock("../../../pages/modules/ModulesPageResults.jsx", () => ({
-  MainView: () => <div>Main view</div>,
-}));
-
-vi.mock("../../../pages/modules/ModulesPageChrome.jsx", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/ModulesPage.delete.test.jsx
   AnimatedContent: () => <div>Animated content</div>,
   ModulesPageModals: () => <div>Page modals</div>,
   ModulesSkeleton: () => <div data-testid="modules-skeleton" />,

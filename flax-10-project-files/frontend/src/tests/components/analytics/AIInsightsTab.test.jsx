@@ -25,11 +25,7 @@ vi.mock('../../../api/analyticsApi', () => ({
     },
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/AIInsightsTab.test.jsx
 import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/analytics/components/AIInsightsTab';
-=======
-import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/analytics/AIInsightsTab';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/AIInsightsTab.test.jsx
 import analyticsService from '../../../api/analyticsApi';
 
 // jsdom doesn't implement scrollIntoView

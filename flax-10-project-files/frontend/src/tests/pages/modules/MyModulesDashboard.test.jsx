@@ -7,11 +7,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/modules/MyModulesDashboard.test.jsx
 import MyModulesDashboard from "../../../pages/modules/components/MyModulesDashboard";
-=======
-import MyModulesDashboard from "../../../pages/modules/MyModulesDashboard";
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Modules/MyModulesDashboard.test.jsx
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getSuggestedReadings, convertReadingToTask } from "../../../api/readingApi";
 import { createTask } from "../../../api/taskApi";

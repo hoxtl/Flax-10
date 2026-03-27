@@ -5,11 +5,7 @@ vi.mock('../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/analytics/StudyHeatmap.test.jsx
 import StudyHeatmap from '../../../components/analytics/components/StudyHeatmap';
-=======
-import StudyHeatmap from '../../../components/analytics/StudyHeatmap';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Analytics/StudyHeatmap.test.jsx
 import { useTheme } from '../../../context/ThemeContext';
 
 const mockHeatmapData = {

@@ -1,17 +1,9 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/dashboard/components/QuickAddModal.jsx
 import styles from "../styles/QuickAddModal.module.css";
 import { useTags } from "../../../context/TagContext";
 import Badge from "../../common/Badge/Badge";
 import StandardModal from "../../common/standard_modal/StandardModal";
 import { getModules } from "../../../api/moduleApi";
-=======
-import styles from "./QuickAddModal.module.css";
-import { useTags } from "../../context/TagContext";
-import Badge from "../common/badge/Badge";
-import StandardModal from "../common/standard_modal/StandardModal";
-import { getModules } from "../../api/moduleApi";
->>>>>>> main:flax-10-project-files/frontend/src/components/dashboard/QuickAddModal.jsx
 
 const CORE_TYPES = [
   { id: 'event', icon: '📅', label: 'Event', color: 'var(--color-light-blue)' },

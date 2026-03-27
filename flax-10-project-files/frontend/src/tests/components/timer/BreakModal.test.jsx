@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD
 import { BreakModal } from '../../../components/timer/components/TimerPopups';
-=======
-import { BreakModal } from '../../../components/timer/TimerPopups';
->>>>>>> main
 
 const testRender = () => {
     const onAction = vi.fn();

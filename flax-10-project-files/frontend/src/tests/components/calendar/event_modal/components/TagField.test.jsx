@@ -24,11 +24,7 @@ vi.mock("../../../../../components/common/tags_selector/TagsSelector", () => ({
   },
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/calendar/event_modal/components/TagField.test.jsx
 vi.mock("../../../../../components/tags/components/TagManagerModal", () => ({
-=======
-vi.mock("../../../../../components/tags/TagManagerModal", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Calendar/event_modal/components/TagField.test.jsx
   default: ({ onClose }) => (
     <button type="button" onClick={onClose}>
       close-manager

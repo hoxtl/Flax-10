@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/SocietyCard.test.jsx
 import SocietyCard from '../../../components/society/components/SocietyCard';
-=======
-import SocietyCard from '../../../components/society/SocietyCard';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/SocietyCard.test.jsx
 
 const society = {
     id: 1,

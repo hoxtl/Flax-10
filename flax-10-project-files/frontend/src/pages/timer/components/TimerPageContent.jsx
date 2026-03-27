@@ -9,15 +9,9 @@ import AppPage from '../../../components/common/app_page/AppPage';
 import BackButton from '../../../components/common/back_button/BackButton.jsx';
 import PageTransition from '../../../components/common/page_transition/PageTransition';
 import ScrollToTop from '../../../components/common/scroll_to_top/ScrollToTop';
-<<<<<<< HEAD
 import TodayBanner from '../../../components/timer/components/TodayBanner';
 import { MainSection, PopupSection, RightPanel, FocusOverlayContent } from '../../../components/timer/components/WrapperComponents';
 import WordLoader from '../../../components/ui/components/WordLoader';
-=======
-import TodayBanner from '../../../components/timer/TodayBanner';
-import { MainSection, PopupSection, RightPanel, FocusOverlayContent } from '../../../components/timer/WrapperComponents';
-import WordLoader from '../../../components/ui/WordLoader';
->>>>>>> main
 import { FocusPageSkeleton } from './FocusPageSkeleton';
 import { NotificationPrompt } from './NotificationPrompt';
 import { ShortcutsModal } from './ShortcutsModal';

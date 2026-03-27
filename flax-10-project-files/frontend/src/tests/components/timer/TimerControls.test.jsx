@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD
 import { TimerControls } from '../../../components/timer/components/TimerComponents';
-=======
-import { TimerControls } from '../../../components/timer/TimerComponents';
->>>>>>> main
 
 const testButtons = () => {
     const onToggle = vi.fn();

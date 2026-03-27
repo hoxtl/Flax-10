@@ -75,11 +75,7 @@ vi.mock("../../../lib/routes", () => ({
 }));
 
 // ── Dependency mocks ─────────────────────────────────────────────────────────
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/topbarRouteVisibilityAndNav.test.jsx
 vi.mock("../../../components/dashboard/components/ProfileDropdown", () => ({
-=======
-vi.mock("../../../components/dashboard/ProfileDropdown", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/topbarRouteVisibilityAndNav.test.jsx
   default: () => <div data-testid="profile-dropdown" />,
 }));
 
@@ -90,7 +86,6 @@ vi.mock("../../../context/NotificationContext", () => ({
   }),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/topbarRouteVisibilityAndNav.test.jsx
 vi.mock("../../../components/notifications/components/NotificationPanel", () => ({
   NotificationPanel: () => <div data-testid="notification-panel" />,
 }));
@@ -104,21 +99,6 @@ vi.mock("../../../components/dashboard/components/ThemeToggle", () => ({
 }));
 
 vi.mock("../../../components/timer/components/MiniTimer", () => ({
-=======
-vi.mock("../../../components/notifications/NotificationPanel", () => ({
-  NotificationPanel: () => <div data-testid="notification-panel" />,
-}));
-
-vi.mock("../../../components/dashboard/ExpandableTabs", () => ({
-  ExpandableTabs: () => <div data-testid="expandable-tabs" />,
-}));
-
-vi.mock("../../../components/dashboard/ThemeToggle", () => ({
-  default: () => <div data-testid="theme-toggle" />,
-}));
-
-vi.mock("../../../components/timer/MiniTimer", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/topbarRouteVisibilityAndNav.test.jsx
   default: () => <div data-testid="mini-timer" />,
 }));
 
@@ -160,11 +140,7 @@ vi.mock("../../../components/common", () => ({
 }));
 
 // ── Import the real TopBar component ─────────────────────────────────────────
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/dashboard/topbarRouteVisibilityAndNav.test.jsx
 import TopBar from "../../../components/dashboard/components/Topbar";
-=======
-import TopBar from "../../../components/dashboard/Topbar";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Dashboard/topbarRouteVisibilityAndNav.test.jsx
 
 
 function renderTopBar(props = {}) {

@@ -4,15 +4,9 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/modules/hooks/modulesPageHooks.js
 import useModules from "../../../components/modules/hooks/useModules.js";
 import useModuleSorting from "../../../components/modules/hooks/useModuleSorting.js";
 import { filterModules } from "../../../components/modules/utils/moduleUtils.js";
-=======
-import useModules from "../../components/modules/hooks/useModules.js";
-import useModuleSorting from "../../components/modules/hooks/useModuleSorting.js";
-import { filterModules } from "../../components/modules/utils/moduleUtils.js";
->>>>>>> main:flax-10-project-files/frontend/src/pages/modules/modulesPageHooks.js
 
 function readUserRole() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");

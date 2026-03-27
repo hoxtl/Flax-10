@@ -4,19 +4,11 @@
 
 import { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/pages/societies/hooks/useSocietyDetailPageState.js
 import { useChangeTracker } from "../../../components/society/hooks/useChangeTracker";
 import { useSocietyDetail } from "../../../components/society/hooks/useSocietyDetail";
 import { useSocietySubscription } from "../../../components/society/hooks/useSocietySubscription";
 import { useUnreportSociety } from "../../../components/society/hooks/useUnreportSociety";
 import { scrollContentToTop, wrapAddAnnouncement, wrapAddEvent, wrapDeleteAnnouncement, wrapDeleteEvent, wrapUpdateAnnouncement, wrapUpdateEvent } from "../utils/societyDetailPageUtils";
-=======
-import { useChangeTracker } from "../../components/society/hooks/useChangeTracker";
-import { useSocietyDetail } from "../../components/society/hooks/useSocietyDetail";
-import { useSocietySubscription } from "../../components/society/hooks/useSocietySubscription";
-import { useUnreportSociety } from "../../components/society/hooks/useUnreportSociety";
-import { scrollContentToTop, wrapAddAnnouncement, wrapAddEvent, wrapDeleteAnnouncement, wrapDeleteEvent, wrapUpdateAnnouncement, wrapUpdateEvent } from "./societyDetailPageUtils";
->>>>>>> main:flax-10-project-files/frontend/src/pages/societies/useSocietyDetailPageState.js
 
 function usePageState(initialTab, location) {
   const [params, setParams] = useSearchParams();

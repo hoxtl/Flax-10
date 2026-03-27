@@ -98,11 +98,7 @@ vi.mock("../../../../components/common/animated_dropdown", () => ({
 }));
 
 vi.mock("../../../../pages/tasks/utils/taskCardUtils", async () => {
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/tasks/components/TaskCard.test.jsx
   const actual = await vi.importActual("../../../../pages/Tasks/utils/taskCardUtils");
-=======
-  const actual = await vi.importActual("../../../../pages/tasks/utils/taskCardUtils");
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Tasks/components/TaskCard.test.jsx
   return {
     ...actual,
     formatDueDate: vi.fn(() => ({ label: "Today", status: "today" })),

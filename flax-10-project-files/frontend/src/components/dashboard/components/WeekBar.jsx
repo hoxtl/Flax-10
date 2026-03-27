@@ -1,13 +1,7 @@
 // src/components/WeekBar.jsx
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/dashboard/components/WeekBar.jsx
 import styles from "../styles/WeekBar.module.css";
 import { loadTermConfig } from "../../../lib/termConfig";
 import { buildWeekLabels, getWeekIndexForDate } from "../../calendar/utils/weekUtils";
-=======
-import styles from "./WeekBar.module.css";
-import { loadTermConfig } from "../../lib/termConfig";
-import { buildWeekLabels, getWeekIndexForDate } from "../calendar/utils/weekUtils";
->>>>>>> main:flax-10-project-files/frontend/src/components/dashboard/WeekBar.jsx
 
 // Badge component that shows the current week or reading week status, and the total number of weeks in the term
 function WeekBadge({ label, totalWeeks, isReadingWeek }) {

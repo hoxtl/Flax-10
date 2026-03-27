@@ -4,19 +4,11 @@
 
 import styles from "../styles/Topbar.module.css";
 import ProfileDropdown from "./ProfileDropdown";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/dashboard/components/Topbar.jsx
 import { useNotifications } from "../../../context/NotificationContext";
 import { NotificationPanel } from "../../notifications/components/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../../timer/components/MiniTimer";
-=======
-import { useNotifications } from "../../context/NotificationContext";
-import { NotificationPanel } from "../notifications/NotificationPanel";
-import { ExpandableTabs } from "./ExpandableTabs";
-import ThemeToggle from "./ThemeToggle";
-import MiniTimer from "../timer/MiniTimer";
->>>>>>> main:flax-10-project-files/frontend/src/components/dashboard/Topbar.jsx
 import {
   Bell,
   BookOpen,

@@ -37,7 +37,6 @@ vi.mock("../../../pages/homepage/components/PhotoWidget", () => ({
   default: (props) => <div data-testid="photo">{JSON.stringify(props)}</div>,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/IntelligenceWidgetRenderer.test.jsx
 vi.mock("../../../components/analytics/components/ProductivityCards", () => ({
   default: (props) => <div data-testid="productivity-cards">{JSON.stringify(props)}</div>,
 }));
@@ -55,25 +54,6 @@ vi.mock("../../../components/analytics/components/AttendanceChart", () => ({
 }));
 
 vi.mock("../../../components/analytics/components/InsightCards", () => ({
-=======
-vi.mock("../../../components/analytics/ProductivityCards", () => ({
-  default: (props) => <div data-testid="productivity-cards">{JSON.stringify(props)}</div>,
-}));
-
-vi.mock("../../../components/analytics/DailyBreakdownChart", () => ({
-  default: (props) => <div data-testid="daily-breakdown">{JSON.stringify(props)}</div>,
-}));
-
-vi.mock("../../../components/analytics/StudyHeatmap", () => ({
-  default: (props) => <div data-testid="heatmap">{JSON.stringify(props)}</div>,
-}));
-
-vi.mock("../../../components/analytics/AttendanceChart", () => ({
-  default: () => <div data-testid="attendance-chart">attendance</div>,
-}));
-
-vi.mock("../../../components/analytics/InsightCards", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/pages/Homepage/IntelligenceWidgetRenderer.test.jsx
   ConsistencyScore: (props) => <div data-testid="consistency">{JSON.stringify(props)}</div>,
   PeakHoursCard: (props) => <div data-testid="peak-hours">{JSON.stringify(props)}</div>,
 }));

@@ -3,15 +3,9 @@
  */
 
 import AnimatedDropdown from "../../common/animated_dropdown";
-<<<<<<< HEAD
 import styles from "../../../pages/settings/styles/Settings.module.css";
 import SettingsContextCard from "../components/SettingsContextCard";
 import { SectionHeader, SubmitButton } from "../components/SettingsUI";
-=======
-import styles from "../../../pages/settings/Settings.module.css";
-import SettingsContextCard from "../SettingsContextCard";
-import { SectionHeader, SubmitButton } from "../SettingsUI";
->>>>>>> main
 import { STUDY_TIME_OPTIONS, WEEK_PREFERENCE_OPTIONS, WORKTIME_PREFERENCE_OPTIONS } from "./useSchedulingState";
 
 function SchedulingDropdownField({ label, value, onChange, options, placeholder }) {

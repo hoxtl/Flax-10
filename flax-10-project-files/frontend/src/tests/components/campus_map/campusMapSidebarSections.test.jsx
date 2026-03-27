@@ -1,17 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-<<<<<<< HEAD
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
-=======
-vi.mock("../../pages/campus_map/sidebar.module.css", () => ({ default: {} }));
-vi.mock("../../pages/CampusMap/status.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/sidebar.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/status.module.css", () => ({ default: {} }));
->>>>>>> main
 
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, { get: () => ({ children, ...props }) => <div {...props}>{children}</div> }),

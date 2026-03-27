@@ -1,10 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/tags/TagManagerModal.test.jsx
 import TagManagerModal from '../../../components/tags/components/TagManagerModal';
-=======
-import TagManagerModal from '../../../components/tags/TagManagerModal';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Tags/TagManagerModal.test.jsx
 
 vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({

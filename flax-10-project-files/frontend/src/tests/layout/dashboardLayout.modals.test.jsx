@@ -4,11 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 vi.mock("../../components/calendar/event_modal/EventModal", () => ({
   EventModal: () => null,
 }));
-<<<<<<< HEAD
 vi.mock("../../components/society/components/CreateSocietyModal", () => ({
-=======
-vi.mock("../../components/society/CreateSocietyModal", () => ({
->>>>>>> main
   default: () => null,
 }));
 vi.mock("../../components/modules/deadlines/DeadlineModal", () => ({
@@ -17,11 +13,7 @@ vi.mock("../../components/modules/deadlines/DeadlineModal", () => ({
 vi.mock("../../components/modules/readings/ReadingModal", () => ({
   default: () => null,
 }));
-<<<<<<< HEAD
 vi.mock("../../components/dashboard/components/QuickAddModal", () => ({
-=======
-vi.mock("../../components/dashboard/QuickAddModal", () => ({
->>>>>>> main
   default: () => null,
 }));
 vi.mock("../../pages/tasks/components/CreateTaskModal", () => ({
@@ -37,11 +29,7 @@ vi.mock("../../layout/dashboard_layout/useDashboardTaskModalOptions", () => ({
   useDashboardTaskModalOptions: () => ({ lists: [], enrolledModules: [] }),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../components/timer/components/TimerPopups", () => ({
-=======
-vi.mock("../../components/timer/TimerPopups", () => ({
->>>>>>> main
   LeaveTimerModal: ({ onCancel, onPause, onExit, onTakeBreak, timeLeftSeconds, sessionTotalSeconds }) => (
     <div data-testid="leave-timer-modal">
       <span data-testid="leave-timer-time-left">{timeLeftSeconds}</span>

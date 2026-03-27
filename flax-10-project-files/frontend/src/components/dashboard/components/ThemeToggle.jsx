@@ -1,12 +1,6 @@
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/dashboard/components/ThemeToggle.jsx
 import { useTheme } from '../../../context/ThemeContext';
 import Tooltip from '../../common/Tooltip/Tooltip';
 import styles from '../styles/ThemeToggle.module.css';
-=======
-import { useTheme } from '../../context/ThemeContext';
-import Tooltip from '../common/tooltip/Tooltip';
-import styles from './ThemeToggle.module.css';
->>>>>>> main:flax-10-project-files/frontend/src/components/dashboard/ThemeToggle.jsx
 
 export default function ThemeToggle() {
   const { mode, setMode } = useTheme();

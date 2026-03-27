@@ -2,11 +2,7 @@
  * Timer presets and configuration panels.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/timer/components/PresetPanel.jsx
 import styles from '../../../pages/timer/TimerPage.module.css';
-=======
-import styles from '../../pages/timer/TimerPage.module.css';
->>>>>>> main:flax-10-project-files/frontend/src/components/timer/PresetPanel.jsx
 import { TimerSettings } from './TimerComponents';
 import { AutoStartToggle } from '../presets/AutoStartToggle';
 import { PresetCard } from '../presets/PresetCard';

@@ -1,24 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/societies/SocietySection.test.jsx
 import SocietySection from '../../../pages/societies/components/SocietySection';
 
 vi.mock('../../../components/society/components/SocietyCard', () => ({
-=======
-import SocietySection from '../../../pages/societies/SocietySection';
-
-vi.mock('../../../components/society/SocietyCard', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Societies/SocietySection.test.jsx
     default: ({ society, onClick }) => (
         <div data-testid="society-card" onClick={() => onClick?.(society)}>{society.name}</div>
     ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/societies/SocietySection.test.jsx
 vi.mock('../../../components/society/components/BrowseCard', () => ({
-=======
-vi.mock('../../../components/society/BrowseCard', () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Societies/SocietySection.test.jsx
     default: ({ onClick }) => (
         <button data-testid="browse-card" onClick={onClick}>Browse</button>
     ),

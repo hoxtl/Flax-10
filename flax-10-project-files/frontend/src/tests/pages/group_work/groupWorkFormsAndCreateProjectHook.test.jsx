@@ -28,11 +28,7 @@ vi.mock("../../../components/common/search_empty_state/SearchEmptyState", () => 
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../../components/social/components/UserSearch", () => ({
-=======
-vi.mock("../../../components/social/UserSearch", () => ({
->>>>>>> main
   default: ({ onUserSelect, filterUsers, renderEmptyState }) => {
     const filtered = filterUsers?.([
       { id: 1, username: "owner" },
@@ -97,11 +93,7 @@ vi.mock("../../../components/common/text_input/TextInput", () => ({
   ),
 }));
 
-<<<<<<< HEAD
 vi.mock("../../../components/modules/components/UserModuleDropdown", () => ({
-=======
-vi.mock("../../../components/modules/UserModuleDropdown", () => ({
->>>>>>> main
   default: ({ value, onChange, placeholder }) => (
     <select aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)}>
       <option value="">None</option>

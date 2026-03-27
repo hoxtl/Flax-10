@@ -47,19 +47,11 @@ vi.mock("../../../components/common/request_status_card/RequestStatusCard", () =
   ),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/accountComponentsAndCourseModal.test.jsx
 vi.mock("../../../components/settings/components/SettingsContextCard", () => ({
   default: ({ title, items }) => <div>{title}:{items.join("|")}</div>,
 }));
 
 vi.mock("../../../components/settings/components/SettingsUI", () => ({
-=======
-vi.mock("../../../components/settings/SettingsContextCard", () => ({
-  default: ({ title, items }) => <div>{title}:{items.join("|")}</div>,
-}));
-
-vi.mock("../../../components/settings/SettingsUI", () => ({
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/accountComponentsAndCourseModal.test.jsx
   SectionHeader: ({ title, description }) => <div>{title}:{description}</div>,
   SubmitButton: ({ label, savingLabel, isSaving }) => <button type="submit">{isSaving ? savingLabel : label}</button>,
 }));

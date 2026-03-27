@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD
 import { TaskInput } from '../../../components/timer/components/TimerComponents';
-=======
-import { TaskInput } from '../../../components/timer/TimerComponents';
->>>>>>> main
 
 describe('TaskInput', () => {
     it('shows the current focus task instead of a text input', () => {

@@ -7,7 +7,6 @@ import { useState } from "react";
 import styles from "../styles/CreateSocietyModal.module.css";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/society/components/CreateSocietyModal.jsx
 import { RatificationToggle } from "../society_detail/RatificationSection";
 import CoverImageModal from "../society_detail/image_handlers/CoverImageModal";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../../pages/societies/utils/societyFilters";
@@ -15,15 +14,6 @@ import { TagsSelector } from "../../common/tags_selector/TagsSelector";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import StandardModal from "../../common/standard_modal/StandardModal";
 import TextInput from "../../common/text_input/TextInput";
-=======
-import { RatificationToggle } from "./society_detail/RatificationSection";
-import CoverImageModal from "./society_detail/image_handlers/CoverImageModal";
-import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/societies/societyFilters";
-import { TagsSelector } from "../common/tags_selector/TagsSelector";
-import PrimaryButton from "../common/primary_button/PrimaryButton";
-import StandardModal from "../common/standard_modal/StandardModal";
-import TextInput from "../common/text_input/TextInput";
->>>>>>> main:flax-10-project-files/frontend/src/components/society/CreateSocietyModal.jsx
 
 const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map(c => ({ id: c.id, label: c.label }));
 

@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/society/CategorySelector.test.jsx
 import CategorySelector, { CategoryDisplay } from '../../../components/society/components/CategorySelector';
-=======
-import CategorySelector, { CategoryDisplay } from '../../../components/society/CategorySelector';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Society/CategorySelector.test.jsx
 
 vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (

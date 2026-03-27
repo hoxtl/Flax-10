@@ -6,11 +6,7 @@ vi.mock('../../../api/socialApi', () => ({
     unshareCalendar: vi.fn().mockResolvedValue({}),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/social/ShareButton.test.jsx
 import ShareButton from '../../../components/social/components/ShareButton';
-=======
-import ShareButton from '../../../components/social/ShareButton';
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Social/ShareButton.test.jsx
 import { shareCalendar, unshareCalendar } from '../../../api/socialApi';
 
 describe('ShareButton', () => {

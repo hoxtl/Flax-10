@@ -2,11 +2,7 @@
  * Attendance prompt event helpers.
  */
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/components/attendance/utils/attendancePromptUtils.js
 import { isTimetableEvent } from "../../../pages/attendance/utils/attendanceTimetable";
-=======
-import { isTimetableEvent } from "../../pages/attendance/utils/attendanceTimetable";
->>>>>>> main:flax-10-project-files/frontend/src/components/attendance/attendancePromptUtils.js
 
 const PROMPT_WINDOW_START_MIN = 15;
 const PAST_PROMPT_WINDOW_MS = 48 * 60 * 60 * 1000; // 48 hours

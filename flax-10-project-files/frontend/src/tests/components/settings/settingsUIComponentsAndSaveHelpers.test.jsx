@@ -83,11 +83,7 @@ import {
   SuccessBanner,
   TabButton,
   ThemeGridSelector,
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/settings/settingsUIComponentsAndSaveHelpers.test.jsx
 } from "../../../components/settings/components/SettingsUI";
-=======
-} from "../../../components/settings/SettingsUI";
->>>>>>> main:flax-10-project-files/frontend/src/tests/components/Settings/settingsUIComponentsAndSaveHelpers.test.jsx
 import {
   clearCachedPendingRequest,
   getCachedPendingRequest,
