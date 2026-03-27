@@ -195,7 +195,7 @@ vi.mock("../../../components/common/back_to_top/BackToTop", () => ({
   default: () => <div data-testid="back-to-top" />,
 }));
 
-vi.mock("../../../components/Tags/pill_filters", () => ({
+vi.mock("../../../components/tags/components/PillFilters", () => ({
   __esModule: true,
   default: () => <div data-testid="pill-filters" />,
 }));

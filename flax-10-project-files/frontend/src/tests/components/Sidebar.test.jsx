@@ -14,13 +14,6 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../lib/routes', () => ({
-  APP_ROUTES: [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'calendar', label: 'Calendar', icon: '📅' },
-  ],
-}), { virtual: true });
-
 vi.mock('../../lib/routes', () => ({
   APP_ROUTES: [
     { id: 'home', label: 'Home', icon: '🏠' },

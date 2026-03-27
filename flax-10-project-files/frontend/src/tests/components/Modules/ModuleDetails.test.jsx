@@ -9,7 +9,7 @@ import ModuleDetails from '../../../components/modules/modules/ModuleDetails';
 
 const useAuthMock = vi.hoisted(() => vi.fn(() => ({ profile: null })));
 
-vi.mock('../../../utils/moduleUtils', () => ({
+vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
 }));

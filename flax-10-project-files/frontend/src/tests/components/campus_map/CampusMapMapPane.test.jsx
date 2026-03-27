@@ -7,8 +7,8 @@ const quickNavMock = vi.fn(({ onFly }) => (
   </button>
 ));
 
-vi.mock("../../pages/campus_map/CampusMap.module.css", () => ({ default: {} }));
-vi.mock("../../pages/campus_map/Sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/CampusMap.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/CampusMap.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 

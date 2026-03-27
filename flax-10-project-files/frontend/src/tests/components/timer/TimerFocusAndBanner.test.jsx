@@ -8,15 +8,10 @@ import * as todayBannerDataModule from "../../../components/timer/today_banner/u
 import * as focusCanvasModule from "../../../components/timer/focus_animation/useFocusCanvasAnimation";
 
 const getSummary = vi.fn();
-const getNearestMilestone = vi.fn();
 const listenToTimerHistoryEvents = vi.fn();
 
 vi.mock("../../../api/analyticsApi", () => ({
   default: { getSummary: (...args) => getSummary(...args) },
-}));
-
-vi.mock("../../../components/timer/utils/milestoneUtils", () => ({
-  getNearestMilestone: (...args) => getNearestMilestone(...args),
 }));
 
 vi.mock("../../../components/timer/utils/historyEvents", () => ({
@@ -97,7 +92,6 @@ describe("Timer focus and banner", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    getNearestMilestone.mockReturnValue({ label: "100 sessions", remaining: 3 });
     listenToTimerHistoryEvents.mockImplementation(() => () => {});
   });
 

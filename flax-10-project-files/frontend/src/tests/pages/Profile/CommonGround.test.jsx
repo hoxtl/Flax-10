@@ -11,9 +11,6 @@ vi.mock('../../../pages/profile/components/widgets/ProfileCompat.module.css', ()
   default: {},
 }), { virtual: true });
 
-// CSS modules stub
-vi.mock('./ProfileCompat.module.css', () => ({ default: {} }), { virtual: true });
-
 describe('CommonGroundSection', () => {
   const viewedModules = ['CS101', 'MA202', 'PH301'];
   const currentUserModules = ['CS101', 'MA202', 'BIO100'];

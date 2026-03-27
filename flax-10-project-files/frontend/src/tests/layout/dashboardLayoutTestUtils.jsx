@@ -72,7 +72,7 @@ vi.mock("../../components/dashboard/components/QuickAddModal", async () => {
   const { QuickAddMock } = await import("./dashboardMocks");
   return { default: QuickAddMock };
 });
-vi.mock("../../components/Calendar/EventModal/EventModal", async () => {
+vi.mock("../../components/calendar/event_modal/EventModal", async () => {
   const { EventModalMock } = await import("./dashboardMocks");
   return { EventModal: EventModalMock };
 });
@@ -101,7 +101,7 @@ vi.mock("../../components/dashboard/components/WeekBar", () => ({ default: () =>
 vi.mock("../../components/floating_chat/components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: hoistedMocks.authService }));
-vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: hoistedMocks.clearUserData }));
+vi.mock("../../components/Auth/utils/authHelpers", () => ({ clearUserData: hoistedMocks.clearUserData }));
 vi.mock("react-router-dom", () => ({ useLocation: hoistedMocks.useLocation }));
 vi.mock("../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
 vi.mock("../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));

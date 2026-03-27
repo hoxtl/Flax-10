@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-vi.mock("../../pages/CampusMap/status.module.css", () => ({ default: {} }));
-vi.mock("../../pages/CampusMap/routes.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/routes.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/routes.module.css", () => ({ default: {} }));
 

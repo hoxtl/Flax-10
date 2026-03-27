@@ -5,8 +5,8 @@ const sidebarMock = vi.fn((props) => <div data-testid="sidebar" data-props={JSON
 const pageHeaderMock = vi.fn((props) => <div data-testid="page-header" data-props={JSON.stringify(props)} />);
 const skeletonBlockMock = vi.fn(({ className }) => <div data-testid="skeleton-block" className={className} />);
 
-vi.mock("../../pages/campus_map/CampusMap.module.css", () => ({ default: {} }));
-vi.mock("../../pages/campus_map/Sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/CampusMap.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/CampusMap.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 

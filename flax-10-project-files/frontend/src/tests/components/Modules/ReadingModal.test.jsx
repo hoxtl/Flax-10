@@ -36,7 +36,7 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     ),
 }));
 
-vi.mock('../../../components/Modules/DeadlineModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/modules/deadlines/DeadlineModal.module.css', () => ({ default: {} }));
 
 const module = { id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering' };
 
