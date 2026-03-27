@@ -38,6 +38,10 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => navigateMock,
 }));
 
+vi.mock("../../../context/AuthContext", () => ({
+  useAuth: () => ({ profile: { id: 1, role: "student" } }),
+}));
+
 vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
 }));

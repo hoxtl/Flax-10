@@ -64,7 +64,7 @@ describe("LocationLink", () => {
         fireEvent.click(button);
 
         expect(onClick).toHaveBeenCalledTimes(1);
-        expect(onClick.mock.calls[0][0]).toBeInstanceOf(MouseEvent);
+        expect(onClick.mock.calls[0][0]).toMatchObject({ nativeEvent: expect.any(MouseEvent) });
         expect(navigateMock).toHaveBeenCalledWith("/map?destination=Somerset%20House", { replace: false });
     });
 

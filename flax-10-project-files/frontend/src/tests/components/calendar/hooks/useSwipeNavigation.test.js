@@ -63,6 +63,7 @@ describe('useSwipeNavigation', () => {
     it('does not navigate when the wheel delta is below the threshold or the container is not at a boundary', () => {
         const preventDefault = vi.fn();
         container.scrollTop = 20;
+        container.scrollHeight = 900;
         renderHook(() => useSwipeNavigation({ containerRef: { current: container }, onPrev, onNext }));
 
         listeners.wheel?.({ deltaY: 100, preventDefault });

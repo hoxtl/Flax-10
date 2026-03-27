@@ -24,6 +24,10 @@ vi.mock("../../../../../context/ToastContext", () => ({
   useToast: () => showToast,
 }));
 
+vi.mock("../../../../../context/AuthContext", () => ({
+  useAuth: () => ({ profile: { id: 1, role: "student" } }),
+}));
+
 vi.mock("../../../../../components/calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent }),
   useCalendarEvents: () => ({ loadEvents }),
