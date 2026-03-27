@@ -52,7 +52,9 @@ def _stable_hash(s):
     return int(hashlib.md5(s.encode()).hexdigest(), 16)
 
 def _get_user_profile(username):
-    return _USER_PROFILES.get(username, random.choice(_RANDOM_PROFILES))
+    if username in _USER_PROFILES:
+        return _USER_PROFILES[username]
+    return _RANDOM_PROFILES[_stable_hash(username) % len(_RANDOM_PROFILES)]
 
 def _event_type_label(title):
     """Infer session type from event title prefix."""
