@@ -1,6 +1,5 @@
 /*
- * Coverage top-up for ScheduleManagerButton – adds the missing useAuth mock
- * and exercises all sub-components and branches not hit by the primary test.
+ * Dialog-state and toast-behavior tests for ScheduleManagerButton.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -63,7 +62,7 @@ vi.mock("../../../../../components/schedules/auto/autoScheduleActions", () => ({
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefs(...args),
 }));
 
-describe("ScheduleManagerButton (coverage top-up)", () => {
+describe("ScheduleManagerButton dialogs and toast states", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockProfile = { role: "student" };

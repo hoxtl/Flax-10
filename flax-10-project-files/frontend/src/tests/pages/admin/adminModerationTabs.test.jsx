@@ -1,5 +1,5 @@
 /*
- * Coverage tests for CourseChangeRequestsTab, RatificationsTab, ReportedSocietiesTab.
+ * Tests for the admin request, ratification, and reported-society tabs.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";

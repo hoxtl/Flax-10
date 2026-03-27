@@ -1,6 +1,5 @@
 /**
- * Coverage topup tests for src/pages/group_work/components/
- * Part 1: Components without conflicting mock dependencies
+ * Group-work component behavior tests.
  */
 
 import React from "react";
@@ -426,7 +425,7 @@ import CreateProjectForm from "../../../pages/group_work/components/CreateProjec
 // GroupWorkStats
 // ---------------------------------------------------------------------------
 
-describe("GroupWorkStats coverage topup", () => {
+describe("GroupWorkStats", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -475,7 +474,7 @@ describe("GroupWorkStats coverage topup", () => {
 // GroupWorkUserSearchEmptyState
 // ---------------------------------------------------------------------------
 
-describe("GroupWorkUserSearchEmptyState coverage topup", () => {
+describe("GroupWorkUserSearchEmptyState", () => {
   it("renders content directly when wrapperClassName is absent", () => {
     const { container } = render(
       <GroupWorkUserSearchEmptyState query="abc" clear={vi.fn()} className="card" />,
@@ -488,7 +487,7 @@ describe("GroupWorkUserSearchEmptyState coverage topup", () => {
 // ProjectProgress
 // ---------------------------------------------------------------------------
 
-describe("ProjectProgress coverage topup", () => {
+describe("ProjectProgress", () => {
   it("uses index as key when segment.id is null", () => {
     const { container } = render(
       <ProjectProgress taskStats={{ percent: 50, completed: 5, total: 10, segments: [{ id: null, name: "S1", percentage: 50 }] }} />,
@@ -561,7 +560,7 @@ describe("ProjectProgress coverage topup", () => {
 // ProjectRowAccordion
 // ---------------------------------------------------------------------------
 
-describe("ProjectRowAccordion coverage topup", () => {
+describe("ProjectRowAccordion", () => {
   it("renders with percent > 0", () => {
     const { container } = render(<ProjectRowAccordion percent={75} />);
     expect(container.querySelector("[aria-label='75% completion']")).toBeTruthy();
@@ -577,7 +576,7 @@ describe("ProjectRowAccordion coverage topup", () => {
 // ProjectRowInfo — additional branches
 // ---------------------------------------------------------------------------
 
-describe("ProjectRowInfo coverage topup", () => {
+describe("ProjectRowInfo", () => {
   it("renders AvatarStack with >10 members showing +N badge", () => {
     const members = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, name: `M${i + 1}` }));
     render(
@@ -658,7 +657,7 @@ describe("ProjectRowInfo coverage topup", () => {
 // SelectableMemberRow
 // ---------------------------------------------------------------------------
 
-describe("SelectableMemberRow coverage topup", () => {
+describe("SelectableMemberRow", () => {
   it("uses member.id when member.user is null/undefined", () => {
     const onToggle = vi.fn();
     render(
@@ -690,7 +689,7 @@ describe("SelectableMemberRow coverage topup", () => {
 // TaskAssigneePopup — closePopupFromOutside branches (lines 42-44)
 // ---------------------------------------------------------------------------
 
-describe("TaskAssigneePopup coverage topup — closePopupFromOutside", () => {
+describe("TaskAssigneePopup outside-click handling", () => {
   it("does not close when mousedown is inside the popup element", () => {
     const onClose = vi.fn();
     const triggerRef = { current: document.createElement("div") };
@@ -758,7 +757,7 @@ describe("TaskAssigneePopup coverage topup — closePopupFromOutside", () => {
 // TaskBoardCard — editing mode, done state, context menu
 // ---------------------------------------------------------------------------
 
-describe("TaskBoardCard coverage topup", () => {
+describe("TaskBoardCard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useTaskTitleEditMock.mockReturnValue({
@@ -907,7 +906,7 @@ describe("TaskBoardCard coverage topup", () => {
 // TaskTimelineCards — line 57 (UnscheduledCard/TimelineCard context menu)
 // ---------------------------------------------------------------------------
 
-describe("TaskTimelineCards coverage topup", () => {
+describe("TaskTimelineCards", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useTaskTitleEditMock.mockReturnValue({
@@ -990,7 +989,7 @@ describe("TaskTimelineCards coverage topup", () => {
 // useCreateProjectForm — handleSubmitResult when created is falsy (lines 87-89)
 // ---------------------------------------------------------------------------
 
-describe("useCreateProjectForm coverage topup", () => {
+describe("useCreateProjectForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -1019,7 +1018,7 @@ describe("useCreateProjectForm coverage topup", () => {
 // useEditProjectForm — line 31 (if (res) onUpdated?.(res))
 // ---------------------------------------------------------------------------
 
-describe("useEditProjectForm coverage topup", () => {
+describe("useEditProjectForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -1081,7 +1080,7 @@ describe("useEditProjectForm coverage topup", () => {
 // GroupWorkContent — filtering branches
 // ---------------------------------------------------------------------------
 
-describe("GroupWorkContent coverage topup", () => {
+describe("GroupWorkContent", () => {
   it("shows all projects when searchTerm is empty (no filter applied)", () => {
     render(
       <MemoryRouter>
@@ -1176,7 +1175,7 @@ const setupGroupTasksState = (overrides = {}) => {
   return state;
 };
 
-describe("GroupTasksTab coverage topup", () => {
+describe("GroupTasksTab", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -1211,7 +1210,7 @@ describe("GroupTasksTab coverage topup", () => {
 // ProjectHeader — owner detection, module pill, deadline meta
 // ---------------------------------------------------------------------------
 
-describe("ProjectHeader coverage topup", () => {
+describe("ProjectHeader", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getStoredViewerMock.mockReturnValue({ id: 1, username: "viewer" });
@@ -1316,7 +1315,7 @@ describe("ProjectHeader coverage topup", () => {
 // ProjectHeaderMeta — additional branches
 // ---------------------------------------------------------------------------
 
-describe("ProjectHeaderMeta coverage topup", () => {
+describe("ProjectHeaderMeta", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuthMock.mockReturnValue({ profile: { id: 1 } });
@@ -1447,7 +1446,7 @@ describe("ProjectHeaderMeta coverage topup", () => {
 // ProjectHeaderSub (ProjectHeaderActions)
 // ---------------------------------------------------------------------------
 
-describe("ProjectHeaderSub coverage topup", () => {
+describe("ProjectHeaderSub", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getCurrentMemberMock.mockReturnValue(null);
@@ -1545,7 +1544,7 @@ const baseAvailabilityState = {
   handleVote: vi.fn(),
 };
 
-describe("AvailabilityTab coverage topup", () => {
+describe("AvailabilityTab", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -1582,7 +1581,7 @@ describe("AvailabilityTab coverage topup", () => {
 // CreateProjectForm — RequiredLabel sub-component (line 155)
 // ---------------------------------------------------------------------------
 
-describe("CreateProjectForm coverage topup — RequiredLabel", () => {
+describe("CreateProjectForm modal rendering", () => {
   it("opens the modal and renders form content (RequiredLabel sub-component is executed)", () => {
     render(<CreateProjectForm onCreated={vi.fn()} />);
     fireEvent.click(screen.getByText("+ Create project"));
