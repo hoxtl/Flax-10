@@ -20,8 +20,8 @@
 
 .positive {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-teal) 18%, var(--surface-card) 82%), color-mix(in srgb, var(--color-teal) 12%, var(--panel) 88%));
-  border-color: color-mix(in srgb, var(--color-teal) 38%, transparent);
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 16%, var(--surface-card) 84%), color-mix(in srgb, var(--color-highlight) 10%, var(--panel) 90%));
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .info {
@@ -117,7 +117,7 @@
 
 [data-mode="dark"] .positive {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-teal) 16%, var(--surface-card) 84%), color-mix(in srgb, var(--color-teal) 10%, var(--surface-inner) 90%));
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 18%, var(--surface-card) 82%), color-mix(in srgb, var(--color-highlight) 10%, var(--surface-inner) 90%));
 }
 
 [data-mode="dark"] .info {
