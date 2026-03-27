@@ -1,14 +1,34 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
+const getTflLinePillStyleMock = vi.hoisted(() => vi.fn((lineName) => (
+  lineName === "Fallback"
+    ? { text: "#111111" }
+    : { bg: "#2200aa", text: "#ffffff" }
+)));
+
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
 
+vi.mock("../../../pages/homepage/utils/kclTflMapping", () => ({
+  getTflLinePillStyle: (...args) => getTflLinePillStyleMock(...args),
+}));
+
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, { get: () => ({ children, ...props }) => <div {...props}>{children}</div> }),
   AnimatePresence: ({ children }) => <>{children}</>,
+}));
+
+vi.mock("../../../components/common/animated_dropdown/AnimatedDropdown", () => ({
+  default: ({ customTrigger, onChange }) => (
+    <div>
+      {customTrigger}
+      <button type="button" onClick={() => onChange("strand")}>Choose Strand</button>
+      <button type="button" onClick={() => onChange("missing")}>Choose Missing Campus</button>
+    </div>
+  ),
 }));
 
 vi.mock("../../../components/campus_map/components/CampusMapSidebarContent", () => ({
@@ -48,6 +68,20 @@ describe("TflStatusSection", () => {
     fireEvent.click(screen.getByRole("button", { name: /Show less/i }));
     expect(screen.getByRole("button", { name: /Show 1 More/i })).toBeTruthy();
   });
+
+  it("falls back to the disruption color when the pill theme has no background", () => {
+    render(
+      <TflStatusSection
+        disruptions={[{ lineName: "Fallback", severityDescription: "Minor", reason: "Signal issue", color: "#123456" }]}
+        loading={false}
+      />
+    );
+
+    expect(screen.getByText("Fallback").closest("div")).toHaveStyle({
+      "--line-badge-bg": "#123456",
+      "--line-badge-text": "#111111",
+    });
+  });
 });
 
 describe("DestinationSection & LocationChip", () => {
@@ -70,7 +104,7 @@ describe("DestinationSection & LocationChip", () => {
       />
     );
 
-    expect(screen.getByRole("button", { name: /Strand/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("button").find((button) => button.textContent?.includes("Strand") && button.textContent?.includes("▾"))).toBeTruthy();
   });
 
   it("renders custom destinations and upcoming events with fallback labels", () => {
@@ -120,6 +154,18 @@ describe("DestinationSection & LocationChip", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Open Day/i }));
     expect(screen.getByRole("button", { name: /Open Day/i })).toBeTruthy();
+  });
+
+  it("only selects campuses that exist in the campus list", () => {
+    const onSelectCampus = vi.fn();
+
+    render(<DestinationSection {...base} onSelectCampus={onSelectCampus} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Choose Strand" }));
+    fireEvent.click(screen.getByRole("button", { name: "Choose Missing Campus" }));
+
+    expect(onSelectCampus).toHaveBeenCalledTimes(1);
+    expect(onSelectCampus).toHaveBeenCalledWith(expect.objectContaining({ id: "strand", name: "Strand Campus" }));
   });
 
   it("LocationChip triggers clear", () => {
