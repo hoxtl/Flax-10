@@ -32,8 +32,6 @@ class SeedNewUserProjectsTest(TestCase):
         self.user = make_user('np_user', 'np_user@e.com')
         self.now = timezone.now()
 
-
-
     def test_returns_zero_when_no_enrolled_modules(self):
         from studyFlax.views.modules.new_user_projects import seed_new_user_projects
         result = seed_new_user_projects(self.user, now=self.now)
@@ -45,9 +43,12 @@ class SeedNewUserProjectsTest(TestCase):
         Enrollment.objects.create(student=self.user, module=module)
         demo_user = make_user('np_demo', 'np_demo@e.com')
         spec = {'name': 'NP Project', 'module': module, 'source_deadline': None}
-        with patch('studyFlax.views.modules.new_user_projects._get_demo_users', return_value=[demo_user]):
-            with patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', return_value=[spec]):
-                result = seed_new_user_projects(self.user, now=self.now)
+        patches = [
+            patch('studyFlax.views.modules.new_user_projects._get_demo_users', return_value=[demo_user]),
+            patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', return_value=[spec]),
+        ]
+        with patches[0], patches[1]:
+            result = seed_new_user_projects(self.user, now=self.now)
         self.assertGreater(result, 0)
         self.assertTrue(GroupProject.objects.filter(name='NP Project').exists())
 

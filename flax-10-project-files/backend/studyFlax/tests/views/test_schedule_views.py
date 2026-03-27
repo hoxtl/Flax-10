@@ -21,12 +21,9 @@ from ..helpers.test_case_support import BaseTestCase
 class ScheduleViewsTests(BaseTestCase):
     """Tests schedule views."""
 
-    def setUp(self):
-        super().setUp()
-        self.url = '/api/schedules/'
-
-        now = timezone.now()
-        self.module = Module.objects.create(
+    def _create_module_and_deadline(self, now):
+        """Create a test module, enrolment, and deadline for the current user."""
+        module = Module.objects.create(
             module_code='CS100',
             module_name='Foundations',
             description='Test module',
@@ -35,14 +32,21 @@ class ScheduleViewsTests(BaseTestCase):
             end_time=now + timedelta(hours=1),
             location='Room 1',
         )
-        Enrollment.objects.create(student=self.user, module=self.module)
-        self.deadline = Deadline.objects.create(
-            module=self.module,
+        Enrollment.objects.create(student=self.user, module=module)
+        deadline = Deadline.objects.create(
+            module=module,
             title='Coursework 1',
             deadline_type='coursework',
             start_due_date=now + timedelta(days=2),
             end_due_date=now + timedelta(days=2, hours=1),
         )
+        return module, deadline
+
+    def setUp(self):
+        super().setUp()
+        self.url = '/api/schedules/'
+        now = timezone.now()
+        self.module, self.deadline = self._create_module_and_deadline(now)
 
     def test_create_auto_schedule(self):
         payload = {

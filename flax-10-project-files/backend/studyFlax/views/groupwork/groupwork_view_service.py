@@ -15,7 +15,6 @@ from studyFlax.models.modules.module_model import Module
 from studyFlax.serialisers.tasks.groupwork_serialisers import GroupMembershipSerialiser, GroupProjectSerialiser
 
 
-
 User = get_user_model()
 
 
@@ -224,17 +223,21 @@ def serialised_project(project, context):
         context = serialiser_context(context)
     return GroupProjectSerialiser(with_project_metrics(project), context=context).data
 
+def _removal_permission_error(is_owner, is_self):
+    """Return an HTTP error status if the removal is not permitted, else None."""
+    if is_owner and is_self:
+        return status.HTTP_400_BAD_REQUEST
+    if not is_owner and not is_self:
+        return status.HTTP_403_FORBIDDEN
+    return None
+
 def remove_project_member(project, user, membership_id):
     membership = get_object_or_404(GroupMembership.objects.filter(project=project), id=membership_id)
     is_owner = project.owner_id == user.id
     is_self = membership.user_id == user.id
-
-    if is_owner:
-        if is_self:
-            return status.HTTP_400_BAD_REQUEST
-    elif not is_self:
-        return status.HTTP_403_FORBIDDEN
-
+    error = _removal_permission_error(is_owner, is_self)
+    if error:
+        return error
     delete_project_member(membership)
     return status.HTTP_204_NO_CONTENT
 
