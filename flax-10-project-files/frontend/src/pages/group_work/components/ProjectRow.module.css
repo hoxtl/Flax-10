@@ -197,9 +197,18 @@
 }
 
 .projectModuleBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    min-height: 28px;
+    padding: 0.22rem 0.65rem;
+    border-radius: 999px;
     background: rgba(123, 103, 81, 0.08);
     color: var(--primary);
     border-color: rgba(123, 103, 81, 0.16);
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1;
 }
 
 :global([data-mode="dark"]) .projectRowContainer {
@@ -360,4 +369,3 @@
     border: 1px solid rgba(220, 38, 38, 0.24);
     flex-shrink: 0;
 }
-
