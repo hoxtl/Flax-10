@@ -20,7 +20,14 @@ function CardTitleArea({ editing, editTitle, setEditTitle, saveEdit, setEditing,
                 onKeyDown={(e) => handleTaskTitleKeyDown(e, saveEdit, setEditing)} />
         );
     }
-    return <div className={styles.cardTitle}>{title}</div>;
+    return (
+        <div className={`${styles.cardTitle} ${styles.cardTitleClickable}`}
+            onClick={() => { setEditTitle(title); setEditing(true); }}
+            role="button" tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setEditTitle(title); setEditing(true); } }}>
+            {title}
+        </div>
+    );
 }
 
 function CardHeader({ task, priorityStyle, onUpdate }) {
