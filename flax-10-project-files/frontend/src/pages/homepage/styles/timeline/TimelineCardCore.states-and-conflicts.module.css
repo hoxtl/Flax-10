@@ -166,6 +166,9 @@
   transition:
     background 0.15s,
     border-color 0.15s;
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
 }
 .planTimelineRescheduleBtn:hover {
   background: var(--hover);
@@ -224,4 +227,30 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .planTimelineCardTagsSlot {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .planTimelineTimeConflictBadge {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .planTimelineRescheduleBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .planTimelineConflictPopover {
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 10px;
+  }
 }

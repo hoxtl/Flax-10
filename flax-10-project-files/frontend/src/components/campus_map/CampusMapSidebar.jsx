@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import styles from "../../pages/campus_map/CampusMap.module.css";
 import { CampusMapSidebarContent } from "./CampusMapSidebarContent";
 
-const SHEET_VARIANTS = { closed: { y: "calc(85vh - 70px)" }, mid: { y: "calc(85vh - 300px)" }, open: { y: 0 } };
+const SHEET_VARIANTS = { closed: { y: "calc(78vh - 76px)" }, mid: { y: "calc(78vh - 320px)" }, open: { y: 0 } };
 const MotionAside = motion.aside;
 
 function hiddenStyle(showInitialSkeleton) {
@@ -14,7 +14,7 @@ function hiddenStyle(showInitialSkeleton) {
 }
 
 function animateValue(ui) {
-  return ui.isMobile ? (ui.mobileInitialOpen ? "open" : undefined) : { y: 0 };
+  return ui.isMobile ? (ui.mobileInitialOpen ? "open" : "closed") : { y: 0 };
 }
 
 export function CampusMapSidebar(props) {

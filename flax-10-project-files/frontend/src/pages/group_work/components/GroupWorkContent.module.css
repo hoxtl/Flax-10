@@ -89,13 +89,24 @@
 }
 
 @media (max-width: 768px) {
+    .projectsSection {
+        margin-top: 18px;
+    }
+
     .projectsHeader {
         justify-content: stretch;
+        margin-bottom: 14px;
     }
 
     .projectsHeaderActions {
         flex-direction: column-reverse;
         align-items: stretch;
+        gap: 10px;
+    }
+
+    .searchBar {
+        min-width: 0;
+        max-width: none;
     }
 
     .sortDropdownWrap {
@@ -103,7 +114,16 @@
         min-width: 0;
     }
 
+    .sortDropdownTrigger {
+        width: 100%;
+    }
+
     .createButton {
         width: 100%;
+    }
+
+    .emptyStateCard {
+        padding: 26px 16px;
+        border-radius: 16px;
     }
 }

@@ -389,3 +389,33 @@
   color: var(--home-mini-cta-hover-ink);
   border-color: var(--home-mini-cta-border);
 }
+
+@media (max-width: 640px) {
+  .timelineHeader {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .timelineHeaderLeft {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .timelineHeaderRight {
+    width: 100%;
+    margin-left: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .timelineHeaderButton {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
+    line-height: 1.2;
+    padding: 0.45rem 0.75rem !important;
+    margin: 0;
+  }
+}

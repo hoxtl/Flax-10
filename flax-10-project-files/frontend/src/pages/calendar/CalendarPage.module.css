@@ -223,6 +223,7 @@
   .sharedCalendarFrame {
     padding: 10px;
     border-radius: 22px;
+    border-width: 1px;
   }
 
   .sharedCalendarBackRow {
@@ -247,5 +248,35 @@
   .skeletonCalendarHeader {
     grid-template-columns: 44px minmax(140px, 1fr) 44px;
     gap: 0.75rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .sharedCalendarFrame {
+    padding: 8px;
+    border-radius: 18px;
+    box-shadow:
+      0 0 0 1px rgba(178, 80, 80, 0.06),
+      0 10px 24px rgba(178, 80, 80, 0.08);
+  }
+
+  .sharedCalendarBanner {
+    padding: 12px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+  }
+
+  .sharedCalendarTitle {
+    font-size: 1.35rem;
+    line-height: 1.08;
+  }
+
+  .sharedCalendarDescription {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .filters {
+    padding: 6px 8px 8px;
   }
 }
