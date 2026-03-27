@@ -116,20 +116,34 @@ export const handleKey = (e, local, min, onError) => {
 const useBufferedInput = (value, onUpdate, min, onError) => {
     const [local, setLocal] = useState(value);
     useEffect(() => setLocal(value), [value]);
+    const stepValue = (delta) => {
+        const base = Number.parseInt(local, 10);
+        const nextValue = Math.max(Number.isNaN(base) ? value : base, min) + delta;
+        const clamped = Math.max(nextValue, min);
+        setLocal(clamped);
+        if (clamped !== value) onUpdate(clamped);
+        if (onError) onError(false);
+    };
     return {
         local,
         onChange: (e) => handleInput(e, min, setLocal, onError),
         onBlur: () => commitInput(local, value, min, setLocal, onUpdate, onError),
         onKeyDown: (e) => handleKey(e, local, min, onError),
+        onIncrement: () => stepValue(1),
+        onDecrement: () => stepValue(-1),
     };
 };
 
 const BufferedInput = ({ label, value, disabled, ...props }) => {
-    const { local, onChange, onBlur, onKeyDown } = useBufferedInput(value, props.onUpdate, props.min, props.onError);
+    const { local, onChange, onBlur, onKeyDown, onIncrement, onDecrement } = useBufferedInput(value, props.onUpdate, props.min, props.onError);
     return (
         <div className={styles.settingItem}>
             <label className={styles.label}>{label}</label>
-            <input type="number" className={styles.input} value={local} onChange={onChange} onBlur={onBlur} onKeyDown={onKeyDown} onFocus={(e) => e.target.select()} disabled={disabled} />
+            <div className={styles.inputWrap}>
+                <button type="button" className={styles.inputStepper} onClick={onDecrement} disabled={disabled} aria-label={`Decrease ${label}`}>−</button>
+                <input type="number" className={styles.input} value={local} onChange={onChange} onBlur={onBlur} onKeyDown={onKeyDown} onFocus={(e) => e.target.select()} disabled={disabled} />
+                <button type="button" className={styles.inputStepper} onClick={onIncrement} disabled={disabled} aria-label={`Increase ${label}`}>+</button>
+            </div>
         </div>
     );
 };
