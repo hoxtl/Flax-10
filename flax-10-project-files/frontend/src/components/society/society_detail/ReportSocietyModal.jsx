@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import StandardModal from "../../common/standard_modal/StandardModal";
+import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import styles from "./ReportSocietyModal.module.css";
 import { reportSociety } from "../../../api/societyApi";
 
@@ -18,7 +19,7 @@ const FormContent = ({ reason, onTextChange, error, submitting }) => (
     </div>
 );
 
-const makeOnSubmit = (reason, setState, societyId, onReportSuccess, onClose) =>
+const makeOnSubmit = (reason, setState, societyId, onReportSuccess) =>
     async () => {
         setState({ submitting: true, error: "" });
         try {
@@ -27,13 +28,35 @@ const makeOnSubmit = (reason, setState, societyId, onReportSuccess, onClose) =>
             return setState({ submitting: false, error: "Failed to submit report." });
         }
         onReportSuccess?.();
-        onClose();
+        setState({ submitting: false, error: "", submitted: true });
     };
 
 export default function ReportSocietyModal({ society, onClose, onReportSuccess }) {
     const [reason, setReason] = useState("");
-    const [state, setState] = useState({ submitting: false, error: "" });
-    const onSubmit = makeOnSubmit(reason, setState, society.id, onReportSuccess, onClose);
+    const [state, setState] = useState({ submitting: false, error: "", submitted: false });
+    const onSubmit = makeOnSubmit(reason, setState, society.id, onReportSuccess);
+
+    if (state.submitted) {
+        return (
+            <StandardModal
+                title="Report submitted"
+                subtitle={`Thanks for flagging ${society.name}. Our team will review it shortly.`}
+                onClose={onClose}
+                size="sm"
+                centerText
+            >
+                <div className={styles.successBody}>
+                    <div className={styles.successBadge} aria-hidden="true">✓</div>
+                    <p className={styles.successText}>You can still unreport this society later if you submitted this by mistake.</p>
+                    <div className={styles.actions}>
+                        <PrimaryButton className={styles.confirmButton} onClick={onClose} pill>
+                            Done
+                        </PrimaryButton>
+                    </div>
+                </div>
+            </StandardModal>
+        );
+    }
 
     return (
         <StandardModal title={`Report "${society.name}"`} onClose={onClose}
@@ -49,10 +72,10 @@ export default function ReportSocietyModal({ society, onClose, onReportSuccess }
 function ReportActions({ onClose, onSubmit, submitting, disabled }) {
     return (
         <div className={styles.actions}>
-            <button className={styles.cancelButton} onClick={onClose} disabled={submitting}>Cancel</button>
-            <button className={styles.submitButton} onClick={onSubmit} disabled={submitting || disabled}>
+            <PrimaryButton className={styles.cancelButton} variant="ghost" onClick={onClose} disabled={submitting} pill>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.submitButton} variant="danger" onClick={onSubmit} disabled={submitting || disabled} pill>
                 {submitting ? "Submitting..." : "Submit Report"}
-            </button>
+            </PrimaryButton>
         </div>
     );
 }

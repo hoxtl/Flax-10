@@ -85,12 +85,11 @@ function JourneyField({ label, locating, onChange, onGeolocate, placeholder, val
   );
 }
 
-function JourneyActions({ canCalculate, hasValue, onClear, onGo }) {
-  const btnText = canCalculate ? "Calculate Route 🚀" : "Enter both locations";
+function JourneyActions({ hasValue, onClear }) {
+  if (!hasValue) return null;
   return (
     <div className={styles.manualButtonGroup}>
-      <button className={styles.goButton} onClick={onGo} disabled={!canCalculate}>{btnText}</button>
-      {hasValue && <button className={styles.clearManualButton} onClick={onClear}>Clear</button>}
+      <button type="button" className={styles.clearManualButton} onClick={onClear}>Clear</button>
     </div>
   );
 }
@@ -106,8 +105,7 @@ function SectionLabel() {
 
 function JourneyInputs({ props, startCoords, destCoords, setStartCoords, setDestCoords }) {
   const { manualStart, setManualStart, manualDestination, setManualDestination } = props;
-  const { onCalculate, onClearAll, onGeolocateStart, onGeolocateDestination, locating } = props;
-  const canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
+  const { onClearAll, onGeolocateStart, onGeolocateDestination, locating } = props;
   const handleClear = () => {
     setManualStart("");
     setManualDestination("");
@@ -119,7 +117,7 @@ function JourneyInputs({ props, startCoords, destCoords, setStartCoords, setDest
     <div className={styles.manualJourneyInputs}>
       <FromField value={manualStart} onChange={setManualStart} onGeolocate={onGeolocateStart} locating={locating} />
       <JourneyField label="To" value={manualDestination} onChange={setManualDestination} onGeolocate={onGeolocateDestination} locating={locating} placeholder="Enter a destination" />
-      <JourneyActions canCalculate={canCalculate} hasValue={manualStart || manualDestination} onClear={handleClear} onGo={() => canCalculate && onCalculate(startCoords, destCoords)} />
+      <JourneyActions hasValue={manualStart || manualDestination} onClear={handleClear} />
     </div>
   );
 }

@@ -3,15 +3,21 @@
  */
 
 import { useState } from 'react';
+import { getTflLinePillStyle } from '../../pages/homepage/utils/kclTflMapping';
 import baseStyles from '../../pages/campus_map/CampusMap.module.css';
 import statusStyles from '../../pages/campus_map/status.module.css';
 const styles = { ...baseStyles, ...statusStyles };
 
 function DisruptionCard({ disruption }) {
+  const pillStyle = getTflLinePillStyle(disruption.lineName);
   return (
     <div className={styles.disruptionCard}>
-      <div className={styles.disruptionBadge} style={{ backgroundColor: disruption.color }}>
-        - {disruption.lineName}
+      <div
+        className={styles.disruptionBadge}
+        style={{ '--line-badge-bg': pillStyle.bg || disruption.color, '--line-badge-text': pillStyle.text }}
+      >
+        <span className={styles.disruptionBadgeDot} aria-hidden="true" />
+        {disruption.lineName}
       </div>
       <div className={styles.disruptionContent}>
         <div className={styles.disruptionSeverity}>{disruption.severityDescription}</div>
@@ -36,17 +42,19 @@ function GoodService() {
 function DisruptionsList({ disruptions }) {
   const [showAll, setShowAll] = useState(false);
   const visible = showAll ? disruptions : disruptions.slice(0, 2);
+  const hiddenCount = Math.max(disruptions.length - 2, 0);
   return (
     <>
       <div className={styles.disruptionsList}>
         {visible.map((d, i) => <DisruptionCard key={i} disruption={d} />)}
       </div>
       {disruptions.length > 2 && (
-        <button className={styles.showMoreBtn} onClick={() => setShowAll(!showAll)}>
-          {showAll
-            ? <>Show Less <span>▲</span></>
-            : <>Show {disruptions.length - 2} More <span>▼</span></>}
-        </button>
+        <div className={styles.showMoreWrap}>
+          <button type="button" className={styles.showMoreBtn} onClick={() => setShowAll((current) => !current)}>
+            {showAll ? 'Show less' : `Show ${hiddenCount} more`}
+            <span aria-hidden="true">{showAll ? '↑' : '↓'}</span>
+          </button>
+        </div>
       )}
     </>
   );

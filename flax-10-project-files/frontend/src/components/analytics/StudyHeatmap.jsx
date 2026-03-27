@@ -22,7 +22,19 @@ const getLegendColor = (intensity, theme) => intensity === 0
 
 const formatHour = (h) => h === 0 ? '12am' : h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h - 12}pm`;
 const getDisplayHours = (hours) => hours.filter((_, i) => i % 3 === 0).map(formatHour);
-const getMaxValue = (data) => Math.max(...data.flat());
+const getMaxValue = (data) => Math.max(...data.flat(), 1);
+
+function normalizeGrid(data, width, height) {
+  const rows = Array.isArray(data) ? data.slice(0, height) : [];
+  const normalizedRows = rows.map((row) => {
+    const safeRow = Array.isArray(row) ? row.slice(0, width) : [];
+    return [...safeRow, ...Array(Math.max(width - safeRow.length, 0)).fill(0)];
+  });
+  return [
+    ...normalizedRows,
+    ...Array(Math.max(height - normalizedRows.length, 0)).fill(null).map(() => Array(width).fill(0)),
+  ];
+}
 
 const renderDayLabel = (day) => <div key={day} className={styles.dayLabel}>{day}</div>;
 
@@ -91,7 +103,8 @@ function HeatmapRows({ data, days, hours, maxValue, theme }) {
 
 const StudyHeatmap = ({ heatmapData }) => {
   const { mode: theme } = useTheme();
-  const { data, days, hours } = heatmapData;
+  const { days, hours } = heatmapData;
+  const data = normalizeGrid(heatmapData?.data, hours.length, days.length);
   const maxValue = getMaxValue(data);
   const displayHours = getDisplayHours(hours);
   return (
