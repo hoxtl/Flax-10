@@ -1,3 +1,7 @@
+/*
+ * Shared hook setup for task feed data tests.
+ */
+
 import { renderHook } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -5,6 +9,14 @@ const hoistedMocks = vi.hoisted(() => ({
   navigateMock: vi.fn(),
   getModulesMock: vi.fn(),
 }));
+
+function createFilterHandlers() {
+  return {
+    toggleListFilter: vi.fn(),
+    toggleModuleFilter: vi.fn(),
+    clearAllFilters: vi.fn(),
+  };
+}
 
 export function getTaskFeedDataMocks() {
   return hoistedMocks;
@@ -48,16 +60,23 @@ vi.mock("../../../../pages/tasks/utils/taskFeedDataUtils", () => ({
   getCompletedTodayCount: vi.fn(() => 1),
   getCompletedWeekCount: vi.fn(() => 2),
   getCompletedLaterCount: vi.fn(() => 3),
-  getFilterHandlers: vi.fn(() => ({
-    toggleListFilter: vi.fn(),
-    toggleModuleFilter: vi.fn(),
-    clearAllFilters: vi.fn(),
-  })),
+  getFilterHandlers: vi.fn(() => createFilterHandlers()),
 }));
 
 import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
 import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
 
+function setTaskFeedCounts({ overdue, today, thisWeek, later, completedToday, completedWeek, completedLater }) {
+  vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue(overdue);
+  vi.mocked(taskFeedDataUtils.getToday).mockReturnValue(today);
+  vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue(thisWeek);
+  vi.mocked(taskFeedDataUtils.getLater).mockReturnValue(later);
+  vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(completedToday);
+  vi.mocked(taskFeedDataUtils.getCompletedWeekCount).mockReturnValue(completedWeek);
+  vi.mocked(taskFeedDataUtils.getCompletedLaterCount).mockReturnValue(completedLater);
+}
+
+/** Resets mocked task feed helpers to a known default state. */
 export function resetTaskFeedDataUtils({
   overdue = [{ id: 1 }],
   today = [{ id: 2 }],
@@ -69,21 +88,12 @@ export function resetTaskFeedDataUtils({
 } = {}) {
   vi.clearAllMocks();
   vi.mocked(taskFeedDataUtils.filterBySearch).mockImplementation((arr) => arr);
-  vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue(overdue);
-  vi.mocked(taskFeedDataUtils.getToday).mockReturnValue(today);
-  vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue(thisWeek);
-  vi.mocked(taskFeedDataUtils.getLater).mockReturnValue(later);
-  vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(completedToday);
-  vi.mocked(taskFeedDataUtils.getCompletedWeekCount).mockReturnValue(completedWeek);
-  vi.mocked(taskFeedDataUtils.getCompletedLaterCount).mockReturnValue(completedLater);
-  vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation(() => ({
-    toggleListFilter: vi.fn(),
-    toggleModuleFilter: vi.fn(),
-    clearAllFilters: vi.fn(),
-  }));
+  setTaskFeedCounts({ overdue, today, thisWeek, later, completedToday, completedWeek, completedLater });
+  vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation(() => createFilterHandlers());
   hoistedMocks.getModulesMock.mockResolvedValue([]);
 }
 
+/** Renders the task feed hook with default test props. */
 export function renderTaskFeedData(props = {}) {
   return renderHook(() =>
     useTaskFeedData({

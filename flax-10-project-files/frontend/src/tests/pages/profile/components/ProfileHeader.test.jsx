@@ -44,24 +44,21 @@ const defaultHandlers = {
   setOptimisticShare: vi.fn(),
 };
 
-function renderHeader(props = {}) {
-  const {
-    user = {},
-    profileData = {},
-    upcomingEventCount = 0,
-    handlers = defaultHandlers,
-    visibility = defaultVisibility,
-    ...rest
-  } = props;
+function buildHeaderProps(props = {}) {
+  return {
+    user: {},
+    profileData: {},
+    upcomingEventCount: 0,
+    handlers: defaultHandlers,
+    visibility: defaultVisibility,
+    ...props,
+  };
+}
 
+function renderHeader(props = {}) {
   return render(
     <ProfileHeader
-      user={user}
-      profileData={profileData}
-      upcomingEventCount={upcomingEventCount}
-      handlers={handlers}
-      visibility={visibility}
-      {...rest}
+      {...buildHeaderProps(props)}
     />
   );
 }

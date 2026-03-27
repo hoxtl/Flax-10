@@ -1,6 +1,11 @@
+/*
+ * Shared test doubles for the society detail page.
+ */
+
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
+import { createFnMap, mergeNested } from "../utils/testBuilderUtils";
 
 const societyDetailPageStateMocks = vi.hoisted(() => ({
   useSocietyPageDataMock: vi.fn(),
@@ -8,6 +13,32 @@ const societyDetailPageStateMocks = vi.hoisted(() => ({
 }));
 
 export { societyDetailPageStateMocks };
+
+const MUTATION_NAMES = [
+  "updateSociety",
+  "updateLocalSociety",
+  "fetchMembers",
+  "removeMember",
+  "deleteSociety",
+  "updateAnnouncement",
+  "addAnnouncement",
+  "deleteAnnouncement",
+  "addCollaborator",
+  "requestRatification",
+  "updateMemberRole",
+  "publishChanges",
+  "addEvent",
+  "updateEvent",
+  "deleteEvent",
+  "addException",
+  "onAddTag",
+  "onDeleteTag",
+  "onUpdateTag",
+  "joinSociety",
+  "leaveSociety",
+  "handleUnreport",
+];
+const DETAIL_NESTED_KEYS = ["society", "page", "modals", "subscription", "tracker"];
 
 const createSocietyDefaults = (overrides = {}) => ({
   id: 1,
@@ -61,32 +92,24 @@ const createTrackerDefaults = (overrides = {}) => ({
   ...overrides,
 });
 
-const createMutations = () => ({
-  updateSociety: vi.fn(),
-  updateLocalSociety: vi.fn(),
-  fetchMembers: vi.fn(),
-  removeMember: vi.fn(),
-  deleteSociety: vi.fn().mockResolvedValue({}),
-  updateAnnouncement: vi.fn(),
-  addAnnouncement: vi.fn(),
-  deleteAnnouncement: vi.fn(),
-  addCollaborator: vi.fn(),
-  requestRatification: vi.fn(),
-  updateMemberRole: vi.fn(),
-  publishChanges: vi.fn().mockResolvedValue({}),
-  addEvent: vi.fn(),
-  updateEvent: vi.fn(),
-  deleteEvent: vi.fn(),
-  addException: vi.fn(),
-  onAddTag: vi.fn(),
-  onDeleteTag: vi.fn(),
-  onUpdateTag: vi.fn(),
-  joinSociety: vi.fn(),
-  leaveSociety: vi.fn(),
-  handleUnreport: vi.fn(),
-});
+const BASE_DETAIL_DATA = {
+  loading: false,
+  society: createSocietyDefaults(),
+  page: createPageDefaults(),
+  modals: createModalDefaults(),
+  subscription: createSubscriptionDefaults(),
+  tracker: createTrackerDefaults(),
+  members: [],
+};
 
-export function SocietyHeroMock({ society, onUpdateName, onImageClick, onEditImages }) {
+function createMutations() {
+  const mutations = createFnMap(MUTATION_NAMES);
+  mutations.deleteSociety.mockResolvedValue({});
+  mutations.publishChanges.mockResolvedValue({});
+  return mutations;
+}
+
+function SocietyHeroMock({ society, onUpdateName, onImageClick, onEditImages }) {
   return (
     <div data-testid="hero">
       <span>{society.name}</span>
@@ -97,7 +120,7 @@ export function SocietyHeroMock({ society, onUpdateName, onImageClick, onEditIma
   );
 }
 
-export function SocietyInfoMock({ onViewMembers, onToggleEditMode }) {
+function SocietyInfoMock({ onViewMembers, onToggleEditMode }) {
   return (
     <div data-testid="info">
       <button type="button" onClick={onViewMembers}>view-members</button>
@@ -106,7 +129,7 @@ export function SocietyInfoMock({ onViewMembers, onToggleEditMode }) {
   );
 }
 
-export function SocietyTabsMock({ focusAnnouncementId, onEditAnnouncement }) {
+function SocietyTabsMock({ focusAnnouncementId, onEditAnnouncement }) {
   return (
     <div data-testid="tabs">
       <span>{focusAnnouncementId || "no-focus"}</span>
@@ -115,11 +138,11 @@ export function SocietyTabsMock({ focusAnnouncementId, onEditAnnouncement }) {
   );
 }
 
-export function SocietySidebarMock() {
+function SocietySidebarMock() {
   return <div data-testid="sidebar">sidebar</div>;
 }
 
-export function CoverImageModalMock({ images = [], onClose, onUpdate }) {
+function CoverImageModalMock({ images = [], onClose, onUpdate }) {
   return (
     <div data-testid="cover-modal">
       <span>{images.length}</span>
@@ -130,7 +153,7 @@ export function CoverImageModalMock({ images = [], onClose, onUpdate }) {
   );
 }
 
-export function ImageGalleryModalMock({ images = [], initialIndex, onClose }) {
+function ImageGalleryModalMock({ images = [], initialIndex, onClose }) {
   return (
     <div data-testid="gallery-modal">
       <span>{images.length}</span>
@@ -140,7 +163,7 @@ export function ImageGalleryModalMock({ images = [], initialIndex, onClose }) {
   );
 }
 
-export function SettingsModalMock({ members = [], ratificationStatus, isRatified, isAdmin, onClose, onDelete }) {
+function SettingsModalMock({ members = [], ratificationStatus, isRatified, isAdmin, onClose, onDelete }) {
   return (
     <div data-testid="settings-modal">
       <span>{members.length}</span>
@@ -153,7 +176,7 @@ export function SettingsModalMock({ members = [], ratificationStatus, isRatified
   );
 }
 
-export function AnnouncementModalMock({ societyId, tags = [], onClose, onSubmit, onDelete }) {
+function AnnouncementModalMock({ societyId, tags = [], onClose, onSubmit, onDelete }) {
   return (
     <div data-testid="announcement-modal">
       <span>{societyId}</span>
@@ -167,7 +190,7 @@ export function AnnouncementModalMock({ societyId, tags = [], onClose, onSubmit,
   );
 }
 
-export function ReportSocietyModalMock({ society, onClose, onReportSuccess }) {
+function ReportSocietyModalMock({ society, onClose, onReportSuccess }) {
   return (
     <div data-testid="report-modal">
       <span>{society?.name}</span>
@@ -177,7 +200,7 @@ export function ReportSocietyModalMock({ society, onClose, onReportSuccess }) {
   );
 }
 
-export function MemberDirectoryModalMock({ societyName, isAdmin, onClose }) {
+function MemberDirectoryModalMock({ societyName, isAdmin, onClose }) {
   return (
     <div data-testid="members-modal">
       <span>{societyName}</span>
@@ -187,11 +210,11 @@ export function MemberDirectoryModalMock({ societyName, isAdmin, onClose }) {
   );
 }
 
-export function BackButtonMock({ onClick, label }) {
+function BackButtonMock({ onClick, label }) {
   return <button type="button" onClick={onClick}>{label}</button>;
 }
 
-export function SocietySkeletonMock() {
+function SocietySkeletonMock() {
   return <div>Loading...</div>;
 }
 
@@ -213,6 +236,7 @@ vi.mock("../../components/society/society_detail/MemberDirectoryModal", () => ({
 vi.mock("../../components/common/back_button/BackButton.jsx", () => ({ default: BackButtonMock }));
 vi.mock("../../pages/societies/components/SocietySkeletons", () => ({ SocietyDetailSkeleton: SocietySkeletonMock }));
 
+/** Builds the open-modal overrides used by interaction tests. */
 export function createSocietyDetailPageInteractiveOverrides() {
   return {
     modals: {
@@ -230,30 +254,54 @@ export function createSocietyDetailPageInteractiveOverrides() {
   };
 }
 
+/** Renders the society detail page inside a memory router. */
 export function renderSocietyDetailPage(ui, { routeState } = {}) {
   const initialEntries = routeState ? [{ pathname: "/societies/1", state: routeState }] : ["/societies/1"];
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 }
 
-export function createSocietyDetailPageData(overrides = {}) {
-  const {
-    society: societyOverrides = {},
-    page: pageOverrides = {},
-    modals: modalOverrides = {},
-    subscription: subscriptionOverrides = {},
-    tracker: trackerOverrides = {},
-    ...rest
-  } = overrides;
+function createModalTestSociety(overrides = {}) {
+  return createSocietyDefaults({
+    name: "Drama Society",
+    role: "editor",
+    is_admin: true,
+    images: [{ url: "cover-1" }, { url: "cover-2" }],
+    tags: ["arts", "events"],
+    ratification_status: "pending",
+    is_ratified: false,
+    ...overrides,
+  });
+}
 
+function createOpenModalDefaults(overrides = {}) {
+  return createModalDefaults({
+    showSettings: true,
+    showReportModal: true,
+    galleryOpen: { index: 1 },
+    showCoverModal: true,
+    showMembersModal: true,
+    editingAnnouncement: { id: 9 },
+    ...overrides,
+  });
+}
+
+/** Builds default society detail page hook data for tests. */
+export function createSocietyDetailPageData(overrides = {}) {
   return {
-    loading: false,
-    society: createSocietyDefaults(societyOverrides),
-    page: createPageDefaults(pageOverrides),
-    modals: createModalDefaults(modalOverrides),
-    subscription: createSubscriptionDefaults(subscriptionOverrides),
-    tracker: createTrackerDefaults(trackerOverrides),
-    members: [],
+    ...mergeNested(BASE_DETAIL_DATA, overrides, DETAIL_NESTED_KEYS),
     ...createMutations(),
-    ...rest,
   };
+}
+
+/** Builds society detail data with every modal open for prop tests. */
+export function createSocietyDetailPageModalData(overrides = {}) {
+  return createSocietyDetailPageData({
+    ...overrides,
+    members: overrides.members ?? [{ id: 1 }, { id: 2 }],
+    society: createModalTestSociety(overrides.society),
+    page: createPageDefaults(overrides.page),
+    modals: createOpenModalDefaults(overrides.modals),
+    subscription: createSubscriptionDefaults(overrides.subscription),
+    tracker: createTrackerDefaults(overrides.tracker),
+  });
 }

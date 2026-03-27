@@ -1,3 +1,7 @@
+/*
+ * Shared dashboard layout test helpers and mocks.
+ */
+
 import { render } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -127,11 +131,51 @@ vi.stubGlobal("localStorage", {
   },
 });
 
+function setDashboardCalendarMocks(selectedDate, eventModal) {
+  return import("../../context/CalendarContext").then(({ useCalendar, useEventModal }) => {
+    useCalendar.mockReturnValue({ selectedDate });
+    useEventModal.mockReturnValue({
+      isModalOpen: false,
+      closeModal: vi.fn(),
+      openModal: mockOpenModal,
+      modalEvent: null,
+      modalType: null,
+      modalInitialDate: null,
+      ...eventModal,
+    });
+  });
+}
+
+function setDashboardLocation(location) {
+  return import("react-router-dom").then(({ useLocation }) => useLocation.mockReturnValue(location));
+}
+
+function setDashboardTimerState(timer) {
+  Object.assign(mockTimerContext, {
+    isActive: false,
+    isPaused: false,
+    mode: "work",
+    timeLeft: 1500,
+    ...timer,
+  });
+}
+
+function setDashboardUser(user) {
+  if (user === null) {
+    localStorage.removeItem("user");
+    return;
+  }
+
+  localStorage.setItem("user", JSON.stringify(user));
+}
+
+/** Sets the viewport width used by dashboard layout tests. */
 export function setDashboardLayoutViewport(width) {
   window.innerWidth = width;
   window.dispatchEvent(new Event("resize"));
 }
 
+/** Prepares mocked dashboard layout state before rendering. */
 export async function prepareDashboardLayoutTest({
   user = mockUser,
   selectedDate = new Date(),
@@ -141,34 +185,14 @@ export async function prepareDashboardLayoutTest({
   timer = {},
 } = {}) {
   vi.clearAllMocks();
-  const { useCalendar, useEventModal } = await import("../../context/CalendarContext");
-  const { useLocation } = await import("react-router-dom");
-  useCalendar.mockReturnValue({ selectedDate });
-  useEventModal.mockReturnValue({
-    isModalOpen: false,
-    closeModal: vi.fn(),
-    openModal: mockOpenModal,
-    modalEvent: null,
-    modalType: null,
-    modalInitialDate: null,
-    ...eventModal,
-  });
-  useLocation.mockReturnValue(location);
-  Object.assign(mockTimerContext, {
-    isActive: false,
-    isPaused: false,
-    mode: "work",
-    timeLeft: 1500,
-    ...timer,
-  });
-  if (user === null) {
-    localStorage.removeItem("user");
-  } else {
-    localStorage.setItem("user", JSON.stringify(user));
-  }
+  await setDashboardCalendarMocks(selectedDate, eventModal);
+  await setDashboardLocation(location);
+  setDashboardTimerState(timer);
+  setDashboardUser(user);
   setDashboardLayoutViewport(width);
 }
 
+/** Renders the dashboard layout with default test props. */
 export function renderDashboardLayout({
   activeNav = "home",
   onNavChange = () => {},

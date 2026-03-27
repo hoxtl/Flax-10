@@ -1,3 +1,7 @@
+/*
+ * Tests analytics page composition and overview rendering.
+ */
+
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -63,6 +67,30 @@ const analyticsData = {
   daily_breakdown: [{ day: "Mon", value: 2 }],
   heatmap: { data: [[1]], hours: ["09"] },
 };
+const STUDENT_OVERVIEW_IDS = [
+  "summary-cards",
+  "productivity-cards",
+  "consistency-score",
+  "peak-hours-card",
+  "study-hours-chart",
+  "daily-breakdown-chart",
+  "planned-vs-actual-chart",
+  "study-heatmap",
+  "theme-usage-chart",
+  "attendance-chart",
+];
+
+function renderOverview(props = {}) {
+  return render(
+    <MemoryRouter>
+      <AnalyticsOverview data={analyticsData} progressData={null} themeStats={null} isTeacher={false} {...props} />
+    </MemoryRouter>,
+  );
+}
+
+function expectOverviewCards(testIds) {
+  testIds.forEach((testId) => expect(screen.getByTestId(testId)).toBeInTheDocument());
+}
 
 describe("Analytics components", () => {
   beforeEach(() => {
@@ -96,27 +124,9 @@ describe("Analytics components", () => {
   });
 
   it("renders all overview cards for students when progress and theme stats exist", () => {
-    render(
-      <MemoryRouter>
-        <AnalyticsOverview
-          data={analyticsData}
-          progressData={{ daily_progress: [1, 2] }}
-          themeStats={{ light: 3 }}
-          isTeacher={false}
-        />
-      </MemoryRouter>,
-    );
+    renderOverview({ progressData: { daily_progress: [1, 2] }, themeStats: { light: 3 } });
 
-    expect(screen.getByTestId("summary-cards")).toBeInTheDocument();
-    expect(screen.getByTestId("productivity-cards")).toBeInTheDocument();
-    expect(screen.getByTestId("consistency-score")).toBeInTheDocument();
-    expect(screen.getByTestId("peak-hours-card")).toBeInTheDocument();
-    expect(screen.getByTestId("study-hours-chart")).toBeInTheDocument();
-    expect(screen.getByTestId("daily-breakdown-chart")).toBeInTheDocument();
-    expect(screen.getByTestId("planned-vs-actual-chart")).toBeInTheDocument();
-    expect(screen.getByTestId("study-heatmap")).toBeInTheDocument();
-    expect(screen.getByTestId("theme-usage-chart")).toBeInTheDocument();
-    expect(screen.getByTestId("attendance-chart")).toBeInTheDocument();
+    expectOverviewCards(STUDENT_OVERVIEW_IDS);
     expect(productivityCardsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         balanced: true,

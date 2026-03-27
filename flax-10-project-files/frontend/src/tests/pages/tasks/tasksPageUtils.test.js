@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { createFnMap } from "../../utils/testBuilderUtils";
 import {
   getTodayEndISO,
   getTomorrowEndISO,
@@ -27,50 +28,61 @@ function withFakeTime(date, run) {
   }
 }
 
+function createTasksPageState(overrides = {}) {
+  return {
+    activeListId: 4,
+    activeFilter: "today",
+    showTaskModal: true,
+    taskModalDueDate: "2026-03-10T12:00:00Z",
+    toastUndo: null,
+    toastDelete: false,
+    toastInfo: null,
+    showListModal: true,
+    showCreateListFromTask: true,
+    lastCreatedListId: 8,
+    ...createFnMap([
+      "setActiveListId",
+      "setActiveFilter",
+      "setFilterListIds",
+      "setShowListModal",
+      "setShowTaskModal",
+      "setTaskModalDueDate",
+      "setToastUndo",
+      "setToastDelete",
+      "setToastInfo",
+      "setShowCreateListFromTask",
+      "setLastCreatedListId",
+    ]),
+    ...overrides,
+  };
+}
+
+function createListsApi(overrides = {}) {
+  return {
+    lists: [{ id: 4, name: "Inbox" }],
+    archivedLists: [],
+    loading: false,
+    addList: vi.fn().mockResolvedValue({ id: 12, name: "New List" }),
+    ...createFnMap(["renameList", "removeList", "restoreList", "permanentlyDeleteList"]),
+    ...overrides,
+  };
+}
+
+function createTasksApi(addTask, overrides = {}) {
+  return {
+    tasks: [],
+    initialLoading: false,
+    addTask,
+    ...createFnMap(["removeTask", "editTask", "toggleComplete", "reload"]),
+    ...overrides,
+  };
+}
+
 function makeMocks(addTask = vi.fn().mockResolvedValue({ id: 45, title: "Saved task" })) {
   return {
-    state: {
-      activeListId: 4,
-      activeFilter: "today",
-      showTaskModal: true,
-      taskModalDueDate: "2026-03-10T12:00:00Z",
-      toastUndo: null,
-      toastDelete: false,
-      toastInfo: null,
-      showListModal: true,
-      showCreateListFromTask: true,
-      lastCreatedListId: 8,
-      setActiveListId: vi.fn(),
-      setActiveFilter: vi.fn(),
-      setFilterListIds: vi.fn(),
-      setShowListModal: vi.fn(),
-      setShowTaskModal: vi.fn(),
-      setTaskModalDueDate: vi.fn(),
-      setToastUndo: vi.fn(),
-      setToastDelete: vi.fn(),
-      setToastInfo: vi.fn(),
-      setShowCreateListFromTask: vi.fn(),
-      setLastCreatedListId: vi.fn(),
-    },
-    listsApi: {
-      lists: [{ id: 4, name: "Inbox" }],
-      archivedLists: [],
-      loading: false,
-      addList: vi.fn().mockResolvedValue({ id: 12, name: "New List" }),
-      renameList: vi.fn(),
-      removeList: vi.fn(),
-      restoreList: vi.fn(),
-      permanentlyDeleteList: vi.fn(),
-    },
-    tasksApi: {
-      tasks: [],
-      initialLoading: false,
-      addTask,
-      removeTask: vi.fn(),
-      editTask: vi.fn(),
-      toggleComplete: vi.fn(),
-      reload: vi.fn(),
-    },
+    state: createTasksPageState(),
+    listsApi: createListsApi(),
+    tasksApi: createTasksApi(addTask),
   };
 }
 
