@@ -4,7 +4,7 @@
 
 import Homepage from "../pages/Homepage/Homepage";
 import CalendarPage from "../pages/Calendar/CalendarPage";
-import SocietiesPage from "../pages/Societies/SocietiesPage";
+import SocietiesPage from "../pages/societies/SocietiesPage";
 import ModulesPage from "../pages/Modules/ModulesPage";
 import CampusMap from "../pages/campus_map/CampusMap";
 import TimerPage from "../pages/Timer/TimerPage";

@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import {
   ModuleItemCardActions,
   ModuleItemDeleteDialog,
-} from "../../../../components/Modules/shared/moduleCardActions";
+} from "../../../../components/modules/shared/moduleCardActions";
 import {
   ModuleFormField,
   ModuleFormActions,
@@ -12,21 +12,21 @@ import {
   requireFieldValue,
   buildValidationState,
   failValidation,
-} from "../../../../components/Modules/shared/moduleFormParts";
+} from "../../../../components/modules/shared/moduleFormParts";
 import {
   AddReadingToTasksButton,
   AddDeadlineToTasksButton,
-} from "../../../../components/Modules/shared/taskButtons";
+} from "../../../../components/modules/shared/taskButtons";
 import {
   WidgetHeader,
   ShowMoreButton,
-} from "../../../../components/Modules/shared/widgetParts";
+} from "../../../../components/modules/shared/widgetParts";
 import {
   expandBodyVariants,
   listVariants,
   itemVariants,
   containerVariants,
-} from "../../../../components/Modules/shared/widgetVariants";
+} from "../../../../components/modules/shared/widgetVariants";
 
 const convertReadingToTaskMock = vi.fn();
 const createTaskMock = vi.fn();

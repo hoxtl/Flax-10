@@ -55,11 +55,11 @@ vi.mock('../pages/Settings/Settings', () => ({
     default: () => <div data-testid="settings-page">Settings</div>,
 }));
 
-vi.mock('../pages/Profile/Profile', () => ({
+vi.mock('../pages/profile/Profile', () => ({
     default: () => <div data-testid="profile-page">Profile</div>,
 }));
 
-vi.mock('../pages/Societies/SocietyDetailPage', () => ({
+vi.mock('../pages/societies/SocietyDetailPage', () => ({
     default: () => <div data-testid="society-detail-page">Society</div>,
 }));
 

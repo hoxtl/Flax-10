@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ScheduleManagerDialog } from '../../../../../components/Calendar/header/schedule_manager/ScheduleManagerDialog';
+import { ScheduleManagerDialog } from '../../../../../components/calendar/header/schedule_manager/ScheduleManagerDialog';
 
 vi.mock('../../../../../api/scheduleApi', () => ({
     getSchedules: vi.fn(),

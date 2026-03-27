@@ -9,7 +9,7 @@ vi.mock('../../../api/moduleApi', () => ({
     getEnrollments: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
+vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn().mockReturnValue(false),
 }));
 

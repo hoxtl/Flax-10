@@ -6,7 +6,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MiniTimeline } from '../../../../../pages/Homepage/components/mini_timeline/MiniTimeline';
-import { isToday } from '../../../../../components/Calendar/utils/dateUtils';
+import { isToday } from '../../../../../components/calendar/utils/dateUtils';
 
 import { createFnMap } from '../../../../utils/testBuilderUtils';
 
@@ -31,7 +31,7 @@ vi.mock('../../../../../api/userApi', () => ({
   getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
-vi.mock('../../../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../../../components/calendar/utils/dateUtils', () => ({
   isToday: vi.fn(() => true),
 }));
 

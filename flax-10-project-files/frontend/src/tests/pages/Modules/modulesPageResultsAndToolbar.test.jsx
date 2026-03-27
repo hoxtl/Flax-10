@@ -99,11 +99,11 @@ vi.mock("../../../components/Pagination/Pagination.jsx", () => ({
   BackToTop: () => <div>BackToTop</div>,
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleCourseFilter", () => ({
+vi.mock("../../../components/modules/Modules/ModuleCourseFilter", () => ({
   default: () => <div>CourseFilter</div>,
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleGrid.jsx", () => ({
+vi.mock("../../../components/modules/Modules/ModuleGrid.jsx", () => ({
   default: ({ modules, onDelete, onEdit, onViewModule }) => (
     <div data-testid="module-grid">
       {modules.map((module) => (
@@ -118,13 +118,13 @@ vi.mock("../../../components/Modules/Modules/ModuleGrid.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/hooks/useModuleSorting.js", () => ({
+vi.mock("../../../components/modules/hooks/useModuleSorting.js", () => ({
   default: function UseModuleSortingMock(...args) {
     return useModuleSortingMock(...args);
   },
 }));
 
-vi.mock("../../../components/Modules/utils/moduleUtils.js", () => ({
+vi.mock("../../../components/modules/utils/moduleUtils.js", () => ({
   filterModules: (...args) => filterModulesMock(...args),
 }));
 

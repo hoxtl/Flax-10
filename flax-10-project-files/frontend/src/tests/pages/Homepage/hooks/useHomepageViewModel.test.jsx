@@ -25,7 +25,7 @@ const utils = vi.hoisted(() => ({
   getUpcomingItems: vi.fn(() => ["upcoming"]),
 }));
 
-vi.mock("../../../../components/Modules/utils/moduleUtils", () => ({
+vi.mock("../../../../components/modules/utils/moduleUtils", () => ({
   isEnrolledIn: (...args) => isEnrolledInMock(...args),
 }));
 

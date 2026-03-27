@@ -10,12 +10,12 @@ import { TaskContextMenu } from "../../Tasks/components/TaskCard";
 import { TaskWidgetRow } from "./TaskWidgetRow";
 import { TaskWidgetAllDone, TaskWidgetCompletedSection, TaskWidgetEmpty } from "./TaskWidgetSections";
 import { isReadingList } from "../../Tasks/utils/readingListUtils";
-import { ShowMoreButton } from "../../../components/Modules/shared/widgetParts.jsx";
+import { ShowMoreButton } from "../../../components/modules/shared/widgetParts.jsx";
 import { useTaskWidgetState } from "./useTaskWidgetState";
 import {
   expandBodyVariants,
   listVariants,
-} from "../../../components/Modules/shared/widgetVariants.js";
+} from "../../../components/modules/shared/widgetVariants.js";
 
 const styles = { ...widgetStyles, ...rowStyles };
 

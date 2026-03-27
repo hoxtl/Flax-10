@@ -24,11 +24,11 @@ vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
 }));
 
 vi.mock('../../components/Dashboard/ThemeToggle', () => ({ default: () => <button>theme</button> }));
-vi.mock('../../components/Timer/MiniTimer', () => ({ default: () => <div>timer</div> }));
+vi.mock('../../components/timer/MiniTimer', () => ({ default: () => <div>timer</div> }));
 vi.mock('../../context/NotificationContext', () => ({
   useNotifications: vi.fn(() => ({ togglePanel: vi.fn(), notifications: [] })),
 }));
-vi.mock('../../components/Notifications/NotificationPanel', () => ({
+vi.mock('../../components/notifications/NotificationPanel', () => ({
   NotificationPanel: () => <div>notifications</div>
 }));
 

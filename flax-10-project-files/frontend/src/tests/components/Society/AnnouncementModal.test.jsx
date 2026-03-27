@@ -4,8 +4,8 @@
 
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import AnnouncementModal from '../../../components/Society/society_detail/tabs/announcement_tab/AnnouncementModal';
-import styles from '../../../components/Society/society_detail/tabs/announcement_tab/AnnouncementModal.module.css';
+import AnnouncementModal from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal';
+import styles from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal.module.css';
 
 const fetchSocietyEventMock = vi.fn();
 const confirmMock = vi.fn();
@@ -16,7 +16,7 @@ const existingPinnedAnnouncement = { id: 1, title: 'Pinned Existing', pinned: tr
 vi.mock('../../../api/societyApi', () => ({ fetchSocietyEvent: (...args) => fetchSocietyEventMock(...args) }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => confirmMock }));
 
-vi.mock('../../../components/Society/society_detail/tabs/announcement_tab/announcementModalHelpers', () => ({
+vi.mock('../../../components/society/society_detail/tabs/announcement_tab/announcementModalHelpers', () => ({
   MAX_IMAGES: 2,
   getInitialForm: (a) => ({
     id: a?.id, title: a?.title || '', content: a?.content || '', tag: a?.tag || '', images: a?.images || [],
@@ -26,7 +26,7 @@ vi.mock('../../../components/Society/society_detail/tabs/announcement_tab/announ
   handleFileSelect: (...args) => handleFileSelectMock(...args),
 }));
 
-vi.mock('../../../components/Calendar/event_modal/components/TimeRow', () => ({
+vi.mock('../../../components/calendar/event_modal/components/TimeRow', () => ({
   TimeRow: ({ update }) => (
     <div>
       <div>time-row</div>
@@ -35,15 +35,15 @@ vi.mock('../../../components/Calendar/event_modal/components/TimeRow', () => ({
     </div>
   ),
 }));
-vi.mock('../../../components/Calendar/event_modal/components/RecurrenceField', () => ({
+vi.mock('../../../components/calendar/event_modal/components/RecurrenceField', () => ({
   RecurrenceField: ({ onChange }) => <button onClick={() => onChange('weekly')}>set-weekly</button>,
 }));
-vi.mock('../../../components/Calendar/event_modal/components/FormField', () => ({
+vi.mock('../../../components/calendar/event_modal/components/FormField', () => ({
   FormField: ({ label, value, onChange, type }) => type === 'textarea'
     ? <textarea aria-label={label} value={value} onChange={onChange} />
     : <input aria-label={label} value={value} onChange={onChange} />,
 }));
-vi.mock('../../../components/Calendar/event_modal/components/TagField', () => ({
+vi.mock('../../../components/calendar/event_modal/components/TagField', () => ({
   TagField: ({ value, onChange }) => <input aria-label="Tag" value={value} onChange={onChange} />,
 }));
 vi.mock('../../../components/common/standard_modal/StandardModal', () => ({

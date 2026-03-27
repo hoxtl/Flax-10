@@ -3,7 +3,7 @@
  */
 
 import { motion as Motion } from "framer-motion";
-import { itemVariants } from "../../../components/Modules/shared/widgetVariants.js";
+import { itemVariants } from "../../../components/modules/shared/widgetVariants.js";
 import InlineTitleField, { useInlineEdit } from "../../../components/common/inline_title_field/InlineTitleField";
 import TaskPriorityPill from "../../../components/common/task_priority_pill/TaskPriorityPill";
 import DeadlineCountdown from "../../../components/common/deadline_countdown/DeadlineCountdown";

@@ -21,7 +21,7 @@ export const mockFramerMotion = () => {
 };
 
 export const mockProfileHelpers = () => {
-  vi.mock('../../../pages/Profile/utils/profileHelpers', () => ({
+  vi.mock('../../../pages/profile/utils/profileHelpers', () => ({
     buildInitials: vi.fn((user) => {
       if (user?.first_name && user?.last_name) return `${user.first_name[0]}${user.last_name[0]}`;
       return '??';

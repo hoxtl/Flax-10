@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useEventForm } from '../../../../components/Calendar/event_modal/useEventForm';
-import * as FormUtilsModule from '../../../../components/Calendar/utils/formUtils';
+import { useEventForm } from '../../../../components/calendar/event_modal/useEventForm';
+import * as FormUtilsModule from '../../../../components/calendar/utils/formUtils';
 import * as UserServiceModule from '../../../../api/userApi';
 import * as SleepWarningModule from '../../../../components/Settings/hooks/useSleepWarning';
 
@@ -22,11 +22,11 @@ vi.mock('../../../../context/CalendarContext', async () => {
     };
 });
 
-vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../../components/calendar/hooks/useCalendarEvents', () => ({
     useEventActions: () => mockActions,
 }));
 
-vi.mock('../../../../components/Calendar/utils/formUtils', () => ({
+vi.mock('../../../../components/calendar/utils/formUtils', () => ({
     getInitialForm: vi.fn(() => mockInitialForm),
     validateAndSubmit: vi.fn(),
     confirmDelete: vi.fn(), // kept for import compatibility

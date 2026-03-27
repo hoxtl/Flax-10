@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../components/Calendar/event_modal/EventModal", () => ({
+vi.mock("../../components/calendar/event_modal/EventModal", () => ({
   EventModal: () => null,
 }));
-vi.mock("../../components/Society/CreateSocietyModal", () => ({
+vi.mock("../../components/society/CreateSocietyModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/Modules/Deadlines/DeadlineModal", () => ({
+vi.mock("../../components/modules/Deadlines/DeadlineModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/Modules/Readings/ReadingModal", () => ({
+vi.mock("../../components/modules/Readings/ReadingModal", () => ({
   default: () => null,
 }));
 vi.mock("../../components/Dashboard/QuickAddModal", () => ({
@@ -29,7 +29,7 @@ vi.mock("../../layout/dashboard_layout/useDashboardTaskModalOptions", () => ({
   useDashboardTaskModalOptions: () => ({ lists: [], enrolledModules: [] }),
 }));
 
-vi.mock("../../components/Timer/TimerPopups", () => ({
+vi.mock("../../components/timer/TimerPopups", () => ({
   LeaveTimerModal: ({ onCancel, onPause, onExit, onTakeBreak, timeLeftSeconds, sessionTotalSeconds }) => (
     <div data-testid="leave-timer-modal">
       <span data-testid="leave-timer-time-left">{timeLeftSeconds}</span>

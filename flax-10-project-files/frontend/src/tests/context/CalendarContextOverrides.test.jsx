@@ -15,7 +15,7 @@ import {
   useEventPopup,
 } from "../../context/CalendarContext";
 
-vi.mock("../../components/Notifications/hooks/useReminderNotifications", () => ({
+vi.mock("../../components/notifications/hooks/useReminderNotifications", () => ({
   useReminderNotifications: () => {},
 }));
 

@@ -2,12 +2,12 @@
  * Dashboard layout modal composition.
  */
 
-import { EventModal } from "../../components/Calendar/event_modal/EventModal";
-import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
-import DeadlineModal from "../../components/Modules/Deadlines/DeadlineModal";
-import ReadingModal from "../../components/Modules/Readings/ReadingModal";
+import { EventModal } from "../../components/calendar/event_modal/EventModal";
+import CreateSocietyModal from "../../components/society/CreateSocietyModal";
+import DeadlineModal from "../../components/modules/Deadlines/DeadlineModal";
+import ReadingModal from "../../components/modules/Readings/ReadingModal";
 import QuickAddModal from "../../components/Dashboard/QuickAddModal";
-import { LeaveTimerModal } from "../../components/Timer/TimerPopups";
+import { LeaveTimerModal } from "../../components/timer/TimerPopups";
 import CreateTaskModal from "../../pages/Tasks/components/CreateTaskModal";
 import { createSociety } from "../../api/societyApi";
 import { createTask } from "../../api/taskApi";

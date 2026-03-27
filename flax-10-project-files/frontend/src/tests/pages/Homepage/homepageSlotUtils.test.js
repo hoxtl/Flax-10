@@ -3,7 +3,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 const isTodayMock = vi.fn();
 const overlapsDayMock = vi.fn();
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
   overlapsDay: (...args) => overlapsDayMock(...args),
 }));

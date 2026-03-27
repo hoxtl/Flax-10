@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("../../components/common/Card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
 
-vi.mock("../../components/Society/SocietyCard", () => ({
+vi.mock("../../components/society/SocietyCard", () => ({
   default: ({ society, onClick, onReport, onUnreport }) => (
     <div>
       <button onClick={() => onClick?.(society.id)}>{society.name}</button>
@@ -50,7 +50,7 @@ vi.mock("../../hooks/usePagination", () => ({
   usePagination: (...args) => paginationMock(...args),
 }));
 
-import { SocietyBrowseResults } from "../../pages/Societies/SocietyBrowseResults";
+import { SocietyBrowseResults } from "../../pages/societies/SocietyBrowseResults";
 
 describe("SocietyBrowseResults", () => {
   beforeEach(() => {

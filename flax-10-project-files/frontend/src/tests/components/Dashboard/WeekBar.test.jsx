@@ -22,13 +22,13 @@ vi.mock('../../../lib/termConfig', () => ({
     loadTermConfig: vi.fn(() => SEMESTER_TERM_CONFIG),
 }));
 
-vi.mock('../../../components/Calendar/utils/weekUtils', () => ({
+vi.mock('../../../components/calendar/utils/weekUtils', () => ({
     buildWeekLabels: vi.fn((total, hasRW, afterWeek) => createWeekLabels(total, hasRW, afterWeek)),
     getWeekIndexForDate: vi.fn(() => 2),
 }));
 
 import WeekBar from '../../../components/Dashboard/WeekBar';
-import { getWeekIndexForDate } from '../../../components/Calendar/utils/weekUtils';
+import { getWeekIndexForDate } from '../../../components/calendar/utils/weekUtils';
 
 describe('WeekBar', () => {
     it('renders without crashing', () => {

@@ -62,7 +62,7 @@ vi.mock("../../../pages/Homepage/components/TinyTimelineWidget", () => ({
   TinyTimelineWidget: (props) => <div data-testid="tiny-timeline">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   getEventType: (...args) => getEventTypeMock(...args),
 }));
 

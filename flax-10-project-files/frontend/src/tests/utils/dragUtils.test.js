@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { parseDropPayload, setupDragStart, handleDragOverEffect } from '../../components/Calendar/utils/dragUtils';
+import { parseDropPayload, setupDragStart, handleDragOverEffect } from '../../components/calendar/utils/dragUtils';
 
 describe('dragUtils', () => {
     describe('parseDropPayload', () => {

@@ -5,7 +5,7 @@
 import { formatTime12h } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
-import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
+import { isReadOnlyEvent } from "../../../../components/calendar/utils/eventUtils";
 import { doesEventOverlapSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
 import { getEventAccentColor } from "./helpers/eventAccent";
 import { ConflictPopover, EventDuration, EventTagSlot } from "./parts/PlanEventRowParts";

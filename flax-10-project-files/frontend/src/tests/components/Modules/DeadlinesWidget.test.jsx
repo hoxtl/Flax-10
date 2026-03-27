@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DeadlinesWidget } from '../../../pages/Homepage/components/DeadlinesWidget';
-import { UpcomingDeadlinesWidget } from '../../../components/Modules/Deadlines/UpcomingDeadlinesWidget';
+import { UpcomingDeadlinesWidget } from '../../../components/modules/Deadlines/UpcomingDeadlinesWidget';
 
 const navigateMock = vi.fn();
 

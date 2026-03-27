@@ -6,7 +6,7 @@ const checkSleepAndRunMock = vi.hoisted(() => vi.fn((_dueDate, callback) => call
 
 vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn(), getEnrollments: vi.fn() }));
 vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn() }));
-vi.mock("../../../../components/Modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => true) }));
+vi.mock("../../../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => true) }));
 vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: checkSleepAndRunMock }),
 }));

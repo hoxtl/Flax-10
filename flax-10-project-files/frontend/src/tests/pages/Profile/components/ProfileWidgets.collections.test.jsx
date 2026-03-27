@@ -16,7 +16,7 @@ vi.mock("../../../../api/moduleApi", () => ({
   ]),
 }));
 
-vi.mock("../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
+vi.mock("../../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
   useAttendanceWidgetData: vi.fn(),
 }));
 

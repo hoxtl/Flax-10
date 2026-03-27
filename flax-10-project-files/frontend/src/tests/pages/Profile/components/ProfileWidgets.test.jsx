@@ -25,11 +25,11 @@ import {
   QuickStatsRail,
   SocietiesSection,
   StudyDNA,
-} from "../../../../pages/Profile/components/ProfileWidgets";
-import { CommonGroundSection } from "../../../../pages/Profile/components/widgets/CommonGround";
-import ProfileWidget from "../../../../pages/Profile/components/widgets/ProfileWidget";
-import { buildButtonActionProps, buildNavigateAction } from "../../../../pages/Profile/components/widgets/widgetActionProps";
-import { useModuleNameMap } from "../../../../pages/Profile/components/widgets/ModulesSocieties";
+} from "../../../../pages/profile/components/ProfileWidgets";
+import { CommonGroundSection } from "../../../../pages/profile/components/widgets/CommonGround";
+import ProfileWidget from "../../../../pages/profile/components/widgets/ProfileWidget";
+import { buildButtonActionProps, buildNavigateAction } from "../../../../pages/profile/components/widgets/widgetActionProps";
+import { useModuleNameMap } from "../../../../pages/profile/components/widgets/ModulesSocieties";
 
 describe("profile widget extras", () => {
   beforeEach(() => {

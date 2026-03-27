@@ -6,7 +6,7 @@ import { TagProvider } from "../../context/TagContext";
 import { TimerProvider } from "../../context/TimerContext";
 import { TaskCompletionProvider } from "../../context/TaskCompletionContext";
 import { NotificationToast } from "../../components/Notifications";
-import AttendancePrompt from "../../components/Attendance/AttendancePrompt";
+import AttendancePrompt from "../../components/attendance/AttendancePrompt";
 
 const providers = [
   NotificationProvider,

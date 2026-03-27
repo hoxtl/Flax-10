@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ProfileModals, { SocietiesModal } from '../../../pages/Profile/ProfileModals';
+import ProfileModals, { SocietiesModal } from '../../../pages/profile/ProfileModals';
 import { getModules } from '../../../api/moduleApi';
 import { createFnMap } from '../../utils/testBuilderUtils';
 
@@ -43,15 +43,15 @@ vi.mock('../../../api/taskApi', () => ({
     fetchTasks: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('../../../pages/Profile/hooks/useProfileModalsData', async () => {
-    const actual = await vi.importActual('../../../pages/Profile/hooks/useProfileModalsData');
+vi.mock('../../../pages/profile/hooks/useProfileModalsData', async () => {
+    const actual = await vi.importActual('../../../pages/profile/hooks/useProfileModalsData');
     return {
         ...actual,
         useTasksModalData: vi.fn(() => ({ loading: false, tasks: [] })),
     };
 });
 
-import { useTasksModalData } from '../../../pages/Profile/hooks/useProfileModalsData';
+import { useTasksModalData } from '../../../pages/profile/hooks/useProfileModalsData';
 
 const modalStateDefaults = {
     showEditProfile: false,

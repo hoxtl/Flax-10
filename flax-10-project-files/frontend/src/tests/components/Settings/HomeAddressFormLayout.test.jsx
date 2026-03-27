@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../../components/Calendar/event_modal/components/LocationAutoComplete", () => ({
+vi.mock("../../../components/calendar/event_modal/components/LocationAutoComplete", () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input
       aria-label="Address"

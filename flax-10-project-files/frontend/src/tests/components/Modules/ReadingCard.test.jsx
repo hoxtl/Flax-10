@@ -4,13 +4,13 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ReadingCard from '../../../components/Modules/Readings/ReadingCard';
+import ReadingCard from '../../../components/modules/Readings/ReadingCard';
 
-vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/calendar/utils/dateUtils', () => ({
     formatDate: vi.fn(() => '13 Apr 2026'),
 }));
 
-vi.mock('../../../components/Modules/Deadlines/DeadlineCard.module.css', () => ({ default: { } }));
+vi.mock('../../../components/modules/Deadlines/DeadlineCard.module.css', () => ({ default: { } }));
 
 const reading = {
     id: 1, title: 'Module Handbook', chapter: 'Ch.1',

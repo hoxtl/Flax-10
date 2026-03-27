@@ -2,8 +2,8 @@
  * Homepage modal collection.
  */
 
-import { extractBaseEventId } from "../../../components/Calendar/utils/eventUtils";
-import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { extractBaseEventId } from "../../../components/calendar/utils/eventUtils";
+import { isToday } from "../../../components/calendar/utils/dateUtils";
 import CreateTaskModal from "../../Tasks/components/CreateTaskModal";
 import CreateListModal from "../../Tasks/components/CreateListModal";
 import { EditTaskModal } from "../../Tasks/components/TaskCard";

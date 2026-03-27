@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
 
-vi.mock('../../../components/Modules/Modules/TravelTimeIndicator.module.css', () => ({
+vi.mock('../../../components/modules/Modules/TravelTimeIndicator.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
@@ -16,8 +16,8 @@ vi.mock('../../../utils/tflTravelTime.js', () => ({
   getTravelTimeModule: (...args) => getTravelTimeModuleMock(...args),
 }));
 
-import TravelTimeIndicator from '../../../components/Modules/Modules/TravelTimeIndicator';
-import { useModuleTravelTime } from '../../../components/Modules/Modules/useModuleTravelTime';
+import TravelTimeIndicator from '../../../components/modules/Modules/TravelTimeIndicator';
+import { useModuleTravelTime } from '../../../components/modules/Modules/useModuleTravelTime';
 
 describe('TravelTimeIndicator', () => {
   it('renders travel time when duration is provided', () => {

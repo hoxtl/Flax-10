@@ -18,7 +18,7 @@ vi.mock("../../../../pages/Homepage/hooks/mini_timeline/assignmentUtils", () => 
   deriveGapDeadlineFallbacks: (...args) => deriveGapDeadlineFallbacksMock(...args),
 }));
 
-vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
 }));
 

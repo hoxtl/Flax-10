@@ -21,7 +21,7 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
   default: (...args) => useBreakpoint(...args),
 }));
 
-vi.mock("../../../components/Timer/utils/timerUtils", () => ({
+vi.mock("../../../components/timer/utils/timerUtils", () => ({
   useNotificationPermission: (...args) => useNotificationPermission(...args),
 }));
 
@@ -57,11 +57,11 @@ vi.mock("../../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>scroll-top</div>,
 }));
 
-vi.mock("../../../components/Timer/TodayBanner", () => ({
+vi.mock("../../../components/timer/TodayBanner", () => ({
   default: ({ onStreakData, isStudying }) => <button type="button" onClick={() => onStreakData?.({ current_streak_days: 3 })}>today-banner-{String(isStudying)}</button>,
 }));
 
-vi.mock("../../../components/Timer/WrapperComponents", () => ({
+vi.mock("../../../components/timer/WrapperComponents", () => ({
   MainSection: ({ onOpenHistory, onOpenFocus }) => (
     <div>
       <button type="button" onClick={onOpenHistory}>open-history</button>

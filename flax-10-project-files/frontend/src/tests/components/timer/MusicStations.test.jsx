@@ -1,17 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
-import { MusicStations } from '../../../components/Timer/sound_panel/MusicStations';
+import { MusicStations } from '../../../components/timer/sound_panel/MusicStations';
 
 vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
 
-vi.mock('../../../components/Timer/sound_panel/soundPanelData', () => ({
+vi.mock('../../../components/timer/sound_panel/soundPanelData', () => ({
   MUSIC_STATIONS: [
     { id: 'yt-lofi', label: 'Lo-fi Beats', provider: 'youtube', embedUrl: 'https://youtube.com/embed/1', externalUrl: 'https://youtube.com/1' },
     { id: 'spotify-lofi', label: 'Lo-fi Café', provider: 'spotify', embedUrl: 'https://spotify.com/embed/1', externalUrl: 'https://spotify.com/1' },
   ],
 }));
 
-vi.mock('../../../components/Timer/sound_panel/MusicEmbed', () => ({
+vi.mock('../../../components/timer/sound_panel/MusicEmbed', () => ({
   MusicEmbed: ({ station, onClose }) => (
     <div data-testid="music-embed">
       <span>{station.label}</span>
@@ -20,7 +20,7 @@ vi.mock('../../../components/Timer/sound_panel/MusicEmbed', () => ({
   ),
 }));
 
-vi.mock('../../../components/Timer/sound_panel/SoundIcons', () => ({
+vi.mock('../../../components/timer/sound_panel/SoundIcons', () => ({
   ProviderIcon: ({ provider }) => <span data-testid={`icon-${provider}`} />,
 }));
 

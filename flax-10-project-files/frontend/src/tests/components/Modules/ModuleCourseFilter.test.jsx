@@ -5,7 +5,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import ModuleCourseFilter from '../../../components/Modules/Modules/ModuleCourseFilter';
+import ModuleCourseFilter from '../../../components/modules/Modules/ModuleCourseFilter';
 
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,

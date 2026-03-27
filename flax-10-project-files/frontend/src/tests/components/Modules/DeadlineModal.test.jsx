@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DeadlineModal from '../../../components/Modules/Deadlines/DeadlineModal';
+import DeadlineModal from '../../../components/modules/Deadlines/DeadlineModal';
 
 // Const values for the test Modal
 const mockModal = {
@@ -18,11 +18,11 @@ const mockModal = {
     close: vi.fn(),
 };
 
-vi.mock('../../../components/Modules/hooks/useDeadlineModal', () => ({
+vi.mock('../../../components/modules/hooks/useDeadlineModal', () => ({
     useDeadlineModal: () => mockModal,
 }));
 
-vi.mock('../../../components/Modules/Deadlines/DeadlineForm', () => ({
+vi.mock('../../../components/modules/Deadlines/DeadlineForm', () => ({
     default: ({ onCancel, onSubmit }) => (
         <div>
             <button onClick={onCancel}>Cancel</button>
@@ -31,7 +31,7 @@ vi.mock('../../../components/Modules/Deadlines/DeadlineForm', () => ({
     ),
 }));
 
-vi.mock('../../../components/Modules/Deadlines/DeadlineCard', () => ({
+vi.mock('../../../components/modules/Deadlines/DeadlineCard', () => ({
     default: ({ deadline, onEdit, onDelete }) => (
         <div>
             <span>{deadline.title}</span>
@@ -41,7 +41,7 @@ vi.mock('../../../components/Modules/Deadlines/DeadlineCard', () => ({
     ),
 }));
 
-vi.mock('../../../components/Modules/Deadlines/DeadlineModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/modules/Deadlines/DeadlineModal.module.css', () => ({ default: {} }));
 
 const module = { id: 1, module_code: '5CCS2SEG' };
 

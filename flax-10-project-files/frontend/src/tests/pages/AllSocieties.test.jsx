@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import AllSocieties from '../../pages/Societies/AllSocieties';
+import AllSocieties from '../../pages/societies/AllSocieties';
 
-vi.mock('../../components/Society/SocietyCard', () => ({
+vi.mock('../../components/society/SocietyCard', () => ({
     default: ({ society, onClick }) => (
         <div data-testid={`society-card-${society.id}`} onClick={onClick}>
             {society.name}

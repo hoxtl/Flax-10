@@ -35,7 +35,7 @@ vi.mock("../../../components/common/urgent_glow/UrgentGlow.module.css", () => ({
   },
 }));
 
-vi.mock("../../../components/Modules/Deadlines/upcomingDeadlinesUtils", () => ({
+vi.mock("../../../components/modules/Deadlines/upcomingDeadlinesUtils", () => ({
   TIER_ACCENT: {
     overdue: "#f00",
     critical: "#c00",
@@ -48,20 +48,20 @@ vi.mock("../../../components/Modules/Deadlines/upcomingDeadlinesUtils", () => ({
   },
 }));
 
-vi.mock("../../../components/Modules/shared/taskButtons.jsx", () => ({
+vi.mock("../../../components/modules/shared/taskButtons.jsx", () => ({
   AddReadingToTasksButton: ({ readingId, onAdded }) => (
     <button onClick={() => onAdded(readingId)}>add reading</button>
   ),
 }));
 
-vi.mock("../../../components/Modules/shared/widgetVariants.js", () => ({
+vi.mock("../../../components/modules/shared/widgetVariants.js", () => ({
   containerVariants: {},
   expandBodyVariants: {},
   itemVariants: {},
   listVariants: {},
 }));
 
-vi.mock("../../../components/Modules/shared/widgetParts.jsx", () => ({
+vi.mock("../../../components/modules/shared/widgetParts.jsx", () => ({
   WidgetHeader: ({ title, count }) => (
     <div>
       <span>{title}</span>

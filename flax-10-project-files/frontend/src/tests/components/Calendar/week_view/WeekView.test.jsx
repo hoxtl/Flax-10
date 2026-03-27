@@ -10,23 +10,23 @@ vi.mock('../../../../context/CalendarContext', () => ({
     useCalendarDispatch: vi.fn(() => dispatchMock),
 }));
 
-vi.mock('../../../../components/Calendar/week_view/DayColumn', () => ({
+vi.mock('../../../../components/calendar/week_view/DayColumn', () => ({
     DayColumn: ({ date }) => <div data-testid="day-column" data-date={date.toISOString().slice(0, 10)} />,
 }));
 
-vi.mock('../../../../components/Calendar/week_view/components/AllDayRow', () => ({
+vi.mock('../../../../components/calendar/week_view/components/AllDayRow', () => ({
     AllDayRow: ({ days }) => <div data-testid="all-day-row" data-days={days.length} />,
 }));
 
-vi.mock('../../../../components/Calendar/week_view/TimeLabels', () => ({
+vi.mock('../../../../components/calendar/week_view/TimeLabels', () => ({
     TimeLabels: () => <div data-testid="time-labels" />,
 }));
 
-vi.mock('../../../../components/Calendar/hooks/useAutoScroll', () => ({
+vi.mock('../../../../components/calendar/hooks/useAutoScroll', () => ({
     useAutoScroll: vi.fn(),
 }));
 
-vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
     getWeekDays: vi.fn(() => [
         new Date('2024-03-04'),
         new Date('2024-03-05'),
@@ -40,16 +40,16 @@ vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
     overlapsDay: vi.fn(() => true),
 }));
 
-vi.mock('../../../../components/Calendar/utils/eventDisplayUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventDisplayUtils', () => ({
     shouldShowInTimeGrid: vi.fn(() => true),
 }));
 
-vi.mock('../../../../components/Calendar/calendarConstants', () => ({
+vi.mock('../../../../components/calendar/calendarConstants', () => ({
     SLOT_HEIGHT: 60,
 }));
 
-import { WeekView } from '../../../../components/Calendar/week_view/WeekView';
-import * as dateUtils from '../../../../components/Calendar/utils/dateUtils';
+import { WeekView } from '../../../../components/calendar/week_view/WeekView';
+import * as dateUtils from '../../../../components/calendar/utils/dateUtils';
 
 const date = new Date('2024-03-04');
 

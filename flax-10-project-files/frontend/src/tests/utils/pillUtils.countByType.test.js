@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 describe("pillUtils extra coverage", () => {
   afterEach(() => {
     vi.resetModules();
-    vi.doUnmock("../../components/Calendar/utils/eventUtils");
+    vi.doUnmock("../../components/calendar/utils/eventUtils");
   });
 
   it("supports the default empty items parameter", async () => {
@@ -12,7 +12,7 @@ describe("pillUtils extra coverage", () => {
   });
 
   it("skips falsy effective tag names", async () => {
-    vi.doMock("../../components/Calendar/utils/eventUtils", () => ({
+    vi.doMock("../../components/calendar/utils/eventUtils", () => ({
       getEffectiveTagName: vi.fn(() => ""),
     }));
 

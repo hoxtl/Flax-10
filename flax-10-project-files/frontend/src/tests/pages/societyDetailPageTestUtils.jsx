@@ -195,23 +195,23 @@ export function SocietySkeletonMock() {
   return <div>Loading...</div>;
 }
 
-vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
+vi.mock("../../pages/societies/useSocietyDetailPageState", () => ({
   useSocietyPageData: (...args) => societyDetailPageStateMocks.useSocietyPageDataMock(...args),
   useSocietyInit: (...args) => societyDetailPageStateMocks.useSocietyInitMock(...args),
 }));
 
-vi.mock("../../components/Society/SocietyDetail/SocietyHero", () => ({ default: SocietyHeroMock }));
-vi.mock("../../components/Society/SocietyDetail/SocietyInfo", () => ({ default: SocietyInfoMock }));
-vi.mock("../../components/Society/SocietyDetail/Tabs/SocietyTabs", () => ({ default: SocietyTabsMock }));
-vi.mock("../../components/Society/SocietyDetail/SocietySidebar", () => ({ default: SocietySidebarMock }));
-vi.mock("../../components/Society/SocietyDetail/imageHandlers/CoverImageModal", () => ({ default: CoverImageModalMock }));
-vi.mock("../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal", () => ({ default: ImageGalleryModalMock }));
-vi.mock("../../components/Society/SocietyDetail/SettingsModal", () => ({ default: SettingsModalMock }));
-vi.mock("../../components/Society/SocietyDetail/Tabs/announcementTab/AnnouncementModal", () => ({ default: AnnouncementModalMock }));
-vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({ default: ReportSocietyModalMock }));
-vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({ default: MemberDirectoryModalMock }));
+vi.mock("../../components/society/SocietyDetail/SocietyHero", () => ({ default: SocietyHeroMock }));
+vi.mock("../../components/society/SocietyDetail/SocietyInfo", () => ({ default: SocietyInfoMock }));
+vi.mock("../../components/society/SocietyDetail/Tabs/SocietyTabs", () => ({ default: SocietyTabsMock }));
+vi.mock("../../components/society/SocietyDetail/SocietySidebar", () => ({ default: SocietySidebarMock }));
+vi.mock("../../components/society/SocietyDetail/imageHandlers/CoverImageModal", () => ({ default: CoverImageModalMock }));
+vi.mock("../../components/society/SocietyDetail/imageHandlers/ImageGalleryModal", () => ({ default: ImageGalleryModalMock }));
+vi.mock("../../components/society/SocietyDetail/SettingsModal", () => ({ default: SettingsModalMock }));
+vi.mock("../../components/society/SocietyDetail/Tabs/announcementTab/AnnouncementModal", () => ({ default: AnnouncementModalMock }));
+vi.mock("../../components/society/SocietyDetail/ReportSocietyModal", () => ({ default: ReportSocietyModalMock }));
+vi.mock("../../components/society/SocietyDetail/MemberDirectoryModal", () => ({ default: MemberDirectoryModalMock }));
 vi.mock("../../components/common/BackButton/BackButton.jsx", () => ({ default: BackButtonMock }));
-vi.mock("../../pages/Societies/SocietySkeletons", () => ({ SocietyDetailSkeleton: SocietySkeletonMock }));
+vi.mock("../../pages/societies/SocietySkeletons", () => ({ SocietyDetailSkeleton: SocietySkeletonMock }));
 
 export function createSocietyDetailPageInteractiveOverrides() {
   return {

@@ -86,7 +86,7 @@ vi.mock("../../../context/NotificationContext", () => ({
   }),
 }));
 
-vi.mock("../../../components/Notifications/NotificationPanel", () => ({
+vi.mock("../../../components/notifications/NotificationPanel", () => ({
   NotificationPanel: () => <div data-testid="notification-panel" />,
 }));
 
@@ -98,7 +98,7 @@ vi.mock("../../../components/Dashboard/ThemeToggle", () => ({
   default: () => <div data-testid="theme-toggle" />,
 }));
 
-vi.mock("../../../components/Timer/MiniTimer", () => ({
+vi.mock("../../../components/timer/MiniTimer", () => ({
   default: () => <div data-testid="mini-timer" />,
 }));
 

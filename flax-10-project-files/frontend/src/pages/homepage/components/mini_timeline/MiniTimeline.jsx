@@ -4,8 +4,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
-import { isToday } from "../../../../components/Calendar/utils/dateUtils";
+import { isReadOnlyEvent } from "../../../../components/calendar/utils/eventUtils";
+import { isToday } from "../../../../components/calendar/utils/dateUtils";
 import { useMiniTimelineData } from "../../hooks/useMiniTimelineData";
 import { useMiniTimelineState } from "../../hooks/useMiniTimelineState";
 import { EventContextMenu } from "./EventContextMenu";

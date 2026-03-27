@@ -50,15 +50,15 @@ vi.mock("../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendance(...args),
 }));
 
-import AttendanceCharts from "../../../pages/Profile/components/widgets/attendance/AttendanceCharts";
+import AttendanceCharts from "../../../pages/profile/components/widgets/attendance/AttendanceCharts";
 import {
   AttendanceWarningBadge,
   CompactAttHeader,
   CompactByTypeDonut,
   CompactOverallDonut,
   SegmentDetailPanelWrapper,
-} from "../../../pages/Profile/components/widgets/attendance/AttendanceShared";
-import { useAttendanceWidgetData } from "../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData";
+} from "../../../pages/profile/components/widgets/attendance/AttendanceShared";
+import { useAttendanceWidgetData } from "../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData";
 
 describe("attendance widget extras", () => {
   beforeEach(() => {

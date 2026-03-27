@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ImageCard, ImageGrid, ImageHeader } from '../../../components/Society/society_detail/image_handlers/ImageManagerComponents';
+import { ImageCard, ImageGrid, ImageHeader } from '../../../components/society/society_detail/image_handlers/ImageManagerComponents';
 
 describe('ImageManagerComponents', () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/Calendar/header/CalendarHeaderUtils';
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/calendar/header/CalendarHeaderUtils';
 
 vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
@@ -17,7 +17,7 @@ vi.mock('lucide-react', () => ({
     Tag: () => <span data-testid="tag-icon" />,
 }));
 
-vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
+vi.mock('../../../../components/calendar/header/DatePickerButton', () => ({
     DatePickerButton: ({ selectedDate, onDatePick }) => (
         <button type="button" onClick={() => onDatePick?.(selectedDate)} data-testid="date-picker">Pick</button>
     ),

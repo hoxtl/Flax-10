@@ -33,26 +33,26 @@ vi.mock('../../context/CalendarContext', () => ({
     useCalendarDispatch: vi.fn(() => mockDispatch),
 }));
 
-vi.mock('../../components/Calendar/Calendar', () => ({
+vi.mock('../../components/calendar/Calendar', () => ({
     Calendar: () => <div data-testid="calendar" />,
 }));
 
-vi.mock('../../components/Calendar/CalendarHeader', () => ({
+vi.mock('../../components/calendar/CalendarHeader', () => ({
     CalendarHeader: () => <div data-testid="calendar-header" />,
 }));
 
-vi.mock('../../components/Calendar/EventPopups', () => ({
+vi.mock('../../components/calendar/EventPopups', () => ({
     EventPopups: (props) => {
         mockEventPopups(props);
         return <div data-testid="event-popups" />;
     },
 }));
 
-vi.mock('../../components/Calendar/hooks/useEventPopupListener', () => ({
+vi.mock('../../components/calendar/hooks/useEventPopupListener', () => ({
     useEventPopupListener: vi.fn(),
 }));
 
-vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../components/calendar/utils/eventUtils', () => ({
     getVisibleEventsInView: vi.fn(() => []),
 }));
 

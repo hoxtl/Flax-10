@@ -40,7 +40,7 @@ vi.mock("../../../../context/CalendarContext", () => ({
   useEventPopup: () => useEventPopupMock(),
 }));
 
-vi.mock("../../../../components/Calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../../components/calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => useCalendarEventsMock(),
   useEventActions: () => useEventActionsMock(),
 }));

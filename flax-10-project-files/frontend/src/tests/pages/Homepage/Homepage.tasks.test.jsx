@@ -15,11 +15,11 @@ let mockSelectedDate = TODAY, mockEvents = [], mockFilter = 'all';
 let mockTimeLeft = 0, mockTimerActive = false, mockTimerMode = 'work';
 let mockDayEvents = [], mockDayTasks = [], mockAllTasks = [];
 
-vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/calendar/utils/dateUtils', () => ({
   isToday: vi.fn((d) => { const t = new Date(); return d && t.toDateString() === new Date(d).toDateString(); }),
   overlapsDay: vi.fn((s, e, day) => { const ds = new Date(day); ds.setHours(0,0,0,0); const de = new Date(ds); de.setDate(de.getDate()+1); return s < de && e > ds; }),
 }));
-vi.mock('../../../components/Calendar/utils/eventUtils', () => ({ extractBaseEventId: vi.fn((id) => (typeof id === 'string' && id.includes('_') ? id.split('_')[0] : id)) }));
+vi.mock('../../../components/calendar/utils/eventUtils', () => ({ extractBaseEventId: vi.fn((id) => (typeof id === 'string' && id.includes('_') ? id.split('_')[0] : id)) }));
 vi.mock('../../../pages/Homepage/utils/index', () => ({
   formatTime: vi.fn((d) => new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
   isNow: vi.fn(() => false), isRoutineEvent: vi.fn(() => false), isRoutineOrEventTask: vi.fn(() => false),
@@ -32,7 +32,7 @@ vi.mock('../../../context/CalendarContext', () => ({
   useCalendarDispatch: () => mockDispatch, useEventModal: () => ({ openModal: mockOpenModal }),
   useEventPopup: () => ({ openPopup: mockOpenPopup }),
 }));
-vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
   useEventActions: () => ({ removeEvent: mockRemoveEvent, addEvent: mockAddEvent, editEvent: mockEditEvent }),
   useEventPopup: () => ({ openPopup: vi.fn() }),
@@ -53,8 +53,8 @@ vi.mock('../../../context/TimerContext', () => ({
 }));
 vi.mock('../../../context/TaskCompletionContext', () => ({ useTaskCompletion: () => ({ showCompletionToast: vi.fn() }) }));
 vi.mock('../../../context/NotificationContext', () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
-vi.mock('../../../components/Notifications/hooks/useNotify', () => ({ useNotify: () => vi.fn() }));
-vi.mock('../../../components/Modules/hooks/useModuleDisenrollment', () => ({ useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }) }));
+vi.mock('../../../components/notifications/hooks/useNotify', () => ({ useNotify: () => vi.fn() }));
+vi.mock('../../../components/modules/hooks/useModuleDisenrollment', () => ({ useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }) }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => vi.fn() }));
 vi.mock('../../../pages/Homepage/components/IntelligenceRow', async () => {
   const { IntelligenceRowMock } = await import('./homepageMocks');
@@ -69,7 +69,7 @@ vi.mock('../../../pages/Homepage/components/DeadlinesWidget', async () => {
   return { DeadlinesWidget: DeadlinesWidgetMock };
 });
 vi.mock('../../../pages/Homepage/components/SleepBanner', () => ({ __esModule: true, default: () => <div data-testid="sleep-banner">sleep</div> }));
-vi.mock('../../../components/Calendar/EventPopups', () => ({ EventPopups: () => <div data-testid="event-popups" /> }));
+vi.mock('../../../components/calendar/EventPopups', () => ({ EventPopups: () => <div data-testid="event-popups" /> }));
 vi.mock('../../../components/common/back_to_top/BackToTop', () => ({ __esModule: true, default: () => <div data-testid="back-to-top" /> }));
 vi.mock('../../../components/Tags/pill_filters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
 vi.mock('../../../pages/Tasks/components/TaskCard', async () => {

@@ -1,6 +1,6 @@
 
 import { describe, it, expect } from 'vitest';
-import { getDateRangeForView } from '../../components/Calendar/hooks/calendarHelpers';
+import { getDateRangeForView } from '../../components/calendar/hooks/calendarHelpers';
 
 describe('calendarHelpers', () => {
     const date = new Date('2026-01-15T12:00:00.000Z');

@@ -1,12 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ModalContent } from '../../../../../components/Calendar/event_modal/components/ModalContent';
+import { ModalContent } from '../../../../../components/calendar/event_modal/components/ModalContent';
 
-vi.mock('../../../../../components/Calendar/event_modal/components/ModalHeader', () => ({
+vi.mock('../../../../../components/calendar/event_modal/components/ModalHeader', () => ({
     ModalHeader: ({ onClose }) => <div data-testid="modal-header"><button onClick={onClose}>Close</button></div>
 }));
 
-vi.mock('../../../../../components/Calendar/event_modal/components/EventFormBody', () => ({
+vi.mock('../../../../../components/calendar/event_modal/components/EventFormBody', () => ({
     EventFormBody: ({ onSubmit }) => <form data-testid="event-form" onSubmit={onSubmit}><button>Submit</button></form>
 }));
 

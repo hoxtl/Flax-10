@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ReminderField } from '../../../../../components/Calendar/event_modal/components/ReminderField';
-import { CustomReminderInput, PermissionStatus } from '../../../../../components/Calendar/event_modal/components/ReminderFieldParts';
+import { ReminderField } from '../../../../../components/calendar/event_modal/components/ReminderField';
+import { CustomReminderInput, PermissionStatus } from '../../../../../components/calendar/event_modal/components/ReminderFieldParts';
 
 function stubNotification(permission = 'granted', requestPermission = vi.fn().mockResolvedValue(permission)) {
     vi.stubGlobal('Notification', {

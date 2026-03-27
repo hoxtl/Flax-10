@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useUnreportSociety } from '../../../../components/Society/hooks/useUnreportSociety';
+import { useUnreportSociety } from '../../../../components/society/hooks/useUnreportSociety';
 import * as api from '../../../../api/societyApi';
 import { useConfirm } from '../../../../context/ConfirmContext';
 

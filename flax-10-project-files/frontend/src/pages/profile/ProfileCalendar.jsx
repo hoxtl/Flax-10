@@ -10,9 +10,9 @@ import { CalendarNav } from "../../components/calendar/header/CalendarHeaderUtil
 import { MonthView } from "../../components/calendar/month_view/MonthView";
 import { EventPopups } from "../../components/calendar/EventPopups";
 import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
-import { EventsSummaryModal } from "../../components/Calendar/events_summary_modal/EventsSummaryModal";
-import "../../components/Calendar/calendar-header.css";
-import "../../components/Calendar/calendar.css";
+import { EventsSummaryModal } from "../../components/calendar/events_summary_modal/EventsSummaryModal";
+import "../../components/calendar/calendar-header.css";
+import "../../components/calendar/calendar.css";
 
 function useProfileCalendarMode(dispatch) {
   useEffect(() => {

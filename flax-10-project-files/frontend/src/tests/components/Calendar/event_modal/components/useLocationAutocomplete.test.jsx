@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 
-import { useLocationAutocomplete } from "../../../../../components/Calendar/event_modal/components/useLocationAutocomplete";
+import { useLocationAutocomplete } from "../../../../../components/calendar/event_modal/components/useLocationAutocomplete";
 
 function AutocompleteState({ autocomplete }) {
   return (

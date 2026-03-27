@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { EventModal } from '../../../../components/Calendar/event_modal/EventModal';
+import { EventModal } from '../../../../components/calendar/event_modal/EventModal';
 import { TagProvider } from '../../../../context/TagContext';
 
 const { mockFormLogic, useEventFormMock } = vi.hoisted(() => ({
@@ -17,7 +17,7 @@ const { mockFormLogic, useEventFormMock } = vi.hoisted(() => ({
     useEventFormMock: vi.fn(),
 }));
 
-vi.mock('../../../../components/Calendar/event_modal/useEventForm', () => ({
+vi.mock('../../../../components/calendar/event_modal/useEventForm', () => ({
     useEventForm: (...args) => useEventFormMock(...args),
 }));
 

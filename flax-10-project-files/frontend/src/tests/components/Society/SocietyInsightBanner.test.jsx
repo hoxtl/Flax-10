@@ -19,7 +19,7 @@ vi.mock("../../../api/moduleApi", () => ({
   getEnrollments,
 }));
 
-import SocietyInsightBanner from "../../../components/Society/society_detail/SocietyInsightBanner";
+import SocietyInsightBanner from "../../../components/society/society_detail/SocietyInsightBanner";
 
 const baseSociety = {
   id: 9,

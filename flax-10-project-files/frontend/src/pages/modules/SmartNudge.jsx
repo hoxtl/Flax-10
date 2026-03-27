@@ -4,8 +4,8 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion as Motion } from 'framer-motion';
-import { getDayCount } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
-import { AddDeadlineToTasksButton, AddReadingToTasksButton } from '../../components/Modules/shared/taskButtons.jsx';
+import { getDayCount } from '../../components/modules/Deadlines/upcomingDeadlinesUtils';
+import { AddDeadlineToTasksButton, AddReadingToTasksButton } from '../../components/modules/shared/taskButtons.jsx';
 import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 

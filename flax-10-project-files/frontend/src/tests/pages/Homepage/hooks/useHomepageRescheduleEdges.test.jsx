@@ -11,7 +11,7 @@ vi.mock("../../../../pages/Homepage/utils/index", () => ({
   isRoutineEvent: vi.fn(() => false),
 }));
 
-vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
 }));
 

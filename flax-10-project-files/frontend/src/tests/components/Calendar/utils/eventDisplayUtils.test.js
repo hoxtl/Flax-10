@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isAllDayEvent, shouldShowInTimeGrid, isFullDay, getAllDayVisualRange } from '../../../../components/Calendar/utils/eventDisplayUtils';
+import { isAllDayEvent, shouldShowInTimeGrid, isFullDay, getAllDayVisualRange } from '../../../../components/calendar/utils/eventDisplayUtils';
 
 const makeEvent = (overrides) => ({
     start_time: '2026-03-15T10:00:00Z',

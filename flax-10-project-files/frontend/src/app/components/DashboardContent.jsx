@@ -1,5 +1,5 @@
 import Settings from "../../pages/Settings/Settings";
-import Profile from "../../pages/Profile/Profile";
+import Profile from "../../pages/profile/Profile";
 import { resolveRouteContent } from "../navigation/helpers";
 
 export function DashboardContent({ activeNav, setActiveNav, user, onNavChange }) {

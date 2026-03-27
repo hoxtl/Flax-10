@@ -6,11 +6,11 @@ const getDayCountMock = vi.fn();
 const addDeadlineAddedMock = vi.fn();
 const addReadingAddedMock = vi.fn();
 
-vi.mock("../../../components/Modules/Deadlines/upcomingDeadlinesUtils", () => ({
+vi.mock("../../../components/modules/Deadlines/upcomingDeadlinesUtils", () => ({
   getDayCount: (...args) => getDayCountMock(...args),
 }));
 
-vi.mock("../../../components/Modules/shared/taskButtons.jsx", () => ({
+vi.mock("../../../components/modules/shared/taskButtons.jsx", () => ({
   AddDeadlineToTasksButton: ({ deadline, onAdded }) => (
     <button onClick={() => { addDeadlineAddedMock(deadline.id); onAdded(deadline.id); }}>
       Add deadline

@@ -17,7 +17,7 @@ vi.mock("../../../../components/Analytics/StudyHeatmap", () => ({
 import {
   ContributionHeatmap,
   FocusHeatmapWidget,
-} from "../../../../pages/Profile/components/widgets/FocusHeatmap";
+} from "../../../../pages/profile/components/widgets/FocusHeatmap";
 
 describe("FocusHeatmap widgets", () => {
   beforeEach(() => {

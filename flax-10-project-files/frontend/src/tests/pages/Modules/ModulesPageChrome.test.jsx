@@ -19,7 +19,7 @@ vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: (props) => <div data-testid="skeleton-block" {...props} />,
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleForm.jsx", () => ({
+vi.mock("../../../components/modules/Modules/ModuleForm.jsx", () => ({
   default: ({ onSuccess, onCancel, module }) => (
     <div>
       <div>{module ? "Editing module" : "New module"}</div>
@@ -30,7 +30,7 @@ vi.mock("../../../components/Modules/Modules/ModuleForm.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Modules/ModuleDetails.jsx", () => ({
+vi.mock("../../../components/modules/Modules/ModuleDetails.jsx", () => ({
   default: ({ module, onBack, onEnroll, onUnenroll }) => (
     <div>
       <div>{module.module_code}</div>
@@ -41,7 +41,7 @@ vi.mock("../../../components/Modules/Modules/ModuleDetails.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Deadlines/DeadlineModal.jsx", () => ({
+vi.mock("../../../components/modules/Deadlines/DeadlineModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Deadline ${module.module_code}`}</div>
@@ -50,7 +50,7 @@ vi.mock("../../../components/Modules/Deadlines/DeadlineModal.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Modules/Readings/ReadingModal.jsx", () => ({
+vi.mock("../../../components/modules/Readings/ReadingModal.jsx", () => ({
   default: ({ module, onClose }) => (
     <div>
       <div>{`Reading ${module.module_code}`}</div>

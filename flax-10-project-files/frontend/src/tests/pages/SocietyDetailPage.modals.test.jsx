@@ -7,7 +7,7 @@ import {
   societyDetailPageStateMocks,
 } from "./societyDetailPageTestUtils.jsx";
 
-import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
+import SocietyDetailPage from "../../pages/societies/SocietyDetailPage";
 
 function renderInteractivePage(overrides = {}, props = {}) {
   const baseOverrides = createSocietyDetailPageInteractiveOverrides();

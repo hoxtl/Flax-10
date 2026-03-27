@@ -23,7 +23,7 @@ vi.mock("../../lib/quotes", () => ({
   pickWelcomeQuoteByKey: () => mockQuote,
 }));
 
-vi.mock("../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../components/calendar/utils/dateUtils", () => ({
   getGreeting: () => "Good morning",
 }));
 

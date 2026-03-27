@@ -9,17 +9,17 @@ vi.mock('../../../../context/TagContext', () => ({
     useTags: vi.fn(() => []),
 }));
 
-vi.mock('../../../../components/Calendar/utils/eventStyleUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventStyleUtils', () => ({
     getEventTheme: vi.fn(() => ({ color: '#9E7E5D' })),
 }));
 
-vi.mock('../../../../components/Calendar/week_view/components/allDayRowHelpers', () => ({
+vi.mock('../../../../components/calendar/week_view/components/allDayRowHelpers', () => ({
     calculateEventLayout: vi.fn((events) =>
         events.map((e, i) => ({ event: e, startCol: i + 1, endCol: i + 2, row: 1 }))
     ),
 }));
 
-import { AllDayRow } from '../../../../components/Calendar/week_view/components/AllDayRow';
+import { AllDayRow } from '../../../../components/calendar/week_view/components/AllDayRow';
 import { useEventPopup } from '../../../../context/CalendarContext';
 
 const monday = new Date('2024-03-04T00:00:00Z');

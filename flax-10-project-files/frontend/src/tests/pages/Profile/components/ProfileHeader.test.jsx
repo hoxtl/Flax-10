@@ -4,9 +4,9 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ProfileHeader from '../../../../pages/Profile/components/ProfileHeader';
+import ProfileHeader from '../../../../pages/profile/components/ProfileHeader';
 
-vi.mock('../../../../pages/Profile/utils/profileHelpers', () => ({
+vi.mock('../../../../pages/profile/utils/profileHelpers', () => ({
   buildInitials: vi.fn((user) => {
     if (user?.name) return 'AB';
     if (user?.first_name && user?.last_name) return `${user.first_name[0]}${user.last_name[0]}`;

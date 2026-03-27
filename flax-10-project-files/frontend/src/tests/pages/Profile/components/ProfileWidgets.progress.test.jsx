@@ -13,7 +13,7 @@ vi.mock("../../../../api/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock("../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
+vi.mock("../../../../pages/profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
   useAttendanceWidgetData: vi.fn(),
 }));
 

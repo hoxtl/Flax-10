@@ -22,11 +22,11 @@ vi.mock("lucide-react", () => ({
   Trash2: () => <span>trash</span>,
 }));
 
-vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   isReadOnlyEvent: (...args) => isReadOnlyEvent(...args),
 }));
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isToday(...args),
 }));
 

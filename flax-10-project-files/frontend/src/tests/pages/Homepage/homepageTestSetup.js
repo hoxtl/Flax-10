@@ -47,7 +47,7 @@ export const homepageState = {
   allTasks: [],
 };
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: vi.fn((date) => {
     const today = new Date();
     return date && today.toDateString() === new Date(date).toDateString();
@@ -61,7 +61,7 @@ vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
   }),
 }));
 
-vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
+vi.mock("../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => (typeof id === "string" && id.includes("_") ? id.split("_")[0] : id)),
 }));
 
@@ -82,7 +82,7 @@ vi.mock("../../../context/CalendarContext", () => ({
   useEventPopup: () => ({ openPopup: vi.fn() }),
 }));
 
-vi.mock("../../../components/Calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../components/calendar/hooks/useCalendarEvents", () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
   useEventActions: () => ({ removeEvent: mockRemoveEvent, addEvent: mockAddEvent, editEvent: mockEditEvent }),
   useEventPopup: () => ({ openPopup: vi.fn() }),
@@ -129,11 +129,11 @@ vi.mock("../../../context/NotificationContext", () => ({
   useNotifications: () => ({ addNotification: vi.fn() }),
 }));
 
-vi.mock("../../../components/Notifications/hooks/useNotify", () => ({
+vi.mock("../../../components/notifications/hooks/useNotify", () => ({
   useNotify: () => vi.fn(),
 }));
 
-vi.mock("../../../components/Modules/hooks/useModuleDisenrollment", () => ({
+vi.mock("../../../components/modules/hooks/useModuleDisenrollment", () => ({
   useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }),
 }));
 
@@ -186,7 +186,7 @@ vi.mock("../../../pages/Homepage/components/SleepBanner", () => ({
   default: () => <div data-testid="sleep-banner">sleep</div>,
 }));
 
-vi.mock("../../../components/Calendar/EventPopups", () => ({
+vi.mock("../../../components/calendar/EventPopups", () => ({
   EventPopups: () => <div data-testid="event-popups" />,
 }));
 

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   getModuleTutorPhoto,
   hideBrokenTutorImage,
-} from "../../../components/Modules/Modules/moduleTutorUtils";
+} from "../../../components/modules/Modules/moduleTutorUtils";
 
 const getResolvedUserPhotoMock = vi.hoisted(() => vi.fn());
 

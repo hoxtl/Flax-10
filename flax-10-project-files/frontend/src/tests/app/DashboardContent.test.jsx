@@ -12,7 +12,7 @@ vi.mock("../../pages/Settings/Settings", () => ({
   ),
 }));
 
-vi.mock("../../pages/Profile/Profile", () => ({
+vi.mock("../../pages/profile/Profile", () => ({
   default: ({ user, viewedUserId, backLabel, onBack, onNavigate }) => (
     <div data-testid="profile-screen">
       <span>{user.name}</span>
