@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Clock, Sparkles } from "lucide-react";
 import { useCalendar } from "../../../../context/CalendarContext";
 import { useAuth } from "../../../../context/AuthContext";
+import { useToast } from "../../../../context/ToastContext";
 import ConfirmModal from "../../../common/confirm_modal/ConfirmModal";
 import Tooltip from "../../../common/tooltip/Tooltip";
 import { useCalendarEvents, useEventActions } from "../../hooks/useCalendarEvents";

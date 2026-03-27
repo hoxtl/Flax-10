@@ -8,6 +8,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { ConfirmModal } from "../../../components/common";
+import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { useAuth } from "../../../context/AuthContext";
 import { MiniTimeline } from "./mini_timeline";
 import widgetStyles from "../../modules/styles/DashboardWidgets.module.css";
