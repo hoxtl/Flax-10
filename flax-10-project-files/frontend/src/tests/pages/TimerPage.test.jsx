@@ -18,15 +18,15 @@ vi.mock('../../components/timer/utils/historyUtils', async () => {
     };
 });
 
-vi.mock('../../components/timer/TreeAnimation', () => ({
+vi.mock('../../components/timer/components/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
 }));
 
-vi.mock('../../components/timer/FocusAnimation', () => ({
+vi.mock('../../components/timer/components/FocusAnimation', () => ({
     default: () => <div data-testid="focus-animation" />,
 }));
 
-vi.mock('../../components/timer/TodayBanner', () => ({
+vi.mock('../../components/timer/components/TodayBanner', () => ({
     default: () => <div data-testid="today-banner" />,
 }));
 

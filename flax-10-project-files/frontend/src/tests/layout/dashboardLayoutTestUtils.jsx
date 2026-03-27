@@ -60,15 +60,15 @@ vi.mock("../../context/CalendarContext", () => ({
   useEventModal: hoistedMocks.useEventModal,
 }));
 
-vi.mock("../../components/dashboard/Sidebar", async () => {
+vi.mock("../../components/dashboard/components/Sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });
-vi.mock("../../components/dashboard/Topbar", async () => {
+vi.mock("../../components/dashboard/components/Topbar", async () => {
   const { TopbarMock } = await import("./dashboardMocks");
   return { default: TopbarMock };
 });
-vi.mock("../../components/dashboard/QuickAddModal", async () => {
+vi.mock("../../components/dashboard/components/QuickAddModal", async () => {
   const { QuickAddMock } = await import("./dashboardMocks");
   return { default: QuickAddMock };
 });
@@ -76,7 +76,7 @@ vi.mock("../../components/Calendar/EventModal/EventModal", async () => {
   const { EventModalMock } = await import("./dashboardMocks");
   return { EventModal: EventModalMock };
 });
-vi.mock("../../components/society/CreateSocietyModal", async () => {
+vi.mock("../../components/society/components/CreateSocietyModal", async () => {
   const { CreateSocietyMock } = await import("./dashboardMocks");
   return { default: CreateSocietyMock };
 });
@@ -88,7 +88,7 @@ vi.mock("../../components/modules/readings/ReadingModal", async () => {
   const { ReadingModalMock } = await import("./dashboardMocks");
   return { default: ReadingModalMock };
 });
-vi.mock("../../components/timer/TimerPopups", async () => {
+vi.mock("../../components/timer/components/TimerPopups", async () => {
   const { LeaveTimerMock } = await import("./dashboardMocks");
   return { LeaveTimerModal: LeaveTimerMock };
 });
@@ -97,7 +97,7 @@ vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
   return { default: CreateTaskMock };
 });
 
-vi.mock("../../components/dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
+vi.mock("../../components/dashboard/components/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: hoistedMocks.authService }));

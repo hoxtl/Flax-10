@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/society/CreateSocietyModal.module.css', () => ({ default: {} }));
-vi.mock('../../../components/society/AddCollaboratorModal', () => ({
+vi.mock('../../../components/society/styles/CreateSocietyModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/society/components/AddCollaboratorModal', () => ({
     default: ({ onClose, onAdd }) => (
         <div data-testid="collab-modal">
             <button onClick={onClose}>CloseCollab</button>
@@ -10,7 +10,7 @@ vi.mock('../../../components/society/AddCollaboratorModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/society/CollaboratorList', () => ({
+vi.mock('../../../components/society/components/CollaboratorList', () => ({
     default: ({ collaborators, onRoleChange, onRemove, emptyMessage }) => (
         <div data-testid="collab-list">
             <span>{emptyMessage}</span>
@@ -58,7 +58,7 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     ),
 }));
 
-import CreateSocietyModal from '../../../components/society/CreateSocietyModal';
+import CreateSocietyModal from '../../../components/society/components/CreateSocietyModal';
 
 describe('CreateSocietyModal', () => {
     let onClose;

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CollaboratorList from '../../../components/society/CollaboratorList';
+import CollaboratorList from '../../../components/society/components/CollaboratorList';
 
 vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (

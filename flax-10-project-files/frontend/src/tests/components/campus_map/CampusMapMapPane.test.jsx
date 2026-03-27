@@ -12,11 +12,11 @@ vi.mock("../../pages/campus_map/Sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/CampusMap.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 
-vi.mock("../../../components/campus_map/CampusQuickNav", () => ({
+vi.mock("../../../components/campus_map/components/CampusQuickNav", () => ({
   CampusQuickNav: (props) => quickNavMock(props),
 }));
 
-import { CampusMapMapPane } from "../../../components/campus_map/CampusMapMapPane";
+import { CampusMapMapPane } from "../../../components/campus_map/components/CampusMapMapPane";
 
 beforeEach(() => {
   vi.clearAllMocks();

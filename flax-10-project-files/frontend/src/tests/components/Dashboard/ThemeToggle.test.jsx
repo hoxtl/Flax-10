@@ -8,7 +8,7 @@ vi.mock('../../../context/ThemeContext', () => ({
     })),
 }));
 
-import ThemeToggle from '../../../components/dashboard/ThemeToggle';
+import ThemeToggle from '../../../components/dashboard/components/ThemeToggle';
 import { useTheme } from '../../../context/ThemeContext';
 
 describe('ThemeToggle', () => {

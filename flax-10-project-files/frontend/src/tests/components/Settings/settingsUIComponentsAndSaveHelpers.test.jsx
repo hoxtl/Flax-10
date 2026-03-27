@@ -83,7 +83,7 @@ import {
   SuccessBanner,
   TabButton,
   ThemeGridSelector,
-} from "../../../components/settings/SettingsUI";
+} from "../../../components/settings/components/SettingsUI";
 import {
   clearCachedPendingRequest,
   getCachedPendingRequest,

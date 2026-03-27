@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ErrorMessage, SettingsSidebar } from "../../components/settings/SettingsUI";
+import { ErrorMessage, SettingsSidebar } from "../../components/settings/components/SettingsUI";
 import useSettingsHandlers from "../../components/settings/hooks/useSettingsHandlers";
 import AppPage from "../../components/common/app_page/AppPage";
 import styles from "./styles/Settings.module.css";

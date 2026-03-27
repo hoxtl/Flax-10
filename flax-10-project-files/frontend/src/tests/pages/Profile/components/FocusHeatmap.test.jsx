@@ -7,7 +7,7 @@ vi.mock("../../../../components/common/Card/Card", () => ({
   default: ({ children, ...props }) => <div data-testid="card" {...props}>{children}</div>,
 }));
 
-vi.mock("../../../../components/analytics/StudyHeatmap", () => ({
+vi.mock("../../../../components/analytics/components/StudyHeatmap", () => ({
   default: (props) => {
     studyHeatmapMock(props);
     return <div data-testid="study-heatmap" />;

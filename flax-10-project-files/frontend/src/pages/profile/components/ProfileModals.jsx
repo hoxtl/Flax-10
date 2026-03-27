@@ -2,11 +2,11 @@
  * Profile feature modals.
  */
 
-import EditProfileModal from "../../../components/dashboard/EditProfileModal";
+import EditProfileModal from "../../../components/dashboard/components/EditProfileModal";
 import GenericSummaryModal from "../../../components/common/generic_summary_modal/GenericSummaryModal";
 import SummaryItem from "../../../components/common/generic_summary_modal/SummaryItem";
 import { SegmentedControl } from "../../../components/common";
-import UserListModal from "../../../components/social/UserListModal";
+import UserListModal from "../../../components/social/components/UserListModal";
 import { DATE_FORMAT, getRangeLabel, RANGE_OPTIONS, TIME_FORMAT } from "../utils/profileHelpers";
 import { socialDataFetchers, useModuleNameMap, useSocialUsers, useTasksModalData } from "../hooks/useProfileModalsData";
 

@@ -78,7 +78,7 @@ vi.mock('../../pages/societies/components/SocietyDetailPage', () => ({
     ),
 }));
 
-vi.mock('../../components/society/CreateSocietyModal', () => ({
+vi.mock('../../components/society/components/CreateSocietyModal', () => ({
     default: ({ onClose, onCreate }) => (
         <div data-testid="create-society-modal">
             <button onClick={onClose}>CloseCreate</button>

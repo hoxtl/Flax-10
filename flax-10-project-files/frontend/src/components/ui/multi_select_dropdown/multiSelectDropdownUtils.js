@@ -3,7 +3,7 @@
  */
 
 import dropdownStyles from "../../common/animated_dropdown/AnimatedDropdown.module.css";
-import pillStyles from "../MultiSelectDropdown.module.css";
+import pillStyles from "../styles/MultiSelectDropdown.module.css";
 
 export function normalizeOption(option) {
   return typeof option === "string" ? { value: option, label: option } : option;

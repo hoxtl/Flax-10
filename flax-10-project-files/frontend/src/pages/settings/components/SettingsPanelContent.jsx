@@ -3,10 +3,10 @@
  */
 
 import styles from "../styles/Settings.module.css";
-import AccountForm from "../../../components/settings/AccountForm";
-import HomeAddressForm from "../../../components/settings/HomeAddressForm";
-import PreferencesPanel from "../../../components/settings/PreferencesPanel";
-import SecurityForm from "../../../components/settings/SecurityForm";
+import AccountForm from "../../../components/settings/components/AccountForm";
+import HomeAddressForm from "../../../components/settings/components/HomeAddressForm";
+import PreferencesPanel from "../../../components/settings/components/PreferencesPanel";
+import SecurityForm from "../../../components/settings/components/SecurityForm";
 import { PANEL_META, panelVariantClass } from "../utils/settingsPageConfig";
 
 function PanelHeader({ tabId }) {

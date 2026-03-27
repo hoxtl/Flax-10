@@ -48,8 +48,8 @@ vi.mock("../../../hooks/useCountUp", () => ({
 
 import { useFocusCanvasAnimation as useFocusCanvasAnimationImpl } from "../../../components/timer/focus_animation/useFocusCanvasAnimation";
 import { useTodayBannerData } from "../../../components/timer/today_banner/useTodayBannerData";
-import TodayBanner from "../../../components/timer/TodayBanner";
-import FocusAnimation from "../../../components/timer/FocusAnimation";
+import TodayBanner from "../../../components/timer/components/TodayBanner";
+import FocusAnimation from "../../../components/timer/components/FocusAnimation";
 
 const canvasMethodNames = ["clearRect", "fillRect", "beginPath", "arc", "fill", "save", "restore", "translate", "rotate", "moveTo", "lineTo", "stroke"];
 

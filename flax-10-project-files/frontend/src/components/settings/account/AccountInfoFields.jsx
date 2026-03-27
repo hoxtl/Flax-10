@@ -3,7 +3,7 @@
  */
 
 import styles from "../../../pages/settings/styles/Settings.module.css";
-import { FormInput, FormSelect } from "../SettingsUI";
+import { FormInput, FormSelect } from "../components/SettingsUI";
 import { YEAR_OPTIONS } from "./accountFormConfig";
 
 export function PersonalInfoFields({ formData, onChange }) {

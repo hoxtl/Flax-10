@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { NotificationToast, showNextToast } from '../../../components/notifications/NotificationToast';
+import { NotificationToast, showNextToast } from '../../../components/notifications/components/NotificationToast';
 
 const useNotificationsMock = vi.fn();
 const playNotificationSoundMock = vi.fn();

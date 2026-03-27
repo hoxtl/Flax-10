@@ -87,12 +87,12 @@ vi.mock("../../../components/common/request_status_card/RequestStatusCard", () =
   ),
 }));
 
-vi.mock("../../../components/settings/SettingsUI", () => ({
+vi.mock("../../../components/settings/components/SettingsUI", () => ({
   SectionHeader: ({ title }) => <h3>{title}</h3>,
   SubmitButton: ({ label }) => <button type="submit">{label}</button>,
 }));
 
-vi.mock("../../../components/settings/SettingsContextCard", () => ({
+vi.mock("../../../components/settings/components/SettingsContextCard", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 

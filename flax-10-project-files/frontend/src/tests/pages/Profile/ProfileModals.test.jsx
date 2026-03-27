@@ -4,12 +4,12 @@ import ProfileModals, { SocietiesModal } from '../../../pages/profile/components
 import { getModules } from '../../../api/moduleApi';
 import { createFnMap } from '../../utils/testBuilderUtils';
 
-vi.mock('../../../components/dashboard/EditProfileModal', () => ({
+vi.mock('../../../components/dashboard/components/EditProfileModal', () => ({
     default: ({ isOpen, onClose }) =>
         isOpen ? <div data-testid="edit-profile-modal"><button onClick={onClose}>Close Edit</button></div> : null,
 }));
 
-vi.mock('../../../components/social/UserListModal', () => ({
+vi.mock('../../../components/social/components/UserListModal', () => ({
     default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
         <div data-testid="user-list-modal">
             <span>{title}</span>

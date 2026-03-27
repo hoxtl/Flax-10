@@ -2,16 +2,16 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AuthPage from '../../pages/auth/AuthPage';
 
-vi.mock('../../components/Auth/AuthComponents', () => ({
+vi.mock('../../components/Auth/utils/AuthComponents', () => ({
   Container: ({ children }) => <div>{children}</div>,
 }));
-vi.mock('../../components/Auth/SignUpForm', () => ({
+vi.mock('../../components/Auth/components/SignUpForm', () => ({
   SignUpForm: ({ onSubmit }) => <button onClick={onSubmit}>signup</button>,
 }));
-vi.mock('../../components/Auth/SignInForm', () => ({
+vi.mock('../../components/Auth/components/SignInForm', () => ({
   SignInForm: ({ onSubmit }) => <button onClick={onSubmit}>signin</button>,
 }));
-vi.mock('../../components/Auth/Overlay', () => ({
+vi.mock('../../components/Auth/components/Overlay', () => ({
   AuthOverlay: ({ onToggle }) => (
     <div>
       <button onClick={() => onToggle(true)}>to-signin</button>
@@ -19,12 +19,12 @@ vi.mock('../../components/Auth/Overlay', () => ({
     </div>
   ),
 }));
-vi.mock('../../components/Auth/ErrorMessage', () => ({
+vi.mock('../../components/Auth/components/ErrorMessage', () => ({
   ErrorMessage: ({ error }) => error ? <div data-testid="error">{error}</div> : null,
 }));
-vi.mock('../../components/Auth/AuthHeroGeometric', () => ({ default: () => <div /> }));
-vi.mock('../../components/Auth/TestimonialsMarquee', () => ({ TestimonialsMarquee: () => <div /> }));
-vi.mock('../../components/Auth/AuthBranding', () => ({
+vi.mock('../../components/Auth/components/AuthHeroGeometric', () => ({ default: () => <div /> }));
+vi.mock('../../components/Auth/components/TestimonialsMarquee', () => ({ TestimonialsMarquee: () => <div /> }));
+vi.mock('../../components/Auth/components/AuthBranding', () => ({
   AuthBrand: () => <div />, AuthFooter: () => <div />,
 }));
 

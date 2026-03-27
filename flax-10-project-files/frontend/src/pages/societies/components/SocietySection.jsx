@@ -5,9 +5,9 @@
 
 import styles from "../styles/SocietiesPage.module.css";
 import gridStyles from "../../../components/common/Card/CardGrid.module.css";
-import SocietyCard from "../../../components/society/SocietyCard";
-import BrowseCard from "../../../components/society/BrowseCard";
-import CreateCard from "../../../components/society/CreateCard";
+import SocietyCard from "../../../components/society/components/SocietyCard";
+import BrowseCard from "../../../components/society/components/BrowseCard";
+import CreateCard from "../../../components/society/components/CreateCard";
 import { Pagination } from "../../../components/pagination/Pagination";
 
 /** Displays a titled collection of societies with optional pagination. */

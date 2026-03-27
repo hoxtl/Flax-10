@@ -22,15 +22,15 @@ vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/campus_map/WalkingRouteCard", () => ({
+vi.mock("../../../components/campus_map/components/WalkingRouteCard", () => ({
   WalkingRouteCard: (props) => walkingCardMock(props),
 }));
 
-vi.mock("../../../components/campus_map/TflRouteCard", () => ({
+vi.mock("../../../components/campus_map/components/TflRouteCard", () => ({
   TflRouteCard: (props) => tflCardMock(props),
 }));
 
-vi.mock("../../../components/campus_map/CampusMapSidebarContent", () => ({
+vi.mock("../../../components/campus_map/components/CampusMapSidebarContent", () => ({
   CampusMapSidebarContent: (props) => sidebarContentMock(props),
 }));
 
@@ -40,9 +40,9 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-import { UserJourneySection } from "../../../components/campus_map/UserJourneySection";
-import { TransportModesSection } from "../../../components/campus_map/TransportModesSection";
-import { CampusMapSidebar } from "../../../components/campus_map/CampusMapSidebar";
+import { UserJourneySection } from "../../../components/campus_map/components/UserJourneySection";
+import { TransportModesSection } from "../../../components/campus_map/components/TransportModesSection";
+import { CampusMapSidebar } from "../../../components/campus_map/components/CampusMapSidebar";
 
 function JourneyHarness(props) {
   const [manualStart, setManualStart] = useState(props.initialStart || "");

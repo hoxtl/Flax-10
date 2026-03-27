@@ -63,7 +63,7 @@ vi.mock('../pages/societies/components/SocietyDetailPage', () => ({
     default: () => <div data-testid="society-detail-page">Society</div>,
 }));
 
-vi.mock('../components/onboarding/OnboardingModal', () => ({
+vi.mock('../components/onboarding/components/OnboardingModal', () => ({
     default: ({ isOpen, onComplete }) => isOpen ? <div data-testid="onboarding-modal"><button onClick={onComplete}>Complete onboarding</button></div> : null,
 }));
 

@@ -4,8 +4,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getEvents } from "../../../api/eventApi";
-import { getLastPromptShownAt, getSkippedIds, setLastPromptShownAt } from "../attendancePromptStorage";
-import { findCandidateEvent, getDateRangeForPrompt } from "../attendancePromptUtils";
+import { getLastPromptShownAt, getSkippedIds, setLastPromptShownAt } from "../utils/attendancePromptStorage";
+import { findCandidateEvent, getDateRangeForPrompt } from "../utils/attendancePromptUtils";
 
 const CHECK_INTERVAL_MS = 15 * 60 * 1000;
 const REPROMPT_COOLDOWN_MS = 15 * 60 * 1000;

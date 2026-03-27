@@ -10,7 +10,7 @@ vi.mock("../../../api/userApi", () => ({
   searchUsers: (...args) => searchUsersMock(...args),
 }));
 
-vi.mock("../../../components/social/UserSearch", () => ({
+vi.mock("../../../components/social/components/UserSearch", () => ({
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),
   useClickOutside: (...args) => useClickOutsideMock(...args),

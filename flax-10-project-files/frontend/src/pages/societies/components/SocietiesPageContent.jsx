@@ -11,7 +11,7 @@ import Tabs from "../../../components/common/Tabs/Tabs";
 import SearchBar from "../../../components/common/search_bar/SearchBar";
 import { BackToTop } from "../../../components/pagination/Pagination";
 import { usePagination } from "../../../hooks/usePagination";
-import CreateSocietyModal from "../../../components/society/CreateSocietyModal";
+import CreateSocietyModal from "../../../components/society/components/CreateSocietyModal";
 import ReportSocietyModal from "../../../components/society/society_detail/ReportSocietyModal";
 import AllSocieties from "./AllSocieties";
 import SocietySection from "./SocietySection";

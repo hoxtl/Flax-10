@@ -50,7 +50,7 @@ vi.mock('../../../pages/profile/components/ProfileCalendar', () => ({
   ProfileCalendar: () => <div data-testid="profile-calendar" />,
 }));
 
-vi.mock('../../../components/social/ShareButton', () => ({
+vi.mock('../../../components/social/components/ShareButton', () => ({
   default: () => <button data-testid="share-button">Share</button>,
 }));
 

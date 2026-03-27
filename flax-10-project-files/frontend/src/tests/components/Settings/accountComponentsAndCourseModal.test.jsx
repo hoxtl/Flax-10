@@ -47,11 +47,11 @@ vi.mock("../../../components/common/request_status_card/RequestStatusCard", () =
   ),
 }));
 
-vi.mock("../../../components/settings/SettingsContextCard", () => ({
+vi.mock("../../../components/settings/components/SettingsContextCard", () => ({
   default: ({ title, items }) => <div>{title}:{items.join("|")}</div>,
 }));
 
-vi.mock("../../../components/settings/SettingsUI", () => ({
+vi.mock("../../../components/settings/components/SettingsUI", () => ({
   SectionHeader: ({ title, description }) => <div>{title}:{description}</div>,
   SubmitButton: ({ label, savingLabel, isSaving }) => <button type="submit">{isSaving ? savingLabel : label}</button>,
 }));

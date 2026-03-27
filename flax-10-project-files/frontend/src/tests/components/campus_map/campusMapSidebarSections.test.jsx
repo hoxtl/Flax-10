@@ -11,7 +11,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/campus_map/CampusMapSidebarContent", () => ({
+vi.mock("../../../components/campus_map/components/CampusMapSidebarContent", () => ({
   CampusMapSidebarContent: () => <div data-testid="sidebar-content" />,
 }));
 
@@ -21,12 +21,12 @@ vi.mock("../../../lib/kclCampuses", () => ({
   ],
 }));
 
-import { TflStatusSection } from "../../../components/campus_map/TflStatusSection";
-import { TransportModesSection } from "../../../components/campus_map/TransportModesSection";
-import { DestinationSection } from "../../../components/campus_map/DestinationSection";
-import { LocationChip } from "../../../components/campus_map/LocationChip";
-import { CampusQuickNav } from "../../../components/campus_map/CampusQuickNav";
-import { CampusMapSidebar } from "../../../components/campus_map/CampusMapSidebar";
+import { TflStatusSection } from "../../../components/campus_map/components/TflStatusSection";
+import { TransportModesSection } from "../../../components/campus_map/components/TransportModesSection";
+import { DestinationSection } from "../../../components/campus_map/components/DestinationSection";
+import { LocationChip } from "../../../components/campus_map/components/LocationChip";
+import { CampusQuickNav } from "../../../components/campus_map/components/CampusQuickNav";
+import { CampusMapSidebar } from "../../../components/campus_map/components/CampusMapSidebar";
 
 describe("TflStatusSection", () => {
   it("renders loading and good service states", () => {

@@ -10,7 +10,7 @@ vi.mock("../../pages/campus_map/Sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/CampusMap.module.css", () => ({ default: {} }));
 vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
 
-vi.mock("../../../components/campus_map/CampusMapSidebar", () => ({
+vi.mock("../../../components/campus_map/components/CampusMapSidebar", () => ({
   CampusMapSidebar: (props) => sidebarMock(props),
 }));
 
@@ -22,8 +22,8 @@ vi.mock("../../../components/common/loading_state/SkeletonBlock", () => ({
   default: (props) => skeletonBlockMock(props),
 }));
 
-import { CampusMapShell } from "../../../components/campus_map/CampusMapShell";
-import { SidebarHeader } from "../../../components/campus_map/SidebarHeader";
+import { CampusMapShell } from "../../../components/campus_map/components/CampusMapShell";
+import { SidebarHeader } from "../../../components/campus_map/components/SidebarHeader";
 
 beforeEach(() => {
   vi.clearAllMocks();

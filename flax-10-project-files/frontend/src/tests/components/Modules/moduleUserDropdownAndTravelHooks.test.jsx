@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import UserModuleDropdown from "../../../components/modules/UserModuleDropdown";
+import UserModuleDropdown from "../../../components/modules/components/UserModuleDropdown";
 import TravelTimeIndicator from "../../../components/modules/modules/TravelTimeIndicator";
 import { useModuleTravelTime } from "../../../components/modules/modules/useModuleTravelTime";
 import { useModuleCourseFilterState } from "../../../components/modules/modules/useModuleCourseFilterState";

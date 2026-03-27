@@ -57,11 +57,11 @@ vi.mock("../../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>scroll-top</div>,
 }));
 
-vi.mock("../../../components/timer/TodayBanner", () => ({
+vi.mock("../../../components/timer/components/TodayBanner", () => ({
   default: ({ onStreakData, isStudying }) => <button type="button" onClick={() => onStreakData?.({ current_streak_days: 3 })}>today-banner-{String(isStudying)}</button>,
 }));
 
-vi.mock("../../../components/timer/WrapperComponents", () => ({
+vi.mock("../../../components/timer/components/WrapperComponents", () => ({
   MainSection: ({ onOpenHistory, onOpenFocus }) => (
     <div>
       <button type="button" onClick={onOpenHistory}>open-history</button>
@@ -78,7 +78,7 @@ vi.mock("../../../components/timer/WrapperComponents", () => ({
   FocusOverlayContent: ({ onExitFocus }) => <button type="button" onClick={onExitFocus}>exit-focus</button>,
 }));
 
-vi.mock("../../../components/ui/WordLoader", () => ({
+vi.mock("../../../components/ui/components/WordLoader", () => ({
   default: ({ words }) => <div>{words.join(",")}</div>,
 }));
 

@@ -66,7 +66,7 @@ vi.mock("../../hooks/usePagination", () => ({
   }),
 }));
 
-vi.mock("../../components/society/CreateSocietyModal", () => ({
+vi.mock("../../components/society/components/CreateSocietyModal", () => ({
   default: ({ onClose, onCreate }) => (
     <div data-testid="create-society-modal">
       <button onClick={onClose}>Close create modal</button>

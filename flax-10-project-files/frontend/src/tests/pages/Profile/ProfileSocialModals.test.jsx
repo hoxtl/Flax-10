@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProfileModals from '../../../pages/profile/components/ProfileModals';
 import { createFnMap } from '../../utils/testBuilderUtils';
-vi.mock('../../../components/social/UserListModal', () => ({
+vi.mock('../../../components/social/components/UserListModal', () => ({
   default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
     <div data-testid="user-list-modal"><span>{title}</span><button onClick={onClose}>Close List</button>{(users || []).map((u, i) => (
       <div key={i}><div onClick={() => onUserClick?.(u)}>{u.username}</div>{showCalendarAction && <button onClick={() => onUserCalendarClick?.(u)}>View calendar</button>}</div>

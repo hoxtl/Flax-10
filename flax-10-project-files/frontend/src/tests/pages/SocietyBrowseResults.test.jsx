@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("../../components/common/Card/CardGrid.module.css", () => ({ default: { grid: "grid" } }));
 
-vi.mock("../../components/society/SocietyCard", () => ({
+vi.mock("../../components/society/components/SocietyCard", () => ({
   default: ({ society, onClick, onReport, onUnreport }) => (
     <div>
       <button onClick={() => onClick?.(society.id)}>{society.name}</button>

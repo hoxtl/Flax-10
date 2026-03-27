@@ -27,7 +27,7 @@ vi.mock('../../../components/calendar/utils/weekUtils', () => ({
     getWeekIndexForDate: vi.fn(() => 2),
 }));
 
-import WeekBar from '../../../components/dashboard/WeekBar';
+import WeekBar from '../../../components/dashboard/components/WeekBar';
 import { getWeekIndexForDate } from '../../../components/calendar/utils/weekUtils';
 
 describe('WeekBar', () => {

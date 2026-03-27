@@ -53,7 +53,7 @@ const useSearchInitMock = vi.fn();
 const useFilterStateMock = vi.fn();
 const useClickOutsideMock = vi.fn();
 
-vi.mock("../../../components/social/UserSearch", () => ({
+vi.mock("../../../components/social/components/UserSearch", () => ({
   FilterSection: () => <div data-testid="filter-section" />,
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),

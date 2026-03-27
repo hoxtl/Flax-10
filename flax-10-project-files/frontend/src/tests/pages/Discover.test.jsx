@@ -6,7 +6,7 @@ vi.mock('../../api/userApi', () => ({
     searchUsers: vi.fn().mockResolvedValue({ results: [], total_count: 0 }),
 }));
 
-vi.mock('../../components/social/UserSearch', () => ({
+vi.mock('../../components/social/components/UserSearch', () => ({
     FilterSection: () => <div data-testid="filter-section" />,
     useSearchInit: vi.fn(() => ({ allCourses: {}, allSocieties: [] })),
     useFilterState: vi.fn(() => ({

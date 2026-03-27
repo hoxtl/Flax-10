@@ -10,8 +10,8 @@ vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-import { TflRouteCard } from "../../../components/campus_map/TflRouteCard";
-import { WalkingRouteCard } from "../../../components/campus_map/WalkingRouteCard";
+import { TflRouteCard } from "../../../components/campus_map/components/TflRouteCard";
+import { WalkingRouteCard } from "../../../components/campus_map/components/WalkingRouteCard";
 
 describe("TflRouteCard", () => {
   it("renders loading and error states", () => {

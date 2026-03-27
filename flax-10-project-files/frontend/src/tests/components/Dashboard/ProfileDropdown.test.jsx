@@ -15,7 +15,7 @@ vi.mock('../../../context/AuthContext', () => ({
     }),
 }));
 
-import ProfileDropdown from '../../../components/dashboard/ProfileDropdown';
+import ProfileDropdown from '../../../components/dashboard/components/ProfileDropdown';
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
 

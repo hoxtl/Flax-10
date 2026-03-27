@@ -10,7 +10,7 @@ import {
   FormInput,
   FormSelect,
   ThemeSelector,
-} from "../../../components/settings/SettingsUI";
+} from "../../../components/settings/components/SettingsUI";
 
 vi.mock("../../../components/common/animated_dropdown", () => ({
   default: ({ value, onChange, options, placeholder, grouped }) => {
