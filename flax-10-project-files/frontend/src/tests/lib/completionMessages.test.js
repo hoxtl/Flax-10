@@ -20,6 +20,11 @@ describe('isRoutineTask', () => {
         expect(isRoutineTask({ title: 'Study Maths' })).toBe(false);
         expect(isRoutineTask({ title: 'Read chapter 2' })).toBe(false);
     });
+
+    it('returns false when the task object has no title', () => {
+        expect(isRoutineTask({})).toBe(false);
+        expect(isRoutineTask({ title: '' })).toBe(false);
+    });
 });
 
 describe('getCompletionMessage', () => {
@@ -62,8 +67,42 @@ describe('getCompletionMessage', () => {
         expect(msg.length).toBeGreaterThan(0);
     });
 
+    it('can return a reflective message when calm selection lands in the middle band', () => {
+        const randomSpy = vi.spyOn(Math, 'random')
+            .mockReturnValueOnce(0.8)
+            .mockReturnValueOnce(0);
+        const msg = getCompletionMessage({ title: 'Study algebra' }, {});
+        const reflectiveMessages = [
+            'Quiet progress. The path clears.',
+            'Ground under your feet. Clarity ahead.',
+            'Well composed. Onward.',
+            'Precision pays off. Next.',
+        ];
+        expect(reflectiveMessages).toContain(msg);
+        randomSpy.mockRestore();
+    });
+
+    it('can return a generic message when calm selection lands in the default band', () => {
+        const randomSpy = vi.spyOn(Math, 'random')
+            .mockReturnValueOnce(0.2)
+            .mockReturnValueOnce(0);
+        const msg = getCompletionMessage({ title: 'Study algebra' }, {});
+        const genericMessages = [
+            'Focus maintained. One step closer.',
+            'Nicely done. Take a deep breath.',
+            'Momentum is on your side.',
+            'One step closer. Well done.',
+            'Steady progress. Keep going.',
+            'Cleared. Breathe. Continue.',
+        ];
+        expect(genericMessages).toContain(msg);
+        randomSpy.mockRestore();
+    });
+
     it('can return Lenny message when pickCalmCleverMessage gets r >= 0.9', () => {
-        const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.95);
+        const randomSpy = vi.spyOn(Math, 'random')
+            .mockReturnValueOnce(0.95)
+            .mockReturnValueOnce(0);
         const msg = getCompletionMessage(null);
         const lennyMessages = [
             'Lenny the campus cat sends a slow blink of approval.',
