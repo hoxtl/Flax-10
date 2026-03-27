@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import styles from "../Tabs.module.css";
+import styles from "../tabs.module.css";
 import { formatShortDate } from "../../../../calendar/utils/dateUtils";
 import ImageGalleryModal from "../../image_handlers/ImageGalleryModal";
 import { getImageList } from "./announcementModalHelpers";
