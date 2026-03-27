@@ -16,7 +16,7 @@ vi.mock("../../../pages/group_work/utils/taskUtils", () => ({
   filterVisibleAssignees: vi.fn((a) => a),
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
@@ -105,7 +105,6 @@ describe("GroupWork task component - List", () => {
     );
 
     fireEvent.click(screen.getByTitle("Delete task"));
-    fireEvent.click(screen.getByText("confirm-hold"));
     expect(onDelete).toHaveBeenCalledWith(5);
   });
 

@@ -13,7 +13,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("../../pages/Banned/BannedPage", () => ({
+vi.mock("../../pages/banned/BannedPage", () => ({
   default: ({ reason }) => <div>{`Banned:${reason}`}</div>,
 }));
 
@@ -81,12 +81,16 @@ vi.mock("../../context/TaskCompletionContext", () => ({
   TaskCompletionProvider: ({ children }) => <div data-testid="task-completion-provider">{children}</div>,
 }));
 
-vi.mock("../../components/Notifications", () => ({
+vi.mock("../../components/notifications", () => ({
   NotificationToast: () => <div>NotificationToast</div>,
 }));
 
-vi.mock("../../components/Attendance/AttendancePrompt", () => ({
+vi.mock("../../components/attendance/components/AttendancePrompt", () => ({
   default: () => <div>AttendancePrompt</div>,
+}));
+
+vi.mock("../../app/hooks/useTourCheck", () => ({
+  useTourCheck: () => [false, vi.fn()],
 }));
 
 import { AppProviders } from "../../app/components/AppProviders";

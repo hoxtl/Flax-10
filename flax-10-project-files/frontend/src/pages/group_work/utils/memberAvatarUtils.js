@@ -118,5 +118,5 @@ export function getCurrentMember(members = []) {
   const viewer = getStoredViewer();
   const viewerId = String(viewer.id ?? viewer.user ?? "");
   if (!viewerId) return null;
-  return members.find((m) => String(m.user ?? m.id ?? "") === viewerId);
+  return members.find((m) => String(m.user ?? m.id ?? "") === viewerId) || null;
 }

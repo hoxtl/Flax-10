@@ -31,48 +31,48 @@ vi.mock('../../api/analyticsApi', () => ({
     },
 }));
 
-vi.mock('../../components/Analytics/SummaryCards', () => ({
+vi.mock('../../components/analytics/components/SummaryCards', () => ({
     default: ({ data }) => <div data-testid="summary-cards">{data ? 'loaded' : 'no-data'}</div>,
 }));
 
-vi.mock('../../components/Analytics/ProductivityCards', () => ({
+vi.mock('../../components/analytics/components/ProductivityCards', () => ({
     default: () => <div data-testid="productivity-cards" />,
 }));
 
-vi.mock('../../components/Analytics/StudyHoursChart', () => ({
+vi.mock('../../components/analytics/components/StudyHoursChart', () => ({
     default: () => <div data-testid="study-hours-chart" />,
 }));
 
-vi.mock('../../components/Analytics/DailyBreakdownChart', () => ({
+vi.mock('../../components/analytics/components/DailyBreakdownChart', () => ({
     default: () => <div data-testid="daily-breakdown-chart" />,
 }));
 
-vi.mock('../../components/Analytics/StudyHeatmap', () => ({
+vi.mock('../../components/analytics/components/StudyHeatmap', () => ({
     default: () => <div data-testid="study-heatmap" />,
 }));
 
-vi.mock('../../components/Analytics/AttendanceChart', () => ({
+vi.mock('../../components/analytics/components/AttendanceChart', () => ({
     default: () => <div data-testid="attendance-chart" />,
 }));
 
-vi.mock('../../components/Analytics/PlannedVsActualChart', () => ({
+vi.mock('../../components/analytics/components/PlannedVsActualChart', () => ({
     default: () => <div data-testid="planned-vs-actual-chart" />,
 }));
 
-vi.mock('../../components/Analytics/ThemeUsageChart', () => ({
+vi.mock('../../components/analytics/components/ThemeUsageChart', () => ({
     default: () => <div data-testid="theme-usage-chart" />,
 }));
 
-vi.mock('../../components/Analytics/AIInsightsTab', () => ({
+vi.mock('../../components/analytics/components/AIInsightsTab', () => ({
     default: () => <div data-testid="ai-insights-tab" />,
 }));
 
-vi.mock('../../components/Analytics/InsightCards', () => ({
+vi.mock('../../components/analytics/components/InsightCards', () => ({
     ConsistencyScore: () => <div data-testid="consistency-score" />,
     PeakHoursCard: () => <div data-testid="peak-hours-card" />,
 }));
 
-import AnalyticsPage from '../../pages/Analytics/AnalyticsPage';
+import AnalyticsPage from '../../pages/analytics/AnalyticsPage';
 import analyticsService from '../../api/analyticsApi';
 
 describe('AnalyticsPage', () => {
@@ -82,12 +82,12 @@ describe('AnalyticsPage', () => {
 
     it('renders page title', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => expect(screen.getByText('Analytics')).toBeTruthy());
+        await waitFor(() => expect(screen.getAllByText('Analytics').length).toBeGreaterThan(0));
     });
 
     it('renders period toggle buttons', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => screen.getByText('Analytics'));
+        await waitFor(() => screen.getAllByText('Analytics'));
         expect(screen.getByText('7d')).toBeTruthy();
         expect(screen.getByText('30d')).toBeTruthy();
         expect(screen.getByText('90d')).toBeTruthy();
@@ -95,7 +95,7 @@ describe('AnalyticsPage', () => {
 
     it('renders tab buttons', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => screen.getByText('Analytics'));
+        await waitFor(() => screen.getAllByText('Analytics'));
         expect(screen.getByText(/Overview/)).toBeTruthy();
         expect(screen.getByText(/AI Insights/)).toBeTruthy();
     });
@@ -140,5 +140,31 @@ describe('AnalyticsPage', () => {
         analyticsService.getThemeStats.mockRejectedValueOnce({});
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => expect(screen.getByText(/Failed to load analytics data/)).toBeTruthy());
+    });
+
+    it('shows the no-sessions empty state and dispatches navigation to timer', async () => {
+        analyticsService.getSummary.mockResolvedValueOnce({
+            summary: {
+                total_study_hours: 0,
+                total_sessions: 0,
+                avg_session_minutes: 0,
+                current_streak_days: 0,
+                longest_session_minutes: 0,
+                active_days: 0,
+            },
+            period_days: 30,
+        });
+        analyticsService.getProgress.mockResolvedValueOnce({});
+        analyticsService.getThemeStats.mockResolvedValueOnce({});
+        const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
+
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
+
+        await waitFor(() => expect(screen.getByText('No study data yet')).toBeTruthy());
+        fireEvent.click(screen.getByText('Open Timer'));
+        expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'navigate',
+            detail: 'timer',
+        }));
     });
 });

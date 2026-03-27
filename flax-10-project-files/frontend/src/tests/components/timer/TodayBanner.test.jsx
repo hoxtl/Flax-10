@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import TodayBanner from '../../../components/Timer/TodayBanner';
+import TodayBanner from '../../../components/timer/components/TodayBanner';
 import analyticsService from '../../../api/analyticsApi';
 
 const statStripSpy = vi.fn();
@@ -22,11 +22,11 @@ vi.mock('../../../hooks/useCountUp', () => ({
   useCountUp: () => undefined,
 }));
 
-vi.mock('../../../components/Timer/utils/historyEvents', () => ({
+vi.mock('../../../components/timer/utils/historyEvents', () => ({
   listenToTimerHistoryEvents: () => () => {},
 }));
 
-vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
   default: {
     todayMetricBanner: 'todayMetricBanner',
   },

@@ -5,7 +5,7 @@ vi.mock('lucide-react', () => ({
     ArrowUp: () => <svg data-testid="arrow-up" />,
 }));
 
-import { Pagination, BackToTop } from '../../components/Pagination/Pagination';
+import { Pagination, BackToTop } from '../../components/pagination/Pagination';
 
 describe('Pagination', () => {
     it('returns null when totalPages <= 1', () => {
@@ -82,6 +82,41 @@ describe('Pagination', () => {
         expect(screen.getByText('4')).toBeInTheDocument();
         expect(screen.getByText('6')).toBeInTheDocument();
         expect(screen.getAllByText('...').length).toBe(2);
+    });
+
+    it('hides nav button text when measured width is below the threshold', () => {
+        const original = HTMLElement.prototype.getBoundingClientRect;
+        HTMLElement.prototype.getBoundingClientRect = vi.fn(function getBoundingClientRect() {
+            const text = this.textContent || '';
+            const width = text.includes('Previous') ? 40 : text.includes('Next') ? 30 : 120;
+            return { width, height: 20, top: 0, left: 0, right: width, bottom: 20, x: 0, y: 0 };
+        });
+
+        try {
+            render(<Pagination currentPage={2} totalPages={5} onPageChange={vi.fn()} />);
+            expect(screen.getByRole('button', { name: '←' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: '→' })).toBeInTheDocument();
+        } finally {
+            HTMLElement.prototype.getBoundingClientRect = original;
+        }
+    });
+
+    it('keeps full nav labels when ResizeObserver is unavailable', () => {
+        const originalResizeObserver = global.ResizeObserver;
+        const original = HTMLElement.prototype.getBoundingClientRect;
+        delete global.ResizeObserver;
+        HTMLElement.prototype.getBoundingClientRect = vi.fn(() => ({
+            width: 120, height: 20, top: 0, left: 0, right: 120, bottom: 20, x: 0, y: 0,
+        }));
+
+        try {
+            render(<Pagination currentPage={2} totalPages={5} onPageChange={vi.fn()} />);
+            expect(screen.getByRole('button', { name: '← Previous' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Next →' })).toBeInTheDocument();
+        } finally {
+            global.ResizeObserver = originalResizeObserver;
+            HTMLElement.prototype.getBoundingClientRect = original;
+        }
     });
 });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { timerReducer, initialState } from '../../components/Timer/utils/timerReducer';
+import { timerReducer, initialState } from '../../components/timer/utils/timerReducer';
 
 describe('timerReducer', () => {
     it('returns initial state correctly', () => {

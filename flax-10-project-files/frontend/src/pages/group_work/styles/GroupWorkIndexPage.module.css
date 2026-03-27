@@ -1,0 +1,43 @@
+.container {
+    min-height: 100%;
+    color: var(--text);
+}
+
+.deadlineBanner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 14px;
+    border: 0.5px solid color-mix(in srgb, var(--warning, orange) 30%, var(--border));
+    background: color-mix(in srgb, var(--warning, orange) 6%, var(--surface-card));
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.deadlineBannerIcon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.deadlineBannerText {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.deadlineBannerText strong {
+    font-weight: 800;
+}
+
+.deadlineBannerActions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+

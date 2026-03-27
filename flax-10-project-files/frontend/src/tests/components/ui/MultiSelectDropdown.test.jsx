@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import MultiSelectDropdown from '../../../components/ui/MultiSelectDropdown';
+import MultiSelectDropdown from '../../../components/ui/components/MultiSelectDropdown';
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy(

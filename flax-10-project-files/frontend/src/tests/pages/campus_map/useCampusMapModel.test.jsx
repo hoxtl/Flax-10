@@ -19,7 +19,7 @@ vi.mock("../../../pages/campus_map/hooks/useDisruptions", () => ({
 vi.mock("../../../pages/campus_map/hooks/useHomeAddress", () => ({
   useHomeAddress: () => ({ userHome: null }),
 }));
-vi.mock("../../../pages/campus_map/mapHelpers", () => ({
+vi.mock("../../../pages/campus_map/utils/mapHelpers", () => ({
   cleanupMap: vi.fn(),
   clearRouteSource: vi.fn(),
   createMapClickHandler: vi.fn(() => vi.fn()),

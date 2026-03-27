@@ -5,7 +5,7 @@ import { Pencil, Trash2, MapPin, Clock, AlignLeft } from 'lucide-react';
 import { calculatePopoverPosition, calculateArrowPosition } from './popoverUtils';
 import { isAllDayEvent } from '../utils/eventDisplayUtils';
 import { formatTimeRange } from '../utils/dateUtils';
-import Badge from '../../common/Badge/Badge';
+import Badge from '../../common/badge/Badge';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import LocationLink from '../../common/location_link/LocationLink';
 import styles from './EventPopover.module.css';

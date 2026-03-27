@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import styles from './PasswordReset.module.css';
-import PasswordResetPageLayout from './PasswordResetPageLayout';
+import styles from './styles/PasswordReset.module.css';
+import PasswordResetPageLayout from './components/PasswordResetPageLayout';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 function useConfirmForm() {
   const [formData, setFormData] = useState({ new_password: '', confirm_password: '' });

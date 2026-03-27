@@ -6,11 +6,12 @@ import { motion as Motion } from "framer-motion";
 import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { ConfirmModal } from "../../../components/common";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+import { useAuth } from "../../../context/AuthContext";
 import { MiniTimeline } from "./mini_timeline";
-import widgetStyles from "../../Modules/DashboardWidgets.module.css";
+import widgetStyles from "../../modules/styles/DashboardWidgets.module.css";
 
 const SECTION_ANIMATION = { opacity: 0, y: 30 };
 const SECTION_VISIBLE = { opacity: 1, y: 0 };
@@ -18,33 +19,37 @@ const SECTION_TRANSITION = { duration: 0.6, ease: [0.23, 1, 0.32, 1] };
 const SECTION_VIEWPORT = { once: true, margin: "-50px" };
 
 export function HomepageTimelineSection(props) {
-  const content = <TimelineContent {...props} />;
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
+  const content = <TimelineContent {...props} isTeacher={isTeacher} />;
   if (props.isWidget) return content;
   return <Motion.div className={props.styles.bentoSpine} id="timeline-section" initial={SECTION_ANIMATION} whileInView={SECTION_VISIBLE} viewport={SECTION_VIEWPORT} transition={SECTION_TRANSITION}>{content}</Motion.div>;
 }
 
-function TimelineInnerContent(props, showRescheduleConfirm, setShowRescheduleConfirm) {
+function TimelineInnerContent(props, showRescheduleConfirm, setShowRescheduleConfirm, isTeacher) {
   return (
     <>
       <TimelineHeader {...props} onOpenRescheduleConfirm={() => setShowRescheduleConfirm(true)} />
       <TimelineTrack styles={props.styles}><MiniTimeline {...getMiniTimelineProps(props)} /></TimelineTrack>
-      <RescheduleConfirmModal open={showRescheduleConfirm} onCancel={() => setShowRescheduleConfirm(false)} onConfirm={() => confirmReschedule(props, setShowRescheduleConfirm)} />
+      <RescheduleConfirmModal open={showRescheduleConfirm} onCancel={() => setShowRescheduleConfirm(false)} onConfirm={() => confirmReschedule(props, setShowRescheduleConfirm)} isTeacher={isTeacher} />
     </>
   );
 }
 
 function TimelineContent(props) {
   const [showRescheduleConfirm, setShowRescheduleConfirm] = useState(false);
-  const inner = TimelineInnerContent(props, showRescheduleConfirm, setShowRescheduleConfirm);
+  const inner = TimelineInnerContent(props, showRescheduleConfirm, setShowRescheduleConfirm, props.isTeacher);
   if (props.isWidget) return inner;
   return <div className={props.styles.timelineBox}>{inner}</div>;
 }
 
 function TimelineHeader(props) {
   return (
-    <div className={widgetStyles.widgetHeader}>
-      <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
-      <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
+    <div className={props.styles.timelineHeader}>
+      <div className={props.styles.timelineHeaderLeft}>
+        <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
+        <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
+      </div>
       <div className={props.styles.timelineHeaderRight}>
         <CalendarLink styles={props.styles} />
         <AutoScheduleButton {...props} />
@@ -86,7 +91,12 @@ function RescheduleEventsButton({ handleResolveTimelineConflicts, onOpenReschedu
   );
 }
 
-function RescheduleConfirmModal({ open, onCancel, onConfirm }) {
+function getRescheduleHint(isTeacher) {
+  const fixed = isTeacher ? "Lectures, exams," : "Lectures, societies, exams,";
+  return `⚠️ ${fixed} and fixed deadlines stay where they are.`;
+}
+
+function RescheduleConfirmModal({ open, onCancel, onConfirm, isTeacher }) {
   if (!open) return null;
   return (
     <ConfirmModal
@@ -96,7 +106,7 @@ function RescheduleConfirmModal({ open, onCancel, onConfirm }) {
       cancelText="Keep plan"
       onConfirm={onConfirm}
       onCancel={onCancel}
-      infoHint="⚠️ Lectures, societies, exams, and fixed deadlines stay where they are."
+      infoHint={getRescheduleHint(isTeacher)}
     />
   );
 }

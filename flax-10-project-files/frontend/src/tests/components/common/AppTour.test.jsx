@@ -42,7 +42,7 @@ describe("AppTour", () => {
 
   const nextStep = async () => {
     fireEvent.click(screen.getByText("Next"));
-    await act(async () => { vi.advanceTimersByTime(100); });
+    await act(async () => { vi.advanceTimersByTime(150); });
   };
   it("measures targeted steps and applies spotlight", async () => {
     vi.spyOn(document, "querySelector").mockReturnValue({
@@ -53,8 +53,9 @@ describe("AppTour", () => {
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     const overlay = getOverlay();
     expect(overlay?.style.clipPath).toContain("polygon");
-    const card = screen.getByText("Dashboard").parentElement;
-    expect(card?.style.left).toBe("178px");
+    const card = Array.from(screen.getByRole("dialog", { name: "App tour" }).querySelectorAll("div[style]"))
+      .find((element) => element.textContent?.includes("Dashboard") && element.style.left);
+    expect(card?.style.left).toBe("100px");
   });
   it("supports back navigation", async () => {
     render(<AppTour onDone={vi.fn()} />);
@@ -63,10 +64,11 @@ describe("AppTour", () => {
     expect(screen.getByText("Welcome to StudyFlax")).toBeInTheDocument();
   });
 
-  it("calls onDone when the user skips", () => {
+  it("calls onDone when the user skips", async () => {
     const onDone = vi.fn();
     render(<AppTour onDone={onDone} />);
 
+    await nextStep();
     fireEvent.click(screen.getByText("Skip tour"));
 
     expect(onDone).toHaveBeenCalledTimes(1);

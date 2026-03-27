@@ -2,10 +2,10 @@
  * Overtime timer modals.
  */
 
-import styles from '../../../pages/Timer/TimerPage.module.css';
+import styles from '../../../pages/timer/TimerPage.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import StandardModal from '../../common/standard_modal/StandardModal';
-import { formatTime } from '../TimerComponents';
+import { formatTime } from '../components/TimerComponents';
 
 function getOvertimeCopy(mode, isLastSession) {
   return {

@@ -2,7 +2,7 @@ import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { useCalendarData } from '../../../context/CalendarContext';
 import { EventRow, ConflictRow } from './EventRow';
 import { isAllDay } from '../utils/eventUtils';
-import { Pagination, BackToTop } from '../../Pagination/Pagination';
+import { Pagination, BackToTop } from '../../pagination/Pagination';
 import { getEffectiveTagName, sortByStartTime } from '../utils/eventUtils';
 import styles from './ListView.module.css';
 

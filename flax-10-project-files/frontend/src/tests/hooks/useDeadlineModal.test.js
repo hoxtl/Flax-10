@@ -1,17 +1,22 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useDeadlineModal } from '../../components/Modules/hooks/useDeadlineModal';
+import { useDeadlineModal } from '../../components/modules/hooks/useDeadlineModal';
 
 const getDeadlinesMock = vi.fn();
 const createDeadlineMock = vi.fn();
 const updateDeadlineMock = vi.fn();
 const deleteDeadlineMock = vi.fn();
+const showToastMock = vi.fn();
 
 vi.mock('../../api/deadlineApi', () => ({
   getDeadlines: (...args) => getDeadlinesMock(...args),
   createDeadline: (...args) => createDeadlineMock(...args),
   updateDeadline: (...args) => updateDeadlineMock(...args),
   deleteDeadline: (...args) => deleteDeadlineMock(...args),
+}));
+
+vi.mock('../../context/ToastContext', () => ({
+  useToast: () => showToastMock,
 }));
 
 describe('useDeadlineModal', () => {
@@ -58,6 +63,7 @@ describe('useDeadlineModal', () => {
     });
 
     expect(createDeadlineMock).toHaveBeenCalledWith(7, { title: 'Exam', end_due_date: null });
+    expect(showToastMock).toHaveBeenCalledWith('Deadline added.', { variant: 'success' });
     expect(result.current.deadlines).toEqual([{ id: 1, title: 'CW' }, { id: 2, title: 'Exam' }]);
     expect(result.current.showForm).toBe(false);
   });
@@ -74,6 +80,7 @@ describe('useDeadlineModal', () => {
     });
 
     expect(updateDeadlineMock).toHaveBeenCalledWith(7, 1, { title: 'CW updated', end_due_date: '2026-03-11' });
+    expect(showToastMock).toHaveBeenCalledWith('Deadline updated.', { variant: 'success' });
     expect(result.current.deadlines).toEqual([{ id: 1, title: 'CW updated' }, { id: 3, title: 'Exam' }]);
   });
 
@@ -86,6 +93,7 @@ describe('useDeadlineModal', () => {
     });
 
     expect(deleteDeadlineMock).toHaveBeenCalledWith(9, 1);
+    expect(showToastMock).toHaveBeenCalledWith('Deadline deleted.', { variant: 'success' });
     expect(result.current.deadlines).toEqual([]);
   });
 });

@@ -2,9 +2,9 @@
  * Task picker utility helpers.
  */
 
-import { FOCUS_BLOCK_COLOURS_HEX } from '../../../pages/Tasks/constants/focusBlockColours';
+import { FOCUS_BLOCK_COLOURS_HEX } from '../../../pages/tasks/constants/focusBlockColours';
 import { normalizeModuleCode, getModuleCodePrefix } from '../../../utils/moduleCodeUtils';
-import { isEnrolledIn } from '../../Modules/utils/moduleUtils';
+import { isEnrolledIn } from '../../modules/utils/moduleUtils';
 import { compareTaskDue, compareTaskEstimatedTime, compareTaskPriority, getTaskDurationMinutes } from '../../../lib/focusPlanner';
 import { SORT_ALPHA, SORT_ALPHA_DESC, SORT_DATE_ADDED, SORT_DATE_ADDED_ASC, SORT_DUE, SORT_TIME } from './taskInputConstants';
 

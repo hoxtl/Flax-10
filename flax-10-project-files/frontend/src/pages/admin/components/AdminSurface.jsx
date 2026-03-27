@@ -3,7 +3,7 @@
  */
 
 import { motion } from "framer-motion";
-import styles from "../styles";
+import styles from "../styles/styles";
 import { fadeUp } from "../utils/adminMotion";
 
 export function SectionCard({ children }) {

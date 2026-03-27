@@ -9,12 +9,12 @@ import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.
 import { formatDate } from '../../calendar/utils/dateUtils.js';
 import { getInitials } from '../../Auth/utils/userUtils.js';
 import { useAuth } from '../../../context/AuthContext.jsx';
-import Badge from '../../common/Badge/Badge.jsx';
-import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
+import Badge from '../../common/badge/Badge.jsx';
 import { getUrgencyTier } from '../../common/deadline_countdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/back_button/BackButton.jsx';
+import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
 import PrimaryButton from '../../common/primary_button/PrimaryButton.jsx';
-import Tooltip from '../../common/Tooltip/Tooltip.jsx';
+import Tooltip from '../../common/tooltip/Tooltip.jsx';
 import LocationLink from '../../common/location_link/LocationLink.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
@@ -28,7 +28,7 @@ function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
 }
 
-function getNextDeadline(deadlines = []) {
+function getNextDeadline(deadlines) {
     const now = new Date();
     const sorted = getSortedDeadlines(deadlines);
     return sorted.find((d) => new Date(d.start_due_date) >= now) || sorted[0] || null;
@@ -49,7 +49,7 @@ function getUrgencyText(kind) {
     return "Later";
 }
 
-function getTimelineProgress(deadlines = []) {
+function getTimelineProgress(deadlines) {
     if (deadlines.length < 2) return null;
     const dates = deadlines.map((d) => new Date(d.start_due_date)).filter((d) => !Number.isNaN(d.getTime()));
     if (dates.length < 2) return null;
@@ -74,21 +74,25 @@ function TutorPhoto({ photo, name }) {
     return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={(event) => hideBrokenTutorImage(event, "inline-flex")} />;
 }
 
-function TutorName({ id, name }) {
-    if (id) return <EntityLinkChip to={`/profile/${id}`} className={heroStyles.heroMetaValue}>{name || "Unknown"}</EntityLinkChip>;
-    return <span className={heroStyles.heroMetaValue}>{name || "Unknown"}</span>;
+function TutorPillInner({ photo, name }) {
+    return (
+        <div className={heroStyles.tutorInline}>
+            <TutorPhoto photo={photo} name={name} />
+            <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(name)}</span>
+            <span className={heroStyles.heroMetaValue}>{name}</span>
+        </div>
+    );
 }
 
 function TutorMetaItem({ module, photo }) {
     const tutorName = module.created_by_name || "Unknown";
+    const tutorId = module.created_by;
     return (
         <div className={heroStyles.heroMetaItem}>
             <span className={heroStyles.heroMetaLabel}>Tutor</span>
-            <div className={heroStyles.tutorInline}>
-                <TutorPhoto photo={photo} name={tutorName} />
-                <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(tutorName)}</span>
-                <TutorName id={module.created_by} name={tutorName} />
-            </div>
+            {tutorId
+                ? <Link to={`/profile/${tutorId}`} className={heroStyles.tutorPillLink}><TutorPillInner photo={photo} name={tutorName} /></Link>
+                : <TutorPillInner photo={photo} name={tutorName} />}
         </div>
     );
 }
@@ -224,7 +228,7 @@ function ModuleProjectsCard({ moduleCode }) {
         <article className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>Study Projects</h2>
             <div className={deadlineStyles.deadlinesList}>
-                {projects.map((p, i) => <ProjectRow key={p.id} project={p} index={i} />)}
+                {projects.map((p, i) => <ProjectRow key={p.id ?? `${p.name || "project"}-${i}`} project={p} index={i} />)}
             </div>
         </article>
     );
@@ -332,7 +336,7 @@ function DeadlinesSection({ deadlines }) {
     if (!deadlines?.length) return <p className={deadlineStyles.emptyText}>No assignments yet.</p>;
     return (
         <div className={deadlineStyles.deadlinesList}>
-            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} />)}
+            {deadlines.map((d, i) => <DeadlineItem key={d.id ?? `${d.title || "deadline"}-${d.start_due_date || i}-${i}`} deadline={d} index={i} />)}
         </div>
     );
 }
@@ -342,7 +346,7 @@ function ReadingsSection({ readings }) {
     const sorted = [...readings].sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
     return (
         <div className={deadlineStyles.deadlinesList}>
-            {sorted.map((r, i) => <ReadingRow key={r.id} reading={r} index={i} />)}
+            {sorted.map((r, i) => <ReadingRow key={r.id ?? `${r.title || "reading"}-${r.deadline || i}-${i}`} reading={r} index={i} />)}
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useEventPopupListener } from '../../components/Calendar/hooks/useEventPopupListener';
+import { useEventPopupListener } from '../../components/calendar/hooks/useEventPopupListener';
 
 const useCalendarMock = vi.fn();
 const useEventPopupMock = vi.fn();

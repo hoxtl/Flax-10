@@ -30,8 +30,8 @@ function LocationLinkButton({
   className,
   iconClassName,
   textClassName,
-  showIcon = true,
-  iconSize = 14,
+  showIcon,
+  iconSize,
   handleClick,
 }) {
   return (

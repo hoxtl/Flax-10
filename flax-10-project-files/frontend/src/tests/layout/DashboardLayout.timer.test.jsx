@@ -200,7 +200,7 @@ describe("DashboardLayout - society, timer, global task", () => {
 
   it("GlobalTaskModal filters modules by isEnrolledIn so enrolledModules is passed to CreateTaskModal", async () => {
     const { getModules, getEnrollments } = await import("../../api/moduleApi");
-    const { isEnrolledIn } = await import("../../components/Modules/utils/moduleUtils");
+    const { isEnrolledIn } = await import("../../components/modules/utils/moduleUtils");
     getModules.mockResolvedValueOnce([{ id: 1, module_code: "CS101" }, { id: 2, module_code: "CS102" }]);
     getEnrollments.mockResolvedValueOnce([{ module: 1 }]);
     isEnrolledIn.mockImplementation((moduleId, enrollments) => enrollments.some((e) => e.module === moduleId));

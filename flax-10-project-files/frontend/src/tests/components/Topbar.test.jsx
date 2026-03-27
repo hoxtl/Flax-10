@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TopBar from '../../components/Dashboard/Topbar';
+import TopBar from '../../components/dashboard/components/Topbar';
 
-vi.mock('../../components/Dashboard/ProfileDropdown', () => ({
+vi.mock('../../components/dashboard/components/ProfileDropdown', () => ({
   default: ({ onSettingsClick, onLogoutClick, onProfileClick }) => (
     <div>
       <button onClick={onSettingsClick}>settings</button>
@@ -12,7 +12,7 @@ vi.mock('../../components/Dashboard/ProfileDropdown', () => ({
   ),
 }));
 
-vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
+vi.mock('../../components/dashboard/components/ExpandableTabs', () => ({
   ExpandableTabs: ({ tabs = [], onChange }) => (
     <div>
       <button data-testid={`tab-${tabs[0]?.title || 'unknown'}`} onClick={() => onChange(0)}>
@@ -23,12 +23,12 @@ vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
   ),
 }));
 
-vi.mock('../../components/Dashboard/ThemeToggle', () => ({ default: () => <button>theme</button> }));
-vi.mock('../../components/Timer/MiniTimer', () => ({ default: () => <div>timer</div> }));
+vi.mock('../../components/dashboard/components/ThemeToggle', () => ({ default: () => <button>theme</button> }));
+vi.mock('../../components/timer/components/MiniTimer', () => ({ default: () => <div>timer</div> }));
 vi.mock('../../context/NotificationContext', () => ({
   useNotifications: vi.fn(() => ({ togglePanel: vi.fn(), notifications: [] })),
 }));
-vi.mock('../../components/Notifications/NotificationPanel', () => ({
+vi.mock('../../components/notifications/components/NotificationPanel', () => ({
   NotificationPanel: () => <div>notifications</div>
 }));
 

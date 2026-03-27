@@ -6,12 +6,13 @@
 import { useState } from "react";
 import { Clock, Sparkles } from "lucide-react";
 import { useCalendar } from "../../../../context/CalendarContext";
+import { useAuth } from "../../../../context/AuthContext";
 import { useToast } from "../../../../context/ToastContext";
 import ConfirmModal from "../../../common/confirm_modal/ConfirmModal";
-import Tooltip from "../../../common/Tooltip/Tooltip";
+import Tooltip from "../../../common/tooltip/Tooltip";
 import { useCalendarEvents, useEventActions } from "../../hooks/useCalendarEvents";
 import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../common/reschedule_events/rescheduleEventConflicts";
-import { loadScheduleSettings, loadUpcomingDeadlineItems, submitAutoScheduleWithPrefs } from "../../../Schedules/auto/autoScheduleActions";
+import { loadScheduleSettings, loadUpcomingDeadlineItems, submitAutoScheduleWithPrefs } from "../../../schedules/auto/autoScheduleActions";
 import styles from "../CalendarHeaderUtils.module.css";
 
 function TriggerButton({ busy, onClick }) {
@@ -48,13 +49,13 @@ function AutoScheduleButton({ busy, onClick }) {
   );
 }
 
-async function executeReschedule(events, selectedDate, editEvent, showToast, setBusy) {
+async function executeReschedule(events, selectedDate, editEvent, showToast, setBusy, isTeacher) {
   const plan = buildConflictResolutionPlan(events, selectedDate);
   if (!plan.operations.length) {
-    showToast(buildConflictResolutionToastMessage(plan));
+    showToast(buildConflictResolutionToastMessage(plan, isTeacher));
     return;
   }
-  await withBusyState(setBusy, () => runReschedulePlan(plan, editEvent, showToast));
+  await withBusyState(setBusy, () => runReschedulePlan(plan, editEvent, showToast, isTeacher));
 }
 
 async function withBusyState(setBusy, task) {
@@ -66,26 +67,26 @@ async function withBusyState(setBusy, task) {
   }
 }
 
-async function runReschedulePlan(plan, editEvent, showToast) {
+async function runReschedulePlan(plan, editEvent, showToast, isTeacher) {
   try {
     const result = await applyConflictResolutionPlan(plan, editEvent);
-    handleRescheduleResult(plan, result, showToast);
+    handleRescheduleResult(plan, result, showToast, isTeacher);
   } catch {
     showToast("Couldn't reschedule your events. Try again.");
   }
 }
 
-function handleRescheduleResult(plan, result, showToast) {
+function handleRescheduleResult(plan, result, showToast, isTeacher) {
   const failureCount = result?.failures?.length ?? 0;
   if (failureCount === plan.operations.length) {
     showToast("Couldn't reschedule your events. Some conflicts are read-only.");
     return;
   }
-  showToast(buildScheduleMessage(plan, failureCount));
+  showToast(buildScheduleMessage(plan, failureCount, isTeacher));
 }
 
-function buildScheduleMessage(plan, failureCount) {
-  const message = buildConflictResolutionToastMessage(plan);
+function buildScheduleMessage(plan, failureCount, isTeacher) {
+  const message = buildConflictResolutionToastMessage(plan, isTeacher);
   return failureCount ? `${message} ${failureCount} couldn't be moved.` : message;
 }
 
@@ -100,9 +101,22 @@ async function executeAutoSchedule(showToast, loadEvents, setBusy) {
   }
 }
 
-function RescheduleConfirmModal({ onConfirm, onCancel }) {
+function getRescheduleHint(isTeacher) {
+  const fixed = isTeacher ? "Lectures, exams," : "Lectures, societies, exams,";
+  return `⚠️ ${fixed} and fixed deadlines stay where they are.`;
+}
+
+function RescheduleConfirmModal({ onConfirm, onCancel, isTeacher }) {
   return (
-    <ConfirmModal title="Reschedule my events" message="This will clear movable conflicts in the current day and may move personal events to tomorrow if today has no free window left." confirmText="Reschedule now" cancelText="Keep plan" onConfirm={onConfirm} onCancel={onCancel} infoHint="⚠️ Lectures, societies, exams, and fixed deadlines stay where they are." />
+    <ConfirmModal
+      title="Reschedule my events"
+      message="This will clear movable conflicts in the current day and may move personal events to tomorrow if today has no free window left."
+      confirmText="Reschedule now"
+      cancelText="Keep plan"
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+      infoHint={getRescheduleHint(isTeacher)}
+    />
   );
 }
 
@@ -112,14 +126,14 @@ function AutoScheduleConfirmModal({ onConfirm, onCancel }) {
   );
 }
 
-function useRescheduleState(events, selectedDate, editEvent, showToast) {
+function useRescheduleState(events, selectedDate, editEvent, showToast, isTeacher) {
   const [busy, setBusy] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [currentOpen, setCurrentOpen] = useState(false);
   const confirm = async () => {
-    setOpen(false);
-    await executeReschedule(events, selectedDate, editEvent, showToast, setBusy);
+    setCurrentOpen(false);
+    await executeReschedule(events, selectedDate, editEvent, showToast, setBusy, isTeacher);
   };
-  return { busy, open, setOpen, confirm };
+  return { busy, open: currentOpen, setOpen: setCurrentOpen, confirm };
 }
 
 function useAutoScheduleState(showToast, loadEvents) {
@@ -137,14 +151,16 @@ export function ScheduleManagerButton() {
   const { editEvent } = useEventActions();
   const { loadEvents } = useCalendarEvents();
   const showToast = useToast();
-  const reschedule = useRescheduleState(events, selectedDate, editEvent, showToast);
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
+  const reschedule = useRescheduleState(events, selectedDate, editEvent, showToast, isTeacher);
   const autoSchedule = useAutoScheduleState(showToast, loadEvents);
   return (
     <>
       <AutoScheduleButton busy={autoSchedule.busy} onClick={() => autoSchedule.setOpen(true)} />
       <TriggerButton busy={reschedule.busy} onClick={() => reschedule.setOpen(true)} />
       {autoSchedule.open ? <AutoScheduleConfirmModal onConfirm={autoSchedule.confirm} onCancel={() => autoSchedule.setOpen(false)} /> : null}
-      {reschedule.open ? <RescheduleConfirmModal onConfirm={reschedule.confirm} onCancel={() => reschedule.setOpen(false)} /> : null}
+      {reschedule.open ? <RescheduleConfirmModal onConfirm={reschedule.confirm} onCancel={() => reschedule.setOpen(false)} isTeacher={isTeacher} /> : null}
     </>
   );
 }

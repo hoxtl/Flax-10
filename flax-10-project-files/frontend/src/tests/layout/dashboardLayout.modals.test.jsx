@@ -1,22 +1,22 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../components/Calendar/event_modal/EventModal", () => ({
+vi.mock("../../components/calendar/event_modal/EventModal", () => ({
   EventModal: () => null,
 }));
-vi.mock("../../components/Society/CreateSocietyModal", () => ({
+vi.mock("../../components/society/components/CreateSocietyModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/Modules/Deadlines/DeadlineModal", () => ({
+vi.mock("../../components/modules/deadlines/DeadlineModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/Modules/Readings/ReadingModal", () => ({
+vi.mock("../../components/modules/readings/ReadingModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/Dashboard/QuickAddModal", () => ({
+vi.mock("../../components/dashboard/components/QuickAddModal", () => ({
   default: () => null,
 }));
-vi.mock("../../pages/Tasks/components/CreateTaskModal", () => ({
+vi.mock("../../pages/tasks/components/CreateTaskModal", () => ({
   default: () => null,
 }));
 vi.mock("../../api/societyApi", () => ({
@@ -29,7 +29,7 @@ vi.mock("../../layout/dashboard_layout/useDashboardTaskModalOptions", () => ({
   useDashboardTaskModalOptions: () => ({ lists: [], enrolledModules: [] }),
 }));
 
-vi.mock("../../components/Timer/TimerPopups", () => ({
+vi.mock("../../components/timer/components/TimerPopups", () => ({
   LeaveTimerModal: ({ onCancel, onPause, onExit, onTakeBreak, timeLeftSeconds, sessionTotalSeconds }) => (
     <div data-testid="leave-timer-modal">
       <span data-testid="leave-timer-time-left">{timeLeftSeconds}</span>

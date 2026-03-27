@@ -7,11 +7,11 @@ const mocks = { ...societyApiMocks };
 export { mocks as mockSocietyApi };
 
 export const setupSocietyMocks = () => {
-    vi.mock('../../../../api/societyApi', () => mocks);
-    vi.mock('../../../../context/TagContext', () => ({
+    vi.mock('../../api/societyApi', () => mocks);
+    vi.mock('../../context/TagContext', () => ({
         useTags: vi.fn(() => ({ refreshTags: vi.fn() }))
     }));
-    vi.mock('../../../../context/ConfirmContext', () => ({
+    vi.mock('../../context/ConfirmContext', () => ({
         useConfirm: vi.fn(() => vi.fn(() => Promise.resolve(true)))
     }));
 };

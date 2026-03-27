@@ -112,6 +112,15 @@
   line-height: 1;
 }
 
+.welcomeTitle {
+  font-size: 1.15rem;
+  text-align: center;
+}
+
+.welcomeDescription {
+  text-align: center;
+}
+
 /* ── Regular step ── */
 .stepInner {
   padding: 1rem 1.25rem 1.125rem;
@@ -196,6 +205,10 @@
   align-items: center;
 }
 
+.cardActionsCentered {
+  justify-content: center;
+}
+
 /* ── Buttons ── */
 .prevBtn {
   background: none;
@@ -225,6 +238,10 @@
   cursor: pointer;
   font-family: inherit;
   transition: opacity 0.15s ease, transform 0.12s ease;
+}
+
+.welcomeStartBtn {
+  padding: 0.5rem 2rem;
 }
 
 .nextBtn:hover {

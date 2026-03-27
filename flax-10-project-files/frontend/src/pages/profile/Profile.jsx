@@ -9,9 +9,9 @@ import EmptyState from "../../components/common/empty_state/EmptyState";
 import ScrollToTop from "../../components/common/scroll_to_top/ScrollToTop";
 import PrimaryButton from "../../components/common/primary_button/PrimaryButton";
 import { useAuth } from "../../context/AuthContext";
-import AchievementsModal from "./AchievementsModal";
-import { ProfileCalendar } from "./ProfileCalendar";
-import styles from "./ProfilePage.module.css";
+import AchievementsModal from "./components/AchievementsModal";
+import { ProfileCalendar } from "./components/ProfileCalendar";
+import styles from "./styles/ProfilePage.module.css";
 import ProfileHeader from "./components/ProfileHeader";
 import ProfileSkeleton from "./components/ProfileSkeleton";
 import {
@@ -29,8 +29,8 @@ import { useProfileBodyData, useProfileContent, useProfileState } from "./hooks/
 import { saveWeeklyGoal, useCurrentUserSummary, usePeakHour, useProfileAnalytics, useSuggestionState } from "./hooks/useProfileInsights";
 import { useProfileSummary } from "./hooks/useProfileSummary";
 import { useProfileVisibility } from "./hooks/useProfileVisibility";
-import ProfileModals, { SocietiesModal } from "./ProfileModals";
-import { useProfileHeaderState } from "./useProfileHeaderState";
+import ProfileModals, { SocietiesModal } from "./components/ProfileModals";
+import { useProfileHeaderState } from "./hooks/useProfileHeaderState";
 
 function SkelBlock({ className }) {
   return <div className={`${styles.skel} ${className || ""}`} />;

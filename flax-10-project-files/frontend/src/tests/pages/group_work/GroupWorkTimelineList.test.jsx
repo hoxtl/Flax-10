@@ -18,7 +18,7 @@ vi.mock("../../../pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
 
@@ -112,7 +112,6 @@ describe("GroupWork timeline and lists", () => {
     fireEvent.click(screen.getAllByRole("button")[0]);
     expect(onToggle).toHaveBeenCalled();
     fireEvent.click(screen.getByTitle("Delete task"));
-    fireEvent.click(screen.getByText("confirm-hold"));
     expect(onDelete).toHaveBeenCalledWith(5);
   });
 

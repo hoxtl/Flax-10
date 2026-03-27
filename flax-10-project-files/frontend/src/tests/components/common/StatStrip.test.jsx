@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 
 import StatStrip from "../../../components/common/stat_strip/StatStrip";
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock("../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => (
     <div>
       <span>{content}</span>

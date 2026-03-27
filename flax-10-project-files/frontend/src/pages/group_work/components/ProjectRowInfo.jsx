@@ -2,7 +2,7 @@
  * GroupWork project row info section.
  */
 
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import Tooltip from "../../../components/common/tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import GroupWorkProjectModuleBadge from "./ProjectModuleBadge";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
@@ -75,10 +75,12 @@ function AvatarStack({ members, totalMembers }) {
   const moreCount = count - (limit - 1);
   return (
     <div className={styles.avatarStack}>
-      {visible.map((member, i) => (
-        <AvatarItem key={getMemberKey(member) || i} member={member} index={i} total={visible.length + (hasMore ? 1 : 0)} />
-      ))}
-      {hasMore && <div className={styles.moreBadge}>+{moreCount}</div>}
+      <div className={styles.avatarCluster}>
+        {visible.map((member, i) => (
+          <AvatarItem key={getMemberKey(member) || i} member={member} index={i} total={visible.length + (hasMore ? 1 : 0)} />
+        ))}
+        {hasMore && <div className={styles.moreBadge}>+{moreCount}</div>}
+      </div>
       <span className={styles.avatarCountLabel}>{count} member{count === 1 ? "" : "s"}</span>
     </div>
   );

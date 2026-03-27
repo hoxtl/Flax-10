@@ -2,8 +2,8 @@
  * Event conflict resolution planning utilities.
  */
 
-import { overlapsDay } from "../../Calendar/utils/dateUtils";
-import { extractBaseEventId, isReadOnlyEvent } from "../../Calendar/utils/eventUtils";
+import { overlapsDay } from "../../calendar/utils/dateUtils";
+import { extractBaseEventId, isReadOnlyEvent } from "../../calendar/utils/eventUtils";
 
 const DAY_START_HOUR = 7;
 const TOMORROW_START_HOUR = 9;
@@ -20,10 +20,12 @@ function handleNoResolution(group, movableCandidates, lockedGroups, unresolved) 
 
 function applyResolution(resolution, workingEvents, tomorrowEvents, operations) {
   const target = workingEvents.find((event) => String(event.id) === String(resolution.movable.id));
+  const originalStart = target.start_time;
+  const originalEnd = target.end_time || target.start_time;
   target.start_time = resolution.slot.start.toISOString();
   target.end_time = resolution.slot.end.toISOString();
   if (resolution.slot.movedToTomorrow) tomorrowEvents.push(cloneEvent(target));
-  operations.push({ event: resolution.movable, start: resolution.slot.start, end: resolution.slot.end, movedToTomorrow: resolution.slot.movedToTomorrow, originalStart: resolution.movable.start_time, originalEnd: resolution.movable.end_time || resolution.movable.start_time });
+  operations.push({ event: resolution.movable, start: resolution.slot.start, end: resolution.slot.end, movedToTomorrow: resolution.slot.movedToTomorrow, originalStart, originalEnd });
 }
 
 function processOverlapGroup(ctx) {
@@ -89,11 +91,14 @@ export async function undoConflictResolutionPlan(plan, editEvent) {
   }
 }
 
-export function buildConflictResolutionToastMessage(plan) {
+export function buildConflictResolutionToastMessage(plan, isTeacher = false) {
   const fixedUnresolvedCount = plan.unresolved.filter((item) => item.reason === "fixed").length;
   const noSlotCount = plan.unresolved.filter((item) => item.reason === "no-slot").length;
   if (!plan.operations.length && !plan.unresolved.length) return "No overlap events.";
-  if (!plan.operations.length && fixedUnresolvedCount && !noSlotCount) return "These overlaps are fixed lectures, societies, or deadline items, so they stay in place.";
+  if (!plan.operations.length && fixedUnresolvedCount && !noSlotCount) {
+    const items = isTeacher ? "lectures or deadline items" : "lectures, societies, or deadline items";
+    return `These overlaps are fixed ${items}, so they stay in place.`;
+  }
   if (!plan.operations.length && noSlotCount && !fixedUnresolvedCount) return "Couldn't find a conflict-free slot for some events.";
   const movedCount = plan.operations.length;
   const tomorrowOperations = plan.operations.filter((operation) => operation.movedToTomorrow);
@@ -164,7 +169,6 @@ function extendOverlapGroup(events, startIndex, group, maxEndRef) {
 
 function buildOverlapGroup(events, startIndex) {
   const seed = events[startIndex];
-  if (!seed) return [];
   const group = [seed];
   const maxEndRef = { value: getEndMs(seed) };
   extendOverlapGroup(events, startIndex, group, maxEndRef);
@@ -195,7 +199,7 @@ function tryResolveMovable(movable, group, workingEvents, selectedDate, tomorrow
   const anchor = getGroupAnchor(group, movable);
   const durationMs = getDurationMs(movable);
   const remainingEvents = workingEvents.filter((event) => String(event.id) !== String(movable.id));
-  const after = anchor ? new Date(anchor.end_time || anchor.start_time) : getDayStart(selectedDate);
+  const after = new Date(anchor.end_time || anchor.start_time);
   const slot = findAvailableDaySlot(remainingEvents, selectedDate, durationMs, after) || getTomorrowSlot(tomorrowCursor, tomorrowDate, tomorrowEvents, durationMs);
   return slot ? { movable, slot } : null;
 }
@@ -206,7 +210,6 @@ function buildGroupResolution(group, movableCandidates, workingEvents, selectedD
 
 function getGroupAnchor(group, movable) {
   const remaining = group.filter((event) => String(event.id) !== String(movable.id));
-  if (!remaining.length) return null;
   return [...remaining].sort((left, right) => getEndMs(right) - getEndMs(left))[0];
 }
 
@@ -244,7 +247,7 @@ function scanEventsForSlot(sorted, cursor, durationMs) {
 function findAvailableDaySlot(events, selectedDate, durationMs, after) {
   const dayStart = getDayStart(selectedDate);
   const dayEnd = getDayEnd(selectedDate);
-  const cursor = Math.max(dayStart.getTime(), after?.getTime?.() || dayStart.getTime());
+  const cursor = Math.max(dayStart.getTime(), after.getTime());
   const result = scanEventsForSlot([...events].sort(compareByStartTime), cursor, durationMs);
   if (result.slot) return result.slot;
   return dayEnd.getTime() - result.cursor >= durationMs ? buildSlot(result.cursor, durationMs, false) : null;

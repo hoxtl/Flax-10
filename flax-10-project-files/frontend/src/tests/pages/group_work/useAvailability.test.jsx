@@ -102,13 +102,19 @@ describe("useAvailability", () => {
       "/api/group-work/suggestions/9/",
       expect.objectContaining({ method: "DELETE" })
     ));
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith("Meeting suggestion deleted."));
   });
 
   it("skips deleting when confirmation is rejected", async () => {
     confirmMock.mockResolvedValue(false);
     renderAvailability();
     fireEvent.click(screen.getByText("delete"));
-    await waitFor(() => expect(confirmMock).toHaveBeenCalled());
+    await waitFor(() => expect(confirmMock).toHaveBeenCalledWith({
+      title: "Delete Suggestion",
+      message: "Delete this meeting suggestion?",
+      confirmText: "Delete",
+      isDanger: true,
+    }));
     expect(fetch).not.toHaveBeenCalledWith(
       "/api/group-work/suggestions/9/",
       expect.objectContaining({ method: "DELETE" })
@@ -136,39 +142,141 @@ describe("useAvailability", () => {
     ));
   });
 
-  it("does not toast when suggestion submission fails", async () => {
+  // --- Coverage gap: onSuggest when res.ok is false ---
+  it("does not toast or refetch when suggestion submission fails", async () => {
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
       .mockResolvedValueOnce({ ok: false }));
 
     renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+    toastMock.mockReset();
+
     fireEvent.click(screen.getByText("suggest"));
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
-    expect(toastMock).not.toHaveBeenCalledWith("You proposed a time for the team.");
+    expect(toastMock).not.toHaveBeenCalled();
+    // fetch should NOT have been called a 3rd time (no refetch)
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  it("does not refresh or toast when deleting a suggestion fails", async () => {
+  // --- Coverage gap: onDelete when res.ok is false ---
+  it("does not refresh or toast when delete API call fails", async () => {
+    confirmMock.mockResolvedValue(true);
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
       .mockResolvedValueOnce({ ok: false }));
 
     renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+    toastMock.mockReset();
+
     fireEvent.click(screen.getByText("delete"));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
-    expect(toastMock).not.toHaveBeenCalledWith("Meeting suggestion deleted.");
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(toastMock).not.toHaveBeenCalled();
+    // No 3rd call means fetchAvail was not triggered
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  it("does not toast when voting fails", async () => {
+  // --- Coverage gap: handleVote accepted toast message ---
+  it("shows a success toast when accepting a meeting slot", async () => {
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+
+    fireEvent.click(screen.getByText("accept"));
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith(
+      "You accepted the meeting slot.",
+      { variant: "success" }
+    ));
+  });
+
+  // --- Coverage gap: handleVote when res.ok is false ---
+  it("does not toast or refetch when vote fails", async () => {
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
       .mockResolvedValueOnce({ ok: false }));
 
     renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+    toastMock.mockReset();
+
     fireEvent.click(screen.getByText("accept"));
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
-    expect(toastMock).not.toHaveBeenCalledWith("You accepted the meeting slot.");
+    expect(toastMock).not.toHaveBeenCalled();
+    // No 3rd fetch call means fetchAvail was not triggered
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  // --- Coverage gap: handleVote declined when res.ok is false ---
+  it("does not toast or refetch when decline vote fails", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
+      .mockResolvedValueOnce({ ok: false }));
+
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+    toastMock.mockReset();
+
+    fireEvent.click(screen.getByText("decline"));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(toastMock).not.toHaveBeenCalled();
+  });
+
+  // --- Coverage gap: suggest function (line 69) clears suggestingSlot ---
+  it("clears suggestingSlot after handleSuggestTime resolves", async () => {
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+
+    // First set a slot so it's non-null
+    fireEvent.click(screen.getByText("set slot"));
+    await waitFor(() => expect(screen.getByTestId("slot").textContent).toBe("2026-04-10T09:00:00.000Z"));
+
+    // Now suggest - this calls handleSuggestTime then setSuggestingSlot(null)
+    fireEvent.click(screen.getByText("suggest"));
+    await waitFor(() => expect(screen.getByTestId("slot").textContent).toBe("none"));
+  });
+
+  // --- Coverage gap: suggest function clears slot even when submission fails ---
+  it("clears suggestingSlot even when suggestion submission fails", async () => {
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
+      .mockResolvedValueOnce({ ok: false }));
+
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+
+    // Set a slot first
+    fireEvent.click(screen.getByText("set slot"));
+    await waitFor(() => expect(screen.getByTestId("slot").textContent).toBe("2026-04-10T09:00:00.000Z"));
+
+    // Suggest with failed fetch - slot should still be cleared
+    fireEvent.click(screen.getByText("suggest"));
+    await waitFor(() => expect(screen.getByTestId("slot").textContent).toBe("none"));
+  });
+
+  // --- Coverage gap: onSuggest success path toasts and refetches ---
+  it("toasts and refetches after successful suggestion", async () => {
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+
+    fireEvent.click(screen.getByText("suggest"));
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith("You proposed a time for the team."));
+    // The initial fetch + suggest POST + refetch = 3 calls
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
+  });
+
+  // --- Coverage gap: onDelete success path toasts and refetches ---
+  it("toasts and refetches after successful deletion", async () => {
+    confirmMock.mockResolvedValue(true);
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+
+    fireEvent.click(screen.getByText("delete"));
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith("Meeting suggestion deleted."));
+    // The initial fetch + delete + refetch = 3 calls
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
   });
 });

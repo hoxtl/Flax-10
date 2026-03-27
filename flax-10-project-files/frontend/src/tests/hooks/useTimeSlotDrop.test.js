@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useTimeSlotDrop } from '../../components/Calendar/hooks/useTimeSlotDrop';
+import { useTimeSlotDrop } from '../../components/calendar/hooks/useTimeSlotDrop';
 
 const useCalendarMock = vi.fn();
 const useEventModalMock = vi.fn();
@@ -17,12 +17,12 @@ vi.mock('../../context/CalendarContext', () => ({
   useEventModal: () => useEventModalMock(),
 }));
 vi.mock('../../context/ConfirmContext', () => ({ useConfirm: () => useConfirmMock() }));
-vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
-vi.mock('../../components/Calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
-vi.mock('../../components/Calendar/calendarConstants', () => ({ SLOT_HEIGHT: 80, getMinuteOffset: (...args) => getMinuteOffsetMock(...args) }));
-vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
+vi.mock('../../components/calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
+vi.mock('../../components/calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
+vi.mock('../../components/calendar/calendarConstants', () => ({ SLOT_HEIGHT: 80, getMinuteOffset: (...args) => getMinuteOffsetMock(...args) }));
+vi.mock('../../components/calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
 const isReadOnlyEventMock = vi.fn(() => false);
-vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../components/calendar/utils/eventUtils', () => ({
   isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),
@@ -111,6 +111,30 @@ describe('useTimeSlotDrop', () => {
     expect(result.current.highlightQuarter).toBeNull();
   });
 
+  it('handles drag highlight updates even when the drop target omits optional handlers', () => {
+    dropProps = {};
+    useDropMock.mockImplementation(({ onDrop: dropHandler }) => {
+      onDrop = dropHandler;
+      return { dropProps, isOver: false };
+    });
+    const { result } = renderTimeSlotDrop();
+
+    act(() => {
+      result.current.mergedProps.onDragOver({
+        clientY: 220,
+        currentTarget: { getBoundingClientRect: () => ({ top: 100 }) },
+      });
+    });
+
+    expect(result.current.highlightQuarter).toBe(3);
+
+    act(() => {
+      result.current.mergedProps.onDragLeave({});
+    });
+
+    expect(result.current.highlightQuarter).toBeNull();
+  });
+
   it('creates event from tag payload when overlap check passes', async () => {
     renderTimeSlotDrop();
     await dropOnTimeSlot({ name: 'Revision', default_duration: 30 }, 'TAG');
@@ -125,6 +149,15 @@ describe('useTimeSlotDrop', () => {
     await dropOnTimeSlot({ name: 'Revision' }, 'TAG');
 
     expect(actions.addEvent).not.toHaveBeenCalled();
+  });
+
+  it('ignores unsupported payload types', async () => {
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ name: 'Ignored' }, 'UNKNOWN');
+
+    expect(actions.addEvent).not.toHaveBeenCalled();
+    expect(actions.editEvent).not.toHaveBeenCalled();
+    expect(actions.addException).not.toHaveBeenCalled();
   });
 
   it('moves non-recurring event with editEvent', async () => {
@@ -162,5 +195,16 @@ describe('useTimeSlotDrop', () => {
 
     expect(actions.addException).toHaveBeenCalledWith(6, '2026-03-09');
     expect(actions.addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'Seminar', location: 'A1' }));
+  });
+
+  it('ignores read-only events before any move logic runs', async () => {
+    isReadOnlyEventMock.mockReturnValue(true);
+    renderTimeSlotDrop();
+    await dropOnTimeSlot({ id: 13, start_time: '2026-03-09T08:00:00Z', end_time: '2026-03-09T09:00:00Z' }, 'EVENT');
+
+    expect(actions.addEvent).not.toHaveBeenCalled();
+    expect(actions.editEvent).not.toHaveBeenCalled();
+    expect(actions.addException).not.toHaveBeenCalled();
+    expect(confirmFn).not.toHaveBeenCalled();
   });
 });

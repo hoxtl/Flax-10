@@ -42,6 +42,7 @@ from .seed_helpers.academics.readings import create_readings
 from .seed_helpers.calendar.attendance import seed_attendance
 from .seed_helpers.users.admin import seed_course_change_requests, seed_society_reports
 from .seed_helpers.users.usersettings import ensure_usersettings_seed_compatibility
+from .seed_helpers.users.pinned_badges import seed_pinned_badges
 
 
 User = get_user_model()
@@ -135,6 +136,7 @@ class Command(BaseCommand):
         create_admin_user(self.stdout)
         create_fixture_users(self.stdout)
         create_random_users(self.stdout, target_teacher_count=self.teacher_count)
+        seed_pinned_badges(self.stdout)
         self.users = _seed_user_pool()
 
     def _seed_catalogue(self):

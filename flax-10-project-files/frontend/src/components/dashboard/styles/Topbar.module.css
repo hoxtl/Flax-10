@@ -1,0 +1,244 @@
+.container {
+  --feature-accent: var(--primary);
+  --feature-tint: color-mix(in srgb, var(--feature-accent) 16%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: var(--glass);
+  backdrop-filter: blur(var(--frame-blur));
+  -webkit-backdrop-filter: blur(var(--frame-blur));
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 rgba(74, 52, 33, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 9998;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brandContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.logoMark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--feature-accent), color-mix(in srgb, var(--feature-accent) 45%, var(--accent)));
+  box-shadow: 0 4px 12px rgba(112, 79, 56, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.logoMark::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.brandName {
+  font-family: var(--font-heading);
+  font-size: var(--type-card);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.navContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navGroup {
+  position: relative;
+}
+
+.tourAnchor {
+  position: relative;
+}
+
+.tourProxy {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.navGroupTrigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navGroupTrigger:hover {
+  background-color: var(--hover);
+}
+
+.navGroupTriggerActive {
+  background: var(--feature-tint);
+  color: var(--feature-accent);
+}
+
+.chevronClosed {
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
+}
+
+.dropdownIcon {
+  font-size: 1.1em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdownLabel {
+  position: relative;
+  z-index: 1;
+}
+
+
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolsWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.actionPill {
+  display: flex;
+  align-items: center;
+  background: var(--surface-card-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 2px;
+  gap: 2px;
+  box-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
+  height: 36px;
+  position: relative;
+}
+
+.pillDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.quickActionsBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.quickActionsBtn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.quickActionsKey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+:root[data-mode="dark"] .quickActionsBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+:root[data-mode="dark"] .actionPill {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] .container {
+  background: var(--glass);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+:root[data-mode="dark"] .toolBtn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-mode="dark"] .toolBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+:root[data-mode="dark"] .navGroupTriggerActive {
+  background: var(--feature-tint);
+}
+
+.dropdownLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

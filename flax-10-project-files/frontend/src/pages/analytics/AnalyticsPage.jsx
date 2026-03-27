@@ -10,10 +10,10 @@ import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import getAnalyticsTabs from './components/AnalyticsPageTabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import EmptyState from '../../components/common/empty_state/EmptyState';
-import { BackToTop } from '../../components/Pagination/Pagination';
-import { PERIODS } from './pageConfig';
-import { useAnalyticsPageState } from './pageState';
-import styles from './AnalyticsPage.module.css';
+import { BackToTop } from '../../components/pagination/Pagination';
+import { PERIODS } from './utils/pageConfig';
+import { useAnalyticsPageState } from './hooks/pageState';
+import styles from './styles/AnalyticsPage.module.css';
 
 const analyticsSubtitle = (
   <>
@@ -59,7 +59,15 @@ function AnalyticsContent({ tabs, activeTab, handleTabChange, error, loading, ha
     <>
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
+      <Tabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        layoutId="analyticsTab"
+        tabVariant="heading"
+        className={styles.analyticsTabs}
+        tabClassName={styles.analyticsTabButton}
+      />
       <BackToTop />
     </>
   );

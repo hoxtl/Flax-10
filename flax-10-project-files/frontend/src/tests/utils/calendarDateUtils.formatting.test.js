@@ -10,7 +10,7 @@ import {
   formatMonthYear,
   getGreeting,
   formatDayLabel,
-} from '../../components/Calendar/utils/dateUtils';
+} from '../../components/calendar/utils/dateUtils';
 
 // Date formatting utility tests
 

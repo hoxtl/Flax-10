@@ -3,12 +3,12 @@
  */
 
 import { motion as Motion } from "framer-motion";
-import { itemVariants } from "../../../components/Modules/shared/widgetVariants.js";
+import { itemVariants } from "../../../components/modules/shared/widgetVariants.js";
 import InlineTitleField, { useInlineEdit } from "../../../components/common/inline_title_field/InlineTitleField";
 import TaskPriorityPill from "../../../components/common/task_priority_pill/TaskPriorityPill";
 import DeadlineCountdown from "../../../components/common/deadline_countdown/DeadlineCountdown";
 import urgentGlowStyles from "../../../components/common/urgent_glow/UrgentGlow.module.css";
-import rowStyles from "../../Modules/DashboardRows.module.css";
+import rowStyles from "../../modules/styles/DashboardRows.module.css";
 
 function getRowClassName(isOverdue, urgentGlow) {
   const base = rowStyles.deadlineRow;

@@ -179,5 +179,46 @@ describe('fetchApi', () => {
         });
         await expect(fetchApi('/test')).rejects.toThrow();
     });
-});
 
+    it('clears auth state and dispatches auth-changed on 401 responses', async () => {
+        localStorage.setItem('token', 'secret');
+        const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 401,
+            json: async () => ({ detail: 'Unauthorized' }),
+        });
+
+        await expect(fetchApi('/test')).rejects.toThrow('Unauthorized');
+
+        expect(localStorage.getItem('token')).toBeNull();
+        expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'auth-changed' }));
+        dispatchSpy.mockRestore();
+    });
+
+    it('does not set Content-Type when the request body is FormData', async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            text: async () => JSON.stringify({ ok: true }),
+        });
+
+        const body = new FormData();
+        body.append('file', new Blob(['hello'], { type: 'text/plain' }), 'hello.txt');
+
+        await fetchApi('/upload', { method: 'POST', body });
+
+        const callHeaders = global.fetch.mock.calls[0][1].headers;
+        expect(callHeaders['Content-Type']).toBeUndefined();
+    });
+
+    it('uses the first flattened error value when the response contains nested arrays', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 400,
+            json: async () => ({ field: [['Nested validation message']] }),
+        });
+
+        await expect(fetchApi('/test')).rejects.toThrow('Nested validation message');
+    });
+});

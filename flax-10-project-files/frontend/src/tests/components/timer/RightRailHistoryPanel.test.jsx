@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 const useRightRailHistoryMock = vi.fn();
 const clearRightRailHistoryMock = vi.fn();
 
-vi.mock("../../../components/Timer/history_panel/useRightRailHistory", () => ({
+vi.mock("../../../components/timer/history_panel/useRightRailHistory", () => ({
   useRightRailHistory: () => useRightRailHistoryMock(),
   clearRightRailHistory: (...args) => clearRightRailHistoryMock(...args),
 }));
@@ -32,17 +32,17 @@ vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal", () => 
   ),
 }));
 
-vi.mock("../../../components/Timer/history_panel/HistoryRailSection", () => ({
+vi.mock("../../../components/timer/history_panel/HistoryRailSection", () => ({
   HistoryRailSection: ({ group }) => <div>{group.label}:{group.items.length}</div>,
 }));
 
-vi.mock("../../../components/Timer/history_panel/WeeklyChart", () => ({
+vi.mock("../../../components/timer/history_panel/WeeklyChart", () => ({
   WeeklyChart: ({ weeklySeries, maxWeeklySeconds }) => (
     <div>{`Weekly chart ${weeklySeries.length}:${maxWeeklySeconds}`}</div>
   ),
 }));
 
-import RightRailHistoryPanel from "../../../components/Timer/RightRailHistoryPanel";
+import RightRailHistoryPanel from "../../../components/timer/components/RightRailHistoryPanel";
 
 describe("RightRailHistoryPanel", () => {
   beforeEach(() => {

@@ -1,0 +1,90 @@
+/*
+ * Goal summary and overtime styles for the timer page.
+ */
+
+.overtimePopup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface-card);
+    border: 2px solid #f59e0b;
+    border-radius: var(--radius-lg);
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 10;
+    animation: slideUp 0.3s ease-out;
+    width: 90%;
+    max-width: 300px;
+}
+
+.overtimeContent h3 {
+    margin: 0 0 0.5rem 0;
+    color: #f59e0b;
+    font-size: 1.2rem;
+}
+
+.overtimeTime {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #f59e0b;
+    margin: 0.5rem 0 1rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.overtimeActionBtn {
+    min-width: 184px;
+    justify-content: center;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+.summaryContainer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.summaryItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.summaryLabel {
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.summaryPill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+}
+
+.pillSessions {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+.pillFocus {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.pillBreak {
+    background-color: #dcfce7;
+    color: #166534;
+}

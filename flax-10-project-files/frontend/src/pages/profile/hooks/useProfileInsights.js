@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import analyticsService from "../../../api/analyticsApi";
 import { fetchApi } from "../../../api/client";
 
-const PROFILE_ANALYTICS_PERIOD = 30;
+const PROFILE_ANALYTICS_PERIOD = 90;
 
 export function useProfileAnalytics(canViewAnalytics) {
   const [data, setData] = useState(null);

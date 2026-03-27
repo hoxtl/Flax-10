@@ -5,9 +5,9 @@
 import { useState } from 'react';
 import styles from '../../../pages/timer/TimerPage.module.css';
 import Tabs from '../../common/Tabs/Tabs';
-import InlineSoundPanel from '../InlineSoundPanel';
-import RightRailHistoryPanel from '../RightRailHistoryPanel';
-import { PresetPanel, TimerConfigPanel } from '../PresetPanel';
+import InlineSoundPanel from '../components/InlineSoundPanel';
+import RightRailHistoryPanel from '../components/RightRailHistoryPanel';
+import { PresetPanel, TimerConfigPanel } from '../components/PresetPanel';
 
 function RightRailTabs({ t }) {
   const [tab, setTab] = useState('presets');

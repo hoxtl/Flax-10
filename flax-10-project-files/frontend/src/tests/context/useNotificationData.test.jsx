@@ -7,16 +7,16 @@ vi.mock('../../api/notificationApi', () => ({
     fetchNotifications: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/browserNotification', () => ({
+vi.mock('../../components/notifications/utils/browserNotification', () => ({
     requestPermission: vi.fn(),
     sendBrowserNotification: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/notificationSound', () => ({
+vi.mock('../../components/notifications/utils/notificationSound', () => ({
     playNotificationSound: vi.fn(),
 }));
 
-vi.mock('../../components/Notifications/utils/notificationAction', () => ({
+vi.mock('../../components/notifications/utils/notificationAction', () => ({
     parseNotificationAction: vi.fn(() => null),
 }));
 
@@ -49,7 +49,7 @@ describe('useNotificationLoader', () => {
     });
 
     it('should call requestPermission on mount', async () => {
-        const { requestPermission } = await import('../../components/Notifications/utils/browserNotification');
+        const { requestPermission } = await import('../../components/notifications/utils/browserNotification');
         requestPermission.mockClear();
         api.fetchNotifications.mockResolvedValue([]);
         renderHook(() => useNotificationLoader());
@@ -154,7 +154,7 @@ describe('useNotificationPolling', () => {
     });
 
     it('should not send browser notification for reminder type', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         sendBrowserNotification.mockClear();
 
         const fresh = [{ id: 77, title: 'Reminder', notification_type: 'reminder' }];
@@ -172,7 +172,7 @@ describe('useNotificationPolling', () => {
     });
 
     it('should send browser notification for non-reminder type', async () => {
-        const { sendBrowserNotification } = await import('../../components/Notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
         sendBrowserNotification.mockClear();
 
         const fresh = [{ id: 55, title: 'Alert', message: 'Hello', notification_type: 'info' }];
@@ -189,8 +189,8 @@ describe('useNotificationPolling', () => {
         expect(sendBrowserNotification).toHaveBeenCalledWith('Alert', 'Hello', 'notification-55', null);
     });
 
-    it('should trigger refreshProfile for role change notifications', async () => {
-        const fresh = [{ id: 33, title: 'Teacher role approved', notification_type: 'info' }];
+    it('should trigger refreshProfile for course change notifications', async () => {
+        const fresh = [{ id: 33, title: 'Course change approved', notification_type: 'info' }];
         api.fetchNotifications.mockResolvedValue(fresh);
         const knownIds = { current: new Set() };
         const refreshProfile = vi.fn();
@@ -205,7 +205,7 @@ describe('useNotificationPolling', () => {
         expect(refreshProfile).toHaveBeenCalled();
     });
 
-    it('should not trigger refreshProfile for non-role-change notifications', async () => {
+    it('should not trigger refreshProfile for non-course-change notifications', async () => {
         const fresh = [{ id: 44, title: 'Random notification', notification_type: 'info' }];
         api.fetchNotifications.mockResolvedValue(fresh);
         const knownIds = { current: new Set() };
@@ -221,10 +221,8 @@ describe('useNotificationPolling', () => {
         expect(refreshProfile).not.toHaveBeenCalled();
     });
 
-    it('should handle role change titles case-insensitively', async () => {
+    it('should handle course change titles case-insensitively', async () => {
         const roleTitles = [
-            'Teacher role approved',
-            'Teacher request rejected',
             'Course change approved',
             'Course change rejected',
         ];
@@ -263,7 +261,7 @@ describe('useNotificationPolling', () => {
     });
 
     it('should not call refreshProfile when refreshProfile is undefined', async () => {
-      const fresh = [{ id: 11, title: 'Teacher role approved', notification_type: 'info' }];
+      const fresh = [{ id: 11, title: 'Course change approved', notification_type: 'info' }];
         api.fetchNotifications.mockResolvedValue(fresh);
         const knownIds = { current: new Set() };
 
@@ -278,7 +276,7 @@ describe('useNotificationPolling', () => {
       await act(async () => { await Promise.resolve(); });
     });
 
-    it('ignores role-refresh logic when a notification has no title', async () => {
+    it('ignores course-change refresh logic when a notification has no title', async () => {
         const fresh = [{ id: 12, message: 'Untitled', notification_type: 'info' }];
         api.fetchNotifications.mockResolvedValue(fresh);
         const knownIds = { current: new Set() };

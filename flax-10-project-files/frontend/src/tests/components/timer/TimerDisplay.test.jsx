@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { TimerDisplay } from '../../../components/Timer/TimerComponents';
+import { TimerDisplay } from '../../../components/timer/components/TimerComponents';
 
 const testFormatCorrectly = () => {
     render(<TimerDisplay timeLeft={1500} mode="work" isOvertime={false} />);

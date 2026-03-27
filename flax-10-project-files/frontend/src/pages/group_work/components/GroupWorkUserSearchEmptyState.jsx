@@ -1,28 +1,25 @@
 /*
- * Empty state for the user/member search in group work forms.
+ * Empty state for group work user search results.
  */
 
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 
-export default function GroupWorkUserSearchEmptyState({
-  query,
-  clear,
-  wrapperClassName,
-  className,
-  titleClassName,
-  hintClassName,
-}) {
+function SearchEmptyStateCard({ query, clear, className, titleClassName, hintClassName }) {
   return (
-    <div className={wrapperClassName}>
-      <SearchEmptyState
-        query={query}
-        itemLabel="users"
-        onClear={clear}
-        hint="Try searching by name or username."
-        className={className}
-        titleClassName={titleClassName}
-        hintClassName={hintClassName}
-      />
-    </div>
+    <SearchEmptyState
+      query={query}
+      itemLabel="users"
+      onClear={clear}
+      hint="Try searching by name or username."
+      className={className}
+      titleClassName={titleClassName}
+      hintClassName={hintClassName}
+    />
   );
+}
+
+/** Empty state shown when a group work user search returns nothing. */
+export default function GroupWorkUserSearchEmptyState(props) {
+  const content = <SearchEmptyStateCard {...props} />;
+  return props.wrapperClassName ? <div className={props.wrapperClassName}>{content}</div> : content;
 }

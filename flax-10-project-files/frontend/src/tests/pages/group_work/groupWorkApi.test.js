@@ -13,9 +13,26 @@ import {
   addProjectMember,
 } from "../../../pages/group_work/api/groupWorkApi";
 
+const createLocalStorageMock = () => {
+  let store = {};
+  return {
+    getItem: (key) => store[key] ?? null,
+    setItem: (key, value) => {
+      store[key] = String(value);
+    },
+    removeItem: (key) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+};
+
 describe("groupWorkApi", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn());
+    vi.stubGlobal("localStorage", createLocalStorageMock());
     localStorage.clear();
   });
 
@@ -84,5 +101,101 @@ describe("groupWorkApi", () => {
     await addProjectMember(1, 22);
     expect(fetch).toHaveBeenCalledWith("/api/group-work/projects/", expect.objectContaining({ method: "POST" }));
     expect(fetch).toHaveBeenCalledWith("/api/group-work/projects/1/members/", expect.objectContaining({ method: "POST" }));
+  });
+
+  describe("createGroupProject error handling", () => {
+    it("throws with detail from error response", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({ detail: "Project limit reached." }),
+      });
+      await expect(createGroupProject({ title: "X" })).rejects.toThrow("Project limit reached.");
+    });
+
+    it("throws with message from error response", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({ message: "Invalid title." }),
+      });
+      await expect(createGroupProject({ title: "X" })).rejects.toThrow("Invalid title.");
+    });
+
+    it("throws with first flat value from other error keys", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({ title: ["Title is required."] }),
+      });
+      await expect(createGroupProject({})).rejects.toThrow("Title is required.");
+    });
+
+    it("throws fallback message when json() rejects", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockRejectedValue(new Error("parse error")),
+      });
+      await expect(createGroupProject({ title: "X" })).rejects.toThrow("We couldn't create that project.");
+    });
+
+    it("throws fallback message when error body is empty", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({}),
+      });
+      await expect(createGroupProject({ title: "X" })).rejects.toThrow("We couldn't create that project.");
+    });
+  });
+
+  describe("addProjectMember error handling", () => {
+    it("throws with detail from error response", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({ detail: "Already a member." }),
+      });
+      await expect(addProjectMember(1, 2)).rejects.toThrow("Already a member.");
+    });
+
+    it("throws with message from error response", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({ message: "User not found." }),
+      });
+      await expect(addProjectMember(1, 2)).rejects.toThrow("User not found.");
+    });
+
+    it("throws with first flat value from other error keys", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({ user: ["This field is required."] }),
+      });
+      await expect(addProjectMember(1, 2)).rejects.toThrow("This field is required.");
+    });
+
+    it("throws fallback message when json() rejects", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockRejectedValue(new Error("parse error")),
+      });
+      await expect(addProjectMember(1, 2)).rejects.toThrow("We couldn't add that teammate.");
+    });
+
+    it("throws fallback message when error body is empty", async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: vi.fn().mockResolvedValue({}),
+      });
+      await expect(addProjectMember(1, 2)).rejects.toThrow("We couldn't add that teammate.");
+    });
+  });
+
+  it("patchGroupProject returns null when response is not ok", async () => {
+    fetch.mockResolvedValueOnce({ ok: false });
+    const result = await patchGroupProject(1, { title: "Fail" });
+    expect(result).toBeNull();
+  });
+
+  it("fetchJSON returns null when json() resolves to a falsy value", async () => {
+    fetch.mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(null) });
+    const result = await fetchJSON("/empty");
+    expect(result).toBeNull();
   });
 });

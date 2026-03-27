@@ -2,10 +2,10 @@
  * Sleep settings section and duration card.
  */
 
-import DateTimePicker from "../../../pages/Tasks/components/DateTimePicker";
-import styles from "../../../pages/Settings/Settings.module.css";
-import SettingsContextCard from "../SettingsContextCard";
-import { SectionHeader, SubmitButton } from "../SettingsUI";
+import DateTimePicker from "../../../pages/tasks/components/DateTimePicker";
+import styles from "../../../pages/settings/styles/Settings.module.css";
+import SettingsContextCard from "../components/SettingsContextCard";
+import { SectionHeader, SubmitButton } from "../components/SettingsUI";
 import { getSleepDuration, getSleepQuality } from "./sleepUtils";
 
 function SleepCard({ totalMinutes, duration }) {

@@ -43,19 +43,27 @@ def _single_member_assignments(members, completed_indexes):
     """Assign the same member list to each completed task."""
     return {index: list(members) for index in completed_indexes}
 
-def _completed_pick_count(members, rng):
-    """Return the number of members to assign to a completed task."""
-    return rng.randint(1, min(3, len(members)))
+def _select_active_members(shuffled):
+    """Return leads, regulars, and occasional contributors from the member pool."""
+    target = min(len(shuffled), max(2, round(len(shuffled) * 0.85)))
+    active = shuffled[:target]
+    occasionals = shuffled[target:]
+    n_leads = max(1, len(active) // 4)
+    return active[:n_leads], active[n_leads:], occasionals
 
 def _multi_member_assignments(members, completed_indexes, rng):
-    """Assign varied members to completed tasks."""
+    """Assign every member to completed tasks while keeping contribution levels varied."""
     assignments = {index: [] for index in completed_indexes}
-    for offset, member in enumerate(members):
-        assignments[completed_indexes[offset % len(completed_indexes)]].append(member)
+    shuffled = list(members)
+    rng.shuffle(shuffled)
+    n_tasks = len(completed_indexes)
+    leads, regulars, occasionals = _select_active_members(shuffled)
     for task_index in completed_indexes:
-        pool = [member for member in members if member not in assignments[task_index]]
-        extra_total = max(_completed_pick_count(members, rng) - len(assignments[task_index]), 0)
-        assignments[task_index].extend(rng.sample(pool, min(extra_total, len(pool))))
+        assignments[task_index].extend(leads)
+    for i, member in enumerate(regulars):
+        assignments[completed_indexes[i % n_tasks]].append(member)
+    for i, member in enumerate(occasionals):
+        assignments[completed_indexes[i % n_tasks]].append(member)
     return assignments
 
 def _build_completed_task_assignments(members, status_pattern, rng):

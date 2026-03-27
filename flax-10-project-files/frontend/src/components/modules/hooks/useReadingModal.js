@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getReadings, createReading, updateReading, deleteReading } from '../../../api/readingApi';
+import { useToast } from '../../../context/ToastContext';
 
 function useReadingList(moduleId) {
     const [readings, setReadings] = useState([]);
@@ -38,16 +39,19 @@ function useReadingForm() {
 export function useReadingModal(moduleId) {
     const { readings, load } = useReadingList(moduleId);
     const { showForm, editing, openCreate, openEdit, close } = useReadingForm();
+    const showToast = useToast();
 
     const handleSubmit = async (formData) => {
         if (editing) await updateReading(moduleId, editing.id, formData);
         else await createReading(moduleId, formData);
+        showToast(editing ? 'Reading updated.' : 'Reading added.', { variant: 'success' });
         await load();
         close();
     };
 
     const handleDelete = async (id) => {
         await deleteReading(moduleId, id);
+        showToast('Reading deleted.', { variant: 'success' });
         await load();
     };
 

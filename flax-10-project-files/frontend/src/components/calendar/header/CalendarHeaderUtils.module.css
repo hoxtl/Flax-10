@@ -76,6 +76,9 @@
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Action Menu */
@@ -327,6 +330,9 @@
 @media (max-width: 640px) {
   .nav {
     justify-content: center;
+    width: 100%;
+    min-width: 0;
+    gap: 4px;
   }
 
   .scheduleCard {
@@ -340,6 +346,26 @@
 
   .searchContainerMobile .searchInner {
     width: 100%;
+  }
+
+  .searchInner {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .searchBar {
+    min-width: 0;
+  }
+
+  .todayBtn {
+    padding-inline: 9px;
+    font-size: 0.78rem;
+  }
+
+  .title {
+    margin-left: 4px;
+    font-size: 1rem;
+    max-width: min(42vw, 170px);
   }
 
   .filterPopup {

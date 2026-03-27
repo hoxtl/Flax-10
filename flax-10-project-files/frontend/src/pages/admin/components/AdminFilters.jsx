@@ -2,7 +2,7 @@
  * Shared admin filter controls.
  */
 
-import styles from "../styles";
+import styles from "../styles/styles";
 
 function FilterPillButton({ active, label, onClick }) {
   return (

@@ -1,0 +1,91 @@
+.container {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  padding: 20px 24px;
+  margin-top: 15px;
+}
+
+.headerRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.taskSearch {
+    min-width: 160px;
+    max-width: 280px;
+    flex: 1;
+}
+
+.addBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 0.9rem;
+    box-shadow: none;
+    font-size: 13px;
+}
+
+.viewToggleControl {
+    margin-left: 4px;
+}
+
+.loadingText {
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 12px 0;
+}
+
+.tabBody {
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px 14px;
+    border-radius: 16px;
+    margin-top: 12px;
+  }
+
+  .headerRow {
+    margin-bottom: 14px;
+  }
+
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
+  .taskSearch {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .addBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .viewToggleControl {
+    margin-left: 0;
+  }
+
+  .tabBody {
+    margin-top: 1rem;
+  }
+}

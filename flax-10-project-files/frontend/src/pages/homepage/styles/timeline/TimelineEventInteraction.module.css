@@ -2,389 +2,438 @@
  * Timeline styles chunk 03.
  */
 
-  .planTimelineConflictPopoverTitle {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--home-timeline-card-title);
-    margin: 0 0 2px;
-  }
-  .planTimelineConflictPopoverBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: left;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .planTimelineConflictPopoverBtn:hover:not(:disabled) {
-    background: var(--hover);
-    border-color: var(--primary);
-  }
-  .planTimelineConflictPopoverBtn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  .planTimelineCardWrap {
-    position: relative;
-    min-width: 0;
-    width: 100%;
-    max-width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: stretch;
-  }
-  .planTimelineCardIconCircle {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    min-height: 28px;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--study) 30%, transparent);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.95rem;
-    line-height: 1;
-    flex-shrink: 0;
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--study) 20%, transparent);
-    grid-row: 1 / -1;
-  }
-  .planTimelineCardIcon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--restoration-charcoal, #2d352d);
-    opacity: 0.85;
-  }
-  .planTimelineCardMeta {
-    font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
-    font-size: 0.6rem;
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-    color: var(--home-text-meta);
-    letter-spacing: 0.02em;
-    align-self: flex-end;
-  }
-  .planTimelineCardDuration {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 9999px;
-    background: rgba(238, 220, 130, 0.22);
-    border: 1px solid rgba(238, 220, 130, 0.35);
-    font-family: inherit;
-    font-variant-numeric: tabular-nums;
-    font-size: inherit;
-    color: var(--restoration-earth, #6B5344);
-  }
-  .planTimelineCardCheck {
-    grid-column: 3;
-    grid-row: 1;
-    align-self: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 2px solid var(--restoration-sage);
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--restoration-sage);
-    flex-shrink: 0;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .planTimelineCard:not(.planTimelineCardWithDuration) .planTimelineCardCheck {
-    grid-column: 2;
-  }
-  .planTimelineCardCheck:hover {
-    background: rgba(135, 169, 107, 0.12);
-  }
-  .planTimelineCardCheck[aria-pressed="true"] {
-    background: var(--restoration-sage);
-    border-color: var(--restoration-sage);
-    color: #fff;
+.planTimelineConflictPopoverTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--home-timeline-card-title);
+  margin: 0 0 2px;
+}
+
+.planTimelineConflictPopoverBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.planTimelineConflictPopoverBtn:hover:not(:disabled) {
+  background: var(--hover);
+  border-color: var(--primary);
+}
+
+.planTimelineConflictPopoverBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.planTimelineCardWrap {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+.planTimelineCardIconCircle {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--study) 30%, transparent);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  line-height: 1;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--study) 20%, transparent);
+  grid-row: 1 / -1;
+}
+
+.planTimelineCardIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--restoration-charcoal, #2d352d);
+  opacity: 0.85;
+}
+
+.planTimelineCardMeta {
+  font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--home-text-meta);
+  letter-spacing: 0.02em;
+  align-self: flex-end;
+}
+
+.planTimelineCardDuration {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: rgba(238, 220, 130, 0.22);
+  border: 1px solid rgba(238, 220, 130, 0.35);
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  font-size: inherit;
+  color: var(--restoration-earth, #6B5344);
+}
+
+.planTimelineCardCheck {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--restoration-sage);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--restoration-sage);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.planTimelineCard:not(.planTimelineCardWithDuration) .planTimelineCardCheck {
+  grid-column: 2;
+}
+
+.planTimelineCardCheck:hover {
+  background: rgba(135, 169, 107, 0.12);
+}
+
+.planTimelineCardCheck[aria-pressed="true"] {
+  background: var(--restoration-sage);
+  border-color: var(--restoration-sage);
+  color: #fff;
+}
+
+/* Event-level completion checkbox (for events without a matched task) */
+.planTimelineEventCheck {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(107, 83, 68, 0.3);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(107, 83, 68, 0.5);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  opacity: 0;
+}
+
+.planTimelineCard:hover .planTimelineEventCheck {
+  opacity: 1;
+}
+
+.planTimelineEventCheck.planTimelineEventCheckDone {
+  opacity: 1;
+  background: rgba(132, 169, 140, 0.2);
+  border-color: var(--restoration-sage, #84A98C);
+  color: var(--restoration-sage, #84A98C);
+}
+
+.planTimelineEventCheck:hover {
+  background: rgba(132, 169, 140, 0.1);
+  border-color: var(--restoration-sage, #84A98C);
+  opacity: 1;
+}
+
+/* Missed session reschedule prompt */
+.planTimelineMissedBtn {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #FF9F67;
+  background: rgba(255, 159, 103, 0.1);
+  border: 1px solid rgba(255, 159, 103, 0.35);
+  border-radius: 9999px;
+  padding: 2px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  opacity: 0;
+}
+
+.planTimelineCard:hover .planTimelineMissedBtn,
+.planTimelineCardPast .planTimelineMissedBtn {
+  opacity: 1;
+}
+
+.planTimelineMissedBtn:hover {
+  background: rgba(255, 159, 103, 0.22);
+}
+
+.planTimelineFreeWindow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 12px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  cursor: default;
+  transition: border-color 0.2s, background 0.2s;
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  position: relative;
+}
+
+.planTimelineFreeWindowDashed {
+  border-radius: 8px;
+  background: rgba(132, 169, 140, 0.04);
+  box-shadow: none;
+}
+
+.planTimelineFreeWindowDashed:hover {
+  background: rgba(132, 169, 140, 0.08);
+  animation: planTimelineGapPulse 2s ease-in-out infinite;
+}
+
+@keyframes planTimelineGapPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.25);
   }
 
-  /* Event-level completion checkbox (for events without a matched task) */
-  .planTimelineEventCheck {
-    grid-column: 3;
-    grid-row: 1;
-    align-self: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(107, 83, 68, 0.3);
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: rgba(107, 83, 68, 0.5);
-    flex-shrink: 0;
-    transition: background 0.15s, border-color 0.15s;
-    opacity: 0;
+  50% {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.5), 0 0 8px rgba(132, 169, 140, 0.15);
   }
-  .planTimelineCard:hover .planTimelineEventCheck {
-    opacity: 1;
-  }
-  .planTimelineEventCheck.planTimelineEventCheckDone {
-    opacity: 1;
-    background: rgba(132, 169, 140, 0.2);
-    border-color: var(--restoration-sage, #84A98C);
-    color: var(--restoration-sage, #84A98C);
-  }
-  .planTimelineEventCheck:hover {
-    background: rgba(132, 169, 140, 0.1);
-    border-color: var(--restoration-sage, #84A98C);
-    opacity: 1;
-  }
+}
 
-  /* Missed session reschedule prompt */
-  .planTimelineMissedBtn {
-    grid-column: 3;
-    grid-row: 1;
-    align-self: center;
-    font-size: 0.6rem;
-    font-weight: 700;
-    color: #FF9F67;
-    background: rgba(255, 159, 103, 0.1);
-    border: 1px solid rgba(255, 159, 103, 0.35);
-    border-radius: 9999px;
-    padding: 2px 8px;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: background 0.15s;
-    opacity: 0;
-  }
-  .planTimelineCard:hover .planTimelineMissedBtn,
-  .planTimelineCardPast .planTimelineMissedBtn {
-    opacity: 1;
-  }
-  .planTimelineMissedBtn:hover {
-    background: rgba(255, 159, 103, 0.22);
-  }
+.planTimelineFreeWindowEmoji {
+  display: none;
+}
 
-  .planTimelineFreeWindow {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 6px;
-    height: 34px;
-    min-height: 34px;
-    padding: 0 12px;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
-    cursor: default;
-    transition: border-color 0.2s, background 0.2s;
-    font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    position: relative;
-  }
-  .planTimelineFreeWindowDashed {
-    border-radius: 8px;
-    background: rgba(132, 169, 140, 0.04);
-    box-shadow: none;
-  }
-  .planTimelineFreeWindowDashed:hover {
-    background: rgba(132, 169, 140, 0.08);
-    animation: planTimelineGapPulse 2s ease-in-out infinite;
-  }
-  @keyframes planTimelineGapPulse {
-    0%, 100% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.25); }
-    50% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.5), 0 0 8px rgba(132, 169, 140, 0.15); }
-  }
-  .planTimelineFreeWindowEmoji {
-    display: none;
-  }
-  .planTimelineFreeWindowDuration {
-    font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.65rem;
-    font-weight: 500;
-    color: rgba(107, 83, 68, 0.65);
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  /* Contextual activity suggestion chip */
-  .planTimelineGapContextChip {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: rgba(132, 169, 140, 0.9);
-    background: rgba(132, 169, 140, 0.12);
-    border-radius: 9999px;
-    padding: 2px 7px;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-  /* "Slot in: Task Name" call-to-action inside gaps */
-  .planTimelineGapSlotCta {
-    font-size: 0.72rem;
-    font-weight: 500;
-    color: rgba(107, 83, 68, 0.75);
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-  }
-  .planTimelineGapSlotCta strong {
-    color: var(--restoration-sage, #84A98C);
-    font-weight: 700;
-  }
-  .planTimelineGapRecommendation {
-    font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--home-text-meta, #6b7280);
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .planTimelineGapRecommendation strong {
-    color: var(--restoration-sage, #84A98C);
-    font-weight: 700;
-  }
-  .planTimelineFreeWindowActions {
-    flex-shrink: 0;
-    margin-left: auto;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-  .planTimelineFreeWindow:hover .planTimelineFreeWindowActions {
-    opacity: 1;
-  }
-  .planTimelineSlotPopover {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: 4px;
-    padding: 10px 12px;
-    background: var(--widget-card-bg-glass);
-    border: 1px solid rgba(210, 180, 140, 0.55);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .planTimelineSlotPopoverTitle {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--home-text-meta, #6b7280);
-    margin: 0 0 6px;
-  }
-  .planTimelineSlotPopoverItem {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
-    padding: 6px 8px;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    cursor: pointer;
-    text-align: left;
-    width: 100%;
-    transition: background 0.15s;
-  }
-  .planTimelineSlotPopoverItem:hover {
-    background: rgba(135, 169, 107, 0.12);
-  }
-  .planTimelineSlotPopoverItemTitle {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--restoration-charcoal, #2d352d);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-  }
-  .planTimelineSlotPopoverItemMeta {
-    font-size: 0.65rem;
-    font-variant-numeric: tabular-nums;
-    color: var(--home-text-meta, #6b7280);
-    opacity: 0.8;
-  }
-  .planTimelineSlotPopoverEmpty {
-    font-size: 0.72rem;
-    color: var(--home-text-meta, #6b7280);
-    padding: 6px 0;
-  }
-  .planTimelineFreeBtn {
-    display: none;
-  }
-  .planTimelineFreeBtnQuickSlot {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    min-height: 24px;
-    padding: 0;
-    border-radius: 50%;
-    border: 1px solid var(--restoration-sage, #87A96B);
-    background: rgba(135, 169, 107, 0.15);
-    color: var(--restoration-sage, #87A96B);
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, transform 0.15s;
-    margin-left: 6px;
-  }
-  .planTimelineFreeBtnQuickSlot:hover {
-    background: var(--restoration-sage, #87A96B);
-    color: #fff;
-    transform: scale(1.08);
-  }
-  .planTimelineCta {
-    display: block;
-    padding: 10px 16px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--restoration-sage);
-    text-decoration: none;
-    text-align: center;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    transition: color 0.2s ease;
-  }
-  .planTimelineCta:hover {
-    color: var(--restoration-charcoal);
-  }
-  .planTimelineEmpty {
-    padding: 24px 16px;
-    text-align: center;
-  }
-  .planTimelineEmptyText {
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    color: var(--home-text-meta);
-  }
+.planTimelineFreeWindowDuration {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(107, 83, 68, 0.65);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
+/* Contextual activity suggestion chip */
+.planTimelineGapContextChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(132, 169, 140, 0.9);
+  background: rgba(132, 169, 140, 0.12);
+  border-radius: 9999px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* "Slot in: Task Name" call-to-action inside gaps */
+.planTimelineGapSlotCta {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(107, 83, 68, 0.75);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.planTimelineGapSlotCta strong {
+  color: var(--restoration-sage, #84A98C);
+  font-weight: 700;
+}
+
+.planTimelineGapRecommendation {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--home-text-meta, #6b7280);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.planTimelineGapRecommendation strong {
+  color: var(--restoration-sage, #84A98C);
+  font-weight: 700;
+}
+
+.planTimelineFreeWindowActions {
+  flex-shrink: 0;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.planTimelineFreeWindow:hover .planTimelineFreeWindowActions {
+  opacity: 1;
+}
+
+.planTimelineSlotPopover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  padding: 10px 12px;
+  background: var(--widget-card-bg-glass);
+  border: 1px solid rgba(210, 180, 140, 0.55);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.planTimelineSlotPopoverTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--home-text-meta, #6b7280);
+  margin: 0 0 6px;
+}
+
+.planTimelineSlotPopoverItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+.planTimelineSlotPopoverItem:hover {
+  background: rgba(135, 169, 107, 0.12);
+}
+
+.planTimelineSlotPopoverItemTitle {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--restoration-charcoal, #2d352d);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.planTimelineSlotPopoverItemMeta {
+  font-size: 0.65rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--home-text-meta, #6b7280);
+  opacity: 0.8;
+}
+
+.planTimelineSlotPopoverEmpty {
+  font-size: 0.72rem;
+  color: var(--home-text-meta, #6b7280);
+  padding: 6px 0;
+}
+
+.planTimelineFreeBtn {
+  display: none;
+}
+
+.planTimelineFreeBtnQuickSlot {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--restoration-sage, #87A96B);
+  background: rgba(135, 169, 107, 0.15);
+  color: var(--restoration-sage, #87A96B);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  margin-left: 6px;
+}
+
+.planTimelineFreeBtnQuickSlot:hover {
+  background: var(--restoration-sage, #87A96B);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.planTimelineCta {
+  display: block;
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--restoration-sage);
+  text-decoration: none;
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  transition: color 0.2s ease;
+}
+
+.planTimelineCta:hover {
+  color: var(--restoration-charcoal);
+}
+
+.planTimelineEmpty {
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.planTimelineEmptyText {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--home-text-meta);
+}

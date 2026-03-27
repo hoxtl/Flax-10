@@ -4,6 +4,7 @@
 
 import { BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import Badge from "../../../components/common/badge/Badge";
 
 export default function GroupWorkProjectModuleBadge({ project, linkClassName, badgeClassName, codeClassName }) {
   const code = project?.course_code;
@@ -16,11 +17,11 @@ export default function GroupWorkProjectModuleBadge({ project, linkClassName, ba
       aria-label={`Open ${name || code} module`}
       onClick={(e) => e.stopPropagation()}
     >
-      <span className={badgeClassName}>
+      <Badge className={badgeClassName}>
         <BookOpen size={12} aria-hidden />
         <span className={codeClassName}>{code || name}</span>
         {code && name && <span>{name}</span>}
-      </span>
+      </Badge>
     </Link>
   );
 }

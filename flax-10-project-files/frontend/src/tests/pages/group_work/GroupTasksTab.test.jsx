@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
-import GroupTasksTab from '../../../pages/group_work/GroupTasksTab';
+import GroupTasksTab from '../../../pages/group_work/components/GroupTasksTab';
 
 vi.mock('../../../context/ConfirmContext', () => ({
   useConfirm: () => mockConfirm,
@@ -44,6 +44,7 @@ vi.mock('lucide-react', () => ({
   Square: () => <div data-testid="square-icon" />,
   ChevronDown: () => <div data-testid="chevron-down-icon" />,
   Plus: () => <div data-testid="plus-icon" />,
+  Search: () => <div data-testid="search-icon" />,
 }));
 
 const mockMembers = [

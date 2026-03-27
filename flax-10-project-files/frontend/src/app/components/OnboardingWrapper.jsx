@@ -1,4 +1,4 @@
-import OnboardingModal from "../../components/Onboarding/OnboardingModal";
+import OnboardingModal from "../../components/onboarding/components/OnboardingModal";
 import { useOnboardingCheck } from "../hooks/useOnboardingCheck";
 
 export function OnboardingWrapper() {

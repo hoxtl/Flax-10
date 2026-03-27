@@ -100,6 +100,18 @@
     word-break: break-word;
 }
 
+.cardTitleClickable {
+    cursor: text;
+    border-radius: 6px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    transition: background 0.12s;
+}
+
+.cardTitleClickable:hover {
+    background: var(--hover);
+}
+
 .cardTitleInput {
     width: 100%;
     font-size: 12px;
@@ -249,6 +261,16 @@
 @media (max-width: 520px) {
   .boardCard {
     padding: 12px;
+  }
+
+  .cardFooter {
+    gap: 8px;
+  }
+
+  .assigneeFooterBtn {
+    max-width: 72px;
+    overflow: hidden;
+    justify-content: flex-end;
   }
 }
 

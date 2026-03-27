@@ -1,11 +1,25 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ExpandableTabs } from '../../components/Dashboard/ExpandableTabs';
+import { ExpandableTabs } from '../../components/dashboard/components/ExpandableTabs';
+
+function resolveMotionStyle(variants, animate, custom) {
+  if (!variants || !animate) return undefined;
+  const value = typeof animate === 'string' ? variants[animate] : animate;
+  return typeof value === 'function' ? value(custom) : value;
+}
 
 vi.mock('framer-motion', () => ({
   motion: {
-    button: ({ children, onClick, className }) => <button onClick={onClick} className={className}>{children}</button>,
-    span: ({ children, className }) => <span className={className}>{children}</span>,
+    button: ({ children, onClick, className, variants, animate, custom }) => (
+      <button onClick={onClick} className={className} style={resolveMotionStyle(variants, animate, custom)}>
+        {children}
+      </button>
+    ),
+    span: ({ children, className, variants, animate }) => (
+      <span className={className} style={resolveMotionStyle(variants, animate)}>
+        {children}
+      </span>
+    ),
     div: ({ children, className }) => <div className={className}>{children}</div>,
   },
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -62,6 +76,20 @@ describe('ExpandableTabs', () => {
     render(<ExpandableTabs tabs={tabs} />);
     fireEvent.click(screen.getAllByRole('button')[0]);
     expect(screen.getByText('Alpha')).toBeTruthy();
+  });
+
+  it('applies the selected spacing animation values', () => {
+    render(<ExpandableTabs tabs={tabs} />);
+    const [alphaButton] = screen.getAllByRole('button');
+
+    expect(alphaButton.style.paddingLeft).toBe('8px');
+    expect(alphaButton.style.paddingRight).toBe('8px');
+
+    fireEvent.click(alphaButton);
+
+    expect(alphaButton.style.gap).toBe('8px');
+    expect(alphaButton.style.paddingLeft).toBe('14px');
+    expect(alphaButton.style.paddingRight).toBe('14px');
   });
 
   it('does not deselect when clicking inside the container', () => {

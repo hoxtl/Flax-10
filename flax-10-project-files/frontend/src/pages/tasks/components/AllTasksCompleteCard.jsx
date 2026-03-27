@@ -24,9 +24,10 @@ export default function AllTasksCompleteCard({
   children,
   ctaLabel,
   onCtaClick,
+  className = "",
 }) {
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${className}`.trim()}>
       <CelebrationEmoji emoji={emoji} className={styles.emoji} />
       <p className={styles.message}>{message}</p>
       {sub && <p className={styles.sub}>{sub}</p>}

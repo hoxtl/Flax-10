@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useModuleDisenrollment } from '../../components/Modules/hooks/useModuleDisenrollment';
+import { useModuleDisenrollment } from '../../components/modules/hooks/useModuleDisenrollment';
 
 const addNotificationMock = vi.hoisted(() => vi.fn());
 const disenrolByModuleIdMock = vi.hoisted(() => vi.fn());

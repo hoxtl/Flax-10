@@ -4,10 +4,10 @@
 
 import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { getInitials } from '../../Auth/utils/userUtils.js';
-import GridCard from '../../common/Card/GridCard';
+import GridCard from '../../common/card/GridCard';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
-import Tooltip from '../../common/Tooltip/Tooltip';
+import Tooltip from '../../common/tooltip/Tooltip';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModulesCard.module.css';
 
@@ -137,7 +137,7 @@ function CardHeader({ module, enrolled, isCore }) {
     const course = getCourse(module.module_code, module.course);
     return (
         <div className={styles.cardHeader}>
-            {enrolled && <EnrolledBadge enrolled={enrolled} isCore={isCore} />}
+            <EnrolledBadge enrolled={enrolled} isCore={isCore} />
             <div className={styles.headerChipsRow}>
                 <HeaderChips course={course} department={department} />
                 <TutorAvatar module={module} />

@@ -1,6 +1,6 @@
 
 import { describe, it, expect } from 'vitest';
-import { getDateRangeForView } from '../../components/Calendar/hooks/calendarHelpers';
+import { getDateRangeForView } from '../../components/calendar/hooks/calendarHelpers';
 
 describe('calendarHelpers', () => {
     const date = new Date('2026-01-15T12:00:00.000Z');
@@ -49,5 +49,16 @@ describe('calendarHelpers', () => {
         const e = new Date(end);
         expect(s.getDate()).toBe(1);
         expect(e.getDate()).toBe(31);
+    });
+
+    it('keeps the original date object unchanged while deriving ranges', () => {
+        const original = new Date('2026-02-18T15:45:00.000Z');
+        const snapshot = original.toISOString();
+
+        getDateRangeForView(original, 'day');
+        getDateRangeForView(original, 'week');
+        getDateRangeForView(original, 'month');
+
+        expect(original.toISOString()).toBe(snapshot);
     });
 });

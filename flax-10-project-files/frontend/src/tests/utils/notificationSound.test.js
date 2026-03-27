@@ -25,7 +25,7 @@ describe('notificationSound', () => {
         const { mockContext, mockOscillator } = createMocks();
         global.AudioContext = vi.fn(function() { return mockContext; });
 
-        const { playNotificationSound } = await import('../../components/Notifications/utils/notificationSound');
+        const { playNotificationSound } = await import('../../components/notifications/utils/notificationSound');
         playNotificationSound();
 
         expect(global.AudioContext).toHaveBeenCalledTimes(1);
@@ -38,7 +38,7 @@ describe('notificationSound', () => {
         const { mockContext } = createMocks();
         global.AudioContext = vi.fn(function() { return mockContext; });
 
-        const { playNotificationSound } = await import('../../components/Notifications/utils/notificationSound');
+        const { playNotificationSound } = await import('../../components/notifications/utils/notificationSound');
         playNotificationSound();
         playNotificationSound();
         expect(global.AudioContext).toHaveBeenCalledTimes(1);
@@ -47,7 +47,7 @@ describe('notificationSound', () => {
     it('handles AudioContext creation errors gracefully', async () => {
         global.AudioContext = vi.fn(function() { throw new Error('Not supported'); });
 
-        const { playNotificationSound } = await import('../../components/Notifications/utils/notificationSound');
+        const { playNotificationSound } = await import('../../components/notifications/utils/notificationSound');
         expect(() => playNotificationSound()).not.toThrow();
     });
 
@@ -55,7 +55,7 @@ describe('notificationSound', () => {
         const { mockContext, mockOscillator, mockGain } = createMocks();
         global.AudioContext = vi.fn(function() { return mockContext; });
 
-        const { playNotificationSound } = await import('../../components/Notifications/utils/notificationSound');
+        const { playNotificationSound } = await import('../../components/notifications/utils/notificationSound');
         playNotificationSound();
 
         expect(mockOscillator.connect).toHaveBeenCalledWith(mockGain);
@@ -67,7 +67,7 @@ describe('notificationSound', () => {
         global.webkitAudioContext = vi.fn(function() { return mockContext; });
         delete global.AudioContext;
 
-        const { playNotificationSound } = await import('../../components/Notifications/utils/notificationSound');
+        const { playNotificationSound } = await import('../../components/notifications/utils/notificationSound');
         playNotificationSound();
         expect(global.webkitAudioContext).toHaveBeenCalled();
     });

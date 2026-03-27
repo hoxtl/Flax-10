@@ -3,48 +3,40 @@
 
 \section{Objectives, context and key stakeholders}
 \label{sect:objectives}
-\textbf{StudyFlax's Key Stakeholders}
+
+Higher education demands a level of autonomous organisation that many students find genuinely difficult to sustain. At KCL, students are expected to independently track deadlines, manage coursework across multiple modules, attend society commitments, and maintain a healthy work-life balance, all without a single system to support them. The administrative burden falls equally on teaching staff, who frequently field repeated queries about module details, reading lists, and submission dates that could be resolved by a well-designed information platform.
+
+Flax-10 identified three primary stakeholder groups whose needs shaped the objectives of StudyFlax:
+
 \begin{itemize}
-    \item \textbf {KCL Students} : They are the main users of the system, who benefit from reduced academic burden and a greater sense of certainty when it comes to their scheduling and academic commitments.
-    \item \textbf {KCL Teachers} : The teachers, who benefit from reduced administrative tasks, due to an intuitive platform that allows teachers to provide students with key module details.
-    \item \textbf {KCL Societies} : The society organisers, who benefit from a dedicated page to keep society members engaged and notified of events.
+    \item \textbf{KCL Students}: the primary users, who stand to gain the most from reduced organisational burden and a clearer view of their academic and personal commitments.
+    \item \textbf{KCL Teaching Staff}: who benefit from a direct channel to broadcast module information to students, reducing repetitive administrative communication.
+    \item \textbf{KCL Society Organisers}: who gain a dedicated space to reach and engage their members without relying on external platforms.
 \end{itemize}
-Higher education can undoubtedly place a lot of strain on students, with many individuals finding it difficult to manage their workload both within and outside of timetabled hours. The level of organisation and self-discipline that university requires is something many students struggle to develop. As students ourselves, Flax-10 sympathises with students who are expected to independently manage their tasks, studies, deadlines and extracurriculars, all while ultimately maintaining a healthy work-life balance. 
 
-The consequences of poor time management are much greater than just a decline in academic performance. There are certain experiences that many students regard as native to student life, such as late night cramming before deadlines, juggling too many commitments, or missing a submission. These experiences can hugely contribute to burnout and stress among students. Flax-10 recognises student wellbeing as a priority, and it is with this in mind that StudyFlax was built.
+These stakeholders informed three core objectives for StudyFlax. The first is \textbf{consolidation}: to give students a single platform through which all academic and extracurricular commitments are visible and actionable, eliminating the need to consult multiple disconnected tools. The second is \textbf{personalisation}: to provide productivity support that adapts to a student's individual habits and workload, rather than imposing a rigid, one-size-fits-all schedule. The third is \textbf{communication}: to close the information gap between teaching staff and students, ensuring that module content, deadlines, and announcements reach students directly within the tool they already use to manage their time.
 
-StudyFlax was developed with this broader context in mind. Its main objective is to provide KCL students with a single platform through which they can manage their academic workload and personal commitments. Students benefit from a system that brings their tasks, calendar, societies, modules, study sessions, and much more together in one place.
-A key objective of StudyFlax was for the app to incorporate personalisation; a platform where the user truly feels like the system knows them, rather than being met with generic schedules and suggestions that do not accurately reflect their individual habits and capabilities. StudyFlax incorporates several elements that ensure the application fosters a productive environment, but also motivates students in a way that feels rewarding rather than rigid and impersonal.
-
-Another objective of StudyFlax was to improve the communication between teaching staff and students. For example, teaching staff may have to frequently answer repeated questions from students about module details, reading lists and deadline reminders, these questions could easily be avoided if such a platform existed to directly provide students with the information. 
-
-Furthermore, the communication gap between students and teachers can often lead to missed submissions, which creates friction between the two. By providing students a reliable and intuitive system to view all key information related to their courses, StudyFlax ensures academic commitments are visible and actionable without students having to go looking for them. 
-
-Together, these objectives reflect Flax-10's belief that the proper tools to sustain time management and student engagement can promote academic and personal success.
+Together, these objectives reflect a belief that the right digital infrastructure can meaningfully reduce the stress and cognitive overhead that student life imposes.
 
 \section{Requirements and specifications}
 \label{sect:requirements}
-\textbf{StudyFlax's Core Requirements}
- \begin{itemize}
-     \item \textbf{Student Capabilities:} The system provides a unified dashboard where students can track tasks, generate personalized study sessions, view module information, and manage a consolidated calendar.
- \end{itemize}
- \begin{itemize}
-     \item \textbf{Administrative Tools:} Teachers can send updates to the syllabus, reading lists, and deadlines directly to students, while society organizers have dedicated tools to manage and promote their events.
- \end{itemize}
- \begin{itemize}
-     \item \textbf{System Constraints:} The platform must be intuitive, secure, and responsive. Designed to reduce cognitive load, not add to it.
- \end{itemize}
 
-The primary goal of StudyFlax is to tackle time management challenges and reduce the pressure of overwhelming academic workload. To achieve this, the system required a set of functional capabilities built around consolidation.
+The requirements for StudyFlax were derived directly from the three objectives above. The system that was delivered can be understood as a set of feature areas, each of which addresses one or more of the objectives of consolidation, personalisation, and communication.
 
-The most critical requirement for students is the aggregation of their academic and personal lives into a single, cohesive interface. Students must be able to create, track, and complete tasks seamlessly. This is most visible on the Homepage and Calendar page, where university timetables, society events, and personal to-do lists are brought together into one unified view.
+\textbf{Calendar and timetable integration.} Students can access the Calendar page through the main navigation. This area of the system allows users to create personal events, manage recurring events, and import timetable data from KCL's iCalendar feed. Its primary contribution is consolidation: academic timetables, personal plans, and other commitments are brought into one view rather than being split across separate systems.
 
-Beyond basic task tracking, the system was required to intelligently interpret this data in service of personalisation. A core specification was that StudyFlax must suggest and allocate optimal times for study sessions based on a student's habits and upcoming deadlines. This is achieved through the Auto Schedule tool and integrated Focus Timer, which encourage productivity without enforcing rigid, stress inducing schedules.
+\textbf{Task management.} Students can access the Tasks page from the main navigation and can also interact with task data through the homepage dashboard. The delivered system supports task lists, task completion, prioritisation, time logging, and links between tasks and related academic work. This feature area supports consolidation by giving users a dedicated place to organise actionable work, and also supports personalisation by allowing students to structure their workload in the way that suits them best.
 
-For the platform to act as a reliable academic safety net, dedicated administrative interfaces were also required. Teaching staff needed tools to broadcast module details, reading lists, and deadline reminders directly into the student's primary workspace, making academic commitments immediately visible. This functionality is centralised within the Modules section of the application.
+\textbf{Focus timer and study tracking.} The timer is accessible from the main navigation and from timer-related controls in the interface. It records structured study sessions and contributes to statistics such as streaks, study history, and weekly progress. This supports personalisation by helping students build routines around their own working habits rather than simply storing deadlines passively.
 
-Extracurricular activities are equally important to a balanced university experience, making society integration a fundamental requirement. Organisers can create and promote events that feed directly into a student's schedule, removing the need to monitor external platforms. This is handled through the Societies page and global Announcements feed.
+\textbf{Auto-scheduler and dashboard customisation.} Students can access the auto-scheduler from the scheduling interface and can personalise the homepage through widget configuration. The auto-scheduler uses deadlines and user settings, such as sleep schedule and preferred study time, to generate a revision plan. These features were specified to ensure the platform does not merely display information, but actively adapts to the student's context and preferences.
 
-Underpinning these features are strict non-functional requirements. Usability took the highest priority, the interface was required to be uncluttered and intuitive, particularly in data heavy views like the Calendar and Group Work tracker. Finally, because the platform holds sensitive academic and personal data, secure authentication and rigorous data protection were specified from the outset, ensuring students can trust that their information remains private.
+\textbf{Modules and academic information.} Teaching staff can access the Modules section to create and manage modules, deadlines, and reading lists, while students can view the same information in the student-facing interface. This feature area supports communication by providing a direct route through which academic information is published and consumed inside the same platform students use to organise their time.
 
-Together, these functional and non-functional requirements form the blueprint for a system designed to support both academic success and student wellbeing.
+\textbf{Societies and announcements.} Students can browse and join societies through the Societies section, while society organisers can manage announcements and events through society administration interfaces. Society events can also be synced into a student's calendar. This supports both consolidation and communication: extracurricular activity is surfaced in the same environment as academic planning, and organisers gain a direct channel to their members.
+
+\textbf{Group work.} The Group Work area allows students to manage shared projects, assign tasks, record member availability, and suggest meeting times. This feature extends the platform from individual organisation into small-scale collaboration, reflecting the reality that much student work is coordinated across groups rather than completed alone.
+
+\textbf{Analytics, AI support, and campus map.} The Analytics page presents study history and progress information, while the AI study coach provides contextual feedback based on recorded activity. The Campus Map page supports route planning to KCL campuses using the student's saved home address. These features broaden the system beyond basic record-keeping by helping students interpret their behaviour and plan around the physical realities of attending university.
+
+Alongside these functional requirements, the project was shaped by several non-functional expectations. Usability was a priority throughout, as a platform intended to reduce cognitive load must not itself become difficult to use. Security was also essential, because the application stores personal, academic, and role-sensitive data. Finally, the system needed to remain accessible across desktop and mobile form factors so that students could consult and update it throughout the day rather than only when seated at a computer.

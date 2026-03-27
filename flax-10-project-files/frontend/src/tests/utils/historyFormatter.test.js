@@ -4,7 +4,7 @@ import {
     formatDate,
     formatDuration,
     groupHistoryByBlock,
-} from '../../components/Timer/utils/historyFormatter';
+} from '../../components/timer/utils/historyFormatter';
 
 describe('historyFormatter', () => {
     describe('formatTimeRange', () => {

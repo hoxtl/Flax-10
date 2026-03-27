@@ -33,6 +33,10 @@ export const commitResize = (event, pixelDiff, editEvent) => {
 
 /**
  * Creates a resize session that listens for mouse move and mouse up events.
+ * @param {number} startY - The clientY pixel position where the drag began.
+ * @param {number} originalHeight - The element's height in pixels at drag start.
+ * @param {{ onMove: (newHeight: number) => void, onEnd: (pixelDiff: number) => void }} callbacks
+ *   onMove receives the clamped new height (min 30px); onEnd receives the total pixel delta.
  */
 
 export const createResizeSession = (startY, originalHeight, { onMove, onEnd }) => {

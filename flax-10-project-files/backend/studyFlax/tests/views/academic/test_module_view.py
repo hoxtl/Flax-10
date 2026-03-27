@@ -257,6 +257,28 @@ class ModuleViewCoverageTest(TestCase):
 class ModuleNotificationsTest(TestCase):
     """Tests for module notification helper branches."""
 
+    def test_get_changed_module_fields_ignores_write_only_serializer_flags(self):
+        from studyFlax.views.modules.module_notifications import get_changed_module_fields
+
+        module = Module.objects.create(
+            module_code='MOD123',
+            module_name='Existing Module',
+            created_by=User.objects.create_user(
+                username='notif_teacher',
+                email='notif_teacher@example.com',
+                password='pass',
+            ),
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+
+        changed_fields = get_changed_module_fields(
+            module,
+            {'module_name': 'Renamed Module', 'is_recurring': False},
+        )
+
+        self.assertEqual(changed_fields, ['module_name'])
+
     def test_notify_module_updated_does_nothing_for_empty_fields(self):
         from studyFlax.views.modules.module_notifications import notify_module_updated
         from unittest.mock import MagicMock

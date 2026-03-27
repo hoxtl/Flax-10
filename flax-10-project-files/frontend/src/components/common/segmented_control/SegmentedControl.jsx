@@ -5,7 +5,7 @@
 import { useId } from 'react';
 import { motion } from 'framer-motion';
 import styles from './SegmentedControl.module.css';
-import Tooltip from '../Tooltip/Tooltip';
+import Tooltip from '../tooltip/Tooltip';
 
 function SegmentButton({ option, isActive, onClick, fill, indicatorId, variant, tooltipPosition }) {
   const { label, icon: Icon, title } = option;
