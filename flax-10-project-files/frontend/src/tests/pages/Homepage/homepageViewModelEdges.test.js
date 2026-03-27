@@ -142,10 +142,10 @@ describe("homepageViewModel fallbacks", () => {
     expect(getTaskWidgetList([{ id: 1, title: "Done", completed: true, due_date: "2026-03-24T11:00:00.000Z", priority: "low" }], now)).toEqual([expect.objectContaining({ id: 1, taskWidgetStatus: "completed" })]);
   });
 
-  it("identifies top upcoming tasks to backfill widget gaps", () => {
-    const getDisp = (allTasks, existing = []) => getTaskWidgetDisplayList(existing, now, allTasks).map(t => t.id);
-    expect(getDisp([{ id: "overdue", due_date: "2026-03-24T08:00Z", taskWidgetStatus: "overdue" }, { id: "upcoming", due_date: "2026-03-24T12:00Z", taskWidgetStatus: "upcoming" }])).toEqual(["overdue", "upcoming"]);
-    expect(getDisp([{ id: "upcoming-first", due_date: "2026-03-24T12:00Z", taskWidgetStatus: "upcoming" }, { id: "overdue-second", due_date: "2026-03-24T08:00Z", taskWidgetStatus: "overdue" }])).toEqual(["overdue-second", "upcoming-first"]);
+  it("keeps only the supplied today widget items", () => {
+    const getDisp = (itemsOnly, allTasks = []) => getTaskWidgetDisplayList(allTasks, now, itemsOnly).map(t => t.id);
+    expect(getDisp([{ id: "overdue", due_date: "2026-03-24T08:00Z", sortTime: new Date("2026-03-24T08:00Z"), taskWidgetStatus: "overdue" }, { id: "upcoming", due_date: "2026-03-24T12:00Z", sortTime: new Date("2026-03-24T12:00Z"), taskWidgetStatus: "upcoming" }])).toEqual(["overdue", "upcoming"]);
+    expect(getDisp([{ id: "today", due_date: "2026-03-24T12:00Z", sortTime: new Date("2026-03-24T12:00Z"), taskWidgetStatus: "upcoming" }], [{ id: "future", due_date: "2026-03-28T12:00Z" }])).toEqual(["today"]);
   });
 
   it("sorts display candidates tightly", () => {

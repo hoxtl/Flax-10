@@ -61,8 +61,9 @@ export function CollapsibleSectionBody({ collapsed, bodyKey, children }) {
  * Resolves list metadata from listMap and renders a TaskCard.
  */
 export function TaskCardRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask, cardProps = {} }) {
-  const listEntry = listMap?.[task.list_id];
-  const listName = listEntry?.name ?? null;
+  const listKey = String(task.task_list ?? task.list_id ?? "");
+  const listEntry = listKey ? listMap?.[listKey] : null;
+  const listName = task.list_name ?? listEntry?.name ?? null;
   const listColor = listEntry?.color ?? null;
 
   return (

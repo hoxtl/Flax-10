@@ -44,7 +44,7 @@ function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions, 
       <span className={s.optionsRowDivider} aria-hidden />
       <span className={s.optionsRowLabel}>List <span className={s.requiredMark}>*</span></span>
       <div className={`${s.dropdownWrap} ${s.listDropdownWrap} ${listError ? s.listDropdownError : ""}`}>
-        <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || "")} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+        <AnimatedDropdown value={String(taskListId ?? "")} onChange={(v) => setTaskListId(v || "")} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
       </div>
     </>
   );

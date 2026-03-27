@@ -38,7 +38,7 @@ describe("useCreateTaskBar", () => {
 
   it("submits quick add", async () => {
     const onAddTask = vi.fn();
-    const { result } = renderHook(() => useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], onAddTask, defaultDueDate: "2026-03-09T10:00" }));
+    const { result } = renderHook(() => useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], defaultListId: 9, onAddTask, defaultDueDate: "2026-03-09T10:00" }));
     act(() => result.current.setTitle("Read"));
     await act(async () => result.current.handleSubmit({ preventDefault: vi.fn() }));
     expect(checkSleepAndRunMock).toHaveBeenCalledWith("2026-03-09T10:00", expect.any(Function));
@@ -65,7 +65,7 @@ describe("useCreateTaskBar", () => {
 
   it("syncs default list ids and ignores invalid submits", async () => {
     const onAddTask = vi.fn();
-    const lists = [{ id: 2, name: "Reading List - History" }, { id: 9, name: "Inbox" }];
+    const lists = [{ id: 2, name: "PO4505 - Public Policy Analysis" }, { id: 9, name: "Inbox" }];
     const { result, rerender } = renderHook(
       ({ defaultListId }) => useCreateTaskBar({
         lists,
@@ -80,6 +80,7 @@ describe("useCreateTaskBar", () => {
 
     rerender({ defaultListId: 2 });
     await waitFor(() => expect(result.current.taskListId).toBe(2));
+    expect(result.current.isReadingList).toBe(true);
 
     await act(async () => result.current.handleSubmit({ preventDefault: vi.fn() }));
     expect(runQuickAdd).not.toHaveBeenCalled();

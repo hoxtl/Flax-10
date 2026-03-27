@@ -132,26 +132,8 @@ export function getTaskWidgetList(allTasks, now) {
   return sortedTasks;
 }
 
-const TASK_WIDGET_MIN_INCOMPLETE = 5;
-
 export function getTaskWidgetDisplayList(allTasks, now, taskWidgetItemsOnly = []) {
-  const displayList = [...(taskWidgetItemsOnly || [])];
-  const incompleteCount = displayList.filter((task) => !task.completed).length;
-  if (incompleteCount >= TASK_WIDGET_MIN_INCOMPLETE) return displayList;
-  const { todayStart, todayEnd } = getTodayBounds(now);
-  const excludedIds = new Set(displayList.map((task) => String(task.id)));
-  const fillers = buildTaskWidgetFillers(allTasks, todayStart, todayEnd)
-    .filter((task) => !excludedIds.has(String(task.id)))
-    .map((task) => buildTaskWidgetItem(task, todayEnd))
-    .slice(0, TASK_WIDGET_MIN_INCOMPLETE - incompleteCount);
-  return [...displayList, ...fillers].sort(compareTaskWidgetItems);
-}
-
-function isFillerCandidate(task, todayStart, todayEnd) {
-  if (!task?.due_date || task.completed) return false;
-  const dueDate = new Date(task.due_date);
-  if (Number.isNaN(dueDate.getTime())) return false;
-  return dueDate < todayStart || dueDate > todayEnd;
+  return [...(taskWidgetItemsOnly || [])].sort(compareTaskWidgetItems);
 }
 
 function getTodayBounds(now) {
@@ -160,28 +142,6 @@ function getTodayBounds(now) {
   todayStart.setHours(0, 0, 0, 0);
   todayEnd.setHours(23, 59, 59, 999);
   return { todayStart, todayEnd };
-}
-
-function classifyFillerTask(task, acc, todayStart) {
-  const dueDate = new Date(task.due_date);
-  if (dueDate < todayStart) acc.overdue.push(task);
-  else acc.upcoming.push(task);
-  return acc;
-}
-
-function buildTaskWidgetFillers(allTasks, todayStart, todayEnd) {
-  const candidates = (allTasks || []).filter((task) => isFillerCandidate(task, todayStart, todayEnd));
-  const { overdue, upcoming } = candidates.reduce((acc, task) => classifyFillerTask(task, acc, todayStart), { overdue: [], upcoming: [] });
-  overdue.sort(compareRawTasksByDueDate);
-  upcoming.sort(compareRawTasksByDueDate);
-  return [...overdue, ...upcoming];
-}
-
-function compareRawTasksByDueDate(left, right) {
-  const leftTime = new Date(left.due_date).getTime();
-  const rightTime = new Date(right.due_date).getTime();
-  if (leftTime !== rightTime) return leftTime - rightTime;
-  return String(left.title || "").localeCompare(String(right.title || ""));
 }
 
 function leftAfterNow(task, now) {

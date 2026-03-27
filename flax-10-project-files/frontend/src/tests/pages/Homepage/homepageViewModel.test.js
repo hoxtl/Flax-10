@@ -248,38 +248,32 @@ describe("homepageViewModel helpers", () => {
   });
 
   describe("task widget ordering", () => {
-    it("sorts upcoming widget fillers by nearest due date before priority", () => {
-    const now = new Date("2026-03-24T09:00:00Z");
-    const tasks = [
-      buildTask(1, "Due in 2 days and urgent", "2026-03-26T09:00:00Z", "urgent"),
-      buildTask(2, "Due tomorrow and medium", "2026-03-25T09:00:00Z", "medium"),
-      buildTask(3, "Due in 3 days and high", "2026-03-27T09:00:00Z", "high"),
-    ];
+    it("keeps the widget focused on tasks due today", () => {
+      const now = new Date("2026-03-24T09:00:00Z");
+      const allTasks = [
+        buildTask(1, "Due later today", "2026-03-24T17:00:00Z", "medium"),
+        buildTask(2, "Due tomorrow", "2026-03-25T09:00:00Z", "urgent"),
+        buildTask(3, "Due in 3 days", "2026-03-27T09:00:00Z", "high"),
+      ];
 
-    const displayList = getTaskWidgetDisplayList(tasks, now, []);
+      const todayOnly = getTaskWidgetList(allTasks, now);
+      const displayList = getTaskWidgetDisplayList(allTasks, now, todayOnly);
 
-    expect(displayList.map((task) => task.title)).toEqual([
-      "Due tomorrow and medium",
-      "Due in 2 days and urgent",
-      "Due in 3 days and high",
-    ]);
-  });
+      expect(displayList.map((task) => task.title)).toEqual(["Due later today"]);
+    });
 
-    it("uses priority only as a tie-breaker when due dates match", () => {
-    const now = new Date("2026-03-24T09:00:00Z");
-    const tasks = [
-      buildTask(1, "Tomorrow medium", "2026-03-25T09:00:00Z", "medium"),
-      buildTask(2, "Tomorrow urgent", "2026-03-25T09:00:00Z", "urgent"),
-      buildTask(3, "Tomorrow high", "2026-03-25T09:00:00Z", "high"),
-    ];
+    it("uses priority only as a tie-breaker when due times match", () => {
+      const displayList = getTaskWidgetDisplayList([], defaultNow, [
+        { id: "medium", title: "Today medium", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: new Date("2026-03-24T10:00:00.000Z"), taskWidgetStatus: "upcoming", priority: "medium" },
+        { id: "urgent", title: "Today urgent", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: new Date("2026-03-24T10:00:00.000Z"), taskWidgetStatus: "upcoming", priority: "urgent" },
+        { id: "high", title: "Today high", completed: false, due_date: "2026-03-24T10:00:00.000Z", sortTime: new Date("2026-03-24T10:00:00.000Z"), taskWidgetStatus: "upcoming", priority: "high" },
+      ]);
 
-    const displayList = getTaskWidgetDisplayList(tasks, now, []);
-
-    expect(displayList.map((task) => task.title)).toEqual([
-      "Tomorrow urgent",
-      "Tomorrow medium",
-      "Tomorrow high",
-    ]);
+      expect(displayList.map((task) => task.title)).toEqual([
+        "Today urgent",
+        "Today medium",
+        "Today high",
+      ]);
     });
 
     describe("widget metrics and recommendations", () => {
@@ -289,7 +283,7 @@ describe("homepageViewModel helpers", () => {
         expect(widgetList.find((task) => task.taskWidgetUrgentGlow)).toMatchObject({ id: 1 });
       });
 
-      it("prioritizes overdue and upcoming fillers before already shown tasks", () => {
+      it("does not backfill the widget with non-today tasks", () => {
         const displayList = getTaskWidgetDisplayList(
           [
             { id: 1, title: "Already shown", completed: false, due_date: "2026-03-24T09:30:00.000Z", priority: "urgent" },
@@ -300,11 +294,7 @@ describe("homepageViewModel helpers", () => {
           defaultNow,
           [{ id: 1, title: "Already shown", completed: false, due_date: "2026-03-24T09:30:00.000Z", priority: "urgent" }],
         );
-        expect(displayList.slice(0, 3).map((task) => task.title)).toEqual([
-          "Overdue filler",
-          "Upcoming filler",
-          "Already shown",
-        ]);
+        expect(displayList.map((task) => task.title)).toEqual(["Already shown"]);
       });
 
       it("computes due counts, completion counts, and progress pct", () => {

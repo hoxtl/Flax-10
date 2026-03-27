@@ -5,23 +5,26 @@ import CompletedTasksSection from "../../../../pages/Tasks/components/CompletedT
 import SuggestedReadingsSection from "../../../../pages/Tasks/components/SuggestedReadingsSection";
 
 vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
-  default: ({ task, onToggle, onDelete, onEdit, listName }) => (
-    <div data-testid={`task-card-${task.id}`}>
-      <span>{task.title}</span>
-      <span>{listName}</span>
-      <button type="button" onClick={onToggle}>
-        toggle
-      </button>
-      <button type="button" onClick={onDelete}>
-        delete
-      </button>
-      {onEdit && (
-        <button type="button" onClick={() => onEdit({ title: "Renamed" }, { source: "test" })}>
-          edit
+  default: ({ task, onToggle, onDelete, onEdit, listName }) => {
+    const isReadingList = /^([a-z]{2,}\d+)\s*-\s*(.+)$/i.test(listName || "");
+    return (
+      <div data-testid={`task-card-${task.id}`}>
+        <span>{task.title}</span>
+        <span>{listName}</span>
+        <button type="button" onClick={onToggle}>
+          toggle
         </button>
-      )}
-    </div>
-  ),
+        <button type="button" onClick={onDelete}>
+          delete
+        </button>
+        {onEdit && !isReadingList && (
+          <button type="button" onClick={() => onEdit({ title: "Renamed" }, { source: "test" })}>
+            edit
+          </button>
+        )}
+      </div>
+    );
+  },
 }));
 
 vi.mock("../../../../api/readingApi", () => ({
@@ -42,13 +45,15 @@ describe("Tasks section coverage", () => {
     const onToggle = vi.fn(); const onDelete = vi.fn(); const onEdit = vi.fn();
     const { unmount } = render(<CompletedTasksSection tasks={[{ id: 1, title: "Essay", task_list: 1, completed: true }]} sortBy="priority" listMap={{ "1": { idx: 0, name: "Inbox" } }} lists={[{ id: 1, name: "Inbox", color: "#fff" }]} onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />);
 
+    expect(screen.getByText("Inbox")).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole("button", { name: "toggle" }));
     fireEvent.click(screen.getByRole("button", { name: "delete" }));
     fireEvent.click(screen.getByRole("button", { name: "edit" }));
 
-    expect(onToggle).toHaveBeenCalledWith(1, true);
+    expect(onToggle).toHaveBeenCalledWith(1);
     expect(onDelete).toHaveBeenCalledWith(1);
-    expect(onEdit).toHaveBeenCalledWith(1, { title: "Renamed" }, { source: "test" });
+    expect(onEdit).toHaveBeenCalledWith(1, { title: "Renamed" });
 
     unmount();
     render(<CompletedTasksSection tasks={[{ id: 2, title: "Reading", task_list: 2, completed: true }]} sortBy="priority" listMap={{ "2": { idx: 1, name: "CS101 - Systems" } }} lists={[{ id: 2, name: "CS101 - Systems", color: "#eee" }]} onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />);

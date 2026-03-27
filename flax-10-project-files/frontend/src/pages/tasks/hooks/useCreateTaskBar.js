@@ -17,7 +17,7 @@ function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   );
   const [title, setTitle] = useState("");
   const [estimatedMinutes, setEstimatedMinutes] = useState(POMODORO_BLOCK_MINUTES);
-  const [taskListId, setTaskListId] = useState(() => defaultListId || "");
+  const [taskListId, setTaskListId] = useState(() => defaultListId ?? "");
   const [moduleId, setModuleId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
@@ -147,6 +147,6 @@ export default function useCreateTaskBar(props) {
   const { handleSubmit } = useCreateTaskBarHandlers(state, onAddTask, onError);
   const { handleInputBlur, handleInputKeyDown } = useCreateTaskBarInputHandlers(state);
   const { moduleOptions, listOptions } = useCreateTaskBarOptions(state);
-  const selectedList = state.sortedLists.find(l => String(l.id) === (state.taskListId));  
+  const selectedList = state.sortedLists.find((l) => String(l.id) === String(state.taskListId));
   return { ...state, handleSubmit, handleInputBlur, handleInputKeyDown, showOptions: state.inputFocused, moduleOptions, listOptions, isReadingList: isReadingTaskList(selectedList) };
 }
