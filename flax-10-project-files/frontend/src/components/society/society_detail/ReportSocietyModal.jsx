@@ -71,27 +71,25 @@ function ReportSuccessModal({ societyName, onClose }) {
   );
 }
 
-function ReportFormModal({ societyName, onClose, model }) {
+function buildReportFormModalProps(societyName, onClose) {
+  return {
+    title: `Report "${societyName}"`,
+    onClose,
+    subtitle: "Please let us know why you are reporting this society.",
+  };
+}
+
+function ReportFormBody({ model, onClose }) {
   return (
-    <StandardModal
-      title={`Report "${societyName}"`}
-      onClose={onClose}
-      subtitle="Please let us know why you are reporting this society."
-    >
-      <FormContent
-        reason={model.reason}
-        onTextChange={(event) => model.setReason(event.target.value)}
-        error={model.error}
-        submitting={model.submitting}
-      />
-      <ReportActions
-        onClose={onClose}
-        onSubmit={model.onSubmit}
-        submitting={model.submitting}
-        disabled={!model.reason.trim()}
-      />
-    </StandardModal>
+    <>
+      <FormContent reason={model.reason} onTextChange={(event) => model.setReason(event.target.value)} error={model.error} submitting={model.submitting} />
+      <ReportActions onClose={onClose} onSubmit={model.onSubmit} submitting={model.submitting} disabled={!model.reason.trim()} />
+    </>
   );
+}
+
+function ReportFormModal({ societyName, onClose, model }) {
+  return <StandardModal {...buildReportFormModalProps(societyName, onClose)}><ReportFormBody model={model} onClose={onClose} /></StandardModal>;
 }
 
 function ReportActions({ onClose, onSubmit, submitting, disabled }) {
