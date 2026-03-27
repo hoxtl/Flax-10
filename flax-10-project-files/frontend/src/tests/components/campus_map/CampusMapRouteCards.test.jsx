@@ -40,6 +40,72 @@ describe("TflRouteCard", () => {
     render(<TflRouteCard loading={false} tflRouteInfo={tflRouteInfo} instructionMode={true} onToggleInstructions={vi.fn()} />);
     expect(screen.getByText("Home → Station")).toBeTruthy();
   });
+
+  it("falls back to an empty leg list when route data omits legs", () => {
+    render(
+      <TflRouteCard
+        loading={false}
+        instructionMode={false}
+        onToggleInstructions={vi.fn()}
+        tflRouteInfo={{ duration: 18 }}
+      />
+    );
+
+    expect(screen.getAllByText("Public Transport")[0]).toBeTruthy();
+    expect(screen.getByText("0")).toBeTruthy();
+  });
+
+  it("summarizes single, double, and multi-line journeys", () => {
+    const onToggleInstructions = vi.fn();
+    const { rerender } = render(
+      <TflRouteCard
+        loading={false}
+        instructionMode={false}
+        onToggleInstructions={onToggleInstructions}
+        tflRouteInfo={{
+          duration: 12,
+          legs: [{ mode: "tube", lineName: "Jubilee", departurePoint: "A", arrivalPoint: "B", duration: 12 }],
+        }}
+      />
+    );
+
+    expect(screen.getByText("via Jubilee")).toBeTruthy();
+
+    rerender(
+      <TflRouteCard
+        loading={false}
+        instructionMode={false}
+        onToggleInstructions={onToggleInstructions}
+        tflRouteInfo={{
+          duration: 22,
+          legs: [
+            { mode: "tube", routeName: "Jubilee", departurePoint: "A", arrivalPoint: "B", duration: 10 },
+            { mode: "tube", lineName: "Northern", departurePoint: "B", arrivalPoint: "C", duration: 12 },
+          ],
+        }}
+      />
+    );
+
+    expect(screen.getByText("via Jubilee & Northern")).toBeTruthy();
+
+    rerender(
+      <TflRouteCard
+        loading={false}
+        instructionMode={false}
+        onToggleInstructions={onToggleInstructions}
+        tflRouteInfo={{
+          duration: 35,
+          legs: [
+            { mode: "tube", routeName: "Jubilee", departurePoint: "A", arrivalPoint: "B", duration: 10 },
+            { mode: "tube", lineName: "Northern", departurePoint: "B", arrivalPoint: "C", duration: 12 },
+            { mode: "tube", routeName: "Victoria", departurePoint: "C", arrivalPoint: "D", duration: 13 },
+          ],
+        }}
+      />
+    );
+
+    expect(screen.getByText("via Jubilee, Northern +1 more")).toBeTruthy();
+  });
 });
 
 describe("WalkingRouteCard", () => {
