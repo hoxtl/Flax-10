@@ -89,11 +89,14 @@ export async function undoConflictResolutionPlan(plan, editEvent) {
   }
 }
 
-export function buildConflictResolutionToastMessage(plan) {
+export function buildConflictResolutionToastMessage(plan, isTeacher = false) {
   const fixedUnresolvedCount = plan.unresolved.filter((item) => item.reason === "fixed").length;
   const noSlotCount = plan.unresolved.filter((item) => item.reason === "no-slot").length;
   if (!plan.operations.length && !plan.unresolved.length) return "No overlap events.";
-  if (!plan.operations.length && fixedUnresolvedCount && !noSlotCount) return "These overlaps are fixed lectures, societies, or deadline items, so they stay in place.";
+  if (!plan.operations.length && fixedUnresolvedCount && !noSlotCount) {
+    const items = isTeacher ? "lectures or deadline items" : "lectures, societies, or deadline items";
+    return `These overlaps are fixed ${items}, so they stay in place.`;
+  }
   if (!plan.operations.length && noSlotCount && !fixedUnresolvedCount) return "Couldn't find a conflict-free slot for some events.";
   const movedCount = plan.operations.length;
   const tomorrowOperations = plan.operations.filter((operation) => operation.movedToTomorrow);
