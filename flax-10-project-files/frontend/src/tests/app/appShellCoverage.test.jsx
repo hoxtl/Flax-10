@@ -1,3 +1,7 @@
+/*
+ * App shell coverage tests for routing and shell-only behaviour.
+ */
+
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -157,6 +161,30 @@ import { OnboardingWrapper } from "../../app/components/OnboardingWrapper";
 import { ScreenWrap } from "../../app/components/ScreenWrap";
 import { WelcomeScreen } from "../../app/components/WelcomeScreen";
 
+function renderAuthScreen(initialEntries) {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      <AuthScreen />
+    </MemoryRouter>,
+  );
+}
+
+function rerenderAuthScreen(rerender, initialEntries) {
+  rerender(
+    <MemoryRouter initialEntries={initialEntries}>
+      <AuthScreen />
+    </MemoryRouter>,
+  );
+}
+
+function renderAppScreen(activeNav) {
+  return render(
+    <MemoryRouter initialEntries={["/today"]}>
+      <AppScreen activeNav={activeNav} setActiveNav={vi.fn()} user={{ name: "Ava" }} />
+    </MemoryRouter>,
+  );
+}
+
 describe("app shell coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -184,9 +212,10 @@ describe("app shell coverage", () => {
       isLoadingTheme: true,
     });
 
-    const { container } = render(<App />);
+    render(<App />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByTestId("auth-provider")).toBeInTheDocument();
+    expect(screen.queryByTestId("theme-provider")).not.toBeInTheDocument();
   });
 
   it("renders the auth and theme providers around the resolved screen", () => {
@@ -222,40 +251,29 @@ describe("app shell coverage", () => {
     expect(screen.getByText("Wrapped child")).toBeInTheDocument();
   });
 
-  it("routes auth pages and redirects unknown auth paths to login", () => {
-    const { rerender } = render(
-      <MemoryRouter initialEntries={["/login"]}>
-        <AuthScreen />
-      </MemoryRouter>,
-    );
+  it("routes the sign-in auth page", () => {
+    renderAuthScreen(["/login"]);
     expect(screen.getByText("auth:signin")).toBeInTheDocument();
+  });
 
-    rerender(
-      <MemoryRouter initialEntries={["/signup"]}>
-        <AuthScreen />
-      </MemoryRouter>,
-    );
+  it("routes the sign-up auth page", () => {
+    renderAuthScreen(["/signup"]);
     expect(screen.getByText("auth:signup")).toBeInTheDocument();
+  });
 
-    rerender(
-      <MemoryRouter initialEntries={["/reset-password"]}>
-        <AuthScreen />
-      </MemoryRouter>,
-    );
+  it("routes the password reset request page", () => {
+    renderAuthScreen(["/reset-password"]);
     expect(screen.getByText("auth:reset-request")).toBeInTheDocument();
+  });
 
-    rerender(
-      <MemoryRouter initialEntries={["/reset-password/token-1"]}>
-        <AuthScreen />
-      </MemoryRouter>,
-    );
+  it("routes the password reset confirm page", () => {
+    renderAuthScreen(["/reset-password/token-1"]);
     expect(screen.getByText("auth:reset-confirm")).toBeInTheDocument();
+  });
 
-    rerender(
-      <MemoryRouter initialEntries={["/unknown"]}>
-        <AuthScreen />
-      </MemoryRouter>,
-    );
+  it("redirects unknown auth paths to sign-in", () => {
+    const { rerender } = renderAuthScreen(["/login"]);
+    rerenderAuthScreen(rerender, ["/unknown"]);
     expect(screen.getByText("auth:signin")).toBeInTheDocument();
   });
 
@@ -292,15 +310,10 @@ describe("app shell coverage", () => {
     dispatchSpy.mockRestore();
   });
 
-  it("renders the app screen tour only on the home tab", () => {
+  it("renders the app screen tour on the home tab", () => {
     const completeTour = vi.fn();
     useTourCheckMock.mockReturnValueOnce([true, completeTour]);
-
-    const { rerender } = render(
-      <MemoryRouter initialEntries={["/today"]}>
-        <AppScreen activeNav="home" setActiveNav={vi.fn()} user={{ name: "Ava" }} />
-      </MemoryRouter>,
-    );
+    renderAppScreen("home");
 
     expect(useSyncNavFromUrlMock).toHaveBeenCalledWith("/today", expect.any(Function));
     expect(screen.getByText("layout:home:Ava")).toBeInTheDocument();
@@ -308,14 +321,11 @@ describe("app shell coverage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "AppTour" }));
     expect(completeTour).toHaveBeenCalledTimes(1);
+  });
 
+  it("hides the app screen tour away from the home tab", () => {
     useTourCheckMock.mockReturnValueOnce([true, vi.fn()]);
-    rerender(
-      <MemoryRouter initialEntries={["/today"]}>
-        <AppScreen activeNav="tasks" setActiveNav={vi.fn()} user={{ name: "Ava" }} />
-      </MemoryRouter>,
-    );
-
+    renderAppScreen("tasks");
     expect(screen.queryByRole("button", { name: "AppTour" })).not.toBeInTheDocument();
   });
 });
