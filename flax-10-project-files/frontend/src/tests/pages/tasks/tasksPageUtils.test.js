@@ -17,6 +17,19 @@ const baseTasks = [
   { id: 2, task_list: "1", completed: false, due_date: "2026-03-10T10:00:00" },
   { id: 3, task_list: "2", completed: false, due_date: "2026-03-20T10:00:00" },
 ];
+const TASK_STATE_SETTERS = [
+  "setActiveListId",
+  "setActiveFilter",
+  "setFilterListIds",
+  "setShowListModal",
+  "setShowTaskModal",
+  "setTaskModalDueDate",
+  "setToastUndo",
+  "setToastDelete",
+  "setToastInfo",
+  "setShowCreateListFromTask",
+  "setLastCreatedListId",
+];
 
 function withFakeTime(date, run) {
   vi.useFakeTimers();
@@ -40,19 +53,7 @@ function createTasksPageState(overrides = {}) {
     showListModal: true,
     showCreateListFromTask: true,
     lastCreatedListId: 8,
-    ...createFnMap([
-      "setActiveListId",
-      "setActiveFilter",
-      "setFilterListIds",
-      "setShowListModal",
-      "setShowTaskModal",
-      "setTaskModalDueDate",
-      "setToastUndo",
-      "setToastDelete",
-      "setToastInfo",
-      "setShowCreateListFromTask",
-      "setLastCreatedListId",
-    ]),
+    ...createFnMap(TASK_STATE_SETTERS),
     ...overrides,
   };
 }
