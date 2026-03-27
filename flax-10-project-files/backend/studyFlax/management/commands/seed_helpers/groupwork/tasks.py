@@ -44,22 +44,25 @@ def _single_member_assignments(members, completed_indexes):
     return {index: list(members) for index in completed_indexes}
 
 def _select_active_members(shuffled):
-    """Return leads and regulars split from the active member pool."""
-    target = max(2, round(len(shuffled) * 0.85))
+    """Return leads, regulars, and occasional contributors from the member pool."""
+    target = min(len(shuffled), max(2, round(len(shuffled) * 0.85)))
     active = shuffled[:target]
+    occasionals = shuffled[target:]
     n_leads = max(1, len(active) // 4)
-    return active[:n_leads], active[n_leads:]
+    return active[:n_leads], active[n_leads:], occasionals
 
 def _multi_member_assignments(members, completed_indexes, rng):
-    """Assign 80-100% of members across completed tasks with varied contribution."""
+    """Assign every member to completed tasks while keeping contribution levels varied."""
     assignments = {index: [] for index in completed_indexes}
     shuffled = list(members)
     rng.shuffle(shuffled)
     n_tasks = len(completed_indexes)
-    leads, regulars = _select_active_members(shuffled)
+    leads, regulars, occasionals = _select_active_members(shuffled)
     for task_index in completed_indexes:
         assignments[task_index].extend(leads)
     for i, member in enumerate(regulars):
+        assignments[completed_indexes[i % n_tasks]].append(member)
+    for i, member in enumerate(occasionals):
         assignments[completed_indexes[i % n_tasks]].append(member)
     return assignments
 

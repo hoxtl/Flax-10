@@ -225,9 +225,11 @@ def serialised_project(project, context):
 
 def _removal_permission_error(is_owner, is_self):
     """Return an HTTP error status if the removal is not permitted, else None."""
-    if is_owner and is_self:
-        return status.HTTP_400_BAD_REQUEST
-    if not is_owner and not is_self:
+    if is_self:
+        if is_owner:
+            return status.HTTP_400_BAD_REQUEST
+        return status.HTTP_403_FORBIDDEN
+    if not is_owner:
         return status.HTTP_403_FORBIDDEN
     return None
 
