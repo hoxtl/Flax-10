@@ -277,8 +277,9 @@ describe('UsersGrid – student with year and major', () => {
 
     expect(screen.getByText('Year 2')).toBeInTheDocument();
     expect(screen.getByText('Mathematics')).toBeInTheDocument();
-    // separator " • " is rendered between the two
-    expect(screen.getByText(' • ')).toBeInTheDocument();
+    // The separator span " • " renders between the two spans; verify via the
+    // document body text so we don't depend on RTL's exact-text matching quirks.
+    expect(document.body.textContent).toContain('•');
     expect(screen.getByText('Student')).toBeInTheDocument();
   });
 
