@@ -1,5 +1,5 @@
 import Card from "../../../../components/common/Card/Card";
-import StudyHeatmap from "../../../../components/analytics/StudyHeatmap";
+import StudyHeatmap from "../../../../components/Analytics/StudyHeatmap";
 import widgetStyles from "./ProfileWidgets.module.css";
 import attendanceStyles from "./ProfileAttendance.module.css";
 import { buildButtonActionProps, buildNavigateAction } from "./widgetActionProps";
@@ -9,8 +9,17 @@ const styles = { ...widgetStyles, ...attendanceStyles };
 const DEFAULT_HEATMAP_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const DEFAULT_HEATMAP_HOURS = Array.from({ length: 24 }, (_, h) => h);
 
+function normalizeHeatmapRow(row, width) {
+  const safeRow = Array.isArray(row) ? row.slice(0, width) : [];
+  return [...safeRow, ...Array(Math.max(width - safeRow.length, 0)).fill(0)];
+}
+
 function normalizeHeatmapData(heatmap) {
-  const data = Array.isArray(heatmap?.data) ? heatmap.data : [];
+  const rawData = Array.isArray(heatmap?.data) ? heatmap.data : [];
+  const hours = Array.isArray(heatmap?.hours) && heatmap.hours.length ? heatmap.hours : DEFAULT_HEATMAP_HOURS;
+  const width = hours.length;
+  const paddedRows = rawData.slice(0, DEFAULT_HEATMAP_DAYS.length).map((row) => normalizeHeatmapRow(row, width));
+  const data = [...paddedRows, ...Array(Math.max(DEFAULT_HEATMAP_DAYS.length - paddedRows.length, 0)).fill(null).map(() => Array(width).fill(0))];
   if (!data.length) return null;
   const days = Array.isArray(heatmap?.days) && heatmap.days.length === data.length
     ? heatmap.days
@@ -18,7 +27,7 @@ function normalizeHeatmapData(heatmap) {
   return {
     data,
     days,
-    hours: Array.isArray(heatmap?.hours) && heatmap.hours.length ? heatmap.hours : DEFAULT_HEATMAP_HOURS,
+    hours,
   };
 }
 

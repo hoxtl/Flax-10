@@ -116,11 +116,15 @@ async function handleToggleEditMode(modals, tracker, publish) {
 /** Toggles the reporting status of the society. */
 
 function ReportButton({ hasReported, onReport, onUnreport }) {
-    const style = { color: hasReported ? 'var(--primary)' : 'var(--text-secondary)', padding: '0.4rem', cursor: 'pointer', opacity: hasReported ? 1 : 0.7 };
     const title = hasReported ? "You have reported this society. Click to unreport." : "Report Society";
     return (
-        <button className={styles.settingsBtn} style={style} onClick={hasReported ? onUnreport : onReport} title={title}>
-            <Flag size={20} fill={hasReported ? "currentColor" : "none"} strokeWidth={hasReported ? 1 : 2} />
+        <button
+            className={`${styles.settingsBtn} ${styles.reportBtn} ${hasReported ? styles.reportedBtn : ''}`}
+            onClick={hasReported ? onUnreport : onReport}
+            title={title}
+            type="button"
+        >
+            <Flag className={styles.reportBtnIcon} size={24} fill={hasReported ? "currentColor" : "none"} strokeWidth={hasReported ? 1 : 2} />
         </button>
     );
 }

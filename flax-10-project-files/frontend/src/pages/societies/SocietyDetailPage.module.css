@@ -53,6 +53,31 @@
   background: var(--hover);
 }
 
+.reportBtn {
+  width: 40px;
+  height: 40px;
+  color: var(--text);
+  opacity: 0.78;
+}
+
+.reportBtnIcon {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex-shrink: 0;
+}
+
+.reportBtn:hover {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 34%, var(--border) 66%);
+}
+
+.reportedBtn {
+  color: var(--primary);
+  opacity: 1;
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg));
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--border) 76%);
+}
+
 .mainContent {
   display: flex;
   gap: 24px;

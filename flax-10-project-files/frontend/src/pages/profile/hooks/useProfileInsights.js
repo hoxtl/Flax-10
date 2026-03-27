@@ -2,12 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import analyticsService from "../../../api/analyticsApi";
 import { fetchApi } from "../../../api/client";
 
+const PROFILE_ANALYTICS_PERIOD = 30;
+
 export function useProfileAnalytics(canViewAnalytics) {
   const [data, setData] = useState(null);
 
   useEffect(() => {
     if (!canViewAnalytics) return;
-    analyticsService.getSummary(90).then(setData).catch(() => {});
+    analyticsService.getSummary(PROFILE_ANALYTICS_PERIOD).then(setData).catch(() => {});
   }, [canViewAnalytics]);
 
   return data;

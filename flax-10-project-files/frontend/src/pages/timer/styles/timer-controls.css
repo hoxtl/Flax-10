@@ -52,31 +52,89 @@
 
 .timerControlBtn {
     min-width: 132px;
+    position: relative;
+    isolation: isolate;
 }
 
 .timerControlBtnStart {
-    background: linear-gradient(180deg, #b7d9b8, #8fc098) !important;
-    border-color: color-mix(in srgb, #8fc098 56%, transparent) !important;
-    color: #193423 !important;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--primary) 90%, white 10%),
+        color-mix(in srgb, var(--primary) 78%, black 22%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--primary) 56%, transparent) !important;
+    color: var(--text-on-primary, #fff) !important;
+    box-shadow:
+        0 14px 30px color-mix(in srgb, var(--primary) 22%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
     padding-inline: 1.6rem !important;
 }
 
 .timerControlBtnPause {
-    background: linear-gradient(180deg, #f0b56f, #df9648) !important;
-    border-color: color-mix(in srgb, #df9648 54%, transparent) !important;
-    color: #4a2f16 !important;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-highlight, var(--primary)) 72%, var(--surface-card) 28%),
+        color-mix(in srgb, var(--primary) 56%, var(--surface-card) 44%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--color-highlight, var(--primary)) 34%, var(--border) 66%) !important;
+    color: var(--text) !important;
+    box-shadow:
+        0 12px 24px color-mix(in srgb, var(--color-highlight, var(--primary)) 16%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
 
 .timerControlBtnReset {
-    background: linear-gradient(180deg, #cf4e4e, #b33d3d) !important;
-    border-color: color-mix(in srgb, #b33d3d 56%, transparent) !important;
-    color: #fff !important;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--danger) 86%, white 14%),
+        color-mix(in srgb, var(--danger) 74%, black 26%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--danger) 52%, transparent) !important;
+    color: var(--text-on-primary, #fff) !important;
+    box-shadow:
+        0 14px 28px color-mix(in srgb, var(--danger) 18%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
 }
 
 .timerControlBtnEndEarly {
-    background: color-mix(in srgb, #cf4e4e 12%, var(--surface-card)) !important;
-    border-color: color-mix(in srgb, #cf4e4e 28%, transparent) !important;
-    color: #ab4343 !important;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--danger) 8%),
+        color-mix(in srgb, var(--surface-card) 84%, var(--danger) 16%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--danger) 24%, var(--border) 76%) !important;
+    color: color-mix(in srgb, var(--danger) 72%, var(--text) 28%) !important;
+    box-shadow:
+        0 10px 24px color-mix(in srgb, black 8%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.timerControlBtnStart:hover,
+.timerControlBtnPause:hover,
+.timerControlBtnReset:hover,
+.timerControlBtnEndEarly:hover {
+    filter: saturate(1.02) brightness(1.02);
+}
+
+:global([data-mode="dark"]) .timerControlBtnPause {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-raised, var(--surface-card)) 88%, var(--color-highlight, var(--primary)) 12%),
+        color-mix(in srgb, var(--surface-card) 76%, var(--primary) 24%)
+    ) !important;
+    color: color-mix(in srgb, var(--text) 92%, white 8%) !important;
+}
+
+:global([data-mode="dark"]) .timerControlBtnEndEarly {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-raised, var(--surface-card)) 88%, var(--danger) 12%),
+        color-mix(in srgb, var(--surface-card) 78%, var(--danger) 22%)
+    ) !important;
+    color: color-mix(in srgb, var(--danger) 62%, white 38%) !important;
+    box-shadow:
+        0 12px 26px color-mix(in srgb, black 20%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 .settingsContainer {
@@ -128,15 +186,62 @@
     flex: 1;
 }
 
+.inputWrap {
+    width: 100%;
+    max-width: 132px;
+    display: grid;
+    grid-template-columns: 2.15rem minmax(0, 1fr) 2.15rem;
+    align-items: center;
+    gap: 0.35rem;
+}
+
 .label {
     font-size: 0.76rem;
     color: var(--muted);
     font-weight: 600;
 }
 
+.inputStepper {
+    width: 2.15rem;
+    height: 2.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 24%, var(--border));
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--surface-card) 96%, white 4%),
+            color-mix(in srgb, var(--surface-card) 88%, var(--hover) 12%)
+        );
+    color: color-mix(in srgb, var(--focus-accent) 72%, var(--text));
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.inputStepper:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--focus-accent) 42%, transparent);
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--surface-card) 94%, var(--focus-accent) 6%),
+            color-mix(in srgb, var(--surface-card) 82%, var(--focus-accent) 18%)
+        );
+}
+
+.inputStepper:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 .input {
     width: 100%;
-    max-width: 76px;
+    max-width: none;
     padding: 0.5rem 0.35rem;
     border: 1px solid color-mix(in srgb, var(--focus-accent) 16%, var(--border));
     border-radius: 12px;
@@ -148,10 +253,31 @@
     font-family: var(--font-body);
 }
 
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
 .input:focus {
     outline: none;
     border-color: color-mix(in srgb, var(--focus-accent) 45%, transparent);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus-accent) 15%, transparent);
+}
+
+:global([data-mode="dark"]) .inputStepper {
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--surface-raised, var(--surface-card)) 90%, var(--surface-inner) 10%),
+            color-mix(in srgb, var(--surface-card) 78%, var(--color-bg) 22%)
+        );
+    color: color-mix(in srgb, var(--focus-accent) 58%, white 42%);
 }
 
 .modeIndicator {

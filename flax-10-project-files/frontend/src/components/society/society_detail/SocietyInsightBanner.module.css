@@ -6,23 +6,28 @@
   align-items: flex-start;
   padding: 0.9rem 1rem;
   border-radius: 18px;
-  border: 1px solid transparent;
-  background: color-mix(in srgb, var(--surface-card) 82%, white);
+  border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-card) 95%, white 5%), color-mix(in srgb, var(--surface-card) 88%, var(--panel) 12%));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--text) 6%, transparent);
 }
 
 .warning {
-  background: color-mix(in srgb, var(--color-amber) 12%, white);
-  border-color: color-mix(in srgb, var(--color-amber) 24%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-amber) 16%, var(--surface-card) 84%), color-mix(in srgb, var(--color-amber) 11%, var(--panel) 89%));
+  border-color: color-mix(in srgb, var(--color-amber) 36%, transparent);
 }
 
 .positive {
-  background: color-mix(in srgb, var(--color-teal) 11%, white);
-  border-color: color-mix(in srgb, var(--color-teal) 24%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 16%, var(--surface-card) 84%), color-mix(in srgb, var(--color-highlight) 10%, var(--panel) 90%));
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .info {
-  background: color-mix(in srgb, var(--primary) 10%, white);
-  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 16%, var(--surface-card) 84%), color-mix(in srgb, var(--primary) 10%, var(--panel) 90%));
+  border-color: color-mix(in srgb, var(--primary) 34%, transparent);
 }
 
 .iconWrap {
@@ -33,8 +38,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--text);
+  background: color-mix(in srgb, white 76%, transparent);
+  color: color-mix(in srgb, var(--text) 82%, var(--primary) 18%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 55%, transparent);
 }
 
 .content {
@@ -86,13 +92,57 @@
 
 .secondaryLink {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.72);
+  background: color-mix(in srgb, var(--surface-card) 72%, white 28%);
   border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
 }
 
 .primaryLink:hover,
 .secondaryLink:hover {
   transform: translateY(-1px);
+}
+
+[data-mode="dark"] .banner {
+  border-color: color-mix(in srgb, var(--color-highlight) 18%, var(--color-border-base) 82%);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-card) 90%, var(--color-bg) 10%), color-mix(in srgb, var(--surface-inner) 86%, var(--color-bg) 14%));
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 color-mix(in srgb, white 6%, transparent);
+}
+
+[data-mode="dark"] .warning {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-amber) 14%, var(--surface-card) 86%), color-mix(in srgb, var(--color-amber) 9%, var(--surface-inner) 91%));
+}
+
+[data-mode="dark"] .positive {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 18%, var(--surface-card) 82%), color-mix(in srgb, var(--color-highlight) 10%, var(--surface-inner) 90%));
+}
+
+[data-mode="dark"] .info {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 15%, var(--surface-card) 85%), color-mix(in srgb, var(--primary) 10%, var(--surface-inner) 90%));
+}
+
+[data-mode="dark"] .iconWrap {
+  background: color-mix(in srgb, var(--surface-card) 82%, white 18%);
+  color: color-mix(in srgb, white 84%, var(--color-highlight) 16%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 8%, transparent);
+}
+
+[data-mode="dark"] .title {
+  color: color-mix(in srgb, white 90%, var(--color-highlight) 10%);
+}
+
+[data-mode="dark"] .description {
+  color: color-mix(in srgb, white 76%, var(--muted) 24%);
+}
+
+[data-mode="dark"] .secondaryLink {
+  color: color-mix(in srgb, white 88%, var(--text) 12%);
+  background: color-mix(in srgb, var(--surface-card) 80%, white 20%);
+  border-color: color-mix(in srgb, white 10%, transparent);
 }
 
 @media (max-width: 720px) {
