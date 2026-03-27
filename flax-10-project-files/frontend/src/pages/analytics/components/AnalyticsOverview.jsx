@@ -58,7 +58,7 @@ function InsightsSection({ data, progressData }) {
     <MotionDiv className={styles.twoCol} custom={1} variants={fadeUp} initial="hidden" animate="visible">
       <div className={styles.card}>
         <p className={styles.cardLabel}>Productivity</p>
-        <ProductivityCards data={data} progressData={progressData} />
+        <ProductivityCards balanced data={data} progressData={progressData} />
       </div>
       <div className={styles.card}>
         <p className={styles.cardLabel}>Insights</p>

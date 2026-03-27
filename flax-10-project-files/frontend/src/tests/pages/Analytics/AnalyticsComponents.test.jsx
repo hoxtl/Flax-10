@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const productivityCardsMock = vi.fn(() => <div data-testid="productivity-cards" />);
+
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, {
     get: (_, tag) => ({ children, ...props }) => {
@@ -21,7 +23,7 @@ vi.mock("../../../components/Analytics/SummaryCards", () => ({
 }));
 
 vi.mock("../../../components/Analytics/ProductivityCards", () => ({
-  default: () => <div data-testid="productivity-cards" />,
+  default: (props) => productivityCardsMock(props),
 }));
 
 vi.mock("../../../components/Analytics/InsightCards", () => ({
@@ -115,6 +117,14 @@ describe("Analytics components", () => {
     expect(screen.getByTestId("study-heatmap")).toBeInTheDocument();
     expect(screen.getByTestId("theme-usage-chart")).toBeInTheDocument();
     expect(screen.getByTestId("attendance-chart")).toBeInTheDocument();
+    expect(productivityCardsMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        balanced: true,
+        data: analyticsData,
+        progressData: { daily_progress: [1, 2] },
+      }),
+      undefined,
+    );
   });
 
   it("omits optional charts for teachers when progress or theme data is absent", () => {
