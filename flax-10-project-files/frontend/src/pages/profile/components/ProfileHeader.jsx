@@ -206,6 +206,17 @@ function ProfileBioSection({ bio }) {
   return <div className={styles.bio}><div className={styles.reminder}>{bio}</div></div>;
 }
 
+function ContactEmail({ email }) {
+  if (!email) return null;
+  return (
+    <div className={styles.emailTipRow}>
+      <p className={styles.teacherEmail}>
+        <a href={`mailto:${email}`}>{email}</a>
+      </p>
+    </div>
+  );
+}
+
 function SharedPlanningTip() {
   return (
     <span className={styles.sharedPlanningTip}>

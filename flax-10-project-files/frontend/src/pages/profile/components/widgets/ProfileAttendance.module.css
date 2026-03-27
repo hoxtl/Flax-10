@@ -296,9 +296,23 @@
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  overflow-x: auto;
+  gap: 12px;
+  overflow: hidden;
   cursor: default;
+}
+
+.focusHeatmapCard :global(.heatmapContainer) {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.focusHeatmapCard :global(.heatmapGrid) {
+  min-width: 600px;
+}
+
+.focusHeatmapCard :global(.legend) {
+  margin-top: 0.8rem;
 }
 
 .focusHeatmapCardInteractive {
