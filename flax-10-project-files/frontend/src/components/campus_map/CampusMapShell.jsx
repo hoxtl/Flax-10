@@ -2,7 +2,7 @@
  * Campus map shell layout.
  */
 
-import styles from "../../pages/campus_map/CampusMap.module.css";
+import styles from "../../pages/campus_map/styles/CampusMap.module.css";
 import { CampusMapMapPane } from "./CampusMapMapPane";
 import { CampusMapSidebar } from "./CampusMapSidebar";
 import { CampusMapSkeleton } from "./CampusMapSkeleton";

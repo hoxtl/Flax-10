@@ -5,7 +5,7 @@ import {
   EmptyListsState,
   ListRow,
   MobileListSection,
-} from "../../../../pages/Tasks/components/MobileTaskListsParts";
+} from "../../../../pages/tasks/components/MobileTaskListsParts";
 
 vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   default: ({ icon, title, description }) => (
@@ -17,7 +17,7 @@ vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/utils/listColorUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/listColorUtils", () => ({
   getListColor: vi.fn((_list, index) => (index === 0 ? "#f00" : "#0f0")),
 }));
 

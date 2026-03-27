@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ConflictRow, EventRow, TagBadge, formatEventTime, getTagBadges } from '../../../../components/Calendar/list_view/EventRow';
+import { ConflictRow, EventRow, TagBadge, formatEventTime, getTagBadges } from '../../../../components/calendar/list_view/EventRow';
 import { createMockEvent } from '../mocks/calendarMocks';
 
 const mockOpenPopup = vi.fn();
@@ -19,13 +19,13 @@ vi.mock('../../../../context/TagContext', () => ({
     useTags: () => ({ tags: [{ id: 1, name: 'Work', color: '#7B6751' }] }),
 }));
 
-vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
     getEventType: (e) => e.module ? 'module' : e.society_name ? 'society' : 'personal',
     isReadOnlyEvent: (e) => !!e.module || !!e.society_name,
     isAllDay: (e) => e.all_day,
 }));
 
-vi.mock('../../../../components/Calendar/utils/eventStyleUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventStyleUtils', () => ({
     getEventTheme: (event) => ({ color: event.noAccent ? undefined : '#7B6751' }),
 }));
 

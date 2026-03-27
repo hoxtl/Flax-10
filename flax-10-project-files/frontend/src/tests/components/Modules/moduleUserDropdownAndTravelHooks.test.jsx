@@ -1,16 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import UserModuleDropdown from "../../../components/Modules/UserModuleDropdown";
-import TravelTimeIndicator from "../../../components/Modules/Modules/TravelTimeIndicator";
-import { useModuleTravelTime } from "../../../components/Modules/Modules/useModuleTravelTime";
-import { useModuleCourseFilterState } from "../../../components/Modules/Modules/useModuleCourseFilterState";
+import UserModuleDropdown from "../../../components/modules/UserModuleDropdown";
+import TravelTimeIndicator from "../../../components/modules/modules/TravelTimeIndicator";
+import { useModuleTravelTime } from "../../../components/modules/modules/useModuleTravelTime";
+import { useModuleCourseFilterState } from "../../../components/modules/modules/useModuleCourseFilterState";
 
 const useModulesMock = vi.fn();
 const getHomeAddressMock = vi.fn();
 const getTravelTimeModuleMock = vi.fn();
 
-vi.mock("../../../components/Modules/hooks/useModules", () => ({
+vi.mock("../../../components/modules/hooks/useModules", () => ({
   default: function useModules() {
     return useModulesMock();
   },

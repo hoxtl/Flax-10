@@ -2,9 +2,9 @@
  * Presentational layout for the home-address form.
  */
 
-import { LocationAutocomplete } from "../Calendar/event_modal/components/LocationAutoComplete";
+import { LocationAutocomplete } from "../calendar/event_modal/components/LocationAutoComplete";
 import InlineAlert from "../common/inline_alert/InlineAlert";
-import styles from "../../pages/Settings/Settings.module.css";
+import styles from "../../pages/settings/styles/Settings.module.css";
 import SettingsContextCard from "./SettingsContextCard";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
 

@@ -5,7 +5,7 @@ import {
   getModuleLabel,
   filterVisibleBlocks,
   groupBlocksByHorizon,
-} from '../../../../components/Timer/history_panel/historyPanelUtils';
+} from '../../../../components/timer/history_panel/historyPanelUtils';
 
 const localDaysAgo = (base, daysBack, hour = 10) =>
   new Date(base.getFullYear(), base.getMonth(), base.getDate() - daysBack, hour);

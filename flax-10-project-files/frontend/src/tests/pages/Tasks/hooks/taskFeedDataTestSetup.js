@@ -29,11 +29,11 @@ vi.mock("../../../../lib/allTasksCompleteMessages", () => ({
   getClearMessage: () => "Great job",
 }));
 
-vi.mock("../../../../pages/Tasks/utils/taskFeedUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/taskFeedUtils", () => ({
   getHeaderTitle: () => "Header",
 }));
 
-vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
+vi.mock("../../../../pages/tasks/utils/taskFeedDataUtils", () => ({
   buildDateBounds: vi.fn(() => ({
     now: new Date("2026-03-08T10:00:00Z"),
     dayStart: new Date("2026-03-08T00:00:00Z"),
@@ -55,8 +55,8 @@ vi.mock("../../../../pages/Tasks/utils/taskFeedDataUtils", () => ({
   })),
 }));
 
-import useTaskFeedData from "../../../../pages/Tasks/hooks/useTaskFeedData";
-import * as taskFeedDataUtils from "../../../../pages/Tasks/utils/taskFeedDataUtils";
+import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
+import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
 
 export function resetTaskFeedDataUtils({
   overdue = [{ id: 1 }],

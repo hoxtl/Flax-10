@@ -21,15 +21,15 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
   default: (...args) => useBreakpoint(...args),
 }));
 
-vi.mock("../../../components/Timer/utils/timerUtils", () => ({
+vi.mock("../../../components/timer/utils/timerUtils", () => ({
   useNotificationPermission: (...args) => useNotificationPermission(...args),
 }));
 
-vi.mock("../../../pages/Timer/hooks/useTimerPageFlags", () => ({
+vi.mock("../../../pages/timer/hooks/useTimerPageFlags", () => ({
   useTimerPageFlags: (...args) => useTimerPageFlags(...args),
 }));
 
-vi.mock("../../../pages/Timer/hooks/useTimerPageEffects", () => ({
+vi.mock("../../../pages/timer/hooks/useTimerPageEffects", () => ({
   useFocusAccent: (...args) => useFocusAccent(...args),
   useTimerDocumentTitle: (...args) => useTimerDocumentTitle(...args),
   useTimerShortcuts: (...args) => useTimerShortcuts(...args),
@@ -57,11 +57,11 @@ vi.mock("../../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div>scroll-top</div>,
 }));
 
-vi.mock("../../../components/Timer/TodayBanner", () => ({
+vi.mock("../../../components/timer/TodayBanner", () => ({
   default: ({ onStreakData, isStudying }) => <button type="button" onClick={() => onStreakData?.({ current_streak_days: 3 })}>today-banner-{String(isStudying)}</button>,
 }));
 
-vi.mock("../../../components/Timer/WrapperComponents", () => ({
+vi.mock("../../../components/timer/WrapperComponents", () => ({
   MainSection: ({ onOpenHistory, onOpenFocus }) => (
     <div>
       <button type="button" onClick={onOpenHistory}>open-history</button>
@@ -82,15 +82,15 @@ vi.mock("../../../components/ui/WordLoader", () => ({
   default: ({ words }) => <div>{words.join(",")}</div>,
 }));
 
-vi.mock("../../../pages/Timer/components/FocusPageSkeleton", () => ({
+vi.mock("../../../pages/timer/components/FocusPageSkeleton", () => ({
   FocusPageSkeleton: () => <div>focus-skeleton</div>,
 }));
 
-vi.mock("../../../pages/Timer/components/NotificationPrompt", () => ({
+vi.mock("../../../pages/timer/components/NotificationPrompt", () => ({
   NotificationPrompt: ({ permission }) => <div>notify:{permission}</div>,
 }));
 
-vi.mock("../../../pages/Timer/components/ShortcutsModal", () => ({
+vi.mock("../../../pages/timer/components/ShortcutsModal", () => ({
   ShortcutsModal: ({ onClose }) => <button type="button" onClick={onClose}>shortcuts</button>,
 }));
 
@@ -98,8 +98,8 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-import { useTimerPageController } from "../../../pages/Timer/hooks/useTimerPageController";
-import { TimerPageContent } from "../../../pages/Timer/components/TimerPageContent";
+import { useTimerPageController } from "../../../pages/timer/hooks/useTimerPageController";
+import { TimerPageContent } from "../../../pages/timer/components/TimerPageContent";
 
 const buildTimerFlags = () => ({
   setFocusMode: vi.fn(),

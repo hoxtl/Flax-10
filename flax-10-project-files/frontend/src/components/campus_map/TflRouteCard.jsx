@@ -2,8 +2,8 @@
  * Public transport route card.
  */
 
-import baseStyles from "../../pages/campus_map/CampusMap.module.css";
-import routeStyles from "../../pages/campus_map/routes.module.css";
+import baseStyles from "../../pages/campus_map/styles/CampusMap.module.css";
+import routeStyles from "../../pages/campus_map/styles/routes.module.css";
 import { getLegIcon, getLegLabel } from "./mapUtils";
 import ExpandablePillButton from "../common/expandable_pill_button/ExpandablePillButton";
 

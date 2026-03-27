@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../pages/Societies/societyFilters", () => ({
+vi.mock("../../../pages/societies/utils/societyFilters", () => ({
   matchesCategory: (society, categoryId) => society.categories?.includes(categoryId) || society.category === categoryId,
 }));
 
-import { countForFilter, filterAndSort } from "../../../pages/Societies/societyBrowseUtils";
+import { countForFilter, filterAndSort } from "../../../pages/societies/utils/societyBrowseUtils";
 
 const societies = [
   { id: 1, name: "Alpha", is_ratified: true, member_count: 0, categories: ["arts"] },

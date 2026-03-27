@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import CompletedTasksSection from "../../../../pages/Tasks/components/CompletedTasksSection";
-import SuggestedReadingsSection from "../../../../pages/Tasks/components/SuggestedReadingsSection";
+import CompletedTasksSection from "../../../../pages/tasks/components/CompletedTasksSection";
+import SuggestedReadingsSection from "../../../../pages/tasks/components/SuggestedReadingsSection";
 
-vi.mock("../../../../pages/Tasks/components/TaskCard", () => ({
+vi.mock("../../../../pages/tasks/components/TaskCard", () => ({
   default: ({ task, onToggle, onDelete, onEdit, listName }) => {
     const isReadingList = /^([a-z]{2,}\d+)\s*-\s*(.+)$/i.test(listName || "");
     return (

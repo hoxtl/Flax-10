@@ -2,10 +2,10 @@
  * Analytics page tabs content.
  */
 
-import AIInsightsTab from "../../../components/Analytics/AIInsightsTab";
+import AIInsightsTab from "../../../components/analytics/AIInsightsTab";
 
 import AnalyticsOverview from "./AnalyticsOverview";
-import { TABS } from "../pageConfig";
+import { TABS } from "../utils/pageConfig";
 
 const getOverviewContent = (loading, data, progressData, themeStats, isTeacher) =>
   (!loading && data ? <AnalyticsOverview data={data} progressData={progressData} themeStats={themeStats} isTeacher={isTeacher} /> : null);

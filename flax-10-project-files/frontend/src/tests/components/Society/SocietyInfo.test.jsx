@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/Society/CategorySelector', () => ({
+vi.mock('../../../components/society/CategorySelector', () => ({
     default: ({ onChange }) => <div data-testid="category-selector"><button onClick={() => onChange(['Tech'])}>Select Cat</button></div>,
     CategoryDisplay: ({ category, editMode, onEdit }) => (
         <div data-testid="category-display">
@@ -11,11 +11,11 @@ vi.mock('../../../components/Society/CategorySelector', () => ({
     ),
 }));
 
-vi.mock('../../../components/Society/society_detail/SocietyInsightBanner', () => ({
+vi.mock('../../../components/society/society_detail/SocietyInsightBanner', () => ({
     default: ({ society }) => <div data-testid="society-insight-banner">{society.name}</div>,
 }));
 
-import SocietyInfo from '../../../components/Society/society_detail/SocietyInfo';
+import SocietyInfo from '../../../components/society/society_detail/SocietyInfo';
 
 const baseSociety = {
     id: 1,

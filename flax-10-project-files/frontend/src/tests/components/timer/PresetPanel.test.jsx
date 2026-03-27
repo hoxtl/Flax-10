@@ -3,13 +3,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 
 const applyPresetMock = vi.fn();
 
-vi.mock("../../../components/Timer/TimerComponents", () => ({
+vi.mock("../../../components/timer/TimerComponents", () => ({
   TimerSettings: ({ breakTime, disabled, sessions, work }) => (
     <div data-testid="timer-settings">{`${work}:${breakTime}:${sessions}:${disabled}`}</div>
   ),
 }));
 
-vi.mock("../../../components/Timer/presets/PresetCard", () => ({
+vi.mock("../../../components/timer/presets/PresetCard", () => ({
   PresetCard: ({ onApply, preset }) => (
     <button type="button" onClick={() => onApply(preset)}>
       {preset.label}
@@ -17,11 +17,11 @@ vi.mock("../../../components/Timer/presets/PresetCard", () => ({
   ),
 }));
 
-vi.mock("../../../components/Timer/presets/AutoStartToggle", () => ({
+vi.mock("../../../components/timer/presets/AutoStartToggle", () => ({
   AutoStartToggle: () => <div data-testid="auto-start-toggle">Auto-start</div>,
 }));
 
-vi.mock("../../../components/Timer/utils/presetUtils", async () => {
+vi.mock("../../../components/timer/utils/presetUtils", async () => {
   const actual = await vi.importActual("../../../components/Timer/utils/presetUtils");
   return {
     ...actual,
@@ -29,7 +29,7 @@ vi.mock("../../../components/Timer/utils/presetUtils", async () => {
   };
 });
 
-import { PresetPanel, TimerConfigPanel } from "../../../components/Timer/PresetPanel";
+import { PresetPanel, TimerConfigPanel } from "../../../components/timer/PresetPanel";
 
 function createTimer(overrides = {}) {
   return {

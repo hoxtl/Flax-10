@@ -2,7 +2,7 @@
  * Authentication landing page.
  */
 
-import styles from "./AuthPage.module.css";
+import styles from "./styles/AuthPage.module.css";
 import { useAuthPage } from "./hooks/useAuthPage";
 import { useAuthPageScroll } from "./hooks/useAuthPageScroll";
 import { useAuthLandingSections } from "./hooks/useAuthLandingSections";

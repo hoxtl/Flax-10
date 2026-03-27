@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-import TaskCard, { EditTaskModal, TaskContextMenu } from "../../../../pages/Tasks/components/TaskCard";
+import TaskCard, { EditTaskModal, TaskContextMenu } from "../../../../pages/tasks/components/TaskCard";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const timerMock = vi.hoisted(() => ({ setActiveTaskId: vi.fn() }));
@@ -40,7 +40,7 @@ vi.mock("../../../../api/userApi", () => ({
   getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }),
 }));
 
-vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
+vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
   useSleepWarning: sleepWarningHookMock,
 }));
 
@@ -65,7 +65,7 @@ vi.mock("../../../../components/task_celebration/CheckBurst", () => ({
   CheckBurst: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../../pages/Tasks/components/CreateTaskModal", () => ({
+vi.mock("../../../../pages/tasks/components/CreateTaskModal", () => ({
   default: ({ onSave, onClose }) => (
     <div data-testid="edit-modal">
       <button type="button" onClick={() => onSave({ title: "Updated" })}>
@@ -78,7 +78,7 @@ vi.mock("../../../../pages/Tasks/components/CreateTaskModal", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskInfoModal", () => ({
+vi.mock("../../../../pages/tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: () => <div data-testid="info-modal" />,
 }));
 
@@ -97,7 +97,7 @@ vi.mock("../../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/utils/taskCardUtils", async () => {
+vi.mock("../../../../pages/tasks/utils/taskCardUtils", async () => {
   const actual = await vi.importActual("../../../../pages/Tasks/utils/taskCardUtils");
   return {
     ...actual,
@@ -109,7 +109,7 @@ vi.mock("../../../../pages/Tasks/utils/taskCardUtils", async () => {
 
 import { isRoutineTask } from "../../../../lib/completionMessages";
 import { getUserSettings } from "../../../../api/userApi";
-import { formatDueDate } from "../../../../pages/Tasks/utils/taskCardUtils";
+import { formatDueDate } from "../../../../pages/tasks/utils/taskCardUtils";
 
 import { createFnMap } from "../../../utils/testBuilderUtils";
 

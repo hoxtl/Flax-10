@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/Society/hooks/useCarouselNavigation', () => ({
+vi.mock('../../../components/society/hooks/useCarouselNavigation', () => ({
     useCarouselNavigation: vi.fn(() => ({ index: 0, prev: vi.fn(), next: vi.fn() })),
     useCarouselGestures: vi.fn(),
 }));
 
-import SocietyHero from '../../../components/Society/society_detail/SocietyHero';
-import { useCarouselNavigation } from '../../../components/Society/hooks/useCarouselNavigation';
+import SocietyHero from '../../../components/society/society_detail/SocietyHero';
+import { useCarouselNavigation } from '../../../components/society/hooks/useCarouselNavigation';
 
 const baseSociety = {
     id: 1,

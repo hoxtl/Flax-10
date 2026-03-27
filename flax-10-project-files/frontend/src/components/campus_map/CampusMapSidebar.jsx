@@ -3,7 +3,7 @@
  */
 
 import { motion } from "framer-motion";
-import styles from "../../pages/campus_map/CampusMap.module.css";
+import styles from "../../pages/campus_map/styles/CampusMap.module.css";
 import { CampusMapSidebarContent } from "./CampusMapSidebarContent";
 
 const SHEET_VARIANTS = { closed: { y: "calc(78vh - 76px)" }, mid: { y: "calc(78vh - 320px)" }, open: { y: 0 } };

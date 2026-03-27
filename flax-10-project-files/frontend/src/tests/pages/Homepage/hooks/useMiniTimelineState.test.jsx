@@ -4,15 +4,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const usePopoverDismissMock = vi.fn();
 const useSleepWindowMock = vi.fn();
 
-vi.mock("../../../../pages/Homepage/hooks/mini_timeline/usePopoverDismiss", () => ({
+vi.mock("../../../../pages/homepage/hooks/mini_timeline/usePopoverDismiss", () => ({
   usePopoverDismiss: (...args) => usePopoverDismissMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/mini_timeline/useSleepWindow", () => ({
+vi.mock("../../../../pages/homepage/hooks/mini_timeline/useSleepWindow", () => ({
   useSleepWindow: () => useSleepWindowMock(),
 }));
 
-import { useMiniTimelineState } from "../../../../pages/Homepage/hooks/useMiniTimelineState";
+import { useMiniTimelineState } from "../../../../pages/homepage/hooks/useMiniTimelineState";
 
 describe("useMiniTimelineState", () => {
   beforeEach(() => {

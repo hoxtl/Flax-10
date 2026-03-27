@@ -3,8 +3,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("../../pages/CampusMap/status.module.css", () => ({ default: {} }));
 vi.mock("../../pages/CampusMap/routes.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/status.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/routes.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/routes.module.css", () => ({ default: {} }));
 
 vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,

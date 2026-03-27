@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { getSyncStatus, syncCalendar, unsyncCalendar } from '../../../api/societyApi';
-import { useNotify } from '../../Notifications/hooks/useNotify';
+import { useNotify } from '../../notifications/hooks/useNotify';
 import { useTags } from '../../../context/TagContext';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 

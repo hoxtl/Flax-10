@@ -2,7 +2,7 @@
  * Combined sign-in and sign-up card content.
  */
 
-import styles from "../AuthPage.module.css";
+import styles from "../styles/AuthPage.module.css";
 import * as Components from "../../../components/Auth/AuthComponents";
 import { ErrorMessage } from "../../../components/Auth/ErrorMessage";
 import { AuthOverlay } from "../../../components/Auth/Overlay";

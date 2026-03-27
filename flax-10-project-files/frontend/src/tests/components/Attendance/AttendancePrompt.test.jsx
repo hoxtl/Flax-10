@@ -25,22 +25,22 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-import AttendancePrompt from "../../../components/Attendance/AttendancePrompt";
-import AttendancePromptModal from "../../../components/Attendance/AttendancePromptModal";
+import AttendancePrompt from "../../../components/attendance/AttendancePrompt";
+import AttendancePromptModal from "../../../components/attendance/AttendancePromptModal";
 import {
   dismissAttendancePrompt,
   submitAttendancePromptAnswer,
-} from "../../../components/Attendance/attendancePromptActions";
+} from "../../../components/attendance/attendancePromptActions";
 import {
   isInPromptWindow,
   getDateRangeForPrompt,
   findCandidateEvent,
-} from "../../../components/Attendance/attendancePromptUtils";
+} from "../../../components/attendance/attendancePromptUtils";
 import {
   getPromptedIds,
   getSessionDismissedIds,
   setPromptedId,
-} from "../../../components/Attendance/attendancePromptStorage";
+} from "../../../components/attendance/attendancePromptStorage";
 
 const attendanceStatsState = { overall: { attended: 0, missed: 0 } };
 
@@ -57,11 +57,11 @@ vi.mock("../../../api/eventApi", () => ({
   getEvents: (...args) => getEventsMock(...args),
 }));
 
-vi.mock("../../../components/Attendance/hooks/useCandidateEvent", () => ({
+vi.mock("../../../components/attendance/hooks/useCandidateEvent", () => ({
   useCandidateEvent: vi.fn(() => [candidateState.value, candidateState.setValue]),
 }));
 
-vi.mock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({
+vi.mock("../../../pages/attendance/hooks/useAttendanceStats", () => ({
   useAttendanceStats: () => ({ refetch: vi.fn(), stats: attendanceStatsState }),
 }));
 

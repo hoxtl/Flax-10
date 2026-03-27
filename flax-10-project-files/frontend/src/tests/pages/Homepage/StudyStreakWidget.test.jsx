@@ -1,7 +1,7 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import StudyStreakWidget from "../../../pages/Homepage/components/StudyStreakWidget";
+import StudyStreakWidget from "../../../pages/homepage/components/StudyStreakWidget";
 
 const fetchApiMock = vi.fn();
 

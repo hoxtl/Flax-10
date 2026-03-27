@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { handleDateOnlyPickerChange, handleDatePickerChange, getDisplayValue, handleToggle } from '../../../../../components/Calendar/event_modal/components/timeRowHelpers';
+import { handleDateOnlyPickerChange, handleDatePickerChange, getDisplayValue, handleToggle } from '../../../../../components/calendar/event_modal/components/timeRowHelpers';
 
 function createUpdateHandler() {
     const innerHandler = vi.fn();

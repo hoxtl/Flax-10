@@ -9,7 +9,7 @@ import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "./society_detail/RatificationSection";
 import CoverImageModal from "./society_detail/image_handlers/CoverImageModal";
-import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
+import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/societies/utils/societyFilters";
 import { TagsSelector } from "../common/tags_selector/TagsSelector";
 import PrimaryButton from "../common/primary_button/PrimaryButton";
 import StandardModal from "../common/standard_modal/StandardModal";

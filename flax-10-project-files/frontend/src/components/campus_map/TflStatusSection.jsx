@@ -4,8 +4,8 @@
 
 import { useState } from 'react';
 import { getTflLinePillStyle } from '../../pages/homepage/utils/kclTflMapping';
-import baseStyles from '../../pages/campus_map/CampusMap.module.css';
-import statusStyles from '../../pages/campus_map/status.module.css';
+import baseStyles from '../../pages/campus_map/styles/CampusMap.module.css';
+import statusStyles from '../../pages/campus_map/styles/status.module.css';
 const styles = { ...baseStyles, ...statusStyles };
 
 function DisruptionCard({ disruption }) {

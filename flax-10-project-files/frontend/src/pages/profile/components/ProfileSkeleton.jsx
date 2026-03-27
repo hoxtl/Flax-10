@@ -2,7 +2,7 @@
  * Profile loading skeleton.
  */
 
-import styles from "../ProfilePage.module.css";
+import styles from "../styles/ProfilePage.module.css";
 
 function SkeletonHeader() {
   return (

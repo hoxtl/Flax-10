@@ -4,9 +4,9 @@
  */
 
 import { useTags } from '../../../context/TagContext';
-import { useNotify } from '../../Notifications/hooks/useNotify';
+import { useNotify } from '../../notifications/hooks/useNotify';
 import { useCalendarEvents } from './useCalendarEvents';
-import { useModuleDisenrollment } from '../../Modules/hooks/useModuleDisenrollment';
+import { useModuleDisenrollment } from '../../modules/hooks/useModuleDisenrollment';
 import { getEventType } from '../utils/eventUtils';
 import { unsyncCalendar } from '../../../api/societyApi';
 

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { ScheduleManagerButton } from "../../../../../components/Calendar/header/schedule_manager/ScheduleManagerButton";
+import { ScheduleManagerButton } from "../../../../../components/calendar/header/schedule_manager/ScheduleManagerButton";
 
 const showToast = vi.fn();
 const editEvent = vi.fn();
@@ -24,7 +24,7 @@ vi.mock("../../../../../context/ToastContext", () => ({
   useToast: () => showToast,
 }));
 
-vi.mock("../../../../../components/Calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../../../components/calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent }),
   useCalendarEvents: () => ({ loadEvents }),
 }));
@@ -50,7 +50,7 @@ vi.mock("../../../../../components/common/reschedule_events/rescheduleEventConfl
   undoConflictResolutionPlan: vi.fn(),
 }));
 
-vi.mock("../../../../../components/Schedules/auto/autoScheduleActions", () => ({
+vi.mock("../../../../../components/schedules/auto/autoScheduleActions", () => ({
   loadUpcomingDeadlineItems: (...args) => loadUpcomingDeadlineItems(...args),
   loadScheduleSettings: (...args) => loadScheduleSettings(...args),
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefs(...args),

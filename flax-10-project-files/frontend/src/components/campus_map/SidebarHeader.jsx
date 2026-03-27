@@ -2,7 +2,7 @@
  * Campus map sidebar header.
  */
 
-import styles from '../../pages/campus_map/CampusMap.module.css';
+import styles from '../../pages/campus_map/styles/CampusMap.module.css';
 import PageHeader from '../common/page_header/PageHeader';
 
 export function SidebarHeader() {

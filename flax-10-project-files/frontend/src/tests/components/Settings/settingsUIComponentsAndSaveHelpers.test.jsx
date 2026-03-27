@@ -83,17 +83,17 @@ import {
   SuccessBanner,
   TabButton,
   ThemeGridSelector,
-} from "../../../components/Settings/SettingsUI";
+} from "../../../components/settings/SettingsUI";
 import {
   clearCachedPendingRequest,
   getCachedPendingRequest,
   normaliseCourseRequest,
   setCachedPendingRequest,
-} from "../../../components/Settings/account/accountCourseRequests";
+} from "../../../components/settings/account/accountCourseRequests";
 import {
   createCancelCourseRequestHandler,
   createCourseRequestSuccessHandler,
-} from "../../../components/Settings/account/useCourseRequestActions";
+} from "../../../components/settings/account/useCourseRequestActions";
 import {
   saveAccount,
   saveAddress,
@@ -105,8 +105,8 @@ import {
   saveWeekPreference,
   saveWorktimePreference,
   showTemporaryMessage,
-} from "../../../components/Settings/hooks/settingsHandlerHelpers";
-import { getSleepDuration, getSleepMinutes, getSleepQuality } from "../../../components/Settings/preferences/sleepUtils";
+} from "../../../components/settings/hooks/settingsHandlerHelpers";
+import { getSleepDuration, getSleepMinutes, getSleepQuality } from "../../../components/settings/preferences/sleepUtils";
 
 const renderSettingsUiShowcase = () => {
   const onChange = vi.fn();

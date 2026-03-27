@@ -1,24 +1,24 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../components/Settings/AccountForm", () => ({
+vi.mock("../../components/settings/AccountForm", () => ({
   default: ({ user }) => <div data-testid="account-form">{user?.first_name || "account"}</div>,
 }));
 
-vi.mock("../../components/Settings/SecurityForm", () => ({
+vi.mock("../../components/settings/SecurityForm", () => ({
   default: ({ error }) => <div data-testid="security-form">{error || "security"}</div>,
 }));
 
-vi.mock("../../components/Settings/HomeAddressForm", () => ({
+vi.mock("../../components/settings/HomeAddressForm", () => ({
   default: ({ error }) => <div data-testid="home-form">{error || "home"}</div>,
 }));
 
-vi.mock("../../components/Settings/PreferencesPanel", () => ({
+vi.mock("../../components/settings/PreferencesPanel", () => ({
   default: ({ activeSubTab }) => <div data-testid="preferences-form">{activeSubTab || "preferences"}</div>,
 }));
 
-import SettingsPanelContent from "../../pages/Settings/SettingsPanelContent";
-import { PANEL_META, VALID_TABS } from "../../pages/Settings/settingsPageConfig";
+import SettingsPanelContent from "../../pages/settings/components/SettingsPanelContent";
+import { PANEL_META, VALID_TABS } from "../../pages/settings/utils/settingsPageConfig";
 
 describe("SettingsPanelContent", () => {
   const handlers = {

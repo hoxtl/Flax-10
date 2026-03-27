@@ -35,7 +35,7 @@ vi.mock("../../../components/common/urgent_glow/UrgentGlow.module.css", () => ({
   },
 }));
 
-vi.mock("../../../components/Modules/Deadlines/upcomingDeadlinesUtils", () => ({
+vi.mock("../../../components/modules/deadlines/upcomingDeadlinesUtils", () => ({
   TIER_ACCENT: {
     overdue: "#f00",
     critical: "#c00",
@@ -48,20 +48,20 @@ vi.mock("../../../components/Modules/Deadlines/upcomingDeadlinesUtils", () => ({
   },
 }));
 
-vi.mock("../../../components/Modules/shared/taskButtons.jsx", () => ({
+vi.mock("../../../components/modules/shared/taskButtons.jsx", () => ({
   AddReadingToTasksButton: ({ readingId, onAdded }) => (
     <button onClick={() => onAdded(readingId)}>add reading</button>
   ),
 }));
 
-vi.mock("../../../components/Modules/shared/widgetVariants.js", () => ({
+vi.mock("../../../components/modules/shared/widgetVariants.js", () => ({
   containerVariants: {},
   expandBodyVariants: {},
   itemVariants: {},
   listVariants: {},
 }));
 
-vi.mock("../../../components/Modules/shared/widgetParts.jsx", () => ({
+vi.mock("../../../components/modules/shared/widgetParts.jsx", () => ({
   WidgetHeader: ({ title, count }) => (
     <div>
       <span>{title}</span>
@@ -73,7 +73,7 @@ vi.mock("../../../components/Modules/shared/widgetParts.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
+vi.mock("../../../pages/tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: ({ task, onClose }) => (
     <div data-testid="task-info-modal">
       <div>{task.title}</div>
@@ -84,7 +84,7 @@ vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
   ),
 }));
 
-import ReadingsPanel from "../../../pages/Modules/ReadingsPanel.jsx";
+import ReadingsPanel from "../../../pages/modules/components/ReadingsPanel.jsx";
 
 const readings = [
   {

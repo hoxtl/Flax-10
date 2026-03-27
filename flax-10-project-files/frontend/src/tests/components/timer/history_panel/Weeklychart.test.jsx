@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useReducedMotion } from 'framer-motion';
-import { WeeklyChart } from '../../../../components/Timer/history_panel/WeeklyChart';
+import { WeeklyChart } from '../../../../components/timer/history_panel/WeeklyChart';
 
-vi.mock('../../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('../../../../pages/timer/TimerPage.module.css', () => ({ default: {} }));
 vi.mock('framer-motion', () => ({
   motion: {
     span: ({ children, initial: _initial, animate: _animate, transition: _transition, ...props }) => (

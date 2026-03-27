@@ -25,7 +25,7 @@ vi.mock('../../../api/analyticsApi', () => ({
     },
 }));
 
-import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/Analytics/AIInsightsTab';
+import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/analytics/AIInsightsTab';
 import analyticsService from '../../../api/analyticsApi';
 
 // jsdom doesn't implement scrollIntoView

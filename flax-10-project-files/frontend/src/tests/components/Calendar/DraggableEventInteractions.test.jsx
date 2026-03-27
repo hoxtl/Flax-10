@@ -1,9 +1,9 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { DraggableEvent } from '../../../components/Calendar/DraggableEvent';
-import * as useDragDrop from '../../../components/Calendar/hooks/useDragDrop';
-import * as useEventResizeModule from '../../../components/Calendar/hooks/useEventResize';
+import { DraggableEvent } from '../../../components/calendar/DraggableEvent';
+import * as useDragDrop from '../../../components/calendar/hooks/useDragDrop';
+import * as useEventResizeModule from '../../../components/calendar/hooks/useEventResize';
 import * as ConfirmContextModule from '../../../context/ConfirmContext';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 
@@ -16,11 +16,11 @@ const { mockOpenPopup, mockOpenModal, mockOpenDelete, mockConfirm } = vi.hoisted
     mockConfirm: vi.fn(() => Promise.resolve(null)),
 }));
 
-vi.mock('../../../components/Calendar/hooks/useDragDrop', () => ({
+vi.mock('../../../components/calendar/hooks/useDragDrop', () => ({
     useDrag: vi.fn(() => ({ dragProps: {}, isDragging: false })),
 }));
 
-vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
     useEventActions: vi.fn(() => ({
         editEvent: vi.fn(),
         removeEvent: vi.fn(),
@@ -49,7 +49,7 @@ vi.mock('../../../context/ConfirmContext', () => ({
     useConfirm: vi.fn(() => mockConfirm),
 }));
 
-vi.mock('../../../components/Calendar/hooks/useEventResize', () => ({
+vi.mock('../../../components/calendar/hooks/useEventResize', () => ({
     useEventResize: vi.fn(() => ({
         handleResizeStart: vi.fn(),
         isResizing: false,
@@ -57,11 +57,11 @@ vi.mock('../../../components/Calendar/hooks/useEventResize', () => ({
     })),
 }));
 
-vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/calendar/utils/dateUtils', () => ({
     formatTime: vi.fn((d) => d.toTimeString().slice(0, 5)),
 }));
 
-vi.mock('../../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../../components/calendar/utils/eventUtils', () => ({
     getEventType: vi.fn((event) => event.source || 'personal'),
     hasRecurrence: vi.fn(() => false),
 }));
@@ -73,12 +73,12 @@ vi.mock('../../../context/TagContext', () => ({
     })),
 }));
 
-vi.mock('../../../components/Calendar/utils/eventStyleUtils', () => ({
+vi.mock('../../../components/calendar/utils/eventStyleUtils', () => ({
     getEventTheme: vi.fn(() => ({ color: '#3b82f6', background: '#dbeafe' })),
 }));
 
 // CSS module mock
-vi.mock('../../../pages/Tasks/components/TaskCardContextMenu.module.css', () => ({
+vi.mock('../../../pages/tasks/components/TaskCardContextMenu.module.css', () => ({
     default: {
         ctxMenu: 'ctxMenu',
         ctxItem: 'ctxItem',
@@ -89,7 +89,7 @@ vi.mock('../../../pages/Tasks/components/TaskCardContextMenu.module.css', () => 
 
 // Test fixtures
 
-import { getEventType, hasRecurrence } from '../../../components/Calendar/utils/eventUtils';
+import { getEventType, hasRecurrence } from '../../../components/calendar/utils/eventUtils';
 
 const personalEvent = {
     id: 1,

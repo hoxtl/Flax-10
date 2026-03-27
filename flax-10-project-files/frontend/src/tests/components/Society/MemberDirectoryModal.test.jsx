@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import MemberDirectoryModal from '../../../components/Society/society_detail/MemberDirectoryModal';
+import MemberDirectoryModal from '../../../components/society/society_detail/MemberDirectoryModal';
 
 vi.mock('../../../components/common/generic_summary_modal/GenericSummaryModal', () => ({
     default: ({ title, subtitle, emptyMessage, topContent, items, renderItem, children }) => {

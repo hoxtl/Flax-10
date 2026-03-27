@@ -7,7 +7,7 @@ const mockIsSameDay = vi.fn();
 const mockCalculateEventColumns = vi.fn();
 const mockGetEventKey = vi.fn((event) => `${event.id}-${new Date(event.start_time).getTime()}-${new Date(event.end_time).getTime()}`);
 
-vi.mock("../../../components/Calendar/hooks/useTimeSlotDrop", () => ({
+vi.mock("../../../components/calendar/hooks/useTimeSlotDrop", () => ({
   useTimeSlotDrop: (...args) => mockUseTimeSlotDrop(...args),
 }));
 
@@ -15,22 +15,22 @@ vi.mock("../../../context/ResizeHighlightContext", () => ({
   useResizeHighlight: () => mockUseResizeHighlight(),
 }));
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isSameDay: (...args) => mockIsSameDay(...args),
 }));
 
-vi.mock("../../../components/Calendar/utils/overlapUtils", () => ({
+vi.mock("../../../components/calendar/utils/overlapUtils", () => ({
   calculateEventColumns: (...args) => mockCalculateEventColumns(...args),
   getEventKey: (...args) => mockGetEventKey(...args),
 }));
 
-import { TimeSlot } from "../../../components/Calendar/day_view/TimeSlot";
+import { TimeSlot } from "../../../components/calendar/day_view/TimeSlot";
 import {
   calculateEventStyle,
   calculateNewEndTime,
   formatHour,
   getHoursOfDay,
-} from "../../../components/Calendar/day_view/dayViewHelpers";
+} from "../../../components/calendar/day_view/dayViewHelpers";
 
 describe("DayView helpers", () => {
   it("returns the full set of day hours and formats hour labels", () => {

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '../../../utils/testUtils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MonthView } from '../../../components/Calendar/month_view/MonthView';
+import { MonthView } from '../../../components/calendar/month_view/MonthView';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 import { TagProvider } from '../../../context/TagContext';
 
@@ -22,11 +22,11 @@ const mockUseMonthDayDrop = vi.fn(() => ({ dropProps: {}, isOver: false }));
 const mockOpenModal = vi.fn();
 const mockDispatch = vi.fn();
 
-vi.mock('../../../components/Calendar/hooks/useDragDrop', () => ({
+vi.mock('../../../components/calendar/hooks/useDragDrop', () => ({
     useDrag: (...args) => mockUseDrag(...args),
 }));
 
-vi.mock('../../../components/Calendar/hooks/useMonthDayDrop', () => ({
+vi.mock('../../../components/calendar/hooks/useMonthDayDrop', () => ({
     useMonthDayDrop: (...args) => mockUseMonthDayDrop(...args),
 }));
 
@@ -41,7 +41,7 @@ vi.mock('../../../context/CalendarContext', async () => {
     };
 });
 
-vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
+vi.mock('../../../components/notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 

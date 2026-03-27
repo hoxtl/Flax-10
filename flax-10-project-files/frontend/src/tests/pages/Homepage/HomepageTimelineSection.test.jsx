@@ -38,7 +38,7 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => navigateMock,
 }));
 
-vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
 }));
 
@@ -66,7 +66,7 @@ vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/mini_timeline", () => ({
+vi.mock("../../../pages/homepage/components/mini_timeline", () => ({
   MiniTimeline: (props) => {
     miniTimelinePropsSpy(props);
     return (
@@ -83,7 +83,7 @@ vi.mock("../../../pages/Homepage/components/mini_timeline", () => ({
   },
 }));
 
-import { HomepageTimelineSection } from "../../../pages/Homepage/components/HomepageTimelineSection";
+import { HomepageTimelineSection } from "../../../pages/homepage/components/HomepageTimelineSection";
 
 const baseTimelineProps = {
   completedEventIds: new Set(),

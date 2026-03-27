@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { EventContextMenu } from '../../../../pages/Homepage/components/mini_timeline/EventContextMenu';
+import { EventContextMenu } from '../../../../pages/homepage/components/mini_timeline/EventContextMenu';
 
 const mockStyles = {
     contextMenu: 'contextMenu',

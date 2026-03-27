@@ -4,7 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useKeyboardNav } from '../../../../components/Calendar/hooks/useKeyboardNav';
+import { useKeyboardNav } from '../../../../components/calendar/hooks/useKeyboardNav';
 
 describe('useKeyboardNav', () => {
     const mockSave = vi.fn();

@@ -20,7 +20,7 @@ const {
   getProgress: vi.fn(() => 42),
 }));
 
-vi.mock("../../../components/Timer/utils/historyUtils", () => ({
+vi.mock("../../../components/timer/utils/historyUtils", () => ({
   saveSession: (...args) => saveSession(...args),
 }));
 
@@ -32,15 +32,15 @@ vi.mock("../../../lib/sounds", () => ({
   playCompletionChime: (...args) => playCompletionChime(...args),
 }));
 
-vi.mock("../../../components/Timer/utils/timerUtils", () => ({
+vi.mock("../../../components/timer/utils/timerUtils", () => ({
   useCompletionCheck: (...args) => useCompletionCheck(...args),
   getProgress: (...args) => getProgress(...args),
 }));
 
-import { useTimer } from "../../../components/Timer/hooks/useTimer";
-import { useTimerFlow } from "../../../components/Timer/hooks/useTimerFlow";
-import { useTimerHandlers } from "../../../components/Timer/hooks/useTimerHandlers";
-import { useTimerPopupEffects } from "../../../components/Timer/hooks/useTimerPopupEffects";
+import { useTimer } from "../../../components/timer/hooks/useTimer";
+import { useTimerFlow } from "../../../components/timer/hooks/useTimerFlow";
+import { useTimerHandlers } from "../../../components/timer/hooks/useTimerHandlers";
+import { useTimerPopupEffects } from "../../../components/timer/hooks/useTimerPopupEffects";
 
 describe("timer hook extras", () => {
   beforeEach(() => {
@@ -259,14 +259,14 @@ function buildFlowState() {
 }
 
 function mockTimerLogicModules(notify, timerState, flowState, handlers) {
-  vi.doMock("../../../components/Notifications/hooks/useNotify", () => ({ useNotify: () => notify }));
-  vi.doMock("../../../components/Timer/hooks/useTimer", () => ({ useTimer: () => timerState }));
-  vi.doMock("../../../components/Timer/hooks/useTimerFlow", () => ({ useTimerFlow: vi.fn(() => flowState) }));
-  vi.doMock("../../../components/Timer/hooks/useTimerHandlers", () => ({ useTimerHandlers: vi.fn(() => handlers) }));
+  vi.doMock("../../../components/notifications/hooks/useNotify", () => ({ useNotify: () => notify }));
+  vi.doMock("../../../components/timer/hooks/useTimer", () => ({ useTimer: () => timerState }));
+  vi.doMock("../../../components/timer/hooks/useTimerFlow", () => ({ useTimerFlow: vi.fn(() => flowState) }));
+  vi.doMock("../../../components/timer/hooks/useTimerHandlers", () => ({ useTimerHandlers: vi.fn(() => handlers) }));
 }
 
 async function renderTimerLogic() {
-  const { useTimerLogic } = await import("../../../components/Timer/hooks/useTimerLogic");
+  const { useTimerLogic } = await import("../../../components/timer/hooks/useTimerLogic");
   return renderHook(({ activeTaskId, meta }) => useTimerLogic(activeTaskId, vi.fn(), meta), { initialProps: timerLogicProps });
 }
 

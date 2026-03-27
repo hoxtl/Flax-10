@@ -32,7 +32,7 @@ vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
+vi.mock("../../../../pages/tasks/components/AllTasksCompleteCard", () => ({
   default: ({ message, sub }) => (
     <div>
       <span>{message}</span>
@@ -41,7 +41,7 @@ vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/TaskFeedSections.module.css", () => ({
+vi.mock("../../../../pages/tasks/components/TaskFeedSections.module.css", () => ({
   default: {
     sectionStatsChip: "sectionStatsChip",
     sectionCountWrap: "sectionCountWrap",
@@ -54,7 +54,7 @@ vi.mock("../../../../pages/Tasks/components/TaskFeedSections.module.css", () => 
   },
 }));
 
-vi.mock("../../../../pages/Tasks/components/SuggestedReadingsSection.module.css", () => ({
+vi.mock("../../../../pages/tasks/components/SuggestedReadingsSection.module.css", () => ({
   default: {
     row: "row",
     rowAdded: "rowAdded",
@@ -75,7 +75,7 @@ import {
   SuggestedReadingsHeader,
   SuggestedReadingsBody,
   SuggestedReadingsCollapse,
-} from "../../../../pages/Tasks/components/SuggestedReadingsSectionParts";
+} from "../../../../pages/tasks/components/SuggestedReadingsSectionParts";
 
 describe("SuggestedReadingsSectionParts", () => {
   beforeEach(() => {

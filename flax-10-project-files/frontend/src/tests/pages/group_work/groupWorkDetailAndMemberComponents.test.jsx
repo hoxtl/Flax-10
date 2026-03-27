@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 
-import GroupProjectDetail from "../../../pages/group_work/GroupWorkDetail";
+import GroupProjectDetail from "../../../pages/group_work/components/GroupWorkDetail";
 import MemberAvatar from "../../../pages/group_work/components/MemberAvatar";
 import MemberFilter from "../../../pages/group_work/components/MemberFilter";
 import MembersSection from "../../../pages/group_work/components/MembersSection";
@@ -65,15 +65,15 @@ vi.mock("../../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label }) => <button onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../components/Pagination/Pagination", () => ({
+vi.mock("../../../components/pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 
-vi.mock("../../../pages/group_work/GroupTasksTab", () => ({
+vi.mock("../../../pages/group_work/components/GroupTasksTab", () => ({
   default: ({ projectId }) => <div>Tasks tab {projectId}</div>,
 }));
 
-vi.mock("../../../pages/group_work/AvailabilityTab", () => ({
+vi.mock("../../../pages/group_work/components/AvailabilityTab", () => ({
   default: ({ projectId }) => <div>Availability tab {projectId}</div>,
 }));
 

@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => ({
     }),
 }));
 
-import SummaryCards from '../../../components/Analytics/SummaryCards';
+import SummaryCards from '../../../components/analytics/SummaryCards';
 
 const mockData = {
     summary: {

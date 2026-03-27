@@ -1,7 +1,7 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import AvailabilityTab from "../../../pages/group_work/AvailabilityTab";
+import AvailabilityTab from "../../../pages/group_work/components/AvailabilityTab";
 
 const useAvailabilityMock = vi.fn();
 const confirmHook = vi.fn();

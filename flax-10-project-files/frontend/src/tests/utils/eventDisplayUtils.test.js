@@ -4,7 +4,7 @@ import {
     shouldShowInTimeGrid,
     isFullDay,
     getAllDayVisualRange,
-} from '../../components/Calendar/utils/eventDisplayUtils';
+} from '../../components/calendar/utils/eventDisplayUtils';
 
 const makeEvent = (startTime, endTime, extraProps = {}) => ({
     id: 1,

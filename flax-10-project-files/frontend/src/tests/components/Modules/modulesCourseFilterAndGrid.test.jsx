@@ -17,7 +17,7 @@ import { renderHook, act } from '@testing-library/react';
 
 // CSS module mocks
 
-vi.mock('../../../components/Modules/Modules/ModuleCourseFilter.module.css', () => ({
+vi.mock('../../../components/modules/modules/ModuleCourseFilter.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 vi.mock('../../../components/common/Card/CardGrid.module.css', () => ({
@@ -72,15 +72,15 @@ vi.mock('../../../lib/kclCourses', () => ({
 }));
 
 // ModuleGrid dependency: ModulesCard mock
-vi.mock('../../../components/Modules/Modules/ModulesCard.jsx', () => ({
+vi.mock('../../../components/modules/modules/ModulesCard.jsx', () => ({
   default: ({ module }) => <div data-testid="modules-card">{module.module_name}</div>,
 }));
 
 // Imports under test
 
-import { useModuleCourseFilterState } from '../../../components/Modules/Modules/useModuleCourseFilterState';
-import ModuleCourseFilter from '../../../components/Modules/Modules/ModuleCourseFilter';
-import ModuleGrid from '../../../components/Modules/Modules/ModuleGrid';
+import { useModuleCourseFilterState } from '../../../components/modules/modules/useModuleCourseFilterState';
+import ModuleCourseFilter from '../../../components/modules/modules/ModuleCourseFilter';
+import ModuleGrid from '../../../components/modules/modules/ModuleGrid';
 
 
 // useModuleCourseFilterState

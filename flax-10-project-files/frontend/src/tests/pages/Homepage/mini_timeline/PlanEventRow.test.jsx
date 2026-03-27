@@ -16,27 +16,27 @@ vi.mock('lucide-react', () => ({
     AlertTriangle: () => <svg data-testid="alert-icon" />,
 }));
 
-vi.mock('../../../../pages/Homepage/utils/dateFormatUtils', () => ({
+vi.mock('../../../../pages/homepage/utils/dateFormatUtils', () => ({
     formatTime: vi.fn((t) => (t ? '9:00 am' : '')),
     formatTime12h: vi.fn((t) => (t ? '9:00 am' : '')),
     fmtDurationShort: vi.fn(() => '1h'),
 }));
 
-vi.mock('../../../../pages/Homepage/utils/eventUtils', () => ({
+vi.mock('../../../../pages/homepage/utils/eventUtils', () => ({
     stripEmojiFromTitle: vi.fn(t => t),
 }));
 
-vi.mock('../../../../pages/Homepage/utils/timelineUtils', () => ({
+vi.mock('../../../../pages/homepage/utils/timelineUtils', () => ({
     getGapStartDate: vi.fn(() => new Date()),
 }));
 
-vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../../components/settings/hooks/useSleepWarning', () => ({
     doesEventOverlapSleepWindow: vi.fn(() => false),
 }));
 
-import { PlanEventRow } from '../../../../pages/Homepage/components/mini_timeline/PlanEventRow';
-import * as useSleepWarning from '../../../../components/Settings/hooks/useSleepWarning';
-import * as homepageEventUtils from '../../../../pages/Homepage/utils/eventUtils';
+import { PlanEventRow } from '../../../../pages/homepage/components/mini_timeline/PlanEventRow';
+import * as useSleepWarning from '../../../../components/settings/hooks/useSleepWarning';
+import * as homepageEventUtils from '../../../../pages/homepage/utils/eventUtils';
 
 const mockStyles = {
     planTimelineRow: 'row',
@@ -329,7 +329,7 @@ describe('PlanEventRow', () => {
     });
 
     it('renders end time when different from start', async () => {
-        const { formatTime12h } = await import('../../../../pages/Homepage/utils/dateFormatUtils');
+        const { formatTime12h } = await import('../../../../pages/homepage/utils/dateFormatUtils');
         formatTime12h.mockReturnValueOnce('9:00 am').mockReturnValueOnce('10:00 am');
         renderRow();
         expect(screen.getByText(/10:00 am/)).toBeTruthy();

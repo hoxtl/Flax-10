@@ -2,7 +2,7 @@
  * Campus map map pane.
  */
 
-import styles from "../../pages/campus_map/CampusMap.module.css";
+import styles from "../../pages/campus_map/styles/CampusMap.module.css";
 import { CampusQuickNav } from "./CampusQuickNav";
 
 function hiddenStyle(showInitialSkeleton) {

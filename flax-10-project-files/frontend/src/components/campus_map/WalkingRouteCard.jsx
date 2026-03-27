@@ -2,7 +2,7 @@
  * Walking route card.
  */
 
-import styles from "../../pages/campus_map/routes.module.css";
+import styles from "../../pages/campus_map/styles/routes.module.css";
 import { travelDistance, travelTime } from "./mapUtils";
 import ExpandablePillButton from "../common/expandable_pill_button/ExpandablePillButton";
 

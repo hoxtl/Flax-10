@@ -10,7 +10,7 @@ import { useTableEdit } from '../hooks/useTableEdit';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { usePagination } from '../../../hooks/usePagination';
 import { TableRow } from './TableRow';
-import { Pagination, BackToTop } from '../../Pagination/Pagination';
+import { Pagination, BackToTop } from '../../pagination/Pagination';
 import styles from './TableView.module.css';
 import { sortByStartTime } from '../utils/eventUtils';
 

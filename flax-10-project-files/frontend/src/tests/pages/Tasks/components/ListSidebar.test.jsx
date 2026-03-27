@@ -9,7 +9,7 @@ import { createFnMap } from "../../../utils/testBuilderUtils";
 const sidebarStateMock = vi.hoisted(() => vi.fn());
 const authMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../../pages/Tasks/components/useListSidebarState", () => ({
+vi.mock("../../../../pages/tasks/components/useListSidebarState", () => ({
   useListSidebarState: sidebarStateMock,
 }));
 
@@ -40,7 +40,7 @@ vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () 
   ),
 }));
 
-vi.mock("../../../../pages/Tasks/components/listSidebarParts", () => ({
+vi.mock("../../../../pages/tasks/components/listSidebarParts", () => ({
   RenameInput: ({ value, onSave, onCancel }) => (
     <div>
       <span>{value}</span>
@@ -76,7 +76,7 @@ vi.mock("../../../../pages/Tasks/components/listSidebarParts", () => ({
   ),
 }));
 
-import ListSidebar from "../../../../pages/Tasks/components/ListSidebar";
+import ListSidebar from "../../../../pages/tasks/components/ListSidebar";
 
 function buildState(overrides = {}) {
   return {

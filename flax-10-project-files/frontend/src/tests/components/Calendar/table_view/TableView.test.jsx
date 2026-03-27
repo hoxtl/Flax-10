@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TableView } from '../../../../components/Calendar/table_view/TableView';
+import { TableView } from '../../../../components/calendar/table_view/TableView';
 import { createMockEvent } from '../mocks/calendarMocks';
 
 let mockEvents = [];
@@ -25,15 +25,15 @@ vi.mock('../../../../hooks/usePagination', () => ({
     usePagination: (items, size) => ({ currentPage: 1, totalPages: Math.ceil(items.length / size) || 1, currentItems: items.slice(0, size), setPage: vi.fn() }),
 }));
 
-vi.mock('../../../../components/Calendar/hooks/useTableEdit', () => ({
+vi.mock('../../../../components/calendar/hooks/useTableEdit', () => ({
     useTableEdit: () => mockEditState,
 }));
 
-vi.mock('../../../../components/Calendar/hooks/useKeyboardNav', () => ({
+vi.mock('../../../../components/calendar/hooks/useKeyboardNav', () => ({
     useKeyboardNav: () => mockNavState,
 }));
 
-vi.mock('../../../../components/Calendar/table_view/TableRow', () => ({
+vi.mock('../../../../components/calendar/table_view/TableRow', () => ({
     TableRow: ({ event, onCellClick, readOnly }) => (
         <tr data-testid="table-row" data-read-only={String(readOnly)}>
             <td>{event.title}</td>
@@ -46,12 +46,12 @@ vi.mock('../../../../components/Calendar/table_view/TableRow', () => ({
     ),
 }));
 
-vi.mock('../../../../components/Pagination/Pagination', () => ({
+vi.mock('../../../../components/pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages }) => <div data-testid="pagination">{currentPage}/{totalPages}</div>,
     BackToTop: () => <div data-testid="back-to-top" />,
 }));
 
-vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
     sortByStartTime: (events) => [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time)),
 }));
 

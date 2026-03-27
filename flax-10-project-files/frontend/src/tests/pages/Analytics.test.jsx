@@ -31,48 +31,48 @@ vi.mock('../../api/analyticsApi', () => ({
     },
 }));
 
-vi.mock('../../components/Analytics/SummaryCards', () => ({
+vi.mock('../../components/analytics/SummaryCards', () => ({
     default: ({ data }) => <div data-testid="summary-cards">{data ? 'loaded' : 'no-data'}</div>,
 }));
 
-vi.mock('../../components/Analytics/ProductivityCards', () => ({
+vi.mock('../../components/analytics/ProductivityCards', () => ({
     default: () => <div data-testid="productivity-cards" />,
 }));
 
-vi.mock('../../components/Analytics/StudyHoursChart', () => ({
+vi.mock('../../components/analytics/StudyHoursChart', () => ({
     default: () => <div data-testid="study-hours-chart" />,
 }));
 
-vi.mock('../../components/Analytics/DailyBreakdownChart', () => ({
+vi.mock('../../components/analytics/DailyBreakdownChart', () => ({
     default: () => <div data-testid="daily-breakdown-chart" />,
 }));
 
-vi.mock('../../components/Analytics/StudyHeatmap', () => ({
+vi.mock('../../components/analytics/StudyHeatmap', () => ({
     default: () => <div data-testid="study-heatmap" />,
 }));
 
-vi.mock('../../components/Analytics/AttendanceChart', () => ({
+vi.mock('../../components/analytics/AttendanceChart', () => ({
     default: () => <div data-testid="attendance-chart" />,
 }));
 
-vi.mock('../../components/Analytics/PlannedVsActualChart', () => ({
+vi.mock('../../components/analytics/PlannedVsActualChart', () => ({
     default: () => <div data-testid="planned-vs-actual-chart" />,
 }));
 
-vi.mock('../../components/Analytics/ThemeUsageChart', () => ({
+vi.mock('../../components/analytics/ThemeUsageChart', () => ({
     default: () => <div data-testid="theme-usage-chart" />,
 }));
 
-vi.mock('../../components/Analytics/AIInsightsTab', () => ({
+vi.mock('../../components/analytics/AIInsightsTab', () => ({
     default: () => <div data-testid="ai-insights-tab" />,
 }));
 
-vi.mock('../../components/Analytics/InsightCards', () => ({
+vi.mock('../../components/analytics/InsightCards', () => ({
     ConsistencyScore: () => <div data-testid="consistency-score" />,
     PeakHoursCard: () => <div data-testid="peak-hours-card" />,
 }));
 
-import AnalyticsPage from '../../pages/Analytics/AnalyticsPage';
+import AnalyticsPage from '../../pages/analytics/AnalyticsPage';
 import analyticsService from '../../api/analyticsApi';
 
 describe('AnalyticsPage', () => {

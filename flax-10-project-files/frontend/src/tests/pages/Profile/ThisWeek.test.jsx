@@ -1,7 +1,7 @@
 /* Tests for ThisWeek widget – goal ring, editor, streak display */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { ThisWeek } from '../../../pages/Profile/components/widgets/ThisWeek';
+import { ThisWeek } from '../../../pages/profile/components/widgets/ThisWeek';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -22,8 +22,8 @@ vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
   ),
 }));
 
-vi.mock('../../../pages/Profile/components/widgets/ProfileWidgets.module.css', () => ({ default: {} }), { virtual: true });
-vi.mock('../../../pages/Profile/components/widgets/ProfileWeekGoal.module.css', () => ({ default: {} }), { virtual: true });
+vi.mock('../../../pages/profile/components/widgets/ProfileWidgets.module.css', () => ({ default: {} }), { virtual: true });
+vi.mock('../../../pages/profile/components/widgets/ProfileWeekGoal.module.css', () => ({ default: {} }), { virtual: true });
 
 const weekly = { hours_studied: 10, goal_hours: 20, percentage: 50 };
 const streaks = { current: 5, longest: 12 };

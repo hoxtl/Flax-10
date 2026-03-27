@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TagEditCell } from '../../../../../components/Calendar/table_view/cells/TagEditCell';
+import { TagEditCell } from '../../../../../components/calendar/table_view/cells/TagEditCell';
 import { createMockEvent, mockTags } from '../../mocks/calendarMocks';
 
 vi.mock('../../../../../components/common/animated_dropdown', () => ({

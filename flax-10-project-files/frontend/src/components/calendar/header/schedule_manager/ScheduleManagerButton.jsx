@@ -11,7 +11,7 @@ import ConfirmModal from "../../../common/confirm_modal/ConfirmModal";
 import Tooltip from "../../../common/Tooltip/Tooltip";
 import { useCalendarEvents, useEventActions } from "../../hooks/useCalendarEvents";
 import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../common/reschedule_events/rescheduleEventConflicts";
-import { loadScheduleSettings, loadUpcomingDeadlineItems, submitAutoScheduleWithPrefs } from "../../../Schedules/auto/autoScheduleActions";
+import { loadScheduleSettings, loadUpcomingDeadlineItems, submitAutoScheduleWithPrefs } from "../../../schedules/auto/autoScheduleActions";
 import styles from "../CalendarHeaderUtils.module.css";
 
 function TriggerButton({ busy, onClick }) {

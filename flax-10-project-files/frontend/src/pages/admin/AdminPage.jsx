@@ -8,8 +8,8 @@ import { BackToTop } from "../../components/pagination/Pagination";
 import Tooltip from "../../components/common/Tooltip/Tooltip";
 import Tabs from "../../components/common/Tabs/Tabs";
 import AppPage from "../../components/common/app_page/AppPage";
-import styles from "./styles";
-import { buildAdminTabs } from "./adminTabs.jsx";
+import styles from "./styles/styles";
+import { buildAdminTabs } from "./components/adminTabs.jsx";
 
 const DJANGO_ADMIN_URL = "http://localhost:8000/admin/login/?next=/admin/";
 const DJANGO_ADMIN_TOOLTIP = {

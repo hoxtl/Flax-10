@@ -3,8 +3,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("../../pages/CampusMap/Sidebar.module.css", () => ({ default: {} }));
 vi.mock("../../pages/CampusMap/status.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/Sidebar.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/status.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
 
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, { get: () => ({ children, ...props }) => <div {...props}>{children}</div> }),

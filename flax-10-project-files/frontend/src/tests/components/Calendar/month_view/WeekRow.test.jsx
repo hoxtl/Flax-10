@@ -4,14 +4,14 @@ import { render } from "@testing-library/react";
 
 const capturedDayCellProps = [];
 
-vi.mock("../../../../components/Calendar/month_view/DayCell", () => ({
+vi.mock("../../../../components/calendar/month_view/DayCell", () => ({
   DayCell: (props) => {
     capturedDayCellProps.push(props);
     return <div data-testid={`day-${props.day.toISOString()}`} />;
   },
 }));
 
-import { WeekRow } from "../../../../components/Calendar/month_view/WeekRow";
+import { WeekRow } from "../../../../components/calendar/month_view/WeekRow";
 
 describe("WeekRow", () => {
   beforeEach(() => {

@@ -2,7 +2,7 @@
  * Campus map sidebar content.
  */
 
-import styles from "../../pages/campus_map/CampusMap.module.css";
+import styles from "../../pages/campus_map/styles/CampusMap.module.css";
 import { DestinationSection } from "./DestinationSection";
 import { SidebarHeader } from "./SidebarHeader";
 import { TflStatusSection } from "./TflStatusSection";

@@ -67,7 +67,7 @@ vi.mock("../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../components/Onboarding/WarningBox", () => ({
+vi.mock("../../../components/onboarding/WarningBox", () => ({
   default: ({ major, confirmed, onConfirm }) => (
     <div>
       <span>{`Warning for ${major}`}</span>
@@ -81,9 +81,9 @@ vi.mock("../../../components/Onboarding/WarningBox", () => ({
   ),
 }));
 
-import SuccessScreen from "../../../components/Onboarding/SuccessScreen";
-import WarningBox from "../../../components/Onboarding/WarningBox";
-import OnboardingForm from "../../../components/Onboarding/OnboardingForm";
+import SuccessScreen from "../../../components/onboarding/SuccessScreen";
+import WarningBox from "../../../components/onboarding/WarningBox";
+import OnboardingForm from "../../../components/onboarding/OnboardingForm";
 
 
 describe("SuccessScreen", () => {

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { buildCreateTaskPayload, runCreateTaskSave } from "../../../pages/Tasks/utils/createTaskModalUtils";
+import { buildCreateTaskPayload, runCreateTaskSave } from "../../../pages/tasks/utils/createTaskModalUtils";
 
 describe("createTaskModalUtils", () => {
   describe("buildCreateTaskPayload", () => {

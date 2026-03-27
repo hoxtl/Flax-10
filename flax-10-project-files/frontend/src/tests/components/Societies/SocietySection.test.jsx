@@ -1,14 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SocietySection from '../../../pages/Societies/SocietySection';
+import SocietySection from '../../../pages/societies/components/SocietySection';
 
-vi.mock('../../../components/Society/SocietyCard', () => ({
+vi.mock('../../../components/society/SocietyCard', () => ({
     default: ({ society, onClick }) => (
         <div data-testid="society-card" onClick={() => onClick?.(society)}>{society.name}</div>
     ),
 }));
 
-vi.mock('../../../components/Society/BrowseCard', () => ({
+vi.mock('../../../components/society/BrowseCard', () => ({
     default: ({ onClick }) => (
         <button data-testid="browse-card" onClick={onClick}>Browse</button>
     ),

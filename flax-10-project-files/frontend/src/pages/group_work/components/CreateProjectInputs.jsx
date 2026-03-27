@@ -4,7 +4,7 @@
 
 import FormField from "../../../components/common/form_field/FormField";
 import TextInput from "../../../components/common/text_input/TextInput";
-import UserModuleDropdown from "../../../components/Modules/UserModuleDropdown";
+import UserModuleDropdown from "../../../components/modules/UserModuleDropdown";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import styles from "./CreateProjectForm.module.css";
 

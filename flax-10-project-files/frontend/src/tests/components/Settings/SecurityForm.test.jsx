@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SecurityForm from '../../../components/Settings/SecurityForm';
+import SecurityForm from '../../../components/settings/SecurityForm';
 
 describe('SecurityForm', () => {
     it('renders password fields', () => {

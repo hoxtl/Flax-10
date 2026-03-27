@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => ({
     }),
 }));
 
-import { ConsistencyScore, PeakHoursCard } from '../../../components/Analytics/InsightCards';
+import { ConsistencyScore, PeakHoursCard } from '../../../components/analytics/InsightCards';
 
 const mockData = {
     summary: {

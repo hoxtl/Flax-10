@@ -2,7 +2,7 @@
  * Shared context card used across settings panels.
  */
 
-import styles from "../../pages/Settings/Settings.module.css";
+import styles from "../../pages/settings/styles/Settings.module.css";
 
 export default function SettingsContextCard({
   emoji,

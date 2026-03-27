@@ -31,13 +31,13 @@ vi.mock("../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-import useSchedulingState from "../../../components/Settings/scheduling/useSchedulingState";
+import useSchedulingState from "../../../components/settings/scheduling/useSchedulingState";
 import {
   SchedulingPanel,
   StudyTimeSection,
   WeekPreferenceSection,
   WorktimePreferenceSection,
-} from "../../../components/Settings/scheduling/SchedulingSection";
+} from "../../../components/settings/scheduling/SchedulingSection";
 
 describe("useSchedulingState", () => {
   beforeEach(() => {

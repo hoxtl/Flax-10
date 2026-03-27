@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useMonthDayDrop } from '../../components/Calendar/hooks/useMonthDayDrop';
+import { useMonthDayDrop } from '../../components/calendar/hooks/useMonthDayDrop';
 
 const useCalendarMock = vi.fn();
 const useConfirmMock = vi.fn();
@@ -12,12 +12,12 @@ const hasRecurrenceMock = vi.fn();
 
 vi.mock('../../context/CalendarContext', () => ({ useCalendar: () => useCalendarMock() }));
 vi.mock('../../context/ConfirmContext', () => ({ useConfirm: () => useConfirmMock() }));
-vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
-vi.mock('../../components/Calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
-vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
+vi.mock('../../components/calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
+vi.mock('../../components/calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
+vi.mock('../../components/calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
 const isReadOnlyEventMock = vi.fn(() => false);
 
-vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+vi.mock('../../components/calendar/utils/eventUtils', () => ({
   isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),

@@ -195,7 +195,7 @@ export function SocietySkeletonMock() {
   return <div>Loading...</div>;
 }
 
-vi.mock("../../pages/Societies/useSocietyDetailPageState", () => ({
+vi.mock("../../pages/societies/hooks/useSocietyDetailPageState", () => ({
   useSocietyPageData: (...args) => societyDetailPageStateMocks.useSocietyPageDataMock(...args),
   useSocietyInit: (...args) => societyDetailPageStateMocks.useSocietyInitMock(...args),
 }));
@@ -211,7 +211,7 @@ vi.mock("../../components/Society/SocietyDetail/Tabs/announcementTab/Announcemen
 vi.mock("../../components/Society/SocietyDetail/ReportSocietyModal", () => ({ default: ReportSocietyModalMock }));
 vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({ default: MemberDirectoryModalMock }));
 vi.mock("../../components/common/BackButton/BackButton.jsx", () => ({ default: BackButtonMock }));
-vi.mock("../../pages/Societies/SocietySkeletons", () => ({ SocietyDetailSkeleton: SocietySkeletonMock }));
+vi.mock("../../pages/societies/components/SocietySkeletons", () => ({ SocietyDetailSkeleton: SocietySkeletonMock }));
 
 export function createSocietyDetailPageInteractiveOverrides() {
   return {

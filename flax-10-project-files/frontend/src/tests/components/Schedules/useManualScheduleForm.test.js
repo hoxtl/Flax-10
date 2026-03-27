@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useManualScheduleForm } from '../../../components/Schedules/manual/useManualScheduleForm';
+import { useManualScheduleForm } from '../../../components/schedules/manual/useManualScheduleForm';
 
 const loadMock = vi.fn();
 const useToastMock = vi.fn();
 
-vi.mock('../../../components/Schedules/manual/loadScheduleTaggedEvents', () => ({
+vi.mock('../../../components/schedules/manual/loadScheduleTaggedEvents', () => ({
     loadScheduleTaggedEvents: (...args) => loadMock(...args),
 }));
 

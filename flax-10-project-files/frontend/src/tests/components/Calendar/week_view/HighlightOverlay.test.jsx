@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { HighlightOverlay } from '../../../../components/Calendar/week_view/components/HighlightOverlay';
+import { HighlightOverlay } from '../../../../components/calendar/week_view/components/HighlightOverlay';
 
 describe('HighlightOverlay', () => {
   it('returns null when quarter is null', () => {

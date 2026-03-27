@@ -2,14 +2,14 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import CreateTaskBar from '../../../pages/Tasks/components/CreateTaskBar';
+import CreateTaskBar from '../../../pages/tasks/components/CreateTaskBar';
 
 vi.mock('../../../api/moduleApi', () => ({
     getModules: vi.fn().mockResolvedValue([]),
     getEnrollments: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
+vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn().mockReturnValue(false),
 }));
 
@@ -17,7 +17,7 @@ vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
-vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
     useSleepWarning: vi.fn(() => ({
         sleepWarning: false,
         checkSleepAndRun: (_date, fn) => fn(),

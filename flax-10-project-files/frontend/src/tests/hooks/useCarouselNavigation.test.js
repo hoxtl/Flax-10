@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act, fireEvent } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import { useRef } from 'react';
-import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../components/Society/hooks/useCarouselNavigation';
+import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../components/society/hooks/useCarouselNavigation';
 
 describe('useCarouselNavigation', () => {
     it('initializes with given index', () => {
@@ -50,7 +50,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import React, { useRef } from 'react';
-import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../components/Society/hooks/useCarouselNavigation';
+import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../components/society/hooks/useCarouselNavigation';
 
 describe('useCarouselGestures', () => {
     it('calls prev when swiping right (endX > startX)', () => {

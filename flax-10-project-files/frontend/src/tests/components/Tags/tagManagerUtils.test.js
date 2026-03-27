@@ -4,7 +4,7 @@ import {
   getInitialTagForm,
   findDuplicateTag,
   validateTagForm,
-} from '../../../components/Tags/tag_manager/tagManagerUtils';
+} from '../../../components/tags/tag_manager/tagManagerUtils';
 
 const tags = [
   { id: 1, label: 'Work', color: '#ff0000' },

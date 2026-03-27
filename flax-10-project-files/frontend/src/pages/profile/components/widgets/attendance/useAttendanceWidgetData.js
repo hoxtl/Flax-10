@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { useAttendanceRecords } from "../../../../Attendance/hooks/useAttendanceRecords";
-import { useAttendanceStats } from "../../../../Attendance/hooks/useAttendanceStats";
+import { useAttendanceRecords } from "../../../../attendance/hooks/useAttendanceRecords";
+import { useAttendanceStats } from "../../../../attendance/hooks/useAttendanceStats";
 import {
   buildByTypeChartData,
   buildOverallChartData,
   withByTypeColors,
-} from "../../../../Attendance/utils/attendanceChartData";
+} from "../../../../attendance/utils/attendanceChartData";
 import { recordAttendance } from "../../../../../api/attendanceApi";
 import {
   buildMarkedEvents,

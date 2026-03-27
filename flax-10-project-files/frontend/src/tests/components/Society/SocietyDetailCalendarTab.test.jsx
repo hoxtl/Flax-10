@@ -12,7 +12,7 @@ vi.mock('../../../context/CalendarContext', () => ({
 }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => mockConfirm }));
 
-vi.mock('../../../components/Calendar/month_view/MonthView', () => ({
+vi.mock('../../../components/calendar/month_view/MonthView', () => ({
   MonthView: ({ onEventClick, onMoreClick, readOnly, events }) => (
     <div>
       <div>readOnly:{String(!!readOnly)}</div>
@@ -23,7 +23,7 @@ vi.mock('../../../components/Calendar/month_view/MonthView', () => ({
   ),
 }));
 
-vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
+vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
   CalendarNav: ({ showToday, onPrev, onNext, onToday, onDatePick }) => (
     <div data-testid="calendar-nav">
       <button type="button" onClick={onPrev}>prev</button>
@@ -34,32 +34,32 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
   ),
 }));
 
-vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+vi.mock('../../../components/calendar/utils/dateUtils', () => ({
   addMonths: vi.fn((d) => d), formatMonthYear: () => 'March 2026', isSameMonth: vi.fn(() => false), formatTimeRange: () => '10:00 - 11:00',
 }));
-vi.mock('../../../components/Calendar/utils/recurrenceUtils', () => ({ expandRecurringEvents: (events) => events }));
-vi.mock('../../../components/Calendar/utils/eventUtils', () => ({ hasRecurrence: (e) => !!e?.recurrence_rule, extractBaseEventId: (id) => String(id).split('-')[0] }));
+vi.mock('../../../components/calendar/utils/recurrenceUtils', () => ({ expandRecurringEvents: (events) => events }));
+vi.mock('../../../components/calendar/utils/eventUtils', () => ({ hasRecurrence: (e) => !!e?.recurrence_rule, extractBaseEventId: (id) => String(id).split('-')[0] }));
 
-vi.mock('../../../components/Society/society_detail/tags/TagFilterBar', () => ({
+vi.mock('../../../components/society/society_detail/tags/TagFilterBar', () => ({
   default: ({ onFilterChange }) => (<div>TagFilterBar<button type="button" onClick={() => onFilterChange([1])}>filter-tag-1</button><button type="button" onClick={() => onFilterChange([])}>clear-filter</button></div>),
 }));
-vi.mock('../../../components/Society/society_detail/tags/TagManager', () => ({ default: () => <div>TagManager</div> }));
-vi.mock('../../../components/Society/society_detail/tabs/calendar_tab/SyncButton', () => ({ default: () => <div>SyncButton</div> }));
+vi.mock('../../../components/society/society_detail/tags/TagManager', () => ({ default: () => <div>TagManager</div> }));
+vi.mock('../../../components/society/society_detail/tabs/calendar_tab/SyncButton', () => ({ default: () => <div>SyncButton</div> }));
 
-vi.mock('../../../components/Calendar/event_modal/EventModal', () => ({
+vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
   EventModal: ({ onDelete, onSubmit }) => (<div data-testid="event-modal"><button type="button" onClick={() => onSubmit?.({ title: 'Updated' })}>submit</button>{onDelete != null && <button type="button" onClick={() => onDelete?.()}>delete</button>}</div>),
 }));
 
-vi.mock('../../../components/Calendar/event_popover/EventPopover', () => ({
+vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
   EventPopover: ({ actions, onClose }) => (<div data-testid="detail-popup"><button type="button" onClick={onClose}>close-popup</button>{actions?.map((a) => (<button key={a.label} type="button" onClick={a.onClick}>{a.label}</button>))}</div>),
 }));
 
-vi.mock('../../../components/Calendar/events_summary_modal/EventsSummaryModal', () => ({
+vi.mock('../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
   EventsSummaryModal: ({ isOpen, onClose }) => (isOpen ? <div data-testid="summary-modal">Summary<button type="button" onClick={onClose}>close-summary</button></div> : null),
 }));
 
-import CalendarTab from '../../../components/Society/society_detail/tabs/calendar_tab/CalendarTab';
-import * as dateUtils from '../../../components/Calendar/utils/dateUtils';
+import CalendarTab from '../../../components/society/society_detail/tabs/calendar_tab/CalendarTab';
+import * as dateUtils from '../../../components/calendar/utils/dateUtils';
 
 const defaultProps = { events: [], editMode: false, societyId: 1, isMember: true, societyName: 'Chess' };
 const renderTab = (props = {}) => render(<CalendarTab {...defaultProps} {...props} />);

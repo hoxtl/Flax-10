@@ -3,7 +3,7 @@ import { getDeadlineCountdown, getDeadlineUrgency, formatDeadlineDateTime,
     DEADLINE_LABELS, DEADLINE_TYPES, TYPES_WITH_LOCATION, TYPES_WITH_END_DATE,
     getTimeRemainingCountdown, getDueInPhrase, getDeadlineDotUrgency,
     getTimeRemainingMonospace, getTimeRemainingClean, getTimeRemainingStamped,
-    isDeadlineUnder24h } from '../../components/Modules/utils/deadlineUtils';
+    isDeadlineUnder24h } from '../../components/modules/utils/deadlineUtils';
 
 describe('deadlineUtils', () => {
     beforeEach(() => {

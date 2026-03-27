@@ -8,23 +8,23 @@ const useSocietySubscriptionMock = vi.fn();
 const useUnreportSocietyMock = vi.fn();
 const scrollContentToTopMock = vi.fn();
 
-vi.mock("../../components/Society/hooks/useChangeTracker", () => ({
+vi.mock("../../components/society/hooks/useChangeTracker", () => ({
   useChangeTracker: (...args) => useChangeTrackerMock(...args),
 }));
 
-vi.mock("../../components/Society/hooks/useSocietyDetail", () => ({
+vi.mock("../../components/society/hooks/useSocietyDetail", () => ({
   useSocietyDetail: (...args) => useSocietyDetailMock(...args),
 }));
 
-vi.mock("../../components/Society/hooks/useSocietySubscription", () => ({
+vi.mock("../../components/society/hooks/useSocietySubscription", () => ({
   useSocietySubscription: (...args) => useSocietySubscriptionMock(...args),
 }));
 
-vi.mock("../../components/Society/hooks/useUnreportSociety", () => ({
+vi.mock("../../components/society/hooks/useUnreportSociety", () => ({
   useUnreportSociety: (...args) => useUnreportSocietyMock(...args),
 }));
 
-vi.mock("../../pages/Societies/SocietyDetailPageUtils", async () => {
+vi.mock("../../pages/societies/utils/societyDetailPageUtils", async () => {
   const actual = await vi.importActual("../../pages/Societies/societyDetailPageUtils");
   return {
     ...actual,
@@ -32,7 +32,7 @@ vi.mock("../../pages/Societies/SocietyDetailPageUtils", async () => {
   };
 });
 
-import { useSocietyInit, useSocietyPageData } from "../../pages/Societies/useSocietyDetailPageState";
+import { useSocietyInit, useSocietyPageData } from "../../pages/societies/hooks/useSocietyDetailPageState";
 
 function createWrapper(entry) {
   return function Wrapper({ children }) {

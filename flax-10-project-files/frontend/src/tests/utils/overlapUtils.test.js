@@ -5,7 +5,7 @@ import {
     checkOverlapWithConfirm,
     calculateEventColumns,
     getEventKey,
-} from '../../components/Calendar/utils/overlapUtils';
+} from '../../components/calendar/utils/overlapUtils';
 
 const makeEvent = (id, start, end) => ({ id, start_time: start, end_time: end, title: `Event ${id}` });
 

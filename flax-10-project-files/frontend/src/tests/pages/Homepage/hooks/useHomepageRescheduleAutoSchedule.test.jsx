@@ -14,7 +14,7 @@ vi.mock("../../../../pages/homepage/utils/index", () => ({
   getNextFreeSlotToday: (...args) => getNextFreeSlotTodayMock(...args),
 }));
 
-vi.mock("../../../../pages/homepage/utils/ScheduleAutoForm", () => ({
+vi.mock("../../../../pages/homepage/utils/scheduleAutoForm", () => ({
   buildScheduleAutoForm: (...args) => buildScheduleAutoFormMock(...args),
 }));
 
@@ -27,7 +27,7 @@ vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => id),
 }));
 
-vi.mock("../../../../components/Schedules/auto/autoScheduleActions", () => ({
+vi.mock("../../../../components/schedules/auto/autoScheduleActions", () => ({
   loadScheduleSettings: (...args) => loadScheduleSettingsMock(...args),
   submitAutoScheduleWithPrefs: (...args) => submitAutoScheduleWithPrefsMock(...args),
 }));

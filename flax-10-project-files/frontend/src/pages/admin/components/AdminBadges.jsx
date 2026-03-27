@@ -2,7 +2,7 @@
  * Shared admin badges.
  */
 
-import styles from "../styles";
+import styles from "../styles/styles";
 
 const ROLE_BADGE_STYLES = {
   admin: styles.badgeAdmin,

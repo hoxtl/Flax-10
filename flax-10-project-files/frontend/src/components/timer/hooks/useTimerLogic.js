@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
-import { useNotify } from '../../Notifications/hooks/useNotify';
+import { useNotify } from '../../notifications/hooks/useNotify';
 import { getProgress } from '../utils/timerUtils';
 import { useTimer } from './useTimer';
 import { useTimerFlow } from './useTimerFlow';

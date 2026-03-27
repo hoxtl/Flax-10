@@ -35,7 +35,7 @@ vi.mock("../../../components/common", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceGrid", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceGrid", () => ({
   default: (props) => (
     <div data-testid="intelligence-grid">
       <div data-testid="grid-props">{JSON.stringify({ catalogue: props.catalogue, edit: props.edit, layout: props.layout, showAdd: props.showAdd })}</div>
@@ -44,18 +44,18 @@ vi.mock("../../../pages/Homepage/components/IntelligenceGrid", () => ({
   ),
 }));
 
-vi.mock("../../../pages/Homepage/components/IntelligenceWidgetRenderer", () => ({
+vi.mock("../../../pages/homepage/components/IntelligenceWidgetRenderer", () => ({
   renderIntelligenceWidget: (...args) => dashboardState.renderIntelligenceWidget(...args),
 }));
 
-vi.mock("../../../pages/Homepage/hooks/useIntelligenceDashboard", () => ({
+vi.mock("../../../pages/homepage/hooks/useIntelligenceDashboard", () => ({
   CATALOGUE: ["hero", "rightNow", "todayTasks"],
   DEFAULT_LAYOUT: ["hero", "deadlines", "todayTasks", "bigTimeline"],
   getSemesterProgress: (...args) => dashboardState.getSemesterProgress(...args),
   useIntelligenceDashboard: () => dashboardState.dashboard,
 }));
 
-import IntelligenceRow, { SemesterProgressWidget } from "../../../pages/Homepage/components/IntelligenceRow";
+import IntelligenceRow, { SemesterProgressWidget } from "../../../pages/homepage/components/IntelligenceRow";
 
 describe("IntelligenceRow extra coverage", () => {
   beforeEach(() => {

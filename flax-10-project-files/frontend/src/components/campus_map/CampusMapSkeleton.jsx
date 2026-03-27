@@ -3,8 +3,8 @@
  */
 
 import SkeletonBlock from '../common/loading_state/SkeletonBlock';
-import baseStyles from '../../pages/campus_map/CampusMap.module.css';
-import sidebarStyles from '../../pages/campus_map/Sidebar.module.css';
+import baseStyles from '../../pages/campus_map/styles/CampusMap.module.css';
+import sidebarStyles from '../../pages/campus_map/styles/sidebar.module.css';
 const styles = { ...baseStyles, ...sidebarStyles };
 
 function SkeletonSectionList() {

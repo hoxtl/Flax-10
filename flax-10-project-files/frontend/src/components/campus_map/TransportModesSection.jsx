@@ -2,8 +2,8 @@
  * Transport mode results section.
  */
 
-import baseStyles from "../../pages/campus_map/CampusMap.module.css";
-import routeStyles from "../../pages/campus_map/routes.module.css";
+import baseStyles from "../../pages/campus_map/styles/CampusMap.module.css";
+import routeStyles from "../../pages/campus_map/styles/routes.module.css";
 import { TflRouteCard } from "./TflRouteCard";
 import { WalkingRouteCard } from "./WalkingRouteCard";
 

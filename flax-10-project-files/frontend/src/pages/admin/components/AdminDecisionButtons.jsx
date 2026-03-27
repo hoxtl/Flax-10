@@ -2,7 +2,7 @@
  * Shared approve/reject action buttons for admin list rows.
  */
 
-import styles from "../styles";
+import styles from "../styles/styles";
 
 export default function AdminDecisionButtons({ busy, onApprove, onReject }) {
   return (

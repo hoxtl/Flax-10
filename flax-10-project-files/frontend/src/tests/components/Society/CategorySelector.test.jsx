@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CategorySelector, { CategoryDisplay } from '../../../components/Society/CategorySelector';
+import CategorySelector, { CategoryDisplay } from '../../../components/society/CategorySelector';
 
 vi.mock('../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (

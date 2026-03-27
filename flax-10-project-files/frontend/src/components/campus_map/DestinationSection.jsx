@@ -2,8 +2,8 @@
  * Destination selection section.
  */
 
-import baseStyles from "../../pages/campus_map/CampusMap.module.css";
-import sidebarStyles from "../../pages/campus_map/Sidebar.module.css";
+import baseStyles from "../../pages/campus_map/styles/CampusMap.module.css";
+import sidebarStyles from "../../pages/campus_map/styles/sidebar.module.css";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
 import { LocationChip } from "./LocationChip";
 import AnimatedDropdown from "../common/animated_dropdown/AnimatedDropdown";

@@ -8,26 +8,26 @@ const deriveGapDeadlineFallbacksMock = vi.fn();
 const isTodayMock = vi.fn();
 const isNowMock = vi.fn();
 
-vi.mock("../../../../pages/Homepage/utils/planTimelineRows", () => ({
+vi.mock("../../../../pages/homepage/utils/planTimelineRows", () => ({
   computePlanTimelineRows: (...args) => computePlanTimelineRowsMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/hooks/mini_timeline/assignmentUtils", () => ({
+vi.mock("../../../../pages/homepage/hooks/mini_timeline/assignmentUtils", () => ({
   deriveAssignedGapTasks: (...args) => deriveAssignedGapTasksMock(...args),
   deriveBestFreeRowId: (...args) => deriveBestFreeRowIdMock(...args),
   deriveGapDeadlineFallbacks: (...args) => deriveGapDeadlineFallbacksMock(...args),
 }));
 
-vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
+vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
   isToday: (...args) => isTodayMock(...args),
 }));
 
-vi.mock("../../../../pages/Homepage/utils/eventUtils", () => ({
+vi.mock("../../../../pages/homepage/utils/eventUtils", () => ({
   isNow: (...args) => isNowMock(...args),
 }));
 
-import { useMiniTimelineData } from "../../../../pages/Homepage/hooks/useMiniTimelineData";
-import { DAY_END_HOUR, DAY_START_HOUR } from "../../../../pages/Homepage/utils/timelineUtils";
+import { useMiniTimelineData } from "../../../../pages/homepage/hooks/useMiniTimelineData";
+import { DAY_END_HOUR, DAY_START_HOUR } from "../../../../pages/homepage/utils/timelineUtils";
 
 describe("useMiniTimelineData", () => {
   beforeEach(() => {

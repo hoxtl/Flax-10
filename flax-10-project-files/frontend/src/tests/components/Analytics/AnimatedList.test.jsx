@@ -12,7 +12,7 @@ vi.mock('framer-motion', () => ({
     useInView: vi.fn(() => true),
 }));
 
-import AnimatedList from '../../../components/Analytics/AnimatedList';
+import AnimatedList from '../../../components/analytics/AnimatedList';
 
 describe('AnimatedList', () => {
     it('renders nothing when items is empty', () => {

@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react';
-import styles from '../../pages/Timer/TimerPage.module.css';
+import styles from '../../pages/timer/TimerPage.module.css';
 import { MusicStations } from './sound_panel/MusicStations';
 
 function toggleStationState(station, setActiveStation) {

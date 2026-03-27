@@ -16,11 +16,11 @@ vi.mock("../../../../components/common/tags_selector/TagsSelector", () => ({
   TagsSelector: () => <div data-testid="tags-selector" />,
 }));
 
-vi.mock("../../../../components/Tags/TagManagerModal", () => ({
+vi.mock("../../../../components/tags/TagManagerModal", () => ({
   default: () => <div data-testid="tag-manager-modal" />,
 }));
 
-vi.mock("../../../../components/Calendar/header/useFilterDropdownState", () => ({
+vi.mock("../../../../components/calendar/header/useFilterDropdownState", () => ({
   useFilterDropdownState: () => ({
     activeCount: 2,
     allowManageTags: true,
@@ -42,7 +42,7 @@ vi.mock("../../../../components/Calendar/header/useFilterDropdownState", () => (
   }),
 }));
 
-import { FilterDropdownButton } from "../../../../components/Calendar/header/FilterDropdownButton";
+import { FilterDropdownButton } from "../../../../components/calendar/header/FilterDropdownButton";
 
 describe("FilterDropdownButton popup positioning", () => {
   it("applies a right offset when the popup shift is non-zero", () => {

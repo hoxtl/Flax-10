@@ -4,8 +4,8 @@
 
 import { banReportedSociety, dismissReport, fetchReportedSocieties } from "../../../api/adminApi";
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
-import styles from "../styles";
-import { ADMIN_LIST_PAGE_SIZE } from "../constants";
+import styles from "../styles/styles";
+import { ADMIN_LIST_PAGE_SIZE } from "../utils/constants";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncList } from "../hooks/useAsyncList";
 import { usePaginatedItems } from "../hooks/usePaginatedItems";
