@@ -2,15 +2,15 @@
  * Modules page entry for browsing, enrolling, and managing course modules.
  */
 
-import { MainView } from "./ModulesPageResults.jsx";
+import { MainView } from "./components/ModulesPageResults.jsx";
 import {
   AnimatedContent,
   getViewKey,
   ModulesPageModals,
   ModulesSkeleton,
   TestModeContent,
-} from "./ModulesPageChrome.jsx";
-import { useModulesPageState } from "./modulesPageHooks.js";
+} from "./components/ModulesPageChrome.jsx";
+import { useModulesPageState } from "./hooks/modulesPageHooks.js";
 import HoldConfirmModal from "../../components/common/hold_confirm_modal/HoldConfirmModal.jsx";
 
 function DeleteModuleModal({ state }) {

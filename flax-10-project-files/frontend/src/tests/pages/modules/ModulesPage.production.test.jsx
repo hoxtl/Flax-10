@@ -5,15 +5,15 @@ const useModulesPageStateMock = vi.fn();
 const getViewKeyMock = vi.fn(() => "details-key");
 const handleDirectDeleteModuleMock = vi.fn();
 
-vi.mock("../../../pages/modules/modulesPageHooks.js", () => ({
+vi.mock("../../../pages/modules/hooks/modulesPageHooks.js", () => ({
   useModulesPageState: (...args) => useModulesPageStateMock(...args),
 }));
 
-vi.mock("../../../pages/modules/ModulesPageResults.jsx", () => ({
+vi.mock("../../../pages/modules/components/ModulesPageResults.jsx", () => ({
   MainView: () => <div data-testid="main-view">main view</div>,
 }));
 
-vi.mock("../../../pages/modules/ModulesPageChrome.jsx", () => ({
+vi.mock("../../../pages/modules/components/ModulesPageChrome.jsx", () => ({
   AnimatedContent: ({ state, viewKey }) => <div data-testid="animated-content">{`${viewKey}:${state.viewingModule?.module_code || "none"}`}</div>,
   getViewKey: (...args) => getViewKeyMock(...args),
   ModulesPageModals: ({ state }) => <div data-testid="page-modals">{state.readingModule ? "has-reading" : "no-reading"}</div>,

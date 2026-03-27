@@ -7,23 +7,23 @@ import {
   getLastPromptShownAt,
   getSkippedIds,
   setLastPromptShownAt,
-} from "../../../components/attendance/attendancePromptStorage";
+} from "../../../components/attendance/utils/attendancePromptStorage";
 import {
   findCandidateEvent,
   getDateRangeForPrompt,
-} from "../../../components/attendance/attendancePromptUtils";
+} from "../../../components/attendance/utils/attendancePromptUtils";
 
 vi.mock("../../../api/eventApi", () => ({
   getEvents: vi.fn(),
 }));
 
-vi.mock("../../../components/attendance/attendancePromptStorage", () => ({
+vi.mock("../../../components/attendance/utils/attendancePromptStorage", () => ({
   getLastPromptShownAt: vi.fn(),
   getSkippedIds: vi.fn(),
   setLastPromptShownAt: vi.fn(),
 }));
 
-vi.mock("../../../components/attendance/attendancePromptUtils", () => ({
+vi.mock("../../../components/attendance/utils/attendancePromptUtils", () => ({
   findCandidateEvent: vi.fn(),
   getDateRangeForPrompt: vi.fn(),
 }));

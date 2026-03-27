@@ -1,6 +1,6 @@
 import { describe, it, expect, act } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AuthBrand, AuthFooter } from '../../../components/Auth/AuthBranding';
+import { AuthBrand, AuthFooter } from '../../../components/Auth/components/AuthBranding';
 
 describe('AuthBrand', () => {
   it('renders brand name and tagline', () => {

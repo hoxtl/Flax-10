@@ -8,7 +8,7 @@ import {
   HeroWidget,
 } from "../../../pages/homepage/components/IntelligenceGridWidgets";
 
-vi.mock("../../../components/ui/BentoGrid", () => ({
+vi.mock("../../../components/ui/components/BentoGrid", () => ({
   BentoCard: ({ children }) => <div data-testid="bento-card">{children}</div>,
 }));
 

@@ -53,7 +53,7 @@ const useSearchInitMock = vi.fn();
 const useFilterStateMock = vi.fn();
 const useClickOutsideMock = vi.fn();
 
-vi.mock("../../../components/social/UserSearch", () => ({
+vi.mock("../../../components/social/components/UserSearch", () => ({
   FilterSection: () => <div data-testid="filter-section" />,
   useSearchInit: (...args) => useSearchInitMock(...args),
   useFilterState: (...args) => useFilterStateMock(...args),
@@ -151,8 +151,8 @@ import {
   DiscoverSkeleton,
   DiscoverToolbar,
   UsersGrid,
-} from "../../../pages/discover/DiscoverComponents";
-import { useDiscoverFetch } from "../../../pages/discover/discoverHooks";
+} from "../../../pages/discover/components/DiscoverComponents";
+import { useDiscoverFetch } from "../../../pages/discover/hooks/discoverHooks";
 
 // ── Helpers for filter state mock ────────────────────────────────────────────
 function makeFilterState(overrides = {}) {

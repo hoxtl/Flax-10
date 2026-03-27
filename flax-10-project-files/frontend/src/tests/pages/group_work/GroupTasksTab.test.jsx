@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
-import GroupTasksTab from '../../../pages/group_work/GroupTasksTab';
+import GroupTasksTab from '../../../pages/group_work/components/GroupTasksTab';
 
 vi.mock('../../../context/ConfirmContext', () => ({
   useConfirm: () => mockConfirm,

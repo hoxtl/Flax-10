@@ -2,7 +2,7 @@
  * Reusable notice shown on request submission dialogues.
  */
 
-import styles from "../../../pages/settings/Settings.module.css";
+import styles from "../../../pages/settings/styles/Settings.module.css";
 
 export default function RequestDecisionNotice() {
   return (

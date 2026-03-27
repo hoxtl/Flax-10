@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Ban } from "lucide-react";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
-import styles from "../styles";
+import styles from "../styles/styles";
 
 export default function BanUserModal(props) {
   const form = useBanReasonForm(props);

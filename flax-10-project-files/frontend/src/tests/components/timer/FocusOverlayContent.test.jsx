@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { FocusOverlayContent } from '../../../components/timer/WrapperComponents';
+import { FocusOverlayContent } from '../../../components/timer/components/WrapperComponents';
 
 const timerCircleSpy = vi.fn();
 
-vi.mock('../../../components/timer/TimerCircle', () => ({
+vi.mock('../../../components/timer/components/TimerCircle', () => ({
   default: (props) => {
     timerCircleSpy(props);
     return <div data-testid="timer-circle" />;

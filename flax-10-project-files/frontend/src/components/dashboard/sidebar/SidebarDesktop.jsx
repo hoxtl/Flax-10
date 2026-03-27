@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { motion as Motion } from "framer-motion";
 
-import sharedStyles from "../SidebarShell.module.css";
+import sharedStyles from "../styles/SidebarShell.module.css";
 import { COLLAPSED_W, EXPANDED_W, LOGO_SPRING, NAV_SPRING, PRESSURE_ROUTE_IDS, SIDEBAR_SPRING } from "./sidebarConstants";
 import { getSidebarRoutes } from "./sidebarUtils";
 

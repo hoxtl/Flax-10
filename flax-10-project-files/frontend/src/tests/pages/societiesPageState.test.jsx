@@ -24,7 +24,7 @@ vi.mock("../../components/society/hooks/useUnreportSociety", () => ({
   useUnreportSociety: (...args) => useUnreportSocietyMock(...args),
 }));
 
-import { useSocietiesPage } from "../../pages/societies/societiesPageState";
+import { useSocietiesPage } from "../../pages/societies/hooks/societiesPageState";
 
 describe("useSocietiesPage", () => {
   beforeEach(() => {

@@ -2,7 +2,7 @@
  * Intelligence grid widgets.
  */
 
-import { BentoCard } from "../../../components/ui/BentoGrid";
+import { BentoCard } from "../../../components/ui/components/BentoGrid";
 import styles from "./IntelligenceGrid.module.css";
 import { DeleteButton, GridGrip, ResizeControls } from "./IntelligenceGridControls";
 

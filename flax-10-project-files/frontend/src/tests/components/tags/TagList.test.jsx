@@ -13,7 +13,7 @@ vi.mock('lucide-react', () => ({
   Trash2: ({ size }) => <svg data-testid="trash-icon" />,
 }));
 
-vi.mock('../../../components/tags/TagManagerModal.module.css', () => ({
+vi.mock('../../../components/tags/styles/TagManagerModal.module.css', () => ({
   default: {
     content: 'content', list: 'list', item: 'item', preview: 'preview',
     colorDot: 'colorDot', actions: 'actions', delete: 'delete',

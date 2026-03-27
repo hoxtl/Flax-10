@@ -31,7 +31,7 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
     ),
 }));
 
-import QuickAddModal from '../../../components/dashboard/QuickAddModal';
+import QuickAddModal from '../../../components/dashboard/components/QuickAddModal';
 
 function renderModal(props = {}) {
     return render(

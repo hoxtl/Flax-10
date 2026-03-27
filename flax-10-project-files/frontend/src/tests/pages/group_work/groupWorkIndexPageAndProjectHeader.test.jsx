@@ -91,7 +91,7 @@ vi.mock("../../../pages/group_work/hooks/groupWorkHooks", () => ({
   getAuthHeaders: () => ({ Authorization: "Token test" }),
 }));
 
-vi.mock("../../../pages/group_work/useGroupTasksTabState", () => ({
+vi.mock("../../../pages/group_work/hooks/useGroupTasksTabState", () => ({
   useGroupTasksTabState: (...args) => useGroupTasksTabState(...args),
 }));
 
@@ -162,7 +162,7 @@ vi.mock("../../../components/pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 
-vi.mock("../../../pages/group_work/GroupWorkDetail", () => ({
+vi.mock("../../../pages/group_work/components/GroupWorkDetail", () => ({
   default: ({ onBack }) => <button type="button" onClick={onBack}>detail-view</button>,
 }));
 
@@ -248,7 +248,7 @@ vi.mock("../../../components/common/stat_strip/StatStrip", () => ({
   default: ({ items }) => <div>{items.map((item) => `${item.label}:${item.value}`).join("|")}</div>,
 }));
 
-import GroupTasksTab from "../../../pages/group_work/GroupTasksTab";
+import GroupTasksTab from "../../../pages/group_work/components/GroupTasksTab";
 import GroupWorkIndexPage from "../../../pages/group_work/GroupWorkIndexPage";
 import ProjectHeader from "../../../pages/group_work/components/ProjectHeader";
 import ProjectDeleteAction from "../../../pages/group_work/components/ProjectHeaderSub";

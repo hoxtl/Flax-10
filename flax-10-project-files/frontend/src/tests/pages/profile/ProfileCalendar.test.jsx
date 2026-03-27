@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ProfileCalendar } from '../../../pages/profile/ProfileCalendar';
+import { ProfileCalendar } from '../../../pages/profile/components/ProfileCalendar';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 import { isSameMonth } from '../../../components/calendar/utils/dateUtils';
 

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import Settings from "../../pages/settings/Settings";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../components/settings/SettingsUI", () => ({
+vi.mock("../../components/settings/components/SettingsUI", () => ({
   SettingsSidebar: ({ activeTab, onChange }) => (
     <div data-testid="settings-tabs">
       <button onClick={() => onChange("account")}>Account</button>
@@ -30,19 +30,19 @@ vi.mock("../../components/settings/SettingsUI", () => ({
     message ? <div data-testid="error-banner">{message}</div> : null,
 }));
 
-vi.mock("../../components/settings/AccountForm", () => ({
+vi.mock("../../components/settings/components/AccountForm", () => ({
   default: ({ onSave, isSaving }) => (
     <div data-testid="account-form">AccountForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/SecurityForm", () => ({
+vi.mock("../../components/settings/components/SecurityForm", () => ({
   default: ({ onSave, isSaving, error }) => (
     <div data-testid="security-form">SecurityForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/PreferencesPanel", () => ({
+vi.mock("../../components/settings/components/PreferencesPanel", () => ({
   default: ({ activeSubTab }) => {
     const labels = {
       sleep: "sleep-schedule-panel",
@@ -60,13 +60,13 @@ vi.mock("../../components/settings/PreferencesPanel", () => ({
   },
 }));
 
-vi.mock("../../components/settings/HomeAddressForm", () => ({
+vi.mock("../../components/settings/components/HomeAddressForm", () => ({
   default: ({ onSave, isSaving, error }) => (
     <div data-testid="home-address-form">HomeAddressForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/SleepSchedulePanel", () => ({
+vi.mock("../../components/settings/components/SleepSchedulePanel", () => ({
   SleepSchedulePanel: ({ onSave, isSaving }) => (
     <div data-testid="sleep-schedule-panel">SleepSchedulePanel</div>
   ),

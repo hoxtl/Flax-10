@@ -1,5 +1,5 @@
-import Card from "../../../../components/common/card/Card";
-import StudyHeatmap from "../../../../components/analytics/StudyHeatmap";
+import Card from "../../../../components/common/Card/Card";
+import StudyHeatmap from "../../../../components/analytics/components/StudyHeatmap";
 import widgetStyles from "./ProfileWidgets.module.css";
 import attendanceStyles from "./ProfileAttendance.module.css";
 import { buildButtonActionProps, buildNavigateAction } from "./widgetActionProps";

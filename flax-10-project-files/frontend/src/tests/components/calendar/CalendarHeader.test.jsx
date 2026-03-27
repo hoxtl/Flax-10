@@ -62,7 +62,7 @@ vi.mock('../../../components/notifications/hooks/useReminderNotifications', () =
     useReminderNotifications: vi.fn(),
 }));
 
-vi.mock('../../../components/TimetableImportModal', () => {
+vi.mock('../../../components/schedules/components/TimetableImportModal', () => {
     const React = require('react');
     function MockTimetableImportModal({ onClose, onImport }) {
         const [url, setUrl] = React.useState('');

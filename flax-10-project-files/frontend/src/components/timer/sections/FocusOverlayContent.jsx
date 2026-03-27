@@ -4,7 +4,7 @@
 
 import styles from '../../../pages/timer/TimerPage.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
-import TimerCircle from '../TimerCircle';
+import TimerCircle from '../components/TimerCircle';
 
 function FocusExitButton({ onExitFocus }) {
   return <PrimaryButton className={styles.focusOverlayExitBtn} size="large" pill onClick={onExitFocus}>Exit Focus</PrimaryButton>;

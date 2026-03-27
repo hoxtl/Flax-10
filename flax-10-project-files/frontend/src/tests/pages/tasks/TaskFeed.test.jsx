@@ -23,7 +23,7 @@ vi.mock('lucide-react', () => ({
     Plus: () => <svg data-testid="plus-icon" />,
     Filter: () => <svg data-testid="filter-icon" />,
 }));
-vi.mock('../../../components/ui/est_time_help_banner', () => ({
+vi.mock('../../../components/ui/components/EstTimeHelpBanner', () => ({
     default: () => <div data-testid="est-time-banner" />,
 }));
 vi.mock('../../../pages/tasks/components/TaskCard', () => ({

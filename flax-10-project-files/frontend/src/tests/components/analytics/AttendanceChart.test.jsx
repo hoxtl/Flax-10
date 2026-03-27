@@ -15,7 +15,7 @@ vi.mock("../../../context/ThemeContext", () => ({
   useTheme: () => mockUseTheme(),
 }));
 
-vi.mock("../../../components/analytics/useAttendanceStats", () => ({
+vi.mock("../../../components/analytics/hooks/useAttendanceStats", () => ({
   default: () => mockUseAttendanceStats(),
 }));
 
@@ -23,11 +23,11 @@ vi.mock("../../../components/analytics/utils/chartColors", () => ({
   getChartColors: (...args) => mockGetChartColors(...args),
 }));
 
-vi.mock("../../../components/analytics/AttendanceSummary", () => ({
+vi.mock("../../../components/analytics/components/AttendanceSummary", () => ({
   default: ({ pct }) => <div data-testid="attendance-summary">pct:{pct}</div>,
 }));
 
-vi.mock("../../../components/analytics/AttendanceBarChart", () => ({
+vi.mock("../../../components/analytics/components/AttendanceBarChart", () => ({
   default: ({ types, isMobile, gridColor, textColor }) => (
     <div data-testid="attendance-bar-chart">
       {types.join(",")}|{String(isMobile)}|{gridColor}|{textColor}
@@ -35,7 +35,7 @@ vi.mock("../../../components/analytics/AttendanceBarChart", () => ({
   ),
 }));
 
-import AttendanceChart from "../../../components/analytics/AttendanceChart";
+import AttendanceChart from "../../../components/analytics/components/AttendanceChart";
 
 function renderChart() {
   return render(

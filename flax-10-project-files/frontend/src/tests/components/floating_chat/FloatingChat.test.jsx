@@ -29,7 +29,7 @@ vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, ...props }) => <button {...props}>{children}</button>,
 }));
 
-vi.mock("../../../components/StudyCoachPanel", () => ({
+vi.mock("../../../components/study_coach/components/StudyCoachPanel", () => ({
   default: ({ initialMessage, onClose }) => (
     <div>
       <div>{initialMessage}</div>

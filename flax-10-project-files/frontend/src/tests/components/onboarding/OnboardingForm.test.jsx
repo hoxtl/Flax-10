@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import OnboardingForm from '../../../components/onboarding/OnboardingForm';
+import OnboardingForm from '../../../components/onboarding/components/OnboardingForm';
 
 vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...props }) => <div {...props}>{children}</div>, span: ({ children, ...props }) => <span {...props}>{children}</span> },
@@ -24,7 +24,7 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
   ),
 }));
 
-vi.mock('../../../components/onboarding/WarningBox', () => ({
+vi.mock('../../../components/onboarding/components/WarningBox', () => ({
   default: ({ major }) => <div>{`Warning for ${major}`}</div>,
 }));
 

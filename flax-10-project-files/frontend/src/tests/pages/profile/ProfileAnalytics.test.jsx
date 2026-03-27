@@ -35,16 +35,16 @@ vi.mock('../../../api/moduleApi', () => ({
 vi.mock('../../../api/client', () => ({
   fetchApi: vi.fn(() => Promise.resolve({})),
 }));
-vi.mock('../../../pages/profile/ProfileModals', () => ({
+vi.mock('../../../pages/profile/components/ProfileModals', () => ({
   default: () => <div data-testid="profile-modals" />,
 }));
-vi.mock('../../../pages/profile/ProfileCalendar', () => ({
+vi.mock('../../../pages/profile/components/ProfileCalendar', () => ({
   ProfileCalendar: () => <div data-testid="profile-calendar" />,
 }));
-vi.mock('../../../components/social/ShareButton', () => ({
+vi.mock('../../../components/social/components/ShareButton', () => ({
   default: () => <button data-testid="share-button">Share</button>,
 }));
-vi.mock('../../../pages/profile/AchievementsModal', () => ({
+vi.mock('../../../pages/profile/components/AchievementsModal', () => ({
   default: ({ onClose }) => <div data-testid="achievements-modal"><button onClick={onClose}>Close</button></div>,
 }));
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };

@@ -3,7 +3,7 @@
  */
 
 import SkeletonBlock from '../../../components/common/loading_state/SkeletonBlock';
-import styles from '../AnalyticsPage.module.css';
+import styles from '../styles/AnalyticsPage.module.css';
 
 const PERIOD_PLACEHOLDERS = [0, 1, 2];
 const SUMMARY_PLACEHOLDERS = [0, 1, 2, 3];

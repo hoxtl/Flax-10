@@ -29,7 +29,7 @@ vi.mock("../../../components/common/search_bar/SearchBar.jsx", () => ({
 import {
   EmptyResults,
   ModuleToolbar,
-} from "../../../pages/modules/ModulesPageResults";
+} from "../../../pages/modules/components/ModulesPageResults";
 
 describe("ModulesPageResults", () => {
   it("EmptyResults: handles various empty states", () => {

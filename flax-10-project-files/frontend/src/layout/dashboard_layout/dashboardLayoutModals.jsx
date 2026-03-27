@@ -3,11 +3,11 @@
  */
 
 import { EventModal } from "../../components/calendar/event_modal/EventModal";
-import CreateSocietyModal from "../../components/society/CreateSocietyModal";
+import CreateSocietyModal from "../../components/society/components/CreateSocietyModal";
 import DeadlineModal from "../../components/modules/deadlines/DeadlineModal";
 import ReadingModal from "../../components/modules/readings/ReadingModal";
-import QuickAddModal from "../../components/dashboard/QuickAddModal";
-import { LeaveTimerModal } from "../../components/timer/TimerPopups";
+import QuickAddModal from "../../components/dashboard/components/QuickAddModal";
+import { LeaveTimerModal } from "../../components/timer/components/TimerPopups";
 import CreateTaskModal from "../../pages/tasks/components/CreateTaskModal";
 import { createSociety } from "../../api/societyApi";
 import { createTask } from "../../api/taskApi";

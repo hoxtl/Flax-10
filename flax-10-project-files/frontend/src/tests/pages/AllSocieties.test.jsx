@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import AllSocieties from '../../pages/societies/AllSocieties';
+import AllSocieties from '../../pages/societies/components/AllSocieties';
 
-vi.mock('../../components/society/SocietyCard', () => ({
+vi.mock('../../components/society/components/SocietyCard', () => ({
     default: ({ society, onClick }) => (
         <div data-testid={`society-card-${society.id}`} onClick={onClick}>
             {society.name}
@@ -10,7 +10,7 @@ vi.mock('../../components/society/SocietyCard', () => ({
     ),
 }));
 
-vi.mock('../../components/tags/BasePill', () => ({
+vi.mock('../../components/tags/components/BasePill', () => ({
     default: ({ label, isActive, onClick }) => (
         <button className={isActive ? 'active' : ''} onClick={onClick}>{label}</button>
     ),

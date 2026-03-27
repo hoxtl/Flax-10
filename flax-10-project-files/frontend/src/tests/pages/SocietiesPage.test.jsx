@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock CSS modules
-vi.mock('../../pages/societies/SocietiesPage.module.css', () => ({ default: {} }));
+vi.mock('../../pages/societies/styles/SocietiesPage.module.css', () => ({ default: {} }));
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -18,7 +18,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock Skeletons
-vi.mock('../../pages/societies/SocietySkeletons', () => ({
+vi.mock('../../pages/societies/components/SocietySkeletons', () => ({
     SocietiesSkeleton: () => <div>Loading...</div>
 }));
 
@@ -36,7 +36,7 @@ vi.mock('../../components/society/hooks/useSocieties', () => ({
 }));
 
 // Mock child components
-vi.mock('../../pages/societies/AllSocieties', () => ({
+vi.mock('../../pages/societies/components/AllSocieties', () => ({
     default: ({ onBack, onSelect, societies, onReport, onUnreport }) => (
         <div data-testid="all-societies">
             <button onClick={onBack}>BackFromAll</button>
@@ -51,7 +51,7 @@ vi.mock('../../pages/societies/AllSocieties', () => ({
     ),
 }));
 
-vi.mock('../../pages/societies/SocietySection', () => ({
+vi.mock('../../pages/societies/components/SocietySection', () => ({
     default: ({ title, type, onAction, onSelect, items, onReport }) => {
         const titleStr = title || (type === 'admin' ? 'Managed Societies' : 'My Memberships');
         return (
@@ -69,7 +69,7 @@ vi.mock('../../pages/societies/SocietySection', () => ({
     },
 }));
 
-vi.mock('../../pages/societies/SocietyDetailPage', () => ({
+vi.mock('../../pages/societies/components/SocietyDetailPage', () => ({
     default: ({ societyId, onBack }) => (
         <div data-testid="society-detail">
             <span>{societyId}</span>
@@ -78,7 +78,7 @@ vi.mock('../../pages/societies/SocietyDetailPage', () => ({
     ),
 }));
 
-vi.mock('../../components/society/CreateSocietyModal', () => ({
+vi.mock('../../components/society/components/CreateSocietyModal', () => ({
     default: ({ onClose, onCreate }) => (
         <div data-testid="create-society-modal">
             <button onClick={onClose}>CloseCreate</button>

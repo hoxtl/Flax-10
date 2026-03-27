@@ -4,7 +4,7 @@
 
 import { Pencil, Trash2 } from "lucide-react";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
-import styles from "../TagManagerModal.module.css";
+import styles from "../styles/TagManagerModal.module.css";
 import { isProtectedTag } from "./tagManagerUtils";
 
 export default function TagList({ modal }) {

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import EditProfileModal from '../../../components/dashboard/EditProfileModal';
+import EditProfileModal from '../../../components/dashboard/components/EditProfileModal';
 
 const updateUserProfileMock = vi.fn();
 

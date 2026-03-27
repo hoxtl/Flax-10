@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import WordLoader from '../../../components/ui/WordLoader';
+import WordLoader from '../../../components/ui/components/WordLoader';
 
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,

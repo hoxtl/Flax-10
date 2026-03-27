@@ -52,7 +52,7 @@ vi.mock("../../../pages/group_work/utils/taskTimelineUtils", () => ({
   placeTasksIntoWeeks: (tasks) => ({ w1: { 0: tasks } }),
 }));
 
-import { useGroupTasksTabState } from "../../../pages/group_work/useGroupTasksTabState";
+import { useGroupTasksTabState } from "../../../pages/group_work/hooks/useGroupTasksTabState";
 import { handleTaskTitleKeyDown, useTaskTitleEdit } from "../../../pages/group_work/components/taskCardEditUtils";
 import TaskListView from "../../../pages/group_work/components/TaskListView";
 import TaskBoardView from "../../../pages/group_work/components/TaskBoardView";

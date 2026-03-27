@@ -37,23 +37,23 @@ vi.mock("../../../pages/homepage/components/PhotoWidget", () => ({
   default: (props) => <div data-testid="photo">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/ProductivityCards", () => ({
+vi.mock("../../../components/analytics/components/ProductivityCards", () => ({
   default: (props) => <div data-testid="productivity-cards">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/DailyBreakdownChart", () => ({
+vi.mock("../../../components/analytics/components/DailyBreakdownChart", () => ({
   default: (props) => <div data-testid="daily-breakdown">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/StudyHeatmap", () => ({
+vi.mock("../../../components/analytics/components/StudyHeatmap", () => ({
   default: (props) => <div data-testid="heatmap">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../components/analytics/AttendanceChart", () => ({
+vi.mock("../../../components/analytics/components/AttendanceChart", () => ({
   default: () => <div data-testid="attendance-chart">attendance</div>,
 }));
 
-vi.mock("../../../components/analytics/InsightCards", () => ({
+vi.mock("../../../components/analytics/components/InsightCards", () => ({
   ConsistencyScore: (props) => <div data-testid="consistency">{JSON.stringify(props)}</div>,
   PeakHoursCard: (props) => <div data-testid="peak-hours">{JSON.stringify(props)}</div>,
 }));

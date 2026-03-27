@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => ({
     }),
 }));
 
-import { BentoGrid, BentoCard } from '../../../components/ui/BentoGrid';
+import { BentoGrid, BentoCard } from '../../../components/ui/components/BentoGrid';
 
 describe('BentoGrid', () => {
     it('renders children', () => {

@@ -5,9 +5,9 @@
 import { useLocation } from "react-router-dom";
 
 import styles from "../DashboardLayout.module.css";
-import TopBar from "../../components/dashboard/Topbar";
-import Sidebar from "../../components/dashboard/Sidebar";
-import WeekBar from "../../components/dashboard/WeekBar";
+import TopBar from "../../components/dashboard/components/Topbar";
+import Sidebar from "../../components/dashboard/components/Sidebar";
+import WeekBar from "../../components/dashboard/components/WeekBar";
 
 function getContentStyle(activeNav) {
   if (activeNav === "map") return { padding: 0, overflow: "hidden", height: "100%" };

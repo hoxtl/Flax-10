@@ -6,7 +6,7 @@ import {
   societyDetailPageStateMocks,
 } from "./societyDetailPageTestUtils.jsx";
 
-import SocietyDetailPage from "../../pages/societies/SocietyDetailPage";
+import SocietyDetailPage from "../../pages/societies/components/SocietyDetailPage";
 
 const modalDataDefaults = {
   society: {

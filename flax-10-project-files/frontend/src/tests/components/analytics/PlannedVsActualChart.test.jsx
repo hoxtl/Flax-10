@@ -11,7 +11,7 @@ vi.mock('../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-import PlannedVsActualChart from '../../../components/analytics/PlannedVsActualChart';
+import PlannedVsActualChart from '../../../components/analytics/components/PlannedVsActualChart';
 
 const mockData = [
     { date: '2024-03-01', planned_hours: 2, actual_hours: 1.5 },

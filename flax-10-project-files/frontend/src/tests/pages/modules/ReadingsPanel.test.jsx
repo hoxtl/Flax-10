@@ -84,7 +84,7 @@ vi.mock("../../../pages/tasks/components/TaskInfoModal", () => ({
   ),
 }));
 
-import ReadingsPanel from "../../../pages/modules/ReadingsPanel.jsx";
+import ReadingsPanel from "../../../pages/modules/components/ReadingsPanel.jsx";
 
 const readings = [
   {

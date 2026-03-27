@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { GoalModal } from '../../../components/timer/TimerPopups';
+import { GoalModal } from '../../../components/timer/components/TimerPopups';
 
 const testRender = () => {
     render(<GoalModal sessions={4} workTime={1500} breakTime={300} onAction={() => { }} />);

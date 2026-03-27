@@ -25,22 +25,22 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-import AttendancePrompt from "../../../components/attendance/AttendancePrompt";
-import AttendancePromptModal from "../../../components/attendance/AttendancePromptModal";
+import AttendancePrompt from "../../../components/attendance/components/AttendancePrompt";
+import AttendancePromptModal from "../../../components/attendance/components/AttendancePromptModal";
 import {
   dismissAttendancePrompt,
   submitAttendancePromptAnswer,
-} from "../../../components/attendance/attendancePromptActions";
+} from "../../../components/attendance/utils/attendancePromptActions";
 import {
   isInPromptWindow,
   getDateRangeForPrompt,
   findCandidateEvent,
-} from "../../../components/attendance/attendancePromptUtils";
+} from "../../../components/attendance/utils/attendancePromptUtils";
 import {
   getPromptedIds,
   getSessionDismissedIds,
   setPromptedId,
-} from "../../../components/attendance/attendancePromptStorage";
+} from "../../../components/attendance/utils/attendancePromptStorage";
 
 const attendanceStatsState = { overall: { attended: 0, missed: 0 } };
 

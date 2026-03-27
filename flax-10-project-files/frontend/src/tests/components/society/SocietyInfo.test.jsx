@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../components/society/CategorySelector', () => ({
+vi.mock('../../../components/society/components/CategorySelector', () => ({
     default: ({ onChange }) => <div data-testid="category-selector"><button onClick={() => onChange(['Tech'])}>Select Cat</button></div>,
     CategoryDisplay: ({ category, editMode, onEdit }) => (
         <div data-testid="category-display">

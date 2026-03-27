@@ -19,7 +19,7 @@ vi.mock("../../../../api/moduleApi", () => ({
   getModules: (...args) => hoistedMocks.getModulesMock(...args),
 }));
 
-vi.mock("../../../../components/timer/taskInput/taskInputUtils", () => ({
+vi.mock("../../../../components/timer/task_input/taskInputUtils", () => ({
   buildListItems: (lists = []) => lists.map((list) => ({ value: list.id, label: list.name })),
   filterListItems: (items) => items,
   groupModuleItems: (items) => ({ All: items }),

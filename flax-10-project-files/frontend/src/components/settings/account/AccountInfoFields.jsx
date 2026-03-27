@@ -2,8 +2,8 @@
  * Account profile fields for personal details.
  */
 
-import styles from "../../../pages/settings/Settings.module.css";
-import { FormInput, FormSelect } from "../SettingsUI";
+import styles from "../../../pages/settings/styles/Settings.module.css";
+import { FormInput, FormSelect } from "../components/SettingsUI";
 import { YEAR_OPTIONS } from "./accountFormConfig";
 
 export function PersonalInfoFields({ formData, onChange }) {

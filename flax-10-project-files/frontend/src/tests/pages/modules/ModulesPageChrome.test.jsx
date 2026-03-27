@@ -78,7 +78,7 @@ import {
   ModulesPageModals,
   ModulesSkeleton,
   TestModeContent,
-} from "../../../pages/modules/ModulesPageChrome";
+} from "../../../pages/modules/components/ModulesPageChrome";
 
 const buildHookState = (overrides = {}) => ({
   enrollments: [],

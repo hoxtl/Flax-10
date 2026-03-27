@@ -3,7 +3,7 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../WordLoader.module.css";
+import styles from "../styles/WordLoader.module.css";
 
 const charVariants = {
   hidden: { opacity: 0, y: 10 },

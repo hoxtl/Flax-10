@@ -9,7 +9,7 @@ const conflictMocks = vi.hoisted(() => ({
   buildConflictResolutionToastMessage: vi.fn(),
 }));
 
-vi.mock("../../../../pages/homepage/utils/index", () => ({
+vi.mock("../../../../pages/homepage/utils", () => ({
   formatTime: vi.fn(() => "09:00"),
   getAllFreeWindowsToday: vi.fn(() => []),
   getNextFreeSlotToday: vi.fn(() => null),
