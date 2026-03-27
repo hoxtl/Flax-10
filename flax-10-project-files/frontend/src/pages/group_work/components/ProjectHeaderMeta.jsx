@@ -5,12 +5,11 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
-import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
-import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
+import { getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
 import MemberAvatar from "./MemberAvatar";
@@ -177,7 +176,7 @@ function TeamManageToggle({ isEditing, onToggle }) {
   );
 }
 
-  function useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject) {
+function useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject) {
   const [showOwnerModal, setShowOwnerModal] = useState(false);
   const soloOwnerId = getSoloOwnerId(teamMembers);
   const handleRemove = (id) => (soloOwnerId && String(id) === String(soloOwnerId) ? setShowOwnerModal(true) : onMemberRemove(id));
@@ -191,8 +190,8 @@ function TeamManageToggle({ isEditing, onToggle }) {
   return { handleRemove, ownerModal, allowOwnerRemove: Boolean(soloOwnerId) };
 }
 
-  function getSoloOwnerId(members) {
-    if (members.length !== 1) return null;
-    const [member] = members;
-    return member?.role === "owner" ? member.id : null;
-  }
+function getSoloOwnerId(members) {
+  if (members.length !== 1) return null;
+  const [member] = members;
+  return member?.role === "owner" ? member.id : null;
+}
