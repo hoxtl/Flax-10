@@ -1,3 +1,7 @@
+/*
+ * Member avatar utility tests for names, colours, photos, and profile links.
+ */
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   MEMBER_PALETTE,
@@ -17,6 +21,31 @@ import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 vi.mock('../../../utils/tutorPhotoFallback.js', () => ({
   getResolvedUserPhoto: vi.fn(() => 'https://example.com/photo.jpg'),
 }));
+
+function buildPhotoMember() {
+  return {
+    user: 7,
+    user_name: 'ava',
+    first_name: 'Ava',
+    last_name: 'Stone',
+    role: 'lead',
+    profile_photo_url: '/avatar.png',
+    profile_photo: '/avatar-full.png',
+    avatar: '/avatar-fallback.png',
+  };
+}
+
+const PHOTO_MEMBER_EXPECTATION = {
+  id: 7,
+  username: 'ava',
+  first_name: 'Ava',
+  last_name: 'Stone',
+  name: 'Ava Stone',
+  role: 'lead',
+  profile_photo_url: '/avatar.png',
+  profile_photo: '/avatar-full.png',
+  avatar: '/avatar-fallback.png',
+};
 
 describe('memberAvatarUtils – MEMBER_PALETTE', () => {
   it('is an array of colour strings', () => {
@@ -105,31 +134,11 @@ describe('memberAvatarUtils – getMemberColor', () => {
 });
 
 describe('memberAvatarUtils – getPhotoUrl', () => {
-  it('passes normalized member data to the tutor photo fallback helper', () => {
-    const member = {
-      user: 7,
-      user_name: 'ava',
-      first_name: 'Ava',
-      last_name: 'Stone',
-      role: 'lead',
-      profile_photo_url: '/avatar.png',
-      profile_photo: '/avatar-full.png',
-      avatar: '/avatar-fallback.png',
-    };
-
+  it('passes normalised member data to the tutor photo fallback helper', () => {
+    const member = buildPhotoMember();
     expect(getPhotoUrl(member)).toBe('https://example.com/photo.jpg');
     expect(getResolvedUserPhoto).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 7,
-        username: 'ava',
-        first_name: 'Ava',
-        last_name: 'Stone',
-        name: 'Ava Stone',
-        role: 'lead',
-        profile_photo_url: '/avatar.png',
-        profile_photo: '/avatar-full.png',
-        avatar: '/avatar-fallback.png',
-      }),
+      expect.objectContaining(PHOTO_MEMBER_EXPECTATION),
       { seed: 'ava', allowGeneric: true },
     );
   });
