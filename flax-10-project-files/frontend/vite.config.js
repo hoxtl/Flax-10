@@ -1,18 +1,27 @@
 import { defineConfig } from 'vite'
+import { readFileSync } from 'fs'
+import { dirname, resolve } from 'path'
 import react from '@vitejs/plugin-react'
+import postcssImport from 'postcss-import'
+import { patchCssModules } from 'vite-css-modules'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: '127.0.0.1',
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
+  build: {
+    manifest: true,
+    emptyOutDir: true,
+  },
+  css: {
+    postcss: {
+      plugins: [
+        postcssImport(), // resolves @import in .module.css before CSS Modules scoping
+      ],
     },
   },
+  plugins: [
+    patchCssModules(),
+    react(),
+  ],
   test: {
     globals: true,
     environment: 'jsdom',
