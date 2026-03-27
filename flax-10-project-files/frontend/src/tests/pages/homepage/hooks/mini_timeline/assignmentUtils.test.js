@@ -66,6 +66,29 @@ describe("deriveBestFreeRowId", () => {
   it("handles null suggestableTasks gracefully", () => {
     expect(() => deriveBestFreeRowId([FREE_ROW_A], null, NOW)).not.toThrow();
   });
+
+  it("prefers a high-priority task when due dates match across rows", () => {
+    const sameDue = "2024-06-02T10:00:00Z";
+    const mediumTask = {
+      id: "medium-1",
+      title: "Medium task",
+      priority: "medium",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: sameDue,
+    };
+    const urgentTask = {
+      id: "urgent-1",
+      title: "Urgent task",
+      priority: "urgent",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: sameDue,
+    };
+
+    const result = deriveBestFreeRowId([FREE_ROW_B, FREE_ROW_A], [mediumTask, urgentTask], NOW);
+    expect(result).toBe("row-a");
+  });
 });
 
 // deriveAssignedGapTasks
@@ -195,6 +218,66 @@ describe("deriveAssignedGapTasks", () => {
     // nextMap for row-a should equal map[row-b]
     expect(result.nextMap["row-a"]).toEqual(result.map["row-b"] || null);
   });
+
+  it("prefers overdue tasks over non-overdue tasks when both fit", () => {
+    const overdue = {
+      id: "overdue-1",
+      title: "Overdue task",
+      priority: "low",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: "2024-05-01T00:00:00Z",
+    };
+    const future = {
+      id: "future-1",
+      title: "Future task",
+      priority: "urgent",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: "2024-06-20T00:00:00Z",
+    };
+
+    const result = deriveAssignedGapTasks(
+      [FREE_ROW_A],
+      [future, overdue],
+      NOW,
+      emptySkipped,
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result.map["row-a"]).toMatchObject({ id: "overdue-1" });
+  });
+
+  it("prefers the longer fitting task when rank ties exactly", () => {
+    const shorter = {
+      id: "short-1",
+      title: "Short task",
+      priority: "medium",
+      estimated_blocks: 1,
+      completed: false,
+      due_date: "2024-06-20T00:00:00Z",
+    };
+    const longer = {
+      id: "long-1",
+      title: "Long task",
+      priority: "medium",
+      estimated_blocks: 2,
+      completed: false,
+      due_date: "2024-06-20T00:00:00Z",
+    };
+
+    const result = deriveAssignedGapTasks(
+      [FREE_ROW_A],
+      [shorter, longer],
+      NOW,
+      emptySkipped,
+      emptySlottedIds,
+      emptySlottedTitles,
+    );
+
+    expect(result.map["row-a"]).toMatchObject({ id: "long-1" });
+  });
 });
 
 // deriveGapDeadlineFallbacks
@@ -283,5 +366,17 @@ describe("deriveGapDeadlineFallbacks", () => {
     );
     expect(result["row-busy"]).toBeUndefined();
     expect(result["row-a"]).toEqual(SUGGESTION_A);
+  });
+
+  it("stops assigning once suggestions run out", () => {
+    const result = deriveGapDeadlineFallbacks(
+      [FREE_ROW_A, FREE_ROW_B],
+      { map: {} },
+      [SUGGESTION_A],
+      new Set(),
+    );
+
+    expect(result["row-a"]).toEqual(SUGGESTION_A);
+    expect(result["row-b"]).toBeUndefined();
   });
 });

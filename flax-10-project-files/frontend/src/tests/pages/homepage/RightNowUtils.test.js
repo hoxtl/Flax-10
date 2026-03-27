@@ -92,4 +92,30 @@ describe("RightNowUtils", () => {
     expect(info).toMatchObject({ urgency: "info", hasSevere: false, lineName: "Northern", severity: "Minor delays", eventTitle: "Seminar", eventTime: "11:00" });
     expect(info.message).toContain("Leave by");
   });
+
+  it("builds urgent leave-by contexts shortly before departure", () => {
+    const urgent = getLeaveByInfo(
+      { title: "Workshop", start_time: "2026-03-24T10:00:00.000Z" },
+      [{ lineName: "Victoria", severityDescription: "Minor delays" }],
+      new Date("2026-03-24T09:40:00.000Z").getTime(),
+    );
+    expect(urgent).toMatchObject({ urgency: "urgent", hasSevere: false, lineName: "Victoria" });
+    expect(urgent.message).toContain("Leave in");
+  });
+
+  it("falls back to the default event title and journey mode formatting", () => {
+    expect(getJourneySummary({
+      duration: 15,
+      legs: [{ mode: "bus_route", routeOptions: [] }],
+    })).toEqual({ duration: "15 min", mode: "bus route", lines: [] });
+
+    const info = getLeaveByInfo(
+      { start_time: "2026-03-24T11:00:00.000Z" },
+      [{ severityDescription: "Minor delays" }],
+      new Date("2026-03-24T09:00:00.000Z").getTime(),
+    );
+    expect(info.lineName).toBe("TfL");
+    expect(info.eventTitle).toBe("your next event");
+    expect(info.message).toContain("your next event");
+  });
 });

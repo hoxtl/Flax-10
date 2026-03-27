@@ -126,6 +126,23 @@ describe("homepageTimelineUtils", () => {
     expect(adjacent.map((r) => r.type)).toEqual(["item", "item"]);
   });
 
+  it("treats touching events as separate singles and marks long gaps as non-quick wins", () => {
+    const touching = groupOverlaps([
+      { id: 21, start_time: "2026-03-24T09:00Z", end_time: "2026-03-24T10:00Z" },
+      { id: 22, start_time: "2026-03-24T10:00Z", end_time: "2026-03-24T11:00Z" },
+    ]);
+    expect(touching.map((g) => g.type)).toEqual(["single", "single"]);
+
+    const timeline = computeTimelineWithGaps(
+      [
+        { id: 23, start_time: "2026-03-24T09:00Z", end_time: "2026-03-24T10:00Z" },
+        { id: 24, start_time: "2026-03-24T11:30Z", end_time: "2026-03-24T12:00Z" },
+      ],
+      [{ id: 103, title: "Long gap task", estimated_blocks: 2 }],
+    );
+    expect(timeline[1]).toMatchObject({ type: "gap", minutes: 90, isQuickWin: false, suggestedTask: { id: 103 } });
+  });
+
   it("determines smart window labels by time of day appropriately", () => {
     expect(getSmartWindowLabel(new Date("2026-03-24T06:30:00.000Z")).variant).toBe("default");
     expect(getSmartWindowLabel(new Date("2026-03-24T09:00:00.000Z")).variant).toBe("morning");
@@ -133,6 +150,8 @@ describe("homepageTimelineUtils", () => {
     expect(getSmartWindowLabel(new Date("2026-03-24T19:00:00.000Z")).variant).toBe("evening");
     expect(getSmartWindowLabel(new Date("2026-03-24T03:00:00.000Z")).variant).toBe("default");
     expect(getSmartWindowLabel("2026-03-24T06:30:00.000Z").variant).toBe("default");
+    expect(getSmartWindowLabel(new Date("2026-03-24T07:59:00.000Z")).label).toContain("Early Window");
+    expect(getSmartWindowLabel(new Date("2026-03-24T16:00:00.000Z")).label).toContain("Focus Window");
   });
 
   it("calculates absolute timeline duration metrics", () => {

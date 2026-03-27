@@ -101,4 +101,19 @@ describe("useSleepWindow", () => {
 
     await waitFor(() => expect(getUserSettings).toHaveBeenCalledTimes(1));
   });
+
+  it("does not update state after unmount if the request resolves later", async () => {
+    let resolveSettings;
+    getUserSettings.mockReturnValue(new Promise((resolve) => {
+      resolveSettings = resolve;
+    }));
+
+    const { result, unmount } = renderHook(() => useSleepWindow());
+
+    unmount();
+    resolveSettings({ sleep_time: "21:15:00", wake_time: "05:45:00" });
+
+    await Promise.resolve();
+    expect(result.current).toEqual(DEFAULT_SLEEP_WINDOW);
+  });
 });

@@ -150,4 +150,99 @@ describe("groupWorkHooks", () => {
     fireEvent.click(screen.getByText("add detail member"));
     expect(screen.getByTestId("detail-members").textContent.match(/New member/g)).toHaveLength(1);
   });
+
+  it("returns null when the URL does not contain a selected project id", async () => {
+    locationState.search = "?tab=tasks";
+    render(<HookHarness />);
+    await waitFor(() => expect(screen.getByTestId("projects-loading").textContent).toBe("false"));
+    expect(screen.getByTestId("selected-project-id").textContent).toBe("null");
+    expect(screen.getByTestId("selected-tab").textContent).toBe("tasks");
+  });
+
+  it("handles fetchGroupProjects returning null (useGroupProjects fallback)", async () => {
+    fetchGroupProjectsMock.mockResolvedValue(null);
+    render(<HookHarness />);
+    await waitFor(() => expect(screen.getByTestId("projects-loading").textContent).toBe("false"));
+    expect(screen.getByTestId("projects").textContent).toBe("[]");
+  });
+
+  it("handles fetchProjectMembers returning null (useProjectMembers fallback)", async () => {
+    fetchProjectMembersMock.mockResolvedValue(null);
+    render(<HookHarness />);
+    await waitFor(() => expect(screen.getByTestId("projects-loading").textContent).toBe("false"));
+    expect(screen.getByTestId("members").textContent).toBe("[]");
+  });
+
+  it("handles findProjectById when projects is null (useProject fallback)", async () => {
+    fetchGroupProjectsMock.mockResolvedValue(null);
+    render(<HookHarness />);
+    await waitFor(() => expect(screen.getByTestId("project-loading").textContent).toBe("false"));
+    expect(screen.getByTestId("project").textContent).toBe("null");
+  });
+
+  it("handles patchGroupProject returning null (updateProject early return)", async () => {
+    patchGroupProjectMock.mockResolvedValue(null);
+    const onUpdate = vi.fn();
+    render(<HookHarness onUpdate={onUpdate} />);
+    await waitFor(() => expect(screen.getByTestId("projects").textContent).toContain("Alpha"));
+
+    fireEvent.click(screen.getByText("patch"));
+    await waitFor(() => expect(patchGroupProjectMock).toHaveBeenCalled());
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
+  it("handles removeProjectMember when response.ok is false", async () => {
+    deleteProjectMemberMock.mockResolvedValue({ ok: false });
+    render(<HookHarness />);
+    await waitFor(() => expect(screen.getByTestId("members").textContent).toContain("Alice"));
+
+    fireEvent.click(screen.getByText("remove member"));
+    await waitFor(() => expect(deleteProjectMemberMock).toHaveBeenCalled());
+    // Member should still be present since removal failed
+    expect(screen.getByTestId("members").textContent).toContain("Alice");
+  });
+
+  it("handles deleteProject when response.ok is false", async () => {
+    deleteGroupProjectMock.mockResolvedValue({ ok: false });
+    const onDelete = vi.fn();
+    const onBack = vi.fn();
+    render(<HookHarness onDelete={onDelete} onBack={onBack} />);
+    await waitFor(() => expect(screen.getByTestId("projects").textContent).toContain("Alpha"));
+
+    fireEvent.click(screen.getByText("delete project"));
+    await waitFor(() => expect(deleteGroupProjectMock).toHaveBeenCalled());
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(onBack).not.toHaveBeenCalled();
+  });
+
+  it("calls onBack when deleteProject succeeds but onDelete is not provided", async () => {
+    const onBack = vi.fn();
+    // Pass undefined for onDelete so the else branch triggers onBack
+    function HarnessNoOnDelete() {
+      const projectsState = useGroupProjects();
+      const sortState = useGroupProjectSort("priority");
+      const selectedProjectId = useSelectedProjectId();
+      const selectedTab = useSelectedTab();
+      const projectState = useProject(12);
+      const membersState = useProjectMembers(12);
+      const actionState = useProjectActions(12, projectState.setProject, membersState.setMembers, onBack, undefined, vi.fn());
+      const detailState = useProjectDetail(12, onBack, undefined, vi.fn());
+      return <HookHarnessView values={buildHookValues(projectsState, sortState, selectedProjectId, selectedTab, projectState, membersState, detailState)} actions={buildHookActions(sortState, actionState, detailState)} />;
+    }
+    render(<HarnessNoOnDelete />);
+    await waitFor(() => expect(screen.getByTestId("projects").textContent).toContain("Alpha"));
+
+    fireEvent.click(screen.getByText("delete project"));
+    await waitFor(() => expect(onBack).toHaveBeenCalled());
+  });
+
+  it("matches project ids even when the input type differs", async () => {
+    function NumericProjectHarness() {
+      const projectState = useProject("12");
+      return <div data-testid="project">{JSON.stringify(projectState.project)}</div>;
+    }
+
+    render(<NumericProjectHarness />);
+    await waitFor(() => expect(screen.getByTestId("project").textContent).toContain("Alpha"));
+  });
 });

@@ -183,6 +183,17 @@ describe('usePaginatedItems', () => {
     expect(result.current.pageItems).toEqual([]);
     expect(result.current.totalPages).toBe(1);
   });
+
+  it('clamps requested pages below 1 and above the total range', () => {
+    const { result } = renderHook(() => usePaginatedItems(items, 10));
+
+    act(() => { result.current.setCurrentPage(0); });
+    expect(result.current.currentPage).toBe(1);
+
+    act(() => { result.current.setCurrentPage(99); });
+    expect(result.current.currentPage).toBe(3);
+    expect(result.current.pageItems.map((item) => item.id)).toEqual([21, 22, 23, 24, 25]);
+  });
 });
 
 describe('useUsersTabState', () => {

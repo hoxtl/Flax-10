@@ -313,6 +313,80 @@ describe("UsersGrid", () => {
     // Two pagination components rendered (top + bottom)
     expect(screen.getAllByTestId("pagination").length).toBeGreaterThanOrEqual(1);
   });
+
+  it("does not render the empty state while users are still loading", () => {
+    render(
+      <UsersGrid
+        users={[]}
+        onNavChange={vi.fn()}
+        loading={true}
+        currentPage={1}
+        totalPages={1}
+        setCurrentPage={vi.fn()}
+        searchQuery=""
+      />
+    );
+
+    expect(screen.queryByText("No users found")).toBeNull();
+    expect(screen.getByTestId("back-to-top")).toBeInTheDocument();
+  });
+
+  it("renders teacher metadata and stops button click bubbling on view profile", () => {
+    const onNavChange = vi.fn();
+    const users = [{
+      id: 10,
+      username: "prof",
+      first_name: "Ada",
+      last_name: "Lovelace",
+      role: "teacher",
+      major: "",
+      bio: "Algorithms and systems.",
+      modules: ["CS1", "CS2", "CS3", "CS4", "CS5"],
+    }];
+
+    render(
+      <UsersGrid
+        users={users}
+        onNavChange={onNavChange}
+        loading={false}
+        currentPage={1}
+        totalPages={1}
+        setCurrentPage={vi.fn()}
+        searchQuery=""
+      />
+    );
+
+    expect(screen.getByText("Professor")).toBeInTheDocument();
+    expect(screen.getByText("Department: Teaching staff")).toBeInTheDocument();
+    expect(screen.getByText("Algorithms and systems.")).toBeInTheDocument();
+    expect(screen.getByText("+2")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("View Profile"));
+    expect(onNavChange).toHaveBeenCalledTimes(1);
+    expect(onNavChange).toHaveBeenCalledWith("profile_10");
+  });
+
+  it("filters the current user out of the visible grid", () => {
+    localStorage.setItem("user", JSON.stringify({ id: 5, username: "me" }));
+
+    render(
+      <UsersGrid
+        users={[
+          { id: 5, username: "me", first_name: "My", last_name: "Self" },
+          { id: 8, username: "other", first_name: "Other", last_name: "Person" },
+        ]}
+        onNavChange={vi.fn()}
+        loading={false}
+        currentPage={1}
+        totalPages={1}
+        setCurrentPage={vi.fn()}
+        searchQuery=""
+      />
+    );
+
+    expect(screen.queryByText("@me")).toBeNull();
+    expect(screen.getByText("@other")).toBeInTheDocument();
+  });
 });
 
 // ── discoverHooks – pagination reset ─────────────────────────────────────────

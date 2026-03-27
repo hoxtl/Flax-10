@@ -141,4 +141,30 @@ describe('AnalyticsPage', () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => expect(screen.getByText(/Failed to load analytics data/)).toBeTruthy());
     });
+
+    it('shows the no-sessions empty state and dispatches navigation to timer', async () => {
+        analyticsService.getSummary.mockResolvedValueOnce({
+            summary: {
+                total_study_hours: 0,
+                total_sessions: 0,
+                avg_session_minutes: 0,
+                current_streak_days: 0,
+                longest_session_minutes: 0,
+                active_days: 0,
+            },
+            period_days: 30,
+        });
+        analyticsService.getProgress.mockResolvedValueOnce({});
+        analyticsService.getThemeStats.mockResolvedValueOnce({});
+        const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
+
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
+
+        await waitFor(() => expect(screen.getByText('No study data yet')).toBeTruthy());
+        fireEvent.click(screen.getByText('Open Timer'));
+        expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'navigate',
+            detail: 'timer',
+        }));
+    });
 });
