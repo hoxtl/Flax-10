@@ -4,7 +4,7 @@
 
 import { useCallback, useState } from "react";
 import { formatTime, getNextFreeSlotToday } from "../utils/index";
-import { buildScheduleAutoForm } from "../utils/ScheduleAutoForm";
+import { buildScheduleAutoForm } from "../utils/scheduleAutoForm";
 import { overlapsDay, isToday } from "../../../components/calendar/utils/dateUtils";
 import { extractBaseEventId } from "../../../components/calendar/utils/eventUtils";
 import { loadScheduleSettings, submitAutoScheduleWithPrefs } from "../../../components/schedules/auto/autoScheduleActions";

@@ -67,7 +67,7 @@ vi.mock('../components/onboarding/OnboardingModal', () => ({
     default: ({ isOpen, onComplete }) => isOpen ? <div data-testid="onboarding-modal"><button onClick={onComplete}>Complete onboarding</button></div> : null,
 }));
 
-vi.mock('../components/Notifications', () => ({
+vi.mock('../components/notifications', () => ({
     NotificationToast: () => null,
 }));
 

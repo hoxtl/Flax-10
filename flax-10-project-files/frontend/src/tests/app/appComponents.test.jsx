@@ -81,7 +81,7 @@ vi.mock("../../context/TaskCompletionContext", () => ({
   TaskCompletionProvider: ({ children }) => <div data-testid="task-completion-provider">{children}</div>,
 }));
 
-vi.mock("../../components/Notifications", () => ({
+vi.mock("../../components/notifications", () => ({
   NotificationToast: () => <div>NotificationToast</div>,
 }));
 
