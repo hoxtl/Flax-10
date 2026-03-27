@@ -239,10 +239,12 @@
 .dot {
   width: 7px;
   height: 7px;
-  background: var(--ai-chat-dot);
+  background: color-mix(in srgb, var(--text) 88%, black 12%);
   border-radius: 50%;
-  animation: bounce 1s infinite;
+  animation: bounce 0.95s infinite ease-in-out;
   display: inline-block;
+  box-shadow: 0 0 0 1px color-mix(in srgb, black 8%, transparent);
+  opacity: 0.95;
 }
 
 @keyframes bounce {
