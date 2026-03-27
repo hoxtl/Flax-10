@@ -138,11 +138,16 @@ describe("Timer sections", () => {
     expect(screen.getByText("Overtime work")).toBeInTheDocument();
     expect(screen.getByText("Overtime break")).toBeInTheDocument();
 
+    render(<PopupSection t={{ ...t, modal: "goal" }} showHistory={false} onCloseHistory={vi.fn()} />);
+    expect(screen.getByText("Goal modal")).toBeInTheDocument();
+
     render(<PopupSection t={{ ...t, modal: "break" }} showHistory={false} onCloseHistory={vi.fn()} />);
     expect(screen.getByText("Break modal")).toBeInTheDocument();
 
     render(<PopupSection t={{ ...t, modal: "endEarly" }} showHistory={false} onCloseHistory={vi.fn()} />);
     expect(screen.getByText("End early")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Cancel end early"));
+    expect(t.setModal).toHaveBeenCalledWith(null);
   });
 
   it("skips rendering when disabled and hides the break modal when autostart is enabled", () => {
@@ -154,6 +159,18 @@ describe("Timer sections", () => {
 
     rerender(<PopupSection t={{ ...t, modal: "break" }} showHistory={false} onCloseHistory={vi.fn()} />);
     expect(screen.queryByText("Break modal")).not.toBeInTheDocument();
+  });
+
+  it("uses goal-state fallbacks when break timing values are missing", () => {
+    render(
+      <PopupSection
+        t={{ ...t, modal: "endEarly", mode: "break", breakTime: 0, timeLeft: undefined }}
+        showHistory={false}
+        onCloseHistory={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("End early")).toBeInTheDocument();
   });
 
   it("renders and interacts with the focus overlay", () => {

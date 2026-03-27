@@ -66,4 +66,9 @@ describe('FocusAnimation', () => {
             ).not.toThrow();
         }
     );
+
+    it('hides the picker when showPicker is false', () => {
+        render(<FocusAnimation progress={0.5} mode="work" isActive={false} showPicker={false} />);
+        expect(screen.queryByTitle('Tree')).not.toBeInTheDocument();
+    });
 });

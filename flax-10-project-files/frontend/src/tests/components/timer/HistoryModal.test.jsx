@@ -107,6 +107,26 @@ const testCancelClearViaOverlay = async () => {
     expect(historyUtils.clearHistory).not.toHaveBeenCalled();
 };
 
+const testUncompletedBlockWithPause = async () => {
+    historyUtils.getHistory.mockResolvedValue([{
+        id: 77,
+        startTime: new Date().toISOString(),
+        endTime: new Date().toISOString(),
+        duration: 25,
+        breakDuration: 0,
+        pauseDuration: 120,
+        studyBlockId: 'block_incomplete',
+        status: 'Incomplete',
+    }]);
+    render(
+        <ConfirmProvider>
+            <HistoryModal onClose={onClose} />
+        </ConfirmProvider>
+    );
+    await screen.findByText('❌ Uncompleted');
+    expect(screen.getByText(/Pause/)).toBeInTheDocument();
+};
+
 describe('HistoryModal', () => {
     beforeEach(setupWrapper);
     it('renders empty state correctly', testEmptyState);
@@ -117,4 +137,5 @@ describe('HistoryModal', () => {
     it('shows singular Session for exactly 1 completed session', testSingularSession);
     it('shows task label when block has a task', testBlockWithTask);
     it('cancels clear by clicking confirm overlay', testCancelClearViaOverlay);
+    it('shows uncompleted and pause pills for incomplete paused blocks', testUncompletedBlockWithPause);
 });
