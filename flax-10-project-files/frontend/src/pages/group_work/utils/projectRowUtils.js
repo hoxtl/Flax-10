@@ -142,6 +142,7 @@ export function openTeacherProfile(event, project) {
 export function compareProjectsBySort(left, right, sortBy) {
   if (sortBy === "name-desc") return compareNames(right, left);
   if (sortBy === "name") return compareNames(left, right);
+  if (sortBy === "due-date-desc") return compareDeadlines(right, left) || compareCompletion(right, left) || compareNames(left, right);
   if (sortBy === "created-desc") return compareCreatedDates(right, left);
   if (sortBy === "created-asc") return compareCreatedDates(left, right);
   if (sortBy === "most-members") return compareMemberCounts(right, left);

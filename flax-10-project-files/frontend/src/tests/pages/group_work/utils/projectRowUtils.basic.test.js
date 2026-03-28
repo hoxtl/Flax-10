@@ -179,6 +179,11 @@ describe('projectRowUtils – compareProjectsBySort (basic)', () => {
   it('sorts by least members and completed tasks', () => {
     expect(compareProjectsBySort(alpha, beta, 'least-members')).toBeLessThan(0);
     expect(compareProjectsBySort(alpha, beta, 'most-completed')).toBeGreaterThan(0);
+    expect(compareProjectsBySort(
+      { ...alpha, deadline: '2026-03-01' },
+      { ...beta, deadline: '2026-03-10' },
+      'due-date-desc',
+    )).toBeGreaterThan(0);
   });
 
   it('identifies identical projects in default sort tie-breaker', () => {
