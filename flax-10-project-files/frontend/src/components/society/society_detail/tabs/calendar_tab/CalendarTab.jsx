@@ -184,7 +184,7 @@ function SocietyEventModal({ eventHandlers, tags, editMode }) {
     if (!isModalOpen || !editMode) return null;
     return (
         <EventModal event={modalEvent} initialDate={modalInitialDate} onClose={closeModal}
-            showReminder={false} customTags={tags}
+            showReminder={false} showTagManager={false} customTags={tags}
             onSubmit={(data) => handleModalSubmit(data, modalEvent, eventHandlers, closeModal)}
             onDelete={modalEvent?.id ? () => onDelete(modalEvent) : null} />
     );

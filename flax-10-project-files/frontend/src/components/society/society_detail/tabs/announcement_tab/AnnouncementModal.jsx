@@ -57,7 +57,7 @@ function FormFields({ form, update, setForm, fileRef, tags }) {
         <div className={styles.form}>
             <FormField label="Title *" value={form.title} onChange={(e) => update("title", e.target.value)} />
             <FormField label="Description" type="textarea" value={form.content} onChange={(e) => update("content", e.target.value)} />
-            <TagField value={form.tag} onChange={(e) => update("tag", e.target.value)} customTags={tags} />
+            <TagField value={form.tag} onChange={(e) => update("tag", e.target.value)} customTags={tags} showManager={false} />
             <ImagesField images={form.images} fileRef={fileRef} onChange={(v) => update("images", v)} />
             <ToggleField label="Pin this announcement" checked={form.pinned} onChange={(v) => update("pinned", v)} />
             <EventSection form={form} update={update} setForm={setForm} />
@@ -130,8 +130,8 @@ function EventFields({ form, update, setForm }) {
 
     return (
         <div className={styles.eventFields}>
-            <TimeRow form={form} update={updateTime} setForm={setForm} />
-            <RecurrenceField value={form.recurrence} onChange={setRecurrence} />
+            <TimeRow form={form} update={updateTime} setForm={setForm} recurrenceValue={form.recurrence} onRecurrenceChange={setRecurrence} />
+            <RecurrenceField value={form.recurrence} onChange={setRecurrence} hideFrequency />
         </div>
     );
 }
