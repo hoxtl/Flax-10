@@ -4,8 +4,9 @@
  */
 
 import { validateEventTimes } from '../../../../calendar/utils/dateValidation';
+import { readImageFile, resetFileInput } from '../../../../../utils/imageFile';
 
-export const MAX_IMAGES = 5;
+export const MAX_IMAGES = 1;
 
 export function getInitialForm(announcement) {
     const base = {
@@ -45,11 +46,5 @@ export function validateForm(form) {
 }
 
 export function handleFileSelect(file, onAdd, fileRef) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        onAdd(e.target.result);
-        if (fileRef.current) fileRef.current.value = "";
-    };
-    reader.readAsDataURL(file);
+    readImageFile(file, onAdd, () => resetFileInput(fileRef));
 }

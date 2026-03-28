@@ -23,8 +23,8 @@ describe('AnnouncementModalHelpers', () => {
   });
 
   describe('MAX_IMAGES', () => {
-    it('is 5', () => {
-      expect(MAX_IMAGES).toBe(5);
+    it('is 1', () => {
+      expect(MAX_IMAGES).toBe(1);
     });
   });
 

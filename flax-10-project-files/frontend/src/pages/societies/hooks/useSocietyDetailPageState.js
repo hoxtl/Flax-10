@@ -35,11 +35,10 @@ function useModalCoreState() {
 }
 
 function useModalDialogState() {
-  const [showCoverModal, setShowCoverModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
-  return { showCoverModal, setShowCoverModal, showSettings, setShowSettings, showReportModal, setShowReportModal, showMembersModal, setShowMembersModal };
+  return { showSettings, setShowSettings, showReportModal, setShowReportModal, showMembersModal, setShowMembersModal };
 }
 
 function useModalState() {
