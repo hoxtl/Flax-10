@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for the daily goal widget and editor behaviour.
+ */
+
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -13,6 +16,10 @@ vi.mock("../../../../api/analyticsApi", () => ({
 }));
 
 import { DailyGoalWidget, GoalEditor } from "../../../../components/timer/presets/DailyGoalWidget";
+
+function renderGoalEditor(overrides = {}) {
+  return render(<GoalEditor editingGoal goalInput="3" setGoalInput={vi.fn()} setGoalHours={vi.fn()} setEditingGoal={vi.fn()} {...overrides} />);
+}
 
 describe("DailyGoalWidget coverage topups", () => {
   beforeEach(() => {
@@ -44,56 +51,27 @@ describe("DailyGoalWidget coverage topups", () => {
     expect(setEditingGoal).toHaveBeenCalledWith(true);
   });
 
-  it("persists valid goal input and closes invalid or escaped edits", () => {
+  it("closes invalid goal edits on blur", () => {
     const setGoalInput = vi.fn();
     const setGoalHours = vi.fn();
     const setEditingGoal = vi.fn();
-
-    const { rerender } = render(
-      <GoalEditor
-        editingGoal
-        goalInput="abc"
-        setGoalInput={setGoalInput}
-        setGoalHours={setGoalHours}
-        setEditingGoal={setEditingGoal}
-      />,
-    );
-
+    renderGoalEditor({ goalInput: "abc", setGoalInput, setGoalHours, setEditingGoal });
     fireEvent.blur(screen.getByRole("spinbutton"));
     expect(setGoalHours).not.toHaveBeenCalled();
     expect(setEditingGoal).toHaveBeenCalledWith(false);
+  });
 
-    rerender(
-      <GoalEditor
-        editingGoal
-        goalInput="2.5"
-        setGoalInput={setGoalInput}
-        setGoalHours={setGoalHours}
-        setEditingGoal={setEditingGoal}
-      />,
-    );
-
+  it("persists valid goal input on Enter", () => {
+    const setGoalHours = vi.fn();
+    renderGoalEditor({ goalInput: "2.5", setGoalHours, setEditingGoal: vi.fn() });
     fireEvent.keyDown(screen.getByRole("spinbutton"), { key: "Enter" });
     expect(setGoalHours).toHaveBeenCalledWith(2.5);
     expect(localStorage.getItem("timerDailyGoalHours")).toBe("2.5");
-
-    fireEvent.keyDown(screen.getByRole("spinbutton"), { key: "Escape" });
-    expect(setEditingGoal).toHaveBeenCalledWith(false);
   });
 
   it("closes the goal editor when Escape is pressed on a fresh edit", () => {
     const setEditingGoal = vi.fn();
-
-    render(
-      <GoalEditor
-        editingGoal
-        goalInput="3"
-        setGoalInput={vi.fn()}
-        setGoalHours={vi.fn()}
-        setEditingGoal={setEditingGoal}
-      />,
-    );
-
+    renderGoalEditor({ setEditingGoal });
     fireEvent.keyDown(screen.getByRole("spinbutton"), { key: "Escape" });
     expect(setEditingGoal).toHaveBeenCalledWith(false);
   });
