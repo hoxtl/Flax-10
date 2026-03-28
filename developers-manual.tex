@@ -77,9 +77,6 @@ environment. Installation of the operating system itself is assumed.
     \item \textbf{Git}\\
           \url{https://git-scm.com/downloads}
 
-    \item \textbf{Docker Desktop} (Windows users only)\\
-          \url{https://www.docker.com/products/docker-desktop/}
-
     \item \textbf{Python} (v3.12 recommended for manual local setup)\\
           \url{https://www.python.org/downloads/}
 
@@ -158,61 +155,6 @@ nix run .#run
 \begin{lstlisting}[language=bash]
 nix run .#tests
 \end{lstlisting}
-\end{enumerate}
-
-\section{Windows (via Docker Desktop)}
-
-On Windows, Nix is run inside a Docker container using the official
-NixOS image.
-
-\begin{enumerate}
-    \item Open the Docker Desktop terminal.
-
-    \item Navigate to the repository folder:
-\begin{lstlisting}[language=bash]
-cd \path\to\Flax-10
-\end{lstlisting}
-
-    \item Create a persistent Nix store volume:
-\begin{lstlisting}[language=bash]
-docker volume create nix-store
-\end{lstlisting}
-
-    \item Launch the NixOS container. In PowerShell, use a backtick
-          (\texttt{`}) for line continuation:
-\begin{lstlisting}[language=bash]
-docker run --rm -it `
-    -v "${PWD}:/work" `
-    -v nix-store:/nix `
-    -w /work `
-    nixos/nix:latest
-\end{lstlisting}
-
-          If the above does not work, use the single-line version:
-\begin{lstlisting}[language=bash]
-docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest
-\end{lstlisting}
-
-    \item Inside the NixOS container, stage the flake file:
-\begin{lstlisting}[language=bash]
-git -C "/work" add "flake.nix"
-\end{lstlisting}
-
-    \item Enter the Nix development shell:
-\begin{lstlisting}[language=bash]
-nix --extra-experimental-features 'nix-command flakes' develop
-\end{lstlisting}
-
-    \item Run the same project tasks used on Linux/macOS:
-\begin{lstlisting}[language=bash]
-nix run .#init
-nix run .#run
-nix run .#tests
-\end{lstlisting}
-
-    \item The container is configured with \texttt{--rm} and will be
-          destroyed upon exit. Repeat steps 4--7 for each subsequent
-          session.
 \end{enumerate}
 
 \section{Re-entering the Nix Shell in Future Sessions}
@@ -542,11 +484,6 @@ npm run dev -- --port 5174
 \begin{lstlisting}[language=bash]
 pip install coverage
 \end{lstlisting}
-
-    \item[Windows Docker container exits immediately.]
-    Ensure Docker Desktop is running and that the \texttt{nix-store}
-    volume has been created before executing the \texttt{docker run}
-    command.
 
     \item[Re-seeding inflates data.]
     Running \texttt{python manage.py seed} repeatedly may duplicate seed
