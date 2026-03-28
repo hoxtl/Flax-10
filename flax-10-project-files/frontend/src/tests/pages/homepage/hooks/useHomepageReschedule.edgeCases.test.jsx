@@ -38,7 +38,6 @@ vi.mock("../../../../components/schedules/auto/autoScheduleActions", () => ({
 }));
 
 vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => conflictMocks);
-
 import { useHomepageReschedule } from "../../../../pages/homepage/hooks/useHomepageReschedule";
 
 function buildProps(overrides = {}) {
@@ -56,7 +55,6 @@ function buildProps(overrides = {}) {
     ...overrides,
   };
 }
-
 describe("useHomepageReschedule edge cases", () => {
   beforeEach(() => {
     vi.clearAllMocks();

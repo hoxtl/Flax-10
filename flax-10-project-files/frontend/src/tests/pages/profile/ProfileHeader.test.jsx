@@ -14,7 +14,7 @@ import {
   baseHandlers,
   editableVisibility,
   viewerVisibility,
-} from './ProfileTestUtils';
+} from './components/ProfileTestUtils';
 
 mockFramerMotion();
 mockProfileHelpers();
@@ -171,7 +171,7 @@ describe('ProfileHeader – Part 1', () => {
     expect(screen.getByText('Hit target')).toBeInTheDocument();
   });
 
-  it('renders "Tap to pin this badge" label in tooltip for editable profile', () => {
+  it('shows editable badge tooltip details', () => {
     render(
       <ProfileHeader
         user={{ username: 'alice' }}
@@ -184,7 +184,8 @@ describe('ProfileHeader – Part 1', () => {
       />,
     );
     fireEvent.mouseEnter(screen.getByText('🔥').closest('button'));
-    expect(screen.getByText('Goal Getter')).toBeInTheDocument();
+    expect(screen.getByText('Flame')).toBeInTheDocument();
+    expect(screen.getByText('Hot streak')).toBeInTheDocument();
   });
 
   it('renders "Tap to unpin" in tooltip when badge is already pinned', () => {

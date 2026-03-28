@@ -1,11 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/group_work/GroupWorkIndexPage.test.jsx
-import GroupWorkIndexPage, { getMostUrgentProject, prependProject } from '../../../pages/group_work/GroupWorkIndexPage';
-=======
-import GroupWorkIndexPage from '../../../../pages/group_work/GroupWorkIndexPage';
->>>>>>> origin:flax-10-project-files/frontend/src/tests/pages/group_work/components/GroupWorkIndexPage.test.jsx
+import GroupWorkIndexPage, { getMostUrgentProject, prependProject } from '../../../../pages/group_work/GroupWorkIndexPage';
 
 const mockNavigate = vi.fn();
 
@@ -20,25 +16,17 @@ vi.mock('../../../../pages/group_work/hooks/groupWorkHooks', () => ({
   useSelectedProjectId: vi.fn(),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/group_work/GroupWorkIndexPage.test.jsx
-vi.mock('../../../pages/group_work/utils/projectRowUtils', () => ({
+vi.mock('../../../../pages/group_work/utils/projectRowUtils', () => ({
   getProjectDate: vi.fn((deadline) => deadline),
   getDaysLeft: vi.fn(() => 5),
 }));
 
-vi.mock('../../../pages/group_work/components/GroupWorkDetail', () => ({
-  default: () => <div data-testid="groupwork-detail" />,
-}));
-
-import { useGroupProjects, useSelectedProjectId } from '../../../pages/group_work/hooks/groupWorkHooks';
-import { getProjectDate, getDaysLeft } from '../../../pages/group_work/utils/projectRowUtils';
-=======
 vi.mock('../../../../pages/group_work/components/GroupWorkDetail', () => ({
   default: () => <div data-testid="groupwork-detail" />,
 }));
 
 import { useGroupProjects, useSelectedProjectId } from '../../../../pages/group_work/hooks/groupWorkHooks';
->>>>>>> origin:flax-10-project-files/frontend/src/tests/pages/group_work/components/GroupWorkIndexPage.test.jsx
+import { getProjectDate, getDaysLeft } from '../../../../pages/group_work/utils/projectRowUtils';
 
 describe('GroupWorkIndexPage', () => {
   beforeEach(() => {
@@ -51,7 +39,6 @@ describe('GroupWorkIndexPage', () => {
     useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: true });
     render(<GroupWorkIndexPage />);
     expect(screen.getByTestId('groupwork-skeleton')).toBeTruthy();
-    // Skeleton uses AppPage and renders the title even while loading.
     expect(screen.getByText('My Group Projects')).toBeTruthy();
   });
 });
