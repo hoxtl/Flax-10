@@ -9,10 +9,10 @@
     top: var(--ctx-top);
     left: var(--ctx-left);
     min-width: 160px;
-    background: var(--panel, #FFFCFA);
-    border: 1px solid rgba(74, 52, 33, 0.1);
+    background: var(--panel);
+    border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(74, 52, 33, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 10%, transparent), 0 1px 4px rgba(0, 0, 0, 0.04);
     z-index: 1500;
     overflow: hidden;
     padding: 3px;

@@ -27,12 +27,12 @@
   position: relative;
   max-height: 85vh;
   max-width: 100%;
-  background: var(--card-bg, #fffcfa);
-  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 18%, transparent);
+  background: var(--card-bg);
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
   border-radius: 16px;
   overflow: hidden;
   box-shadow:
-    0 24px 48px rgba(74, 52, 33, 0.1),
+    0 24px 48px color-mix(in srgb, var(--primary) 10%, transparent),
     0 0 0 1px rgba(0, 0, 0, 0.04);
   animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: flex;
@@ -51,7 +51,7 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: var(--info-accent, var(--primary, #7b6751));
+  background: var(--info-accent, var(--primary));
   border-radius: 16px 0 0 16px;
 }
 
@@ -60,14 +60,14 @@
   align-items: center;
   gap: 12px;
   padding: 18px 20px 16px;
-  background: var(--card-bg, #fffcfa);
+  background: var(--card-bg);
   border-bottom: 1px solid
-    color-mix(in srgb, var(--primary, #7b6751) 12%, transparent);
+    color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .infoModalIcon {
   flex-shrink: 0;
-  color: var(--info-accent, var(--primary, #7b6751));
+  color: var(--info-accent, var(--primary));
 }
 
 .infoModalHeaderText {
@@ -100,7 +100,7 @@
   border-radius: 10px;
   background: transparent;
   border: none;
-  color: var(--muted, var(--color-primary));
+  color: var(--muted, var(--primary));
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -109,7 +109,7 @@
     color 0.2s;
 }
 .infoModalClose:hover {
-  background: color-mix(in srgb, var(--primary, #7b6751) 10%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
   color: var(--text, var(--text));
 }
 
@@ -119,15 +119,15 @@
   overflow-x: hidden;
   flex: 1;
   min-height: 0;
-  background: var(--card-bg, #fffcfa);
+  background: var(--card-bg);
 }
 
 .infoHero {
   margin-bottom: 18px;
   padding: 16px 18px;
-  background: color-mix(in srgb, var(--primary, #7b6751) 4%, transparent);
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
 }
 
 .infoHeroTitle {
@@ -162,8 +162,8 @@
   max-width: 100%;
   padding: 0.45rem 0.8rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--primary, #7b6751) 6%, transparent);
-  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 14%, transparent);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
 }
 
 .readingDetailLabel {
@@ -195,9 +195,9 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 12px;
-  background: color-mix(in srgb, var(--primary, #7b6751) 3%, transparent);
+  background: color-mix(in srgb, var(--primary) 3%, transparent);
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .infoRowFull {
@@ -220,7 +220,7 @@
 .infoLabel svg {
   flex-shrink: 0;
   opacity: 0.9;
-  color: var(--info-accent, var(--primary, #7b6751));
+  color: var(--info-accent, var(--primary));
 }
 
 .infoVal {
@@ -241,9 +241,9 @@
   font-weight: 500;
   padding: 4px 10px;
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--primary, #7b6751) 8%, transparent);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
   color: var(--text);
-  border: 1px solid color-mix(in srgb, var(--primary, #7b6751) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
   white-space: nowrap;
 }
 
@@ -254,7 +254,7 @@
   border-radius: 50%;
   margin-right: 6px;
   vertical-align: middle;
-  background: var(--primary, #7b6751);
+  background: var(--primary);
 }
 
 .infoModalFooter {
@@ -264,8 +264,8 @@
   gap: 12px;
   padding: 14px 20px 18px;
   border-top: 1px solid
-    color-mix(in srgb, var(--primary, #7b6751) 12%, transparent);
-  background: color-mix(in srgb, var(--primary, #7b6751) 3%, transparent);
+    color-mix(in srgb, var(--primary) 12%, transparent);
+  background: color-mix(in srgb, var(--primary) 3%, transparent);
   flex-shrink: 0;
 }
 

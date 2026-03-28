@@ -172,7 +172,7 @@
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: #2b1e14;
+  background: var(--color-primary-strong, #2b1e14);
   border-radius: 8px;
   padding: 6px 10px;
   display: flex;
@@ -211,7 +211,7 @@
   font-size: 11px;
   font-style: italic;
   font-weight: 600;
-  color: #5D4037;
+  color: var(--color-primary);
   cursor: pointer;
   font-family: inherit;
   padding: 2px 4px;

@@ -135,19 +135,19 @@
   --chip-font-weight: 600;
 
   --segmented-bg: rgba(255, 255, 255, 0.6);
-  --segmented-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
+  --segmented-shadow: 0 1px 4px color-mix(in srgb, var(--primary) 12%, transparent);
   --segmented-button-fg: var(--muted);
   --segmented-button-hover-bg: var(--hover);
   --segmented-button-hover-fg: var(--text);
   --segmented-active-bg: var(--active);
   --segmented-active-fg: var(--primary-strong);
   --segmented-solid-bg: rgba(255, 255, 255, 0.5);
-  --segmented-solid-border: rgba(74, 52, 33, 0.25);
+  --segmented-solid-border: color-mix(in srgb, var(--primary) 28%, transparent);
   --segmented-solid-shadow: none;
   --segmented-solid-button-fg: var(--text);
-  --segmented-solid-button-hover-bg: rgba(74, 52, 33, 0.08);
+  --segmented-solid-button-hover-bg: color-mix(in srgb, var(--primary) 10%, transparent);
   --segmented-solid-button-hover-fg: var(--text);
-  --segmented-solid-active-bg: rgba(74, 52, 33, 0.88);
+  --segmented-solid-active-bg: var(--primary);
   --segmented-solid-active-fg: #FAF9F6;
 
   /* Semantic text colors for typography — Warm-Classy */

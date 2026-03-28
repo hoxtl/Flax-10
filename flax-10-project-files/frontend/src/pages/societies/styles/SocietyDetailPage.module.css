@@ -41,7 +41,7 @@
   cursor: pointer;
   font-size: 1.1rem;
   color: var(--text);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 15%, transparent);
   transition: all 0.2s;
   display: flex;
   align-items: center;

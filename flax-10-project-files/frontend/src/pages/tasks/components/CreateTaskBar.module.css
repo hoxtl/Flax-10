@@ -27,8 +27,8 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text);
-  background: var(--panel, #FFFCFA);
-  border: 1px solid var(--border, rgba(74, 52, 33, 0.12));
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: 10px;
   outline: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -40,8 +40,8 @@
   font-weight: 400;
 }
 .input:focus {
-  border-color: var(--primary, #7B6751);
-  box-shadow: 0 0 0 3px rgba(123, 103, 81, 0.08);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .addBtn {
@@ -160,9 +160,9 @@
 }
 .durationBtn:hover { background: var(--hover); color: var(--text); border-color: var(--border); }
 .durationBtnActive {
-  background: var(--primary, #7B6751);
+  background: var(--primary);
   color: var(--color-card);
-  border-color: var(--primary, #7B6751);
+  border-color: var(--primary);
   font-weight: 600;
 }
 
@@ -176,7 +176,7 @@
   height: auto;
   border-radius: 9999px;
   border-width: 1.5px;
-  border-color: var(--border, rgba(74, 52, 33, 0.2));
+  border-color: var(--border, color-mix(in srgb, var(--primary) 20%, transparent));
   font-size: 0.75rem;
   font-weight: 500;
   text-align: center;
@@ -207,8 +207,8 @@
 }
 
 .customDurationActive .customDurationInputField {
-  border-color: var(--primary, #7B6751);
-  box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.12);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .pageCountInput {
