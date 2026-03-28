@@ -34,6 +34,16 @@ const baseSociety = {
   ],
 };
 
+function createDeferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
 function renderBanner(society = baseSociety) {
   return render(
     <MemoryRouter>
@@ -221,6 +231,12 @@ describe("SocietyInsightBanner", () => {
     expect(screen.getByRole("link", { name: "Open Calendar" })).toHaveAttribute("href", "/calendar");
   });
 
+  it("handles societies without an events array", async () => {
+    renderBanner({ id: 44, name: "Empty Society" });
+
+    await waitFor(() => expect(screen.getByText("No society sessions scheduled yet")).toBeInTheDocument());
+  });
+
   it("falls back to the timer onboarding message when loading throws synchronously", async () => {
     getSummary.mockImplementation(() => {
       throw new Error("boom");
@@ -230,5 +246,91 @@ describe("SocietyInsightBanner", () => {
 
     await waitFor(() => expect(screen.getByText("We can personalise this once you use Timer")).toBeInTheDocument());
     expect(screen.getByRole("link", { name: "View Modules" })).toHaveAttribute("href", "/modules");
+  });
+
+  it("stays positive when modules or enrollments resolve to null", async () => {
+    getModules.mockResolvedValue(null);
+    getEnrollments.mockResolvedValue(null);
+
+    renderBanner();
+
+    await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
+  });
+
+  it("uses the default heatmap when analytics returns null data", async () => {
+    getSummary.mockResolvedValue({
+      summary: { total_sessions: 2, total_study_hours: 3 },
+      heatmap: { data: null },
+    });
+
+    renderBanner();
+
+    await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
+  });
+
+  it("falls back to an empty heatmap when analytics data is missing", async () => {
+    getSummary.mockResolvedValue({
+      summary: { total_sessions: 3, total_study_hours: 4 },
+      heatmap: { data: [] },
+    });
+
+    renderBanner();
+
+    await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
+  });
+
+  it("ignores resolved insights after the component unmounts", async () => {
+    const summaryDeferred = createDeferred();
+    const modulesDeferred = createDeferred();
+    const enrollmentsDeferred = createDeferred();
+
+    getSummary.mockReturnValue(summaryDeferred.promise);
+    getModules.mockReturnValue(modulesDeferred.promise);
+    getEnrollments.mockReturnValue(enrollmentsDeferred.promise);
+
+    const { unmount } = renderBanner();
+    unmount();
+
+    summaryDeferred.resolve({
+      summary: { total_sessions: 1, total_study_hours: 2 },
+      heatmap: { data: Array.from({ length: 7 }, () => Array(24).fill(0)) },
+    });
+    modulesDeferred.resolve([]);
+    enrollmentsDeferred.resolve([]);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.queryByText("This looks like a good fit for your week")).not.toBeInTheDocument();
+  });
+
+  it("ignores rejected insight loads after the component unmounts", async () => {
+    getSummary.mockImplementation(() => {
+      throw new Error("later failure");
+    });
+
+    const { unmount } = renderBanner();
+    unmount();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.queryByText("We can personalise this once you use Timer")).not.toBeInTheDocument();
+  });
+
+  it("uses the fallback weekday row when the heatmap lacks that day", async () => {
+    const heatmap = [Array(24).fill(60)];
+    getSummary.mockResolvedValue({
+      summary: { total_sessions: 10, total_study_hours: 12 },
+      heatmap: { data: heatmap },
+    });
+
+    renderBanner({
+      ...baseSociety,
+      events: [{
+        id: 41,
+        title: "Tuesday Meetup",
+        start_time: "2026-04-07T18:30:00Z",
+        end_time: "2026-04-07T19:00:00Z",
+      }],
+    });
+
+    await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
   });
 });

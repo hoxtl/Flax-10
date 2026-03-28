@@ -104,6 +104,16 @@ describe("useCampusMapModel - extras", () => {
     vi.useRealTimers();
   });
 
+  it("marks past events without an end time as not upcoming", async () => {
+    getEventsMock.mockResolvedValue([{ start_time: "2026-03-26T07:00:00.000Z", location: "Lab A" }]);
+    renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
+    await flushEffects();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(getEventsMock).toHaveBeenCalled();
+  });
+
   it("syncs a destination query once and focuses the map on geocoded coordinates", async () => {
     geocodeAddressMock.mockResolvedValue({ latitude: 51.501, longitude: -0.141 });
 
@@ -303,6 +313,23 @@ describe("useCampusMapModel - extras", () => {
 
     await flushEffects();
     expect(result.current.upcomingEvents).toEqual([]);
+  });
+
+  it("treats undefined upcoming-events payloads like an empty list", async () => {
+    getEventsMock.mockResolvedValueOnce(undefined);
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
+    await flushEffects();
+    expect(result.current.upcomingEvents).toEqual([]);
+  });
+
+  it("drops upcoming rows whose start time does not parse", async () => {
+    getEventsMock.mockResolvedValueOnce([
+      { id: "bad-start", location: "Room", start_time: "not-a-real-date" },
+      { id: "ok", location: "Hall", start_time: "2026-03-26T09:05:00.000Z" },
+    ]);
+    const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });
+    await flushEffects();
+    expect(result.current.upcomingEvents.map((e) => e.id)).toEqual(["ok"]);
   });
 
   it("refreshes upcoming events when the tab becomes visible again", async () => {

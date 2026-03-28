@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import GroupWorkIndexPage from '../../../pages/group_work/GroupWorkIndexPage';
+import GroupWorkIndexPage, { getMostUrgentProject, prependProject } from '../../../pages/group_work/GroupWorkIndexPage';
 
 const mockNavigate = vi.fn();
 
@@ -16,11 +16,17 @@ vi.mock('../../../pages/group_work/hooks/groupWorkHooks', () => ({
   useSelectedProjectId: vi.fn(),
 }));
 
+vi.mock('../../../pages/group_work/utils/projectRowUtils', () => ({
+  getProjectDate: vi.fn((deadline) => deadline),
+  getDaysLeft: vi.fn(() => 5),
+}));
+
 vi.mock('../../../pages/group_work/components/GroupWorkDetail', () => ({
   default: () => <div data-testid="groupwork-detail" />,
 }));
 
 import { useGroupProjects, useSelectedProjectId } from '../../../pages/group_work/hooks/groupWorkHooks';
+import { getProjectDate, getDaysLeft } from '../../../pages/group_work/utils/projectRowUtils';
 
 describe('GroupWorkIndexPage', () => {
   beforeEach(() => {
@@ -35,5 +41,41 @@ describe('GroupWorkIndexPage', () => {
     expect(screen.getByTestId('groupwork-skeleton')).toBeTruthy();
     // Skeleton uses AppPage and renders the title even while loading.
     expect(screen.getByText('My Group Projects')).toBeTruthy();
+  });
+});
+
+describe('GroupWorkIndexPage helpers', () => {
+  beforeEach(() => {
+    getProjectDate.mockImplementation((deadline) => deadline);
+    getDaysLeft.mockImplementation(() => 5);
+  });
+
+  it('getMostUrgentProject handles undefined inputs', () => {
+    expect(getMostUrgentProject()).toBeNull();
+  });
+
+  it('getMostUrgentProject ranks projects by soonest days left', () => {
+    const soon = { id: 2, deadline: 'soon' };
+    const later = { id: 3, deadline: 'later' };
+    getDaysLeft.mockImplementation((value) => (value === 'soon' ? 1 : 6));
+
+    const result = getMostUrgentProject([later, soon]);
+
+    expect(result.project).toBe(soon);
+    expect(result.daysLeft).toBe(1);
+  });
+
+  it('prependProject inserts new projects at the top of the list', () => {
+    let projects = [{ id: 1 }, { id: 3 }];
+    const setProjects = vi.fn((updater) => {
+      projects = updater(projects);
+    });
+
+    const newProject = { id: 9 };
+    prependProject(newProject, setProjects);
+
+    expect(projects[0]).toBe(newProject);
+    expect(projects.slice(1)).toEqual([{ id: 1 }, { id: 3 }]);
+    expect(setProjects).toHaveBeenCalledTimes(1);
   });
 });

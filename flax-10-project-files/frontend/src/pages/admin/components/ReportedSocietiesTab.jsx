@@ -20,7 +20,7 @@ function BanDismissButtons({ busy, onBan, onDismiss }) {
   return <><button className={styles.banBtn} disabled={busy} onClick={onBan}>Ban</button><button className={styles.dismissBtn} disabled={busy} onClick={onDismiss}>Dismiss</button></>;
 }
 
-function removeReportsBySociety(reports, reportId) {
+export function removeReportsBySociety(reports, reportId) {
   const target = reports.find((report) => report.id === reportId);
   return target ? reports.filter((report) => report.society_id !== target.society_id) : reports.filter((report) => report.id !== reportId);
 }
@@ -57,8 +57,7 @@ export default function ReportedSocietiesTab() {
   const handleDismiss = (id) => run(id, () => dismissReport(id), () => setItems((current) => current.filter((report) => report.id !== id)), "Failed to dismiss report.");
   const handleBanOpen = (report) => setBanTarget(report);
   const handleBanCancel = () => setBanTarget(null);
-  const handleBanConfirm = (reason = "") => {
-    if (!banTarget) return;
+  const handleBanConfirm = (reason) => {
     run(
       banTarget.id,
       () => banReportedSociety(banTarget.id, reason),

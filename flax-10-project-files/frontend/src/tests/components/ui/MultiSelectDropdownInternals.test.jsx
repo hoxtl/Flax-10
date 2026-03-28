@@ -30,6 +30,8 @@ import {
   useDropdownRootRef,
 } from "../../../components/ui/multi_select_dropdown/useDropdownInteractions";
 
+const resolveToggle = (arg) => (typeof arg === "function" ? arg(false) : arg);
+
 const buildTriggerProps = (overrides = {}) => ({
   customTrigger: null,
   displayAsPills: false,
@@ -39,7 +41,7 @@ const buildTriggerProps = (overrides = {}) => ({
   placeholder: "Pick",
   selected: [],
   triggerLabel: "Pick",
-  updateOpen: vi.fn(),
+  updateOpen: vi.fn(resolveToggle),
   ...overrides,
 });
 
@@ -162,6 +164,40 @@ describe("MultiSelectDropdown internals", () => {
     expect(props.updateOpen).toHaveBeenCalledTimes(1);
   });
 
+  it("mutes the default label until a value is selected", () => {
+    const { container } = renderTrigger({ selected: [] });
+    expect(container.innerHTML).toContain("--muted");
+  });
+
+  it("inherits text color once the default trigger has selections", () => {
+    const { container } = renderTrigger({
+      selected: ["alpha"],
+      options: [{ label: "Alpha", value: "alpha" }],
+      triggerLabel: "Alpha",
+    });
+    expect(container.innerHTML).not.toContain("--muted");
+  });
+
+  it("shows a pills placeholder and toggles open with Enter", () => {
+    const { props } = renderTrigger({ displayAsPills: true, selected: [], placeholder: "Choose items" });
+    expect(screen.getByText("Choose items")).toBeInTheDocument();
+    const trigger = document.querySelector('[aria-haspopup="listbox"]');
+    fireEvent.keyDown(trigger, { key: "Enter", preventDefault: vi.fn() });
+    expect(props.updateOpen).toHaveBeenCalledWith(expect.any(Function));
+  });
+
+  it("toggles the pills trigger via a surface click outside pill chips", () => {
+    const { props } = renderTrigger({ displayAsPills: true, selected: [], placeholder: "Choose items" });
+    props.updateOpen.mockClear();
+    fireEvent.click(document.querySelector('[aria-haspopup="listbox"]'));
+    expect(props.updateOpen).toHaveBeenCalled();
+  });
+
+  it("animates the chevron when the dropdown is open", () => {
+    const { container } = renderTrigger({ isOpen: true });
+    expect(container.querySelector('[class*="chevron"]')).toBeTruthy();
+  });
+
   it("handles pill trigger keyboard and removal interactions", () => {
     const { props, rerenderTrigger } = renderTrigger({
       displayAsPills: true,
@@ -187,5 +223,20 @@ describe("MultiSelectDropdown internals", () => {
     const { rerenderMenu } = renderMenu();
     rerenderMenu({ showCheckboxes: false });
     expect(document.querySelector("svg.lucide-check")).toBeTruthy();
+  });
+
+  it("uses fallback keys for options with a falsy value", () => {
+    const { props } = renderMenu({
+      options: [{ label: "Any", value: "" }],
+      selected: [],
+      selectedSet: new Set(),
+    });
+    fireEvent.click(screen.getByText("Any"));
+    expect(props.onToggle).toHaveBeenCalledWith("");
+  });
+
+  it("applies module variant styling to option labels", () => {
+    const { container } = renderMenu({ isModuleVariant: true });
+    expect(container.querySelector('[class*="modulesItemLabel"]')).toBeTruthy();
   });
 });

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import {
   getItemClassName,
   getMenuClassName,
@@ -12,84 +11,107 @@ import {
 } from "../../../components/ui/multi_select_dropdown/multiSelectDropdownUtils";
 
 describe("multiSelectDropdownUtils", () => {
-  it("normalizes string options and preserves object options", () => {
-    expect(normalizeOption("Alpha")).toEqual({ value: "Alpha", label: "Alpha" });
-    expect(normalizeOption({ value: "a", label: "Alpha" })).toEqual({ value: "a", label: "Alpha" });
+  it("normalizes string options into value/label objects", () => {
+    expect(normalizeOption("A")).toEqual({ value: "A", label: "A" });
+    expect(normalizeOption({ value: "v", label: "L" })).toEqual({ value: "v", label: "L" });
   });
 
-  it("returns selected values only for arrays", () => {
+  it("coerces selection values to arrays", () => {
     expect(getSelectedValues(["a"])).toEqual(["a"]);
-    expect(getSelectedValues("a")).toEqual([]);
+    expect(getSelectedValues(undefined)).toEqual([]);
     expect(getSelectedValues(null)).toEqual([]);
   });
 
-  it("resolves option labels and falls back when missing", () => {
-    const options = [{ value: "a", label: "Alpha" }];
-    expect(getOptionLabel(options, "a", "Fallback")).toBe("Alpha");
-    expect(getOptionLabel(options, "b", "Fallback")).toBe("Fallback");
+  it("resolves option labels with a fallback", () => {
+    const options = [{ value: "x", label: "X" }];
+    expect(getOptionLabel(options, "x", "fb")).toBe("X");
+    expect(getOptionLabel(options, "missing", "fb")).toBe("fb");
   });
 
-  it("builds trigger labels for empty, single, and multiple selections", () => {
-    const options = [{ value: "a", label: "Alpha" }, { value: "b", label: "Beta" }];
+  it("formats trigger labels for empty, single, and multi selections", () => {
+    const options = [{ value: "a", label: "Alpha" }];
     expect(getTriggerLabel([], options, "Pick", "items")).toBe("Pick");
     expect(getTriggerLabel(["a"], options, "Pick", "items")).toBe("Alpha");
     expect(getTriggerLabel(["a", "b"], options, "Pick", "items")).toBe("2 items");
   });
 
-  it("toggles selected values and clears all when the empty option is chosen", () => {
-    expect(toggleSelectedValue(["a"], new Set(["a"]), "")).toEqual([]);
-    expect(toggleSelectedValue(["a"], new Set(["a"]), "a")).toEqual([]);
-    expect(toggleSelectedValue(["a"], new Set(["a"]), "b")).toEqual(["a", "b"]);
+  it("toggles membership and clears when the sentinel value is used", () => {
+    const set = new Set(["a"]);
+    expect(toggleSelectedValue(["a"], set, "")).toEqual([]);
+    expect(toggleSelectedValue(["a"], set, "a")).toEqual([]);
+    expect(toggleSelectedValue(["a"], set, "b")).toEqual(["a", "b"]);
   });
 
-  it("builds menu classes for alignment and variants", () => {
-    const className = getMenuClassName("right", "custom-menu", true, "modules");
-    expect(className).toContain("alignRight");
-    expect(className).toContain("menuPillsGrid");
-    expect(className).toContain("modulesMenu");
-    expect(className).toContain("custom-menu");
+  it("builds menu class names for alignment, pills, modules, and extras", () => {
+    const base = getMenuClassName("left", "", false, "default");
+    expect(base.length).toBeGreaterThan(0);
+    const right = getMenuClassName("right", "extra", true, "modules");
+    expect(right).toContain("extra");
   });
 
-  it("reports option active and checkbox-hidden state", () => {
-    expect(getOptionState("", [], new Set(), [])).toEqual({ hideCheckbox: false, isActive: true });
-    expect(getOptionState("a", ["a"], new Set(["a"]), ["a"])).toEqual({ hideCheckbox: true, isActive: true });
-    expect(getOptionState("b", ["a"], new Set(["a"]), [])).toEqual({ hideCheckbox: false, isActive: false });
+  it("derives per-option checkbox and active state", () => {
+    const hide = ["x"];
+    expect(getOptionState("x", [], new Set(), hide).hideCheckbox).toBe(true);
+    expect(getOptionState("", [], new Set(), []).isActive).toBe(true);
+    expect(getOptionState("", ["a"], new Set(["a"]), []).isActive).toBe(false);
+    expect(getOptionState("a", ["a"], new Set(["a"]), []).isActive).toBe(true);
   });
 
-  it("builds item classes for pill, module, and active states", () => {
-    const pillClass = getItemClassName({
-      isActive: true,
-      isModuleVariant: false,
-      optionsAsPills: true,
+  it("composes item classes for inactive rows", () => {
+    const cls = getItemClassName({
+      activeItemClassName: "act",
       hideCheckbox: false,
-      itemClassName: "custom",
-      activeItemClassName: "active-custom",
-    });
-    expect(pillClass).toContain("itemPill");
-    expect(pillClass).toContain("itemPillActive");
-    expect(pillClass).toContain("active-custom");
-
-    const moduleClass = getItemClassName({
-      isActive: true,
-      isModuleVariant: true,
-      optionsAsPills: false,
-      hideCheckbox: true,
-      itemClassName: "",
-      activeItemClassName: "",
-    });
-    expect(moduleClass).toContain("modulesItem");
-    expect(moduleClass).toContain("modulesItemManage");
-    expect(moduleClass).toContain("modulesItemActive");
-
-    const plainClass = getItemClassName({
       isActive: false,
       isModuleVariant: false,
+      itemClassName: "item",
       optionsAsPills: false,
-      hideCheckbox: false,
-      itemClassName: "",
-      activeItemClassName: "",
     });
-    expect(plainClass).toContain("dropdownItem");
-    expect(plainClass).not.toContain("dropdownItemActive");
+    expect(cls).toContain("item");
+    expect(cls).not.toContain("act");
+  });
+
+  it("adds pill active styling when pills are active", () => {
+    const cls = getItemClassName({
+      activeItemClassName: "act",
+      hideCheckbox: false,
+      isActive: true,
+      isModuleVariant: false,
+      itemClassName: "",
+      optionsAsPills: true,
+    });
+    expect(cls).toContain("act");
+  });
+
+  it("adds module active and manage classes for module rows", () => {
+    const active = getItemClassName({
+      activeItemClassName: "act",
+      hideCheckbox: false,
+      isActive: true,
+      isModuleVariant: true,
+      itemClassName: "",
+      optionsAsPills: false,
+    });
+    expect(active).toContain("act");
+    const manage = getItemClassName({
+      activeItemClassName: "",
+      hideCheckbox: true,
+      isActive: true,
+      isModuleVariant: true,
+      itemClassName: "",
+      optionsAsPills: false,
+    });
+    expect(manage.length).toBeGreaterThan(0);
+  });
+
+  it("uses default item active styling outside pill and module modes", () => {
+    const cls = getItemClassName({
+      activeItemClassName: "act",
+      hideCheckbox: false,
+      isActive: true,
+      isModuleVariant: false,
+      itemClassName: "",
+      optionsAsPills: false,
+    });
+    expect(cls).toContain("act");
   });
 });

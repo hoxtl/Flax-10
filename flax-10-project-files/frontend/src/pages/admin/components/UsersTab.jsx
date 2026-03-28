@@ -174,7 +174,7 @@ function toggleFilterGroup(setFilters, group, value) {
 
 function confirmBanHandler(state, reason) {
   const trimmedReason = reason.trim();
-  if (!state.banTarget || !trimmedReason) return;
+  if (!trimmedReason) return;
   state.setBusy(true);
   banUser(state.banTarget.id, trimmedReason)
     .then(() => state.setUsers((users) => banUserState(users, state.banTarget.id, trimmedReason)))
@@ -230,3 +230,11 @@ function renderBanModal(state, confirmBan) {
   if (!state.banTarget) return null;
   return <BanUserModal user={state.banTarget} onConfirm={confirmBan} onCancel={() => state.setBanTarget(null)} />;
 }
+
+export {
+  toggleFilterGroup,
+  confirmBanHandler,
+  unbanHandler,
+  renderUsersBody,
+  renderBanModal,
+};

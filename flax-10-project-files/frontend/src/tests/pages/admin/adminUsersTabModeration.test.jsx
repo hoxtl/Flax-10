@@ -42,7 +42,7 @@ vi.mock("../../../pages/admin/styles/styles", () => ({
     requiredMark: "requiredMark", reasonInput: "reasonInput",
     modalActions: "modalActions", cancelActionBtn: "cancelActionBtn",
     confirmActionBtn: "confirmActionBtn", searchCompact: "searchCompact",
-    searchInput: "searchInput",
+    searchInput: "searchInput", spinner: "spinner", spinnerWrap: "spinnerWrap",
   },
 }));
 
@@ -55,6 +55,16 @@ vi.mock("../../../components/common/standard_modal/StandardModal", () => ({
 vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, disabled, type }) => (
     <button type={type || "button"} onClick={onClick} disabled={disabled}>{children}</button>
+  ),
+}));
+
+vi.mock("../../../pages/admin/components/AdminFilters", () => ({
+  FilterToggleGroup: ({ ariaLabel, options, onToggle }) => (
+    <div aria-label={ariaLabel}>
+      {options.map((opt) => (
+        <button key={opt.value} onClick={() => onToggle(opt.value)}>{opt.label}</button>
+      ))}
+    </div>
   ),
 }));
 
@@ -89,6 +99,7 @@ vi.mock("../../../pages/admin/utils/adminNavigation", () => ({
 import * as api from "../../../api/adminApi";
 import { useUsersTabState } from "../../../pages/admin/hooks/useUsersTabState";
 import { isProtectedFixtureUser } from "../../../pages/admin/utils/protectedUsers";
+import { navigateToProfile } from "../../../pages/admin/utils/adminNavigation";
 import UsersTab from "../../../pages/admin/components/UsersTab";
 
 function makeState(overrides = {}) {
@@ -162,6 +173,10 @@ describe("UsersTab moderation", () => {
     fireEvent.click(screen.getAllByText("Unban")[0]);
     await waitFor(() => expect(api.unbanUser).toHaveBeenCalledWith(6));
     expect(state.setBusy).toHaveBeenCalledWith(false);
+
+    // execute unbanUserState callback
+    const setUsersUpdater = state.setUsers.mock.calls[0][0];
+    setUsersUpdater([inactiveUser]);
   });
 
   it("sets error on unban failure", async () => {
@@ -213,6 +228,10 @@ describe("UsersTab moderation", () => {
     fireEvent.submit(textarea.closest("form"));
     await waitFor(() => expect(api.banUser).toHaveBeenCalledWith(10, "Valid reason"));
     await waitFor(() => expect(state.setUsers).toHaveBeenCalled());
+
+    // Execute state.setUsers callback
+    const setUsersUpdater = state.setUsers.mock.calls[0][0];
+    setUsersUpdater([activeUser]); // Hits the line 180 success string!
   });
 
   it("returns early from confirmBanHandler when reason is whitespace", async () => {
@@ -228,5 +247,65 @@ describe("UsersTab moderation", () => {
     fireEvent.submit(textarea.closest("form"));
     expect(state.setBusy).not.toHaveBeenCalled();
     expect(api.banUser).not.toHaveBeenCalled();
+  });
+
+  it("navigates to user profile on name click", () => {
+    const activeUser = { id: 5, first_name: "Eve", last_name: "E", username: "eve", role: "student", is_active: true };
+    useUsersTabState.mockReturnValue(makeState({ users: [activeUser] }));
+    const onNavigate = vi.fn();
+    const { container } = render(<UsersTab onNavigate={onNavigate} />);
+    fireEvent.click(container.querySelector(".nameBtn"));
+    expect(navigateToProfile).toHaveBeenCalledWith(onNavigate, 5);
+  });
+
+  it("calls setBanTarget and handleUnban from mobile view buttons", () => {
+    const activeUser = { id: 5, first_name: "Eve", last_name: "E", username: "eve", role: "student", is_active: true };
+    const inactiveUser = { id: 6, first_name: "Frank", username: "frank", role: "student", is_active: false };
+    const state = makeState({ users: [activeUser, inactiveUser] });
+    useUsersTabState.mockReturnValue(state);
+    api.unbanUser.mockResolvedValue({});
+    const { container } = render(<UsersTab onNavigate={vi.fn()} />);
+    
+    // mobile view renders UserMobileRow which uses .banPillBtn and .unbanPillBtn
+    const banPill = container.querySelector(".banPillBtn");
+    const unbanPill = container.querySelector(".unbanPillBtn");
+    
+    fireEvent.click(banPill);
+    expect(state.setBanTarget).toHaveBeenCalledWith(activeUser);
+    
+    fireEvent.click(unbanPill);
+    expect(state.setBusy).toHaveBeenCalledWith(true);
+  });
+
+  it("toggles filters when FilterToggleGroup options are clicked", () => {
+    const state = makeState({ filters: { roles: [], status: [] } });
+    useUsersTabState.mockReturnValue(state);
+    render(<UsersTab onNavigate={vi.fn()} />);
+    
+    fireEvent.click(screen.getByText("Student"));
+    fireEvent.click(screen.getByText("Banned"));
+    
+    expect(state.setFilters).toHaveBeenCalledTimes(2);
+    
+    // evaluate the updaters
+    const roleUpdater = state.setFilters.mock.calls[0][0];
+    const statusUpdater = state.setFilters.mock.calls[1][0];
+    roleUpdater({ roles: [], status: [] });
+    statusUpdater({ roles: [], status: [] });
+  });
+
+  it("closes the ban modal and resets banTarget on cancel", () => {
+    const activeUser = { id: 9, first_name: "Iris", username: "iris", role: "student", is_active: true };
+    const state = makeState({ users: [activeUser], banTarget: activeUser });
+    useUsersTabState.mockReturnValue(state);
+    render(<UsersTab onNavigate={vi.fn()} />);
+    fireEvent.click(screen.getByText("close-modal"));
+    expect(state.setBanTarget).toHaveBeenCalledWith(null);
+  });
+
+  it("shows loading spinner when loading", () => {
+    useUsersTabState.mockReturnValue(makeState({ loading: true }));
+    const { container } = render(<UsersTab onNavigate={vi.fn()} />);
+    expect(container.querySelector(".spinnerWrap")).toBeInTheDocument();
   });
 });

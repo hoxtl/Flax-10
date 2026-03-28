@@ -85,6 +85,7 @@ import { navigateToProfile, navigateToSociety } from "../../../pages/admin/utils
 import CourseChangeRequestsTab from "../../../pages/admin/components/CourseChangeRequestsTab";
 import RatificationsTab from "../../../pages/admin/components/RatificationsTab";
 import ReportedSocietiesTab from "../../../pages/admin/components/ReportedSocietiesTab";
+import * as api from "../../../api/adminApi";
 
 const noopSetters = { setError: vi.fn(), setItems: vi.fn() };
 
@@ -297,6 +298,22 @@ describe("ReportedSocietiesTab", () => {
     fireEvent.change(textarea, { target: { value: "Violating rules" } });
     fireEvent.submit(textarea.closest("form"));
     expect(run).toHaveBeenCalled();
+
+    // Execute the action callback passed to run(id, actionFn, successFn, err)
+    const actionFn = run.mock.calls[0][1];
+    actionFn(); // calls banReportedSociety
+    expect(api.banReportedSociety).toHaveBeenCalledWith(10, "Violating rules");
+
+    // Execute the success callback passed to run
+    const successFn = run.mock.calls[0][2];
+    successFn(); // calls setItems and setBanTarget
+    
+    // setItems is a mock. Its updater function is now in noopSetters.setItems
+    const setItemsUpdater = noopSetters.setItems.mock.calls[0][0];
+    // Evaluate the removeReportsBySociety true branch (target exists)
+    setItemsUpdater([report]);
+    // Evaluate the removeReportsBySociety false branch (target does not exist)
+    setItemsUpdater([]);
   });
 
   it("calls run to dismiss a report when Dismiss is clicked", () => {
@@ -307,6 +324,19 @@ describe("ReportedSocietiesTab", () => {
     render(<ReportedSocietiesTab />);
     fireEvent.click(screen.getByText("Dismiss"));
     expect(run).toHaveBeenCalled();
+
+    // Execute the action callback
+    const actionFn = run.mock.calls[0][1];
+    actionFn(); // calls dismissReport
+    expect(api.dismissReport).toHaveBeenCalledWith(10);
+
+    // Execute the success callback
+    const successFn = run.mock.calls[0][2];
+    successFn(); // calls setItems
+
+    // Execute setItems updater
+    const setItemsUpdater = noopSetters.setItems.mock.calls[0][0];
+    setItemsUpdater([report]);
   });
 
   it("does not trigger ban when handleBanConfirm is called with no banTarget", () => {
@@ -321,5 +351,13 @@ describe("ReportedSocietiesTab", () => {
     fireEvent.click(screen.getByText("close-modal"));
     // Modal closed. banTarget is null. Calling confirm now would be a no-op.
     expect(run).not.toHaveBeenCalled();
+  });
+
+  it("shows loading spinner when loading", () => {
+    useAsyncList.mockReturnValue({ ...makeListState([]), loading: true });
+    useAsyncAction.mockReturnValue(makeActionState());
+    usePaginatedItems.mockReturnValue(makePagination([]));
+    const { container } = render(<ReportedSocietiesTab />);
+    expect(container.querySelector(".spinnerWrap")).toBeInTheDocument();
   });
 });

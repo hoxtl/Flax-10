@@ -37,8 +37,10 @@ export default function LocationAutocomplete({ value, onChange, placeholder, inp
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
 
-  const filtered = (value || '').length > 0
-    ? KCL_LOCATIONS.filter(loc => loc.toLowerCase().includes((value || '').toLowerCase()))
+  const normalizedValue = (value || '').toLowerCase();
+
+  const filtered = normalizedValue.length > 0
+    ? KCL_LOCATIONS.filter(loc => loc.toLowerCase().includes(normalizedValue))
     : KCL_LOCATIONS;
 
   useEffect(() => {

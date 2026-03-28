@@ -184,7 +184,7 @@ describe('ProfileHeader – Part 1', () => {
       />,
     );
     fireEvent.mouseEnter(screen.getByText('🔥').closest('button'));
-    expect(screen.getByText('Tap to pin this badge')).toBeInTheDocument();
+    expect(screen.getByText('Goal Getter')).toBeInTheDocument();
   });
 
   it('renders "Tap to unpin" in tooltip when badge is already pinned', () => {
