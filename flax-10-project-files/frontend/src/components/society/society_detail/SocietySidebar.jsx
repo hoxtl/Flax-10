@@ -1,5 +1,5 @@
 /**
- * SocietySidebar displays pinned announcements and the upcoming society event.
+ * SocietySidebar displays society about info, pinned announcements, and the upcoming society event.
  * In edit mode, it provides direct actions for creating new content.
  */
 
@@ -17,11 +17,11 @@ export default function SocietySidebar({ society, editMode, onAddAnnouncement, o
 
     return (
         <aside className={styles.sidebar}>
-            <SidebarContent pinned={society.announcements?.find(a => a.pinned)} next={society.events?.[0]} editMode={editMode} />
+            <SidebarContent society={society} editMode={editMode} />
             {editMode && <AddButtons onAnnouncement={() => setShowAnnounce(true)} onEvent={() => setShowEvent(true)} />}
             {showAnnounce && <SidebarAnnouncementModal society={society} tags={tags}
                 onAdd={onAddAnnouncement} onUpdate={onUpdateAnnouncement} onClose={() => setShowAnnounce(false)} />}
-            {showEvent && <EventModal onClose={() => setShowEvent(false)} showReminder={false}
+            {showEvent && <EventModal onClose={() => setShowEvent(false)} showReminder={false} showTagManager={false}
                 customTags={tags} onSubmit={(d) => { onAddEvent?.(d); setShowEvent(false); }} />}
         </aside>
     );
@@ -39,13 +39,39 @@ function SidebarAnnouncementModal({ society, tags, onAdd, onUpdate, onClose }) {
         tags={tags} societyId={society.id} announcements={society.announcements} />;
 }
 
-function SidebarContent({ pinned, next, editMode }) {
-    if (!pinned && !next && !editMode) return <EmptyMessage />;
+function SidebarContent({ society, editMode }) {
+    const pinned = society.announcements?.find(a => a.pinned);
+    const next = society.events?.[0];
+    const hasAbout = society.about || society.admin_emails;
+    if (!hasAbout && !pinned && !next && !editMode) return <EmptyMessage />;
     return (
         <>
             {pinned && <PinnedSection announcement={pinned} />}
+            {hasAbout && <AboutSection about={society.about} adminEmails={society.admin_emails} />}
             {next && <UpcomingSection event={next} />}
         </>
+    );
+}
+
+function AboutSection({ about, adminEmails }) {
+    return (
+        <div className={styles.section}>
+            <h4 className={styles.sectionTitle}>About</h4>
+            {about && <p className={styles.aboutText}>{about}</p>}
+            {adminEmails && <AdminContact emails={adminEmails} />}
+        </div>
+    );
+}
+
+function AdminContact({ emails }) {
+    const list = emails.split(",").map(e => e.trim());
+    return (
+        <div className={styles.adminContact}>
+            <span className={styles.adminLabel}>Admin:</span>
+            {list.map((email, i) => (
+                <a key={i} href={`mailto:${email}`} className={styles.adminEmail}>{email}</a>
+            ))}
+        </div>
     );
 }
 
@@ -81,4 +107,3 @@ function AddButtons({ onAnnouncement, onEvent }) {
         </div>
     );
 }
-

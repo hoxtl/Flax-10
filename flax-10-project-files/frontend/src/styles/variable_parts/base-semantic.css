@@ -192,7 +192,7 @@
   --ai-panel-radius: 28px;
   --ai-panel-radius-mobile: 24px;
   --ai-panel-border: var(--border);
-  --ai-panel-shadow: 0 30px 80px rgba(49, 32, 16, 0.12), 0 8px 24px rgba(49, 32, 16, 0.06);
+  --ai-panel-shadow: 0 30px 80px color-mix(in srgb, var(--color-primary) 12%, transparent), 0 8px 24px color-mix(in srgb, var(--color-primary) 6%, transparent);
   --ai-card-title: var(--text);
   --ai-card-subtitle: var(--text-secondary);
   --ai-header-border: color-mix(in srgb, var(--color-primary) 12%, transparent);

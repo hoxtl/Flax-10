@@ -141,6 +141,7 @@ function useTaskSectionState(props) {
 }
 
 /* A collapsible group of tasks with a title, emoji, progress ring, and optional empty state. */
+
 export default function TaskSection(props) {
   const state = useTaskSectionState(props);
   if (state.isEmpty && !state.showEmptyState && props.completedCount === 0) return null;

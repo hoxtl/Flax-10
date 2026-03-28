@@ -104,6 +104,7 @@ function ReportActions({ onClose, onSubmit, submitting, disabled }) {
 }
 
 /** Modal that lets a user report a society. */
+
 export default function ReportSocietyModal({ society, onClose, onReportSuccess }) {
   const model = useReportSocietyModel(society.id, onReportSuccess);
   if (model.submitted) return <ReportSuccessModal societyName={society.name} onClose={onClose} />;

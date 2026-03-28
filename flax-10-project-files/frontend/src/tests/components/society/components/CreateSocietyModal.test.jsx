@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+
+const useToastMock = vi.fn();
 
 vi.mock('../../../../components/society/styles/CreateSocietyModal.module.css', () => ({ default: {} }));
 vi.mock('../../../../components/society/components/AddCollaboratorModal', () => ({
@@ -58,6 +60,9 @@ vi.mock('../../../../components/common/standard_modal/StandardModal', () => ({
         </div>
     ),
 }));
+vi.mock('../../../../context/ToastContext', () => ({
+    useToast: () => useToastMock(),
+}));
 
 import CreateSocietyModal from '../../../../components/society/components/CreateSocietyModal';
 
@@ -68,6 +73,8 @@ describe('CreateSocietyModal', () => {
     beforeEach(() => {
         onClose = vi.fn();
         onCreate = vi.fn();
+        useToastMock.mockReset();
+        useToastMock.mockReturnValue(undefined);
         vi.clearAllMocks();
     });
 
@@ -119,12 +126,14 @@ describe('CreateSocietyModal', () => {
         expect(onClose).toHaveBeenCalled();
     });
 
-    it('calls onCreate with form data when Create Society is clicked', () => {
+    it('calls onCreate with form data when Create Society is clicked', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
             target: { value: 'Chess Club' },
         });
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({ name: 'Chess Club' })
         );
@@ -186,32 +195,31 @@ describe('CreateSocietyModal', () => {
         expect(screen.getByText('alice')).toBeInTheDocument();
     });
 
-    it('opens photo modal when Add Photos is clicked', () => {
+    it('opens photo modal when Add Cover Image is clicked', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         expect(screen.getByTestId('photo-modal')).toBeInTheDocument();
     });
 
     it('closes photo modal when ClosePhoto is clicked', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         fireEvent.click(screen.getByText('ClosePhoto'));
         expect(screen.queryByTestId('photo-modal')).not.toBeInTheDocument();
     });
 
     it('updates images when photo is added via photo modal', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         fireEvent.click(screen.getByText('AddPhoto'));
-        // After adding a photo, the label should show (1/5)
-        expect(screen.getByText('(1/5)')).toBeInTheDocument();
+        expect(screen.getByText('(1/1)')).toBeInTheDocument();
     });
 
-    it('shows Manage Photos label after photo added', () => {
+    it('shows Edit Cover Image label after photo added', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         fireEvent.click(screen.getByText('AddPhoto'));
-        expect(screen.getByText('Manage Photos')).toBeInTheDocument();
+        expect(screen.getByText('Edit Cover Image')).toBeInTheDocument();
     });
 
     it('toggles ratification via the RatificationToggle', () => {
@@ -234,7 +242,7 @@ describe('CreateSocietyModal', () => {
         expect(bio.value).toBe('A fun photography club');
     });
 
-    it('includes bio in onCreate form data', () => {
+    it('includes bio in onCreate form data', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
             target: { value: 'Society X' },
@@ -242,19 +250,23 @@ describe('CreateSocietyModal', () => {
         fireEvent.change(screen.getByPlaceholderText('What is your society about?'), {
             target: { value: 'About us' },
         });
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({ name: 'Society X', bio: 'About us' })
         );
     });
 
-    it('includes categories in onCreate form data', () => {
+    it('includes categories in onCreate form data', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
             target: { value: 'Tech Society' },
         });
         fireEvent.click(screen.getByText('SelectCategory'));
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({ categories: ['Tech'] })
         );
@@ -270,7 +282,7 @@ describe('CreateSocietyModal', () => {
         expect(screen.queryByText('alice')).not.toBeInTheDocument();
     });
 
-    it('updates collaborator roles before submit', () => {
+    it('updates collaborator roles before submit', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
 
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
@@ -279,7 +291,9 @@ describe('CreateSocietyModal', () => {
         fireEvent.click(screen.getByText('+ Add Collaborators'));
         fireEvent.click(screen.getByText('AddCollab'));
         fireEvent.click(screen.getByText('ChangeRole'));
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
 
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -288,7 +302,7 @@ describe('CreateSocietyModal', () => {
         );
     });
 
-    it('preserves untouched collaborators when roles change and when one collaborator is removed', () => {
+    it('preserves untouched collaborators when roles change and when one collaborator is removed', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
 
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
@@ -299,7 +313,9 @@ describe('CreateSocietyModal', () => {
         fireEvent.click(screen.getByText('AddSecondCollab'));
         fireEvent.click(screen.getAllByText('ChangeRole')[0]);
         fireEvent.click(screen.getAllByText('Remove')[0]);
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
 
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -308,13 +324,46 @@ describe('CreateSocietyModal', () => {
         );
     });
 
-    it('shows Photos (0/5) label initially', () => {
+    it('shows Cover Image (0/1) label initially', () => {
         const { container } = render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        const addPhotosBtn = screen.getByText('+ Add Photos');
-        expect(addPhotosBtn).toBeInTheDocument();
+        const addCoverImageBtn = screen.getByText('+ Add Cover Image');
+        expect(addCoverImageBtn).toBeInTheDocument();
         const labels = container.querySelectorAll('label');
-        const photosLabel = Array.from(labels).find(l => l.textContent.includes('Photos'));
-        expect(photosLabel).toBeTruthy();
-        expect(photosLabel.textContent).toContain('0');
+        const coverImageLabel = Array.from(labels).find(l => l.textContent.includes('Cover Image'));
+        expect(coverImageLabel).toBeTruthy();
+        expect(coverImageLabel.textContent).toContain('(0/1)');
+    });
+
+    it('shows the submit error and toast when creation fails with an explicit message', async () => {
+        const showToast = vi.fn();
+        useToastMock.mockReturnValue(showToast);
+        onCreate.mockRejectedValue(new Error('Creation failed'));
+
+        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+        fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
+            target: { value: 'Drama Society' },
+        });
+
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
+
+        expect(screen.getByText('Creation failed')).toBeInTheDocument();
+        expect(showToast).toHaveBeenCalledWith('Creation failed', { variant: 'error' });
+    });
+
+    it('uses the fallback submit error when creation fails without a message', async () => {
+        onCreate.mockRejectedValue({});
+
+        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+        fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
+            target: { value: 'Debate Society' },
+        });
+
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
+
+        expect(screen.getByText("Couldn't create the society just yet.")).toBeInTheDocument();
     });
 });

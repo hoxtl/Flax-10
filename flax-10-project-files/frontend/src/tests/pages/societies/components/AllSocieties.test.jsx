@@ -110,6 +110,23 @@ describe('AllSocieties', () => {
         expect(screen.getByText(/No societies match/i)).toBeTruthy();
     });
 
+    it('clears the empty-state search and filters through the browse results callback', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+
+        fireEvent.click(screen.getByRole('button', { name: /Filter societies/i }));
+        const ratifiedBtn = screen.getAllByRole('button').find((button) => button.textContent?.includes('Ratified'));
+        if (ratifiedBtn) fireEvent.click(ratifiedBtn);
+
+        fireEvent.change(screen.getByPlaceholderText('Search societies...'), { target: { value: 'zzz' } });
+        expect(screen.getByText(/No societies match/i)).toBeTruthy();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
+
+        expect(screen.getByPlaceholderText('Search societies...')).toHaveValue('');
+        expect(screen.getByText('Art Society')).toBeTruthy();
+        expect(screen.getByText('Chess Club')).toBeTruthy();
+    });
+
     it('calls onSelect when a society card is clicked', () => {
         const onSelect = vi.fn();
         render(<AllSocieties onBack={vi.fn()} onSelect={onSelect} societies={mockSocieties} />);

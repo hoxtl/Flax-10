@@ -1,4 +1,5 @@
 /* Tests for CompletedTasksSection component rendering and visibility toggling */
+
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import CompletedTasksSection from "../../../../pages/tasks/components/CompletedTasksSection";

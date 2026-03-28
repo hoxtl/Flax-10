@@ -36,6 +36,16 @@ describe("SocietyDetailPage", () => {
     expect(screen.getByTestId("sidebar")).toBeInTheDocument();
   });
 
+  it("forwards hero bio edits into the society updater", () => {
+    const data = createSocietyDetailPageData();
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(data);
+
+    renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("rewrite-bio"));
+
+    expect(data.updateSociety).toHaveBeenCalledWith({ bio: "Updated bio" });
+  });
+
   it("renders loading and not-found states", () => {
     societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValueOnce(createSocietyDetailPageData({ loading: true }));
     const { unmount } = renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
@@ -58,7 +68,7 @@ describe("SocietyDetailPage", () => {
     societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(adminData);
     renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
 
-    fireEvent.click(screen.getByTitle("Report Society"));
+    fireEvent.click(screen.getByRole("button", { name: "Report Society" }));
     fireEvent.click(screen.getByTitle("Settings"));
     expect(adminData.modals.setShowReportModal).toHaveBeenCalledWith(true);
     expect(adminData.modals.setShowSettings).toHaveBeenCalledWith(true);
@@ -72,7 +82,7 @@ describe("SocietyDetailPage", () => {
     renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
 
     expect(screen.queryByTitle("Settings")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTitle("You have reported this society. Click to unreport."));
+    fireEvent.click(screen.getByRole("button", { name: "You have reported this society. Click to unreport." }));
     expect(memberData.handleUnreport).toHaveBeenCalledWith(memberData.society);
   });
 

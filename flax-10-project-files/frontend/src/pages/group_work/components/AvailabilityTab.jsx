@@ -2,7 +2,7 @@
  * GroupWork availability tab.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Clock3, Plus, Star, Trash2, X } from "lucide-react";
 import ConfirmModal from "../../../components/common/confirm_modal/ConfirmModal";
@@ -14,6 +14,8 @@ import { useAvailability } from "../hooks/useAvailability";
 import { formatSuggestionDateLabel, getMemberStatuses, getTeamSize, getSuggestionCount, getCurrentUserStatus } from "../utils/availabilityUtils";
 import styles from "../styles/AvailabilityTab.module.css";
 import meetingStyles from "../styles/AvailabilityMeetingCards.module.css";
+
+const MotionDiv = motion.div;
 
 const RESPONSE_META = {
     accepted: { label: "Accepted", Icon: Check, countClassName: meetingStyles.acceptedCount, avatarClassName: meetingStyles.responseAccepted },
@@ -31,19 +33,16 @@ function useSortedSuggestions(active_suggestions) {
 function useMeetingView(proposedSuggestions, confirmedSuggestions) {
     const [activeMeetingView, setActiveMeetingView] = useState("proposed");
     const [hasChosenMeetingView, setHasChosenMeetingView] = useState(false);
-    useEffect(() => {
-        if (hasChosenMeetingView) return;
-        if (!proposedSuggestions.length && confirmedSuggestions.length > 0) setActiveMeetingView("confirmed");
-    }, [confirmedSuggestions.length, hasChosenMeetingView, proposedSuggestions.length]);
+    const defaultMeetingView = !proposedSuggestions.length && confirmedSuggestions.length > 0 ? "confirmed" : "proposed";
     const onViewChange = (nextView) => { setHasChosenMeetingView(true); setActiveMeetingView(nextView); };
-    return { activeMeetingView, onViewChange };
+    return { activeMeetingView: hasChosenMeetingView ? activeMeetingView : defaultMeetingView, onViewChange };
 }
 
 function MeetingToggleButton({ isActive, label, count, onClick }) {
     return (
         <button type="button" className={`${styles.meetingToggleButton} ${isActive ? styles.meetingToggleButtonActive : ""}`} onClick={onClick}>
             {isActive && (
-                <motion.div
+                <MotionDiv
                     layoutId="meetingToggleIndicator"
                     className={styles.meetingToggleIndicator}
                     transition={{ type: "spring", stiffness: 380, damping: 32 }}
@@ -123,8 +122,15 @@ function DeleteButton({ suggestion, currentUserId, onDelete }) {
 function MeetingCardActions({ suggestion, currentUserId, onVote, onDelete }) {
     return (
         <div className={meetingStyles.suggestionActions}>
-            <VoteButtons suggestion={suggestion} currentUserId={currentUserId} onVote={onVote} />
-            <DeleteButton suggestion={suggestion} currentUserId={currentUserId} onDelete={onDelete} />
+            <div className={meetingStyles.countRow}>
+                <MeetingCountPill suggestion={suggestion} status="accepted" />
+                <MeetingCountPill suggestion={suggestion} status="rejected" />
+                <MeetingCountPill suggestion={suggestion} status="pending" />
+            </div>
+            <div className={meetingStyles.actionButtonRow}>
+                <VoteButtons suggestion={suggestion} currentUserId={currentUserId} onVote={onVote} />
+                <DeleteButton suggestion={suggestion} currentUserId={currentUserId} onDelete={onDelete} />
+            </div>
         </div>
     );
 }
@@ -166,11 +172,6 @@ function ProposedMeetingMeta({ suggestion }) {
         <div className={meetingStyles.suggestionMain}>
             <div className={meetingStyles.suggestionTopRow}>
                 <div className={meetingStyles.suggestionTitle}>{formatSuggestionDateLabel(suggestion.start)}</div>
-                <div className={meetingStyles.countRow}>
-                    <MeetingCountPill suggestion={suggestion} status="accepted" />
-                    <MeetingCountPill suggestion={suggestion} status="rejected" />
-                    <MeetingCountPill suggestion={suggestion} status="pending" />
-                </div>
             </div>
             <div className={meetingStyles.suggestionMeta}>Proposed by {suggestion.suggested_by.username}</div>
             <div className={meetingStyles.suggestionSubtext}>{teamSize} team members tracking this slot</div>
@@ -241,9 +242,9 @@ function MeetingCardsSection({ activeView, proposedSuggestions, confirmedSuggest
     const items = isConfirmedView ? confirmedSuggestions : proposedSuggestions;
     return (
         <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={activeView} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+            <MotionDiv key={activeView} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: "easeOut" }}>
                 <MeetingCardsContent isConfirmedView={isConfirmedView} items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />
-            </motion.div>
+            </MotionDiv>
         </AnimatePresence>
     );
 }

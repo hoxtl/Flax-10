@@ -6,6 +6,7 @@ import json
 from rest_framework import status
 from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Tag
+from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 
 
 class TagDetailTests(BaseTestCase):
@@ -166,3 +167,12 @@ class TagListTests(BaseTestCase):
         get_societies_tag()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_tag_list_with_group_membership_shows_group_study_tag(self):
+        project = GroupProject.objects.create(name='Study Sprint', course_code='CS101', owner=self.user)
+        GroupMembership.objects.create(project=project, user=self.user, role='owner')
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('Group Study', [tag['name'] for tag in response.data])

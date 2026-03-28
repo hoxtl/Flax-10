@@ -3,25 +3,33 @@
  * society events by their assigned category/tags.
  */
 
-import BasePill from "../../../tags/components/BasePill";
+import { TagsSelector } from "../../../common/tags_selector/TagsSelector";
 import styles from "./TagFilterBar.module.css";
 
-export default function TagFilterBar({ tags, activeFilters = [], onFilterChange }) {
-    if (!tags || tags.length === 0) return null;
+const ALL_TAG = { id: "__all__", label: "All" };
 
-    const isAllActive = activeFilters.length === 0;
-    const toggleTag = (tagId) => {
-        if (activeFilters.includes(tagId)) onFilterChange(activeFilters.filter(id => id !== tagId));
-        else onFilterChange([...activeFilters, tagId]);
-    };
+function getSelectedTags(tags, activeFilters) {
+    return activeFilters.length === 0 ? [ALL_TAG] : tags.filter((tag) => activeFilters.includes(tag.id));
+}
 
+function getNextFilterIds(nextSelection, selectedTags) {
+    const nextIds = nextSelection.map((tag) => tag.id).filter((id) => id !== ALL_TAG.id);
+    if (nextSelection.length === 0) return [];
+    if (!nextSelection.some((tag) => tag.id === ALL_TAG.id)) return nextIds;
+    return selectedTags.some((tag) => tag.id === ALL_TAG.id) ? nextIds : [];
+}
+
+function FilterSelector({ tags, selectedTags, onSelectionChange }) {
     return (
         <div className={styles.filterBar}>
-            <BasePill label="All" isActive={isAllActive} onClick={() => onFilterChange([])} />
-            {tags.map(tag => (
-                <BasePill key={tag.id} label={tag.label} color={tag.color}
-                    isActive={activeFilters.includes(tag.id)} onClick={() => toggleTag(tag.id)} />
-            ))}
+            <TagsSelector className={styles.selector} tags={[ALL_TAG, ...tags]} selectedTags={selectedTags} onSelectionChange={onSelectionChange} emptyHint="All" variant="inline" />
         </div>
     );
+}
+
+/** Renders the tag filter controls for society events. */
+export default function TagFilterBar({ tags, activeFilters = [], onFilterChange }) {
+    if (!tags?.length) return null;
+    const selectedTags = getSelectedTags(tags, activeFilters);
+    return <FilterSelector tags={tags} selectedTags={selectedTags} onSelectionChange={(selection) => onFilterChange(getNextFilterIds(selection, selectedTags))} />;
 }

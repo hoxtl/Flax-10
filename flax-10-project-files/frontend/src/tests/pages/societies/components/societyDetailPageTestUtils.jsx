@@ -109,21 +109,26 @@ function createMutations() {
   return mutations;
 }
 
-function SocietyHeroMock({ society, onUpdateName, onImageClick, onEditImages }) {
+function SocietyHeroMock({ society, onUpdateName, onUpdateBio, onImageClick, onEditImages, onViewMembers, actionContent, metaContent }) {
   return (
     <div data-testid="hero">
       <span>{society.name}</span>
       <button type="button" onClick={() => onUpdateName("Renamed Society")}>rename-society</button>
+      <button type="button" onClick={() => onUpdateBio("Updated bio")}>rewrite-bio</button>
       <button type="button" onClick={() => onImageClick(1)}>open-gallery</button>
       <button type="button" onClick={onEditImages}>edit-images</button>
+      <button type="button" onClick={onViewMembers}>view-members</button>
+      {actionContent}
+      {metaContent}
     </div>
   );
 }
 
-function SocietyInfoMock({ onViewMembers, onToggleEditMode }) {
+function SocietyInfoMock({ onViewMembers, onToggleEditMode, showMeta = true }) {
+  if (!showMeta) return null;
+
   return (
     <div data-testid="info">
-      <button type="button" onClick={onViewMembers}>view-members</button>
       <button type="button" onClick={onToggleEditMode}>toggle-edit-mode</button>
     </div>
   );
@@ -237,6 +242,7 @@ vi.mock("../../../../components/common/back_button/BackButton.jsx", () => ({ def
 vi.mock("../../../../pages/societies/components/SocietySkeletons", () => ({ SocietyDetailSkeleton: SocietySkeletonMock }));
 
 /** Builds the open-modal overrides used by interaction tests. */
+
 export function createSocietyDetailPageInteractiveOverrides() {
   return {
     modals: {
@@ -255,6 +261,7 @@ export function createSocietyDetailPageInteractiveOverrides() {
 }
 
 /** Renders the society detail page inside a memory router. */
+
 export function renderSocietyDetailPage(ui, { routeState } = {}) {
   const initialEntries = routeState ? [{ pathname: "/societies/1", state: routeState }] : ["/societies/1"];
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
@@ -286,6 +293,7 @@ function createOpenModalDefaults(overrides = {}) {
 }
 
 /** Builds default society detail page hook data for tests. */
+
 export function createSocietyDetailPageData(overrides = {}) {
   return {
     ...mergeNested(BASE_DETAIL_DATA, overrides, DETAIL_NESTED_KEYS),
@@ -294,6 +302,7 @@ export function createSocietyDetailPageData(overrides = {}) {
 }
 
 /** Builds society detail data with every modal open for prop tests. */
+
 export function createSocietyDetailPageModalData(overrides = {}) {
   return createSocietyDetailPageData({
     ...overrides,

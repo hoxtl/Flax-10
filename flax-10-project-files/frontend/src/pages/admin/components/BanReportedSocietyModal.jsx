@@ -31,6 +31,7 @@ function BanForm({ busy, inputId, onClose, onReasonChange, onSubmit, reason }) {
 }
 
 /** Modal for confirming a society ban with an optional reason note. */
+
 export default function BanReportedSocietyModal({ busy = false, onCancel, onConfirm, report }) {
   const [reason, setReason] = useState("");
   const inputId = `ban-society-reason-${report?.id || "pending"}`;

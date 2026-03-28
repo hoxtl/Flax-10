@@ -6,11 +6,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--restoration-earth, #6B5344);
-  color: #F8F5F2;
+  background: var(--primary-strong);
+  color: var(--color-bg);
   padding: 0.75rem 1.25rem 0.75rem 1rem;
   border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(74, 52, 33, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--primary) 20%, transparent), 0 2px 6px color-mix(in srgb, var(--primary) 8%, transparent);
   z-index: 10000;
   font-family: var(--font-body, "Inter", system-ui, sans-serif);
   font-size: 0.85rem;
@@ -81,7 +81,7 @@
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
   animation: levelUpOverlayFade 2.5s ease-out forwards;
 }
 
@@ -99,7 +99,7 @@
   border: 1px solid var(--border);
   border-radius: 9999px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
 .levelUpOverlayClose:hover {

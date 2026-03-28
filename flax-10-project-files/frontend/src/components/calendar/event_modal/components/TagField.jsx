@@ -5,7 +5,7 @@ import TagManagerModal from '../../../tags/components/TagManagerModal';
 function getSelectionHandler(onChange) {
     return (s) => onChange({ target: { value: s.length ? s[s.length - 1].id : '' } });
 }
-export function TagField({ value, onChange, customTags }) {
+export function TagField({ value, onChange, customTags, showManager = true }) {
     const globalTags = useTags();
     const tags = customTags || globalTags.tags || [];
     const [manager, setManager] = useState(false);
@@ -15,7 +15,7 @@ export function TagField({ value, onChange, customTags }) {
         <div className="form-field">
             <div className="tag-field-header">
                 <label>Type</label>
-                <button type="button" className="tag-manage-btn" onClick={() => setManager(true)}>Manage tags…</button>
+                {showManager && <button type="button" className="tag-manage-btn" onClick={() => setManager(true)}>Manage tags…</button>}
             </div>
             <TagsSelector tags={unique} selectedTags={selected} onSelectionChange={getSelectionHandler(onChange)} emptyHint="Select event type…" />
             {manager && <TagManagerModal onClose={() => setManager(false)} />}

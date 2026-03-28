@@ -140,6 +140,7 @@ describe('projectRowUtils – compareProjectsBySort (advanced)', () => {
     expect(compareProjectsBySort(a, b, 'created-asc')).toBeLessThan(0);
     expect(compareProjectsBySort(a, b, 'created-desc')).toBeGreaterThan(0);
     expect(compareProjectsBySort(a, b, 'due-date')).toBeLessThan(0);
+    expect(compareProjectsBySort(a, b, 'due-date-desc')).toBeGreaterThan(0);
   });
 
   it('uses completion and tie breakers with differing member counts', () => {

@@ -17,11 +17,11 @@
     min-height: 0;
     border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
     box-shadow: var(--card-shadow-rest);
-    background: var(--surface-card, #faf7f3);
+    background: var(--surface-card);
 }
 
 .taskPickBackdrop {
-    background: rgba(20, 14, 8, 0.42);
+    background: color-mix(in srgb, var(--primary-strong) 42%, transparent);
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
 }
@@ -102,12 +102,12 @@
 }
 
 .taskPickList::-webkit-scrollbar-thumb {
-    background: rgba(74, 52, 33, 0.15);
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
     border-radius: 9999px;
 }
 
 .taskPickList::-webkit-scrollbar-thumb:hover {
-    background: rgba(74, 52, 33, 0.28);
+    background: color-mix(in srgb, var(--primary) 28%, transparent);
 }
 
 .taskPickItem {

@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSocietyCalendarSync } from '../../../../components/society/hooks/useSocietyCalendarSync';
 import * as api from '../../../../api/societyApi';
-import { useNotify } from '../../../../components/notifications/hooks/useNotify';
 import { useTags } from '../../../../context/TagContext';
+import { useToast } from '../../../../context/ToastContext';
 
 vi.mock('../../../../api/societyApi', () => ({
     getSyncStatus: vi.fn(),
@@ -11,8 +11,8 @@ vi.mock('../../../../api/societyApi', () => ({
     unsyncCalendar: vi.fn()
 }));
 
-vi.mock('../../../../components/notifications/hooks/useNotify', () => ({
-    useNotify: vi.fn(() => vi.fn())
+vi.mock('../../../../context/ToastContext', () => ({
+    useToast: vi.fn(() => vi.fn())
 }));
 
 vi.mock('../../../../context/TagContext', () => ({
@@ -21,12 +21,12 @@ vi.mock('../../../../context/TagContext', () => ({
 
 describe('useSocietyCalendarSync', () => {
     const mockId = 1;
-    let notify, refreshTags;
+    let showToast, refreshTags;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        notify = vi.fn();
-        useNotify.mockReturnValue(notify);
+        showToast = vi.fn();
+        useToast.mockReturnValue(showToast);
         refreshTags = vi.fn();
         useTags.mockReturnValue({ refreshTags });
         api.getSyncStatus.mockResolvedValue({ is_synced: false });
@@ -65,7 +65,7 @@ describe('useSocietyCalendarSync', () => {
         });
         expect(api.unsyncCalendar).toHaveBeenCalledWith(mockId);
         expect(syncedHook.current.isSynced).toBe(false);
-        expect(notify).toHaveBeenCalledWith('Unsync Successful', expect.any(String));
+        expect(showToast).toHaveBeenCalledWith(expect.stringContaining('unsynced'), expect.objectContaining({ title: 'Unsync Successful' }));
     });
 
     it('toggleSync syncs when not synced', async () => {
@@ -78,7 +78,7 @@ describe('useSocietyCalendarSync', () => {
         });
         expect(api.syncCalendar).toHaveBeenCalledWith(mockId);
         expect(result.current.isSynced).toBe(true);
-        expect(notify).toHaveBeenCalledWith('Sync Successful', expect.any(String));
+        expect(showToast).toHaveBeenCalledWith(expect.stringContaining('synced'), expect.objectContaining({ title: 'Sync Successful' }));
     });
 
     it('toggleSync handles error', async () => {

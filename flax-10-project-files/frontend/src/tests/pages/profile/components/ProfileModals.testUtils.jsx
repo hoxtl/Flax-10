@@ -80,6 +80,7 @@ const defaultVisibility = {
 };
 
 /** Builds profile modal state with mocked setters and handlers. */
+
 export function makeProfileModalState(overrides = {}) {
   return {
     ...modalStateDefaults,
@@ -117,11 +118,13 @@ function buildProfileModalProps({
 }
 
 /** Renders the profile modals component with default test props. */
+
 export function renderProfileModals(options = {}) {
   return render(<ProfileModals {...buildProfileModalProps(options)} />);
 }
 
 /** Renders the societies modal with default test props. */
+
 export function renderSocietiesModal({ isOpen = true, societies = [], onNavigate = vi.fn(), onClose = vi.fn() } = {}) {
   const utils = render(<SocietiesModal isOpen={isOpen} onClose={onClose} societies={societies} onNavigate={onNavigate} />);
   return { ...utils, onClose, onNavigate };

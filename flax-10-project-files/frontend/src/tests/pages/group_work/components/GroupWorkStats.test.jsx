@@ -37,7 +37,7 @@ describe("GroupWorkStats", () => {
     render(<GroupWorkStats projects={[{ id: 1 }]} />);
     
     expect(screen.getByTestId("stat-active-projects")).toHaveTextContent("Active projects: 1");
-    expect(screen.getByTestId("stat-next-deadline")).toHaveTextContent("Upcoming deadlines: 5");
+    expect(screen.getByTestId("stat-next-deadline")).toHaveTextContent("Days to next deadline: 5");
     expect(screen.getByTestId("stat-overall-progress")).toHaveTextContent("Overall progress: 45%");
   });
 
@@ -48,6 +48,6 @@ describe("GroupWorkStats", () => {
     render(<GroupWorkStats projects={[]} />);
     
     expect(screen.getByTestId("stat-active-projects")).toHaveTextContent("Active projects: 0");
-    expect(screen.getByTestId("stat-next-deadline")).toHaveTextContent("Upcoming deadlines: --");
+    expect(screen.getByTestId("stat-next-deadline")).toHaveTextContent("Days to next deadline: --");
   });
 });

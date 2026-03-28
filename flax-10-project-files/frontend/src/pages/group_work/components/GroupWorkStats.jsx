@@ -10,7 +10,7 @@ import { getNextDeadline, getProgressStats } from "../utils/projectStatsUtils";
 function buildDeadlineStatItem(deadline, deadlineCountRef) {
     return {
         key: "next-deadline",
-        label: "Upcoming deadlines",
+        label: "Days to next deadline",
         value: deadline.project ? deadline.days : "--",
         valueRef: deadline.project ? deadlineCountRef : undefined,
         tooltip: deadline.project ? deadline.project.name : undefined,

@@ -2,12 +2,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import SettingsModal from '../../../../components/society/society_detail/SettingsModal';
 
-const confirmMock = vi.fn();
-
-vi.mock('../../../../context/ConfirmContext', () => ({
-  useConfirm: () => confirmMock,
-}));
-
 vi.mock('../../../../components/society/society_detail/SettingsModal.module.css', () => ({
     default: { backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title' }
 }));
@@ -37,6 +31,15 @@ vi.mock('../../../../components/society/society_detail/RatificationSection', () 
   RatificationSection: ({ status }) => <div>Ratification: {status}</div>,
 }));
 
+vi.mock('../../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({
+  default: ({ onConfirm, onCancel }) => (
+    <div>
+      <button onClick={onConfirm}>confirm-delete</button>
+      <button onClick={onCancel}>cancel-delete</button>
+    </div>
+  ),
+}));
+
 function baseProps(overrides = {}) {
   return {
     onClose: vi.fn(),
@@ -59,7 +62,6 @@ function baseProps(overrides = {}) {
 describe('SocietyDetail/SettingsModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    confirmMock.mockResolvedValue(true);
   });
 
   it('fetches members on mount and renders sections', () => {
@@ -98,9 +100,9 @@ describe('SocietyDetail/SettingsModal', () => {
 
   it('supports close actions and confirms deletion', async () => {
     const props = baseProps();
-    const { container } = render(<SettingsModal {...props} />);
+    render(<SettingsModal {...props} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '×' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(props.onClose).toHaveBeenCalledTimes(1);
 
     // Modal backdrop is portal-rendered into document.body.
@@ -110,21 +112,20 @@ describe('SocietyDetail/SettingsModal', () => {
     expect(props.onClose).toHaveBeenCalledTimes(2);
 
     fireEvent.click(screen.getByText('Delete Society'));
-    await waitFor(() => {
-      expect(confirmMock).toHaveBeenCalled();
-      expect(props.onDelete).toHaveBeenCalled();
-      expect(props.onClose).toHaveBeenCalledTimes(3);
-    });
+    fireEvent.click(screen.getByText('confirm-delete'));
+
+    await waitFor(() => expect(props.onDelete).toHaveBeenCalled());
+    expect(props.onClose).toHaveBeenCalledTimes(3);
   });
 
-  it('does not delete when confirm is declined', async () => {
-    confirmMock.mockResolvedValue(false);
+  it('does not delete when confirmation is cancelled', async () => {
     const props = baseProps();
     render(<SettingsModal {...props} />);
 
     fireEvent.click(screen.getByText('Delete Society'));
+    fireEvent.click(screen.getByText('cancel-delete'));
 
-    await waitFor(() => expect(confirmMock).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByText('confirm-delete')).toBeNull());
     expect(props.onDelete).not.toHaveBeenCalled();
   });
 

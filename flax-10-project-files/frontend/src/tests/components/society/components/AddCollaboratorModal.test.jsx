@@ -116,7 +116,7 @@ describe('AddCollaboratorModal', () => {
         expect(screen.getByText('Add').closest('button')).toBeDisabled();
     });
 
-    it('calls onAdd and onClose when Add is clicked with selected users', () => {
+    it('calls onAdd and onClose when Add is clicked with selected users', async () => {
         const onAdd = vi.fn();
         const onClose = vi.fn();
         render(<AddCollaboratorModal onClose={onClose} onAdd={onAdd} />);
@@ -124,8 +124,62 @@ describe('AddCollaboratorModal', () => {
         fireEvent.click(screen.getByText('Select Alice'));
         fireEvent.click(screen.getByText('Add'));
 
-        expect(onAdd).toHaveBeenCalledWith([{ id: 1, username: 'alice' }]);
-        expect(onClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(onAdd).toHaveBeenCalledWith([{ id: 1, username: 'alice' }]);
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('shows error message when onAdd throws', async () => {
+        const onAdd = vi.fn().mockRejectedValue(new Error('Already a member'));
+        const onClose = vi.fn();
+        render(<AddCollaboratorModal onClose={onClose} onAdd={onAdd} />);
+
+        fireEvent.click(screen.getByText('Select Alice'));
+        fireEvent.click(screen.getByText('Add'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Already a member')).toBeTruthy();
+        });
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the default error message when the rejection has no message', async () => {
+        const onAdd = vi.fn().mockRejectedValue({});
+        render(<AddCollaboratorModal onClose={vi.fn()} onAdd={onAdd} />);
+
+        fireEvent.click(screen.getByText('Select Alice'));
+        fireEvent.click(screen.getByText('Add'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Failed to add collaborator. Please try again.')).toBeTruthy();
+        });
+    });
+
+    it('does not duplicate a user when they are selected twice', async () => {
+        const onAdd = vi.fn();
+        render(<AddCollaboratorModal onClose={vi.fn()} onAdd={onAdd} />);
+
+        fireEvent.click(screen.getByText('Select Alice'));
+        fireEvent.click(screen.getByText('Select Alice'));
+        fireEvent.click(screen.getByText('Add'));
+
+        await waitFor(() => {
+            expect(onAdd).toHaveBeenCalledWith([{ id: 1, username: 'alice' }]);
+        });
+        expect(screen.getAllByLabelText('Remove alice')).toHaveLength(1);
+    });
+
+    it('returns early when confirm runs with no selected collaborators', () => {
+        const onAdd = vi.fn();
+        render(<AddCollaboratorModal onClose={vi.fn()} onAdd={onAdd} />);
+
+        const addButton = screen.getByText('Add').closest('button');
+        addButton.disabled = false;
+        fireEvent.click(addButton);
+
+        expect(onAdd).not.toHaveBeenCalled();
+        expect(screen.queryByText('Adding...')).toBeNull();
     });
 
     it('uses the filter default users branch and renders the custom empty state content', async () => {

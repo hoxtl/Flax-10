@@ -35,6 +35,7 @@ vi.mock('../../../components/calendar/hooks/calendarHelpers', () => ({
 describe('useCalendarEvents', () => {
   let dispatch;
   let monthOffset = 0;
+  let pendingDateOffset = 0;
 
   beforeEach(() => {
     vi.resetAllMocks();
@@ -145,9 +146,11 @@ describe('useCalendarEvents', () => {
   }
 
   function createPendingCalendarState() {
+    const selectedDate = new Date(2026, 7 + pendingDateOffset, 9).toISOString();
+    pendingDateOffset += 1;
     return {
       events: [],
-      selectedDate: new Date(2026, 7, 9).toISOString(),
+      selectedDate,
       viewMode: 'month',
       reloadKey: 0,
       sharedCalendarUserId: null,
@@ -168,6 +171,10 @@ describe('useCalendarEvents', () => {
     calendarState = { ...calendarState, selectedDate: new Date(2026, 7, 10).toISOString() };
     rerender();
     expect(getEventsMock).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      resolveEvents([{ id: 20 }]);
+      await pendingEvents;
+    });
   });
 
   it('dispatches the resolved result from a pending request', async () => {
@@ -176,9 +183,8 @@ describe('useCalendarEvents', () => {
       resolveEvents = resolve;
     });
     getEventsMock.mockReturnValueOnce(pendingEvents);
-    const { result } = renderCalendarEventsWithState(createPendingCalendarState());
+    renderCalendarEventsWithState(createPendingCalendarState());
     await act(async () => {
-      await result.current.loadEvents();
       resolveEvents([{ id: 19 }]);
       await pendingEvents;
     });
@@ -186,11 +192,18 @@ describe('useCalendarEvents', () => {
   });
 
   it('reloads events when the reload key changes', async () => {
-    let calendarState = { ...createPendingCalendarState(), selectedDate: new Date(2026, 7, 10).toISOString() };
-    const { rerender } = renderCalendarEventsWithState(calendarState);
+    let calendarState = createPendingCalendarState();
+    useCalendarMock.mockImplementation(() => calendarState);
+    const { rerender } = renderHook(({ tick }) => {
+      void tick;
+      return useCalendarEvents();
+    }, { initialProps: { tick: 0 } });
     await waitFor(() => expect(getEventsMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(dispatch).toHaveBeenCalledWith({ type: 'SET_EVENTS', payload: [{ id: 2 }] }));
     calendarState = { ...calendarState, reloadKey: 1 };
-    rerender();
+    await act(async () => {
+      rerender({ tick: 1 });
+    });
     await waitFor(() => expect(getEventsMock).toHaveBeenCalledTimes(2));
   });
 

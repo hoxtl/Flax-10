@@ -59,6 +59,7 @@ function LocationDropdown({ options, onSelect }) {
 }
 
 /** Autocomplete text input filtered against known KCL campus locations. */
+
 export default function LocationAutocomplete({ value, onChange, placeholder, inputClassName }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);

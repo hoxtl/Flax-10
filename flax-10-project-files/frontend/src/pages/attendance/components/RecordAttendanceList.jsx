@@ -7,6 +7,7 @@
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { recordAttendance } from "../../../api/attendanceApi";
+import { useToast } from "../../../context/ToastContext";
 import AttendanceEventList from "./AttendanceEventList";
 import AttendanceListSection from "./AttendanceListSection";
 import AttendanceRecordActions from "./AttendanceRecordActions";
@@ -25,6 +26,7 @@ function isAttendanceEvent(event) {
 }
 
 function useRecordAttendanceState(onRecorded) {
+  const showToast = useToast();
   const [submittingId, setSubmittingId] = useState(null);
   const [successState, setSuccessState] = useState(null);
   const timerRef = useRef(null);
@@ -33,7 +35,7 @@ function useRecordAttendanceState(onRecorded) {
     setSuccessState({ attended });
     timerRef.current = setTimeout(() => setSuccessState(null), 1500);
   };
-  const onRecord = (eventId, attended) => submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess);
+  const onRecord = (eventId, attended) => submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess, showToast);
   return { submittingId, successState, onRecord };
 }
 
@@ -57,15 +59,21 @@ export default function RecordAttendanceList({ events, onRecorded }) {
   );
 }
 
-async function submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess) {
+async function submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess, showToast) {
   setSubmittingId(eventId);
   try {
     await recordAttendance(eventId, attended);
     showSuccess(attended);
-    onRecorded?.();
+    showToast?.(buildAttendanceMarkedMessage(attended));
+    await onRecorded?.(attended);
   } catch {
+    showToast?.("Couldn't mark attendance. Try again.", { variant: "error" });
     return null;
   } finally {
     setSubmittingId(null);
   }
+}
+
+function buildAttendanceMarkedMessage(attended) {
+  return attended ? "Attendance marked." : "Attendance marked as missed.";
 }

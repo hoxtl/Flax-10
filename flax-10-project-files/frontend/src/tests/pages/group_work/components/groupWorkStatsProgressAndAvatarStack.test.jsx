@@ -29,7 +29,7 @@ describe("GroupWork presentation low-coverage components", () => {
   it("renders overview stats with deadline and progress values", () => {
     render(<GroupWorkStats projects={[{ id: 1 }, { id: 2 }]} />);
     expect(screen.getByTestId("stat-strip")).toHaveTextContent(
-      "Active projects:2|Upcoming deadlines:3|Overall progress:42%",
+      "Active projects:2|Days to next deadline:3|Overall progress:42%",
     );
   });
 

@@ -18,18 +18,28 @@
     margin: 0 0 0.75rem 0;
 }
 
-.requestBtn {
-    padding: 0.5rem 1rem;
-    background: var(--primary-color, #9E7E5D);
-    border: none;
-    color: var(--color-card);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
+.compactLead {
+    color: var(--text, #1f2937);
+    font-size: 0.95rem;
+    line-height: 1.45;
+    margin: 0 0 0.75rem 0;
+    font-weight: 500;
 }
 
-.requestBtn:hover {
-    filter: brightness(1.1);
+.compactTitle {
+    margin: 0;
+    color: var(--text, #1f2937);
+    font-size: 0.98rem;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+.requestBtn {
+    margin-top: 0.65rem;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 500;
+    box-shadow: none;
 }
 
 .statusApproved {

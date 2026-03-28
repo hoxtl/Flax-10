@@ -1,6 +1,7 @@
 /*
  * Dialog-state and toast-behaviour tests for ScheduleManagerButton.
  */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { ScheduleManagerButton } from "../../../../../components/calendar/header/schedule_manager/ScheduleManagerButton";

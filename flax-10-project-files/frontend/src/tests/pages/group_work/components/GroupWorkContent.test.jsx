@@ -2,6 +2,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
+  mockAnimatedDropdown,
   mockCompareProjectsBySort,
   mockSearchEmptyState,
   resetGroupWorkContentMocks,
@@ -69,6 +70,16 @@ describe("GroupWorkContent", () => {
     renderContent();
     expect(mockCompareProjectsBySort).toHaveBeenCalled();
     expect(mockCompareProjectsBySort.mock.calls[0][2]).toBe("due-date");
+  });
+
+  it("offers a latest-first due date sort option", () => {
+    renderContent();
+    const [[{ options }]] = mockAnimatedDropdown.mock.calls;
+    expect(options).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: "due-date-desc", label: "Due date (latest first)" }),
+      ]),
+    );
   });
 
   it("handles projects without names during filtering", () => {

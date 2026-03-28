@@ -54,6 +54,7 @@ function CompletedCardsList({ sorted, listMap, lists, onToggleComplete, onDelete
 }
 
 /* Renders a collapsible list of completed tasks. */
+
 export default function CompletedTasksSection({ tasks, sortBy, listMap, lists, onToggleComplete, onDeleteTask, onEditTask }) {
   const [showDone, setShowDone] = useState(true);
   if (tasks.length === 0) return null;

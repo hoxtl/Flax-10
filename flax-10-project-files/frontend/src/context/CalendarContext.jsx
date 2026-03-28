@@ -1,11 +1,17 @@
+/*
+ * Calendar context state and shared view data hooks.
+ */
+
 import { createContext, useContext, useReducer, useMemo } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
 import { useReminderNotifications } from "../components/notifications/hooks/useReminderNotifications";
-import { getEffectiveTagName } from "../components/calendar/utils/eventUtils";
+import { dedupeEvents, getEffectiveTagName } from "../components/calendar/utils/eventUtils";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
 const DEFAULT_CONTEXT = { events: [], allEvents: [], selectedDate: new Date(), viewMode: 'month', displayMode: 'grid', filter: 'all', reloadKey: 0 };
+
+/** Provides calendar state and dispatch to descendant calendar features. */
 
 export function CalendarProvider({ children }) {
     const [state, dispatch] = useReducer(calendarReducer, initialState);
@@ -20,21 +26,22 @@ export function CalendarProvider({ children }) {
     );
 }
 
+/** Returns filtered calendar state together with the full deduplicated event list. */
+
 export function useCalendar() {
     const context = useContext(CalendarContext);
     const filter = context?.filter;
     const searchQuery = context?.searchQuery;
-    const events = context?.events;
+    const uniqueEvents = useMemo(() => dedupeEvents(context?.events), [context?.events]);
 
     const filteredEvents = useMemo(() => {
-        if (!events) return [];
-        return applyFilters(events, filter, searchQuery);
-    }, [events, filter, searchQuery]);
+        return applyFilters(uniqueEvents, filter, searchQuery);
+    }, [uniqueEvents, filter, searchQuery]);
 
     return useMemo(() => {
         if (!context) return DEFAULT_CONTEXT;
-        return { ...context, events: filteredEvents, allEvents: context.events };
-    }, [context, filteredEvents]);
+        return { ...context, events: filteredEvents, allEvents: uniqueEvents };
+    }, [context, filteredEvents, uniqueEvents]);
 }
 
 function applyFilters(events, filter, searchQuery) {
@@ -64,19 +71,26 @@ function matchesSearch(event, query) {
     return title.includes(query) || description.includes(query) || location.includes(query);
 }
 
+/** Returns calendar view data with prop overrides and deduplicated events. */
+
 export function useCalendarData(props = {}) {
     const calendarState = useCalendar();
+    const events = useMemo(() => dedupeEvents(props.events ?? calendarState.events), [props.events, calendarState.events]);
     return useMemo(() => ({
         selectedDate: props.selectedDate ?? calendarState.selectedDate,
-        events: props.events ?? calendarState.events,
+        events,
         viewMode: props.viewMode ?? calendarState.viewMode,
         displayMode: props.displayMode ?? calendarState.displayMode,
-    }), [props.selectedDate, props.events, props.viewMode, props.displayMode, calendarState]);
+    }), [props.selectedDate, props.viewMode, props.displayMode, calendarState, events]);
 }
+
+/** Returns the calendar dispatch function when a provider is available. */
 
 export function useCalendarDispatch() {
     return useContext(CalendarDispatchContext);
 }
+
+/** Returns event modal state plus open and close helpers. */
 
 export function useEventModal() {
     const context = useContext(CalendarContext);
@@ -94,6 +108,8 @@ export function useEventModal() {
     return { modalEvent, modalType, modalInitialDate, isModalOpen, openModal, closeModal };
 }
 
+/** Returns event popup state plus open and close helpers. */
+
 export function useEventPopup() {
     const context = useContext(CalendarContext);
     const dispatch = useContext(CalendarDispatchContext);
@@ -110,6 +126,8 @@ export function useEventPopup() {
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
     return { popupEvent, popupAnchorRect, readOnly: popupReadOnly || contextReadOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
 }
+
+/** Returns delete-confirmation state plus open and close helpers. */
 
 export function useEventDelete() {
     const context = useContext(CalendarContext);

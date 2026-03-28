@@ -55,7 +55,8 @@ the system as a whole.
 The system consists of two software components:
 
 \begin{itemize}
-    \item \textbf{Backend} --- A Django (Python 3.14) REST API backed
+    \item \textbf{Backend} --- A Django REST API developed primarily
+          with Python 3.12 in the Nix environment and backed
           by a PostgreSQL database.
     \item \textbf{Frontend} --- A React (Vite) single-page application.
 \end{itemize}
@@ -76,6 +77,12 @@ environment. Installation of the operating system itself is assumed.
     \item \textbf{Git}\\
           \url{https://git-scm.com/downloads}
 
+    \item \textbf{Python} (v3.12 recommended for manual local setup)\\
+          \url{https://www.python.org/downloads/}
+
+    \item \textbf{Node.js} (v20 recommended)\\
+          \url{https://nodejs.org/}
+
     \item \textbf{PostgreSQL} (only required for manual setup without Nix)\\
           \url{https://www.postgresql.org/download/}
 \end{itemize}
@@ -93,22 +100,25 @@ cd Flax-10
 % ─────────────────────────────────────────────────────────────
 \chapter{Setting Up the Development Environment with Nix}
 
-This project uses a Nix flake to automate the full development
-environment setup. Upon entering the Nix shell, the following steps
-are performed automatically:
+This project uses a Nix flake to provide a reproducible development
+environment. The Nix shell itself only provides the required tools and
+prints the available entrypoints. Project setup and common tasks are
+then run explicitly using the Nix packages defined in
+\texttt{flake.nix}.
 
 \begin{itemize}
-    \item A Python 3.14 virtual environment is created and activated.
-    \item All Python dependencies are installed from
-          \texttt{requirements.txt}.
-    \item All Node.js (v20) dependencies are installed via npm.
-    \item Django database migrations are applied
-          (\texttt{makemigrations} and \texttt{migrate}).
-    \item The database is seeded with fixture and generated data.
-    \item The Django development server is started on
-          \texttt{http://localhost:8000}.
-    \item The Vite frontend development server is started.
-    \item Backend and frontend coverage reports are generated.
+    \item \texttt{nix develop} enters the shell and exposes Python,
+          Node.js, Git, and PostgreSQL tooling.
+    \item \texttt{nix run .\#init} creates the project virtual
+          environment, installs Python and Node dependencies, prepares
+          a project-local PostgreSQL instance, applies migrations, and
+          seeds the database.
+    \item \texttt{nix run .\#run} starts the backend and frontend
+          development servers.
+    \item \texttt{nix run .\#tests} runs backend and frontend automated
+          tests and writes coverage reports to \texttt{./coverage/}.
+    \item \texttt{nix run .\#seed} and \texttt{nix run .\#unseed}
+          manage seeded data without reinitialising the whole project.
 \end{itemize}
 
 \section{Linux and macOS}
@@ -121,7 +131,7 @@ cd /path/to/Flax-10
 
     \item Enter the Nix development shell:
 \begin{lstlisting}[language=bash]
-nix --extra-experimental-features 'nix-command flakes' develop -c bash
+nix --extra-experimental-features 'nix-command flakes' develop
 \end{lstlisting}
 
     \item \textbf{Optional --- enable experimental features permanently.}
@@ -131,10 +141,20 @@ nix --extra-experimental-features 'nix-command flakes' develop -c bash
 experimental-features = nix-command flakes
 \end{lstlisting}
 
-    \item On first run, the flake creates the virtual environment and
-          installs all dependencies. On subsequent runs, it detects the
-          existing environment and activates it. You will be returned to
-          a \texttt{bash} terminal once setup is complete.
+    \item Initialise the repository:
+\begin{lstlisting}[language=bash]
+nix run .#init
+\end{lstlisting}
+
+    \item Start the development servers when required:
+\begin{lstlisting}[language=bash]
+nix run .#run
+\end{lstlisting}
+
+    \item Run the full automated test suite when required:
+\begin{lstlisting}[language=bash]
+nix run .#tests
+\end{lstlisting}
 \end{enumerate}
 
 \section{Re-entering the Nix Shell in Future Sessions}
@@ -143,7 +163,7 @@ Each time you wish to return to the development environment, run the
 following from the root of the repository:
 
 \begin{lstlisting}[language=bash]
-nix --extra-experimental-features 'nix-command flakes' develop -c bash
+nix --extra-experimental-features 'nix-command flakes' develop
 \end{lstlisting}
 
 % ─────────────────────────────────────────────────────────────
@@ -151,34 +171,96 @@ nix --extra-experimental-features 'nix-command flakes' develop -c bash
 
 \section{Automated Setup via Nix (Recommended)}
 
-The Nix shell hook runs \texttt{makemigrations}, \texttt{migrate}, and
-\texttt{seed} automatically on entry. No manual database configuration
-is required when using Nix.
+The recommended Nix workflow does not require a separately installed
+PostgreSQL server. The \texttt{nix run .\#init}, \texttt{nix run .\#run},
+\texttt{nix run .\#tests}, \texttt{nix run .\#seed}, and
+\texttt{nix run .\#unseed} commands start a project-local PostgreSQL
+cluster in \texttt{.postgres/data}, create the \texttt{flax10}
+database, and export the required \texttt{POSTGRES\_*} variables
+automatically.
 
 \section{Manual PostgreSQL Setup}
 
-If you are setting up the project without Nix:
+If you are setting up the project without Nix, install and configure
+PostgreSQL first.
 
 \begin{enumerate}
-    \item Install PostgreSQL and open the \texttt{psql} terminal.
+    \item Create a PostgreSQL database and user matching the Django
+          defaults in \texttt{settings.py}, or set the corresponding
+          environment variables manually:
+\begin{lstlisting}[language=sql]
+CREATE USER postgres WITH PASSWORD '1234';
+CREATE DATABASE postgres OWNER postgres;
+\end{lstlisting}
 
-    \item Accept all default connection parameters (server, database,
-          port) by pressing \texttt{Enter} at each prompt.
-
-    \item When prompted for a password, enter \texttt{1234} --- this
-          is the default value expected by \texttt{settings.py}.
+    \item Alternatively, export custom connection variables before
+          running Django commands:
+\begin{lstlisting}[language=bash]
+export POSTGRES_DB=postgres
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=1234
+export POSTGRES_HOST=localhost
+export POSTGRES_PORT=5432
+\end{lstlisting}
 
     \item Apply migrations and seed the database from within
           \texttt{flax-10-project-files/backend}:
 \begin{lstlisting}[language=bash]
-python manage.py makemigrations
 python manage.py migrate
 python manage.py seed
 \end{lstlisting}
 \end{enumerate}
 
-\textbf{Note:} If you choose a different PostgreSQL password, update
-the \texttt{PASSWORD} field in \texttt{settings.py} accordingly.
+\textbf{Note:} The project reads database connection values from
+environment variables when provided. The default fallback values are
+\texttt{postgres}/\texttt{postgres}/\texttt{1234}/
+\texttt{localhost}/\texttt{5432}.
+
+% ─────────────────────────────────────────────────────────────
+\chapter{Manual Setup Without Nix}
+
+This section is intended for developers who want to work without the
+Nix flake.
+
+\section{Backend}
+
+\begin{enumerate}
+    \item Create and activate a virtual environment from the repository
+          root:
+\begin{lstlisting}[language=bash]
+python3.12 -m venv flax-10-project-files/venv
+source flax-10-project-files/venv/bin/activate
+\end{lstlisting}
+
+    \item Install Python dependencies:
+\begin{lstlisting}[language=bash]
+pip install -r requirements.txt
+\end{lstlisting}
+
+    \item Configure PostgreSQL as described in Chapter~5.
+
+    \item Run migrations and seed data:
+\begin{lstlisting}[language=bash]
+cd flax-10-project-files/backend
+python manage.py migrate
+python manage.py seed
+\end{lstlisting}
+\end{enumerate}
+
+\section{Frontend}
+
+\begin{enumerate}
+    \item Install frontend dependencies:
+\begin{lstlisting}[language=bash]
+cd flax-10-project-files/frontend
+npm install
+\end{lstlisting}
+
+    \item If required, provide frontend environment variables before
+          starting Vite. The application can run without optional
+          third-party API keys, but related map and travel-time
+          features depend on them.
+\end{enumerate}
 
 % ─────────────────────────────────────────────────────────────
 \chapter{Running the Application}
@@ -204,8 +286,10 @@ npm run dev
 The frontend will be available at \texttt{http://localhost:5173}
 (or the port shown in the Vite terminal output).
 
-\textbf{Note:} When using the Nix shell, both servers are started
-automatically in the background.
+\textbf{Note:} When using the Nix workflow, start both servers with
+\texttt{nix run .\#run}. That command selects the first available ports
+starting from \texttt{8000} for the backend and \texttt{5173} for the
+frontend.
 
 % ─────────────────────────────────────────────────────────────
 \chapter{Running the Tests}
@@ -216,24 +300,81 @@ From within \texttt{flax-10-project-files/backend}:
 
 \begin{lstlisting}[language=bash]
 python -m coverage erase
-python -m coverage run manage.py test
+python -m coverage run --source=studyFlax manage.py test --verbosity=1
 python -m coverage report -m
 python -m coverage html
 \end{lstlisting}
 
-The HTML coverage report is generated at\\
-\texttt{flax-10-project-files/backend/htmlcov/index.html}.
+The HTML coverage report is generated at
+\texttt{flax-10-project-files/backend/htmlcov/index.html} when run
+manually.
 
-\textbf{Note:} The Nix shell runs these commands automatically on entry.
+\textbf{Note:} The Nix test entrypoint writes backend coverage to
+\texttt{coverage/backend/html/index.html} and
+\texttt{coverage/backend/coverage.xml}.
 
 \section{Frontend Tests and Coverage}
 
 From within \texttt{flax-10-project-files/frontend}:
 
 \begin{lstlisting}[language=bash]
-npm run test -- --run
+npm run test
 npm run coverage
 \end{lstlisting}
+
+When using the Nix test entrypoint, frontend coverage is copied to
+\texttt{coverage/frontend/}.
+
+% ─────────────────────────────────────────────────────────────
+\chapter{Environment Variables and Third-Party Services}
+
+\section{Backend Variables}
+
+\begin{center}
+\begin{longtable}{lll}
+\toprule
+\textbf{Variable} & \textbf{Required} & \textbf{Purpose} \\
+\midrule
+POSTGRES\_DB & Yes & PostgreSQL database name \\
+POSTGRES\_USER & Yes & PostgreSQL username \\
+POSTGRES\_PASSWORD & Yes & PostgreSQL password \\
+POSTGRES\_HOST & Yes & PostgreSQL host \\
+POSTGRES\_PORT & Yes & PostgreSQL port \\
+FRONTEND\_URL & Recommended & Used in password reset links \\
+OPENAI\_API\_KEY & Optional & Enables AI analytics features \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\section{Frontend Variables}
+
+\begin{center}
+\begin{longtable}{lll}
+\toprule
+\textbf{Variable} & \textbf{Required} & \textbf{Purpose} \\
+\midrule
+VITE\_API\_BASE\_URL & Recommended & Backend API base URL \\
+VITE\_MAPBOX\_TOKEN & Optional & Mapbox-powered map and geocoding features \\
+VITE\_TFL\_API\_KEY & Optional & TfL travel-time integration \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\section{Third-Party Services}
+
+\begin{itemize}
+    \item \textbf{Mapbox} --- required for campus map and location
+          autocomplete features. Provide a valid
+          \texttt{VITE\_MAPBOX\_TOKEN}.
+    \item \textbf{TfL API} --- required for travel-time features.
+          Provide a valid \texttt{VITE\_TFL\_API\_KEY}.
+    \item \textbf{OpenAI API} --- optional. AI analytics endpoints are
+          only fully functional when \texttt{OPENAI\_API\_KEY} is set.
+    \item \textbf{SMTP email} --- password reset emails use the SMTP
+          configuration currently present in \texttt{settings.py}. For
+          any real deployment, replace the default email account details
+          with deployment-specific credentials.
+\end{itemize}
 
 % ─────────────────────────────────────────────────────────────
 \chapter{User Fixtures and Access Credentials}
@@ -272,6 +413,42 @@ The production deployment is hosted on Railway:
 \url{https://flax-10-production.up.railway.app/}
 \end{center}
 
+\section{Deployment Notes}
+
+The repository includes a top-level \texttt{Dockerfile} that builds the
+frontend and backend into a single container image. The container build
+accepts the following build arguments for the frontend:
+
+\begin{lstlisting}[language=bash]
+VITE_MAPBOX_TOKEN
+VITE_TFL_API_KEY
+OPENAI_API_KEY
+\end{lstlisting}
+
+For deployment, ensure that the runtime environment also provides the
+backend database connection variables
+(\texttt{POSTGRES\_DB}, \texttt{POSTGRES\_USER},
+\texttt{POSTGRES\_PASSWORD}, \texttt{POSTGRES\_HOST},
+\texttt{POSTGRES\_PORT}) and \texttt{FRONTEND\_URL} if password reset
+emails should point to the deployed frontend rather than localhost.
+
+\textbf{Suggested deployment procedure for IT staff:}
+\begin{enumerate}
+    \item Provision a PostgreSQL database.
+    \item Set the backend environment variables listed in Chapter~9.
+    \item Provide the frontend build arguments required by the enabled
+          third-party features.
+    \item Build the Docker image using the repository \texttt{Dockerfile}.
+    \item Run Django migrations:
+\begin{lstlisting}[language=bash]
+python manage.py migrate
+\end{lstlisting}
+    \item Optionally seed demonstration data:
+\begin{lstlisting}[language=bash]
+python manage.py seed
+\end{lstlisting}
+\end{enumerate}
+
 % ─────────────────────────────────────────────────────────────
 \chapter{Troubleshooting}
 
@@ -283,9 +460,11 @@ The production deployment is hosted on Railway:
     Chapter~4, or add them permanently to \texttt{/etc/nix/nix.conf}.
 
     \item[Database connection error.]
-    Verify that your PostgreSQL server is running and that the password
-    in \texttt{settings.py} matches your local PostgreSQL password
-    (default: \texttt{1234}).
+    Verify that your PostgreSQL server is running and that the
+    \texttt{POSTGRES\_*} environment variables match the target
+    database. For non-Nix local setup, the fallback defaults are
+    \texttt{postgres}/\texttt{postgres}/\texttt{1234}/
+    \texttt{localhost}/\texttt{5432}.
 
     \item[Port already in use.]
     If \texttt{localhost:8000} or \texttt{localhost:5173} is already
@@ -295,6 +474,11 @@ The production deployment is hosted on Railway:
 python manage.py runserver 8080
 \end{lstlisting}
 
+    For the frontend, you can use:
+\begin{lstlisting}[language=bash]
+npm run dev -- --port 5174
+\end{lstlisting}
+
     \item[Coverage module not found.]
     Ensure \texttt{coverage} is installed in the virtual environment:
 \begin{lstlisting}[language=bash]
@@ -302,15 +486,18 @@ pip install coverage
 \end{lstlisting}
 
     \item[Re-seeding inflates data.]
-    The Nix shell runs \texttt{python manage.py seed} on every entry,
-    which may duplicate seeded data. To reset the database to a clean
-    state, run the following from within
-    \texttt{flax-10-project-files/backend}:
+    Running \texttt{python manage.py seed} repeatedly may duplicate seed
+    data. To reset the database to a clean state, run the following
+    from within \texttt{flax-10-project-files/backend}:
 \begin{lstlisting}[language=bash]
 python manage.py flush --no-input
 python manage.py migrate
 python manage.py seed
 \end{lstlisting}
+
+    If you are using the Nix workflow, \texttt{nix run .\#unseed} can
+    also be used to remove seeded data before running
+    \texttt{nix run .\#seed}.
 
 \end{description}
 
@@ -331,8 +518,8 @@ psycopg-binary      & 3.3.2  & Precompiled psycopg binaries \\
 faker               & 40.4.0 & Fake data generation for seeding \\
 python-dotenv       & 1.2.1  & Environment variable management \\
 openai              & 2.21.0 & OpenAI API integration \\
-requests            & 2.32.5 & HTTP client library \\
-coverage            & latest & Test coverage reporting \\
+httpx               & 0.28.1 & HTTP client library \\
+whitenoise          & 6.11.0 & Static file serving in deployment \\
 \bottomrule
 \end{longtable}
 \end{center}
@@ -347,8 +534,9 @@ coverage            & latest & Test coverage reporting \\
 react           & 19.2.0  & UI library \\
 react-dom       & 19.2.0  & React DOM renderer \\
 vite            & 7.2.4   & Build tool and dev server \\
-framer-motion   & 12.34.0 & Animation library \\
-canvas-confetti & 1.9.4   & Confetti animation \\
+framer-motion   & 12.34.3 & Animation library \\
+mapbox-gl       & 3.18.1  & Map rendering \\
+styled-components & 6.3.9 & Component-scoped styling \\
 eslint          & 9.39.1  & JavaScript linter \\
 \bottomrule
 \end{longtable}

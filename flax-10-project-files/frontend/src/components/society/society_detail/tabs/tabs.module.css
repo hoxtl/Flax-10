@@ -161,9 +161,13 @@
 
 /* Announcements Tab */
 .announcementList {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.announcementEmptyState {
+  margin-top: 0.5rem;
 }
 
 .announcementCard {

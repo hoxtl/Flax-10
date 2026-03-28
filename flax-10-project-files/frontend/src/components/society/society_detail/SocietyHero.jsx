@@ -1,122 +1,240 @@
 /**
  * SocietyHero renders the visual header of the society detail page,
- * featuring an image carousel and an editable society name.
+ * featuring a single cover image and an editable society name.
  */
 
-import { useState, useRef, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { BadgeCheck } from "lucide-react";
 import styles from "./SocietyHero.module.css";
-import { useCarouselNavigation, useCarouselGestures } from "../hooks/useCarouselNavigation";
+import Tooltip from "../../common/tooltip/Tooltip";
+import {
+    getSocietyHeroLayoutId,
+    getSocietyImages,
+    getSocietyTitleLayoutId,
+    SOCIETY_SHARED_TRANSITION,
+} from "../utils/societyMotion";
+
+function useHeroMedia(society) {
+    const reduceMotion = useReducedMotion();
+    const images = useMemo(() => getSocietyImages(society), [society]);
+    return {
+        activeImage: images[0] || "",
+        heroLayoutId: reduceMotion ? undefined : getSocietyHeroLayoutId(society.id),
+        titleLayoutId: reduceMotion ? undefined : getSocietyTitleLayoutId(society.id),
+    };
+}
 
 /** Visual header carousel for the society detail page. */
+export default function SocietyHero(props) {
+    const media = useHeroMedia(props.society);
+    return <HeroFrame {...props} media={media} />;
+}
 
-export default function SocietyHero({ society, onImageClick, editMode, onEditImages, onUpdateName }) {
-    const heroRef = useRef(null);
-    const images = useMemo(() => getImages(society), [society]);
-    const { index, prev, next } = useCarouselNavigation(images.length);
+function HeroFrame(props) {
+    const { media, editMode } = props;
     const [hovered, setHovered] = useState(false);
-
-    useCarouselGestures(heroRef, { prev, next });
-
     return (
-        <div className={styles.hero} style={{ backgroundImage: `url("${images[index] || images[0]}")` }}
-            ref={heroRef} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-            onClick={!editMode ? onImageClick : undefined}>
-            <div className={styles.overlay}>
-                {hovered && <HeroControls editMode={editMode} images={images}
-                    prev={prev} next={next} onEditImages={onEditImages} />}
-                <HeroContent society={society} imageCount={images.length} editMode={editMode} onUpdateName={onUpdateName} />
-            </div>
+        <div className={styles.hero} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+            <HeroMedia activeImage={media.activeImage} heroLayoutId={media.heroLayoutId} />
+            <HeroOverlay {...props} hovered={hovered} titleLayoutId={media.titleLayoutId} />
         </div>
     );
 }
 
-/** Handles rendering of contextual controls (arrows or edit layer). */
-
-function HeroControls({ editMode, images, prev, next, onEditImages }) {
-    if (editMode) return <EditLayer onClick={onEditImages} />;
-    return <HeroArrows total={images.length} prev={prev} next={next} />;
-}
-
-function getImages(society) {
-    const rawUrls = (society.images || []).map(i => i.url || i);
-    const unique = new Set(rawUrls.map(u => u.trim()));
-
-    if (society.image) {
-        unique.add(society.image.trim());
-    }
-
-    return Array.from(unique);
-}
-
-function HeroArrows({ total, prev, next }) {
-    if (total <= 1) return null;
-    const stop = (e, fn) => { e.stopPropagation(); fn(); };
+function HeroMedia({ activeImage, heroLayoutId }) {
     return (
-        <>
-            <button className={`${styles.arrowBtn} ${styles.leftArrow}`} onClick={(e) => stop(e, prev)}>
-                <Chevron dir="left" />
-            </button>
-            <button className={`${styles.arrowBtn} ${styles.rightArrow}`} onClick={(e) => stop(e, next)}>
-                <Chevron dir="right" />
-            </button>
-        </>
+        <motion.div
+            className={styles.heroMedia}
+            layoutId={heroLayoutId}
+            transition={SOCIETY_SHARED_TRANSITION}
+            style={activeImage ? { backgroundImage: `url("${activeImage}")` } : undefined}
+        />
     );
 }
 
-function Chevron({ dir }) {
-    const isRight = dir === 'right';
+function HeroOverlay({ hovered, society, editMode, onEditImages, actionContent, onUpdateName, onUpdateBio, onViewMembers, metaContent, titleLayoutId }) {
     return (
-        <svg viewBox="0 0 18 42" width="18" height="42" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <path d={isRight ? "M 3 3 L 15 21 L 3 39" : "M 15 3 L 3 21 L 15 39"} />
-        </svg>
+        <div className={styles.overlay}>
+            <HeroUtilityBar hovered={hovered} editMode={editMode} onEditImages={onEditImages} actionContent={actionContent} />
+            <HeroContent society={society} editMode={editMode} onUpdateName={onUpdateName} onUpdateBio={onUpdateBio} onViewMembers={onViewMembers} metaContent={metaContent} titleLayoutId={titleLayoutId} />
+        </div>
+    );
+}
+
+function HeroUtilityBar({ hovered, editMode, onEditImages, actionContent }) {
+    const showEditButton = editMode && hovered;
+    if (!showEditButton && !actionContent) return null;
+
+    return (
+        <div className={styles.utilityBar} onClick={(event) => event.stopPropagation()}>
+            {showEditButton && <EditLayer onClick={onEditImages} />}
+            {actionContent}
+        </div>
     );
 }
 
 function EditLayer({ onClick }) {
     return (
-        <div className={styles.editLayer} onClick={onClick}>
-            <span className={styles.editLabel}>Click to Edit Cover Images</span>
+        <button type="button" className={styles.editLayer} onClick={onClick}>
+            <span className={styles.editLabel}>Click to Edit Cover Image</span>
+        </button>
+    );
+}
+
+function HeroContent({ society, editMode, onUpdateName, onUpdateBio, onViewMembers, metaContent, titleLayoutId }) {
+    return (
+        <div className={styles.content}>
+            <HeroCopyRail society={society} editMode={editMode} onUpdateName={onUpdateName} onUpdateBio={onUpdateBio} onViewMembers={onViewMembers} titleLayoutId={titleLayoutId} />
+            {metaContent && <HeroMetaSlot>{metaContent}</HeroMetaSlot>}
         </div>
     );
 }
 
-function HeroContent({ society, imageCount, editMode, onUpdateName }) {
+function HeroCopyRail({ society, editMode, onUpdateName, onUpdateBio, onViewMembers, titleLayoutId }) {
     return (
-        <div className={styles.content}>
-            <EditableName name={society.name} editMode={editMode} onUpdate={onUpdateName} />
-            <ImageCounter count={imageCount} />
+        <div className={styles.copyRail}>
+            <HeroNameRow society={society} editMode={editMode} onUpdateName={onUpdateName} onViewMembers={onViewMembers} titleLayoutId={titleLayoutId} />
+            <EditableBio bio={society.bio} editMode={editMode} onUpdate={onUpdateBio} />
         </div>
     );
+}
+
+function HeroNameRow({ society, editMode, onUpdateName, onViewMembers, titleLayoutId }) {
+    return (
+        <div className={styles.nameRow}>
+            <EditableName name={society.name} editMode={editMode} onUpdate={onUpdateName} layoutId={titleLayoutId} />
+            {society.is_ratified && <RatifiedIndicator />}
+            <MemberCountPill count={society.member_count} onClick={onViewMembers} />
+        </div>
+    );
+}
+
+function HeroMetaSlot({ children }) {
+    return (
+        <div className={styles.metaSlot} onClick={(event) => event.stopPropagation()}>
+            {children}
+        </div>
+    );
+}
+
+function RatifiedIndicator() {
+    return (
+        <Tooltip content="Ratified" position="top" wrapperClassName={styles.ratifiedTooltip}>
+            <span className={styles.ratifiedBadge} aria-label="Ratified">
+                <BadgeCheck size={20} strokeWidth={2.1} />
+            </span>
+        </Tooltip>
+    );
+}
+
+function MemberCountPill({ count = 0, onClick }) {
+    const label = `${count} member${count === 1 ? "" : "s"}`;
+    return (
+        <button type="button" className={styles.memberPill} onClick={(event) => handleMemberClick(event, onClick)} title="View members" aria-label={`View members: ${label}`}>
+            {label}
+        </button>
+    );
+}
+
+function handleMemberClick(event, onClick) {
+    event.stopPropagation();
+    onClick?.();
 }
 
 /** Renders a name that becomes an input field in edit mode. */
-
-export function EditableName({ name, editMode, onUpdate }) {
+export function EditableName({ name, editMode, onUpdate, layoutId }) {
     const [isEditing, setIsEditing] = useState(false);
-    const [val, setVal] = useState(name);
+    const [value, setValue] = useState(name);
+    useEffect(() => setValue(name), [name]);
+    if (isEditing) return <NameInput value={value} setValue={setValue} onUpdate={onUpdate} setEditing={setIsEditing} />;
+    return <EditableNameDisplay editMode={editMode} name={name} layoutId={layoutId} onEdit={() => setIsEditing(true)} />;
+}
 
-    if (isEditing) return <NameInput val={val} setVal={setVal} onUpdate={onUpdate} setEditing={setIsEditing} />;
-
+function EditableNameDisplay({ editMode, name, layoutId, onEdit }) {
     return (
-        <div className={styles.nameWrapper}
-            onClick={(e) => { if (editMode) { e.stopPropagation(); setIsEditing(true); } }}>
-            <h1 className={styles.name}>{name}</h1>
+        <div className={styles.nameWrapper} onClick={(event) => handleNameClick(event, editMode, onEdit)}>
+            <h1 className={styles.name}>
+                <motion.span layoutId={layoutId} transition={SOCIETY_SHARED_TRANSITION}>{name}</motion.span>
+            </h1>
             {editMode && <span className={styles.editIcon}>✎</span>}
         </div>
     );
 }
 
-/** Inline text input for editing society names. */
-
-function NameInput({ val, setVal, onUpdate, setEditing }) {
-    const handleClose = () => { setEditing(false); onUpdate?.(val); };
-    return <input className={styles.nameInput} value={val} autoFocus
-        onChange={e => setVal(e.target.value)}
-        onBlur={handleClose}
-        onKeyDown={e => e.key === 'Enter' && handleClose()} />;
+function handleNameClick(event, editMode, onEdit) {
+    if (!editMode) return;
+    event.stopPropagation();
+    onEdit();
 }
 
-function ImageCounter({ count }) {
-    if (count <= 1) return null;
-    return <span className={styles.imageCount}>{count} photos</span>;
+function NameInput({ value, setValue, onUpdate, setEditing }) {
+    const handleClose = () => {
+        setEditing(false);
+        onUpdate?.(value);
+    };
+    return <input className={styles.nameInput} value={value} autoFocus onChange={(event) => setValue(event.target.value)} onBlur={handleClose} onKeyDown={(event) => event.key === "Enter" && handleClose()} />;
+}
+
+function useBioEditor(bio) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [value, setValue] = useState(bio || "");
+    useEffect(() => setValue(bio || ""), [bio]);
+    return { isEditing, setIsEditing, value, setValue };
+}
+
+function EditableBio({ bio, editMode, onUpdate }) {
+    const editor = useBioEditor(bio);
+    if (editor.isEditing) return <BioEditor bio={bio} editor={editor} onUpdate={onUpdate} />;
+    return <BioDisplay bio={bio} editMode={editMode} onEdit={() => editor.setIsEditing(true)} />;
+}
+
+function BioEditor({ bio, editor, onUpdate }) {
+    return (
+        <div className={styles.bioEditor} onClick={(event) => event.stopPropagation()}>
+            <textarea className={styles.bioInput} value={editor.value} onChange={(event) => editor.setValue(event.target.value)} rows={2} autoFocus placeholder="Describe your society..." />
+            <BioEditorActions bio={bio} editor={editor} onUpdate={onUpdate} />
+        </div>
+    );
+}
+
+function BioEditorActions({ bio, editor, onUpdate }) {
+    return (
+        <div className={styles.bioActions}>
+            <button type="button" className={styles.bioGhostButton} onClick={() => resetBioEditor(bio, editor)}>Cancel</button>
+            <button type="button" className={styles.bioSaveButton} onClick={() => saveBioEditor(editor, onUpdate)}>Save</button>
+        </div>
+    );
+}
+
+function resetBioEditor(bio, editor) {
+    editor.setValue(bio || "");
+    editor.setIsEditing(false);
+}
+
+function saveBioEditor(editor, onUpdate) {
+    onUpdate?.(editor.value);
+    editor.setIsEditing(false);
+}
+
+function BioDisplay({ bio, editMode, onEdit }) {
+    if (!bio && !editMode) return null;
+    const text = bio || "Add a short society bio...";
+    const className = bio ? styles.heroBio : `${styles.heroBio} ${styles.heroBioPlaceholder}`;
+    if (!editMode) return <p className={className}>{text}</p>;
+    return <BioEditButton className={className} text={text} onEdit={onEdit} />;
+}
+
+function BioEditButton({ className, text, onEdit }) {
+    return (
+        <button type="button" className={`${styles.heroBioButton} ${className}`} onClick={(event) => handleBioEditClick(event, onEdit)}>
+            <span>{text}</span>
+            <span className={styles.inlineEditPill}>Edit</span>
+        </button>
+    );
+}
+
+function handleBioEditClick(event, onEdit) {
+    event.stopPropagation();
+    onEdit();
 }

@@ -1,9 +1,24 @@
+import { MIN_EVENT_DURATION } from '../calendarConstants';
+
+function getNormalizedRange(event) {
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return { start, end };
+    }
+
+    const minimumEnd = new Date(start.getTime() + MIN_EVENT_DURATION * 60 * 1000);
+    return {
+        start,
+        end: end > start ? end : minimumEnd,
+    };
+}
+
 export function eventsOverlap(event1, event2) {
     if (event1 === event2) return false;
-    const start1 = new Date(event1.start_time);
-    const end1 = new Date(event1.end_time);
-    const start2 = new Date(event2.start_time);
-    const end2 = new Date(event2.end_time);
+    const { start: start1, end: end1 } = getNormalizedRange(event1);
+    const { start: start2, end: end2 } = getNormalizedRange(event2);
     return start1 < end2 && start2 < end1;
 }
 
@@ -23,6 +38,7 @@ export function findOverlappingEvents(event, allEvents) {
  * @param {(opts: { title: string, message: React.ReactNode, confirmText: string }) => Promise<boolean>} confirmFn
  *   Called with a conflict dialog descriptor; resolves true if the user accepts.
  */
+
 export async function checkOverlapWithConfirm(event, allEvents, confirmFn) {
     const overlapping = findOverlappingEvents(event, allEvents);
     if (overlapping.length === 0) return true;
@@ -44,14 +60,14 @@ function processGroup(groupEvents, columnsMap) {
     groupEvents.forEach(event => {
         const col = findAvailableColumn(event, columnEnds);
         groupResults.set(getEventKey(event), { column: col });
-        columnEnds[col] = new Date(event.end_time);
+        columnEnds[col] = getNormalizedRange(event).end;
     });
 
     assignTotalColumns(groupResults, columnEnds.length, columnsMap);
 }
 
 function findAvailableColumn(event, columnEnds) {
-    const start = new Date(event.start_time);
+    const { start } = getNormalizedRange(event);
     const col = columnEnds.findIndex(end => end <= start);
     return col === -1 ? columnEnds.length : col;
 }
@@ -91,6 +107,6 @@ function shouldStartNewGroup(event, groupEnd) {
 }
 
 function updateGroupEnd(event, currentGroupEnd) {
-    const end = new Date(event.end_time);
+    const { end } = getNormalizedRange(event);
     return !currentGroupEnd || end > currentGroupEnd ? end : currentGroupEnd;
 }

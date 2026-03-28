@@ -5,6 +5,7 @@ Compatibility exports for society seeding helpers.
 from .society_seed.societies import (
     _ensure_seed_membership,
     create_societies,
+    create_society_announcements,
     create_society_events,
     create_society_images,
     create_society_memberships,
@@ -14,6 +15,7 @@ from .society_seed.societies import (
 __all__ = [
     "_ensure_seed_membership",
     "create_societies",
+    "create_society_announcements",
     "create_society_events",
     "create_society_images",
     "create_society_memberships",

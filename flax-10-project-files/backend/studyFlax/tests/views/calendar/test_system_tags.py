@@ -169,6 +169,11 @@ class ShortcutFunctionsTest(TestCase):
         tag = get_societies_tag()
         self.assertEqual(tag.name, 'Societies')
 
+    def test_get_group_study_tag(self):
+        from studyFlax.views.calendar.system_tags import get_group_study_tag
+        tag = get_group_study_tag()
+        self.assertEqual(tag.name, 'Group Study')
+
 class FixUntaggedEventsTest(TestCase):
     """Tests for fix_untagged_deadline_events, fix_deadline_events, fix_exam_events."""
 

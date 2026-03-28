@@ -11,7 +11,7 @@ import './event-modal.css';
 
 /** Modal for creating or editing a calendar event. */
 
-export function EventModal({ event, onClose, initialType, initialDate, showReminder = true, customTags = null, onSubmit = null, onDelete = null }) {
+export function EventModal({ event, onClose, initialType, initialDate, showReminder = true, showTagManager = true, customTags = null, onSubmit = null, onDelete = null }) {
     const globalTags = useTags();
     const tags = customTags || globalTags.tags;
     const loading = customTags ? false : globalTags.loading;
@@ -24,7 +24,7 @@ export function EventModal({ event, onClose, initialType, initialDate, showRemin
 
     return (
         <StandardModal onClose={onClose}>
-            <ModalContent onClose={onClose} showReminder={showReminder} tags={tags} {...logic} onDelete={onDelete} />
+            <ModalContent onClose={onClose} showReminder={showReminder} showTagManager={showTagManager} tags={tags} {...logic} onDelete={onDelete} />
         </StandardModal>
     );
 }

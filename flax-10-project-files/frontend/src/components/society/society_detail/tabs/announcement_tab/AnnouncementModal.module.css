@@ -39,10 +39,12 @@
 
 .imageThumb {
     position: relative;
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
+    width: 160px;
+    height: 100px;
+    border-radius: 12px;
     overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
 }
 
 .imageThumb img {
@@ -52,22 +54,14 @@
 }
 
 .addImageBtn {
-    width: 80px;
-    height: 80px;
-    border: 2px dashed var(--border);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
+    min-height: 38px;
+    width: 100%;
     justify-content: center;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: var(--muted);
-    transition: all 0.2s;
 }
 
 .addImageBtn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: var(--primary-color, #9E7E5D);
+    color: var(--primary-color, #9E7E5D);
 }
 
 .removeBtn {
@@ -96,10 +90,8 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 20px;
-    background: var(--panel);
-    border-radius: 12px;
-    margin-top: 24px;
+    padding: 4px 0 0;
+    margin-top: 8px;
 }
 
 .toggle {
@@ -128,16 +120,20 @@
 
 .footer {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
-    margin-top: 24px;
-    padding-top: 16px;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
 }
 
 .footerRight {
     display: flex;
-    gap: 12px;
+    flex-direction: row;
+    gap: 8px;
+    margin-left: auto;
 }
 
 

@@ -119,7 +119,10 @@ function editModule(state, module) {
   state.setShowForm(true);
 }
 
-export function MyEnrollmentsTabContent({ state }) {
+/*
+ * Renders the student enrolments tab content with local search state.
+ */
+export function MyEnrolmentsTabContent({ state }) {
   const [enrollSearch, setEnrollSearch] = useState("");
   const enrolledModules = filterModules(state.hook.modules, state.hook.enrollments, enrollSearch, "enrolled");
   const sorting = useModuleSorting(enrolledModules);
@@ -132,6 +135,8 @@ export function MyEnrollmentsTabContent({ state }) {
     </>
   );
 }
+
+export { MyEnrolmentsTabContent as MyEnrollmentsTabContent };
 
 function MyModulesWithTabs({ state }) {
   const [innerTab, setInnerTab] = useState("overview");
@@ -151,15 +156,15 @@ function MyModulesWithTabs({ state }) {
 function buildTabs(state) {
   return [
     { id: "overview", icon: "📊", label: "Overview", content: <MyModulesTabContent state={state} /> },
-    { id: "enrollments", icon: "📚", label: enrollmentTabLabel(), content: <MyEnrollmentsTabContent state={state} /> },
+    { id: "enrollments", icon: "📚", label: enrolmentTabLabel(), content: <MyEnrolmentsTabContent state={state} /> },
   ];
 }
 
-function enrollmentTabLabel() {
+function enrolmentTabLabel() {
   return (
     <>
       <span className={styles.enrollmentsLabelFull}>My Enrolments</span>
-      <span className={styles.enrollmentsLabelShort}>Enrollments</span>
+      <span className={styles.enrollmentsLabelShort}>Enrolments</span>
     </>
   );
 }
@@ -173,6 +178,9 @@ function getSearchPlaceholder(isMyModules) {
   return "Search King's modules by name or code...";
 }
 
+/*
+ * Renders the shared toolbar for modules search and sorting.
+ */
 export function ModuleToolbar({ search, sorting, isTeacher, isMyModules }) {
   return (
     <PageToolbar
@@ -231,6 +239,9 @@ function StudentEmptyState({ search }) {
   );
 }
 
+/*
+ * Renders the appropriate empty state for the current modules view.
+ */
 export function EmptyResults({ search, sorting, isTeacher }) {
   const isStudentMyModules = !isTeacher && search.filter === "enrolled";
   const hasSearch = String(search.query || "").trim().length > 0;
@@ -274,6 +285,9 @@ function ModuleGridWithPagination({ state, sorting }) {
   );
 }
 
+/*
+ * Renders module results with pagination or the matching empty state.
+ */
 export function ModuleResults({ state, search, sorting }) {
   if (sorting.results.length === 0) return <EmptyResults search={search} sorting={sorting} isTeacher={state.isTeacher} />;
   return <ModuleGridWithPagination state={state} sorting={sorting} />;
@@ -311,10 +325,13 @@ function AppPageContent({ state, search, sorting, isStudentMyModules }) {
   );
 }
 
+/*
+ * Renders the main modules page view for the current user role.
+ */
 export function MainView({ state }) {
   const { search, sorting } = useMainModuleView(state);
   const isStudentMyModules = !state.isTeacher && search.filter === "enrolled";
-  const isTestEnv = typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+  const isTestEnv = globalThis.process?.env?.NODE_ENV === "test";
   const content = <AppPageContent state={state} search={search} sorting={sorting} isStudentMyModules={isStudentMyModules} />;
   if (state.isTeacher || isTestEnv) return content;
   return <StudentPageTransition search={search}>{content}</StudentPageTransition>;

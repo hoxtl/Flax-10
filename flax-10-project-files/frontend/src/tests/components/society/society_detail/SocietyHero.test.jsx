@@ -1,13 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../../components/society/hooks/useCarouselNavigation', () => ({
-    useCarouselNavigation: vi.fn(() => ({ index: 0, prev: vi.fn(), next: vi.fn() })),
-    useCarouselGestures: vi.fn(),
+const { useReducedMotionMock } = vi.hoisted(() => ({
+    useReducedMotionMock: vi.fn(() => false),
 }));
 
+vi.mock('framer-motion', async () => {
+    const actual = await vi.importActual('framer-motion');
+    return {
+        ...actual,
+        useReducedMotion: useReducedMotionMock,
+    };
+});
+
 import SocietyHero from '../../../../components/society/society_detail/SocietyHero';
-import { useCarouselNavigation } from '../../../../components/society/hooks/useCarouselNavigation';
 
 const baseSociety = {
     id: 1,
@@ -20,6 +26,14 @@ const baseSociety = {
 };
 
 describe('SocietyHero', () => {
+    beforeEach(() => {
+        useReducedMotionMock.mockReturnValue(false);
+    });
+
+    function getHeroMedia(container) {
+        return container.querySelector('[class*="heroMedia"]');
+    }
+
     it('renders without crashing', () => {
         const { container } = render(
             <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode={false} />
@@ -33,7 +47,7 @@ describe('SocietyHero', () => {
             <SocietyHero society={baseSociety} onImageClick={onImageClick} editMode={false} />
         );
         fireEvent.click(container.firstChild);
-        expect(onImageClick).toHaveBeenCalledOnce();
+        expect(onImageClick).toHaveBeenCalledWith(0);
     });
 
     it('does not call onImageClick in edit mode', () => {
@@ -43,23 +57,6 @@ describe('SocietyHero', () => {
         );
         fireEvent.click(container.firstChild);
         expect(onImageClick).not.toHaveBeenCalled();
-    });
-
-    it('shows arrow buttons when multiple images and hovered', () => {
-        useCarouselNavigation.mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
-        const societyWithImages = {
-            ...baseSociety,
-            images: [
-                { url: 'https://example.com/img1.jpg' },
-                { url: 'https://example.com/img2.jpg' },
-            ],
-        };
-        const { container } = render(
-            <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />
-        );
-        fireEvent.mouseEnter(container.firstChild);
-        const buttons = screen.getAllByRole('button');
-        expect(buttons.length).toBeGreaterThan(0);
     });
 
     it('uses images from society.images array', () => {
@@ -84,29 +81,28 @@ describe('SocietyHero', () => {
             <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode onEditImages={onEditImages} />
         );
         fireEvent.mouseEnter(container.firstChild);
-        const editLayer = screen.getByText('Click to Edit Cover Images');
+        const editLayer = screen.getByRole('button', { name: 'Click to Edit Cover Images' });
         fireEvent.click(editLayer);
         expect(onEditImages).toHaveBeenCalledOnce();
     });
 
-    it('hides arrow buttons when only one image', () => {
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
-        const { container } = render(
-            <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode={false} />
-        );
-        fireEvent.mouseEnter(container.firstChild);
-        const arrows = container.querySelectorAll('[class*="arrowBtn"]');
-        expect(arrows.length).toBe(0);
+    it('shows the member count chip and opens the member list when clicked', () => {
+        const onViewMembers = vi.fn();
+        render(<SocietyHero society={baseSociety} onImageClick={vi.fn()} onViewMembers={onViewMembers} editMode={false} />);
+        fireEvent.click(screen.getByRole('button', { name: /view members: 42 members/i }));
+        expect(onViewMembers).toHaveBeenCalledOnce();
     });
 
-    it('shows image counter when multiple images', () => {
-        const societyWithImages = {
-            ...baseSociety,
-            image: null,
-            images: [{ url: 'https://example.com/img1.jpg' }, { url: 'https://example.com/img2.jpg' }],
-        };
-        render(<SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />);
-        expect(screen.getByText(/2 photos/)).toBeTruthy();
+    it('renders the singular member label when there is exactly one member', () => {
+        render(<SocietyHero society={{ ...baseSociety, member_count: 1 }} onImageClick={vi.fn()} editMode={false} />);
+        expect(screen.getByRole('button', { name: 'View members: 1 member' })).toBeInTheDocument();
+    });
+
+    it('falls back to 0 members when member_count is missing', () => {
+        const societyWithoutCount = { ...baseSociety };
+        delete societyWithoutCount.member_count;
+        render(<SocietyHero society={societyWithoutCount} onImageClick={vi.fn()} editMode={false} />);
+        expect(screen.getByRole('button', { name: 'View members: 0 members' })).toBeInTheDocument();
     });
 
     it('EditableName: enter edit mode, change value, blur calls onUpdateName', async () => {
@@ -147,37 +143,9 @@ describe('SocietyHero', () => {
         expect(container.firstChild).toBeTruthy();
     });
 
-    it('arrow buttons call prev and next without propagating click', () => {
-        const prev = vi.fn();
-        const next = vi.fn();
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 1, prev, next });
-        const societyWithImages = {
-            ...baseSociety,
-            images: [{ url: 'https://a.com/1.jpg' }, { url: 'https://a.com/2.jpg' }],
-        };
-        const { container } = render(
-            <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />
-        );
-        fireEvent.mouseEnter(container.firstChild);
-        const leftBtn = container.querySelector('[class*="leftArrow"]');
-        const rightBtn = container.querySelector('[class*="rightArrow"]');
-        fireEvent.click(leftBtn);
-        fireEvent.click(rightBtn);
-        expect(prev).toHaveBeenCalledOnce();
-        expect(next).toHaveBeenCalledOnce();
-    });
-
-    it('uses images[0] fallback when index out of bounds', () => {
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 99, prev: vi.fn(), next: vi.fn() });
-        const societyWithImages = {
-            ...baseSociety,
-            image: null,
-            images: [{ url: 'https://a.com/1.jpg' }],
-        };
-        const { container } = render(
-            <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />
-        );
-        expect(container.firstChild?.style?.backgroundImage).toContain('1.jpg');
+    it('shows the ratified indicator beside the title when the society is ratified', () => {
+        render(<SocietyHero society={{ ...baseSociety, is_ratified: true }} onImageClick={vi.fn()} editMode={false} />);
+        expect(screen.getByLabelText('Ratified')).toBeInTheDocument();
     });
 
     it('EditableName: does not enter edit mode when editMode is false', () => {
@@ -198,16 +166,108 @@ describe('SocietyHero', () => {
     it('getImages handles images as plain strings without url property', () => {
         const society = { ...baseSociety, images: ['plain-url.jpg', 'another.jpg'], image: null };
         const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
-        expect(container.firstChild?.style?.backgroundImage).toContain('plain-url.jpg');
+        expect(getHeroMedia(container)?.style?.backgroundImage).toContain('plain-url.jpg');
     });
 
-    it('hides controls when mouse leaves hero', () => {
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
-        const society = { ...baseSociety, images: [{ url: 'a.jpg' }, { url: 'b.jpg' }] };
-        const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
+    it('does not render a photos counter pill', () => {
+        render(<SocietyHero society={{ ...baseSociety, images: [{ url: 'a.jpg' }, { url: 'b.jpg' }] }} onImageClick={vi.fn()} editMode={false} />);
+        expect(screen.queryByText(/photos/)).not.toBeInTheDocument();
+    });
+
+    it('supports reduced motion by omitting motion layout ids', () => {
+        useReducedMotionMock.mockReturnValue(true);
+        const { container } = render(<SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode={false} />);
+        expect(getHeroMedia(container)).toBeTruthy();
+        expect(screen.getByText('Chess Society')).toBeInTheDocument();
+    });
+
+    it('clears the hover-only image editor after mouse leave', () => {
+        const { container } = render(
+            <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode onEditImages={vi.fn()} />
+        );
         fireEvent.mouseEnter(container.firstChild);
-        expect(container.querySelector('[class*="arrowBtn"]')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Click to Edit Cover Images' })).toBeInTheDocument();
         fireEvent.mouseLeave(container.firstChild);
-        expect(container.querySelector('[class*="arrowBtn"]')).toBeNull();
+        expect(screen.queryByRole('button', { name: 'Click to Edit Cover Images' })).not.toBeInTheDocument();
+    });
+
+    it('does not set a background image when the society has no images', () => {
+        const { container } = render(
+            <SocietyHero
+                society={{ ...baseSociety, image: null, cover_image: null, images: [] }}
+                onImageClick={vi.fn()}
+                editMode={false}
+            />
+        );
+        expect(getHeroMedia(container)?.style.backgroundImage).toBe('');
+    });
+
+    it('renders meta content and prevents hero click propagation from the meta slot', () => {
+        const onImageClick = vi.fn();
+        render(
+            <SocietyHero
+                society={baseSociety}
+                onImageClick={onImageClick}
+                editMode={false}
+                metaContent={<button type="button">Open Meta</button>}
+            />
+        );
+        fireEvent.click(screen.getByRole('button', { name: 'Open Meta' }));
+        expect(onImageClick).not.toHaveBeenCalled();
+    });
+
+    it('does not render a bio block when there is no bio and edit mode is off', () => {
+        render(
+            <SocietyHero
+                society={{ ...baseSociety, bio: '' }}
+                onImageClick={vi.fn()}
+                editMode={false}
+            />
+        );
+        expect(screen.queryByText('Add a short society bio...')).not.toBeInTheDocument();
+        expect(document.querySelector('[class*="heroBioButton"]')).toBeNull();
+    });
+
+    it('lets editors cancel and save bio updates, including a null bio', () => {
+        const onUpdateBio = vi.fn();
+        render(
+            <SocietyHero
+                society={{ ...baseSociety, bio: null }}
+                onImageClick={vi.fn()}
+                editMode
+                onUpdateBio={onUpdateBio}
+            />
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: /add a short society bio/i }));
+        const textarea = screen.getByRole('textbox');
+        expect(textarea).toHaveAttribute('placeholder', 'Describe your society...');
+
+        fireEvent.change(textarea, { target: { value: 'Draft bio' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+        expect(onUpdateBio).not.toHaveBeenCalled();
+        expect(screen.getByRole('button', { name: /add a short society bio/i })).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: /add a short society bio/i }));
+        fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Saved bio' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        expect(onUpdateBio).toHaveBeenCalledWith('Saved bio');
+        expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /add a short society bio/i })).toBeInTheDocument();
+    });
+
+    it('stops bio edit clicks from bubbling to the hero image action', () => {
+        const onImageClick = vi.fn();
+        render(
+            <SocietyHero
+                society={baseSociety}
+                onImageClick={onImageClick}
+                editMode
+            />
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: /a chess society/i }));
+        expect(onImageClick).not.toHaveBeenCalled();
     });
 });

@@ -10,6 +10,8 @@ from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMember
 
 PROJECT_DEADLINE_OFFSETS = (2, 5, 7, 10, 12, 15, 17, 19)
 URGENT_PROJECT_LIMIT = 3
+MIN_SEED_PROJECTS = 5
+MAX_SEED_PROJECTS = 10
 GENERIC_SUBJECT_WORDS = {
     "analysis", "assignment", "case", "coursework", "deck", "discussion", "essay",
     "final", "findings", "group", "lab", "methods", "oral", "paper", "poster",
@@ -218,7 +220,8 @@ def _build_project_specs(showcase_student, student_modules, seed_modules, now):
     specs = []
     for module in seed_modules:
         specs.extend(_build_module_project_specs(module, now))
-    return _uniquify_project_spec_names(specs)
+    specs = _uniquify_project_spec_names(specs)
+    return specs[:MAX_SEED_PROJECTS]
 
 def _next_candidate_name(module, index, variant_index, max_variants):
     if variant_index > max_variants:
@@ -270,6 +273,7 @@ def _create_single_project(spec, students, now, rng, index, module_students):
     if not owner:
         return
     defaults = _build_project_defaults(owner, module, now, index, source_deadline=spec.get("source_deadline"))
+    defaults["is_seeded"] = True
     project, created = GroupProject.objects.get_or_create(name=spec["name"], course_code=defaults["course_code"], defaults=defaults)
     if not created:
         _update_project_fields(project, defaults)

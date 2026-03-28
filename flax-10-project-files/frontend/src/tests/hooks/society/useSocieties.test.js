@@ -32,8 +32,10 @@ describe('useSocieties', () => {
     }
 
     it('starts with loading=true', () => {
-        const { result } = renderHook(() => useSocieties());
+        fetchSocieties.mockImplementationOnce(() => new Promise(() => {}));
+        const { result, unmount } = renderHook(() => useSocieties());
         expect(result.current.loading).toBe(true);
+        unmount();
     });
 
     it('loads societies on mount', async () => {

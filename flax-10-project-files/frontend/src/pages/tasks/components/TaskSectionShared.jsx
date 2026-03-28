@@ -26,6 +26,7 @@ function CollapsibleChipExtra({ collapsed, extraContent }) {
 }
 
 /** Collapsible count chip for task section headers. */
+
 export function CollapsibleCountChip({ count, collapsed, extraContent }) {
   return (
     <div className={styles.sectionCountWrap}>
@@ -38,6 +39,7 @@ export function CollapsibleCountChip({ count, collapsed, extraContent }) {
 }
 
 /** Animated section body that expands and collapses vertically. */
+
 export function CollapsibleSectionBody({ collapsed, bodyKey, children }) {
   return (
     <AnimatePresence initial={false}>
@@ -78,6 +80,7 @@ function buildTaskCardHandlers(task, onToggleComplete, onDeleteTask, onEditTask,
 }
 
 /** Task card row that resolves list metadata before rendering. */
+
 export function TaskCardRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask, cardProps = {} }) {
   const listEntry = getTaskCardListEntry(task, listMap);
   const listMeta = getTaskCardListMeta(task, listEntry);

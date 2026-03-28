@@ -37,10 +37,17 @@ def build_societies_list(user):
     memberships = SocietyMembership.objects.filter(user=user).select_related('society')
     if getattr(user, 'role', None) == 'teacher':
         return []
-    return [serialise_society(membership.society) for membership in memberships]
+    return [serialise_society(membership) for membership in memberships]
 
-def serialise_society(society):
-    return {'id': society.id, 'name': society.name, 'image': get_society_image(society)}
+def serialise_society(membership):
+    society = membership.society
+    return {
+        'id': society.id,
+        'name': society.name,
+        'image': get_society_image(society),
+        'role': membership.role,
+        'is_admin': membership.is_admin,
+    }
 
 def build_connection_ids(user):
     outgoing = CalendarShare.objects.filter(owner=user).values_list('shared_with_id', flat=True)

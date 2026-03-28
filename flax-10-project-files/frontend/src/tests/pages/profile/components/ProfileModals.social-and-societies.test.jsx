@@ -126,13 +126,14 @@ describe("ProfileModals sharing and societies", () => {
   it("renders society previews and artwork", () => {
     renderSocietiesModal({
       societies: [
-        { id: 11, name: "Chess Club", description: "Weekly matches", cover_image: "https://example.com/cover.png" },
+        { id: 11, name: "Chess Club", description: "Weekly matches", cover_image: "https://example.com/cover.png", role: "admin" },
         { name: "Mystery Society" },
       ],
     });
     expect(screen.getByText("Societies")).toBeTruthy();
     expect(screen.getByText("Chess Club")).toBeTruthy();
     expect(screen.getByText("Weekly matches")).toBeTruthy();
+    expect(screen.getByText("Society Manager")).toBeInTheDocument();
     expect(screen.getByAltText("Chess Club").getAttribute("src")).toContain("cover.png");
   });
 

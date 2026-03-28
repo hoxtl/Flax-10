@@ -40,12 +40,12 @@ function OverlapWarningView({ overlapWarning, onConfirm, onCancel }) {
     );
 }
 
-function EventFormView({ onClose, isEditing, form, setForm, error, handleSubmit, onDelete, showReminder, tags }) {
+function EventFormView({ onClose, isEditing, form, setForm, error, handleSubmit, onDelete, showReminder, showTagManager, tags }) {
     return (
         <>
             <ModalHeader isEditing={isEditing} onClose={onClose} />
             {error && <div className="form-error">{error}</div>}
-            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={onDelete} showReminder={showReminder} tags={tags} />
+            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={onDelete} showReminder={showReminder} showTagManager={showTagManager} tags={tags} />
         </>
     );
 }

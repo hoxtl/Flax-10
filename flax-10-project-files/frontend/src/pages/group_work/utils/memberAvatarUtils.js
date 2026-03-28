@@ -29,11 +29,14 @@ export function getInitials(member) {
   return (parts[0]?.[0] || "?").toUpperCase();
 }
 
-/** Returns a display name, preferring first + last name over username or name field. */
+/** Returns the cleanest available display name for a member. */
 
 export function getDisplayName(member) {
-  if (member.first_name) return `${member.first_name} ${member.last_name || ""}`.trim();
-  return member.user_name || member.name || "";
+  const fullName = [member?.first_name, member?.last_name].filter(Boolean).join(" ").trim();
+  const named = String(member?.display_name || member?.full_name || member?.name || "").trim();
+  if (shouldPreferNamedValue(named, fullName)) return named;
+  if (fullName) return fullName;
+  return member?.user_name || member?.username || "";
 }
 
 /** Returns a stable string key for a member regardless of which ID field is present. */
@@ -74,7 +77,7 @@ export function getPhotoUrl(member) {
     username,
     first_name: member?.first_name,
     last_name: member?.last_name,
-    name: member?.name || getDisplayName(member),
+    name: getDisplayName(member),
     role: member?.role || "student",
     profile_photo_url: member?.profile_photo_url,
     profile_photo: member?.profile_photo,
@@ -119,4 +122,24 @@ export function getCurrentMember(members = []) {
   const viewerId = String(viewer.id ?? viewer.user ?? "");
   if (!viewerId) return null;
   return members.find((m) => String(m.user ?? m.id ?? "") === viewerId) || null;
+}
+
+function shouldPreferNamedValue(named, fullName) {
+  const namedScore = scoreHumanName(named);
+  if (namedScore === Number.NEGATIVE_INFINITY) return false;
+
+  const fullNameScore = scoreHumanName(fullName);
+  if (fullNameScore === Number.NEGATIVE_INFINITY) return true;
+
+  return namedScore >= fullNameScore;
+}
+
+function scoreHumanName(value) {
+  const text = String(value || "").trim();
+  if (!text) return Number.NEGATIVE_INFINITY;
+  const digitPenalty = (text.match(/\d/g) || []).length * 2;
+  const separatorPenalty = (text.match(/[_@.]/g) || []).length;
+  const letterBonus = /[a-z]/i.test(text) ? 3 : 0;
+  const fullNameBonus = /\s/.test(text) ? 2 : 0;
+  return letterBonus + fullNameBonus - digitPenalty - separatorPenalty;
 }

@@ -117,4 +117,16 @@ describe("quick command bar extra branches", () => {
     fireEvent.click(screen.getByText("Clear"));
     expect(input).toHaveValue("");
   });
+
+  it("keeps the bar open for non-enter input keys and for clicks inside the shell", () => {
+    render(<QuickCommandBar onNavChange={vi.fn()} onOpenTask={vi.fn()} />);
+
+    fireEvent(window, new Event("quick-actions:open"));
+    const input = screen.getByPlaceholderText("Type to filter actions…");
+    fireEvent.keyDown(input, { key: "ArrowDown", code: "ArrowDown" });
+    expect(screen.getByText("Quick actions")).toBeInTheDocument();
+
+    fireEvent.mouseDown(screen.getByText("Quick actions"));
+    expect(screen.getByText("Quick actions")).toBeInTheDocument();
+  });
 });

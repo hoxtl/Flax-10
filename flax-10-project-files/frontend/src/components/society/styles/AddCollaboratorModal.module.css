@@ -49,6 +49,16 @@
     box-shadow: none;
 }
 
+.error {
+    background: var(--danger-bg);
+    color: var(--danger);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-top: var(--space-2);
+    border: 1px solid var(--danger-border);
+}
+
 .footer {
     display: flex;
     justify-content: flex-end;

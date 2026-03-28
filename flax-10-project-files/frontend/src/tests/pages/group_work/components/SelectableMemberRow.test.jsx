@@ -30,6 +30,11 @@ describe("SelectableMemberRow", () => {
     expect(onToggle).toHaveBeenCalledWith("101");
   });
 
+  it("supports custom checkbox ID prefixes", () => {
+    render(<SelectableMemberRow member={member} checked={false} onToggle={onToggle} inputIdPrefix="task-assignee" />);
+    expect(screen.getByRole("checkbox")).toHaveAttribute("id", "task-assignee-101");
+  });
+
   it("handles checked state", () => {
     render(<SelectableMemberRow member={member} checked={true} onToggle={onToggle} />);
     const checkbox = screen.getByRole("checkbox");

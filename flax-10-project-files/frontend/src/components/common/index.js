@@ -15,6 +15,7 @@ export { default as ScrollToTop } from "./scroll_to_top/ScrollToTop";
 export { default as SearchBar } from "./search_bar/SearchBar";
 export { default as SearchEmptyState } from "./search_empty_state/SearchEmptyState";
 export { default as SectionHeader } from "./section_header/SectionHeader";
+export { SegmentedDivider, SegmentedSlot, SegmentedSlots } from "./segmented_slots/SegmentedSlots";
 export { SleepWarningModal } from "./sleep_warning_modal/SleepWarningModal";
 export { default as StandardModal } from "./standard_modal/StandardModal";
 export { default as Tabs } from "./tabs/Tabs";

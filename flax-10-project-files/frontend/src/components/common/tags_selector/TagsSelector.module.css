@@ -43,6 +43,13 @@
     box-shadow: var(--tag-selector-pill-shadow);
 }
 
+.tagDot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+
 .tagLabel {
     font-size: 0.78rem;
     font-weight: 500;
@@ -79,6 +86,7 @@
 .pill {
     display: flex;
     align-items: center;
+    gap: 7px;
     padding: 5px 12px;
     background: var(--tag-selector-option-bg);
     border: 1.5px solid var(--tag-selector-option-border);
@@ -96,4 +104,28 @@
 
 .pill:active {
     transform: translateY(0);
+}
+
+.inlineSelectedRow {
+    justify-content: flex-start;
+    min-height: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    overflow: visible;
+    gap: 10px;
+}
+
+.inlineSelectedTag,
+.inlinePill {
+    padding: 5px 14px;
+    background: color-mix(in srgb, var(--surface-card) 88%, white);
+    border: 1.5px solid var(--border);
+    box-shadow: none;
+}
+
+.inlinePillsWrap {
+    justify-content: flex-start;
+    padding: 0;
+    gap: 10px;
 }

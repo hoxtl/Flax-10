@@ -110,13 +110,21 @@
 
 /* Read-only events — still clickable to view details */
 .draggable-event.society-event,
-.draggable-event.timetable-event {
+.draggable-event.timetable-event,
+.draggable-event.group-meeting-event {
     cursor: pointer;
 }
 
 .draggable-event.society-event:hover,
-.draggable-event.timetable-event:hover {
+.draggable-event.timetable-event:hover,
+.draggable-event.group-meeting-event:hover {
     transform: none;
+}
+
+/* Group meeting events — teal accent to distinguish from personal events */
+.draggable-event.group-meeting-event {
+    border-left-color: var(--sage, #5a8a6a);
+    background: color-mix(in srgb, var(--sage, #5a8a6a) 12%, transparent);
 }
 
 .society-badge {

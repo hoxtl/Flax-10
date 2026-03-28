@@ -236,8 +236,9 @@ describe("IntelligenceUtils", () => {
       expect(getLiveContext(context)).toEqual({
         iconKey: "Clock3",
         label: "On now",
+        location: "Library",
         meta: "Until 10:30",
-        text: "😴 Deep work · Library",
+        text: "😴 Deep work",
         tone: "neutral",
       });
     });
@@ -248,7 +249,7 @@ describe("IntelligenceUtils", () => {
         iconKey: "AlertTriangle",
         label: "Attention",
         meta: "Conflict at 10:00",
-        text: "You have an overlap in today’s plan.",
+        text: "You have an overlap in today's plan.",
         tone: "warning",
       });
     });

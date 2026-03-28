@@ -2,20 +2,47 @@
  * Availability data and action hooks for the GroupWork tab.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useToast } from "../../../context/ToastContext";
 
-function useAvailabilityData(projectId) {
-    const [data, setData] = useState({ suggestions: [], active_suggestions: [], current_user_id: null, project_members: [], team_size: 0 });
-    const [loading, setLoading] = useState(true);
+const DEFAULT_AVAILABILITY_DATA = {
+    suggestions: [],
+    active_suggestions: [],
+    current_user_id: null,
+    project_members: [],
+    team_size: 0,
+};
 
-    const fetchAvail = useCallback(async () => {
-        setLoading(true);
-        const res = await fetch(`/api/group-work/projects/${projectId}/availability/`, { headers: getAuthHeaders() });
-        const payload = res.ok ? await res.json() : null;
-        if (payload) setData(payload);
-        setLoading(false);
+function setAvailabilityLoading(background, hasLoadedRef, setLoading) {
+    if (background && hasLoadedRef.current) return;
+    setLoading(true);
+}
+
+async function fetchAvailabilityPayload(projectId) {
+    const res = await fetch(`/api/group-work/projects/${projectId}/availability/`, { headers: getAuthHeaders() });
+    return res.ok ? res.json() : null;
+}
+
+function storeAvailabilityPayload(payload, setData, hasLoadedRef) {
+    if (!payload) return;
+    setData(payload);
+    hasLoadedRef.current = true;
+}
+
+function useAvailabilityData(projectId) {
+    const [data, setData] = useState(DEFAULT_AVAILABILITY_DATA);
+    const [loading, setLoading] = useState(true);
+    const hasLoadedRef = useRef(false);
+
+    const fetchAvail = useCallback(async ({ background = false } = {}) => {
+        setAvailabilityLoading(background, hasLoadedRef, setLoading);
+        try {
+            const payload = await fetchAvailabilityPayload(projectId);
+            storeAvailabilityPayload(payload, setData, hasLoadedRef);
+        } finally {
+            setLoading(false);
+        }
     }, [projectId]);
 
     useEffect(() => { fetchAvail(); }, [fetchAvail]);
@@ -30,11 +57,11 @@ function buildSuggestionActions(projectId, fetchAvail, showToast) {
             headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
             body: JSON.stringify({ start_time: slot.start, end_time: end }),
         });
-        if (res.ok) { fetchAvail(); showToast("You proposed a time for the team."); }
+        if (res.ok) { await fetchAvail({ background: true }); showToast("You proposed a time for the team."); }
     };
     const onDelete = async (id) => {
         const res = await fetch(`/api/group-work/suggestions/${id}/`, { method: "DELETE", headers: getAuthHeaders() });
-        if (res.ok) { fetchAvail(); showToast("Meeting suggestion deleted."); }
+        if (res.ok) { await fetchAvail({ background: true }); showToast("Meeting suggestion deleted."); }
     };
     return { onSuggest, onDelete };
 }
@@ -53,14 +80,16 @@ function useAvailabilityActions(projectId, fetchAvail, confirm) {
             body: JSON.stringify({ status }),
         });
         if (!res.ok) return;
-        fetchAvail();
+        await fetchAvail({ background: true });
         const msg = status === "accepted" ? "You accepted the meeting slot." : "You declined the meeting slot.";
         showToast(msg, { variant: status === "accepted" ? "success" : "neutral" });
     };
     return { handleSuggestTime: onSuggest, handleDelete, handleVote };
 }
 
-/** Provides availability data and actions for proposing and voting on meeting slots. */
+/*
+ * Provides availability data and actions for meeting suggestions.
+ */
 
 export function useAvailability(projectId, confirm) {
     const { data, fetchAvail, loading } = useAvailabilityData(projectId);

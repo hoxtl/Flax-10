@@ -58,6 +58,22 @@ def _seed_meeting_responses_for_suggestion(suggestion, members, suggestion_index
             defaults={"status": status},
         )
 
+def _get_group_study_tag():
+    from studyFlax.views.calendar.system_tags import get_group_study_tag
+    return get_group_study_tag()
+
+def _seed_confirmed_meeting_events(project, members, start, end):
+    """Create calendar events for all members for a confirmed group meeting."""
+    title = f"Group meeting: {project.name}"
+    tag = _get_group_study_tag()
+    for member in members:
+        CalendarEvent.objects.update_or_create(
+            user=member,
+            title=title,
+            start_time=start,
+            defaults={"end_time": end, "source": "group_meeting", "tag": tag},
+        )
+
 def _create_suggestion_with_responses(project, suggester, start, end, members, idx):
     """Create or update a meeting suggestion and seed its responses."""
     suggestion, _ = MeetingSuggestion.objects.update_or_create(
@@ -67,6 +83,8 @@ def _create_suggestion_with_responses(project, suggester, start, end, members, i
         defaults={"end_time": end},
     )
     _seed_meeting_responses_for_suggestion(suggestion, members, idx)
+    if idx == 0:
+        _seed_confirmed_meeting_events(project, members, start, end)
 
 def _seed_meeting_suggestions_for_project(project, members, now):
     if not members:

@@ -2,7 +2,7 @@
  * Covers GroupWork hook combinations through a small test harness.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 
 import {
@@ -22,6 +22,7 @@ const fetchProjectMembersMock = vi.fn();
 const patchGroupProjectMock = vi.fn();
 const deleteProjectMemberMock = vi.fn();
 const deleteGroupProjectMock = vi.fn();
+const fetchMock = vi.fn();
 
 vi.mock("react-router-dom", () => ({
   useLocation: () => locationState,
@@ -84,11 +85,13 @@ function HookHarness({ projectId = 12, onBack = vi.fn(), onDelete = vi.fn(), onU
 
 describe("groupWorkHooks", () => {
   beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
     fetchGroupProjectsMock.mockReset();
     fetchProjectMembersMock.mockReset();
     patchGroupProjectMock.mockReset();
     deleteProjectMemberMock.mockReset();
     deleteGroupProjectMock.mockReset();
+    fetchMock.mockReset();
 
     fetchGroupProjectsMock.mockResolvedValue([
       { id: 12, title: "Alpha" },
@@ -98,6 +101,11 @@ describe("groupWorkHooks", () => {
     patchGroupProjectMock.mockResolvedValue({ id: 12, title: "Patched" });
     deleteProjectMemberMock.mockResolvedValue({ ok: true });
     deleteGroupProjectMock.mockResolvedValue({ ok: true });
+    fetchMock.mockResolvedValue({ ok: false });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("loads projects, project members, selected URL state, and detail defaults", async () => {
@@ -254,5 +262,45 @@ describe("groupWorkHooks", () => {
 
     render(<NumericProjectHarness />);
     await waitFor(() => expect(screen.getByTestId("project").textContent).toContain("Alpha"));
+  });
+
+  it("hydrates eager task stats from the task API when the fetch succeeds", async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => [{ id: 1, completed: true, assignees_info: [] }],
+    });
+
+    render(<HookHarness />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("detail-task-stats").textContent).toContain('"percent":100');
+    });
+  });
+
+  it("falls back to empty eager task stats when the task API rejects", async () => {
+    fetchMock.mockRejectedValueOnce(new Error("network"));
+
+    render(<HookHarness />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("detail-task-stats").textContent).toContain('"segments":[]');
+    });
+  });
+
+  it("skips eager task fetching when no project id is provided", async () => {
+    render(<HookHarness projectId={null} />);
+
+    await waitFor(() => expect(screen.getByTestId("projects-loading").textContent).toBe("false"));
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByTestId("detail-task-stats").textContent).toContain('"percent":0');
+  });
+
+  it("uses the localhost fallback when window.location.origin is unavailable", async () => {
+    vi.stubGlobal("location", undefined);
+
+    render(<HookHarness />);
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(String(fetchMock.mock.calls[0][0])).toContain("http://localhost/api/tasks/?group_project=12");
   });
 });

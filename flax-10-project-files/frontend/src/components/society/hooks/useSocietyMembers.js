@@ -27,8 +27,9 @@ const makeAddCollaborator = (id, setSociety, setMembers) =>
     async (userId, role) => {
         const member = await api.addCollaborator(id, userId, role);
         adjustMemberCount(setSociety, 1);
-        setMembers(prev => [...prev, member]);
-        return member;
+        const normalizedMember = { ...member, username: member?.username || userId };
+        setMembers(prev => [...prev, normalizedMember]);
+        return normalizedMember;
     };
 
 const makeRemoveMember = (id, setSociety, setMembers) =>

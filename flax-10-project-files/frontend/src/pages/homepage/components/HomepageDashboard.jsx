@@ -2,10 +2,12 @@
  * Homepage dashboard body.
  */
 
+import { useContext } from "react";
 import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/taskApi";
 import { EventPopups } from "../../../components/calendar/EventPopups";
 import { useAuth } from "../../../context/AuthContext";
+import { UNSAFE_NavigationContext } from "react-router-dom";
 import BackToTop from "../../../components/common/back_to_top/BackToTop";
 import { TaskWidgetSlot } from "./TaskWidgetSlot";
 import { DeadlinesWidget } from "./DeadlinesWidget";
@@ -21,6 +23,15 @@ import { HomepageTimelineSection } from ".";
 export function HomepageDashboard(props) {
   if (props.homeDataLoading) return <HomepageSkeleton />;
   return <HomepageDashboardContent {...props} />;
+}
+
+function useOptionalNavigate() {
+  const navigationContext = useContext(UNSAFE_NavigationContext);
+  const navigator = navigationContext?.navigator;
+
+  if (!navigator?.push) return null;
+
+  return (to) => navigator.push(to);
 }
 
 function HomepageDashboardContent(props) {
@@ -52,11 +63,14 @@ function HomepageTaskSlot(props) {
 function HomepageDeadlines(props) {
   const { profile } = useAuth();
   const isTeacher = profile?.role === "teacher";
+  const handleSelectModule = (module) => {
+    props.modals.setSelectedModulePill(module);
+  };
   return (
     <DeadlinesWidget
       deadlines={props.upcomingDeadlines || []}
       onSelectDeadline={props.modals.setSelectedDeadline}
-      onSelectModule={props.modals.setSelectedModulePill}
+      onSelectModule={handleSelectModule}
       isTeacher={isTeacher}
     />
   );

@@ -3,38 +3,39 @@
  * Supports pinning, editing, and smooth-scrolling to focused announcements.
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { Megaphone } from "lucide-react";
 import styles from "../tabs.module.css";
 import { formatShortDate } from "../../../../calendar/utils/dateUtils";
-import ImageGalleryModal from "../../image_handlers/ImageGalleryModal";
+import SearchEmptyState from "../../../../common/search_empty_state/SearchEmptyState";
 import { getImageList } from "./announcementModalHelpers";
 
 export default function AnnouncementsTab({ announcements = [], editMode, tags, focusAnnouncementId, onEdit }) {
-    const [gallery, setGallery] = useState(null);
-    const openGallery = (imgs, idx) => setGallery({ images: imgs, index: idx });
-    return (
-        <>
-            <AnnouncementsList {...{ announcements, editMode, onEdit, tags, focusAnnouncementId }} onImageClick={openGallery} />
-            {gallery && <ImageGalleryModal images={gallery.images} initialIndex={gallery.index} onClose={() => setGallery(null)} />}
-        </>
-    );
+    return <AnnouncementsList {...{ announcements, editMode, onEdit, tags, focusAnnouncementId }} />;
 }
 
-function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnouncementId, onImageClick }) {
+function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnouncementId }) {
     if (announcements.length === 0) return <EmptyAnnouncements editMode={editMode} />;
     return (
         <div className={styles.announcementList}>
             {announcements.map(a => (
                 <AnnouncementCard key={a.id} announcement={a} editMode={editMode} onEdit={() => onEdit(a)}
-                    tag={tags?.find(t => t.id === a.tag)} isFocused={String(a.id) === String(focusAnnouncementId)} onImageClick={onImageClick} />
+                    tag={tags?.find(t => t.id === a.tag)} isFocused={String(a.id) === String(focusAnnouncementId)} />
             ))}
         </div>
     );
 }
 
 function EmptyAnnouncements({ editMode }) {
-    const msg = editMode ? "No announcements yet. Use the sidebar to add one." : "No announcements yet.";
-    return <p className={styles.empty}>{msg}</p>;
+    return (
+        <SearchEmptyState
+            className={styles.announcementEmptyState}
+            title="No announcements yet"
+            hint={editMode ? "Use the sidebar to post the first update for this society." : "Check back soon for society updates, reminders, and event news."}
+            itemLabel="announcements"
+            icon={<Megaphone size={22} aria-hidden="true" />}
+        />
+    );
 }
 
 function useFocusScroll(isFocused, ref) {
@@ -46,7 +47,7 @@ function useFocusScroll(isFocused, ref) {
     }, [isFocused, ref]);
 }
 
-function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused, onImageClick }) {
+function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused }) {
     const cardRef = useRef(null);
     useFocusScroll(isFocused, cardRef);
     const cardClass = `${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`;
@@ -55,7 +56,7 @@ function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused, onIm
             {editMode && <EditButton onClick={onEdit} />}
             <CardHeader announcement={announcement} tag={tag} />
             <p className={styles.announcementContent}>{announcement.content}</p>
-            <AnnouncementImages announcement={announcement} onImageClick={onImageClick} />
+            <AnnouncementImages announcement={announcement} />
         </div>
     );
 }
@@ -75,26 +76,8 @@ function CardHeader({ announcement, tag }) {
     );
 }
 
-function AnnouncementImages({ announcement, onImageClick }) {
+function AnnouncementImages({ announcement }) {
     const images = getImageList(announcement);
     if (images.length === 0) return null;
-    if (images.length === 1) return <SingleImage src={images[0]} onImageClick={onImageClick} images={images} />;
-    return <ImageGallery images={images} onImageClick={onImageClick} />;
-}
-
-function SingleImage({ src, onImageClick, images }) {
-    return (
-        <img className={styles.announcementImage} src={src} alt="Announcement"
-            onClick={() => onImageClick?.(images, 0)} style={{ cursor: 'pointer' }} />
-    );
-}
-
-function ImageGallery({ images, onImageClick }) {
-    return (
-        <div className={styles.announcementGallery}>
-            {images.map((src, i) => (
-                <img key={i} className={styles.galleryImage} src={src} alt={`Image ${i + 1}`} onClick={() => onImageClick?.(images, i)} />
-            ))}
-        </div>
-    );
+    return <img className={styles.announcementImage} src={images[0]} alt="Announcement" />;
 }

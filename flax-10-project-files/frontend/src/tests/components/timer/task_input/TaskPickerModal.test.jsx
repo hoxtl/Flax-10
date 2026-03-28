@@ -1,10 +1,17 @@
-/**
- * Covers TaskPickerModal open, loading, and filter states.
+/*
+ * Tests timer task picker modal states and helper callbacks.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '../../../../utils/testUtils';
 import { TaskPickerModal } from '../../../../components/timer/task_input/TaskPickerModal';
+import {
+  buildFilterPanelProps,
+  clearAllFilters,
+  closeFilterPanel,
+  toggleList,
+  toggleModule,
+} from '../../../../components/timer/task_input/TaskPickerModal.helpers';
 
 import { createFnMap } from '../../../utils/testBuilderUtils';
 
@@ -99,6 +106,34 @@ const makeState = (overrides = {}) => ({
   ...overrides,
 });
 
+const expectedFilterPanelState = {
+  activeFilterTab: 'modules',
+  filterQuery: 'math',
+  visibleListItems: [{ id: 5, name: 'Revision' }],
+  filterListIds: ['5'],
+  moduleGroupKeys: ['SCI'],
+  groupedModuleItems: { SCI: [{ code: 'SCI101' }] },
+  filterModuleCodes: ['SCI101'],
+};
+
+function expectFilterPanelProps(props) {
+  expect(props.activeFilterTab).toBe(expectedFilterPanelState.activeFilterTab);
+  expect(props.filterQuery).toBe(expectedFilterPanelState.filterQuery);
+  expect(props.visibleListItems).toEqual(expectedFilterPanelState.visibleListItems);
+  expect(props.filterListIds).toEqual(expectedFilterPanelState.filterListIds);
+  expect(props.moduleGroupKeys).toEqual(expectedFilterPanelState.moduleGroupKeys);
+  expect(props.groupedModuleItems).toEqual(expectedFilterPanelState.groupedModuleItems);
+  expect(props.filterModuleCodes).toEqual(expectedFilterPanelState.filterModuleCodes);
+}
+
+function triggerFilterPanelActions(props) {
+  props.onTabChange('lists');
+  props.onQueryChange('bio');
+  props.onToggleList(9);
+  props.onToggleModule('ENG202');
+  props.onClearAll();
+}
+
 describe('TaskPickerModal – when open', () => {
   it('renders the header title', () => {
     render(<TaskPickerModal state={makeState()} filterWrapRef={{ current: null }} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
@@ -129,6 +164,13 @@ describe('TaskPickerModal – when open', () => {
     const setOpen = vi.fn();
     render(<TaskPickerModal state={makeState({ setOpen })} filterWrapRef={{ current: null }} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
     fireEvent.click(screen.getByLabelText('Close task picker'));
+    expect(setOpen).toHaveBeenCalledWith(false);
+  });
+
+  it('calls setOpen(false) when the modal backdrop closes', () => {
+    const setOpen = vi.fn();
+    render(<TaskPickerModal state={makeState({ setOpen })} filterWrapRef={{ current: null }} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('standard-modal'));
     expect(setOpen).toHaveBeenCalledWith(false);
   });
 
@@ -186,11 +228,73 @@ describe('TaskPickerModal – filter panel', () => {
     const filterWrapRef = { current: document.createElement('div') };
     const state = makeState({ isFilterOpen: true, setIsFilterOpen });
     render(<TaskPickerModal state={state} filterWrapRef={filterWrapRef} onSelect={vi.fn()} onPickForMe={vi.fn()} />);
-    // Simulate mousedown on the shell (not inside filterWrapRef)
-    const shell = document.querySelector('[data-testid="standard-modal"]');
-    if (shell) fireEvent.mouseDown(shell);
-    // setIsFilterOpen may be called
-    // We just assert no crash occurs
-    expect(setIsFilterOpen).toBeDefined();
+    const shell = screen.getByText('Select a Task').closest('div');
+    fireEvent.mouseDown(shell);
+    expect(setIsFilterOpen).toHaveBeenCalledWith(false);
+  });
+});
+
+describe('TaskPickerModal helpers', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('builds filter panel props that toggle lists, modules, and clear all filters', () => {
+    const state = makeState({
+      ...expectedFilterPanelState,
+    });
+    const props = buildFilterPanelProps(state);
+    expectFilterPanelProps(props);
+    triggerFilterPanelActions(props);
+    expect(state.setActiveFilterTab).toHaveBeenCalledWith('lists');
+    expect(state.setFilterQuery).toHaveBeenCalledWith('bio');
+    expect(state.setFilterListIds).toHaveBeenCalledTimes(2);
+    expect(state.setFilterModuleCodes).toHaveBeenCalledTimes(2);
+  });
+
+  it('toggleList removes an existing id and adds a missing one', () => {
+    const setFilterListIds = vi.fn();
+
+    toggleList(2, setFilterListIds);
+    const removeUpdater = setFilterListIds.mock.calls[0][0];
+    expect(removeUpdater(['2', '3'])).toEqual(['3']);
+
+    toggleList(7, setFilterListIds);
+    const addUpdater = setFilterListIds.mock.calls[1][0];
+    expect(addUpdater(['2', '3'])).toEqual(['2', '3', '7']);
+  });
+
+  it('toggleModule removes an existing code and adds a missing one', () => {
+    const setFilterModuleCodes = vi.fn();
+
+    toggleModule('SCI101', setFilterModuleCodes);
+    const removeUpdater = setFilterModuleCodes.mock.calls[0][0];
+    expect(removeUpdater(['SCI101', 'ENG202'])).toEqual(['ENG202']);
+
+    toggleModule('MAT303', setFilterModuleCodes);
+    const addUpdater = setFilterModuleCodes.mock.calls[1][0];
+    expect(addUpdater(['SCI101', 'ENG202'])).toEqual(['SCI101', 'ENG202', 'MAT303']);
+  });
+
+  it('clearAllFilters resets list, module, and query filters', () => {
+    const state = makeState();
+
+    clearAllFilters(state);
+
+    expect(state.setFilterListIds).toHaveBeenCalledWith([]);
+    expect(state.setFilterModuleCodes).toHaveBeenCalledWith([]);
+    expect(state.setFilterQuery).toHaveBeenCalledWith('');
+  });
+
+  it('closeFilterPanel ignores inside clicks and closed states', () => {
+    const setIsFilterOpen = vi.fn();
+    const wrapper = document.createElement('div');
+    const child = document.createElement('button');
+    wrapper.appendChild(child);
+
+    closeFilterPanel({ target: child }, { isFilterOpen: true, setIsFilterOpen }, { current: wrapper });
+    closeFilterPanel({ target: document.createElement('div') }, { isFilterOpen: false, setIsFilterOpen }, { current: wrapper });
+
+    expect(setIsFilterOpen).not.toHaveBeenCalled();
   });
 });

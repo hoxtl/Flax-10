@@ -3,74 +3,66 @@ import { renderHook, act } from '@testing-library/react';
 import { useSocietyMembership } from '../../../../components/society/hooks/useSocietyMembership';
 import * as api from '../../../../api/societyApi';
 import { useTags } from '../../../../context/TagContext';
-import { useConfirm } from '../../../../context/ConfirmContext';
+import { useToast } from '../../../../context/ToastContext';
 
 vi.mock('../../../../api/societyApi', () => ({
     joinSociety: vi.fn(),
     leaveSociety: vi.fn(),
     requestRatification: vi.fn(),
-    publishChanges: vi.fn(),
-    toggleSubscription: vi.fn()
+    publishChanges: vi.fn()
 }));
 
 vi.mock('../../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({ refreshTags: vi.fn() }))
 }));
 
-vi.mock('../../../../context/ConfirmContext', () => ({
-    useConfirm: vi.fn()
+vi.mock('../../../../context/ToastContext', () => ({
+    useToast: vi.fn()
 }));
 
 describe('useSocietyMembership', () => {
     const mockId = 1;
-    let mockSoc = { id: 1, member_count: 5, is_member: false };
-    let setSociety, confirm, refreshTags;
+    let mockSoc = { id: 1, name: 'Chess Club', member_count: 5, is_member: false };
+    let setSociety, refreshTags, showToast;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockSoc = { id: 1, member_count: 5, is_member: false };
+        mockSoc = { id: 1, name: 'Chess Club', member_count: 5, is_member: false };
         setSociety = vi.fn((updater) => {
             if (typeof updater === 'function') {
                 mockSoc = updater(mockSoc);
             }
         });
-        confirm = vi.fn().mockResolvedValue(true);
-        useConfirm.mockReturnValue(confirm);
         refreshTags = vi.fn();
         useTags.mockReturnValue({ refreshTags });
+        showToast = vi.fn();
+        useToast.mockReturnValue(showToast);
     });
 
     it('joinSociety successfully', async () => {
         api.joinSociety.mockResolvedValue({});
-        api.toggleSubscription.mockResolvedValue({});
         const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
         
         await act(async () => { await result.current.joinSociety(); });
         expect(api.joinSociety).toHaveBeenCalledWith(mockId);
         expect(mockSoc.is_member).toBe(true);
         expect(mockSoc.member_count).toBe(6);
-        expect(confirm).toHaveBeenCalled();
-        expect(api.toggleSubscription).toHaveBeenCalledWith(mockId, true);
+        expect(showToast).toHaveBeenCalledWith('Joined Chess Club');
     });
 
-    it('joinSociety handles error and subscription cancel/error', async () => {
+    it('joinSociety handles error and still updates state on later success', async () => {
         api.joinSociety.mockRejectedValue(new Error('join fail'));
         const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
         await act(async () => { await result.current.joinSociety(); });
         expect(api.joinSociety).toHaveBeenCalledWith(mockId);
         expect(mockSoc.is_member).toBe(false);
+        expect(showToast).toHaveBeenCalledWith("Couldn't join this society.", { variant: "error" });
 
         api.joinSociety.mockResolvedValue({});
-        confirm.mockResolvedValue(false);
+        showToast.mockClear();
         await act(async () => { await result.current.joinSociety(); });
-        expect(api.toggleSubscription).not.toHaveBeenCalled();
         expect(mockSoc.is_member).toBe(true);
-
-        confirm.mockResolvedValue(true);
-        api.toggleSubscription.mockRejectedValueOnce(new Error('sub fail'));
-        await act(async () => { await result.current.joinSociety(); });
-        expect(api.toggleSubscription).toHaveBeenCalledWith(mockId, true);
-        expect(mockSoc.is_member).toBe(true);
+        expect(showToast).toHaveBeenCalledWith('Joined Chess Club');
     });
 
     it('leaveSociety successfully and error paths', async () => {
@@ -82,22 +74,24 @@ describe('useSocietyMembership', () => {
         expect(mockSoc.is_member).toBe(false);
         expect(mockSoc.member_count).toBe(4);
         expect(refreshTags).toHaveBeenCalled();
+        expect(showToast).toHaveBeenCalledWith('Left Chess Club');
 
         api.leaveSociety.mockRejectedValue(new Error('leave fail'));
+        showToast.mockClear();
         await act(async () => { await result.current.leaveSociety(); });
         expect(api.leaveSociety).toHaveBeenCalledWith(mockId, 'me');
+        expect(showToast).toHaveBeenCalledWith("Couldn't leave this society.", { variant: "error" });
 
         // Missing member_count branch
-        mockSoc = { id: 1, is_member: true }; // No member_count
+        mockSoc = { id: 1, name: 'Chess Club', is_member: true }; // No member_count
         api.leaveSociety.mockResolvedValue({});
         await act(async () => { await result.current.leaveSociety(); });
         expect(mockSoc.member_count).toBe(0);
     });
 
     it('joinSociety missing member_count branch', async () => {
-        mockSoc = { id: 1 }; // No member_count
+        mockSoc = { id: 1, name: 'Chess Club' }; // No member_count
         api.joinSociety.mockResolvedValue({});
-        confirm.mockResolvedValue(false);
         const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
         await act(async () => { await result.current.joinSociety(); });
         expect(mockSoc.member_count).toBe(1);

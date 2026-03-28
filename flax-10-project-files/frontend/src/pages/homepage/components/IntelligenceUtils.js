@@ -123,9 +123,11 @@ function buildCurrentContext(currentEvent, sleepWindow) {
     currentEvent?.start_time,
     currentEvent?.end_time,
   );
+  const location = String(currentEvent?.location || "").trim() || null;
   return {
     label: "On now",
-    text: `${overlapsSleep ? "😴 " : ""}${currentEvent.title}${currentEvent.location ? ` · ${currentEvent.location}` : ""}`,
+    text: `${overlapsSleep ? "😴 " : ""}${currentEvent.title}`,
+    location,
     meta: currentEvent.end_time ? `Until ${formatEventTime(currentEvent.end_time)}` : null,
     tone: "neutral",
     iconKey: "Clock3",
@@ -136,7 +138,7 @@ function buildOverlapContext(overlaps) {
   const first = overlaps[0]?.a?.start_time;
   return {
     label: "Attention",
-    text: "You have an overlap in today’s plan.",
+    text: "You have an overlap in today's plan.",
     meta: first ? `Conflict at ${formatEventTime(first)}` : null,
     tone: "warning",
     iconKey: "AlertTriangle",

@@ -1,5 +1,5 @@
-/**
- * Covers CalendarContext fallback and override branches.
+/*
+ * Covers calendar context fallback and override branches.
  */
 
 import { act, render, screen } from "@testing-library/react";
@@ -21,7 +21,7 @@ vi.mock("../../../components/notifications/hooks/useReminderNotifications", () =
 
 const providerOverrides = {
   selectedDate: "override-date",
-  events: [{ id: "override", title: "Override Event" }],
+  events: [{ id: "override", title: "Override Event" }, { id: "override", title: "Override Event" }],
   viewMode: "day",
   displayMode: "list",
 };

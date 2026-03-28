@@ -13,7 +13,8 @@ import { compareProjectsBySort } from "../utils/projectRowUtils";
 import styles from "./GroupWorkContent.module.css";
 
 const SORT_OPTIONS = [
-  { value: "due-date", label: "Due date" },
+  { value: "due-date", label: "Due date (soonest first)" },
+  { value: "due-date-desc", label: "Due date (latest first)" },
   { value: "created-desc", label: "Date created (newest)" },
   { value: "created-asc", label: "Date created (oldest)" },
   { value: "most-members", label: "Most team members" },

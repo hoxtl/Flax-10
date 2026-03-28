@@ -1,4 +1,5 @@
 /* Tests for ThisWeek widget – goal ring, editor, streak display */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ThisWeek } from '../../../../pages/profile/components/widgets/ThisWeek';

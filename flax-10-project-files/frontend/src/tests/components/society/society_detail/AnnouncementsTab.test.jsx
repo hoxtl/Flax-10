@@ -69,10 +69,11 @@ describe('AnnouncementsTab', () => {
 
   it('renders the empty-state copy for view and edit modes', () => {
     const { rerender } = renderTab({ announcements: [], editMode: false });
-    expect(screen.getByText('No announcements yet.')).toBeTruthy();
+    expect(screen.getByText('No announcements yet')).toBeTruthy();
+    expect(screen.getByText('Check back soon for society updates, reminders, and event news.')).toBeTruthy();
 
     rerender(<AnnouncementsTab tags={[]} announcements={[]} editMode={true} />);
-    expect(screen.getByText('No announcements yet. Use the sidebar to add one.')).toBeTruthy();
+    expect(screen.getByText('Use the sidebar to post the first update for this society.')).toBeTruthy();
   });
 
   it('opens the gallery from a multi-image announcement and hides edit controls in view mode', () => {
@@ -84,6 +85,6 @@ describe('AnnouncementsTab', () => {
 
   it('uses the default empty announcements prop when none is provided', () => {
     render(<AnnouncementsTab editMode={false} tags={[]} />);
-    expect(screen.getByText('No announcements yet.')).toBeInTheDocument();
+    expect(screen.getByText('No announcements yet')).toBeInTheDocument();
   });
 });

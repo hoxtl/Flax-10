@@ -13,6 +13,8 @@ User = get_user_model()
 
 MAX_SYNC_PER_USER = 2
 
+DEMO_MANAGED_SOCIETIES = {"Photography Society", "Esports Society", "Chess Club"}
+
 
 def _pick_admin(admin_counts, student_users):
     eligible = [user for user in student_users if admin_counts[user.id] < 3]
@@ -57,13 +59,30 @@ def _seed_society_members(society, admin_counts, member_counts, student_users, s
     _add_admin_membership(society, admin, admin_counts, sync_counts)
     _seed_regular_members(society, admin, member_counts, student_users, sync_counts)
 
+def _seed_demo_managed_societies(demo_user, societies, admin_counts, member_counts, student_users, sync_counts):
+    managed = [s for s in societies if s.name in DEMO_MANAGED_SOCIETIES]
+    for society in managed:
+        _add_admin_membership(society, demo_user, admin_counts, sync_counts)
+        _seed_regular_members(society, demo_user, member_counts, student_users, sync_counts)
+
+def _non_demo_societies(societies, demo_user):
+    if not demo_user:
+        return societies
+    return [s for s in societies if s.name not in DEMO_MANAGED_SOCIETIES]
+
+
 def create_society_memberships(stdout):
+    """Seed memberships across all societies, giving the demo user admin access to her fixed societies."""
     del stdout
     SocietyMembership.objects.filter(user__role="teacher").delete()
     student_users = list(User.objects.filter(role="student"))
     admin_counts = {user.id: 0 for user in student_users}
     member_counts = {user.id: 0 for user in student_users}
     sync_counts = {user.id: 0 for user in student_users}
-    for society in Society.objects.all():
+    demo_user = User.objects.filter(username="janedoe").first()
+    societies = list(Society.objects.all())
+    if demo_user:
+        _seed_demo_managed_societies(demo_user, societies, admin_counts, member_counts, student_users, sync_counts)
+    for society in _non_demo_societies(societies, demo_user):
         _seed_society_members(society, admin_counts, member_counts, student_users, sync_counts)
 

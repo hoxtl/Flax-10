@@ -36,7 +36,7 @@ from .seed_helpers.groupwork.groups import (
 from .seed_helpers.timer.sessions import create_study_sessions
 from .seed_helpers.societies.societies import (
     create_societies, create_society_memberships,
-    create_society_events, create_society_images,
+    create_society_events, create_society_images, create_society_announcements,
 )
 from .seed_helpers.academics.readings import create_readings
 from .seed_helpers.calendar.attendance import seed_attendance
@@ -191,6 +191,7 @@ class Command(BaseCommand):
         create_society_memberships(self.stdout)
         create_society_events(self.stdout)
         create_society_images(self.stdout)
+        create_society_announcements(self.stdout)
         create_society_tasks(self.stdout)
         self.stdout.write(f"  \u2713  {'Societies':<14} {Society.objects.count():,}")
         create_group_projects(self.stdout)

@@ -16,13 +16,13 @@
   top: 0;
   z-index: 90;
   background: var(--panel);
-  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12));
+  border-bottom: 0.5px solid var(--border);
 }
 
 .week-header {
   z-index: 10;
   display: flex;
-  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12));
+  border-bottom: 0.5px solid var(--border);
   background-color: var(--bg);
   flex-shrink: 0;
 }
@@ -128,7 +128,7 @@
 .day-column {
   display: flex;
   flex-direction: column;
-  border-left: 0.5px solid var(--border, rgba(74, 52, 33, 0.10));
+  border-left: 0.5px solid var(--border);
   position: relative;
   flex: 1;
   min-height: 1440px;
@@ -137,7 +137,7 @@
 
 /* Hour cells — ultra-thin lines for clean Apple feel */
 .hour-cell {
-  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.08)) !important;
+  border-bottom: 0.5px solid var(--border) !important;
   box-sizing: border-box;
   position: relative;
   background-image: none;
@@ -149,16 +149,16 @@
 .week-view:has(.draggable-event.resizing) .hour-cell {
   background-image: linear-gradient(to bottom,
       transparent 24%,
-      rgba(74, 52, 33, 0.06) 25%,
-      rgba(74, 52, 33, 0.06) 26%,
+      color-mix(in srgb, var(--primary) 6%, transparent) 25%,
+      color-mix(in srgb, var(--primary) 6%, transparent) 26%,
       transparent 27%,
       transparent 49%,
-      rgba(74, 52, 33, 0.06) 50%,
-      rgba(74, 52, 33, 0.06) 51%,
+      color-mix(in srgb, var(--primary) 6%, transparent) 50%,
+      color-mix(in srgb, var(--primary) 6%, transparent) 51%,
       transparent 52%,
       transparent 74%,
-      rgba(74, 52, 33, 0.06) 75%,
-      rgba(74, 52, 33, 0.06) 76%,
+      color-mix(in srgb, var(--primary) 6%, transparent) 75%,
+      color-mix(in srgb, var(--primary) 6%, transparent) 76%,
       transparent 77%);
 }
 
@@ -170,11 +170,11 @@
 }
 
 .hour-cell:hover {
-  background-color: var(--hover, rgba(74, 52, 33, 0.02));
+  background-color: var(--hover);
 }
 
 .hour-cell:nth-last-child(1) {
-  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12)) !important;
+  border-bottom: 0.5px solid var(--border) !important;
 }
 
 /* Event cards — floating with 2px gap on each side */

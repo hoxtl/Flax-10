@@ -178,6 +178,7 @@ vi.mock("@/components/common/primary_button/PrimaryButton", () => ({
 }));
 
 import GroupWorkIndexPage from "../../../../pages/group_work/GroupWorkIndexPage";
+import { getMostUrgentProject, prependProject } from "../../../../pages/group_work/GroupWorkIndexPage";
 import ProjectHeader from "@/pages/group_work/components/ProjectHeader";
 import { getDaysLeft } from "../../../../pages/group_work/utils/projectRowUtils";
 
@@ -286,6 +287,22 @@ describe("GroupWork project header and urgent banner", () => {
       useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: false });
       render(<GroupWorkIndexPage />);
       expect(screen.queryByText("Schedule meeting slots")).not.toBeInTheDocument();
+    });
+
+    it("treats a missing projects collection as having no urgent banner candidate", () => {
+      expect(getMostUrgentProject(null)).toBeNull();
+    });
+
+    it("prepends new projects ahead of the existing list", () => {
+      const setProjects = vi.fn();
+
+      prependProject({ id: 30, name: "Prepended" }, setProjects);
+
+      const updater = setProjects.mock.calls[0][0];
+      expect(updater([{ id: 10, name: "Existing" }])).toEqual([
+        { id: 30, name: "Prepended" },
+        { id: 10, name: "Existing" },
+      ]);
     });
 
     it("navigates to the schedule tab when 'Schedule meeting slots' is clicked", () => {

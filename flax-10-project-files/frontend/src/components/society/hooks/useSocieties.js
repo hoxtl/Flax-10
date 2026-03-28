@@ -8,51 +8,84 @@ import { fetchSocieties, createSociety, addCollaborator, requestRatification } f
 function toSnakeCase(obj) {
     const result = {};
     for (const [key, value] of Object.entries(obj)) {
-        const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
-        result[snakeKey] = value;
+        result[key.replace(/([A-Z])/g, "_$1").toLowerCase()] = value;
     }
     return result;
 }
 
-async function addCollaboratorsToSociety(societyId, collaborators) {
-    if (!collaborators?.length) return;
-    for (const c of collaborators) await addCollaborator(societyId, c.username, c.role);
+async function addCollaboratorSafely(societyId, collaborator) {
+    try {
+        await addCollaborator(societyId, collaborator.username, collaborator.role);
+        return null;
+    } catch (error) {
+        return { username: collaborator.username, message: error.message };
+    }
 }
 
-const loadSocieties = async (setState, setSocieties) => {
+async function addCollaboratorsToSociety(societyId, collaborators = []) {
+    if (!collaborators.length) return [];
+    const failures = await Promise.all(collaborators.map((collaborator) => addCollaboratorSafely(societyId, collaborator)));
+    return failures.filter(Boolean);
+}
+
+async function requestRatificationSafely(societyId, shouldRequest) {
+    if (!shouldRequest) return null;
+    try {
+        await requestRatification(societyId);
+        return null;
+    } catch (error) {
+        return error.message;
+    }
+}
+
+function buildCreatedSociety(newSociety, collaboratorFailures, ratificationError) {
+    return { ...newSociety, is_admin: true, role: "admin", create_meta: { collaboratorFailures, ratificationError } };
+}
+
+function appendCreatedSociety(setSocieties, society) {
+    const { create_meta, ...societyForList } = society;
+    setSocieties((current) => [...current, societyForList]);
+}
+
+async function createSocietyWithMetadata(formData) {
+    const { collaborators, requestRatification: shouldRequest, ...rest } = formData;
+    const newSociety = await createSociety(toSnakeCase(rest));
+    const [collaboratorFailures, ratificationError] = await Promise.all([addCollaboratorsToSociety(newSociety.id, collaborators), requestRatificationSafely(newSociety.id, shouldRequest)]);
+    return buildCreatedSociety(newSociety, collaboratorFailures, ratificationError);
+}
+
+async function loadSocieties(setState, setSocieties) {
     try {
         setState({ loading: true, error: null });
         setSocieties(await fetchSocieties());
-    } catch (err) { setState({ loading: false, error: err.message }); }
-    finally { setState(s => ({ ...s, loading: false })); }
-};
+    } catch (error) {
+        setState({ loading: false, error: error.message });
+    } finally {
+        setState((current) => ({ ...current, loading: false }));
+    }
+}
 
-const makeHandleCreate = (setSocieties) =>
-    async (formData) => {
-        const { collaborators, requestRatification: shouldRequest, ...rest } = formData;
-        const newSociety = await createSociety(toSnakeCase(rest));
-        await addCollaboratorsToSociety(newSociety.id, collaborators);
-        if (shouldRequest) await requestRatification(newSociety.id);
-        const societyWithAdminFlag = { ...newSociety, is_admin: true, role: 'admin' };
-        setSocieties(prev => [...prev, societyWithAdminFlag]);
-        return societyWithAdminFlag;
+function makeHandleCreate(setSocieties) {
+    return async function handleCreate(formData) {
+        const society = await createSocietyWithMetadata(formData);
+        appendCreatedSociety(setSocieties, society);
+        return society;
     };
+}
 
-const updateSocietyLocally = (setSocieties, id, updates) =>
-    setSocieties(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+function updateSocietyLocally(setSocieties, id, updates) {
+    setSocieties((current) => current.map((society) => society.id === id ? { ...society, ...updates } : society));
+}
 
-const removeSocietyFromList = (setSocieties, id) =>
-    setSocieties(prev => prev.filter(s => s.id !== id));
+function removeSocietyFromList(setSocieties, id) {
+    setSocieties((current) => current.filter((society) => society.id !== id));
+}
 
+/** Exposes societies data plus local list mutation helpers for the societies page. */
 export function useSocieties() {
     const [societies, setSocieties] = useState([]);
     const [state, setState] = useState({ loading: true, error: null });
     const load = useCallback(() => loadSocieties(setState, setSocieties), []);
     useEffect(() => { load(); }, [load]);
-    return {
-        societies, ...state, refresh: load,
-        handleCreate: makeHandleCreate(setSocieties),
-        updateSocietyLocally: (id, u) => updateSocietyLocally(setSocieties, id, u),
-        removeSociety: (id) => removeSocietyFromList(setSocieties, id),
-    };
+    return { societies, ...state, refresh: load, handleCreate: makeHandleCreate(setSocieties), updateSocietyLocally: (id, updates) => updateSocietyLocally(setSocieties, id, updates), removeSociety: (id) => removeSocietyFromList(setSocieties, id) };
 }

@@ -54,7 +54,7 @@ function sortByRole(members) {
 
 const ListItems = ({ members, isAdmin, onRemove }) => (
     members.map(m => (
-        <SummaryItem key={m.user} avatar={<UserAvatar user={m} avatarOnly />} title={<MemberTitle member={m} />}
+        <SummaryItem key={m.user} avatar={<UserAvatar user={m} avatarOnly allowGenericFallback size="52px" />} title={<MemberTitle member={m} />}
             onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: `profile_${m.user}` }))}
             rightAction={isAdmin ? <RemoveButton member={m} onRemove={onRemove} /> : null} />
     ))

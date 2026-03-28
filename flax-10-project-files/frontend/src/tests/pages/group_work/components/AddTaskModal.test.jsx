@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import AddTaskModal from "@/pages/group_work/components/AddTaskModal";
 
 vi.mock("@/components/common/standard_modal/StandardModal", () => ({
@@ -129,6 +129,27 @@ describe("AddTaskModal", () => {
     render(<AddTaskModal members={members} onAdd={onAdd} onClose={onClose} />);
     fireEvent.click(screen.getByText("Cancel"));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("normalises numeric assignee IDs before submitting", async () => {
+    const numericMembers = [
+      { id: 1, user: 1, name: "Alice" },
+      { id: 2, user: 2, name: "Bob" },
+    ];
+    render(<AddTaskModal members={numericMembers} onAdd={onAdd} onClose={onClose} />);
+
+    const aliceCheckbox = screen.getByTestId("member-1").querySelector("input");
+    const bobCheckbox = screen.getByTestId("member-2").querySelector("input");
+    fireEvent.click(aliceCheckbox);
+    fireEvent.click(bobCheckbox);
+    fireEvent.change(screen.getByPlaceholderText("What needs to be done?"), { target: { value: "Numeric task" } });
+    fireEvent.click(screen.getByText("Add task"));
+
+    expect(onAdd).toHaveBeenCalledWith({
+      title: "Numeric task",
+      due_date: null,
+      assigned_to: [1, 2],
+    });
   });
 
   it("uses default empty array for members when not provided", () => {

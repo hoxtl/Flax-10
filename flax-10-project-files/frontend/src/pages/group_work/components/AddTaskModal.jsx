@@ -1,20 +1,17 @@
-/*
- * Modal for adding a new group task with title, due date, and assignees.
- */
-
-import { useState } from "react";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import SelectableMemberRow from "./SelectableMemberRow";
+import { handleTaskSubmit, hasAssignee, useAddTaskFormState } from "./addTaskModalState";
 import styles from "./AddTaskModal.module.css";
 
 function MemberCheckItem({ member, checked, onToggle }) {
-  return (
+    return (
     <SelectableMemberRow
       member={member}
       checked={checked}
       onToggle={onToggle}
+      inputIdPrefix="task-assignee"
       classNames={{ row: styles.memberItem, checkbox: styles.checkbox, label: styles.memberLabel }}
       avatarSize={24}
     />
@@ -42,13 +39,20 @@ function TaskAssigneesField({ members, assignees, onToggle }) {
         <div className={styles.field}>
             <label className={styles.label}>Assign to</label>
             <div className={styles.memberList}>
-                {members.map((m) => <MemberCheckItem key={m.user ?? m.id} member={m} checked={assignees.includes(m.user)} onToggle={onToggle} />)}
+                {members.map((member) => (
+                    <MemberCheckItem
+                        key={member.user ?? member.id}
+                        member={member}
+                        checked={hasAssignee(assignees, member)}
+                        onToggle={onToggle}
+                    />
+                ))}
             </div>
         </div>
     );
 }
 
-function TaskFormActions({ title, dueDate, onClose }) {
+function TaskFormActions({ title, onClose }) {
     return (
         <div className={styles.actions}>
             <PrimaryButton type="button" variant="ghost" pill onClick={onClose}>Cancel</PrimaryButton>
@@ -57,25 +61,19 @@ function TaskFormActions({ title, dueDate, onClose }) {
     );
 }
 
-async function submitTask(title, dueDate, assignees, onAdd, onClose) {
-    const trimmed = title.trim();
-    if (!trimmed) return;
-    await onAdd({ title: trimmed, due_date: dueDate || null, assigned_to: assignees });
-    onClose();
-}
+/*
+ * Renders the add-task modal for group work projects.
+ */
 
 export default function AddTaskModal({ members = [], onAdd, onClose }) {
-    const [title, setTitle] = useState("");
-    const [dueDate, setDueDate] = useState("");
-    const [assignees, setAssignees] = useState([]);
-    const toggleAssignee = (userId) => setAssignees((prev) => prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]);
-    const handleSubmit = (e) => { e.preventDefault(); submitTask(title, dueDate, assignees, onAdd, onClose); };
+    const { assignees, dueDate, setDueDate, setTitle, title, toggleAssignee } = useAddTaskFormState();
+    const onSubmit = (event) => handleTaskSubmit(event, title, dueDate, assignees, onAdd, onClose);
     return (
         <StandardModal title="Add new task" onClose={onClose} size="md">
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form onSubmit={onSubmit} className={styles.form}>
                 <TaskTwoColFields title={title} setTitle={setTitle} dueDate={dueDate} setDueDate={setDueDate} />
                 <TaskAssigneesField members={members} assignees={assignees} onToggle={toggleAssignee} />
-                <TaskFormActions title={title} dueDate={dueDate} onClose={onClose} />
+                <TaskFormActions title={title} onClose={onClose} />
             </form>
         </StandardModal>
     );
