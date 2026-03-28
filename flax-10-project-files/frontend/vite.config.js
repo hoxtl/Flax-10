@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
+import { readFileSync } from 'fs'
+import { dirname, resolve } from 'path'
 import react from '@vitejs/plugin-react'
+import postcssImport from 'postcss-import'
+import { patchCssModules } from 'vite-css-modules'
 import { fileURLToPath, URL } from 'node:url'
 
 /** Vitest forwards CLI args; bundled config still runs in the main vitest process. */
@@ -9,21 +13,21 @@ const coverageRun = process.argv.some(
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+  build: {
+    manifest: true,
+    emptyOutDir: true,
+  },
+  css: {
+    postcss: {
+      plugins: [
+        postcssImport(), // resolves @import in .module.css before CSS Modules scoping
+      ],
     },
   },
-  server: {
-    host: '127.0.0.1',
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-    },
-  },
+  plugins: [
+    patchCssModules(),
+    react(),
+  ],
   test: {
     globals: true,
     environment: 'jsdom',
