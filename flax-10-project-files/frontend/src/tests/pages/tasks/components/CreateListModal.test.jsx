@@ -46,4 +46,19 @@ describe("CreateListModal coverage", () => {
     );
     expect(onClose).toHaveBeenCalled();
   });
+
+  it("changes category, disables save while blank, and closes from cancel", async () => {
+    const onClose = vi.fn();
+    render(<CreateListModal onSave={vi.fn()} onClose={onClose} />);
+
+    expect(screen.getByRole("button", { name: /Create list/i })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "University" }));
+    fireEvent.change(screen.getByPlaceholderText(/List name/i), {
+      target: { value: "Coursework" },
+    });
+
+    expect(screen.getByText("Coursework")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    expect(onClose).toHaveBeenCalled();
+  });
 });

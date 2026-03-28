@@ -56,7 +56,7 @@ function HighlightText({ text, query }) {
   );
 }
 
-function useTaskContextMenuState(task) {
+export function useTaskContextMenuState(task) {
   const [view, setView] = useState("main");
   const [dueValue, setDueValue] = useState(task.due_date ? task.due_date.slice(0, 16) : "");
   const [sleepSettings, setSleepSettings] = useState(null);
@@ -64,7 +64,7 @@ function useTaskContextMenuState(task) {
   return { view, setView, dueValue, setDueValue, sleepSettings, setSleepSettings, sleepWarning, checkSleepAndRun, sleepWarningProps };
 }
 
-function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
+export function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
   useEffect(() => {
     const handler = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) onClose();
@@ -126,7 +126,7 @@ function DueViewHeader({ setView }) {
   );
 }
 
-function useDueViewHandlers({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun }) {
+export function useDueViewHandlers({ dueValue, setDueValue, onEdit, onClose, checkSleepAndRun }) {
   const [pending, setPending] = useState(dueValue);
   const [changed, setChanged] = useState(false);
   const onPicker = (val) => {
