@@ -66,10 +66,6 @@ const createModalDefaults = (overrides = {}) => ({
   setShowSettings: vi.fn(),
   showReportModal: false,
   setShowReportModal: vi.fn(),
-  galleryOpen: false,
-  setGalleryOpen: vi.fn(),
-  showCoverModal: false,
-  setShowCoverModal: vi.fn(),
   showMembersModal: false,
   setShowMembersModal: vi.fn(),
   editingAnnouncement: null,
@@ -109,13 +105,12 @@ function createMutations() {
   return mutations;
 }
 
-function SocietyHeroMock({ society, onUpdateName, onUpdateBio, onImageClick, onEditImages, onViewMembers, actionContent, metaContent }) {
+function SocietyHeroMock({ society, onUpdateName, onUpdateBio, onEditImages, onViewMembers, actionContent, metaContent }) {
   return (
     <div data-testid="hero">
       <span>{society.name}</span>
       <button type="button" onClick={() => onUpdateName("Renamed Society")}>rename-society</button>
       <button type="button" onClick={() => onUpdateBio("Updated bio")}>rewrite-bio</button>
-      <button type="button" onClick={() => onImageClick(1)}>open-gallery</button>
       <button type="button" onClick={onEditImages}>edit-images</button>
       <button type="button" onClick={onViewMembers}>view-members</button>
       {actionContent}
@@ -145,27 +140,6 @@ function SocietyTabsMock({ focusAnnouncementId, onEditAnnouncement }) {
 
 function SocietySidebarMock() {
   return <div data-testid="sidebar">sidebar</div>;
-}
-
-function CoverImageModalMock({ images = [], onClose, onUpdate }) {
-  return (
-    <div data-testid="cover-modal">
-      <span>{images.length}</span>
-      <button type="button" onClick={onClose}>close-cover</button>
-      <button type="button" onClick={() => onUpdate(["img-1", "img-2"])}>save-cover</button>
-      <button type="button" onClick={() => onUpdate([])}>save-empty-cover</button>
-    </div>
-  );
-}
-
-function ImageGalleryModalMock({ images = [], initialIndex, onClose }) {
-  return (
-    <div data-testid="gallery-modal">
-      <span>{images.length}</span>
-      <span>{initialIndex}</span>
-      <button type="button" onClick={onClose}>close-gallery</button>
-    </div>
-  );
 }
 
 function SettingsModalMock({ members = [], ratificationStatus, isRatified, isAdmin, onClose, onDelete }) {
@@ -232,8 +206,6 @@ vi.mock("../../../../components/society/society_detail/SocietyHero", () => ({ de
 vi.mock("../../../../components/society/society_detail/SocietyInfo", () => ({ default: SocietyInfoMock }));
 vi.mock("../../../../components/society/society_detail/tabs/SocietyTabs", () => ({ default: SocietyTabsMock }));
 vi.mock("../../../../components/society/society_detail/SocietySidebar", () => ({ default: SocietySidebarMock }));
-vi.mock("../../../../components/society/society_detail/image_handlers/CoverImageModal", () => ({ default: CoverImageModalMock }));
-vi.mock("../../../../components/society/society_detail/image_handlers/ImageGalleryModal", () => ({ default: ImageGalleryModalMock }));
 vi.mock("../../../../components/society/society_detail/SettingsModal", () => ({ default: SettingsModalMock }));
 vi.mock("../../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal", () => ({ default: AnnouncementModalMock }));
 vi.mock("../../../../components/society/society_detail/ReportSocietyModal", () => ({ default: ReportSocietyModalMock }));
@@ -248,8 +220,6 @@ export function createSocietyDetailPageInteractiveOverrides() {
     modals: {
       showSettings: true,
       showReportModal: true,
-      galleryOpen: { index: 1 },
-      showCoverModal: true,
       showMembersModal: true,
       editingAnnouncement: { id: 7 },
     },
@@ -284,8 +254,6 @@ function createOpenModalDefaults(overrides = {}) {
   return createModalDefaults({
     showSettings: true,
     showReportModal: true,
-    galleryOpen: { index: 1 },
-    showCoverModal: true,
     showMembersModal: true,
     editingAnnouncement: { id: 9 },
     ...overrides,

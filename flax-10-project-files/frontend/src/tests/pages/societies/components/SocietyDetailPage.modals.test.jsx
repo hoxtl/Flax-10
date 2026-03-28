@@ -7,6 +7,13 @@ import {
   societyDetailPageStateMocks,
 } from "./societyDetailPageTestUtils.jsx";
 
+const imageFileMocks = vi.hoisted(() => ({
+  readImageFile: vi.fn(),
+  resetFileInput: vi.fn(),
+}));
+
+vi.mock("../../../../utils/imageFile", () => imageFileMocks);
+
 import SocietyDetailPage from "../../../../pages/societies/components/SocietyDetailPage";
 
 function renderInteractivePage(overrides = {}, props = {}) {
@@ -43,48 +50,61 @@ function clickByText(text) {
 describe("SocietyDetailPage Modals", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    imageFileMocks.readImageFile.mockReset();
+    imageFileMocks.resetFileInput.mockReset();
   });
 
   describe("modal workflows", () => {
     it("handles basic entry points and reporting", () => {
       const data = renderInteractivePage();
+      const clickSpy = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(() => {});
       clickByText("rename-society");
-      clickByText("open-gallery");
       clickByText("edit-images");
       clickByText("view-members");
       clickByText("edit-announcement");
 
       expect(data.updateSociety).toHaveBeenCalledWith({ name: "Renamed Society" });
-      expect(data.modals.setGalleryOpen).toHaveBeenCalledWith({ index: 1 });
-      expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(true);
+      expect(clickSpy).toHaveBeenCalledTimes(1);
       expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(true);
       expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith({ id: 7 });
 
       fireEvent.click(screen.getByText("report-success"));
       expect(data.updateLocalSociety).toHaveBeenCalledWith({ has_reported: true });
+      clickSpy.mockRestore();
     });
 
     it("handles modal closing states", () => {
       const data = renderInteractivePage();
       fireEvent.click(screen.getByText("close-report"));
-      fireEvent.click(screen.getByText("close-gallery"));
-      fireEvent.click(screen.getByText("close-cover"));
       fireEvent.click(screen.getByText("close-members"));
       fireEvent.click(screen.getByText("close-announcement"));
 
       expect(data.modals.setShowReportModal).toHaveBeenCalledWith(false);
-      expect(data.modals.setGalleryOpen).toHaveBeenCalledWith(null);
-      expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(false);
       expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(false);
       expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith(null);
     });
 
-    it("handles cover image and announcement persistence", () => {
+    it("handles cover uploads and announcement persistence", () => {
       const data = renderInteractivePage();
-      fireEvent.click(screen.getByText("save-cover"));
-      expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1", "img-2"], image: "img-1" });
-      fireEvent.click(screen.getByText("save-empty-cover"));
+      imageFileMocks.readImageFile.mockImplementationOnce((file, onSelect, onReset) => {
+        onSelect("img-1");
+        onReset();
+      });
+      imageFileMocks.readImageFile.mockImplementationOnce((file, onSelect, onReset) => {
+        onSelect(null);
+        onReset();
+      });
+
+      fireEvent.change(screen.getByTestId("cover-image-input"), {
+        target: { files: [new File(["first"], "cover-a.png", { type: "image/png" })] },
+      });
+      expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1"], image: "img-1" });
+
+      fireEvent.change(screen.getByTestId("cover-image-input"), {
+        target: { files: [new File(["second"], "cover-b.png", { type: "image/png" })] },
+      });
       expect(data.updateSociety).toHaveBeenCalledWith({ images: [], image: null });
+      expect(imageFileMocks.resetFileInput).toHaveBeenCalledTimes(2);
 
       fireEvent.click(screen.getByText("submit-announcement"));
       fireEvent.click(screen.getByText("submit-new-announcement"));

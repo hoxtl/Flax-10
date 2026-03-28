@@ -1,18 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AnnouncementsTab from '../../../../components/society/society_detail/tabs/announcement_tab/AnnouncementsTab';
-import * as Mocks from '../societyTestMocks';
 
 vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
   formatShortDate: () => 'Mar 9',
-}));
-
-vi.mock('../../../../components/society/society_detail/image_handlers/ImageGalleryModal', () => ({
-  default: ({ onClose }) => (
-    <div data-testid="gallery-modal">
-      <button onClick={onClose}>close</button>
-    </div>
-  ),
 }));
 
 describe('AnnouncementsTab', () => {
@@ -39,15 +30,18 @@ describe('AnnouncementsTab', () => {
     renderTab({ announcements: announcementsWithMedia });
     expect(screen.getByText('S1')).toBeTruthy();
     expect(screen.getByText('Pinned')).toBeTruthy();
-    expect(screen.getByAltText('Announcement')).toBeTruthy();
+    const images = screen.getAllByAltText('Announcement');
+    expect(images).toHaveLength(2);
+    expect(images[0]).toHaveAttribute('src', 'a.jpg');
+    expect(images[1]).toHaveAttribute('src', 'b.jpg');
   });
 
-  it('handles gallery open and close', () => {
+  it('renders only the first image from a multi-image announcement', () => {
     renderTab({ announcements: announcementsWithMedia });
-    fireEvent.click(screen.getByAltText('Announcement'));
-    expect(screen.getByTestId('gallery-modal')).toBeTruthy();
-    fireEvent.click(screen.getByText('close'));
-    expect(screen.queryByTestId('gallery-modal')).toBeNull();
+    const images = screen.getAllByAltText('Announcement');
+    fireEvent.click(images[1]);
+    expect(images[1]).toHaveAttribute('src', 'b.jpg');
+    expect(screen.queryByAltText('Image 2')).toBeNull();
   });
 
   it('handles edit callback', () => {
@@ -76,10 +70,8 @@ describe('AnnouncementsTab', () => {
     expect(screen.getByText('Use the sidebar to post the first update for this society.')).toBeTruthy();
   });
 
-  it('opens the gallery from a multi-image announcement and hides edit controls in view mode', () => {
+  it('hides edit controls in view mode', () => {
     renderTab({ announcements: announcementsWithMedia, editMode: false });
-    fireEvent.click(screen.getByAltText('Image 2'));
-    expect(screen.getByTestId('gallery-modal')).toBeTruthy();
     expect(screen.queryByTitle('Edit')).toBeNull();
   });
 

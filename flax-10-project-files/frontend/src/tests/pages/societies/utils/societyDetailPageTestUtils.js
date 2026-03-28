@@ -32,8 +32,6 @@ const actionNames = [
 const modalNames = [
   "setShowSettings",
   "setShowReportModal",
-  "setGalleryOpen",
-  "setShowCoverModal",
   "setShowMembersModal",
   "setEditingAnnouncement",
   "setEditMode",
@@ -63,8 +61,6 @@ const createPage = (overrides = {}) => ({
 const createModals = (overrides = {}) => ({
   showSettings: false,
   showReportModal: false,
-  galleryOpen: false,
-  showCoverModal: false,
   showMembersModal: false,
   editingAnnouncement: null,
   editMode: false,
