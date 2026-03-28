@@ -85,6 +85,10 @@ describe('memberAvatarUtils – getDisplayName', () => {
     expect(getDisplayName({ name: 'Alice Brown' })).toBe('Alice Brown');
     expect(getDisplayName({})).toBe('');
   });
+
+  it('prefers a cleaner explicit name over username-like first and last names', () => {
+    expect(getDisplayName({ first_name: 'John21', last_name: 'Doe332', name: 'John Doe' })).toBe('John Doe');
+  });
 });
 
 describe('memberAvatarUtils – getMemberKey', () => {

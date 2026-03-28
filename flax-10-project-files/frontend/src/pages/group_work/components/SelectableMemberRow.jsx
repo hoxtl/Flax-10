@@ -5,12 +5,13 @@
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName } from "../utils/memberAvatarUtils";
 
-export default function SelectableMemberRow({ member, checked, onToggle, classNames = {}, avatarSize = 24 }) {
+export default function SelectableMemberRow({ member, checked, onToggle, classNames = {}, avatarSize = 24, inputIdPrefix = "member-filter" }) {
   const id = String(member.user ?? member.id ?? "");
+  const inputId = `${inputIdPrefix}-${id}`;
   return (
-    <label className={classNames.row} htmlFor={`member-filter-${id}`}>
+    <label className={classNames.row} htmlFor={inputId}>
       <input
-        id={`member-filter-${id}`}
+        id={inputId}
         type="checkbox"
         className={classNames.checkbox}
         checked={checked}
