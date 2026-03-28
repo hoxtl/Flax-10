@@ -1,16 +1,42 @@
-# React + Vite
+# StudyFlax — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for StudyFlax. See the [root README](../../README.md) for full installation instructions, access credentials, and project overview.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** — UI component library
+- **Vite 7** — build tool and development server
+- **Framer Motion** — animations
+- **Vitest** — unit and integration testing
 
-## React Compiler
+## Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev        # starts dev server on http://localhost:5173
+npm run build      # production build
+```
 
-## Expanding the ESLint configuration
+## Testing
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm run test              # run all tests
+npm run coverage          # run tests with coverage report
+```
+
+Tests live in `src/tests/` and mirror the structure of `src/`.
+
+## Structure
+
+```
+src/
+├── api/           # API client functions (one file per backend domain)
+├── components/    # Shared and feature-specific React components
+├── context/       # React context providers (auth, theme, toast)
+├── hooks/         # Custom React hooks
+├── layout/        # Dashboard shell and navigation layout
+├── pages/         # Top-level page components
+├── styles/        # Global CSS
+├── tests/         # Vitest test suites
+└── utils/         # Pure utility functions
+```
