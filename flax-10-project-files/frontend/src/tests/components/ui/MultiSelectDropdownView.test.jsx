@@ -1,3 +1,7 @@
+/*
+ * Tests for the multi-select dropdown view shell.
+ */
+
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
@@ -24,30 +28,34 @@ vi.mock("../../../components/ui/multi_select_dropdown/MultiSelectDropdownMenu", 
 
 import { MultiSelectDropdownView } from "../../../components/ui/multi_select_dropdown/MultiSelectDropdownView";
 
-const baseProps = () => ({
+const baseDropdownProps = {
   activeItemClassName: "",
   align: "left",
   className: "wrap",
   customTrigger: null,
   displayAsPills: false,
   hideCheckboxForValues: [],
-  hoverHandlers: { onMouseEnter: vi.fn(), onMouseLeave: vi.fn() },
   isModuleVariant: false,
   itemClassName: "",
   menuClassName: "",
   menuOpen: false,
-  onRemovePill: vi.fn(),
-  onToggle: vi.fn(),
   optionsAsPills: false,
   optionsList: [],
   placeholder: "Pick",
-  rootRef: vi.fn(),
   selected: [],
   selectedSet: new Set(),
   showCheckboxes: true,
   triggerLabel: "Pick",
-  updateOpen: vi.fn(),
   variant: "default",
+};
+
+const baseProps = () => ({
+  ...baseDropdownProps,
+  hoverHandlers: { onMouseEnter: vi.fn(), onMouseLeave: vi.fn() },
+  onRemovePill: vi.fn(),
+  onToggle: vi.fn(),
+  rootRef: vi.fn(),
+  updateOpen: vi.fn(),
 });
 
 describe("MultiSelectDropdownView", () => {

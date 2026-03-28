@@ -160,25 +160,19 @@ describe("Profile widget attendance coverage", () => {
   it("renders shared attendance pieces and blocks parent bubbling from charts and donuts", () => {
     const outerClick = vi.fn();
     const onSegmentClick = vi.fn();
-
+    const overallData = [{ label: "Attended", color: "#0f0" }];
+    const byTypeData = [{ label: "Lecture", color: "#00f" }];
     render(
       <div onClick={outerClick}>
-        <AttendanceCharts
-          overall={{ attended: 4, missed: 1 }}
-          overallData={[{ label: "Attended", color: "#0f0" }]}
-          byTypeData={[{ label: "Lecture", color: "#00f" }]}
-          onSegmentClick={onSegmentClick}
-        />
+        <AttendanceCharts overall={{ attended: 4, missed: 1 }} overallData={overallData} byTypeData={byTypeData} onSegmentClick={onSegmentClick} />
         <AttendanceWarningBadge attendancePct={49} />
-        <CompactOverallDonut overallData={[{ label: "Attended", color: "#0f0" }]} onSegmentClick={onSegmentClick} />
-        <CompactByTypeDonut byTypeData={[{ label: "Lecture", color: "#00f" }]} onSegmentClick={onSegmentClick} />
+        <CompactOverallDonut overallData={overallData} onSegmentClick={onSegmentClick} />
+        <CompactByTypeDonut byTypeData={byTypeData} onSegmentClick={onSegmentClick} />
       </div>,
     );
-
     fireEvent.click(screen.getByText("Overall chart"));
     fireEvent.click(screen.getAllByText("Pie chart")[0]);
     fireEvent.click(screen.getAllByText("Pie chart")[1]);
-
     expect(screen.getByText("Low Attendance (49%)")).toBeInTheDocument();
     expect(screen.getByText("Overall")).toBeInTheDocument();
     expect(screen.getAllByText("By Type").length).toBeGreaterThan(0);
@@ -186,11 +180,10 @@ describe("Profile widget attendance coverage", () => {
     expect(outerClick).not.toHaveBeenCalled();
   });
 
-  it("covers empty and fallback attendance shared branches", () => {
+  it("renders empty attendance shared branches and fires navigate event", () => {
     const navigateListener = vi.fn();
     window.addEventListener("navigate", navigateListener);
-
-    const { container, rerender } = render(
+    const { container } = render(
       <>
         <CompactOverallDonut overallData={[]} onSegmentClick={vi.fn()} />
         <CompactByTypeDonut byTypeData={[]} onSegmentClick={vi.fn()} />
@@ -198,13 +191,15 @@ describe("Profile widget attendance coverage", () => {
         <SegmentDetailPanelWrapper selectedSegment={null} events={[]} onToggleStatus={vi.fn()} onClose={vi.fn()} />
       </>,
     );
-
     expect(screen.getByText("No attendance records yet.")).toBeInTheDocument();
     expect(container).not.toBeEmptyDOMElement();
     fireEvent.click(screen.getByRole("button", { name: /view attendance details/i }));
     expect(navigateListener).toHaveBeenCalledTimes(1);
+    window.removeEventListener("navigate", navigateListener);
+  });
 
-    rerender(
+  it("renders populated donuts and segment detail panel with label", () => {
+    render(
       <>
         <CompactOverallDonut overallData={[{ label: "Attended", color: "#0f0" }]} />
         <CompactByTypeDonut byTypeData={[{ label: "Lecture", color: "#00f" }]} />
@@ -216,60 +211,40 @@ describe("Profile widget attendance coverage", () => {
         />
       </>,
     );
-
     expect(screen.getByText("By type: Lecture")).toBeInTheDocument();
-    window.removeEventListener("navigate", navigateListener);
   });
 
-  it("covers compact and detailed attendance widget states and selection clearing", async () => {
+  it("compact tile navigates and clears segment selection", async () => {
     const onNavigate = vi.fn();
     render(<CompactAttendanceTile onNavigate={onNavigate} />);
-
     expect(screen.queryByText(/Low Attendance/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /view attendance details/i }));
     expect(onNavigate).toHaveBeenCalledWith("attendance");
-
     fireEvent.click(screen.getAllByText("Pie chart")[0]);
     expect(screen.getByText("Overall: Attended")).toBeInTheDocument();
     fireEvent.click(screen.getByText("close detail"));
     await waitFor(() => expect(screen.queryByText("Overall: Attended")).not.toBeInTheDocument());
+  });
 
-    useAttendanceStatsMock.mockReturnValueOnce({
-      stats: null,
-      loading: true,
-      error: null,
-      refetch: vi.fn(),
-    });
+  it("attendance widget renders loading and error states", () => {
+    useAttendanceStatsMock.mockReturnValueOnce({ stats: null, loading: true, error: null, refetch: vi.fn() });
     const loadingRender = render(<AttendanceWidget />);
     expect(screen.getByText("Loading metrics...")).toBeInTheDocument();
     loadingRender.unmount();
 
-    useAttendanceStatsMock.mockReturnValueOnce({
-      stats: null,
-      loading: false,
-      error: new Error("fail"),
-      refetch: vi.fn(),
-    });
+    useAttendanceStatsMock.mockReturnValueOnce({ stats: null, loading: false, error: new Error("fail"), refetch: vi.fn() });
     const errorRender = render(<AttendanceWidget />);
     expect(errorRender.container).toBeEmptyDOMElement();
     errorRender.unmount();
+  });
 
-    useAttendanceStatsMock.mockReturnValueOnce({
-      stats: null,
-      loading: false,
-      error: null,
-      refetch: vi.fn(),
-    });
+  it("compact tile and widget render empty and low-attendance states", () => {
+    useAttendanceStatsMock.mockReturnValueOnce({ stats: null, loading: false, error: null, refetch: vi.fn() });
     const compactEmpty = render(<CompactAttendanceTile onNavigate={vi.fn()} />);
     expect(compactEmpty.container).toBeEmptyDOMElement();
     compactEmpty.unmount();
 
-    useAttendanceStatsMock.mockReturnValueOnce({
-      stats: { overall: { attended: 2, missed: 3 }, by_type: {} },
-      loading: false,
-      error: null,
-      refetch: vi.fn(),
-    });
+    useAttendanceStatsMock.mockReturnValueOnce({ stats: { overall: { attended: 2, missed: 3 }, by_type: {} }, loading: false, error: null, refetch: vi.fn() });
     render(<AttendanceWidget />);
     expect(screen.getByText("Low Attendance (40%)")).toBeInTheDocument();
   });

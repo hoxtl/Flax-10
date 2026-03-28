@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for study coach panel and composer components.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "../../../../utils/testUtils";
 
@@ -63,6 +66,20 @@ import StudyCoachHeader from "../../../../components/study_coach/components/Stud
 import StudyCoachMessages from "../../../../components/study_coach/components/StudyCoachMessages";
 import StudyCoachPanelView from "../../../../components/study_coach/components/StudyCoachPanelView";
 
+function renderComposer(overrides = {}) {
+  return render(
+    <StudyCoachComposer
+      input=""
+      loading={false}
+      onChange={vi.fn()}
+      onKeyDown={vi.fn()}
+      onSend={vi.fn()}
+      placeholder="Ask here"
+      {...overrides}
+    />,
+  );
+}
+
 describe("study coach component coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -85,51 +102,27 @@ describe("study coach component coverage", () => {
     expect(container.querySelectorAll("span")).toHaveLength(3);
   });
 
-  it("handles composer input, keyboard, send, and disabled states", () => {
+  it("handles composer input and keyboard events", () => {
     const onChange = vi.fn();
     const onKeyDown = vi.fn();
-    const onSend = vi.fn();
-    const { rerender } = render(
-      <StudyCoachComposer
-        input=""
-        loading={false}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        onSend={onSend}
-        placeholder="Ask here"
-      />,
-    );
-
+    renderComposer({ onChange, onKeyDown });
     const textarea = screen.getByPlaceholderText("Ask here");
     fireEvent.change(textarea, { target: { value: "Hello" } });
     fireEvent.keyDown(textarea, { key: "Enter" });
     expect(onChange).toHaveBeenCalled();
     expect(onKeyDown).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Send message" })).toBeDisabled();
+  });
 
-    rerender(
-      <StudyCoachComposer
-        input="Hello"
-        loading={false}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        onSend={onSend}
-        placeholder="Ask here"
-      />,
-    );
+  it("sends messages when the composer has content", () => {
+    const onSend = vi.fn();
+    renderComposer({ input: "Hello", onSend });
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     expect(onSend).toHaveBeenCalledWith();
+  });
 
-    rerender(
-      <StudyCoachComposer
-        input="Hello"
-        loading
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        onSend={onSend}
-        placeholder="Ask here"
-      />,
-    );
+  it("disables the composer while loading", () => {
+    renderComposer({ input: "Hello", loading: true });
     expect(screen.getByPlaceholderText("Ask here")).toBeDisabled();
     expect(screen.getByRole("button", { name: "Send message" })).toBeDisabled();
   });
@@ -171,8 +164,8 @@ describe("study coach component coverage", () => {
     expect(screen.getAllByText("message-circle").length).toBeGreaterThan(0);
   });
 
-  it("renders the real panel view with defaults and custom class wiring", () => {
-    const { rerender } = render(<StudyCoachPanelView onClose={vi.fn()} />);
+  it("renders the real panel view with default values", () => {
+    render(<StudyCoachPanelView onClose={vi.fn()} />);
     expect(useStudyCoachPanel).toHaveBeenCalledWith("", 30);
     expect(screen.getByText("Flax Bot")).toBeInTheDocument();
     expect(screen.getByText("Ask me anything")).toBeInTheDocument();
@@ -180,7 +173,9 @@ describe("study coach component coverage", () => {
     expect(setInput).toHaveBeenCalledWith("New prompt");
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     expect(sendMessage).toHaveBeenCalledWith();
+  });
 
+  it("renders the panel view with custom copy and class wiring", () => {
     useStudyCoachPanel.mockReturnValue({
       messages: [{ role: "user", content: "Hi" }],
       loading: false,
@@ -192,7 +187,7 @@ describe("study coach component coverage", () => {
       sendMessage,
       clearMessages,
     });
-    rerender(<StudyCoachPanelView period={45} initialMessage="Hello" className="custom-shell" title="Coach" subtitle="Custom" placeholder="Type here" onClose={vi.fn()} />);
+    render(<StudyCoachPanelView period={45} initialMessage="Hello" className="custom-shell" title="Coach" subtitle="Custom" placeholder="Type here" onClose={vi.fn()} />);
     expect(useStudyCoachPanel).toHaveBeenLastCalledWith("Hello", 45);
     expect(screen.getByText("Coach")).toBeInTheDocument();
     expect(screen.getByText("Custom")).toBeInTheDocument();

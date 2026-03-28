@@ -19,14 +19,12 @@ import { StudyDNA } from "../../../../pages/profile/components/widgets/StudyDNA"
 import { ThisWeek } from "../../../../pages/profile/components/widgets/ThisWeek";
 
 describe("Profile remaining widget coverage", () => {
-  it("covers common ground null, module, and society navigation branches", () => {
+  it("renders nothing when common ground has no shared modules or societies", () => {
     const onNavigate = vi.fn();
     const { container, rerender } = render(
       <CommonGroundSection
-        viewedModules={[]}
-        viewedSocieties={[]}
-        currentUserModules={[]}
-        currentUserSocieties={[]}
+        viewedModules={[]} viewedSocieties={[]}
+        currentUserModules={[]} currentUserSocieties={[]}
         onNavigate={onNavigate}
       />,
     );
@@ -34,21 +32,28 @@ describe("Profile remaining widget coverage", () => {
 
     rerender(
       <CommonGroundSection
-        viewedModules={undefined}
-        viewedSocieties={undefined}
-        currentUserModules={undefined}
-        currentUserSocieties={undefined}
+        viewedModules={undefined} viewedSocieties={undefined}
+        currentUserModules={undefined} currentUserSocieties={undefined}
         onNavigate={onNavigate}
       />,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("navigates to modules from common ground section", () => {
+    const onNavigate = vi.fn();
+    const { rerender } = render(
+      <CommonGroundSection
+        viewedModules={[]} viewedSocieties={[]}
+        currentUserModules={[]} currentUserSocieties={[]}
+        onNavigate={onNavigate}
+      />,
+    );
 
     rerender(
       <CommonGroundSection
-        viewedModules={["CS101", "MA102"]}
-        viewedSocieties={[]}
-        currentUserModules={["CS101"]}
-        currentUserSocieties={[]}
+        viewedModules={["CS101", "MA102"]} viewedSocieties={[]}
+        currentUserModules={["CS101"]} currentUserSocieties={[]}
         onNavigate={onNavigate}
       />,
     );
@@ -56,13 +61,14 @@ describe("Profile remaining widget coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: "MA102" }));
     expect(onNavigate).toHaveBeenCalledWith("modules_CS101");
     expect(onNavigate).toHaveBeenCalledWith("modules_MA102");
+  });
 
-    rerender(
+  it("navigates to societies from common ground section", () => {
+    const onNavigate = vi.fn();
+    render(
       <CommonGroundSection
-        viewedModules={["CS101"]}
-        viewedSocieties={[{ id: 1, name: "Chess" }]}
-        currentUserModules={undefined}
-        currentUserSocieties={undefined}
+        viewedModules={["CS101"]} viewedSocieties={[{ id: 1, name: "Chess" }]}
+        currentUserModules={undefined} currentUserSocieties={undefined}
         onNavigate={onNavigate}
       />,
     );
@@ -70,13 +76,14 @@ describe("Profile remaining widget coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Chess" }));
     expect(onNavigate).toHaveBeenCalledWith("modules_CS101");
     expect(onNavigate).toHaveBeenCalledWith("/societies?id=1");
+  });
 
-    rerender(
+  it("distinguishes shared vs non-shared societies in common ground", () => {
+    const onNavigate = vi.fn();
+    render(
       <CommonGroundSection
-        viewedModules={[]}
-        viewedSocieties={[{ id: 1, name: "Chess" }, { id: 2, name: "Dance" }]}
-        currentUserModules={[]}
-        currentUserSocieties={[{ id: 1, name: "Chess" }]}
+        viewedModules={[]} viewedSocieties={[{ id: 1, name: "Chess" }, { id: 2, name: "Dance" }]}
+        currentUserModules={[]} currentUserSocieties={[{ id: 1, name: "Chess" }]}
         onNavigate={onNavigate}
       />,
     );
@@ -86,42 +93,33 @@ describe("Profile remaining widget coverage", () => {
     expect(onNavigate).toHaveBeenCalledWith("/societies?id=2");
   });
 
-  it("covers study dna null, night segment, and className trim branches", () => {
-    const { container, rerender } = render(<StudyDNA heatmap={null} />);
+  it("renders nothing for null heatmap in StudyDNA", () => {
+    const { container } = render(<StudyDNA heatmap={null} />);
     expect(container).toBeEmptyDOMElement();
+  });
 
-    rerender(
+  it("renders StudyDNA with night segment and extra className", () => {
+    render(
       <StudyDNA
         className="extra-class"
         heatmap={{
-          data: [
-            Array.from({ length: 24 }, (_, hour) => {
-              if (hour === 1) return 60;
-              if (hour === 6) return 60;
-              return 0;
-            }),
-          ],
+          data: [Array.from({ length: 24 }, (_, hour) => (hour === 1 || hour === 6 ? 60 : 0))],
         }}
       />,
     );
-
     expect(screen.getByText("STUDY DNA")).toBeInTheDocument();
     expect(screen.getByText("Night")).toBeInTheDocument();
     expect(screen.getByTestId("card").className).toContain("extra-class");
 
-    rerender(
-      <StudyDNA
-        heatmap={{
-          data: [Array.from({ length: 24 }, () => 0)],
-        }}
-      />,
+    render(
+      <StudyDNA heatmap={{ data: [Array.from({ length: 24 }, () => 0)] }} />,
     );
-    expect(screen.getByText("STUDY DNA")).toBeInTheDocument();
+    expect(screen.getAllByText("STUDY DNA").length).toBeGreaterThan(0);
   });
 
-  it("covers this week solo layout, failed save rollback, and prop sync", async () => {
+  it("covers this week solo layout without streak display", async () => {
     const onGoalSave = vi.fn().mockRejectedValueOnce(new Error("nope")).mockResolvedValueOnce(undefined);
-    const firstRender = render(
+    render(
       <ThisWeek
         weekly={{ percentage: 25, hours_studied: 5, goal_hours: 20 }}
         streaks={{ current: 1, longest: 2 }}
@@ -137,9 +135,10 @@ describe("Profile remaining widget coverage", () => {
 
     await waitFor(() => expect(onGoalSave).toHaveBeenCalledWith(12));
     expect(screen.getByText("tap to close")).toBeInTheDocument();
+  });
 
-    firstRender.unmount();
-
+  it("covers this week successful save and panel close with streak visible", async () => {
+    const onGoalSave = vi.fn().mockResolvedValueOnce(undefined);
     render(
       <ThisWeek
         weekly={{ percentage: 50, hours_studied: 6, goal_hours: 24 }}

@@ -59,14 +59,10 @@ describe("profile hook extras", () => {
     });
   });
 
-  it("opens/closes header collections, updates persona state, and handles badge pinning", async () => {
+  it("opens and closes header collections", async () => {
     const reload = vi.fn();
     const { result } = renderHook(() =>
-      useProfileHeaderState(
-        { pinned_badge_id: 7 },
-        { canEditProfile: true },
-        reload,
-      ),
+      useProfileHeaderState({ pinned_badge_id: 7 }, { canEditProfile: true }, reload),
     );
 
     expect(result.current.pinnedBadgeId).toBe(7);
@@ -74,46 +70,52 @@ describe("profile hook extras", () => {
     result.current.openSocieties();
     result.current.setSocieties([{ id: 1 }]);
     result.current.setBadges([{ id: 7 }]);
-    result.current.setPersonaState("Night owl", 23);
 
     await waitFor(() => {
       expect(result.current.showAchievements).toBe(true);
       expect(result.current.showSocieties).toBe(true);
       expect(result.current.societies).toEqual([{ id: 1 }]);
       expect(result.current.badges).toEqual([{ id: 7 }]);
-      expect(result.current.persona).toBe("Night owl");
-      expect(result.current.peakHour).toBe(23);
     });
-
-    await result.current.handlePinBadge(7);
-    expect(fetchApi).toHaveBeenCalledWith("/profile/", {
-      method: "PATCH",
-      body: JSON.stringify({ pinned_badge_id: "" }),
-    });
-    expect(reload).toHaveBeenCalled();
-
-    await result.current.handlePinBadge(11);
-    expect(fetchApi).toHaveBeenCalledWith("/profile/", {
-      method: "PATCH",
-      body: JSON.stringify({ pinned_badge_id: "11" }),
-    });
-
-    const readOnly = renderHook(() =>
-      useProfileHeaderState(
-        { pinned_badge_id: "" },
-        { canEditProfile: false },
-        reload,
-      ),
-    );
-    await readOnly.result.current.handlePinBadge(4);
-    expect(fetchApi).toHaveBeenCalledTimes(2);
-
     result.current.closeAchievements();
     result.current.closeSocieties();
     await waitFor(() => {
       expect(result.current.showAchievements).toBe(false);
       expect(result.current.showSocieties).toBe(false);
     });
+  });
+
+  it("updates profile persona state", async () => {
+    const { result } = renderHook(() => useProfileHeaderState({ pinned_badge_id: 7 }, { canEditProfile: true }, vi.fn()));
+    result.current.setPersonaState("Night owl", 23);
+    await waitFor(() => {
+      expect(result.current.persona).toBe("Night owl");
+      expect(result.current.peakHour).toBe(23);
+    });
+  });
+
+  it("handles badge pinning, unpinning, and read-only guard", async () => {
+    const reload = vi.fn();
+    const { result } = renderHook(() =>
+      useProfileHeaderState({ pinned_badge_id: 7 }, { canEditProfile: true }, reload),
+    );
+
+    await result.current.handlePinBadge(7);
+    expect(fetchApi).toHaveBeenCalledWith("/profile/", {
+      method: "PATCH", body: JSON.stringify({ pinned_badge_id: "" }),
+    });
+    expect(reload).toHaveBeenCalled();
+
+    await result.current.handlePinBadge(11);
+    expect(fetchApi).toHaveBeenCalledWith("/profile/", {
+      method: "PATCH", body: JSON.stringify({ pinned_badge_id: "11" }),
+    });
+
+    const readOnly = renderHook(() =>
+      useProfileHeaderState({ pinned_badge_id: "" }, { canEditProfile: false }, reload),
+    );
+    await readOnly.result.current.handlePinBadge(4);
+    expect(fetchApi).toHaveBeenCalledTimes(2);
   });
 
   it("uses empty pinned badge ids when profile data or badge ids are missing", async () => {
@@ -134,7 +136,7 @@ describe("profile hook extras", () => {
     });
   });
 
-  it("loads profiles, events, and task counts across success and failure paths", async () => {
+  it("loads profiles and handles try-load success and failure paths", async () => {
     getUserProfile.mockResolvedValue({ username: "ada" });
     getAnotherUserProfile.mockResolvedValue({ username: "grace" });
     await expect(loadProfile()).resolves.toEqual({ username: "ada" });
@@ -156,7 +158,9 @@ describe("profile hook extras", () => {
     await tryLoadProfile(setProfileData, setLoading);
     expect(setProfileData).toHaveBeenCalledWith({ username: "ada-default" });
     expect(setLoading).toHaveBeenCalledTimes(2);
+  });
 
+  it("loads events across success, null response, and failure paths", async () => {
     const setAllEvents = vi.fn();
     getEvents.mockResolvedValueOnce([{ id: 1 }]);
     await tryLoadEvents(setAllEvents, 8);
@@ -170,13 +174,11 @@ describe("profile hook extras", () => {
 
     getEvents.mockRejectedValueOnce(new Error("events failed"));
     await tryLoadEvents(setAllEvents);
+  });
 
+  it("counts incomplete tasks from array, paginated, null, and error responses", async () => {
     const setTaskCount = vi.fn();
-    fetchTasks.mockResolvedValueOnce([
-      { completed: false },
-      { completed: true },
-      { completed: false },
-    ]);
+    fetchTasks.mockResolvedValueOnce([{ completed: false }, { completed: true }, { completed: false }]);
     await loadTaskCount(setTaskCount);
     expect(setTaskCount).toHaveBeenCalledWith(2);
 

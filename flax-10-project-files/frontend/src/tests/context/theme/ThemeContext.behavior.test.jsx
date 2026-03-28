@@ -1,3 +1,7 @@
+/*
+ * Tests for theme context persistence behaviour.
+ */
+
 import React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -14,6 +18,23 @@ vi.mock("../../../api/userApi", () => ({
 
 import { ThemeProvider, useTheme } from "../../../context/ThemeContext";
 import { THEME_GROUPS } from "../../../context/ThemeConstants";
+
+async function importThemeContextWithSavedRef() {
+  let refCalls = 0;
+  vi.doMock("react", async () => {
+    const actual = await vi.importActual("react");
+    return {
+      ...actual,
+      useRef: (initialValue) => {
+        const ref = actual.useRef(initialValue);
+        refCalls += 1;
+        if (refCalls === 3) ref.current = { mode: "light", theme: "flax" };
+        return ref;
+      },
+    };
+  });
+  return import("../../../context/ThemeContext");
+}
 
 describe("ThemeContext coverage topups", () => {
   beforeEach(() => {
@@ -63,34 +84,14 @@ describe("ThemeContext coverage topups", () => {
   it("skips persistence when the current mode and theme were already saved", async () => {
     localStorage.setItem("token", "token-123");
     vi.resetModules();
-
-    let refCalls = 0;
-    vi.doMock("react", async () => {
-      const actual = await vi.importActual("react");
-      return {
-        ...actual,
-        useRef: (initialValue) => {
-          const ref = actual.useRef(initialValue);
-          refCalls += 1;
-          if (refCalls === 3) {
-            ref.current = { mode: "light", theme: "flax" };
-          }
-          return ref;
-        },
-      };
-    });
-
-    const themeModule = await import("../../../context/ThemeContext");
+    const themeModule = await importThemeContextWithSavedRef();
     const DynamicThemeProvider = themeModule.ThemeProvider;
     const dynamicUseTheme = themeModule.useTheme;
     const wrapper = ({ children }) => <DynamicThemeProvider>{children}</DynamicThemeProvider>;
-
     renderHook(() => dynamicUseTheme(), { wrapper });
-
     await act(async () => {
       await Promise.resolve();
     });
-
     expect(updateUserSettingsMock).not.toHaveBeenCalled();
   });
 });
