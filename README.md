@@ -89,7 +89,6 @@ The following fixture accounts are available for testing and assessment purposes
 ### Prerequisites
 
 - [Nix Package Manager](https://nixos.org/download/#download-nix) must be installed before proceeding.
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) is required for Windows users who are not using WSL.
 
 ---
 
@@ -113,49 +112,6 @@ The following fixture accounts are available for testing and assessment purposes
    > ```
 
 3. The Nix flake script will automatically configure the Python virtual environment and npm environment. Once complete, you will be returned to the bash terminal, from which you may activate the virtual environment or run the frontend development server.
-
----
-
-### Windows (via Docker)
-
-> Alternatively, Windows users may use WSL and follow the Linux/macOS instructions above.
-
-1. Open Docker Desktop and navigate to the Docker Desktop Terminal.
-
-2. Change directory to the cloned repository folder and run the following commands in order:
-
-   **Create a persistent Nix store volume:**
-   ```bash
-   docker volume create nix-store
-   ```
-
-   **Launch the NixOS container:**
-   ```powershell
-   docker run --rm -it `
-     -v "${PWD}:/work" `
-     -v nix-store:/nix `
-     -w /work `
-     nixos/nix:latest
-   ```
-
-   If the above does not work, use the single-line equivalent:
-   ```powershell
-   docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest
-   ```
-
-3. Inside the NixOS container, stage the flake file:
-
-   ```bash
-   git -C "/work" add "flake.nix"
-   ```
-
-4. Enter the Nix development environment:
-
-   ```bash
-   nix --extra-experimental-features 'nix-command flakes' develop -c bash
-   ```
-
-> **Note:** The container is configured to remove itself upon exit (`--rm`). The `docker run` command must be re-run each time you wish to re-enter the environment.
 
 ---
 
