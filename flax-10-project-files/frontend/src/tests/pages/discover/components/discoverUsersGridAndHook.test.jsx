@@ -1,12 +1,11 @@
-/**
- * Extra coverage for Discover page, DiscoverComponents, and discoverHooks.
+/*
+ * Tests for the UsersGrid component and useDiscoverFetch hook.
  */
 
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, act, renderHook, fireEvent } from "@testing-library/react";
 
-// ── framer-motion mock ───────────────────────────────────────────────────────
 vi.mock("framer-motion", () => ({
   motion: new Proxy(
     {},
@@ -29,12 +28,10 @@ vi.mock("framer-motion", () => ({
     React.createElement(React.Fragment, null, children),
 }));
 
-// ── CSS module mocks ─────────────────────────────────────────────────────────
 vi.mock("*.module.css", () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-// ── lucide-react mock ────────────────────────────────────────────────────────
 vi.mock("lucide-react", () => ({
   Search: () => <span data-testid="icon-search" />,
   X: () => <span data-testid="icon-x" />,
@@ -43,7 +40,6 @@ vi.mock("lucide-react", () => ({
   ArrowUp: () => <span data-testid="icon-arrow-up" />,
 }));
 
-// ── API / Social mocks ───────────────────────────────────────────────────────
 const searchUsersMock = vi.fn();
 vi.mock("../../../../api/userApi", () => ({
   searchUsers: (...args) => searchUsersMock(...args),
@@ -145,16 +141,9 @@ vi.mock("../../../../components/common", () => ({
   ),
 }));
 
-// ── Imports (after mocks) ────────────────────────────────────────────────────
-import Discover from "../../../../pages/discover/Discover";
-import {
-  DiscoverSkeleton,
-  DiscoverToolbar,
-  UsersGrid,
-} from "../../../../pages/discover/components/DiscoverComponents";
+import { UsersGrid } from "../../../../pages/discover/components/DiscoverComponents";
 import { useDiscoverFetch } from "../../../../pages/discover/hooks/discoverHooks";
 
-// ── Helpers for filter state mock ────────────────────────────────────────────
 function makeFilterState(overrides = {}) {
   return {
     isFilterOpen: false,
@@ -168,79 +157,6 @@ function makeFilterState(overrides = {}) {
     },
   };
 }
-
-// ── Discover page ─────────────────────────────────────────────────────────────
-
-describe("Discover page extras", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    localStorage.clear();
-    useSearchInitMock.mockReturnValue({ allCourses: {}, allSocieties: [] });
-    useFilterStateMock.mockReturnValue(makeFilterState());
-    searchUsersMock.mockResolvedValue({ results: [], total_count: 0 });
-  });
-
-  it("shows skeleton when loading=true and users is empty", () => {
-    // Block the mock so loading stays true
-    searchUsersMock.mockReturnValue(new Promise(() => {}));
-    const { container } = render(<Discover onNavChange={vi.fn()} />);
-    expect(container.querySelector("[class*='skelWrap']")).toBeTruthy();
-  });
-
-  it("shows UsersGrid (no skeleton) after data loads", async () => {
-    searchUsersMock.mockResolvedValue({
-      results: [{ id: 1, username: "alice", first_name: "Alice", last_name: "Smith" }],
-      total_count: 1,
-    });
-    render(<Discover onNavChange={vi.fn()} />);
-    await waitFor(() => expect(screen.getByText("@alice")).toBeTruthy());
-    // no skeleton wrapper present
-    expect(document.querySelector("[class*='skelWrap']")).toBeNull();
-  });
-
-  it("DiscoverContent renders empty state when users=[] and not loading", async () => {
-    searchUsersMock.mockResolvedValue({ results: [], total_count: 0 });
-    render(<Discover onNavChange={vi.fn()} />);
-    await waitFor(() =>
-      expect(screen.getByText("No users found")).toBeTruthy()
-    );
-  });
-});
-
-// ── DiscoverSkeleton ──────────────────────────────────────────────────────────
-
-describe("DiscoverSkeleton", () => {
-  it("renders 8 skeleton cards", () => {
-    const { container } = render(<DiscoverSkeleton />);
-    // Each card renders a skelAvatar div
-    const avatars = container.querySelectorAll("[class*='skelAvatar']");
-    expect(avatars.length).toBe(8);
-  });
-});
-
-// ── DiscoverToolbar ───────────────────────────────────────────────────────────
-
-describe("DiscoverToolbar", () => {
-  it("renders search bar and filter section", () => {
-    const filterState = makeFilterState();
-    render(
-      <DiscoverToolbar
-        searchQuery=""
-        setSearchQuery={vi.fn()}
-        filterRef={{ current: null }}
-        filterState={filterState}
-        sortBy="name"
-        setSortBy={vi.fn()}
-      />
-    );
-    expect(screen.getByTestId("page-toolbar")).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText(/Search by name or username/i)
-    ).toBeInTheDocument();
-  });
-});
-
-// ── UsersGrid ─────────────────────────────────────────────────────────────────
 
 describe("UsersGrid", () => {
   beforeEach(() => {
@@ -310,7 +226,6 @@ describe("UsersGrid", () => {
         searchQuery=""
       />
     );
-    // Two pagination components rendered (top + bottom)
     expect(screen.getAllByTestId("pagination").length).toBeGreaterThanOrEqual(1);
   });
 
@@ -326,13 +241,11 @@ describe("UsersGrid", () => {
         searchQuery=""
       />
     );
-
     expect(screen.queryByText("No users found")).toBeNull();
     expect(screen.getByTestId("back-to-top")).toBeInTheDocument();
   });
 
-  it("renders teacher metadata and stops button click bubbling on view profile", () => {
-    const onNavChange = vi.fn();
+  function renderTeacherGrid(onNavChange = vi.fn()) {
     const users = [{
       id: 10,
       username: "prof",
@@ -343,24 +256,20 @@ describe("UsersGrid", () => {
       bio: "Algorithms and systems.",
       modules: ["CS1", "CS2", "CS3", "CS4", "CS5"],
     }];
+    render(<UsersGrid users={users} onNavChange={onNavChange} loading={false} currentPage={1} totalPages={1} setCurrentPage={vi.fn()} searchQuery="" />);
+    return onNavChange;
+  }
 
-    render(
-      <UsersGrid
-        users={users}
-        onNavChange={onNavChange}
-        loading={false}
-        currentPage={1}
-        totalPages={1}
-        setCurrentPage={vi.fn()}
-        searchQuery=""
-      />
-    );
-
+  it("renders teacher metadata", () => {
+    renderTeacherGrid();
     expect(screen.getByText("Professor")).toBeInTheDocument();
     expect(screen.getByText("Department: Teaching staff")).toBeInTheDocument();
     expect(screen.getByText("Algorithms and systems.")).toBeInTheDocument();
     expect(screen.getByText("+2")).toBeInTheDocument();
+  });
 
+  it("stops button click bubbling on the teacher profile action", () => {
+    const onNavChange = renderTeacherGrid();
     fireEvent.click(screen.getByText("View Profile"));
     expect(onNavChange).toHaveBeenCalledTimes(1);
     expect(onNavChange).toHaveBeenCalledWith("profile_10");
@@ -368,7 +277,6 @@ describe("UsersGrid", () => {
 
   it("filters the current user out of the visible grid", () => {
     localStorage.setItem("user", JSON.stringify({ id: 5, username: "me" }));
-
     render(
       <UsersGrid
         users={[
@@ -383,13 +291,10 @@ describe("UsersGrid", () => {
         searchQuery=""
       />
     );
-
     expect(screen.queryByText("@me")).toBeNull();
     expect(screen.getByText("@other")).toBeInTheDocument();
   });
 });
-
-// ── discoverHooks – pagination reset ─────────────────────────────────────────
 
 describe("useDiscoverFetch – pagination reset and error handling", () => {
   beforeEach(() => {
@@ -403,19 +308,14 @@ describe("useDiscoverFetch – pagination reset and error handling", () => {
     vi.useRealTimers();
     searchUsersMock.mockResolvedValue({ results: [], total_count: 0 });
     const filterState = makeFilterState();
-
     const { result, rerender } = renderHook(
       ({ query }) => useDiscoverFetch(query, filterState, "name"),
       { initialProps: { query: "alpha" } }
     );
-
     await new Promise((r) => setTimeout(r, 350));
     await waitFor(() => expect(result.current.loading).toBe(false));
-
-    // Manually bump page then change query
     act(() => result.current.setCurrentPage(3));
     expect(result.current.currentPage).toBe(3);
-
     rerender({ query: "beta" });
     await waitFor(() => expect(result.current.currentPage).toBe(1));
   });
@@ -424,11 +324,9 @@ describe("useDiscoverFetch – pagination reset and error handling", () => {
     vi.useRealTimers();
     searchUsersMock.mockRejectedValue(new Error("network failure"));
     const filterState = makeFilterState();
-
     const { result } = renderHook(() =>
       useDiscoverFetch("query", filterState, "name")
     );
-
     await new Promise((r) => setTimeout(r, 350));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.users).toEqual([]);

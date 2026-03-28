@@ -1,14 +1,13 @@
-/**
- * Targeted tests to reach 100% coverage on DiscoverComponents.jsx.
+/*
+ * Targeted tests to reach full coverage on DiscoverComponents.jsx.
  *
  * Gaps addressed:
- *  - openFilters / closeFilters / toggleFilter bodies (3 uncovered functions)
- *  - teacher with a non-empty major  → "Department: <major>"
- *  - student with year + major       → CourseInfo yearText+majorText truthy branches
- *  - student with year but no major  → separator falsy branch
- *  - student with no year            → user?.year || "" fallback
- *  - user identified as teacher via "Dr." name prefix (role !== "teacher")
- *  - modules 1-3 (modules.length > 3 === false, non-empty list)
+ *  - openFilters, closeFilters, and toggleFilter bodies
+ *  - teacher with a non-empty major shows the department copy
+ *  - student year and major combinations cover both course-info branches
+ *  - student with no year covers the empty-year fallback
+ *  - user identified as teacher via "Dr." name prefix when the role differs
+ *  - modules one to three cover the short-list branch
  */
 
 import React from 'react';
@@ -68,7 +67,7 @@ vi.mock('../../../../components/common/entity_link_chip/EntityLinkChip', () => (
 }));
 
 vi.mock('../../../../components/common/primary_button/PrimaryButton', () => ({
-  default: ({ children, onClick, type, className, pill }) => (
+  default: ({ children, onClick, type, className: _className, pill: _pill }) => (
     <button type={type || 'button'} onClick={onClick}>
       {children}
     </button>
@@ -106,7 +105,7 @@ vi.mock('../../../../components/common/search_bar/SearchBar', () => ({
 }));
 
 vi.mock('../../../../components/common', () => ({
-  SegmentedControl: ({ value, onChange, options }) => (
+  SegmentedControl: ({ value: _value, onChange, options }) => (
     <div data-testid="segmented-control">
       {options.map((opt) => (
         <button key={opt.value} onClick={() => onChange(opt.value)}>
@@ -348,7 +347,7 @@ describe('UsersGrid – teacher with a non-empty major', () => {
   });
 });
 
-// ── UsersGrid: user identified as teacher by "Dr." name prefix ───────────────
+// UsersGrid tests for a "Dr." display-name prefix.
 
 describe('UsersGrid – Dr. prefix without teacher role', () => {
   it('identifies a user as Professor when their display name starts with "Dr."', () => {
@@ -357,7 +356,7 @@ describe('UsersGrid – Dr. prefix without teacher role', () => {
         id: 50,
         username: 'drwatson',
         name: 'Dr. Watson', // serverName returned by getDisplayName
-        // role deliberately omitted → not "teacher" but Dr. prefix triggers isTeacher
+        // The role is omitted so the "Dr." prefix drives the teacher state.
         modules: [],
       },
     ];
@@ -368,7 +367,7 @@ describe('UsersGrid – Dr. prefix without teacher role', () => {
   });
 });
 
-// ── UsersGrid: modules list between 1 and 3 items ────────────────────────────
+// UsersGrid tests for short module lists.
 
 describe('UsersGrid – modules length between 1 and 3', () => {
   it('shows pills but no overflow "+N" label when modules.length <= 3', () => {

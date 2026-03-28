@@ -21,6 +21,17 @@ import {
   useDiscoverSearch,
 } from "../../../../pages/discover/hooks/discoverHooks";
 
+function mockClosableFilterState(setIsFilterOpen) {
+  useFilterStateMock.mockImplementation((allCourses, allSocieties, query, allowRoles, roles, onOpen, onClose) => {
+    onOpen?.();
+    onClose?.();
+    return {
+      setIsFilterOpen,
+      props: { selectedCourses: [], selectedSocieties: [], selectedYears: [], selectedRoles: undefined },
+    };
+  });
+}
+
 describe("discoverHooks", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,30 +70,14 @@ describe("discoverHooks", () => {
 
   it("closes the filter drawer when the click-outside callback fires", async () => {
     const setIsFilterOpen = vi.fn();
-    useFilterStateMock.mockImplementation((allCourses, allSocieties, query, allowRoles, roles, onOpen, onClose) => {
-      onOpen?.();
-      onClose?.();
-      return {
-        setIsFilterOpen,
-        props: {
-          selectedCourses: [],
-          selectedSocieties: [],
-          selectedYears: [],
-          selectedRoles: undefined,
-        },
-      };
-    });
+    mockClosableFilterState(setIsFilterOpen);
     searchUsersMock.mockResolvedValueOnce({ results: [], total_count: 0 });
-
     renderHook(() => useDiscoverSearch());
-
     await act(async () => {
       vi.advanceTimersByTime(320);
     });
-
     const closeFilters = useClickOutsideMock.mock.calls[0][1];
     closeFilters();
-
     expect(setIsFilterOpen).toHaveBeenCalledWith(false);
   });
 });

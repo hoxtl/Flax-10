@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for discover page grid and toolbar components.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
@@ -89,6 +92,35 @@ import {
   UsersGrid,
 } from "../../../../pages/discover/components/DiscoverComponents";
 
+function renderUsersGrid(overrides = {}) {
+  return render(
+    <UsersGrid
+      users={[]}
+      onNavChange={vi.fn()}
+      loading={false}
+      currentPage={1}
+      totalPages={1}
+      setCurrentPage={vi.fn()}
+      searchQuery=""
+      {...overrides}
+    />,
+  );
+}
+
+function renderToolbar(overrides = {}) {
+  return render(
+    <DiscoverToolbar
+      searchQuery=""
+      setSearchQuery={vi.fn()}
+      filterRef={{ current: null }}
+      filterState={{ isFilterOpen: false, setIsFilterOpen: vi.fn(), props: {} }}
+      sortBy="name"
+      setSortBy={vi.fn()}
+      {...overrides}
+    />,
+  );
+}
+
 describe("DiscoverComponents", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -96,27 +128,18 @@ describe("DiscoverComponents", () => {
   });
 
   it("renders student metadata with year-major separator and short module lists", () => {
-    render(
-      <UsersGrid
-        users={[{
-          id: 11,
-          username: "student.sam",
-          first_name: "Sam",
-          last_name: "Taylor",
-          role: "student",
-          year: "Year 2",
-          major: "Computer Science",
-          modules: ["CS101", "CS102", "CS103"],
-        }]}
-        onNavChange={vi.fn()}
-        loading={false}
-        currentPage={1}
-        totalPages={1}
-        setCurrentPage={vi.fn()}
-        searchQuery=""
-      />
-    );
-
+    renderUsersGrid({
+      users: [{
+        id: 11,
+        username: "student.sam",
+        first_name: "Sam",
+        last_name: "Taylor",
+        role: "student",
+        year: "Year 2",
+        major: "Computer Science",
+        modules: ["CS101", "CS102", "CS103"],
+      }],
+    });
     expect(screen.getByText("Student")).toBeInTheDocument();
     expect(screen.getByText("Year 2")).toBeInTheDocument();
     expect(screen.getByText("•")).toBeInTheDocument();
@@ -126,79 +149,69 @@ describe("DiscoverComponents", () => {
     expect(screen.queryByText("+1")).not.toBeInTheDocument();
   });
 
-  it("treats doctor-prefixed names as teachers and safely handles missing navigation", () => {
-    render(
-      <UsersGrid
-        users={[{
-          id: 12,
-          username: "dr.jones",
-          name: "Dr. Jane Jones",
-          role: "user",
-          major: "Physics",
-          bio: "Works on optics.",
-          modules: ["PHY1", "PHY2", "PHY3", "PHY4"],
-        }]}
-        loading={false}
-        currentPage={1}
-        totalPages={1}
-        setCurrentPage={vi.fn()}
-        searchQuery=""
-      />
-    );
-
+  it("treats doctor-prefixed names as teachers", () => {
+    renderUsersGrid({
+      users: [{
+        id: 12,
+        username: "dr.jones",
+        name: "Dr. Jane Jones",
+        role: "user",
+        major: "Physics",
+        bio: "Works on optics.",
+        modules: ["PHY1", "PHY2", "PHY3", "PHY4"],
+      }],
+    });
     expect(screen.getByText("Professor")).toBeInTheDocument();
     expect(screen.getByText("Department: Physics")).toBeInTheDocument();
     expect(screen.getByText("Works on optics.")).toBeInTheDocument();
     expect(screen.getByText("+1")).toBeInTheDocument();
     expect(screen.getByTestId("user-avatar")).toHaveTextContent("photo-12");
+  });
+
+  it("safely handles teacher navigation when handlers are missing", () => {
+    renderUsersGrid({
+      users: [{
+        id: 12,
+        username: "dr.jones",
+        name: "Dr. Jane Jones",
+        role: "user",
+        major: "Physics",
+      }],
+      onNavChange: undefined,
+    });
     expect(() => fireEvent.click(screen.getByText("View Profile"))).not.toThrow();
     expect(() => fireEvent.click(screen.getByTestId("grid-card"))).not.toThrow();
   });
 
   it("falls back to major-only copy for students without a year value", () => {
-    render(
-      <UsersGrid
-        users={[{
-          id: 13,
-          username: "student.noyear",
-          first_name: "Nina",
-          last_name: "Hart",
-          role: "student",
-          major: "Mathematics",
-        }]}
-        onNavChange={vi.fn()}
-        loading={false}
-        currentPage={1}
-        totalPages={1}
-        setCurrentPage={vi.fn()}
-        searchQuery=""
-      />
-    );
-
+    renderUsersGrid({
+      users: [{
+        id: 13,
+        username: "student.noyear",
+        first_name: "Nina",
+        last_name: "Hart",
+        role: "student",
+        major: "Mathematics",
+      }],
+    });
     expect(screen.queryByText("•")).not.toBeInTheDocument();
     expect(screen.getByText("Mathematics")).toBeInTheDocument();
   });
 
   it("shows the empty state after filtering out the current user", () => {
     localStorage.setItem("user", JSON.stringify({ id: 99, username: "me" }));
-
-    render(
-      <UsersGrid
-        users={[{ id: 99, username: "me", first_name: "My", last_name: "Self" }]}
-        onNavChange={vi.fn()}
-        loading={false}
-        currentPage={1}
-        totalPages={1}
-        setCurrentPage={vi.fn()}
-        searchQuery=""
-      />
-    );
-
+    renderUsersGrid({ users: [{ id: 99, username: "me", first_name: "My", last_name: "Self" }] });
     expect(screen.getByText(/No users found/)).toBeInTheDocument();
   });
 
-  it("wires toolbar search, sort, and filter controls", () => {
+  it("wires the toolbar search input", () => {
     const setSearchQuery = vi.fn();
+    renderToolbar({ setSearchQuery });
+    fireEvent.change(screen.getByLabelText("discover-search"), { target: { value: "ada" } });
+    expect(setSearchQuery).toHaveBeenCalledWith("ada");
+  });
+
+  it("wires the toolbar filter controls", () => {
     const setSortBy = vi.fn();
     const setIsFilterOpen = vi.fn();
     const filterState = {
@@ -211,27 +224,18 @@ describe("DiscoverComponents", () => {
         selectedRoles: [],
       },
     };
-
-    render(
-      <DiscoverToolbar
-        searchQuery=""
-        setSearchQuery={setSearchQuery}
-        filterRef={{ current: null }}
-        filterState={filterState}
-        sortBy="name"
-        setSortBy={setSortBy}
-      />
-    );
-
-    fireEvent.change(screen.getByLabelText("discover-search"), { target: { value: "ada" } });
+    renderToolbar({ filterState, setSortBy });
     fireEvent.click(screen.getByText("Open filters"));
     fireEvent.click(screen.getByText("Close filters"));
     fireEvent.click(screen.getByText("Toggle filters"));
-    fireEvent.click(screen.getByText("Z → A"));
-
-    expect(setSearchQuery).toHaveBeenCalledWith("ada");
     expect(setIsFilterOpen).toHaveBeenCalledWith(true);
     expect(setIsFilterOpen).toHaveBeenCalledWith(false);
+  });
+
+  it("wires the toolbar sort control", () => {
+    const setSortBy = vi.fn();
+    renderToolbar({ setSortBy });
+    fireEvent.click(screen.getByText("Z → A"));
     expect(setSortBy).toHaveBeenCalledWith("name-desc");
   });
 
