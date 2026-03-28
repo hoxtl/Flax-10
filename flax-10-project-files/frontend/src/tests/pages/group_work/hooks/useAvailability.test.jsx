@@ -48,6 +48,14 @@ function stubFetch(payload) {
   });
 }
 
+function createDeferredResponse() {
+  let resolve;
+  const promise = new Promise((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
 function renderAvailability() {
   return render(<AvailabilityHarness />);
 }
@@ -182,6 +190,29 @@ describe("useAvailability", () => {
     await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
 
     fireEvent.click(screen.getByText("accept"));
+    await waitFor(() => expect(toastMock).toHaveBeenCalledWith(
+      "You accepted the meeting slot.",
+      { variant: "success" }
+    ));
+  });
+
+  it("keeps loading false while a vote refresh is in flight", async () => {
+    const refreshResponse = createDeferredResponse();
+    vi.stubGlobal("fetch", vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
+      .mockResolvedValueOnce({ ok: true })
+      .mockImplementationOnce(() => refreshResponse.promise));
+
+    renderAvailability();
+    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
+
+    fireEvent.click(screen.getByText("accept"));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
+    expect(screen.getByTestId("loading").textContent).toBe("false");
+
+    refreshResponse.resolve({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) });
+
     await waitFor(() => expect(toastMock).toHaveBeenCalledWith(
       "You accepted the meeting slot.",
       { variant: "success" }
