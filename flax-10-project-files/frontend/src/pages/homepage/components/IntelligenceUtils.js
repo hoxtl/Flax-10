@@ -31,10 +31,10 @@ export function getNextWindowMeta(windows = [], now = new Date()) {
     .filter((window) => window?.end && window.end.getTime() > now.getTime())
     .sort((a, b) => a.start.getTime() - b.start.getTime())[0];
   if (!upcoming) return null;
-  const start = upcoming.start?.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const start = upcoming.start.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
   const minutes = Math.max(0, Math.round((upcoming.end.getTime() - upcoming.start.getTime()) / 60000));
   return {
-    label: start ? `Next focus window ${start}` : "Next focus window",
+    label: `Next focus window ${start}`,
     duration: formatWindowDuration(minutes),
   };
 }
@@ -109,7 +109,7 @@ function buildTravelContext(upcomingEvent, relevantDelays, isSevereDisruption) {
   const severe = relevantDelays.some((delay) => isSevereDisruption(delay?.severityDescription));
   return {
     label: "Travel",
-    text: `${primaryDelay?.lineName || "TfL"} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime ? `${eventTime} ` : ""}${upcomingEvent.title || "your next class"}.`,
+    text: `${primaryDelay?.lineName || "TfL"} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime} ${upcomingEvent.title || "your next class"}.`,
     meta: `${primaryDelay?.severityDescription || "Delays"}${upcomingEvent.location ? ` · ${upcomingEvent.location}` : ""}`,
     tone: "warning",
     iconKey: "Train",

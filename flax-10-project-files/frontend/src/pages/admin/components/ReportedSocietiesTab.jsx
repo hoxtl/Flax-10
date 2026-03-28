@@ -20,9 +20,26 @@ function BanDismissButtons({ busy, onBan, onDismiss }) {
   return <><button className={styles.banBtn} disabled={busy} onClick={onBan}>Ban</button><button className={styles.dismissBtn} disabled={busy} onClick={onDismiss}>Dismiss</button></>;
 }
 
-function removeReportsBySociety(reports, reportId) {
+export function removeReportsBySociety(reports, reportId) {
   const target = reports.find((report) => report.id === reportId);
   return target ? reports.filter((report) => report.society_id !== target.society_id) : reports.filter((report) => report.id !== reportId);
+}
+
+function createBanHandlers(banTarget, run, setItems, setBanTarget) {
+  const handleBanOpen = (report) => setBanTarget(report);
+  const handleBanCancel = () => setBanTarget(null);
+  const handleBanConfirm = (reason) => {
+    run(
+      banTarget.id,
+      () => banReportedSociety(banTarget.id, reason),
+      () => {
+        setItems((current) => removeReportsBySociety(current, banTarget.id));
+        setBanTarget(null);
+      },
+      "Failed to ban society.",
+    );
+  };
+  return { handleBanCancel, handleBanConfirm, handleBanOpen };
 }
 
 function getReportMeta(report) {
@@ -55,20 +72,7 @@ export default function ReportedSocietiesTab() {
   const { busy, run } = useAsyncAction(setError);
   const pagination = usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
   const handleDismiss = (id) => run(id, () => dismissReport(id), () => setItems((current) => current.filter((report) => report.id !== id)), "Failed to dismiss report.");
-  const handleBanOpen = (report) => setBanTarget(report);
-  const handleBanCancel = () => setBanTarget(null);
-  const handleBanConfirm = (reason = "") => {
-    if (!banTarget) return;
-    run(
-      banTarget.id,
-      () => banReportedSociety(banTarget.id, reason),
-      () => {
-        setItems((current) => removeReportsBySociety(current, banTarget.id));
-        setBanTarget(null);
-      },
-      "Failed to ban society.",
-    );
-  };
+  const { handleBanCancel, handleBanConfirm, handleBanOpen } = createBanHandlers(banTarget, run, setItems, setBanTarget);
   return (
     <>
       <SectionCard>

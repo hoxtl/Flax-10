@@ -38,7 +38,6 @@ vi.mock("../../../../components/schedules/auto/autoScheduleActions", () => ({
 }));
 
 vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => conflictMocks);
-
 import { useHomepageReschedule } from "../../../../pages/homepage/hooks/useHomepageReschedule";
 
 function buildProps(overrides = {}) {
@@ -56,7 +55,6 @@ function buildProps(overrides = {}) {
     ...overrides,
   };
 }
-
 describe("useHomepageReschedule edge cases", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -354,25 +352,11 @@ describe("useHomepageReschedule edge cases", () => {
   });
 
   it("restores the original event when a same-day reschedule update fails", async () => {
-    getNextFreeSlotTodayMock.mockReturnValue({
-      start: new Date("2026-03-24T12:00:00.000Z"),
-      end: new Date("2026-03-24T12:45:00.000Z"),
-    });
-    const props = buildProps({
-      editEvent: vi.fn().mockRejectedValue(new Error("edit failed")),
-    });
-    const originalEvent = {
-      id: "evt-7",
-      title: "Workshop",
-      start_time: "2026-03-24T09:00:00.000Z",
-      end_time: "2026-03-24T09:45:00.000Z",
-    };
+    getNextFreeSlotTodayMock.mockReturnValue({ start: new Date("2026-03-24T12:00:00.000Z"), end: new Date("2026-03-24T12:45:00.000Z") });
+    const props = buildProps({ editEvent: vi.fn().mockRejectedValue(new Error("edit failed")) });
+    const originalEvent = { id: "evt-7", title: "Workshop", start_time: "2026-03-24T09:00:00.000Z", end_time: "2026-03-24T09:45:00.000Z" };
     const { result } = renderHook(() => useHomepageReschedule(props));
-
-    await act(async () => {
-      await result.current.handleReschedule(originalEvent);
-    });
-
+    await act(async () => { await result.current.handleReschedule(originalEvent); });
     expect(props.removeEvent).toHaveBeenCalledTimes(2);
     expect(props.removeEvent).toHaveBeenNthCalledWith(1, "evt-7");
     expect(props.removeEvent).toHaveBeenNthCalledWith(2, "evt-7");

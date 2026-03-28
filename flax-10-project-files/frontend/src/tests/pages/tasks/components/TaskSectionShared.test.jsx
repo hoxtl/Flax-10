@@ -57,29 +57,34 @@ describe("TaskSectionShared", () => {
     expect(screen.queryByText("Body content")).not.toBeInTheDocument();
   });
 
-  it("resolves list metadata and forwards card handlers for normal lists", () => {
-    const onDeleteTask = vi.fn();
-    const onEditTask = vi.fn();
-    const onToggleComplete = vi.fn();
-
-    render(
+  function renderNormalTaskCardRow(overrides = {}) {
+    return render(
       <TaskCardRow
         task={{ id: 4, title: "Essay", task_list: 1 }}
         listMap={{ 1: { id: 1, name: "Inbox", color: "#abc" } }}
         lists={[{ id: 1, name: "Inbox" }]}
-        onDeleteTask={onDeleteTask}
-        onEditTask={onEditTask}
-        onToggleComplete={onToggleComplete}
+        onDeleteTask={vi.fn()}
+        onEditTask={vi.fn()}
+        onToggleComplete={vi.fn()}
+        {...overrides}
       />,
     );
+  }
 
+  it("resolves list metadata for normal lists", () => {
+    renderNormalTaskCardRow();
     expect(screen.getByTestId("task-card-4")).toHaveTextContent("#abc");
     expect(screen.getByTestId("task-card-4")).toHaveTextContent("Inbox");
+  });
 
+  it("forwards card handlers for normal lists", () => {
+    const onDeleteTask = vi.fn();
+    const onEditTask = vi.fn();
+    const onToggleComplete = vi.fn();
+    renderNormalTaskCardRow({ onDeleteTask, onEditTask, onToggleComplete });
     fireEvent.click(screen.getByRole("button", { name: "delete" }));
     fireEvent.click(screen.getByRole("button", { name: "edit" }));
     fireEvent.click(screen.getByRole("button", { name: "toggle" }));
-
     expect(onDeleteTask).toHaveBeenCalledWith(4);
     expect(onEditTask).toHaveBeenCalledWith(4, { title: "Updated" }, { source: "test" });
     expect(onToggleComplete).toHaveBeenCalledWith(4);

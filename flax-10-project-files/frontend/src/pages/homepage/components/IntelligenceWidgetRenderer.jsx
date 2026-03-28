@@ -8,9 +8,9 @@ import { getEventType } from "../../../components/calendar/utils/eventUtils";
 import SharedWidgetHeader from "../../../components/common/widget_header/WidgetHeader";
 import styles from "./IntelligenceRow.module.css";
 import { IntelligenceHero } from "./IntelligenceWidgets";
-import { RightNowWidget } from "./RightNowWidget";
+import { RightNowWidget } from "@/pages/homepage/components/RightNowWidget";
 import { HomepageTimelineSection } from "./HomepageTimelineSection";
-import SemesterOverviewWidget from "./SemesterOverviewWidget";
+import SemesterOverviewWidget from "@/pages/homepage/components/SemesterOverviewWidget";
 import StudyStreakWidget from "./StudyStreakWidget";
 import WeeklyGoalWidget from "./WeeklyGoalWidget";
 import PhotoWidget from "./PhotoWidget";
@@ -145,13 +145,15 @@ function countUpcomingDeadlines(deadlines = []) {
   return deadlines.filter((deadline) => deadline?.start_due_date).length;
 }
 
-function countUpcomingSocietyEvents(events = [], societies = [], now = new Date()) {
-  const membershipIds = new Set((societies || []).map((society) => society?.society_id ?? society?.id).filter((value) => value != null).map(String));
-  const membershipNames = new Set((societies || []).map((society) => String(society?.name || "").trim().toLowerCase()).filter(Boolean));
+function countUpcomingSocietyEvents(events, societies, nowArg) {
+  const societiesArr = societies || [];
+  const now = nowArg || new Date();
+  const membershipIds = new Set(societiesArr.map((society) => society?.society_id ?? society?.id).filter((value) => value != null).map(String));
+  const membershipNames = new Set(societiesArr.map((society) => String(society?.name || "").trim().toLowerCase()).filter(Boolean));
   const start = new Date(now);
   const end = new Date(now);
   end.setDate(end.getDate() + 14);
-  return events.filter((event) => isMatchingSocietyEvent(event, membershipIds, membershipNames) && isWithinUpcomingWindow(event, start, end)).length;
+  return (events || []).filter((event) => isMatchingSocietyEvent(event, membershipIds, membershipNames) && isWithinUpcomingWindow(event, start, end)).length;
 }
 
 function isWithinUpcomingWindow(event, start, end) {

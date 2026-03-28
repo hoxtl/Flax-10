@@ -8,7 +8,7 @@ import EmptyState from "../../../components/common/empty_state/EmptyState";
 import { useProjectDetail } from "../hooks/groupWorkHooks";
 import GroupWorkDetailSkeleton from "./GroupWorkDetailSkeleton";
 import ProjectHeader from "./ProjectHeader";
-import TabsSection from "./TabsSection";
+import TabsSection from "@/pages/group_work/components/TabsSection";
 import BackButton from "../../../components/common/back_button/BackButton.jsx";
 import Breadcrumb from "../../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { BackToTop } from "../../../components/pagination/Pagination";

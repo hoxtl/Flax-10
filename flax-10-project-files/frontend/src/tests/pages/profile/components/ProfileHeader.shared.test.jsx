@@ -12,7 +12,9 @@ vi.mock("../../../../components/social/components/ShareButton", () => ({
 }));
 
 vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
-  default: ({ children, onClick, ...props }) => <button type="button" onClick={onClick} {...props}>{children}</button>,
+  default: ({ children, onClick, pill, size, variant, className, ...props }) => (
+    <button type="button" className={className} onClick={onClick} {...props}>{children}</button>
+  ),
 }));
 
 vi.mock("../../../../utils/tutorPhotoFallback", () => ({

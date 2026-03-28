@@ -100,28 +100,24 @@ describe("TaskContextMenu", () => {
     await act(async () => { rejectPromise(new Error("late failure")); });
   });
 
-  it("covers delete actions and confirmed due-date updates", async () => {
+  it("covers delete actions", () => {
     const onDelete = vi.fn();
-    const onEdit = vi.fn();
     const onClose = vi.fn();
-    const checkSleepAndRun = vi.fn((_date, callback) => callback());
-    sleepWarningHookMock.mockReturnValue({
-      sleepWarning: false,
-      sleepWarningProps: {},
-      checkSleepAndRun,
-    });
-
-    renderTaskContextMenu({ onDelete, onEdit, onClose });
-
+    renderTaskContextMenu({ onDelete, onEdit: vi.fn(), onClose });
     fireEvent.click(screen.getByRole("button", { name: /^Delete$/i }));
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
 
+  it("covers confirmed due-date updates", () => {
+    const onEdit = vi.fn();
+    const onClose = vi.fn();
+    const checkSleepAndRun = vi.fn((_date, callback) => callback());
+    sleepWarningHookMock.mockReturnValue({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun });
     const dueView = renderTaskContextMenu({ onEdit, onClose });
     fireEvent.click(screen.getAllByRole("button", { name: /Set due date/i })[0]);
     fireEvent.click(screen.getAllByRole("button", { name: /Set date/i })[0]);
     fireEvent.click(screen.getAllByRole("button", { name: /Set date/i })[1]);
-
     expect(checkSleepAndRun).toHaveBeenCalledWith("2026-03-10T10:00", expect.any(Function));
     expect(onEdit).toHaveBeenCalledWith(
       { due_date: "2026-03-10T10:00" },

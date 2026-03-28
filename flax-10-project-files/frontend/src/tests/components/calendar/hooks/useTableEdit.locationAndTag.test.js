@@ -92,7 +92,7 @@ describe("useTableEdit location and tag edges", () => {
     }));
   });
 
-  it("matches numeric string tag ids and clears empty tag values", async () => {
+  it("matches numeric string tag ids", async () => {
     const { result, rerender } = renderHook(({ providedTags }) => useTableEdit(events, providedTags), {
       initialProps: { providedTags: tags },
     });
@@ -107,7 +107,12 @@ describe("useTableEdit location and tag edges", () => {
       tag_id: "2",
       tag_name: "Deep Work",
     }));
+  });
 
+  it("clears empty tag values", async () => {
+    const { result, rerender } = renderHook(({ providedTags }) => useTableEdit(events, providedTags), {
+      initialProps: { providedTags: tags },
+    });
     rerender({ providedTags: undefined });
     act(() => result.current.startEdit(1, "tag", "2"));
     await act(async () => {

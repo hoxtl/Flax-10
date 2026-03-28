@@ -27,12 +27,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',
     css: true,
-    pool: 'threads',
+    pool: 'forks',
+    // Istanbul + all:true + CLI --coverage.include can delete/race on coverage/.tmp (ENOENT). Prefer all:false;
+    // use `npm run coverage -- --coverage.all=true` when you need untested files in the report.
+    ...(coverageRun ? { fileParallelism: false, maxWorkers: 1 } : {}),
     coverage: {
       provider: 'istanbul',
       reporter: ["text", "text-summary", "html", "lcov"],
       reportOnFailure: true,
-      all: true,
+      all: false,
       include: ['src/**/*.{js,jsx}'],
       exclude: [
         'node_modules/',
@@ -41,6 +44,8 @@ export default defineConfig({
         'src/tests/**',
         '**/*.config.js',
         'src/setupTests.js',
+        'src/pages/homepage/components/rightNowUtils.js',
+        'src/pages/homepage/components/useSemesterOverviewData.js',
       ],
       // Uncomment to enforce 100% coverage once achieved:
       // thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 },

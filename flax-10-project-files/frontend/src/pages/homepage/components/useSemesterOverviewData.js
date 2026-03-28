@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getEvents } from "../../../api/eventApi";
-import { getUpcomingDeadlines } from "../../../api/deadlineApi";
+import { getEvents } from "@/api/eventApi";
+import { getUpcomingDeadlines } from "@/api/deadlineApi";
 
 function getMonday(dateInput) {
   const date = new Date(dateInput);
@@ -24,13 +24,18 @@ function getSemesterStart(semesterStart, numWeeks, now) {
   return getMonday(approx);
 }
 
+async function safeUpcomingDeadlines() {
+  try {
+    return await getUpcomingDeadlines();
+  } catch (_err) {
+    return [];
+  }
+}
+
 async function fetchSemesterData(semStart, semEnd) {
   const start = semStart.toISOString().slice(0, 10);
   const end = semEnd.toISOString().slice(0, 10);
-  const [events, deadlines] = await Promise.all([
-    getEvents({ start, end }),
-    getUpcomingDeadlines().catch(() => []),
-  ]);
+  const [events, deadlines] = await Promise.all([getEvents({ start, end }), safeUpcomingDeadlines()]);
   return [Array.isArray(events) ? events : [], Array.isArray(deadlines) ? deadlines : []];
 }
 

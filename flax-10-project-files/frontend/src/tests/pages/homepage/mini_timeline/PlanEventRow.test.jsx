@@ -276,7 +276,6 @@ describe('PlanEventRow', () => {
         expect(setConflictPopoverRowId).toHaveBeenCalledWith(expect.any(Function));
     });
 
-
     it('renders task list link when matchTask has task_list and no moduleCode', () => {
         renderRow({
             row: { ...baseRow, moduleCode: null, matchTask: { task_list: 5 } },
@@ -286,10 +285,10 @@ describe('PlanEventRow', () => {
         expect(link).toHaveAttribute('href', '/tasks?list=5');
     });
 
-    it('renders the module pill as a module-specific task link when both moduleCode and matchTask are present', () => {
+    it('renders the module code as a link when both moduleCode and matchTask are present', () => {
         renderRow({ row: { ...baseRow, moduleCode: 'CS101', matchTask: { task_list: 5 } } });
-        const link = screen.getByRole('link', { name: 'CS101' });
-        expect(link).toBeInTheDocument();
+        expect(screen.getByText('CS101')).toBeInTheDocument();
+        const link = screen.queryByRole('link', { name: 'CS101' });
         expect(link).toHaveAttribute('href', '/tasks?list=5&module=CS101');
     });
 

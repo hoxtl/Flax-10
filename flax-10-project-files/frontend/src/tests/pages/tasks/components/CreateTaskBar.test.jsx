@@ -173,33 +173,29 @@ describe("CreateTaskBar", () => {
     expect(s.setTaskListId).toHaveBeenCalledWith("");
   });
 
-  it("covers input focus handlers, page count conversion, and list fallback to the first sorted list", () => {
-    const s = state({
-      title: "Read chapter",
-      isReadingList: true,
-      pageCount: 12,
-      setPageCount: vi.fn(),
-      sortedLists: [{ id: "1", name: "Inbox" }],
-      listOptions: [{ value: "", label: "Select" }],
-    });
+  it("covers input focus handlers and page count conversion", () => {
+    const s = state({ title: "Read chapter", isReadingList: true, pageCount: 12, setPageCount: vi.fn(), sortedLists: [{ id: "1", name: "Inbox" }], listOptions: [{ value: "", label: "Select" }] });
     hookMock.mockReturnValue(s);
-
     render(<CreateTaskBar inputRef={{ current: null }} />);
-
     const input = screen.getByLabelText(/Quick add task/i);
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "Read chapter 2" } });
     fireEvent.blur(input);
     fireEvent.keyDown(input, { key: "Enter" });
     fireEvent.change(screen.getByLabelText("Page count"), { target: { value: "24" } });
-    fireEvent.change(screen.getByLabelText("Select list"), { target: { value: "" } });
-
     expect(screen.getByRole("button", { name: /Add task/i })).toBeInTheDocument();
     expect(s.setInputFocused).toHaveBeenCalledWith(true);
     expect(s.setTitle).toHaveBeenCalledWith("Read chapter 2");
     expect(s.handleInputBlur).toHaveBeenCalled();
     expect(s.handleInputKeyDown).toHaveBeenCalled();
     expect(s.setPageCount).toHaveBeenCalledWith(24);
+  });
+
+  it("falls back to the first sorted list when the selection is cleared", () => {
+    const s = state({ title: "Read chapter", sortedLists: [{ id: "1", name: "Inbox" }], listOptions: [{ value: "", label: "Select" }] });
+    hookMock.mockReturnValue(s);
+    render(<CreateTaskBar inputRef={{ current: null }} />);
+    fireEvent.change(screen.getByLabelText("Select list"), { target: { value: "" } });
     expect(s.setTaskListId).toHaveBeenCalledWith("1");
   });
 

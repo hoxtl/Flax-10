@@ -1,3 +1,7 @@
+/*
+ * Tests for list sidebar state and derived counts.
+ */
+
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -9,18 +13,20 @@ vi.mock("../../../../pages/tasks/utils/listSidebarUtils", () => ({
 
 import { useListSidebarState } from "../../../../pages/tasks/components/useListSidebarState";
 
+function renderSidebarState() {
+  const tasks = [{ id: 1, task_list: 1 }];
+  const lists = [{ id: 1, name: "Inbox" }];
+  return renderHook(() => useListSidebarState(tasks, lists));
+}
+
 describe("useListSidebarState", () => {
-  it("returns sidebar control state, computed counts, and context-menu coordinates", () => {
+  it("returns computed counts and default sidebar state", () => {
     computeListSidebarCountsMock.mockReturnValue({
       listCounts: { 1: 3 },
       smartFilters: { today: 2, overdue: 1 },
     });
-
-    const tasks = [{ id: 1, task_list: 1 }];
-    const lists = [{ id: 1, name: "Inbox" }];
-    const { result } = renderHook(() => useListSidebarState(tasks, lists));
-
-    expect(computeListSidebarCountsMock).toHaveBeenCalledWith(tasks, lists);
+    const { result } = renderSidebarState();
+    expect(computeListSidebarCountsMock).toHaveBeenCalledWith([{ id: 1, task_list: 1 }], [{ id: 1, name: "Inbox" }]);
     expect(result.current.listCounts).toEqual({ 1: 3 });
     expect(result.current.smartFilters).toEqual({ today: 2, overdue: 1 });
     expect(result.current.ctxMenu).toBeNull();
@@ -28,7 +34,11 @@ describe("useListSidebarState", () => {
     expect(result.current.showArchived).toBe(false);
     expect(result.current.deleteListId).toBeNull();
     expect(result.current.permDeleteId).toBeNull();
+  });
 
+  it("updates sidebar controls and context-menu coordinates", () => {
+    computeListSidebarCountsMock.mockReturnValue({ listCounts: {}, smartFilters: {} });
+    const { result } = renderSidebarState();
     act(() => {
       result.current.setShowArchived(true);
       result.current.setRenamingId(8);

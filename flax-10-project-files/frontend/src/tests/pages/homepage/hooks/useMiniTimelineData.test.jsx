@@ -52,11 +52,13 @@ describe("useMiniTimelineData", () => {
     expect(result.current.rows).toEqual([{ id: "row-1" }]);
     expect(result.current.bestFreeRowId).toBe("free-row");
   });
+
   it("derives gap tasks and fallbacks", () => {
     const { result } = renderHook(() => useMiniTimelineData(baseProps));
     expect(result.current.assignedGapTasks).toEqual({ map: { "free-row": { id: 1 } }, nextMap: { "free-row": null } });
     expect(result.current.gapDeadlineFallbacks).toEqual({ "free-row": { title: "Fallback" } });
   });
+
   it("uses correct day bounds", () => {
     renderHook(() => useMiniTimelineData(baseProps));
     const [, , start, end] = computePlanTimelineRowsMock.mock.calls[0];

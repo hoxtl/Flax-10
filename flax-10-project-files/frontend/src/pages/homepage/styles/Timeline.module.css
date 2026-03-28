@@ -2,7 +2,8 @@
 
 @import "./timeline/TimelineTaskWidget.module.css";
 @import "./timeline/TimelineCardCore.module.css";
-@import "./timeline/TimelineEventInteraction.module.css";
+@import "./timeline/TimelineEventInteraction.conflict.module.css";
+@import "./timeline/TimelineEventInteraction.freeWindow.module.css";
 @import "./timeline/TimelineMiniView.module.css";
 @import "./timeline/TimelineStructure.module.css";
 @import "./timeline/TimelineCardStyles.module.css";

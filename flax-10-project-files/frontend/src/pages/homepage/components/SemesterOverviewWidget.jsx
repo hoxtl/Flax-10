@@ -6,18 +6,9 @@ import { useMemo } from "react";
 import { CalendarDays } from "lucide-react";
 import SharedWidgetHeader from "../../../components/common/widget_header/WidgetHeader";
 import styles from "../styles/SemesterOverview.module.css";
-import { useSemesterData, useSemesterRange } from "./useSemesterOverviewData";
+import { useSemesterData, useSemesterRange } from "@/pages/homepage/components/useSemesterOverviewData";
 
 // Helpers
-
-function getMonday(d) {
-  const date = new Date(d);
-  const day = date.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  date.setDate(date.getDate() + diff);
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
 
 function addWeeks(date, n) {
   const d = new Date(date);
@@ -52,9 +43,11 @@ function buildWeeks(semStart, numWeeks, readingWeekIndices, events, deadlines, n
   return Array.from({ length: numWeeks }, (_, index) => buildWeek(semStart, index, readingSet, events, deadlines, now));
 }
 
-function toHeight(count, maxCount, maxPx = 40, minPx = 4) {
+const MIN_BAR_PX = 4;
+
+function toHeight(count, maxCount, maxPx) {
   if (!count) return 0;
-  return Math.round(minPx + (Math.min(count / Math.max(maxCount, 1), 1)) * (maxPx - minPx));
+  return Math.round(MIN_BAR_PX + (Math.min(count / Math.max(maxCount, 1), 1)) * (maxPx - MIN_BAR_PX));
 }
 
 // Component
@@ -222,5 +215,5 @@ function getClusterSummary(clusterWeeks) {
   const deadlineCount = clusterWeeks.reduce((sum, week) => sum + week.deadlineCount, 0);
   const examCount = clusterWeeks.reduce((sum, week) => sum + week.examCount, 0);
   const examLabel = examCount ? ` + ${examCount} exam${examCount !== 1 ? "s" : ""}` : "";
-  return `${deadlineCount} deadline${deadlineCount !== 1 ? "s" : ""}${examLabel}`;
+  return `${deadlineCount} deadlines${examLabel}`;
 }

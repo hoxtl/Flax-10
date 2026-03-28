@@ -67,7 +67,7 @@ function CourseChangeBanner({ onDismiss, request }) {
   return <StatusBanner cta="/settings?tab=account" icon={BookOpen} onDismiss={onDismiss} text={request.requested_course ? <>Course switch pending to <strong>{request.requested_course}</strong></> : "Course switch pending"} />;
 }
 
-function StatusBanner({ cta, icon, onDismiss, text }) {
+export function StatusBanner({ cta, icon, onDismiss, text }) {
   const navigate = useNavigate();
   const statusIcon = icon;
   return (

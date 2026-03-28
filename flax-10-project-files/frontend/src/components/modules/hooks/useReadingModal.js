@@ -12,48 +12,35 @@ function useReadingList(moduleId) {
         const data = await getReadings(moduleId);
         setReadings(data || []);
     }, [moduleId]);
-
-    useEffect(() => {
-        let active = true;
-        getReadings(moduleId).then((data) => {
-            if (active) setReadings(data || []);
-        });
-        return () => { active = false; };
-    }, [moduleId]);
-
-    const reload = useCallback(() => load(), [load]);
-    return { readings, load: reload };
+    useEffect(() => { load(); }, [load]);
+    return { readings, reload: load };
 }
 
 function useReadingForm() {
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState(null);
-
     const openCreate = () => { setEditing(null); setShowForm(true); };
     const openEdit = (reading) => { setEditing(reading); setShowForm(true); };
     const close = () => { setEditing(null); setShowForm(false); };
-
     return { showForm, editing, openCreate, openEdit, close };
 }
 
+/** Hook providing reading list state, form visibility, and submit/delete handlers. */
 export function useReadingModal(moduleId) {
-    const { readings, load } = useReadingList(moduleId);
-    const { showForm, editing, openCreate, openEdit, close } = useReadingForm();
+    const { readings, reload } = useReadingList(moduleId);
+    const form = useReadingForm();
     const showToast = useToast();
-
     const handleSubmit = async (formData) => {
-        if (editing) await updateReading(moduleId, editing.id, formData);
+        if (form.editing) await updateReading(moduleId, form.editing.id, formData);
         else await createReading(moduleId, formData);
-        showToast(editing ? 'Reading updated.' : 'Reading added.', { variant: 'success' });
-        await load();
-        close();
+        showToast(form.editing ? 'Reading updated.' : 'Reading added.', { variant: 'success' });
+        await reload();
+        form.close();
     };
-
     const handleDelete = async (id) => {
         await deleteReading(moduleId, id);
         showToast('Reading deleted.', { variant: 'success' });
-        await load();
+        await reload();
     };
-
-    return { readings, showForm, editing, openCreate, openEdit, close, handleSubmit, handleDelete };
+    return { readings, ...form, handleSubmit, handleDelete };
 }

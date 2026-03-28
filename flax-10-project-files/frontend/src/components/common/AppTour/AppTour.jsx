@@ -171,8 +171,6 @@ function SpotlightOverlay({ rect }) {
 }
 
 function SpotlightRing({ rect }) {
-  if (!rect) return null;
-
   return (
     <Motion.div
       className={styles.spotlightRing}
@@ -207,8 +205,8 @@ function ProgressDots({ total, current, onJump }) {
           key={index}
           className={`${styles.dot} ${index === current ? styles.dotActive : ""}`}
           onClick={() => onJump?.(index)}
-          aria-label={`Go to step ${index + 1}: ${TOUR_STEPS[index]?.title ?? ""}`}
-          title={TOUR_STEPS[index]?.title ?? ""}
+          aria-label={`Go to step ${index + 1}: ${TOUR_STEPS[index].title}`}
+          title={TOUR_STEPS[index].title}
         />
       ))}
     </div>
@@ -266,7 +264,7 @@ function WelcomeTourContent({ step, stepIndex, total, onNext, onJump }) {
 }
 
 function GuidedTourContent({ step, stepIndex, total, onJump, onNext, onPrev, onSkip }) {
-  const StepIcon = STEP_ICONS[step.tourId] ?? null;
+  const StepIcon = STEP_ICONS[step.tourId];
   return (
     <div className={styles.stepInner}>
       <GuidedTourHeader StepIcon={StepIcon} stepIndex={stepIndex} total={total} onSkip={onSkip} />
@@ -281,7 +279,7 @@ function GuidedTourHeader({ StepIcon, stepIndex, total, onSkip }) {
   return (
     <div className={styles.cardHeader}>
       <div className={styles.stepHeaderLeft}>
-        {StepIcon ? <StepBadge StepIcon={StepIcon} stepIndex={stepIndex} /> : null}
+        <StepBadge StepIcon={StepIcon} stepIndex={stepIndex} />
         <span className={styles.stepCount}>{stepIndex + 1} / {total}</span>
       </div>
       <button className={styles.skipBtn} onClick={onSkip}>Skip tour</button>
@@ -309,7 +307,7 @@ function GuidedTourFooter({ stepIndex, total, onJump, onNext, onPrev }) {
     <div className={styles.cardFooter}>
       <ProgressDots total={total} current={stepIndex} onJump={onJump} />
       <div className={styles.cardActions}>
-        {stepIndex > 0 ? <button className={styles.prevBtn} onClick={onPrev}>Back</button> : null}
+        <button className={styles.prevBtn} onClick={onPrev}>Back</button>
         <button className={`${styles.nextBtn}${isLast ? ` ${styles.finishBtn}` : ""}`} onClick={onNext}>
           {isLast ? "Finish" : "Next"}
         </button>

@@ -84,7 +84,7 @@ function RescheduleEventsButton({ handleResolveTimelineConflicts, onOpenReschedu
   if (!isToday(selectedDate) || !handleResolveTimelineConflicts) return null;
   return (
     <AnimatedHeaderButton>
-      <PrimaryButton size="small" pill className={styles.timelineHeaderButton} onClick={onOpenRescheduleConfirm || handleResolveTimelineConflicts} aria-label="Reschedule my events" disabled={resolveConflictsLoading}>
+      <PrimaryButton size="small" pill className={styles.timelineHeaderButton} onClick={onOpenRescheduleConfirm} aria-label="Reschedule my events" disabled={resolveConflictsLoading}>
         {resolveConflictsLoading ? "Rescheduling…" : "Reschedule my events"}
       </PrimaryButton>
     </AnimatedHeaderButton>
@@ -113,7 +113,7 @@ function RescheduleConfirmModal({ open, onCancel, onConfirm, isTeacher }) {
 
 async function confirmReschedule(props, setShowRescheduleConfirm) {
   setShowRescheduleConfirm(false);
-  await props.handleResolveTimelineConflicts?.();
+  await props.handleResolveTimelineConflicts();
 }
 
 function TimelineTrack({ children, styles }) {

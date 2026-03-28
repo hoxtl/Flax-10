@@ -25,7 +25,7 @@ function getTimeLabel(isTask, data) {
 }
 
 function getTaskTimeLabel(data) {
-  return `${data.due_date ? formatTime(data.due_date) : ""}${data.estimated_blocks ? ` · ${(data.estimated_blocks || 1) * 25}m` : ""}`;
+  return `${data.due_date ? formatTime(data.due_date) : ""}${data.estimated_blocks ? ` · ${data.estimated_blocks * 25}m` : ""}`;
 }
 
 function getEventTimeLabel(data) {

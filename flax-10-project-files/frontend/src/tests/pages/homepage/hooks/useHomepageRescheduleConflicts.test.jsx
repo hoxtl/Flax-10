@@ -22,12 +22,14 @@ describe("useHomepageReschedule Conflicts", () => {
     expect(props.editEvent).toHaveBeenCalled();
     expect(props.showToast).toHaveBeenCalledWith("Event moved to next available window.");
   });
+
   it("handleConflictPushTomorrow moves event to tomorrow", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
     await act(async () => { await result.current.handleConflictPushTomorrow({ id: "e3", title: "S", start_time: "2026-03-24T14:00:00Z", end_time: "2026-03-24T15:00:00Z" }); });
     expect(props.showToast).toHaveBeenCalledWith(expect.stringContaining("moved to tomorrow"), expect.objectContaining({ actionLabel: "Undo" }));
   });
+
   it("handleConflictPushTomorrow undo action restores event", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
@@ -36,6 +38,7 @@ describe("useHomepageReschedule Conflicts", () => {
     await act(async () => { await undoOptions.onAction(); });
     expect(props.editEvent).toHaveBeenLastCalledWith("e3", { start_time: "2026-03-24T14:00:00.000Z", end_time: "2026-03-24T15:00:00.000Z" });
   });
+
   it("handleResolveTimelineConflicts showing progress via resolveConflictsLoading", async () => {
     let resolve;
     conflictMocks.applyConflictResolutionPlan.mockImplementationOnce(() => new Promise((r) => { resolve = r; }));
@@ -46,6 +49,7 @@ describe("useHomepageReschedule Conflicts", () => {
     await act(async () => { resolve(); await pending; });
     expect(result.current.resolveConflictsLoading).toBe(false);
   });
+
   it("shows the read-only conflicts message", async () => {
     conflictMocks.applyConflictResolutionPlan.mockResolvedValueOnce({ failures: [{ id: 1 }] });
     const { result } = renderHook(() => useHomepageReschedule(buildRescheduleProps()));

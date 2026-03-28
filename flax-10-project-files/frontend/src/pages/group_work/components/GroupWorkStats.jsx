@@ -17,8 +17,7 @@ function buildDeadlineStatItem(deadline, deadlineCountRef) {
         tone: deadline.project ? "danger" : undefined,
     };
 }
-
-export default function GroupWorkStats({ projects }) {
+const GroupWorkStats = ({ projects }) => {
     const safeProjects = projects || [];
     const progress = getProgressStats(safeProjects);
     const deadline = getNextDeadline(safeProjects);
@@ -31,4 +30,6 @@ export default function GroupWorkStats({ projects }) {
         { key: "overall-progress", label: "Overall progress", value: progress.percent, valueRef: progressCountRef, suffix: "%", tone: progress.percent > 0 ? "success" : undefined },
     ];
     return <StatStrip className={styles.statsStrip} items={items} />;
-}
+};
+
+export default GroupWorkStats;

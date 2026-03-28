@@ -13,11 +13,11 @@ import { AnimatedList, DecisionListRow } from "./AdminList";
 import AdminPagination from "./AdminPagination";
 import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
 
-function getCourseMeta(request) {
+export function getCourseMeta(request) {
   return request.current_course ? `${request.current_course} → ${request.requested_course}` : `Requesting: ${request.requested_course}`;
 }
 
-function getCourseCursor(request) {
+export function getCourseCursor(request) {
   return request.user_id ? "pointer" : "default";
 }
 

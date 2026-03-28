@@ -67,7 +67,7 @@ function BadgeTile({ badge, earned }) {
   );
 }
 
-function AchievementsHeader({ totalEarned, totalBadges, onClose }) {
+export function AchievementsHeader({ totalEarned, totalBadges, onClose }) {
   const progressWidth = totalBadges > 0 ? `${(totalEarned / totalBadges) * 100}%` : "0%";
   return (
     <div className={styles.header}>
