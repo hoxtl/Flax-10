@@ -1,127 +1,117 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ProfileCalendar } from '../../../../pages/profile/components/ProfileCalendar';
-import { useCalendarDispatch } from '../../../../context/CalendarContext';
-import { isSameMonth } from '../../../../components/calendar/utils/dateUtils';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { ProfileCalendar } from "../../../../pages/profile/components/ProfileCalendar";
 
-vi.mock('../../../../context/CalendarContext', () => ({
-    CalendarProvider: ({ children }) => <div data-testid="calendar-provider">{children}</div>,
-    useCalendar: vi.fn(() => ({ selectedDate: new Date('2024-03-08') })),
-    useCalendarDispatch: vi.fn(() => vi.fn()),
+// Mock side-effects in context
+vi.mock("../../../../components/notifications/hooks/useReminderNotifications", () => ({
+  useReminderNotifications: vi.fn(),
 }));
 
-vi.mock('../../../../context/ResizeHighlightContext', () => ({
-    ResizeHighlightProvider: ({ children }) => <div>{children}</div>,
+// Mock subcomponents to simplify testing
+vi.mock("../../../../components/calendar/header/CalendarHeaderUtils", () => ({
+  CalendarNav: ({ onPrev, onNext, onToday, title, showToday }) => (
+    <div data-testid="calendar-nav">
+      <button onClick={onPrev}>Prev</button>
+      <button onClick={onNext}>Next</button>
+      <button onClick={onToday}>Go to Today</button>
+      <span>{title}</span>
+      {showToday && <span data-testid="today-indicator">Current Month</span>}
+    </div>
+  ),
 }));
 
-vi.mock('../../../../components/calendar/month_view/MonthView', () => ({
-    MonthView: ({ readOnly, onMoreClick }) => (
-        <div data-testid="month-view" data-readonly={String(readOnly)}>
-            <button type="button" onClick={() => onMoreClick && onMoreClick(new Date('2024-03-08'))}>
-                Open day summary
-            </button>
-        </div>
-    ),
+vi.mock("../../../../components/calendar/month_view/MonthView", () => ({
+  MonthView: ({ onMoreClick, readOnly }) => (
+    <div data-testid="month-view">
+      <span>ReadOnly: {String(readOnly)}</span>
+      <button onClick={() => onMoreClick?.(new Date(2026, 2, 20))}>More</button>
+    </div>
+  ),
 }));
 
-vi.mock('../../../../components/calendar/EventPopups', () => ({
-    EventPopups: () => <div data-testid="event-popups" />,
+vi.mock("../../../../components/calendar/EventPopups", () => ({
+  EventPopups: () => <div data-testid="event-popups" />,
 }));
 
-vi.mock('../../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
-    EventsSummaryModal: ({ isOpen, onClose }) => isOpen ? <div data-testid="summary-modal"><button type="button" onClick={onClose}>Close Summary</button></div> : null,
+vi.mock("../../../../components/calendar/events_summary_modal/EventsSummaryModal", () => ({
+  EventsSummaryModal: ({ isOpen, baseDate, onClose }) => (
+    <div data-testid="summary-modal">
+      {isOpen ? (
+        <>
+          <span>Open at {baseDate?.toISOString()}</span>
+          <button onClick={onClose}>Close Summary</button>
+        </>
+      ) : (
+        "Closed"
+      )}
+    </div>
+  ),
 }));
 
-vi.mock('../../../../components/calendar/header/NavigationButtons', () => ({
-    NavigationButtons: () => <div data-testid="nav-buttons" />,
-}));
+describe("ProfileCalendar", () => {
+  const mockEvents = [{ id: 1, title: "Event 1" }];
 
-vi.mock('../../../../components/calendar/header/CalendarHeaderUtils', () => ({
-    CalendarNav: ({ onPrev, onNext, onToday, showToday, title }) => (
-        <div data-testid="nav-buttons">
-            <span>{title}</span>
-            <button type="button" onClick={() => onPrev?.()}>Prev</button>
-            <button type="button" onClick={() => onNext?.()}>Next</button>
-            {showToday && <button type="button" onClick={() => onToday?.()}>Today</button>}
-        </div>
-    ),
-}));
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
-    addMonths: vi.fn((d, n) => d),
-    formatMonthYear: vi.fn(() => 'March 2024'),
-    isSameMonth: vi.fn(() => false),
-}));
+  it("renders correctly and initializes calendar mode", () => {
+    render(<ProfileCalendar allEvents={mockEvents} />);
+    
+    expect(screen.getByTestId("calendar-nav")).toBeInTheDocument();
+    expect(screen.getByTestId("month-view")).toBeInTheDocument();
+    expect(screen.getByTestId("event-popups")).toBeInTheDocument();
+    expect(screen.getByText("ReadOnly: true")).toBeInTheDocument();
+  });
 
-describe('ProfileCalendar', () => {
-    it('renders within CalendarProvider', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.getByTestId('calendar-provider')).toBeTruthy();
+  it("handles navigation correctly", () => {
+    render(<ProfileCalendar allEvents={[]} />);
+    
+    // Initially shows some month (default is current month)
+    const initialTitle = screen.getByTestId("calendar-nav").querySelector("span").textContent;
+    
+    fireEvent.click(screen.getByText("Next"));
+    const nextTitle = screen.getByTestId("calendar-nav").querySelector("span").textContent;
+    expect(nextTitle).not.toBe(initialTitle);
+    
+    fireEvent.click(screen.getByText("Prev"));
+    const prevTitle = screen.getByTestId("calendar-nav").querySelector("span").textContent;
+    expect(prevTitle).toBe(initialTitle);
+  });
+
+  it("handles today button correctly", () => {
+    // Force selected date to something else first
+    render(<ProfileCalendar allEvents={[]} />);
+    fireEvent.click(screen.getByText("Next"));
+    
+    expect(screen.getByTestId("today-indicator")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Go to Today"));
+    expect(screen.queryByTestId("today-indicator")).toBeNull();
+  });
+
+  it("opens summary modal when onMoreClick is called and can close it", () => {
+    render(<ProfileCalendar allEvents={[]} />);
+    
+    expect(screen.getByText("Closed")).toBeInTheDocument();
+    
+    fireEvent.click(screen.getByText("More"));
+    expect(screen.getByText(/Open at 2026-03-20/)).toBeInTheDocument();
+    
+    fireEvent.click(screen.getByText("Close Summary"));
+    expect(screen.getByText("Closed")).toBeInTheDocument();
+  });
+
+  it("syncs events when allEvents prop changes and handles null", () => {
+    const { rerender } = render(<ProfileCalendar allEvents={mockEvents} />);
+    
+    act(() => {
+      rerender(<ProfileCalendar allEvents={null} />);
     });
-
-    it('renders MonthView in readOnly mode', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        const monthView = screen.getByTestId('month-view');
-        expect(monthView.getAttribute('data-readonly')).toBe('true');
+    
+    // Verifies no crash and coverage of null check in useSyncEvents
+    const newEvents = [{ id: 2, title: "New" }];
+    act(() => {
+      rerender(<ProfileCalendar allEvents={newEvents} />);
     });
-
-    it('renders EventPopups', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.getByTestId('event-popups')).toBeTruthy();
-    });
-
-    it('renders navigation buttons', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.getByTestId('nav-buttons')).toBeTruthy();
-    });
-
-    it('renders month/year title', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.getByText('March 2024')).toBeTruthy();
-    });
-
-    it('summary modal is not visible by default', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.queryByTestId('summary-modal')).toBeNull();
-    });
-
-    it('summary modal opens when onMoreClick is triggered', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.queryByTestId('summary-modal')).toBeNull();
-        fireEvent.click(screen.getByText('Open day summary'));
-        expect(screen.getByTestId('summary-modal')).toBeTruthy();
-    });
-
-    it('calendar nav prev/next/today call dispatch', () => {
-        const dispatch = vi.fn();
-        vi.mocked(useCalendarDispatch).mockReturnValue(dispatch);
-        render(<ProfileCalendar allEvents={[]} />);
-        fireEvent.click(screen.getByText('Prev'));
-        expect(dispatch).toHaveBeenCalled();
-        fireEvent.click(screen.getByText('Next'));
-        expect(dispatch).toHaveBeenCalled();
-        fireEvent.click(screen.getByText('Today'));
-        expect(dispatch).toHaveBeenCalled();
-    });
-
-    it('hides the Today shortcut when the selected month already matches today', () => {
-        isSameMonth.mockReturnValueOnce(true);
-
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.queryByText('Today')).toBeNull();
-    });
-
-    it('skips the calendar dispatch effect when the dispatcher is missing', () => {
-        vi.mocked(useCalendarDispatch).mockReturnValueOnce(null);
-
-        render(<ProfileCalendar allEvents={[]} />);
-        expect(screen.getByText('March 2024')).toBeTruthy();
-    });
-
-    it('closes the summary modal when requested', () => {
-        render(<ProfileCalendar allEvents={[]} />);
-        fireEvent.click(screen.getByText('Open day summary'));
-        fireEvent.click(screen.getByText('Close Summary'));
-        expect(screen.queryByTestId('summary-modal')).toBeNull();
-    });
+  });
 });

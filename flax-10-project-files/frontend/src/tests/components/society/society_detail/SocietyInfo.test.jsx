@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('../../../../components/society/components/CategorySelector', () => ({
     default: ({ onChange }) => <div data-testid="category-selector"><button onClick={() => onChange(['Tech'])}>Select Cat</button></div>,
@@ -212,5 +213,14 @@ describe('SocietyInfo', () => {
         render(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode onUpdateSociety={vi.fn()} />);
         fireEvent.click(screen.getByTestId('edit-category'));
         expect(screen.getByTestId('category-selector')).toBeInTheDocument();
+    });
+
+    it('renders a map link when the society has a location', () => {
+        render(
+            <MemoryRouter>
+                <SocietyInfo society={{ ...baseSociety, location: 'Bush House' }} editMode={false} />
+            </MemoryRouter>,
+        );
+        expect(screen.getByLabelText('Open UniMap for Bush House')).toBeInTheDocument();
     });
 });

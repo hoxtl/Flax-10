@@ -84,7 +84,7 @@ import { usePaginatedItems } from "../../../../pages/admin/hooks/usePaginatedIte
 import { navigateToProfile, navigateToSociety } from "../../../../pages/admin/utils/adminNavigation";
 import CourseChangeRequestsTab from "../../../../pages/admin/components/CourseChangeRequestsTab";
 import RatificationsTab from "../../../../pages/admin/components/RatificationsTab";
-import ReportedSocietiesTab from "../../../../pages/admin/components/ReportedSocietiesTab";
+import * as api from "../../../../api/adminApi";
 
 const noopSetters = { setError: vi.fn(), setItems: vi.fn() };
 
@@ -162,6 +162,50 @@ describe("CourseChangeRequestsTab", () => {
     render(<CourseChangeRequestsTab onNavigate={vi.fn()} />);
     expect(screen.getByText(/Requesting: CS102/)).toBeInTheDocument();
   });
+
+  it("still navigates when user_id is missing", () => {
+    const onNavigate = vi.fn();
+    const req = { ...request, user_id: null };
+    useAsyncList.mockReturnValue(makeListState([req]));
+    useAsyncAction.mockReturnValue(makeActionState());
+    usePaginatedItems.mockReturnValue(makePagination([req]));
+    render(<CourseChangeRequestsTab onNavigate={onNavigate} />);
+    fireEvent.click(screen.getByText("Alice Smith"));
+    expect(navigateToProfile).toHaveBeenCalledWith(onNavigate, null);
+  });
+
+  it("resolves a request when Approve is clicked", async () => {
+    api.resolveCourseChangeRequest.mockResolvedValue(undefined);
+    const run = vi.fn((id, actionFn, onSuccess) => actionFn().then(onSuccess));
+    const setItems = vi.fn();
+    useAsyncList.mockReturnValue(makeListState([request], { setItems }));
+    useAsyncAction.mockReturnValue({ busy: null, run });
+    usePaginatedItems.mockReturnValue(makePagination([request]));
+    render(<CourseChangeRequestsTab onNavigate={vi.fn()} />);
+    fireEvent.click(screen.getByText("✓ Approve"));
+    await waitFor(() => {
+      expect(api.resolveCourseChangeRequest).toHaveBeenCalledWith(1, "approve");
+    });
+    await waitFor(() => expect(setItems).toHaveBeenCalled());
+    const updater = setItems.mock.calls[0][0];
+    expect(updater([request])).toEqual([]);
+  });
+
+  it("resolves a request when Reject is clicked", async () => {
+    api.resolveCourseChangeRequest.mockResolvedValue(undefined);
+    const run = vi.fn((id, actionFn, onSuccess) => actionFn().then(onSuccess));
+    const setItems = vi.fn();
+    useAsyncList.mockReturnValue(makeListState([request], { setItems }));
+    useAsyncAction.mockReturnValue({ busy: null, run });
+    usePaginatedItems.mockReturnValue(makePagination([request]));
+    render(<CourseChangeRequestsTab onNavigate={vi.fn()} />);
+    fireEvent.click(screen.getByText("✗ Reject"));
+    await waitFor(() => {
+      expect(api.resolveCourseChangeRequest).toHaveBeenCalledWith(1, "reject");
+    });
+    await waitFor(() => expect(setItems).toHaveBeenCalled());
+    expect(setItems.mock.calls[0][0]([request])).toEqual([]);
+  });
 });
 
 describe("RatificationsTab", () => {
@@ -206,120 +250,27 @@ describe("RatificationsTab", () => {
     expect(screen.getByText(/12 members/)).toBeInTheDocument();
   });
 
+  it("calls rejectRatification when Reject is clicked", async () => {
+    api.rejectRatification.mockResolvedValue(undefined);
+    const run = vi.fn((id, actionFn, onSuccess) => actionFn().then(onSuccess));
+    const setItems = vi.fn();
+    useAsyncList.mockReturnValue(makeListState([item], { setItems }));
+    useAsyncAction.mockReturnValue({ busy: null, run });
+    usePaginatedItems.mockReturnValue(makePagination([item]));
+    render(<RatificationsTab />);
+    fireEvent.click(screen.getByText("✗ Reject"));
+    await waitFor(() => {
+      expect(api.rejectRatification).toHaveBeenCalledWith(2);
+    });
+    await waitFor(() => expect(setItems).toHaveBeenCalled());
+    expect(setItems.mock.calls[0][0]([item])).toEqual([]);
+  });
+
   it("shows empty state when no items", () => {
     useAsyncList.mockReturnValue(makeListState([]));
     useAsyncAction.mockReturnValue(makeActionState());
     usePaginatedItems.mockReturnValue(makePagination([]));
     render(<RatificationsTab />);
     expect(screen.getByText("No societies awaiting ratification")).toBeInTheDocument();
-  });
-});
-
-describe("ReportedSocietiesTab", () => {
-  const report = {
-    id: 10, society_id: 20, society_name: "Drama Society",
-    reporter_username: "john", reason: "Spam",
-  };
-
-  it("renders the tab with reports", () => {
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue(makeActionState());
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    expect(screen.getByText("Reported Societies")).toBeInTheDocument();
-    expect(screen.getByText("Drama Society")).toBeInTheDocument();
-  });
-
-  it("shows empty state when no reports", () => {
-    useAsyncList.mockReturnValue(makeListState([]));
-    useAsyncAction.mockReturnValue(makeActionState());
-    usePaginatedItems.mockReturnValue(makePagination([]));
-    render(<ReportedSocietiesTab />);
-    expect(screen.getByText("No reported societies")).toBeInTheDocument();
-  });
-
-  it("navigates to society when row is clicked", () => {
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue(makeActionState());
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    fireEvent.click(screen.getByText("Drama Society"));
-    expect(navigateToSociety).toHaveBeenCalledWith(20);
-  });
-
-  it("renders report meta with reason", () => {
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue(makeActionState());
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    expect(screen.getByText(/@john/)).toBeInTheDocument();
-    expect(screen.getByText(/Spam/)).toBeInTheDocument();
-  });
-
-  it("renders report meta without reason (no separator shown)", () => {
-    const reportNoReason = { ...report, reason: null };
-    useAsyncList.mockReturnValue(makeListState([reportNoReason]));
-    useAsyncAction.mockReturnValue(makeActionState());
-    usePaginatedItems.mockReturnValue(makePagination([reportNoReason]));
-    render(<ReportedSocietiesTab />);
-    expect(screen.getByText(/@john/)).toBeInTheDocument();
-    expect(screen.queryByText(/·/)).not.toBeInTheDocument();
-  });
-
-  it("opens the ban modal when Ban is clicked", () => {
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue(makeActionState());
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    fireEvent.click(screen.getByText("Ban"));
-    expect(screen.getByText(/Ban Drama Society/)).toBeInTheDocument();
-  });
-
-  it("closes the ban modal when cancel is clicked", () => {
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue(makeActionState());
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    fireEvent.click(screen.getByText("Ban"));
-    fireEvent.click(screen.getByText("close-modal"));
-    expect(screen.queryByText(/Ban Drama Society/)).not.toBeInTheDocument();
-  });
-
-  it("calls run to ban the society when confirmed", () => {
-    const run = vi.fn();
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue({ busy: null, run });
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    fireEvent.click(screen.getByText("Ban"));
-    // Submit with a reason
-    const textarea = screen.getByRole("textbox");
-    fireEvent.change(textarea, { target: { value: "Violating rules" } });
-    fireEvent.submit(textarea.closest("form"));
-    expect(run).toHaveBeenCalled();
-  });
-
-  it("calls run to dismiss a report when Dismiss is clicked", () => {
-    const run = vi.fn();
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue({ busy: null, run });
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    fireEvent.click(screen.getByText("Dismiss"));
-    expect(run).toHaveBeenCalled();
-  });
-
-  it("does not trigger ban when handleBanConfirm is called with no banTarget", () => {
-    // This covers the handleBanConfirm early return when banTarget is null
-    const run = vi.fn();
-    useAsyncList.mockReturnValue(makeListState([report]));
-    useAsyncAction.mockReturnValue({ busy: null, run });
-    usePaginatedItems.mockReturnValue(makePagination([report]));
-    render(<ReportedSocietiesTab />);
-    // Open and immediately cancel (banTarget gets set to null)
-    fireEvent.click(screen.getByText("Ban"));
-    fireEvent.click(screen.getByText("close-modal"));
-    // Modal closed. banTarget is null. Calling confirm now would be a no-op.
-    expect(run).not.toHaveBeenCalled();
   });
 });

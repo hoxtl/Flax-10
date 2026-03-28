@@ -8,6 +8,14 @@ import {
   DropdownPanel,
 } from '../../../../components/common/inputs/DateTimePickerParts';
 
+const createStateSetter = (initialValue = false) => {
+  let value = initialValue;
+  return vi.fn((next) => {
+    value = typeof next === 'function' ? next(value) : next;
+    return value;
+  });
+};
+
 vi.mock(
   '../../../../components/common/inputs/DateTimePicker.module.css',
   () => ({
@@ -77,19 +85,42 @@ describe('DateTimePicker parts', () => {
   });
 
   it('renders trigger button and handles keyboard events', () => {
-    const setOpen = vi.fn(), setSelDate = vi.fn(), onChange = vi.fn();
+    const setOpen = createStateSetter(false), setSelDate = vi.fn(), onChange = vi.fn();
     const props = { open: false, setOpen, selDate: new Date('2026-03-12T09:05:00'), timeOnly: false, dateOnly: false, placeholder: 'Pick', setSelDate, onChange, hideIcon: true };
     render(<TriggerButton {...props} />);
 
     const trigger = document.querySelector('[role="button"]');
+    fireEvent.click(trigger);
     fireEvent.keyDown(trigger, { key: 'Enter' });
     fireEvent.keyDown(trigger, { key: ' ' });
     fireEvent.keyDown(trigger, { key: 'Tab' });
     fireEvent.click(screen.getByLabelText('Clear date'));
-    
+
     expect(setOpen).toHaveBeenCalled();
     expect(setSelDate).toHaveBeenCalledWith(null);
     expect(onChange).toHaveBeenCalledWith('');
+  });
+
+  it('toggles the trigger with Enter and Space keys', () => {
+    const setOpen = createStateSetter(false);
+    render(
+      <TriggerButton
+        open={false}
+        setOpen={setOpen}
+        selDate={new Date('2026-03-12T09:05:00')}
+        timeOnly={false}
+        dateOnly={false}
+        placeholder="Pick"
+        setSelDate={vi.fn()}
+        onChange={vi.fn()}
+        hideIcon
+      />,
+    );
+
+  const trigger = document.querySelector('[role="button"]');
+    fireEvent.keyDown(trigger, { key: 'Enter' });
+    fireEvent.keyDown(trigger, { key: ' ' });
+    expect(setOpen).toHaveBeenCalledTimes(2);
   });
 
   it('renders the trigger icon and date-only formatting when not hidden', () => {
@@ -109,6 +140,42 @@ describe('DateTimePicker parts', () => {
 
     expect(screen.getByText('📅')).toBeInTheDocument();
     expect(screen.getByText('12 / 03 / 2026')).toBeInTheDocument();
+  });
+
+  it('shows placeholder styles when no date is selected', () => {
+    render(
+      <TriggerButton
+        open={false}
+        setOpen={createStateSetter(false)}
+        selDate={null}
+        timeOnly={false}
+        dateOnly={false}
+        placeholder="Pick"
+        setSelDate={vi.fn()}
+        onChange={vi.fn()}
+        hideIcon
+      />,
+    );
+    expect(screen.getByText('Pick')).toBeInTheDocument();
+  });
+
+  it('shows the clock icon for time-only mode and accepts a custom trigger class', () => {
+    const { container } = render(
+      <TriggerButton
+        open={false}
+        setOpen={vi.fn()}
+        selDate={new Date('2026-03-12T14:05:00')}
+        timeOnly
+        dateOnly={false}
+        placeholder="Pick"
+        setSelDate={vi.fn()}
+        onChange={vi.fn()}
+        hideIcon={false}
+        triggerClassName="customTrig"
+      />,
+    );
+    expect(screen.getByText('🕒')).toBeInTheDocument();
+    expect(container.querySelector('.customTrig')).toBeTruthy();
   });
 
   it('renders calendar section and handles navigation', () => {
@@ -142,5 +209,33 @@ describe('DateTimePicker parts', () => {
     fireEvent.click(screen.getByRole('button', { name: '12' }));
     expect(selectDay).toHaveBeenCalledWith(12);
     expect(setOpen).toHaveBeenCalledWith(false);
+  });
+
+  it('renders calendar and time sections together when not restricted', () => {
+    const props = {
+      ref: null,
+      pos: { top: 4, left: 6 },
+      dateOnly: false,
+      timeOnly: false,
+      setOpen: vi.fn(),
+      selectDay: vi.fn(),
+      viewM: 2,
+      viewY: 2026,
+      prevMonth: vi.fn(),
+      nextMonth: vi.fn(),
+      days: [null, 5],
+      isToday: () => false,
+      isSel: () => false,
+      isDisabled: () => false,
+      hour: 1,
+      minute: 2,
+      changeHour: vi.fn(),
+      changeMinute: vi.fn(),
+    };
+    render(<DropdownPanel {...props} />);
+    expect(screen.getByTestId('dd-HH')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '5' }));
+    expect(props.selectDay).toHaveBeenCalledWith(5);
+    expect(props.setOpen).not.toHaveBeenCalled();
   });
 });

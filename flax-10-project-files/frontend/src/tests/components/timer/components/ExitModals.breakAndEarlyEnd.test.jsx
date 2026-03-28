@@ -35,6 +35,24 @@ describe("Exit modals coverage", () => {
     expect(onPause).not.toHaveBeenCalled();
   });
 
+  it("animates the progress fill when reduced motion is disabled", () => {
+    reduceMotion.mockReturnValueOnce(false);
+
+    render(
+      <LeaveTimerModal
+        onCancel={vi.fn()}
+        onPause={vi.fn()}
+        onExit={vi.fn()}
+        timeLeftSeconds={30}
+        sessionTotalSeconds={120}
+      />,
+    );
+
+    const progressFill = screen.getByRole("progressbar").querySelector("span");
+    expect(progressFill).toBeTruthy();
+    expect(progressFill.style.width).toBe("");
+  });
+
   it("falls back to onPause when take-break is not supplied", () => {
     const onPause = vi.fn();
 
@@ -52,11 +70,40 @@ describe("Exit modals coverage", () => {
     expect(onPause).toHaveBeenCalled();
   });
 
+  it("pluralises the minutes label when more than one minute remains", () => {
+    render(
+      <LeaveTimerModal
+        onCancel={vi.fn()}
+        onPause={vi.fn()}
+        onExit={vi.fn()}
+        onTakeBreak={vi.fn()}
+        timeLeftSeconds={150}
+        sessionTotalSeconds={900}
+      />,
+    );
+
+    expect(screen.getByText("3 mins")).toBeInTheDocument();
+  });
+
+  it("uses the default timer values when durations are omitted", () => {
+    render(<LeaveTimerModal onCancel={vi.fn()} onPause={vi.fn()} onExit={vi.fn()} />);
+
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
+    expect(screen.getByText("1 min")).toBeInTheDocument();
+  });
+
   it("renders both end-early copy branches", () => {
     const { rerender } = render(<EndEarlyModal onConfirm={vi.fn()} onCancel={vi.fn()} elapsedSeconds={60} goalSeconds={300} />);
     expect(screen.getByText(/You're so close to your/)).toBeInTheDocument();
 
     rerender(<EndEarlyModal onConfirm={vi.fn()} onCancel={vi.fn()} elapsedSeconds={360} goalSeconds={300} />);
     expect(screen.getByText(/already reached your/)).toBeInTheDocument();
+  });
+
+  it("handles missing elapsed and goal seconds via defaults", () => {
+    render(<EndEarlyModal onConfirm={vi.fn()} onCancel={vi.fn()} />);
+
+    expect(screen.getByText(/0 minutes/)).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
   });
 });

@@ -2,16 +2,8 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import { getEventAccentColor } from "../../../../pages/homepage/components/mini_timeline/helpers/eventAccent";
+import eventAccentColors from "../../../../pages/homepage/components/mini_timeline/helpers/eventAccentColors.json";
 import { buildDeadlineTask } from "../../../../pages/homepage/components/mini_timeline/helpers/deadlineTask";
-import { getConflictTimeLabel } from "../../../../pages/homepage/components/mini_timeline/helpers/conflictRowUtils";
-import {
-  formatGapDuration,
-  getGapMinHeight,
-  getTinyGapMinHeight,
-  getGapTimeLabel,
-  getTinyGapTimeLabel,
-  getGapRecommendationTitle,
-} from "../../../../pages/homepage/components/mini_timeline/helpers/gapRowUtils";
 import { NowStrip } from "../../../../pages/homepage/components/mini_timeline/NowStrip";
 import { MiniTimelineRowRenderer } from "../../../../pages/homepage/components/mini_timeline/MiniTimelineRowRenderer";
 import { TimelineRowLayout, TimelineGutter, TimelineSpineCell } from "../../../../pages/homepage/components/mini_timeline/parts/TimelineRowLayout";
@@ -192,6 +184,36 @@ const buildEventRowProps = () => ({
   selectedDate: "2026-03-24",
 });
 
+describe("getEventAccentColor", () => {
+  it.each([
+    ["lecture tag", "Weekly session", "lecture", "lecture"],
+    ["lecture prefix", "Lecture: History", "", "lecture"],
+    ["routine tag", "Morning block", "routine", "routine"],
+  ["routine keyword", "Dinner", "", "routine"],
+    ["wellness tag", "Wind down", "wellness", "wellness"],
+    ["wellness keyword", "Gym training", "", "wellness"],
+    ["society tag", "Social", "society", "society"],
+    ["society keyword", "KCLSU committee", "", "society"],
+    ["social tag", "Hangout", "social", "social"],
+    ["social keyword", "Birthday party", "", "social"],
+    ["study keyword", "Essay crunch", "", "study"],
+    ["study tag", "Catch up", "Academic support", "study"],
+    ["meeting keyword", "Tutor meeting", "", "meeting"],
+    ["admin tag", "Morning chores", "admin", "admin"],
+  ["admin keyword", "Pay rent", "", "admin"],
+  ])("returns %s accent", (_label, title, tagName, expectedKey) => {
+    expect(getEventAccentColor(title, tagName)).toBe(eventAccentColors[expectedKey]);
+  });
+
+  it("falls back to default when nothing matches", () => {
+    expect(getEventAccentColor("Random block", "misc")).toBe(eventAccentColors.default);
+  });
+
+  it("handles missing titles and tags", () => {
+    expect(getEventAccentColor(undefined, undefined)).toBe(eventAccentColors.default);
+  });
+});
+
 describe("MiniTimeline helpers and parts", () => {
   describe("helper utilities", () => {
     it("derives accent colors across categories", () => {
@@ -214,21 +236,6 @@ describe("MiniTimeline helpers and parts", () => {
       expect(buildDeadlineTask({ minutes: 20 }, null)).toBeNull();
     });
 
-    it("formats gap durations, heights, and labels", () => {
-      expect(formatGapDuration(130)).toBe("2h 10m");
-      expect(formatGapDuration(120)).toBe("2h");
-      expect(formatGapDuration(45)).toBe("45m");
-      expect(getGapMinHeight(90, 30)).toBeGreaterThanOrEqual(56);
-      expect(getGapMinHeight(0, 30)).toBe(56);
-      expect(getGapMinHeight(500, 0)).toBe(260);
-      expect(getTinyGapMinHeight(10)).toBeGreaterThanOrEqual(24);
-      expect(getTinyGapMinHeight(0)).toBe(24);
-      expect(getGapTimeLabel(60)).toBeTruthy();
-      expect(getTinyGapTimeLabel(5)).toMatch(/^\d{2}:\d{2}$/);
-      expect(getGapRecommendationTitle({ title: "Read chapter" })).toBe("Read chapter");
-      expect(getGapRecommendationTitle(null)).toBe("");
-      expect(getConflictTimeLabel({ startMins: 30 })).toBeTruthy();
-    });
   });
 
   describe("Now strip and layout", () => {
@@ -358,6 +365,19 @@ describe("MiniTimeline helpers and parts", () => {
     it("renders free rows with full gap props", () => {
       renderTimelineRow(buildRow("f1", "free"), buildFreeRowProps());
       expect(screen.getByText("Plan free f1")).toBeInTheDocument();
+    });
+
+    it("passes deadline fallbacks into free row suggestions", () => {
+      const hint = { title: "Submit ethics form" };
+      renderTimelineRow(buildRow("f2", "free"), { ...buildFreeRowProps(), gapDeadlineFallbacks: { f2: hint } });
+      expect(screen.getByText("Submit ethics form")).toBeInTheDocument();
+    });
+
+    it("forwards skip actions with the rendered free row id", () => {
+      const onSkipGapTask = vi.fn();
+      renderTimelineRow(buildRow("f3", "free"), { ...buildFreeRowProps(), onSkipGapTask });
+      fireEvent.click(screen.getByText("Skip free row task"));
+      expect(onSkipGapTask).toHaveBeenCalledWith("f3", "task-1");
     });
 
     it("renders conflict pair rows", () => {

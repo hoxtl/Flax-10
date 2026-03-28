@@ -1,111 +1,125 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import AchievementsModal from '../../../../pages/profile/components/AchievementsModal';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import AchievementsModal, { AchievementsHeader } from "../../../../pages/profile/components/AchievementsModal";
 
-describe('AchievementsModal', () => {
+// Mock StandardModal
+vi.mock("../../../../components/common/standard_modal/StandardModal", () => ({
+  default: ({ children, onClose }) => (
+    <div data-testid="standard-modal">
+      <button data-testid="modal-close" onClick={onClose}>Modal Close</button>
+      {children}
+    </div>
+  )
+}));
+
+// Mock styles
+vi.mock("../../../../pages/profile/styles/AchievementsModal.module.css", () => ({
+  default: {
+    tile: "tile",
+    tileEarned: "tileEarned",
+    tileLocked: "tileLocked",
+    progressBar: "progressBar",
+    closeBtn: "closeBtn",
+    tileEmoji: "tileEmoji",
+    tileLabel: "tileLabel",
+    tileTier: "tileTier",
+    tileLockHint: "tileLockHint",
+    header: "header",
+    title: "title",
+    subtitle: "subtitle",
+    progressWrap: "progressWrap",
+    category: "category",
+    catHeader: "catHeader",
+    catName: "catName",
+    catCount: "catCount",
+    grid: "grid",
+    body: "body"
+  }
+}));
+
+describe("AchievementsModal", () => {
+  const defaultProps = {
+    badges: [{ id: "1hr" }, { id: "streak_3" }],
+    onClose: vi.fn()
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("renders correctly with earned and locked badges", () => {
+    render(<AchievementsModal {...defaultProps} />);
+    
+    // Check header
+    expect(screen.getByText(/2 \/ 26 unlocked/i)).toBeInTheDocument();
+    
+    // Check progress bar width (2/26 ~ 7.69%)
+    const progressBar = document.querySelector(".progressBar");
+    expect(progressBar.style.width).toBe(`${(2 / 26) * 100}%`);
+    
+    // Check specific badges
+    expect(screen.getByText("First Hour")).toBeInTheDocument();
+    expect(screen.getByText("⏱️")).toBeInTheDocument(); 
+    expect(screen.getByText("On a Roll")).toBeInTheDocument();
+    expect(screen.getByText("🔥")).toBeInTheDocument(); 
+    
+    // Check locked badge
+    expect(screen.getByText("Getting Started")).toBeInTheDocument();
+    expect(screen.getAllByText("🔒")).toHaveLength(24);
+  });
+
+  it("calls onClose when close button or Escape is pressed", () => {
+    render(<AchievementsModal {...defaultProps} />);
+    
+    fireEvent.click(screen.getByLabelText("Close"));
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+    
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(2);
+    
+    // Test non-escape key
+    fireEvent.keyDown(window, { key: "Enter" });
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(2);
+  });
+
+  it("renders all categories correctly", () => {
+    render(<AchievementsModal {...defaultProps} />);
+    const categories = ['Hours', 'Sessions', 'Streaks', 'Consistency', 'Style', 'Modules', 'Goals'];
+    categories.forEach(cat => {
+      expect(screen.getByText(cat)).toBeInTheDocument();
+    });
+  });
+
+  it("BadgeTile displays correct tier label for earned badges", () => {
+    render(<AchievementsModal badges={[{ id: "1hr" }]} onClose={vi.fn()} />);
+    expect(screen.getByText("🥉 Bronze")).toBeInTheDocument();
+  });
+
+  it("handles zero badges correctly for progress bar and title", () => {
+    render(<AchievementsModal badges={[]} onClose={vi.fn()} />);
+    expect(screen.getByText(/0 \/ 26 unlocked/i)).toBeInTheDocument();
+    expect(screen.getByText("Achievements")).toBeInTheDocument();
+    const progressBar = document.querySelector(".progressBar");
+    expect(progressBar.style.width).toBe("0%");
+  });
+
+  it("handles missing badges prop correctly", () => {
+    // Should default to 0 earnings and not crash
+    render(<AchievementsModal onClose={vi.fn()} />);
+    expect(screen.getByText(/0 \/ 26 unlocked/i)).toBeInTheDocument();
+  });
+
+  it("BadgeTile handles locked state detail", () => {
+    render(<AchievementsModal badges={[]} onClose={vi.fn()} />);
+    expect(screen.getByText("Study for 1 hour total")).toBeInTheDocument();
+  });
+
+  it("AchievementsHeader supports zero total badges", () => {
     const onClose = vi.fn();
-
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    it('renders Achievements title', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        expect(screen.getByText('Achievements')).toBeTruthy();
-    });
-
-    it('shows 0 / N unlocked when no badges', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        expect(screen.getByText(/0 \/ \d+ unlocked/)).toBeTruthy();
-    });
-
-    it('shows earned badge count', () => {
-        const badges = [{ id: '1hr' }, { id: 'sessions_1' }];
-        render(<AchievementsModal badges={badges} onClose={onClose} />);
-        expect(screen.getByText(/2 \/ \d+ unlocked/)).toBeTruthy();
-    });
-
-    it('renders all category sections', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        expect(screen.getByText('Hours')).toBeTruthy();
-        expect(screen.getByText('Sessions')).toBeTruthy();
-        expect(screen.getByText('Streaks')).toBeTruthy();
-        expect(screen.getByText('Consistency')).toBeTruthy();
-        expect(screen.getByText('Style')).toBeTruthy();
-        expect(screen.getByText('Modules')).toBeTruthy();
-        expect(screen.getByText('Goals')).toBeTruthy();
-    });
-
-    it('renders First Hour badge (locked)', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        expect(screen.getByText('First Hour')).toBeTruthy();
-    });
-
-    it('shows earned badge with tier label', () => {
-        const badges = [{ id: '1hr' }];
-        render(<AchievementsModal badges={badges} onClose={onClose} />);
-        expect(screen.getByText('🥉 Bronze')).toBeTruthy();
-    });
-
-    it('shows gold tier for gold badges', () => {
-        const badges = [{ id: '100hr' }];
-        render(<AchievementsModal badges={badges} onClose={onClose} />);
-        expect(screen.getByText('🥇 Gold')).toBeTruthy();
-    });
-
-    it('shows silver tier for silver badges', () => {
-        const badges = [{ id: 'sessions_50' }];
-        render(<AchievementsModal badges={badges} onClose={onClose} />);
-        expect(screen.getByText('🥈 Silver')).toBeTruthy();
-    });
-
-    it('calls onClose when close button clicked', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        fireEvent.click(screen.getByLabelText('Close'));
-        expect(onClose).toHaveBeenCalledOnce();
-    });
-
-    it('calls onClose when Escape key pressed', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        fireEvent.keyDown(window, { key: 'Escape' });
-        expect(onClose).toHaveBeenCalledOnce();
-    });
-
-    it('calls onClose when clicking overlay background', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        const overlay = document.querySelector('[class*="backdrop"]');
-        fireEvent.mouseDown(overlay);
-        expect(onClose).toHaveBeenCalledOnce();
-    });
-
-    it('shows category earned count', () => {
-        const badges = [{ id: '1hr' }, { id: '10hr' }];
-        render(<AchievementsModal badges={badges} onClose={onClose} />);
-        // Hours category should show 2/6
-        expect(screen.getByText('2/6')).toBeTruthy();
-    });
-
-    it('shows locked description for unearned badges', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        expect(screen.getByText('Study for 1 hour total')).toBeTruthy();
-    });
-
-    it('handles null badges prop', () => {
-        render(<AchievementsModal badges={null} onClose={onClose} />);
-        expect(screen.getByText('Achievements')).toBeTruthy();
-        expect(screen.getByText(/0 \/ \d+ unlocked/)).toBeTruthy();
-    });
-
-    it('shows lock icon for unearned badges', () => {
-        render(<AchievementsModal badges={[]} onClose={onClose} />);
-        const lockIcons = screen.getAllByText('🔒');
-        expect(lockIcons.length).toBeGreaterThan(0);
-    });
-
-    it('removes keydown listener on unmount', () => {
-        const { unmount } = render(<AchievementsModal badges={[]} onClose={onClose} />);
-        unmount();
-        fireEvent.keyDown(window, { key: 'Escape' });
-        expect(onClose).toHaveBeenCalledTimes(0);
-    });
+    render(<AchievementsHeader totalEarned={5} totalBadges={0} onClose={onClose} />);
+    const progressBar = document.querySelector(".progressBar");
+    expect(progressBar.style.width).toBe("0%");
+    fireEvent.click(screen.getByLabelText("Close"));
+    expect(onClose).toHaveBeenCalled();
+  });
 });

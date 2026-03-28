@@ -298,6 +298,37 @@ describe('EventPopups extra coverage', () => {
         });
     });
 
+    it('Delete action prompts recurrence options and uses occurrence branch', async () => {
+        setupModalClosed();
+        const evt = { id: 19, title: 'Repeating Task', source: 'personal', tag: null };
+        setupPopupEvent(evt);
+        getEventType.mockReturnValue('personal');
+        hasRecurrence.mockReturnValue(true);
+        mockConfirm.mockResolvedValue('ALTERNATE');
+
+        render(<EventPopups />);
+        fireEvent.click(screen.getByText('Delete'));
+
+        await waitFor(() => {
+            expect(mockOpenDelete).toHaveBeenCalledWith(evt, 'occurrence');
+        });
+    });
+
+    it('Delete action does nothing when recurrence confirmation is dismissed', async () => {
+        setupModalClosed();
+        const evt = { id: 20, title: 'Cancelled Recurring', source: 'personal', tag: null };
+        setupPopupEvent(evt);
+        getEventType.mockReturnValue('personal');
+        hasRecurrence.mockReturnValue(true);
+        mockConfirm.mockResolvedValue(undefined);
+
+        render(<EventPopups />);
+        fireEvent.click(screen.getByText('Delete'));
+
+        await waitFor(() => expect(mockConfirm).toHaveBeenCalled());
+        expect(mockOpenDelete).not.toHaveBeenCalled();
+    });
+
     it('EventPopupContainer is not rendered when isModalOpen is true', () => {
         useEventModal.mockReturnValue({
             isModalOpen: true,

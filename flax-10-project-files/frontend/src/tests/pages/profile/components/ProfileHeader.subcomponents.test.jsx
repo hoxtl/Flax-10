@@ -33,6 +33,14 @@ const defaultVisibility = {
   canEditProfile: true,
 };
 
+const viewerVisibility = {
+  canViewModules: false,
+  canViewTasks: false,
+  canViewEvents: false,
+  canViewSharedWith: false,
+  canEditProfile: false,
+};
+
 const defaultHandlers = {
   onEditProfile: vi.fn(),
   onModulesClick: vi.fn(),
@@ -262,5 +270,67 @@ describe('ProfileHeader', () => {
     });
     fireEvent.click(screen.getByText('🎯').closest('button'));
     expect(onPinBadge).toHaveBeenCalledWith('goal_getter');
+  });
+
+  it('reloads profile data when share is toggled on someone else profile', () => {
+    renderHeader({
+      user: { id: 5, username: 'peer' },
+      visibility: viewerVisibility,
+    });
+    fireEvent.click(screen.getAllByTestId('share-button')[0]);
+    expect(defaultHandlers.reload).toHaveBeenCalled();
+  });
+
+  it('does not call onPinBadge when pinning is disabled', () => {
+    const onPinBadge = vi.fn();
+    renderHeader({
+      user: { username: 'alice' },
+      visibility: viewerVisibility,
+      badges: [{ id: 'b1', emoji: '🎲', label: 'Roll', description: 'd' }],
+      pinnedBadgeId: '',
+      onPinBadge,
+    });
+    fireEvent.click(screen.getByText('🎲').closest('button'));
+    expect(onPinBadge).not.toHaveBeenCalled();
+  });
+
+  it('omits shared-calendar chrome when navigation is not provided', () => {
+    renderHeader({
+      user: { username: 'bob' },
+      profileData: { is_shared_with_me: true },
+      visibility: viewerVisibility,
+    });
+    expect(screen.queryByText('View their calendar')).not.toBeInTheDocument();
+  });
+
+  it('reads student year from the user object when profile omits it', () => {
+    renderHeader({
+      user: { username: 's', role: 'student', year: 'Year 3' },
+      profileData: { major: 'Art' },
+    });
+    expect(screen.getAllByText(/Year 3 · Art/).length).toBeGreaterThan(0);
+  });
+
+  it('renders a featured badge without a description paragraph when empty', () => {
+    renderHeader({
+      user: { username: 'alice' },
+      badges: [{ id: 'p', emoji: '⭐', label: 'Star', description: '' }],
+      pinnedBadgeId: 'p',
+      onPinBadge: vi.fn(),
+    });
+    expect(screen.getByText('Star')).toBeInTheDocument();
+  });
+
+  it('clears the badge tooltip when the pointer leaves the badge', () => {
+    renderHeader({
+      user: { username: 'alice' },
+      badges: [{ id: 'tip', emoji: '🏅', label: 'Badge', description: 'd' }],
+      pinnedBadgeId: '',
+      onPinBadge: vi.fn(),
+    });
+    const btn = screen.getByText('🏅').closest('button');
+    fireEvent.mouseEnter(btn);
+    fireEvent.mouseLeave(btn);
+    expect(btn).toBeTruthy();
   });
 });

@@ -32,7 +32,7 @@ function buildShareUser(user, handlers) {
 }
 
 function buildSharedCalendarRoute(user, profileData) {
-  const targetUser = profileData || user;
+  const targetUser = profileData;
   if (!targetUser?.id) return "/calendar";
   const displayName = buildFullName(targetUser);
   const params = new URLSearchParams({
@@ -61,25 +61,21 @@ function SharedCalendarPill({ profileData, visibility, onNavigate }) {
   );
 }
 
-function BadgeTooltip({ badge, canPin, pinned }) {
+function BadgeTooltip({ badge }) {
   return (
     <Motion.div className={styles.badgeTooltip} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }} transition={{ duration: 0.15 }}>
       <span className={styles.badgeTooltipLabel}>{badge.label}</span>
       <span className={styles.badgeTooltipDesc}>{badge.description}</span>
-      {canPin && <span className={styles.badgeTooltipPin}>{pinned ? "Tap to unpin" : "Tap to pin this badge"}</span>}
     </Motion.div>
   );
 }
 
-function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave, pinned }) {
-  const className = `${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`;
-  const animate = pinned ? { scale: [1, 1.4, 0.9, 1.05, 1] } : { scale: 1 };
-  const transition = pinned ? { duration: 0.45, ease: "easeOut" } : { duration: 0.25, ease: "easeInOut" };
+function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave }) {
   return (
-    <Motion.button type="button" className={className} onMouseEnter={() => onEnter(badge.id)} onMouseLeave={onLeave} onClick={() => canPin && onPinBadge?.(badge.id)} layout animate={animate} transition={transition} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}>
+    <Motion.button type="button" className={styles.headerBadge} onMouseEnter={() => onEnter(badge.id)} onMouseLeave={onLeave} onClick={() => canPin && onPinBadge?.(badge.id)} layout animate={{ scale: 1 }} transition={{ duration: 0.25, ease: "easeInOut" }} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}>
       <span className={styles.headerBadgeEmoji}>{badge.emoji}</span>
       <AnimatePresence>
-        {activeTooltip === badge.id && <BadgeTooltip badge={badge} canPin={canPin} pinned={pinned} />}
+        {activeTooltip === badge.id && <BadgeTooltip badge={badge} />}
       </AnimatePresence>
     </Motion.button>
   );
@@ -99,7 +95,6 @@ function FeaturedBadgeContent({ badge, canPin }) {
 }
 
 function FeaturedBadgeCard({ badge, canPin, onPinBadge }) {
-  if (!badge) return null;
   return (
     <Motion.button type="button" className={styles.featuredBadgeCard} onClick={() => canPin && onPinBadge?.(badge.id)} initial={{ opacity: 0, scale: 0.9, x: -8 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9, x: -8 }} transition={{ duration: 0.28, ease: "easeOut" }} whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} layout>
       <FeaturedBadgeContent badge={badge} canPin={canPin} />
@@ -121,7 +116,7 @@ function BadgeRail({ topBadges, onViewAll, canPin, onPinBadge, activeTooltip, on
     <div className={styles.headerBadgeRail}>
       <div className={styles.headerBadges}>
         <div className={styles.headerBadgesMain}>
-          {topBadges.map((badge) => <BadgeButton key={badge.id} badge={badge} pinned={false} {...tooltipProps} />)}
+          {topBadges.map((badge) => <BadgeButton key={badge.id} badge={badge} {...tooltipProps} />)}
         </div>
         {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
       </div>
@@ -131,9 +126,7 @@ function BadgeRail({ topBadges, onViewAll, canPin, onPinBadge, activeTooltip, on
 
 function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll }) {
   const [activeTooltip, setActiveTooltip] = useState(null);
-  const allBadges = badges || [];
-  if (!allBadges.length) return null;
-  const { featuredBadge, topBadges } = resolveBadgeLists(allBadges, pinnedBadgeId);
+  const { featuredBadge, topBadges } = resolveBadgeLists(badges, pinnedBadgeId);
   const tooltipProps = { canPin, onPinBadge, activeTooltip, onEnter: setActiveTooltip, onLeave: () => setActiveTooltip(null) };
   return (
     <div className={styles.headerAchievementsRow}>
@@ -187,7 +180,6 @@ function ProfileStats({
 }
 
 function PersonaInlineChip({ persona, peakHour }) {
-  if (!persona) return null;
   const peakLabel = buildPeakLabel(peakHour);
   return (
     <div className={styles.headerPersonaCard}>

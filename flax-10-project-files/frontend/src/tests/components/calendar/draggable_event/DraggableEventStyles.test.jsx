@@ -73,8 +73,9 @@ vi.mock('../../../../context/TagContext', () => ({
     })),
 }));
 
+const mockGetEventTheme = vi.fn(() => ({ color: '#3b82f6', background: '#dbeafe' }));
 vi.mock('../../../../components/calendar/utils/eventStyleUtils', () => ({
-    getEventTheme: vi.fn(() => ({ color: '#3b82f6', background: '#dbeafe' })),
+    getEventTheme: (...args) => mockGetEventTheme(...args),
 }));
 
 // CSS module mock
@@ -130,6 +131,7 @@ const moduleEvent = {
 describe('DraggableEvent Styles Coverage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockGetEventTheme.mockImplementation(() => ({ color: '#3b82f6', background: '#dbeafe' }));
         getEventType.mockImplementation((event) => event.source || 'personal');
         hasRecurrence.mockReturnValue(false);
         vi.mocked(useEventResizeModule.useEventResize).mockReturnValue({
@@ -240,9 +242,131 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(mockOpenPopup).toHaveBeenCalledWith(societyEvent, expect.anything(), true);
     });
 
+    it('treats non-numeric heights as zero for read-only cards', () => {
+        getEventType.mockReturnValue('society');
+        const { container } = render(<DraggableEvent event={societyEvent} style={{ height: 'auto', width: '100%' }} />);
+        expect(container.querySelector('.event-content.compact')).toBeInTheDocument();
+    });
+
+    it('opens the event popup after a normal click', () => {
+        render(<DraggableEvent event={personalEvent} style={{ height: '80px', width: '220px' }} />);
+        fireEvent.click(screen.getByText('Team Meeting').closest('[data-event-id]'));
+        expect(mockOpenPopup).toHaveBeenCalledWith(personalEvent, expect.anything());
+    });
+
     it('applies dragging class when isDragging is true', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: true });
         const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
         expect(container.querySelector('.dragging')).toBeInTheDocument();
+    });
+
+    it('uses the default primary token when the theme omits a color', () => {
+        mockGetEventTheme.mockReturnValueOnce({ background: '#fff' });
+        const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
+        const el = container.querySelector('.draggable-event');
+        expect(el.style.borderLeftColor).toBe('var(--color-primary)');
+    });
+
+    it('routes context menu actions and resize handles for personal events', async () => {
+        const handleResizeStart = vi.fn();
+        vi.mocked(useEventResizeModule.useEventResize).mockReturnValue({
+            handleResizeStart,
+            isResizing: false,
+            resizePreview: null,
+        });
+        render(<DraggableEvent event={personalEvent} style={{ height: '80px', width: '220px' }} />);
+        const card = screen.getByText('Team Meeting').closest('[data-event-id]');
+        fireEvent.contextMenu(card, { clientX: 12, clientY: 14 });
+        fireEvent.click(screen.getByRole('button', { name: /Edit/i }));
+        expect(mockOpenModal).toHaveBeenCalledWith(personalEvent);
+        fireEvent.contextMenu(card, { clientX: 12, clientY: 14 });
+        await act(async () => { fireEvent.click(screen.getByRole('button', { name: /Delete/i })); });
+        expect(mockOpenDelete).toHaveBeenCalledWith(personalEvent);
+        fireEvent.mouseDown(card.querySelector('.resize-handle'));
+        expect(handleResizeStart).toHaveBeenCalled();
+    });
+
+    it('asks how to delete recurring events before opening delete', async () => {
+        hasRecurrence.mockReturnValue(true);
+        mockConfirm.mockResolvedValueOnce(true);
+        render(<DraggableEvent event={personalEvent} style={{ height: '80px', width: '220px' }} />);
+        const card = screen.getByText('Team Meeting').closest('[data-event-id]');
+        fireEvent.contextMenu(card);
+        await act(async () => { fireEvent.click(screen.getByRole('button', { name: /Delete/i })); });
+        expect(mockOpenDelete).toHaveBeenCalledWith(personalEvent, 'all');
+        mockConfirm.mockResolvedValueOnce('ALTERNATE');
+        fireEvent.contextMenu(card);
+        await act(async () => { fireEvent.click(screen.getByRole('button', { name: /Delete/i })); });
+        expect(mockOpenDelete).toHaveBeenCalledWith(personalEvent, 'occurrence');
+    });
+
+    it('blocks popup opens during drag, resize, or immediately after resize', () => {
+        vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: true });
+        const { unmount } = render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
+        fireEvent.click(screen.getByText('Team Meeting').closest('[data-event-id]'));
+        expect(mockOpenPopup).not.toHaveBeenCalled();
+        unmount();
+        mockOpenPopup.mockClear();
+        vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: false });
+        vi.mocked(useEventResizeModule.useEventResize).mockReturnValue({
+            handleResizeStart: vi.fn(),
+            isResizing: true,
+            resizePreview: 50,
+        });
+        render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
+        fireEvent.click(screen.getByText('Team Meeting').closest('[data-event-id]'));
+        expect(mockOpenPopup).not.toHaveBeenCalled();
+    });
+
+    it('suppresses the popup right after a resize gesture', () => {
+        let resizeEndedRef;
+        vi.mocked(useEventResizeModule.useEventResize).mockImplementation((_e, _ref, _edit, re) => {
+            resizeEndedRef = re;
+            return { handleResizeStart: vi.fn(), isResizing: false, resizePreview: null };
+        });
+        render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
+        const card = screen.getByText('Team Meeting').closest('[data-event-id]');
+        resizeEndedRef.current = true;
+        fireEvent.click(card);
+        expect(mockOpenPopup).not.toHaveBeenCalled();
+    });
+
+    it('closes the context menu after an outside mousedown', async () => {
+        render(<DraggableEvent event={personalEvent} style={{ height: '80px', width: '220px' }} />);
+        const card = screen.getByText('Team Meeting').closest('[data-event-id]');
+        fireEvent.contextMenu(card);
+        expect(screen.getByRole('button', { name: /Edit/i })).toBeInTheDocument();
+        fireEvent.mouseDown(document.body);
+        await waitFor(() => expect(screen.queryByRole('button', { name: /Edit/i })).not.toBeInTheDocument());
+    });
+
+    it('ignores recurring delete confirmations that are dismissed', async () => {
+        hasRecurrence.mockReturnValue(true);
+        mockConfirm.mockResolvedValueOnce(false);
+        mockOpenDelete.mockClear();
+        render(<DraggableEvent event={personalEvent} style={{ height: '80px', width: '220px' }} />);
+        const card = screen.getByText('Team Meeting').closest('[data-event-id]');
+        fireEvent.contextMenu(card);
+        await act(async () => { fireEvent.click(screen.getByRole('button', { name: /Delete/i })); });
+        expect(mockOpenDelete).not.toHaveBeenCalled();
+    });
+
+    it('does not close the context menu when the press stays inside it', () => {
+        render(<DraggableEvent event={personalEvent} style={{ height: '80px', width: '220px' }} />);
+        const card = screen.getByText('Team Meeting').closest('[data-event-id]');
+        fireEvent.contextMenu(card);
+        const editBtn = screen.getByRole('button', { name: /Edit/i });
+        fireEvent.mouseDown(editBtn);
+        expect(editBtn).toBeInTheDocument();
+    });
+
+    it('uses zero height when neither resize preview nor style height parse', () => {
+        vi.mocked(useEventResizeModule.useEventResize).mockReturnValue({
+            handleResizeStart: vi.fn(),
+            isResizing: false,
+            resizePreview: null,
+        });
+        const { container } = render(<DraggableEvent event={personalEvent} style={{ height: 'auto', width: '100%' }} />);
+        expect(container.querySelector('.event-content.compact')).toBeInTheDocument();
     });
 });

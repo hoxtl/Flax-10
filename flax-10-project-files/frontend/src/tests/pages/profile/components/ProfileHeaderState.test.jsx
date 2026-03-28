@@ -42,7 +42,7 @@ describe('ProfileHeader – Part 2', () => {
 
   it('mobile header shows ShareButton when not editable', () => {
     render(<ProfileHeader user={{ id: 5, username: 'b' }} profileData={{}} handlers={baseHandlers} visibility={viewerVisibility} />);
-    expect(screen.getAllByTestId('share-btn').length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0);
   });
 
   it('mobile stats are hidden when canViewModules is false', () => {

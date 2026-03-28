@@ -140,7 +140,6 @@ vi.mock("../../../../pages/modules/components/MyModulesDashboard.jsx", () => ({
 vi.mock("../../../../pages/modules/hooks/modulesPageHooks.js", () => ({
   useMainModuleView: (...args) => useMainModuleViewMock(...args),
 }));
-
 import { EmptyResults, MainView, ModuleResults, ModuleToolbar, MyEnrollmentsTabContent } from "../../../../pages/modules/components/ModulesPageResults.jsx";
 
 function buildSorting(overrides = {}) {
@@ -158,7 +157,6 @@ function buildSorting(overrides = {}) {
     ...overrides,
   };
 }
-
 function buildTestState(overrides = {}) {
   return {
     isTeacher: true,
@@ -172,7 +170,6 @@ function buildTestState(overrides = {}) {
     ...overrides,
   };
 }
-
 describe("ModulesPageResults coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();

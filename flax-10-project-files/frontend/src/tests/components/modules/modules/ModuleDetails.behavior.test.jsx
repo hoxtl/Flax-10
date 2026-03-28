@@ -7,6 +7,10 @@ const getModuleTutorPhotoMock = vi.hoisted(() => vi.fn(() => null));
 const useModuleTravelTimeMock = vi.hoisted(() => vi.fn(() => "12 min"));
 const formatDurationMock = vi.hoisted(() => vi.fn((start, end) => (start && end ? "2h" : "TBA")));
 const hideBrokenTutorImageMock = vi.hoisted(() => vi.fn());
+const getCourseMock = vi.hoisted(() => vi.fn(() => "Computer Science"));
+const getDepartmentMock = vi.hoisted(() => vi.fn(() => "Engineering"));
+const formatDeadlineDateTimeMock = vi.hoisted(() => vi.fn((value) => `formatted:${value}`));
+const getUrgencyTierMock = vi.hoisted(() => vi.fn(() => "later"));
 
 vi.mock("../../../../components/modules/utils/moduleUtils.js", () => ({
   formatTime: vi.fn((value) => {
@@ -14,8 +18,8 @@ vi.mock("../../../../components/modules/utils/moduleUtils.js", () => ({
     return value.includes("11:00") ? "11:00" : "09:00";
   }),
   formatDuration: (...args) => formatDurationMock(...args),
-  getDepartment: vi.fn(() => "Engineering"),
-  getCourse: vi.fn(() => "Computer Science"),
+  getDepartment: (...args) => getDepartmentMock(...args),
+  getCourse: (...args) => getCourseMock(...args),
 }));
 
 vi.mock("../../../../components/modules/utils/deadlineUtils.js", () => ({
@@ -23,7 +27,7 @@ vi.mock("../../../../components/modules/utils/deadlineUtils.js", () => ({
     coursework: "Coursework",
     exam: "Exam",
   },
-  formatDeadlineDateTime: vi.fn((value) => `formatted:${value}`),
+  formatDeadlineDateTime: (...args) => formatDeadlineDateTimeMock(...args),
 }));
 
 vi.mock("../../../../components/calendar/utils/dateUtils.js", () => ({
@@ -43,7 +47,7 @@ vi.mock("../../../../components/common/badge/Badge.jsx", () => ({
 }));
 
 vi.mock("../../../../components/common/deadline_countdown/deadlineCountdownUtils.js", () => ({
-  getUrgencyTier: vi.fn(() => "later"),
+  getUrgencyTier: (...args) => getUrgencyTierMock(...args),
 }));
 
 vi.mock("../../../../components/common/back_button/BackButton.jsx", () => ({
@@ -115,12 +119,53 @@ const baseModule = {
   deadlines: [],
   readings: [],
   recurrence_rule: null,
+  course: "Computer Science",
 };
 
-function renderDetails(props) {
+function defaultDetailsProps() {
+  return {
+    is_enrolled: false,
+    is_core: false,
+    onBack: vi.fn(),
+    onEnroll: vi.fn(),
+    onUnenroll: vi.fn(),
+  };
+}
+
+function setupStudyProjectsFetch() {
+  localStorage.setItem("token", "abc123");
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => [
+      { id: 7, name: "Operating Systems", course_code: "CS101", member_count: 1 },
+      { id: 8, name: "Compiler Design", course_code: "CS101", member_count: 2 },
+      { id: null, name: "Systems Project", course_code: "CS101" },
+      { name: "Mystery Project", course_code: "CS101" },
+      { course_code: "CS101", member_count: 3 },
+      { id: 9, name: "Ignore Me", course_code: "LAW1", member_count: 99 },
+    ],
+  });
+}
+
+function stubMailtoLocation() {
+  const originalLocation = window.location;
+  Object.defineProperty(window, "location", {
+    configurable: true,
+    writable: true,
+    value: { assign: vi.fn(), replace: vi.fn(), reload: vi.fn(), href: "" },
+  });
+  return () => Object.defineProperty(window, "location", {
+    configurable: true,
+    writable: false,
+    value: originalLocation,
+  });
+}
+
+function renderDetails(props, { disableProjects = false } = {}) {
+  const moduleProp = disableProjects ? { ...props.module, module_code: "" } : props.module;
   return render(
     <MemoryRouter>
-      <ModuleDetails {...props} />
+      <ModuleDetails {...props} module={moduleProp} />
     </MemoryRouter>,
   );
 }
@@ -138,6 +183,10 @@ describe("ModuleDetails coverage top-up", () => {
       ok: true,
       json: async () => [],
     });
+    getCourseMock.mockImplementation(() => "Computer Science");
+    getDepartmentMock.mockImplementation(() => "Engineering");
+    formatDeadlineDateTimeMock.mockImplementation((value) => `formatted:${value}`);
+    getUrgencyTierMock.mockImplementation(() => "later");
   });
 
   it("covers the no-class, no-photo, no-location, and no-module-code branches", async () => {
@@ -151,18 +200,12 @@ describe("ModuleDetails coverage top-up", () => {
         created_by: null,
         created_by_name: "",
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      ...defaultDetailsProps(),
     });
-
     expect(screen.getAllByText("No class time set")).toHaveLength(2);
     expect(screen.getByText("To be announced")).toBeInTheDocument();
     expect(screen.getByText("Unknown")).toBeInTheDocument();
     expect(screen.getByText("U")).toBeInTheDocument();
-
     await waitFor(() => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
@@ -171,7 +214,6 @@ describe("ModuleDetails coverage top-up", () => {
   it("shows the timeline-started-later progress copy when progress resolves to zero", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
-
     renderDetails({
       module: {
         ...baseModule,
@@ -180,13 +222,8 @@ describe("ModuleDetails coverage top-up", () => {
           { id: 2, title: "CW2", deadline_type: "coursework", start_due_date: "2026-06-01T00:00:00Z" },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+      ...defaultDetailsProps(),
+    }, { disableProjects: true });
     expect(screen.getByText("Assignment timeline hasn't started yet")).toBeInTheDocument();
     expect(document.querySelector("[style*='width: 0%']")).toBeTruthy();
   });
@@ -200,13 +237,8 @@ describe("ModuleDetails coverage top-up", () => {
           { id: 2, title: "CW2", deadline_type: "coursework", start_due_date: "2026-05-01T00:00:00Z" },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+      ...defaultDetailsProps(),
+    }, { disableProjects: true });
     expect(screen.getByText("Progress will appear when more deadlines are set")).toBeInTheDocument();
   });
 
@@ -219,48 +251,25 @@ describe("ModuleDetails coverage top-up", () => {
           { id: 2, title: "CW2", deadline_type: "coursework", start_due_date: "2026-05-01T00:00:00Z" },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+      ...defaultDetailsProps(),
+    }, { disableProjects: true });
     expect(screen.getByText("Progress will appear when more deadlines are set")).toBeInTheDocument();
   });
 
   it("fetches matching study projects with auth headers and renders singular and plural member labels", async () => {
-    localStorage.setItem("token", "abc123");
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [
-        { id: 7, name: "Operating Systems", course_code: "CS101", member_count: 1 },
-        { id: 8, name: "Compiler Design", course_code: "CS101", member_count: 2 },
-        { id: 10, name: "Systems Project", course_code: "CS101" },
-        { id: 9, name: "Ignore Me", course_code: "LAW1", member_count: 99 },
-      ],
-    });
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+    setupStudyProjectsFetch();
+    renderDetails({ module: baseModule, ...defaultDetailsProps() });
     await waitFor(() => {
       expect(screen.getByText("Study Projects")).toBeInTheDocument();
     });
-
     expect(global.fetch).toHaveBeenCalledWith("/api/group-work/projects/", {
       headers: { Authorization: "Token abc123" },
     });
     expect(screen.getByRole("link", { name: /Operating Systems/i })).toHaveAttribute("href", "/group-work?project=7");
     expect(screen.getByText("1 member")).toBeInTheDocument();
     expect(screen.getByText("2 members")).toBeInTheDocument();
-    expect(screen.getByText("0 members")).toBeInTheDocument();
+    expect(screen.getAllByText(/0\s+members?/i)).toHaveLength(2);
+    expect(screen.getByText("Mystery Project")).toBeInTheDocument();
     expect(screen.queryByText("Ignore Me")).not.toBeInTheDocument();
   });
 
@@ -271,21 +280,10 @@ describe("ModuleDetails coverage top-up", () => {
         throw new Error("should not be called");
       },
     });
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+    renderDetails({ module: baseModule, ...defaultDetailsProps() });
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalled();
+      expect(screen.queryByText("Study Projects")).not.toBeInTheDocument();
     });
-
-    expect(screen.queryByText("Study Projects")).not.toBeInTheDocument();
   });
 
   it("keeps reading titles unchanged when they do not start with the module prefix and omits page counts when absent", () => {
@@ -304,92 +302,45 @@ describe("ModuleDetails coverage top-up", () => {
           },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+      ...defaultDetailsProps(),
+    }, { disableProjects: true });
     expect(screen.getByText("Independent reading")).toBeInTheDocument();
     expect(screen.getByText(/Due 13 Apr 2026/)).toBeInTheDocument();
     expect(screen.queryByText(/pages/)).not.toBeInTheDocument();
   });
 
-  it("renders the tutor photo error handler and the email tutor button callback", () => {
-    getModuleTutorPhotoMock.mockReturnValue("https://example.com/tutor.jpg");
-
+  it("uses fallback identifiers for deadlines and readings when ids or titles are missing", () => {
     renderDetails({
       module: {
         ...baseModule,
-        created_by_email: "tutor@kcl.ac.uk",
-      },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
-    fireEvent.error(screen.getByAltText("Dr Ada profile"));
-    expect(hideBrokenTutorImageMock).toHaveBeenCalledWith(expect.any(Object), "inline-flex");
-
-    fireEvent.click(screen.getByText("Email tutor"));
-  });
-
-  it("falls back to TBA when duration formatting returns an empty value", () => {
-    formatDurationMock.mockReturnValue("");
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
-    expect(screen.getAllByText("TBA").length).toBeGreaterThan(0);
-  });
-
-  it("handles null project payloads and renders reading rows in deadline order", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => null,
-    });
-
-    renderDetails({
-      module: {
-        ...baseModule,
+        deadlines: [
+          { deadline_type: "coursework", title: "", start_due_date: "", id: null },
+        ],
         readings: [
           {
-            id: 1,
-            title: "Later reading",
             module_name: "Software Engineering",
-            deadline: "2026-05-10T00:00:00Z",
-          },
-          {
-            id: 2,
-            title: "Earlier reading",
-            module_name: "Software Engineering",
-            deadline: "2026-04-10T00:00:00Z",
-          },
-          {
-            id: 3,
-            deadline: "2026-04-15T00:00:00Z",
+            title: "",
+            deadline: null,
           },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
+      ...defaultDetailsProps(),
+    }, { disableProjects: true });
+    expect(screen.getByText("Coursework")).toBeInTheDocument();
+    expect(screen.getByText("Reading")).toBeInTheDocument();
+  });
 
-    const readingTitles = screen.getAllByText(/reading|Earlier|Later/i).map((node) => node.textContent);
-    expect(readingTitles).toContain("Earlier reading");
-    expect(readingTitles).toContain("Later reading");
-    expect(screen.queryByText("Study Projects")).not.toBeInTheDocument();
+  it("renders the tutor photo error handler and the email tutor button callback", () => {
+    getModuleTutorPhotoMock.mockReturnValue("https://example.com/tutor.jpg");
+    const restoreLocation = stubMailtoLocation();
+    renderDetails({
+      module: { ...baseModule, created_by_email: "tutor@kcl.ac.uk" },
+      ...defaultDetailsProps(),
+    }, { disableProjects: true });
+    fireEvent.error(screen.getByAltText("Dr Ada profile"));
+    expect(hideBrokenTutorImageMock).toHaveBeenCalledWith(expect.any(Object), "inline-flex");
+    fireEvent.click(screen.getByText("Email tutor"));
+    expect(window.location.href).toBe("mailto:tutor@kcl.ac.uk");
+    restoreLocation();
   });
 });

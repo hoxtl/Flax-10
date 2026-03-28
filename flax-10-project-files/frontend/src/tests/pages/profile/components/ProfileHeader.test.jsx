@@ -1,5 +1,5 @@
 /**
- * Extra coverage tests for ProfileHeader uncovered branches part 1.
+ * ProfileHeader coverage tests (stats, badges, persona, teacher/student copy).
  */
 
 import React from 'react';
@@ -14,6 +14,8 @@ import {
   baseHandlers,
   editableVisibility,
   viewerVisibility,
+  overrideProfileHelperMocks,
+  resetProfileHelperMocks,
 } from './ProfileTestUtils';
 
 mockFramerMotion();
@@ -21,17 +23,13 @@ mockProfileHelpers();
 mockSocialComponents();
 mockTutorPhotoFallback();
 
-const fetchApiMock = vi.fn();
-vi.mock('../../../../api/client', () => ({
-  fetchApi: (...args) => fetchApiMock(...args),
-}));
-
 import ProfileHeader from '../../../../pages/profile/components/ProfileHeader';
 
-// ProfileHeader component tests – part 1
-
 describe('ProfileHeader – Part 1', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetProfileHelperMocks();
+  });
 
   it('renders initials fallback when no photo is provided', () => {
     render(
@@ -129,6 +127,30 @@ describe('ProfileHeader – Part 1', () => {
     expect(onSocietiesClick).toHaveBeenCalled();
   });
 
+  it('shows the shared planning tip when viewing someone else profile', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'other' }}
+        profileData={{}}
+        handlers={baseHandlers}
+        visibility={viewerVisibility}
+      />,
+    );
+    expect(screen.getByText(/Compare free slots/i)).toBeInTheDocument();
+  });
+
+  it('joins student year and major with a middle dot in the description', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'stu', role: 'student' }}
+        profileData={{ year: 'Year 2', major: 'Physics' }}
+        handlers={baseHandlers}
+        visibility={editableVisibility}
+      />,
+    );
+    expect(screen.getAllByText(/Year 2 · Physics/).length).toBeGreaterThan(0);
+  });
+
   it('renders teacher description with "Department:" prefix', () => {
     render(
       <ProfileHeader
@@ -153,6 +175,22 @@ describe('ProfileHeader – Part 1', () => {
     expect(screen.getAllByText('Professor').length).toBeGreaterThan(0);
   });
 
+  it('detects professor by Dr. prefix on full name', () => {
+    overrideProfileHelperMocks({
+      buildFullName: () => 'Dr. Jane Smith',
+    });
+    render(
+      <ProfileHeader
+        user={{ username: 'jane' }}
+        profileData={{ major: 'Biology' }}
+        handlers={baseHandlers}
+        visibility={editableVisibility}
+      />,
+    );
+    expect(screen.getAllByText(/Professor/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Department: Biology/i).length).toBeGreaterThan(0);
+  });
+
   it('renders badge tooltip on mouse enter', () => {
     render(
       <ProfileHeader
@@ -171,23 +209,7 @@ describe('ProfileHeader – Part 1', () => {
     expect(screen.getByText('Hit target')).toBeInTheDocument();
   });
 
-  it('renders "Tap to pin this badge" label in tooltip for editable profile', () => {
-    render(
-      <ProfileHeader
-        user={{ username: 'alice' }}
-        profileData={{}}
-        handlers={baseHandlers}
-        visibility={editableVisibility}
-        badges={[{ id: 'b2', emoji: '🔥', label: 'Flame', description: 'Hot streak' }]}
-        pinnedBadgeId=""
-        onPinBadge={vi.fn()}
-      />,
-    );
-    fireEvent.mouseEnter(screen.getByText('🔥').closest('button'));
-    expect(screen.getByText('Tap to pin this badge')).toBeInTheDocument();
-  });
-
-  it('renders "Tap to unpin" in tooltip when badge is already pinned', () => {
+  it('renders "Tap to unpin" when a badge is pinned as featured', () => {
     const badges = [
       { id: 'pinned1', emoji: '⭐', label: 'Star', description: 'Shines bright' },
       { id: 'other', emoji: '💡', label: 'Idea', description: 'Bright idea' },
@@ -266,7 +288,60 @@ describe('ProfileHeader – Part 1', () => {
     expect(screen.getByText('💎')).toBeInTheDocument();
   });
 
-  it('renders ViewAll button and calls onViewAllBadges when clicked', () => {
+  it('hides mobile stats row when modules are not visible to the viewer', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{}}
+        handlers={baseHandlers}
+        visibility={{ ...editableVisibility, canViewModules: false }}
+      />,
+    );
+    expect(screen.queryByText('Modules')).not.toBeInTheDocument();
+  });
+
+  it('shows the mobile shared-calendar pill when viewing another user shared calendar', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'bob' }}
+        profileData={{ is_shared_with_me: true }}
+        handlers={baseHandlers}
+        visibility={viewerVisibility}
+        onNavigate={vi.fn()}
+      />,
+    );
+    expect(screen.getAllByText('Shared calendar with me').length).toBeGreaterThan(0);
+  });
+
+  it('hides persona and badge rows for viewers with no insights content', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'viewer' }}
+        profileData={{}}
+        handlers={baseHandlers}
+        visibility={viewerVisibility}
+        badges={[]}
+        persona={null}
+      />,
+    );
+    expect(screen.queryByText(/Earn badges/i)).not.toBeInTheDocument();
+  });
+
+  it('shows the empty insights placeholder when the owner has no badges or persona', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{}}
+        handlers={baseHandlers}
+        visibility={editableVisibility}
+        badges={[]}
+        persona={null}
+      />,
+    );
+    expect(screen.getByText(/Earn badges by building study habits/i)).toBeInTheDocument();
+  });
+
+  it('renders View All and calls onViewAllBadges when clicked', () => {
     const onViewAllBadges = vi.fn();
     render(
       <ProfileHeader
