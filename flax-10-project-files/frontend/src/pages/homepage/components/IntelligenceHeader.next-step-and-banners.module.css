@@ -55,6 +55,14 @@
   letter-spacing: -0.01em;
 }
 
+.nextStepTextRich {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.42rem;
+  min-width: 0;
+}
+
 .nextStepMeta {
   font-family: var(--font-body);
   font-size: 0.64rem;

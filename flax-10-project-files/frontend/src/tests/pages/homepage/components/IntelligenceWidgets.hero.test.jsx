@@ -42,6 +42,7 @@ vi.mock("lucide-react", () => {
     Calendar: Icon,
     Clock3: Icon,
     GraduationCap: Icon,
+    MapPin: Icon,
     Train: Icon,
   };
 });
@@ -69,6 +70,35 @@ describe("IntelligenceHero", () => {
     expect(screen.getByText("Hello Ava")).toBeInTheDocument();
     expect(screen.getByText("Travel")).toBeInTheDocument();
     expect(screen.getByText("Minor delays")).toBeInTheDocument();
+  });
+
+  it("renders the current-event location as a clickable map link in the hero banner", () => {
+    render(
+      <MemoryRouter>
+        <IntelligenceHero
+          liveContext={{ iconKey: "Clock3", label: "On now", text: "Lecture", location: "Bush House", meta: "Until 15:00", tone: "neutral" }}
+        />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByLabelText("Open UniMap for Bush House"));
+    expect(navigateMock).toHaveBeenCalledWith("/map?destination=Bush%20House", { replace: false });
+  });
+
+  it("keeps the current-event location map link active for teacher accounts", () => {
+    render(
+      <MemoryRouter>
+        <IntelligenceHero
+          isTeacher
+          classesCount={1}
+          liveContext={{ iconKey: "Clock3", label: "On now", text: "Office hour", location: "Somerset House", meta: "Until 16:00", tone: "neutral" }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Teaching today")).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText("Open UniMap for Somerset House"));
+    expect(navigateMock).toHaveBeenCalledWith("/map?destination=Somerset%20House", { replace: false });
   });
 
   it("links to correct internal pages from stat shortcuts", () => {
