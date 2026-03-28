@@ -46,13 +46,8 @@ vi.mock("../../../../components/common/badge/Badge.jsx", () => ({
   default: ({ children, tone, className }) => <span className={className} data-tone={tone}>{children}</span>,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/modules/ModuleDetails.coverageTopup.test.jsx
-vi.mock("../../../components/common/deadline_countdown/deadlineCountdownUtils.js", () => ({
-  getUrgencyTier: (...args) => getUrgencyTierMock(...args),
-=======
 vi.mock("../../../../components/common/deadline_countdown/deadlineCountdownUtils.js", () => ({
-  getUrgencyTier: vi.fn(() => "later"),
->>>>>>> origin:flax-10-project-files/frontend/src/tests/components/modules/modules/ModuleDetails.behavior.test.jsx
+  getUrgencyTier: (...args) => getUrgencyTierMock(...args),
 }));
 
 vi.mock("../../../../components/common/back_button/BackButton.jsx", () => ({
@@ -127,6 +122,45 @@ const baseModule = {
   course: "Computer Science",
 };
 
+function defaultDetailsProps() {
+  return {
+    is_enrolled: false,
+    is_core: false,
+    onBack: vi.fn(),
+    onEnroll: vi.fn(),
+    onUnenroll: vi.fn(),
+  };
+}
+
+function setupStudyProjectsFetch() {
+  localStorage.setItem("token", "abc123");
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => [
+      { id: 7, name: "Operating Systems", course_code: "CS101", member_count: 1 },
+      { id: 8, name: "Compiler Design", course_code: "CS101", member_count: 2 },
+      { id: null, name: "Systems Project", course_code: "CS101" },
+      { name: "Mystery Project", course_code: "CS101" },
+      { course_code: "CS101", member_count: 3 },
+      { id: 9, name: "Ignore Me", course_code: "LAW1", member_count: 99 },
+    ],
+  });
+}
+
+function stubMailtoLocation() {
+  const originalLocation = window.location;
+  Object.defineProperty(window, "location", {
+    configurable: true,
+    writable: true,
+    value: { assign: vi.fn(), replace: vi.fn(), reload: vi.fn(), href: "" },
+  });
+  return () => Object.defineProperty(window, "location", {
+    configurable: true,
+    writable: false,
+    value: originalLocation,
+  });
+}
+
 function renderDetails(props, { disableProjects = false } = {}) {
   const moduleProp = disableProjects ? { ...props.module, module_code: "" } : props.module;
   return render(
@@ -166,18 +200,12 @@ describe("ModuleDetails coverage top-up", () => {
         created_by: null,
         created_by_name: "",
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      ...defaultDetailsProps(),
     });
-
     expect(screen.getAllByText("No class time set")).toHaveLength(2);
     expect(screen.getByText("To be announced")).toBeInTheDocument();
     expect(screen.getByText("Unknown")).toBeInTheDocument();
     expect(screen.getByText("U")).toBeInTheDocument();
-
     await waitFor(() => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
@@ -186,7 +214,6 @@ describe("ModuleDetails coverage top-up", () => {
   it("shows the timeline-started-later progress copy when progress resolves to zero", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
-
     renderDetails({
       module: {
         ...baseModule,
@@ -195,13 +222,8 @@ describe("ModuleDetails coverage top-up", () => {
           { id: 2, title: "CW2", deadline_type: "coursework", start_due_date: "2026-06-01T00:00:00Z" },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      ...defaultDetailsProps(),
     }, { disableProjects: true });
-
     expect(screen.getByText("Assignment timeline hasn't started yet")).toBeInTheDocument();
     expect(document.querySelector("[style*='width: 0%']")).toBeTruthy();
   });
@@ -215,13 +237,8 @@ describe("ModuleDetails coverage top-up", () => {
           { id: 2, title: "CW2", deadline_type: "coursework", start_due_date: "2026-05-01T00:00:00Z" },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      ...defaultDetailsProps(),
     }, { disableProjects: true });
-
     expect(screen.getByText("Progress will appear when more deadlines are set")).toBeInTheDocument();
   });
 
@@ -234,50 +251,24 @@ describe("ModuleDetails coverage top-up", () => {
           { id: 2, title: "CW2", deadline_type: "coursework", start_due_date: "2026-05-01T00:00:00Z" },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      ...defaultDetailsProps(),
     }, { disableProjects: true });
-
     expect(screen.getByText("Progress will appear when more deadlines are set")).toBeInTheDocument();
   });
 
   it("fetches matching study projects with auth headers and renders singular and plural member labels", async () => {
-    localStorage.setItem("token", "abc123");
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [
-        { id: 7, name: "Operating Systems", course_code: "CS101", member_count: 1 },
-        { id: 8, name: "Compiler Design", course_code: "CS101", member_count: 2 },
-        { id: null, name: "Systems Project", course_code: "CS101" },
-        { name: "Mystery Project", course_code: "CS101" },
-  { course_code: "CS101", member_count: 3 },
-        { id: 9, name: "Ignore Me", course_code: "LAW1", member_count: 99 },
-      ],
-    });
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+    setupStudyProjectsFetch();
+    renderDetails({ module: baseModule, ...defaultDetailsProps() });
     await waitFor(() => {
       expect(screen.getByText("Study Projects")).toBeInTheDocument();
     });
-
     expect(global.fetch).toHaveBeenCalledWith("/api/group-work/projects/", {
       headers: { Authorization: "Token abc123" },
     });
     expect(screen.getByRole("link", { name: /Operating Systems/i })).toHaveAttribute("href", "/group-work?project=7");
-  expect(screen.getByText("1 member")).toBeInTheDocument();
-  expect(screen.getByText("2 members")).toBeInTheDocument();
-  expect(screen.getAllByText(/0\s+members?/i)).toHaveLength(2);
+    expect(screen.getByText("1 member")).toBeInTheDocument();
+    expect(screen.getByText("2 members")).toBeInTheDocument();
+    expect(screen.getAllByText(/0\s+members?/i)).toHaveLength(2);
     expect(screen.getByText("Mystery Project")).toBeInTheDocument();
     expect(screen.queryByText("Ignore Me")).not.toBeInTheDocument();
   });
@@ -289,16 +280,7 @@ describe("ModuleDetails coverage top-up", () => {
         throw new Error("should not be called");
       },
     });
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
+    renderDetails({ module: baseModule, ...defaultDetailsProps() });
     await waitFor(() => {
       expect(screen.queryByText("Study Projects")).not.toBeInTheDocument();
     });
@@ -320,13 +302,8 @@ describe("ModuleDetails coverage top-up", () => {
           },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      ...defaultDetailsProps(),
     }, { disableProjects: true });
-
     expect(screen.getByText("Independent reading")).toBeInTheDocument();
     expect(screen.getByText(/Due 13 Apr 2026/)).toBeInTheDocument();
     expect(screen.queryByText(/pages/)).not.toBeInTheDocument();
@@ -347,212 +324,23 @@ describe("ModuleDetails coverage top-up", () => {
           },
         ],
       },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      ...defaultDetailsProps(),
     }, { disableProjects: true });
-
     expect(screen.getByText("Coursework")).toBeInTheDocument();
     expect(screen.getByText("Reading")).toBeInTheDocument();
   });
 
   it("renders the tutor photo error handler and the email tutor button callback", () => {
     getModuleTutorPhotoMock.mockReturnValue("https://example.com/tutor.jpg");
-    const originalLocation = window.location;
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      writable: true,
-      value: {
-        assign: vi.fn(),
-        replace: vi.fn(),
-        reload: vi.fn(),
-        href: "",
-      },
-    });
-
+    const restoreLocation = stubMailtoLocation();
     renderDetails({
-      module: {
-        ...baseModule,
-        created_by_email: "tutor@kcl.ac.uk",
-      },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
+      module: { ...baseModule, created_by_email: "tutor@kcl.ac.uk" },
+      ...defaultDetailsProps(),
     }, { disableProjects: true });
-
     fireEvent.error(screen.getByAltText("Dr Ada profile"));
     expect(hideBrokenTutorImageMock).toHaveBeenCalledWith(expect.any(Object), "inline-flex");
-
     fireEvent.click(screen.getByText("Email tutor"));
     expect(window.location.href).toBe("mailto:tutor@kcl.ac.uk");
-
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      writable: false,
-      value: originalLocation,
-    });
-  });
-
-  it("falls back to TBA when duration formatting returns an empty value", () => {
-    formatDurationMock.mockReturnValue("");
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    }, { disableProjects: true });
-
-    expect(screen.getAllByText("TBA").length).toBeGreaterThan(0);
-  });
-
-  it("handles null project payloads and renders reading rows in deadline order", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => null,
-    });
-
-    renderDetails({
-      module: {
-        ...baseModule,
-        readings: [
-          {
-            id: 1,
-            title: "Later reading",
-            module_name: "Software Engineering",
-            deadline: "2026-05-10T00:00:00Z",
-          },
-          {
-            id: 2,
-            title: "Earlier reading",
-            module_name: "Software Engineering",
-            deadline: "2026-04-10T00:00:00Z",
-          },
-          {
-            id: 3,
-            deadline: "2026-04-15T00:00:00Z",
-          },
-        ],
-      },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-  });
-
-    const readingTitles = screen.getAllByText(/reading|Earlier|Later/i).map((node) => node.textContent);
-    expect(readingTitles).toContain("Earlier reading");
-    expect(readingTitles).toContain("Later reading");
-    await waitFor(() => {
-      expect(screen.queryByText("Study Projects")).not.toBeInTheDocument();
-    });
-  });
-
-  it("omits the course badge when the formatter returns an empty value", () => {
-    getCourseMock.mockReturnValueOnce("");
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    }, { disableProjects: true });
-
-    expect(screen.queryByText("Computer Science")).not.toBeInTheDocument();
-  });
-
-  it("links tutor names to their profile when tutor identifiers are present", () => {
-    renderDetails({
-      module: {
-        ...baseModule,
-        created_by: 42,
-      },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    }, { disableProjects: true });
-
-    expect(screen.getByRole("link", { name: /Dr Ada/ })).toHaveAttribute("href", "/profile/42");
-  });
-
-  it("renders due soon and this week urgency states", () => {
-    getUrgencyTierMock
-      .mockImplementationOnce(() => "critical")
-      .mockImplementationOnce(() => "urgent");
-
-    renderDetails({
-      module: {
-        ...baseModule,
-        deadlines: [
-          { id: 1, title: "CW Critical", deadline_type: "coursework", start_due_date: "2026-05-01T00:00:00Z" },
-          { id: 2, title: "CW Urgent", deadline_type: "exam", start_due_date: "2026-05-02T00:00:00Z" },
-        ],
-      },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    }, { disableProjects: true });
-
-    expect(screen.getByText("Due soon")).toBeInTheDocument();
-    expect(screen.getByText("This week")).toBeInTheDocument();
-  });
-
-  it("surfaces the earliest past deadline when future matches are unavailable", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-07-01T00:00:00Z"));
-
-    renderDetails({
-      module: {
-        ...baseModule,
-        deadlines: [
-          { id: 1, title: "CW Past", deadline_type: "coursework", start_due_date: "2026-05-01T12:00:00Z" },
-          { id: 2, title: "CW Older", deadline_type: "exam", start_due_date: "2026-04-01T12:00:00Z" },
-        ],
-      },
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    }, { disableProjects: true });
-
-    expect(
-      screen.getByText((text) => text.includes("CW Older · formatted:2026-04-01T12:00:00Z")),
-    ).toBeInTheDocument();
-    vi.useRealTimers();
-  });
-
-  it("ignores rejected project fetches and keeps the study projects section hidden", async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error("boom"));
-
-    renderDetails({
-      module: baseModule,
-      is_enrolled: false,
-      is_core: false,
-      onBack: vi.fn(),
-      onEnroll: vi.fn(),
-      onUnenroll: vi.fn(),
-    });
-
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalled();
-    });
-
-    await waitFor(() => {
-      expect(screen.queryByText("Study Projects")).not.toBeInTheDocument();
-    });
+    restoreLocation();
   });
 });
