@@ -1,3 +1,7 @@
+/*
+ * Tests for recurring calendar event expansion helpers.
+ */
+
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
@@ -21,6 +25,59 @@ vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
 }));
 
 import { expandRecurringEvents } from "../../../../components/calendar/utils/recurrenceUtils";
+
+const march = new Date("2026-03-15T00:00:00.000Z");
+const recurrenceCases = [
+  {
+    label: "weekly",
+    event: {
+      id: 5,
+      recurrence: "weekly",
+      start_time: "2026-03-01T09:00:00.000Z",
+      end_time: "2026-03-01T10:00:00.000Z",
+      recurrence_rule: { exception_dates: ["2026-03-08"] },
+      recurrence_end_date: "2026-03-20T00:00:00.000Z",
+    },
+    ids: ["5_0", "5_2"],
+  },
+  {
+    label: "biweekly",
+    event: {
+      id: 6,
+      recurrence: "biweekly",
+      start_time: "2026-03-01T09:00:00.000Z",
+      end_time: "2026-03-01T10:00:00.000Z",
+      recurrence_end_date: "2026-03-31T00:00:00.000Z",
+    },
+    ids: ["6_0", "6_1", "6_2"],
+  },
+  {
+    label: "monthly",
+    event: {
+      id: 7,
+      recurrence: "monthly",
+      start_time: "2026-03-10T09:00:00.000Z",
+      end_time: "2026-03-10T10:00:00.000Z",
+      recurrence_end_date: "2026-04-15T00:00:00.000Z",
+    },
+    ids: ["7_0"],
+  },
+  {
+    label: "yearly",
+    event: {
+      id: 8,
+      recurrence: "yearly",
+      start_time: "2025-03-10T09:00:00.000Z",
+      end_time: "2025-03-10T10:00:00.000Z",
+      recurrence_end_date: "2027-03-15T00:00:00.000Z",
+    },
+    ids: ["8_1"],
+  },
+];
+
+function expectExpandedRecurringIds({ event, ids }) {
+  expect(expandRecurringEvents([event], march).map((expandedEvent) => expandedEvent.id)).toEqual(ids);
+}
 
 describe("recurrenceUtils", () => {
   it("returns non-recurring events unchanged", () => {
@@ -87,43 +144,7 @@ describe("recurrenceUtils", () => {
     expect(result.map((event) => event.id)).toEqual(["4_0", "4_2"]);
   });
 
-  it("reads nested recurrence exceptions and supports weekly/biweekly/monthly/yearly rules", () => {
-    const weekly = {
-      id: 5,
-      recurrence: "weekly",
-      start_time: "2026-03-01T09:00:00.000Z",
-      end_time: "2026-03-01T10:00:00.000Z",
-      recurrence_rule: { exception_dates: ["2026-03-08"] },
-      recurrence_end_date: "2026-03-20T00:00:00.000Z",
-    };
-    const biweekly = {
-      id: 6,
-      recurrence: "biweekly",
-      start_time: "2026-03-01T09:00:00.000Z",
-      end_time: "2026-03-01T10:00:00.000Z",
-      recurrence_end_date: "2026-03-31T00:00:00.000Z",
-    };
-    const monthly = {
-      id: 7,
-      recurrence: "monthly",
-      start_time: "2026-03-10T09:00:00.000Z",
-      end_time: "2026-03-10T10:00:00.000Z",
-      recurrence_end_date: "2026-04-15T00:00:00.000Z",
-    };
-    const yearly = {
-      id: 8,
-      recurrence: "yearly",
-      start_time: "2025-03-10T09:00:00.000Z",
-      end_time: "2025-03-10T10:00:00.000Z",
-      recurrence_end_date: "2027-03-15T00:00:00.000Z",
-    };
-
-    const march = new Date("2026-03-15T00:00:00.000Z");
-    expect(expandRecurringEvents([weekly], march).map((event) => event.id)).toEqual(["5_0", "5_2"]);
-    expect(expandRecurringEvents([biweekly], march).map((event) => event.id)).toEqual(["6_0", "6_1", "6_2"]);
-    expect(expandRecurringEvents([monthly], march).map((event) => event.id)).toEqual(["7_0"]);
-    expect(expandRecurringEvents([yearly], march).map((event) => event.id)).toEqual(["8_1"]);
-  });
+  it.each(recurrenceCases)("expands $label recurrences with exception handling", expectExpandedRecurringIds);
 
   it("includes a yearly occurrence created via addYears when the next year overlaps the view", () => {
     const yearly = {

@@ -51,30 +51,36 @@ describe("attendancePromptUtils", () => {
     expect(range.end.startsWith("2026-03-25")).toBe(true);
   });
 
-  it("returns the first unskipped timetable event in the prompt window", () => {
-    const events = [
-      {
-        id: 1,
-        isTimetable: false,
-        start_time: "2026-03-24T11:30:00.000Z",
-        end_time: "2026-03-24T12:30:00.000Z",
-      },
-      {
-        id: 2,
-        isTimetable: true,
-        start_time: "2026-03-24T11:30:00.000Z",
-        end_time: "2026-03-24T12:30:00.000Z",
-      },
-      {
-        id: 3,
-        isTimetable: true,
-        start_time: "2026-03-20T10:00:00.000Z",
-        end_time: "2026-03-21T10:30:00.000Z",
-      },
-    ];
+  const promptEvents = [
+    {
+      id: 1,
+      isTimetable: false,
+      start_time: "2026-03-24T11:30:00.000Z",
+      end_time: "2026-03-24T12:30:00.000Z",
+    },
+    {
+      id: 2,
+      isTimetable: true,
+      start_time: "2026-03-24T11:30:00.000Z",
+      end_time: "2026-03-24T12:30:00.000Z",
+    },
+    {
+      id: 3,
+      isTimetable: true,
+      start_time: "2026-03-20T10:00:00.000Z",
+      end_time: "2026-03-21T10:30:00.000Z",
+    },
+  ];
 
-    expect(findCandidateEvent(events, new Set([2]))).toBeNull();
-    expect(findCandidateEvent(events, new Set())).toEqual(events[1]);
+  it("returns null when the prompt candidate is skipped", () => {
+    expect(findCandidateEvent(promptEvents, new Set([2]))).toBeNull();
+  });
+
+  it("returns the first unskipped timetable event in the prompt window", () => {
+    expect(findCandidateEvent(promptEvents, new Set())).toEqual(promptEvents[1]);
+  });
+
+  it("returns null for missing event collections", () => {
     expect(findCandidateEvent(null, new Set())).toBeNull();
   });
 });

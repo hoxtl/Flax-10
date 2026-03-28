@@ -122,19 +122,9 @@ describe("calendar hook coverage topups", () => {
     createResizeSessionMock.mockImplementation((clientY, initialHeight, handlers) => {
       captured = { clientY, initialHeight, ...handlers };
     });
+    const event = { id: "77-occ", start_time: "2026-03-09T10:00:00.000Z", end_time: "2026-03-09T11:00:00.000Z" };
 
-    const { result } = renderHook(() =>
-      useEventResize(
-        {
-          id: "77-occ",
-          start_time: "2026-03-09T10:00:00.000Z",
-          end_time: "2026-03-09T11:00:00.000Z",
-        },
-        eventRef,
-        editEvent,
-        null,
-      ),
-    );
+    const { result } = renderHook(() => useEventResize(event, eventRef, editEvent, null));
 
     await act(async () => {
       result.current.handleResizeStart({ clientY: 100, stopPropagation: vi.fn() });
@@ -169,16 +159,8 @@ describe("calendar hook coverage topups", () => {
     const { result } = renderHook(() => useMonthDayDrop(new Date("2026-03-10T00:00:00.000Z")));
     expect(result.current.dropProps).toEqual({});
 
-    await act(async () => {
-      await dropHandler({
-        type: "EVENT",
-        data: {
-          id: 10,
-          start_time: "2026-03-09T08:00:00.000Z",
-          end_time: "2026-03-09T09:00:00.000Z",
-        },
-      });
-    });
+    const droppedEvent = { id: 10, start_time: "2026-03-09T08:00:00.000Z", end_time: "2026-03-09T09:00:00.000Z" };
+    await act(async () => { await dropHandler({ type: "EVENT", data: droppedEvent }); });
 
     const { editEvent, addEvent, addException } = useEventActionsMock.mock.results[0].value;
     expect(editEvent).not.toHaveBeenCalled();

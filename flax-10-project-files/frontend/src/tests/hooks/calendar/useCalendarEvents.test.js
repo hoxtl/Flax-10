@@ -1,3 +1,7 @@
+/*
+ * Tests for calendar event loading and mutation hooks.
+ */
+
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCalendarEvents, useEventActions } from '../../../components/calendar/hooks/useCalendarEvents';
@@ -135,45 +139,58 @@ describe('useCalendarEvents', () => {
     expect(getEventsMock).toHaveBeenCalledTimes(1);
   });
 
-  it('skips concurrent fetches and reloads when reloadKey changes', async () => {
-    let resolveEvents;
-    const pendingEvents = new Promise((resolve) => {
-      resolveEvents = resolve;
-    });
-    let calendarState = {
+  function renderCalendarEventsWithState(calendarState) {
+    useCalendarMock.mockImplementation(() => calendarState);
+    return renderHook(() => useCalendarEvents());
+  }
+
+  function createPendingCalendarState() {
+    return {
       events: [],
       selectedDate: new Date(2026, 7, 9).toISOString(),
       viewMode: 'month',
       reloadKey: 0,
       sharedCalendarUserId: null,
     };
-    useCalendarMock.mockImplementation(() => calendarState);
-    getEventsMock
-      .mockReturnValueOnce(pendingEvents)
-      .mockResolvedValueOnce([{ id: 20 }]);
+  }
 
-    const { rerender, result } = renderHook(() => useCalendarEvents());
-
+  it('skips concurrent fetches while an earlier request is still pending', async () => {
+    let resolveEvents;
+    const pendingEvents = new Promise((resolve) => {
+      resolveEvents = resolve;
+    });
+    let calendarState = createPendingCalendarState();
+    getEventsMock.mockReturnValueOnce(pendingEvents).mockResolvedValueOnce([{ id: 20 }]);
+    const { rerender, result } = renderCalendarEventsWithState(calendarState);
     await act(async () => {
       await result.current.loadEvents();
     });
-
-    calendarState = {
-      ...calendarState,
-      selectedDate: new Date(2026, 7, 10).toISOString(),
-    };
+    calendarState = { ...calendarState, selectedDate: new Date(2026, 7, 10).toISOString() };
     rerender();
-
     expect(getEventsMock).toHaveBeenCalledTimes(1);
+  });
 
-    resolveEvents([{ id: 19 }]);
-    await waitFor(() => {
-      expect(dispatch).toHaveBeenCalledWith({ type: 'SET_EVENTS', payload: [{ id: 19 }] });
+  it('dispatches the resolved result from a pending request', async () => {
+    let resolveEvents;
+    const pendingEvents = new Promise((resolve) => {
+      resolveEvents = resolve;
     });
+    getEventsMock.mockReturnValueOnce(pendingEvents);
+    const { result } = renderCalendarEventsWithState(createPendingCalendarState());
+    await act(async () => {
+      await result.current.loadEvents();
+      resolveEvents([{ id: 19 }]);
+      await pendingEvents;
+    });
+    await waitFor(() => expect(dispatch).toHaveBeenCalledWith({ type: 'SET_EVENTS', payload: [{ id: 19 }] }));
+  });
 
+  it('reloads events when the reload key changes', async () => {
+    let calendarState = { ...createPendingCalendarState(), selectedDate: new Date(2026, 7, 10).toISOString() };
+    const { rerender } = renderCalendarEventsWithState(calendarState);
+    await waitFor(() => expect(getEventsMock).toHaveBeenCalledTimes(1));
     calendarState = { ...calendarState, reloadKey: 1 };
     rerender();
-
     await waitFor(() => expect(getEventsMock).toHaveBeenCalledTimes(2));
   });
 
