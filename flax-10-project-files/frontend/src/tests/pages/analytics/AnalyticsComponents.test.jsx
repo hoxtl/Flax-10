@@ -169,4 +169,19 @@ describe("Analytics components", () => {
     expect(screen.getByRole("link", { name: "Open Timer" })).toHaveAttribute("href", "/timer");
     expect(screen.queryByTestId("summary-cards")).not.toBeInTheDocument();
   });
+
+  it("treats missing analytics data as empty state data", () => {
+    render(
+      <MemoryRouter>
+        <AnalyticsOverview
+          data={null}
+          progressData={null}
+          themeStats={null}
+          isTeacher={false}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("No analytics yet")).toBeInTheDocument();
+  });
 });
