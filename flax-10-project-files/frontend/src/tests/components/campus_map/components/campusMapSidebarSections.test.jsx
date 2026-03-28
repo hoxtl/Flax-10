@@ -7,12 +7,12 @@ const getTflLinePillStyleMock = vi.hoisted(() => vi.fn((lineName) => (
     : { bg: "#2200aa", text: "#ffffff" }
 )));
 
-vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
-vi.mock("../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
+vi.mock("../../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
+vi.mock("../../../../pages/campus_map/styles/sidebar.module.css", () => ({ default: {} }));
+vi.mock("../../../../pages/campus_map/styles/status.module.css", () => ({ default: {} }));
 
-vi.mock("../../../pages/homepage/utils/kclTflMapping", () => ({
+vi.mock("../../../../pages/homepage/utils/kclTflMapping", () => ({
   getTflLinePillStyle: (...args) => getTflLinePillStyleMock(...args),
 }));
 
@@ -21,7 +21,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/common/animated_dropdown/AnimatedDropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown/AnimatedDropdown", () => ({
   default: ({ customTrigger, onChange }) => (
     <div>
       {customTrigger}
@@ -31,22 +31,22 @@ vi.mock("../../../components/common/animated_dropdown/AnimatedDropdown", () => (
   ),
 }));
 
-vi.mock("../../../components/campus_map/components/CampusMapSidebarContent", () => ({
+vi.mock("../../../../components/campus_map/components/CampusMapSidebarContent", () => ({
   CampusMapSidebarContent: () => <div data-testid="sidebar-content" />,
 }));
 
-vi.mock("../../../lib/kclCampuses", () => ({
+vi.mock("../../../../lib/kclCampuses", () => ({
   KCL_CAMPUSES: [
     { id: "strand", name: "Strand Campus", shortName: "Strand", coords: [-0.1, 51.5], address: "Strand", color: "#e63f3f" },
   ],
 }));
 
-import { TflStatusSection } from "../../../components/campus_map/components/TflStatusSection";
-import { TransportModesSection } from "../../../components/campus_map/components/TransportModesSection";
-import { DestinationSection } from "../../../components/campus_map/components/DestinationSection";
-import { LocationChip } from "../../../components/campus_map/components/LocationChip";
-import { CampusQuickNav } from "../../../components/campus_map/components/CampusQuickNav";
-import { CampusMapSidebar } from "../../../components/campus_map/components/CampusMapSidebar";
+import { TflStatusSection } from "../../../../components/campus_map/components/TflStatusSection";
+import { TransportModesSection } from "../../../../components/campus_map/components/TransportModesSection";
+import { DestinationSection } from "../../../../components/campus_map/components/DestinationSection";
+import { LocationChip } from "../../../../components/campus_map/components/LocationChip";
+import { CampusQuickNav } from "../../../../components/campus_map/components/CampusQuickNav";
+import { CampusMapSidebar } from "../../../../components/campus_map/components/CampusMapSidebar";
 
 describe("TflStatusSection", () => {
   it("renders loading and good service states", () => {

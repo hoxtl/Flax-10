@@ -5,7 +5,7 @@ import {
   getPriorityColor,
   getLegIcon,
   getLegLabel,
-} from "../../../components/campus_map/utils/mapUtils";
+} from "../../../../components/campus_map/utils/mapUtils";
 
 describe("mapUtils – travelTime", () => {
   it("returns singular minute for exactly 60 seconds", () => {

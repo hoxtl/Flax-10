@@ -8,29 +8,29 @@ const tflCardMock = vi.fn((props) => <div data-testid="tfl-card" data-props={JSO
 const sidebarContentMock = vi.fn((props) => <div data-testid="sidebar-content" data-props={JSON.stringify(props)} />);
 const asideMock = vi.fn(({ children, ...props }) => <aside data-testid="sidebar" data-props={JSON.stringify(props)}>{children}</aside>);
 
-vi.mock("../../../api/geocodeApi", () => ({
+vi.mock("../../../../api/geocodeApi", () => ({
   geocodeAddress: (...args) => geocodeAddressMock(...args),
 }));
 
-vi.mock("../../../components/calendar/event_modal/components/LocationAutoComplete", () => ({
+vi.mock("../../../../components/calendar/event_modal/components/LocationAutoComplete", () => ({
   LocationAutocomplete: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
   ),
 }));
 
-vi.mock("../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../components/campus_map/components/WalkingRouteCard", () => ({
+vi.mock("../../../../components/campus_map/components/WalkingRouteCard", () => ({
   WalkingRouteCard: (props) => walkingCardMock(props),
 }));
 
-vi.mock("../../../components/campus_map/components/TflRouteCard", () => ({
+vi.mock("../../../../components/campus_map/components/TflRouteCard", () => ({
   TflRouteCard: (props) => tflCardMock(props),
 }));
 
-vi.mock("../../../components/campus_map/components/CampusMapSidebarContent", () => ({
+vi.mock("../../../../components/campus_map/components/CampusMapSidebarContent", () => ({
   CampusMapSidebarContent: (props) => sidebarContentMock(props),
 }));
 
@@ -40,9 +40,9 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-import { UserJourneySection } from "../../../components/campus_map/components/UserJourneySection";
-import { TransportModesSection } from "../../../components/campus_map/components/TransportModesSection";
-import { CampusMapSidebar } from "../../../components/campus_map/components/CampusMapSidebar";
+import { UserJourneySection } from "../../../../components/campus_map/components/UserJourneySection";
+import { TransportModesSection } from "../../../../components/campus_map/components/TransportModesSection";
+import { CampusMapSidebar } from "../../../../components/campus_map/components/CampusMapSidebar";
 
 function JourneyHarness(props) {
   const [manualStart, setManualStart] = useState(props.initialStart || "");
