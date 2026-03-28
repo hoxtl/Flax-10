@@ -153,7 +153,7 @@ function isDueToday(task, todayStart, todayEnd) {
   return dueDate && dueDate >= todayStart && dueDate <= todayEnd;
 }
 
-function buildTaskWidgetItem(task, todayEnd) {
+export function buildTaskWidgetItem(task, todayEnd) {
   const dueDate = new Date(task.due_date);
   const todayStart = new Date(todayEnd);
   todayStart.setHours(0, 0, 0, 0);

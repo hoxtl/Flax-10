@@ -30,7 +30,9 @@ import {
 describe("account helper modules", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.localStorage = {
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: {
       store: {},
       getItem(key) {
         return this.store[key] ?? null;
@@ -44,7 +46,8 @@ describe("account helper modules", () => {
       clear() {
         this.store = {};
       },
-    };
+      },
+    });
     localStorage.clear();
   });
 

@@ -72,10 +72,78 @@ describe("planTimelineHelpersEdges", () => {
       expect(event.moduleCode).toBe("CS100");
     });
 
+    it("matches fallback tasks-due-today titles when day tasks do not match", () => {
+      const event = buildEventEntry(
+        { ...buildTimerEntry({ title: "Essay review", end_time: null }) },
+        [],
+        new Date("2026-03-24T11:00Z"),
+        [{ title: "Different task" }],
+        [{ title: "Essay review" }],
+      );
+
+      expect(event.matchTask).toEqual({ title: "Essay review" });
+      expect(event.endMins).toBe(event.startMins);
+    });
+
+    it("falls back cleanly when event and task titles are missing", () => {
+      const event = buildEventEntry(
+        { ...buildTimerEntry({ title: "", description: "", end_time: null }) },
+        [],
+        new Date("2026-03-24T11:00Z"),
+        undefined,
+        undefined,
+      );
+
+      expect(event.matchTask).toBeNull();
+      expect(event.moduleCode).toBeNull();
+    });
+
+    it("matches untitled tasks using empty-string title fallbacks", () => {
+      const event = buildEventEntry(
+        { ...buildTimerEntry({ title: undefined, description: "", end_time: null }) },
+        [],
+        new Date("2026-03-24T11:00Z"),
+        [{}],
+        undefined,
+      );
+
+      expect(event.matchTask).toEqual({});
+    });
+
     it("layers vertical spacing metadata accurately onto event rows", () => {
       const spaced = addSpacing([buildEventRow({ id: 1 }), buildEventRow({ id: 2, startMins: 120, endMins: 180 }), { type: "free", id: 3, startMins: 240, gapStartMins: 240, minutes: 60 }]);
       expect(spaced[0].spacingBeforePx).toBe(0);
       expect(spaced[2].spacingBeforePx).toBeGreaterThanOrEqual(0);
+    });
+
+    it("handles rows without start or end helpers when spacing rows", () => {
+      const spaced = addSpacing([
+        { type: "note", id: "custom-1" },
+        { type: "free", id: "free-1", gapStartMins: 90, minutes: 30 },
+        { type: "note", id: "custom-2" },
+      ]);
+
+      expect(spaced[0].spacingBeforePx).toBe(0);
+      expect(spaced[1].spacingBeforePx).toBeGreaterThanOrEqual(0);
+      expect(spaced[2].spacingBeforePx).toBeGreaterThanOrEqual(0);
+    });
+
+    it("computes free-row end positions from gapStartMins plus minutes when endMins is absent", () => {
+      const spaced = addSpacing([
+        { type: "free", id: "free-1", gapStartMins: 60, minutes: 20 },
+        { type: "event", id: 2, startMins: 80, endMins: 120 },
+      ]);
+
+      expect(spaced[1].spacingBeforePx).toBe(0);
+    });
+
+    it("uses zero fallbacks when free rows have neither gapStartMins nor minutes", () => {
+      const spaced = addSpacing([
+        { type: "free", id: "free-1" },
+        { type: "event", id: 2, startMins: 30, endMins: 60 },
+      ]);
+
+      expect(spaced[1].spacingBeforePx).toBeGreaterThanOrEqual(0);
     });
 
     it("groups overlaps gracefully into nested array clusters", () => {
