@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for integrated mini timeline row components.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { PlanFreeRowContent } from "@/pages/homepage/components/mini_timeline/parts/PlanFreeRowContent";
@@ -97,6 +100,22 @@ const baseRow = {
   active: false,
 };
 const rows = [baseRow, { type: "free", gapStartMins: 700, minutes: 90 }];
+const baseEventRowProps = {
+  row: baseRow,
+  rows,
+  taskLists: [],
+  conflictPopoverRowId: "evt-1",
+  setConflictPopoverRowId: vi.fn(),
+  onConflictAutoMove: vi.fn(),
+  onPushTomorrow: vi.fn(),
+  onEdit: vi.fn(),
+  onCardClick: vi.fn(),
+  onEventContextMenu: vi.fn(),
+  getTag: () => ({ name: "Study" }),
+  styles,
+  sleepWindow: { sleepTime: "23:00", wakeTime: "07:00" },
+  selectedDate: new Date("2026-03-28T00:00:00Z"),
+};
 
 const renderFreeRow = (props = {}) =>
   render(
@@ -108,29 +127,7 @@ const renderFreeRow = (props = {}) =>
     />,
   );
 
-const renderEventRow = (props = {}) => {
-  const conflictPopoverRef = React.createRef();
-  return render(
-    <PlanEventRow
-      row={baseRow}
-      rows={rows}
-      taskLists={[]}
-      conflictPopoverRowId="evt-1"
-      conflictPopoverRef={conflictPopoverRef}
-      setConflictPopoverRowId={vi.fn()}
-      onConflictAutoMove={vi.fn()}
-      onPushTomorrow={vi.fn()}
-      onEdit={vi.fn()}
-      onCardClick={vi.fn()}
-      onEventContextMenu={vi.fn()}
-      getTag={() => ({ name: "Study" })}
-      styles={styles}
-      sleepWindow={{ sleepTime: "23:00", wakeTime: "07:00" }}
-      selectedDate={new Date("2026-03-28T00:00:00Z")}
-      {...props}
-    />,
-  );
-};
+const renderEventRow = (props = {}) => render(<PlanEventRow conflictPopoverRef={{ current: null }} {...baseEventRowProps} {...props} />);
 
 describe("Mini timeline integration coverage", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -344,28 +341,8 @@ describe("Mini timeline integration coverage", () => {
   it("creates relocation plans that hit ordering fallbacks", () => {
     const row = {
       items: [
-        {
-          id: "a",
-          durationMins: 45,
-          item: {
-            id: 2,
-            priority: "medium",
-            start_time: "2026-03-28T09:00:00Z",
-            tag_name: null,
-            tag: { name: "study" },
-          },
-        },
-        {
-          id: "b",
-          durationMins: 30,
-          item: {
-            id: 3,
-            priority: "medium",
-            start_time: "2026-03-28T09:15:00Z",
-            tag_name: null,
-            tag: { name: "lecture" },
-          },
-        },
+        { id: "a", durationMins: 45, item: { id: 2, priority: "medium", start_time: "2026-03-28T09:00:00Z", tag_name: null, tag: { name: "study" } } },
+        { id: "b", durationMins: 30, item: { id: 3, priority: "medium", start_time: "2026-03-28T09:15:00Z", tag_name: null, tag: { name: "lecture" } } },
       ],
       endMins: 600,
     };

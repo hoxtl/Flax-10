@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for individual mini timeline row behaviour.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { PlanEventRow } from "@/pages/homepage/components/mini_timeline/PlanEventRow";
@@ -58,28 +61,25 @@ const baseRow = {
 };
 
 const rows = [baseRow, { type: "free", gapStartMins: 700, minutes: 90 }];
+const baseEventRowProps = {
+  row: baseRow,
+  rows,
+  taskLists: [],
+  conflictPopoverRowId: "evt-1",
+  setConflictPopoverRowId: vi.fn(),
+  onConflictAutoMove: vi.fn(),
+  onPushTomorrow: vi.fn(),
+  onEdit: vi.fn(),
+  onCardClick: vi.fn(),
+  onEventContextMenu: vi.fn(),
+  getTag: () => ({ name: "Study" }),
+  styles,
+  sleepWindow: { sleepTime: "23:00", wakeTime: "07:00" },
+  selectedDate: new Date("2026-03-28T00:00:00Z"),
+};
 
 function renderEventRow(overrides = {}) {
-  return render(
-    <PlanEventRow
-      row={baseRow}
-      rows={rows}
-      taskLists={[]}
-      conflictPopoverRowId="evt-1"
-      conflictPopoverRef={React.createRef()}
-      setConflictPopoverRowId={vi.fn()}
-      onConflictAutoMove={vi.fn()}
-      onPushTomorrow={vi.fn()}
-      onEdit={vi.fn()}
-      onCardClick={vi.fn()}
-      onEventContextMenu={vi.fn()}
-      getTag={() => ({ name: "Study" })}
-      styles={styles}
-      sleepWindow={{ sleepTime: "23:00", wakeTime: "07:00" }}
-      selectedDate={new Date("2026-03-28T00:00:00Z")}
-      {...overrides}
-    />,
-  );
+  return render(<PlanEventRow conflictPopoverRef={{ current: null }} {...baseEventRowProps} {...overrides} />);
 }
 
 describe("Mini timeline row coverage", () => {

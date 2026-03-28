@@ -82,7 +82,6 @@ const row = {
 };
 
 const rowsWithFreeGap = [row, { type: 'free', gapStartMins: 690, minutes: 60 }];
-
 const rowsNoFree = [row];
 function renderConflictPairRow(props = {}) {
   return render(
