@@ -89,4 +89,11 @@ describe('TagFilterBar', () => {
         fireEvent.click(screen.getByTestId('selected-Sports'));
         expect(onFilterChange).toHaveBeenCalledWith([]);
     });
+
+    it('keeps explicit tag selections when adding another non-All tag', () => {
+        const onFilterChange = vi.fn();
+        render(<TagFilterBar tags={mockTags} activeFilters={[1]} onFilterChange={onFilterChange} />);
+        fireEvent.click(screen.getByTestId('option-Music'));
+        expect(onFilterChange).toHaveBeenCalledWith([1, 2]);
+    });
 });

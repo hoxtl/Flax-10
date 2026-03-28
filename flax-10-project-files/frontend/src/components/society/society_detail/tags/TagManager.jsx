@@ -19,7 +19,7 @@ function getInitialNewTag(tags) {
     return { label: "", color: getNextColor(tags) };
 }
 
-function isDuplicateTag(tags, label, excludeId = null) {
+function isDuplicateTag(tags, label, excludeId) {
     return tags.some((tag) => tag.id !== excludeId && tag.label.toLowerCase() === label.toLowerCase());
 }
 

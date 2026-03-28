@@ -129,4 +129,119 @@ describe('TagManager', () => {
         render(<TagManager tags={fullTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
         expect(screen.getByText('8/7')).toBeInTheDocument();
     });
+
+    it('shows a blank-name validation error when Enter is pressed on whitespace', () => {
+        render(<TagManager tags={[]} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
+        const input = screen.getByPlaceholderText('Tag name');
+        fireEvent.change(input, { target: { value: '   ' } });
+        fireEvent.keyDown(input, { key: 'Enter' });
+        expect(screen.getByText('Give the tag a name.')).toBeInTheDocument();
+    });
+
+    it('shows returned add errors and falls back to the default message', async () => {
+        const onAddTag = vi
+            .fn()
+            .mockRejectedValueOnce(new Error('Nope'))
+            .mockRejectedValueOnce({});
+        render(<TagManager tags={[]} onAddTag={onAddTag} onDeleteTag={vi.fn()} />);
+
+        const input = screen.getByPlaceholderText('Tag name');
+        fireEvent.change(input, { target: { value: 'Broken' } });
+        await act(async () => {
+            fireEvent.click(screen.getByText('Add'));
+        });
+        expect(screen.getByText('Nope')).toBeInTheDocument();
+
+        fireEvent.change(input, { target: { value: 'Still Broken' } });
+        await act(async () => {
+            fireEvent.click(screen.getByText('Add'));
+        });
+        expect(screen.getByText('Failed to add tag. Please try again.')).toBeInTheDocument();
+    });
+
+    it('keeps the add form populated when the add callback returns no result', async () => {
+        const onAddTag = vi.fn().mockResolvedValue(null);
+        render(<TagManager tags={[]} onAddTag={onAddTag} onDeleteTag={vi.fn()} />);
+
+        const input = screen.getByPlaceholderText('Tag name');
+        fireEvent.change(input, { target: { value: 'Draft Tag' } });
+        await act(async () => {
+            fireEvent.click(screen.getByText('Add'));
+        });
+
+        expect(onAddTag).toHaveBeenCalledWith({ label: 'Draft Tag', color: '#3b82f6' });
+        expect(input.value).toBe('Draft Tag');
+    });
+
+    it('edits, validates, and resets existing tags', async () => {
+        const onUpdateTag = vi.fn().mockResolvedValue(undefined);
+        const { rerender } = render(
+            <TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} onUpdateTag={onUpdateTag} />,
+        );
+
+        fireEvent.click(screen.getByText('Important'));
+        const editInput = screen.getByDisplayValue('Important');
+        fireEvent.change(editInput, { target: { value: 'Meeting' } });
+        await act(async () => {
+            fireEvent.click(screen.getByText('Save'));
+        });
+        expect(screen.getByText('A tag with this name already exists.')).toBeInTheDocument();
+        expect(onUpdateTag).not.toHaveBeenCalled();
+
+        fireEvent.change(editInput, { target: { value: 'Updated Important' } });
+        const colorButtons = document.querySelectorAll('[class*="colorOption"]');
+        fireEvent.click(colorButtons[3]);
+        await act(async () => {
+            fireEvent.click(screen.getByText('Save'));
+        });
+        expect(onUpdateTag).toHaveBeenCalledWith(1, { label: 'Updated Important', color: '#f59e0b' });
+
+        rerender(
+            <TagManager
+                tags={[{ id: 1, label: 'Updated Important', color: '#f59e0b' }, mockTags[1]]}
+                onAddTag={vi.fn()}
+                onDeleteTag={vi.fn()}
+                onUpdateTag={onUpdateTag}
+            />,
+        );
+
+        fireEvent.click(screen.getByText('Updated Important'));
+        const reopenedInput = screen.getByDisplayValue('Updated Important');
+        fireEvent.change(reopenedInput, { target: { value: 'Temporary' } });
+        fireEvent.click(screen.getByText('Cancel'));
+        fireEvent.click(screen.getByText('Updated Important'));
+        expect(screen.getByDisplayValue('Updated Important')).toBeInTheDocument();
+    });
+
+    it('does not save an edited tag when a non-Enter key is pressed', () => {
+        const onUpdateTag = vi.fn();
+        render(<TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} onUpdateTag={onUpdateTag} />);
+
+        fireEvent.click(screen.getByText('Important'));
+        fireEvent.keyDown(screen.getByDisplayValue('Important'), { key: 'Escape' });
+
+        expect(onUpdateTag).not.toHaveBeenCalled();
+        expect(screen.getByDisplayValue('Important')).toBeInTheDocument();
+    });
+
+    it('saves an edited tag when Enter is pressed in the editor input', async () => {
+        const onUpdateTag = vi.fn().mockResolvedValue(undefined);
+        render(<TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} onUpdateTag={onUpdateTag} />);
+
+        fireEvent.click(screen.getByText('Important'));
+        const editInput = screen.getByDisplayValue('Important');
+        fireEvent.change(editInput, { target: { value: 'Keyboard Saved' } });
+        await act(async () => {
+            fireEvent.keyDown(editInput, { key: 'Enter' });
+        });
+
+        expect(onUpdateTag).toHaveBeenCalledWith(1, { label: 'Keyboard Saved', color: '#3b82f6' });
+    });
+
+    it('hides the color dot for tags without a color', () => {
+        const tagWithoutColor = [{ id: 9, label: 'No Color', color: '' }];
+        const { container } = render(<TagManager tags={tagWithoutColor} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
+        expect(screen.getByText('No Color')).toBeInTheDocument();
+        expect(container.querySelector('[class*="tagDot"]')).toBeNull();
+    });
 });
