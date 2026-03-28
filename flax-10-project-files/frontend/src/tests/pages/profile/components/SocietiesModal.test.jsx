@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SocietiesModal } from '../../../pages/profile/components/ProfileModals';
+import { SocietiesModal } from '../../../../pages/profile/components/ProfileModals';
 describe('SocietiesModal', () => {
   it('renders societies and navigates', () => {
     const onNavigate = vi.fn();

@@ -23,12 +23,12 @@ mockSocialComponents();
 mockTutorPhotoFallback();
 
 const fetchApiMock = vi.fn();
-vi.mock('../../../api/client', () => ({
+vi.mock('../../../../api/client', () => ({
   fetchApi: (...args) => fetchApiMock(...args),
 }));
 
-import ProfileHeader from '../../../pages/profile/components/ProfileHeader';
-import { useProfileHeaderState } from '../../../pages/profile/hooks/useProfileHeaderState';
+import ProfileHeader from '../../../../pages/profile/components/ProfileHeader';
+import { useProfileHeaderState } from '../../../../pages/profile/hooks/useProfileHeaderState';
 
 // ProfileHeader component tests – part 2
 

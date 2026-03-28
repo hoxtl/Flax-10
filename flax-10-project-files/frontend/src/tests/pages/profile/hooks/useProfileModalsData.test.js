@@ -1,12 +1,12 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
-vi.mock("../../../api/socialApi", () => ({ getSharingWith: vi.fn(), getSharedWithMe: vi.fn() }));
-vi.mock("../../../api/taskApi", () => ({ fetchTasks: vi.fn() }));
-vi.mock("../../../api/moduleApi", () => ({ getModules: vi.fn() }));
-import { useModuleNameMap, useSocialUsers, useTasksModalData, socialDataFetchers } from "../../../pages/profile/hooks/useProfileModalsData";
-import { getSharingWith, getSharedWithMe } from "../../../api/socialApi";
-import { fetchTasks } from "../../../api/taskApi";
-import { getModules } from "../../../api/moduleApi";
+vi.mock("../../../../api/socialApi", () => ({ getSharingWith: vi.fn(), getSharedWithMe: vi.fn() }));
+vi.mock("../../../../api/taskApi", () => ({ fetchTasks: vi.fn() }));
+vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn() }));
+import { useModuleNameMap, useSocialUsers, useTasksModalData, socialDataFetchers } from "../../../../pages/profile/hooks/useProfileModalsData";
+import { getSharingWith, getSharedWithMe } from "../../../../api/socialApi";
+import { fetchTasks } from "../../../../api/taskApi";
+import { getModules } from "../../../../api/moduleApi";
 
 describe("useProfileModalsData", () => {
   const gSW = getSharingWith, fT = fetchTasks;

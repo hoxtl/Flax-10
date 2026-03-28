@@ -12,7 +12,7 @@ describe("ProfileModals sharing and societies", () => {
   });
 
   it("renders the shared-with modal when requested", async () => {
-    const { getSharingWith } = await import("../../../api/socialApi");
+    const { getSharingWith } = await import("../../../../api/socialApi");
     getSharingWith.mockResolvedValue([{ id: 2, username: "bob" }]);
     renderProfileModals({ state: { showSharedWith: true } });
     await waitFor(() => expect(screen.getByTestId("user-list-modal")).toBeTruthy());
@@ -20,7 +20,7 @@ describe("ProfileModals sharing and societies", () => {
   });
 
   it("renders the shared-by modal when requested", async () => {
-    const { getSharedWithMe } = await import("../../../api/socialApi");
+    const { getSharedWithMe } = await import("../../../../api/socialApi");
     getSharedWithMe.mockResolvedValue([{ id: 3, username: "carol" }]);
     renderProfileModals({ state: { showSharedBy: true } });
     await waitFor(() => expect(screen.getByTestId("user-list-modal")).toBeTruthy());
@@ -29,7 +29,7 @@ describe("ProfileModals sharing and societies", () => {
   });
 
   it("renders plural titles for populated shared lists", async () => {
-    const { getSharingWith, getSharedWithMe } = await import("../../../api/socialApi");
+    const { getSharingWith, getSharedWithMe } = await import("../../../../api/socialApi");
     getSharingWith.mockResolvedValue([{ id: 2, username: "bob" }, { id: 4, username: "dana" }]);
     getSharedWithMe.mockResolvedValue([{ id: 3, username: "carol" }, { id: 5, username: "eli" }]);
     renderProfileModals({ state: { showSharedWith: true } });
@@ -39,7 +39,7 @@ describe("ProfileModals sharing and societies", () => {
   });
 
   it("renders zero-count titles for empty shared lists", async () => {
-    const { getSharingWith, getSharedWithMe } = await import("../../../api/socialApi");
+    const { getSharingWith, getSharedWithMe } = await import("../../../../api/socialApi");
     getSharingWith.mockResolvedValue([]);
     getSharedWithMe.mockResolvedValue([]);
     renderProfileModals({ state: { showSharedWith: true } });
@@ -49,7 +49,7 @@ describe("ProfileModals sharing and societies", () => {
   });
 
   it("handles fetch errors when loading social data", async () => {
-    const { getSharingWith } = await import("../../../api/socialApi");
+    const { getSharingWith } = await import("../../../../api/socialApi");
     getSharingWith.mockRejectedValueOnce(new Error("fetch failed"));
     renderProfileModals({ state: { showSharedWith: true } });
     await waitFor(() => expect(getSharingWith).toHaveBeenCalled());
@@ -58,7 +58,7 @@ describe("ProfileModals sharing and societies", () => {
   it("closes the shared-with modal and navigates when a user is clicked", async () => {
     const onNavChange = vi.fn();
     const setShowSharedWith = vi.fn();
-    const { getSharingWith } = await import("../../../api/socialApi");
+    const { getSharingWith } = await import("../../../../api/socialApi");
     getSharingWith.mockResolvedValue([{ id: 2, username: "bob" }]);
     renderProfileModals({ state: { showSharedWith: true, setShowSharedWith }, onNavChange });
     await waitFor(() => expect(screen.getByTestId("user-list-modal")).toBeTruthy());
@@ -69,7 +69,7 @@ describe("ProfileModals sharing and societies", () => {
 
   it("closes the shared-with list modal when the close action is clicked", async () => {
     const setShowSharedWith = vi.fn();
-    const { getSharingWith } = await import("../../../api/socialApi");
+    const { getSharingWith } = await import("../../../../api/socialApi");
     getSharingWith.mockResolvedValue([{ id: 2, username: "bob" }]);
     renderProfileModals({ state: { showSharedWith: true, setShowSharedWith } });
     await waitFor(() => expect(screen.getByText("Close List")).toBeInTheDocument());
@@ -79,7 +79,7 @@ describe("ProfileModals sharing and societies", () => {
 
   it("closes the shared-by list modal when the close action is clicked", async () => {
     const setShowSharedBy = vi.fn();
-    const { getSharedWithMe } = await import("../../../api/socialApi");
+    const { getSharedWithMe } = await import("../../../../api/socialApi");
     getSharedWithMe.mockResolvedValue([{ id: 3, username: "carol" }]);
     renderProfileModals({ state: { showSharedBy: true, setShowSharedBy } });
     await waitFor(() => expect(screen.getByText("Close List")).toBeInTheDocument());
@@ -90,7 +90,7 @@ describe("ProfileModals sharing and societies", () => {
   it("opens a shared calendar from the shared-by modal", async () => {
     const onNavChange = vi.fn();
     const setShowSharedBy = vi.fn();
-    const { getSharedWithMe } = await import("../../../api/socialApi");
+    const { getSharedWithMe } = await import("../../../../api/socialApi");
     getSharedWithMe.mockResolvedValue([{ id: 3, username: "carol", first_name: "Carol", last_name: "Stone" }]);
     renderProfileModals({ state: { showSharedBy: true, setShowSharedBy }, onNavChange });
     await waitFor(() => expect(screen.getByRole("button", { name: /view calendar/i })).toBeInTheDocument());
@@ -101,7 +101,7 @@ describe("ProfileModals sharing and societies", () => {
 
   it("falls back to sensible shared calendar labels", async () => {
     const onNavChange = vi.fn();
-    const { getSharedWithMe } = await import("../../../api/socialApi");
+    const { getSharedWithMe } = await import("../../../../api/socialApi");
     getSharedWithMe.mockResolvedValue([{ id: 3 }, { id: 4, username: "anonymous" }, { username: "anon" }]);
     renderProfileModals({ state: { showSharedBy: true }, onNavChange });
     await waitFor(() => expect(screen.getAllByRole("button", { name: /view calendar/i }).length).toBe(3));
@@ -115,7 +115,7 @@ describe("ProfileModals sharing and societies", () => {
 
   it("uses the current user id when shared lists open without profile data", async () => {
     const onNavChange = vi.fn();
-    const { getSharingWith } = await import("../../../api/socialApi");
+    const { getSharingWith } = await import("../../../../api/socialApi");
     getSharingWith.mockResolvedValue([{ id: 2, username: "bob" }]);
     renderProfileModals({ user: { id: 9, username: "alice" }, state: { profileData: null, showSharedWith: true }, onNavChange });
     await waitFor(() => expect(screen.getByTestId("user-list-modal")).toBeTruthy());

@@ -16,7 +16,7 @@ const useSuggestionState = vi.fn();
 const saveWeeklyGoal = vi.fn();
 const useProfileHeaderState = vi.fn();
 
-vi.mock("../../../pages/profile/styles/ProfilePage.module.css", () => ({
+vi.mock("../../../../pages/profile/styles/ProfilePage.module.css", () => ({
   default: {
     skel: "skel",
     container: "container",
@@ -38,21 +38,21 @@ vi.mock("../../../pages/profile/styles/ProfilePage.module.css", () => ({
   },
 }));
 
-vi.mock("../../../pages/profile/hooks/useProfile", () => ({
+vi.mock("../../../../pages/profile/hooks/useProfile", () => ({
   useProfileState: (...args) => useProfileState(...args),
   useProfileBodyData: (...args) => useProfileBodyData(...args),
   useProfileContent: (...args) => useProfileContent(...args),
 }));
 
-vi.mock("../../../pages/profile/hooks/useProfileSummary", () => ({
+vi.mock("../../../../pages/profile/hooks/useProfileSummary", () => ({
   useProfileSummary: (...args) => useProfileSummary(...args),
 }));
 
-vi.mock("../../../pages/profile/hooks/useProfileVisibility", () => ({
+vi.mock("../../../../pages/profile/hooks/useProfileVisibility", () => ({
   useProfileVisibility: (...args) => useProfileVisibility(...args),
 }));
 
-vi.mock("../../../pages/profile/hooks/useProfileInsights", () => ({
+vi.mock("../../../../pages/profile/hooks/useProfileInsights", () => ({
   saveWeeklyGoal: (...args) => saveWeeklyGoal(...args),
   useCurrentUserSummary: (...args) => useCurrentUserSummary(...args),
   usePeakHour: (...args) => usePeakHour(...args),
@@ -60,19 +60,19 @@ vi.mock("../../../pages/profile/hooks/useProfileInsights", () => ({
   useSuggestionState: (...args) => useSuggestionState(...args),
 }));
 
-vi.mock("../../../pages/profile/hooks/useProfileHeaderState", () => ({
+vi.mock("../../../../pages/profile/hooks/useProfileHeaderState", () => ({
   useProfileHeaderState: (...args) => useProfileHeaderState(...args),
 }));
 
-vi.mock("../../../context/AuthContext", () => ({
+vi.mock("../../../../context/AuthContext", () => ({
   useAuth: () => useAuthMock(),
 }));
 
-vi.mock("../../../components/common/back_button/BackButton.jsx", () => ({
+vi.mock("../../../../components/common/back_button/BackButton.jsx", () => ({
   default: ({ label, onClick }) => <button onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../components/common/Breadcrumb/Breadcrumb.jsx", () => ({
+vi.mock("../../../../components/common/Breadcrumb/Breadcrumb.jsx", () => ({
   default: ({ crumbs }) => (
     <nav data-testid="breadcrumb">
       {crumbs.map((crumb) => <span key={crumb.label}>{crumb.label}</span>)}
@@ -80,7 +80,7 @@ vi.mock("../../../components/common/Breadcrumb/Breadcrumb.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/empty_state/EmptyState", () => ({
+vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, message, description, action }) => (
     <div>
       <div>{title}</div>
@@ -90,31 +90,31 @@ vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/scroll_to_top/ScrollToTop", () => ({
+vi.mock("../../../../components/common/scroll_to_top/ScrollToTop", () => ({
   default: () => <div data-testid="scroll-to-top" />,
 }));
 
-vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
 }));
 
-vi.mock("../../../pages/profile/components/AchievementsModal", () => ({
+vi.mock("../../../../pages/profile/components/AchievementsModal", () => ({
   default: () => <div data-testid="achievements-modal" />,
 }));
 
-vi.mock("../../../pages/profile/components/ProfileCalendar", () => ({
+vi.mock("../../../../pages/profile/components/ProfileCalendar", () => ({
   ProfileCalendar: ({ allEvents }) => <div data-testid="profile-calendar">{allEvents.length}</div>,
 }));
 
-vi.mock("../../../pages/profile/components/ProfileHeader", () => ({
+vi.mock("../../../../pages/profile/components/ProfileHeader", () => ({
   default: () => <div data-testid="profile-header" />,
 }));
 
-vi.mock("../../../pages/profile/components/ProfileSkeleton", () => ({
+vi.mock("../../../../pages/profile/components/ProfileSkeleton", () => ({
   default: ({ blocks }) => <div data-testid="profile-skeleton">{blocks}</div>,
 }));
 
-vi.mock("../../../pages/profile/components/ProfileWidgets", () => ({
+vi.mock("../../../../pages/profile/components/ProfileWidgets", () => ({
   CommonGroundSection: () => <div>Common Ground</div>,
   CompatibilityScore: () => <div>Compatibility</div>,
   CompactAttendanceTile: () => <div>Attendance</div>,
@@ -126,14 +126,14 @@ vi.mock("../../../pages/profile/components/ProfileWidgets", () => ({
   ThisWeek: ({ onGoalSave }) => <button onClick={() => onGoalSave?.(4)}>This Week</button>,
 }));
 
-vi.mock("../../../pages/profile/components/ProfileModals", () => ({
+vi.mock("../../../../pages/profile/components/ProfileModals", () => ({
   default: () => <div data-testid="profile-modals" />,
   SocietiesModal: ({ isOpen, societies }) => (
     isOpen ? <div data-testid="societies-modal">{societies.map((society) => society.name || society).join(", ")}</div> : null
   ),
 }));
 
-import Profile from "../../../pages/profile/Profile";
+import Profile from "../../../../pages/profile/Profile";
 
 function buildState(overrides = {}) {
   return {

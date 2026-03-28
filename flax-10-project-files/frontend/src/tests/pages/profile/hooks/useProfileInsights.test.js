@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
-vi.mock("../../../api/analyticsApi", () => ({ default: { getSummary: vi.fn() } }));
-import analyticsApi from "../../../api/analyticsApi";
-import { useProfileAnalytics } from "../../../pages/profile/hooks/useProfileInsights";
+vi.mock("../../../../api/analyticsApi", () => ({ default: { getSummary: vi.fn() } }));
+import analyticsApi from "../../../../api/analyticsApi";
+import { useProfileAnalytics } from "../../../../pages/profile/hooks/useProfileInsights";
 describe("useProfileAnalytics", () => {
   const gS = analyticsApi.getSummary;
   beforeEach(() => { vi.clearAllMocks(); });

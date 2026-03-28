@@ -1,20 +1,20 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ProfileCalendar } from '../../../pages/profile/components/ProfileCalendar';
-import { useCalendarDispatch } from '../../../context/CalendarContext';
-import { isSameMonth } from '../../../components/calendar/utils/dateUtils';
+import { ProfileCalendar } from '../../../../pages/profile/components/ProfileCalendar';
+import { useCalendarDispatch } from '../../../../context/CalendarContext';
+import { isSameMonth } from '../../../../components/calendar/utils/dateUtils';
 
-vi.mock('../../../context/CalendarContext', () => ({
+vi.mock('../../../../context/CalendarContext', () => ({
     CalendarProvider: ({ children }) => <div data-testid="calendar-provider">{children}</div>,
     useCalendar: vi.fn(() => ({ selectedDate: new Date('2024-03-08') })),
     useCalendarDispatch: vi.fn(() => vi.fn()),
 }));
 
-vi.mock('../../../context/ResizeHighlightContext', () => ({
+vi.mock('../../../../context/ResizeHighlightContext', () => ({
     ResizeHighlightProvider: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock('../../../components/calendar/month_view/MonthView', () => ({
+vi.mock('../../../../components/calendar/month_view/MonthView', () => ({
     MonthView: ({ readOnly, onMoreClick }) => (
         <div data-testid="month-view" data-readonly={String(readOnly)}>
             <button type="button" onClick={() => onMoreClick && onMoreClick(new Date('2024-03-08'))}>
@@ -24,19 +24,19 @@ vi.mock('../../../components/calendar/month_view/MonthView', () => ({
     ),
 }));
 
-vi.mock('../../../components/calendar/EventPopups', () => ({
+vi.mock('../../../../components/calendar/EventPopups', () => ({
     EventPopups: () => <div data-testid="event-popups" />,
 }));
 
-vi.mock('../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
+vi.mock('../../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
     EventsSummaryModal: ({ isOpen, onClose }) => isOpen ? <div data-testid="summary-modal"><button type="button" onClick={onClose}>Close Summary</button></div> : null,
 }));
 
-vi.mock('../../../components/calendar/header/NavigationButtons', () => ({
+vi.mock('../../../../components/calendar/header/NavigationButtons', () => ({
     NavigationButtons: () => <div data-testid="nav-buttons" />,
 }));
 
-vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
+vi.mock('../../../../components/calendar/header/CalendarHeaderUtils', () => ({
     CalendarNav: ({ onPrev, onNext, onToday, showToday, title }) => (
         <div data-testid="nav-buttons">
             <span>{title}</span>
@@ -47,7 +47,7 @@ vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
     ),
 }));
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
     addMonths: vi.fn((d, n) => d),
     formatMonthYear: vi.fn(() => 'March 2024'),
     isSameMonth: vi.fn(() => false),

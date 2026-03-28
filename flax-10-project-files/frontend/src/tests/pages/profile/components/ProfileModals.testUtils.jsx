@@ -4,14 +4,14 @@
 
 import { render } from "@testing-library/react";
 import { vi } from "vitest";
-import { createFnMap } from "../../utils/testBuilderUtils";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
-vi.mock("../../../components/dashboard/components/EditProfileModal", () => ({
+vi.mock("../../../../components/dashboard/components/EditProfileModal", () => ({
   default: ({ isOpen, onClose }) =>
     isOpen ? <div data-testid="edit-profile-modal"><button onClick={onClose}>Close Edit</button></div> : null,
 }));
 
-vi.mock("../../../components/social/components/UserListModal", () => ({
+vi.mock("../../../../components/social/components/UserListModal", () => ({
   default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
     <div data-testid="user-list-modal">
       <span>{title}</span>
@@ -30,30 +30,30 @@ vi.mock("../../../components/social/components/UserListModal", () => ({
   ),
 }));
 
-vi.mock("../../../api/socialApi", () => ({
+vi.mock("../../../../api/socialApi", () => ({
   getSharingWith: vi.fn().mockResolvedValue([]),
   getSharedWithMe: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock("../../../api/moduleApi", () => ({
+vi.mock("../../../../api/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock("../../../api/taskApi", () => ({
+vi.mock("../../../../api/taskApi", () => ({
   fetchTasks: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock("../../../pages/profile/hooks/useProfileModalsData", async () => {
-  const actual = await vi.importActual("../../../pages/profile/hooks/useProfileModalsData");
+vi.mock("../../../../pages/profile/hooks/useProfileModalsData", async () => {
+  const actual = await vi.importActual("../../../../pages/profile/hooks/useProfileModalsData");
   return {
     ...actual,
     useTasksModalData: vi.fn(() => ({ loading: false, tasks: [] })),
   };
 });
 
-import ProfileModals, { SocietiesModal } from "../../../pages/profile/components/ProfileModals";
-import { getModules } from "../../../api/moduleApi";
-import { useTasksModalData } from "../../../pages/profile/hooks/useProfileModalsData";
+import ProfileModals, { SocietiesModal } from "../../../../pages/profile/components/ProfileModals";
+import { getModules } from "../../../../api/moduleApi";
+import { useTasksModalData } from "../../../../pages/profile/hooks/useProfileModalsData";
 
 export { getModules, useTasksModalData };
 

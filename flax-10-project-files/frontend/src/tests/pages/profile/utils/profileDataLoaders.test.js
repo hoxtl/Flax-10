@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const { gAUP, gUP, gE, fT } = vi.hoisted(() => ({ gAUP: vi.fn(), gUP: vi.fn(), gE: vi.fn(), fT: vi.fn() }));
-vi.mock("../../../api/userApi", () => ({ getAnotherUserProfile: gAUP, getUserProfile: gUP }));
-vi.mock("../../../api/eventApi", () => ({ getEvents: gE }));
-vi.mock("../../../api/taskApi", () => ({ fetchTasks: fT }));
-vi.mock("../../../context/AuthContext", () => ({ useAuth: () => ({ profile: { id: 5 } }) }));
-import { loadProfile, loadTaskCount, tryLoadEvents, tryLoadProfile } from "../../../pages/profile/hooks/profileDataLoaders";
+vi.mock("../../../../api/userApi", () => ({ getAnotherUserProfile: gAUP, getUserProfile: gUP }));
+vi.mock("../../../../api/eventApi", () => ({ getEvents: gE }));
+vi.mock("../../../../api/taskApi", () => ({ fetchTasks: fT }));
+vi.mock("../../../../context/AuthContext", () => ({ useAuth: () => ({ profile: { id: 5 } }) }));
+import { loadProfile, loadTaskCount, tryLoadEvents, tryLoadProfile } from "../../../../pages/profile/hooks/profileDataLoaders";
 describe("profileDataLoaders", () => {
   beforeEach(() => vi.clearAllMocks());
   it("loads self and remote profiles", async () => {

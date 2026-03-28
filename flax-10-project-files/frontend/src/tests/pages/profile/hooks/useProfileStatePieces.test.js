@@ -1,11 +1,11 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-vi.mock("../../../api/userApi", () => ({ getAnotherUserProfile: vi.fn(), getUserProfile: vi.fn() }));
-vi.mock("../../../api/eventApi", () => ({ getEvents: vi.fn().mockResolvedValue([]) }));
-vi.mock("../../../context/AuthContext", () => ({ useAuth: vi.fn(() => ({ profile: { id: 5 }, loading: false, refreshProfile: vi.fn() })) }));
-import { useProfileState, useProfileBodyData } from "../../../pages/profile/hooks/useProfile";
-import { getUserProfile, getAnotherUserProfile } from "../../../api/userApi";
-import { useAuth } from "../../../context/AuthContext";
+vi.mock("../../../../api/userApi", () => ({ getAnotherUserProfile: vi.fn(), getUserProfile: vi.fn() }));
+vi.mock("../../../../api/eventApi", () => ({ getEvents: vi.fn().mockResolvedValue([]) }));
+vi.mock("../../../../context/AuthContext", () => ({ useAuth: vi.fn(() => ({ profile: { id: 5 }, loading: false, refreshProfile: vi.fn() })) }));
+import { useProfileState, useProfileBodyData } from "../../../../pages/profile/hooks/useProfile";
+import { getUserProfile, getAnotherUserProfile } from "../../../../api/userApi";
+import { useAuth } from "../../../../context/AuthContext";
 describe("useProfileStatePieces", () => {
   const mockRefresh = vi.fn();
   beforeEach(() => {

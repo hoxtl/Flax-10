@@ -7,31 +7,31 @@ const getUserProfile = vi.fn();
 const getEvents = vi.fn();
 const fetchTasks = vi.fn();
 
-vi.mock("../../../api/client", () => ({
+vi.mock("../../../../api/client", () => ({
   fetchApi: (...args) => fetchApi(...args),
 }));
 
-vi.mock("../../../api/userApi", () => ({
+vi.mock("../../../../api/userApi", () => ({
   getAnotherUserProfile: (...args) => getAnotherUserProfile(...args),
   getUserProfile: (...args) => getUserProfile(...args),
 }));
 
-vi.mock("../../../api/eventApi", () => ({
+vi.mock("../../../../api/eventApi", () => ({
   getEvents: (...args) => getEvents(...args),
 }));
 
-vi.mock("../../../api/taskApi", () => ({
+vi.mock("../../../../api/taskApi", () => ({
   fetchTasks: (...args) => fetchTasks(...args),
 }));
 
-import { useProfileVisibility } from "../../../pages/profile/hooks/useProfileVisibility";
-import { useProfileHeaderState } from "../../../pages/profile/hooks/useProfileHeaderState";
+import { useProfileVisibility } from "../../../../pages/profile/hooks/useProfileVisibility";
+import { useProfileHeaderState } from "../../../../pages/profile/hooks/useProfileHeaderState";
 import {
   loadProfile,
   loadTaskCount,
   tryLoadEvents,
   tryLoadProfile,
-} from "../../../pages/profile/hooks/profileDataLoaders";
+} from "../../../../pages/profile/hooks/profileDataLoaders";
 
 describe("profile hook extras", () => {
   beforeEach(() => {

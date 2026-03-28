@@ -21,7 +21,7 @@ export const mockFramerMotion = () => {
 };
 
 export const mockProfileHelpers = () => {
-  vi.mock('../../../pages/profile/utils/profileHelpers', () => ({
+  vi.mock('../../../../pages/profile/utils/profileHelpers', () => ({
     buildInitials: vi.fn((user) => {
       if (user?.first_name && user?.last_name) return `${user.first_name[0]}${user.last_name[0]}`;
       return '??';
@@ -34,7 +34,7 @@ export const mockProfileHelpers = () => {
 };
 
 export const mockSocialComponents = () => {
-  vi.mock('../../../components/social/components/ShareButton', () => ({
+  vi.mock('../../../../components/social/components/ShareButton', () => ({
     default: ({ userId, onToggle, initialIsSharing }) => (
       <button data-testid="share-btn" onClick={() => onToggle?.(!initialIsSharing)}>
         Share {userId}
@@ -42,7 +42,7 @@ export const mockSocialComponents = () => {
     ),
   }));
 
-  vi.mock('../../../components/common/primary_button/PrimaryButton', () => ({
+  vi.mock('../../../../components/common/primary_button/PrimaryButton', () => ({
     default: ({ children, onClick, ...rest }) => (
       <button onClick={onClick} {...rest}>
         {children}
@@ -52,7 +52,7 @@ export const mockSocialComponents = () => {
 };
 
 export const mockTutorPhotoFallback = () => {
-  vi.mock('../../../utils/tutorPhotoFallback', () => ({
+  vi.mock('../../../../utils/tutorPhotoFallback', () => ({
     getResolvedUserPhoto: (user) => {
       if (user?.profile_photo_url) return user.profile_photo_url;
       return '';

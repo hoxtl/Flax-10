@@ -3,11 +3,11 @@ import { act, renderHook } from "@testing-library/react";
 
 const fetchApiMock = vi.fn();
 
-vi.mock("../../../api/client", () => ({
+vi.mock("../../../../api/client", () => ({
   fetchApi: (...args) => fetchApiMock(...args),
 }));
 
-import { useProfileHeaderState } from "../../../pages/profile/hooks/useProfileHeaderState";
+import { useProfileHeaderState } from "../../../../pages/profile/hooks/useProfileHeaderState";
 
 describe("useProfileHeaderState", () => {
   beforeEach(() => {

@@ -4,13 +4,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const analyticsSummaryMock = vi.fn();
 const fetchApiMock = vi.fn();
 
-vi.mock("../../../api/analyticsApi", () => ({
+vi.mock("../../../../api/analyticsApi", () => ({
   default: {
     getSummary: (...args) => analyticsSummaryMock(...args),
   },
 }));
 
-vi.mock("../../../api/client", () => ({
+vi.mock("../../../../api/client", () => ({
   fetchApi: (...args) => fetchApiMock(...args),
 }));
 
@@ -20,7 +20,7 @@ import {
   usePeakHour,
   useProfileAnalytics,
   useSuggestionState,
-} from "../../../pages/profile/hooks/useProfileInsights";
+} from "../../../../pages/profile/hooks/useProfileInsights";
 
 async function flushEffects() {
   await act(async () => {

@@ -32,7 +32,7 @@ describe("ProfileModals core rendering", () => {
   });
 
   it("renders mapped module names when they are available", async () => {
-    const { getModules } = await import("../../../api/moduleApi");
+    const { getModules } = await import("../../../../api/moduleApi");
     vi.mocked(getModules).mockResolvedValueOnce({ results: [{ module_code: "CS101", module_name: "Intro to CS" }] });
     renderProfileModals({ state: { showModules: true }, modules: ["CS101"] });
     await waitFor(() => expect(screen.getByText("CS101 – Intro to CS")).toBeTruthy());
@@ -50,7 +50,7 @@ describe("ProfileModals core rendering", () => {
   });
 
   it("renders task counts and fallback metadata when tasks are populated", async () => {
-    const { useTasksModalData } = await import("../../../pages/profile/hooks/useProfileModalsData");
+    const { useTasksModalData } = await import("../../../../pages/profile/hooks/useProfileModalsData");
     vi.mocked(useTasksModalData).mockReturnValueOnce({
       loading: false,
       tasks: [
@@ -118,7 +118,7 @@ describe("ProfileModals core rendering", () => {
   });
 
   it("renders task subtitles with due dates and fallback list labels", async () => {
-    const { useTasksModalData } = await import("../../../pages/profile/hooks/useProfileModalsData");
+    const { useTasksModalData } = await import("../../../../pages/profile/hooks/useProfileModalsData");
     vi.mocked(useTasksModalData).mockReturnValueOnce({
       loading: false,
       tasks: [

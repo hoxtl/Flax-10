@@ -1,26 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Profile from '../../../pages/profile/Profile';
-import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/profile/hooks/useProfile';
-import { useProfileSummary } from '../../../pages/profile/hooks/useProfileSummary';
-import { useProfileVisibility } from '../../../pages/profile/hooks/useProfileVisibility';
-import { createFnMap } from '../../utils/testBuilderUtils';
+import Profile from '../../../../pages/profile/Profile';
+import { useProfileState, useProfileBodyData, useProfileContent } from '../../../../pages/profile/hooks/useProfile';
+import { useProfileSummary } from '../../../../pages/profile/hooks/useProfileSummary';
+import { useProfileVisibility } from '../../../../pages/profile/hooks/useProfileVisibility';
+import { createFnMap } from '../../../utils/testBuilderUtils';
 const useAuthMock = vi.fn();
-vi.mock('../../../pages/profile/hooks/useProfile', () => ({
+vi.mock('../../../../pages/profile/hooks/useProfile', () => ({
   useProfileState: vi.fn(), useProfileBodyData: vi.fn(), useProfileContent: vi.fn(),
 }));
-vi.mock('../../../pages/profile/hooks/useProfileSummary', () => ({ useProfileSummary: vi.fn() }));
-vi.mock('../../../pages/profile/hooks/useProfileVisibility', () => ({ useProfileVisibility: vi.fn() }));
-vi.mock('../../../context/AuthContext', () => ({ useAuth: () => useAuthMock() }));
-vi.mock('../../../context/ThemeContext', () => ({ useTheme: () => ({ mode: 'light' }) }));
-vi.mock('../../../api/analyticsApi', () => ({ default: { getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })) } }));
-vi.mock('../../../api/moduleApi', () => ({ getModules: vi.fn(() => Promise.resolve([])) }));
-vi.mock('../../../api/client', () => ({ fetchApi: vi.fn(() => Promise.resolve({})) }));
-vi.mock('../../../pages/profile/components/ProfileModals', () => ({ default: () => <div data-testid="profile-modals" /> }));
-vi.mock('../../../pages/profile/components/ProfileCalendar', () => ({ ProfileCalendar: () => <div data-testid="profile-calendar" /> }));
-vi.mock('../../../components/social/components/ShareButton', () => ({ default: () => <button data-testid="share-button">Share</button> }));
-vi.mock('../../../pages/profile/components/AchievementsModal', () => ({
+vi.mock('../../../../pages/profile/hooks/useProfileSummary', () => ({ useProfileSummary: vi.fn() }));
+vi.mock('../../../../pages/profile/hooks/useProfileVisibility', () => ({ useProfileVisibility: vi.fn() }));
+vi.mock('../../../../context/AuthContext', () => ({ useAuth: () => useAuthMock() }));
+vi.mock('../../../../context/ThemeContext', () => ({ useTheme: () => ({ mode: 'light' }) }));
+vi.mock('../../../../api/analyticsApi', () => ({ default: { getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })) } }));
+vi.mock('../../../../api/moduleApi', () => ({ getModules: vi.fn(() => Promise.resolve([])) }));
+vi.mock('../../../../api/client', () => ({ fetchApi: vi.fn(() => Promise.resolve({})) }));
+vi.mock('../../../../pages/profile/components/ProfileModals', () => ({ default: () => <div data-testid="profile-modals" /> }));
+vi.mock('../../../../pages/profile/components/ProfileCalendar', () => ({ ProfileCalendar: () => <div data-testid="profile-calendar" /> }));
+vi.mock('../../../../components/social/components/ShareButton', () => ({ default: () => <button data-testid="share-button">Share</button> }));
+vi.mock('../../../../pages/profile/components/AchievementsModal', () => ({
   default: ({ onClose }) => <div data-testid="achievements-modal"><button onClick={onClose}>Close</button></div>,
 }));
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
