@@ -191,8 +191,7 @@ def build():
         ("3.", "Cloning the Repository"),
         ("4.", "Setting Up the Development Environment with Nix"),
         ("",   "  4.1  Linux and macOS"),
-        ("",   "  4.2  Windows (via Docker Desktop)"),
-        ("",   "  4.3  Re-entering the Nix Shell in Future Sessions"),
+        ("",   "  4.2  Re-entering the Nix Shell in Future Sessions"),
         ("5.", "Database Setup"),
         ("",   "  5.1  Automated Setup via Nix (Recommended)"),
         ("",   "  5.2  Manual PostgreSQL Setup"),
@@ -242,7 +241,6 @@ def build():
     prereqs = [
         ("Nix Package Manager (v2.33.2 or later)", "https://nixos.org/download/#download-nix"),
         ("Git", "https://git-scm.com/downloads"),
-        ("Docker Desktop (Windows users only)", "https://www.docker.com/products/docker-desktop/"),
         ("PostgreSQL (only required for manual setup without Nix)", "https://www.postgresql.org/download/"),
     ]
     for tool, link in prereqs:
@@ -300,40 +298,7 @@ def build():
             story.extend(code_block(cmd))
 
     story.append(sp(10))
-    story.append(section("4.2  Windows (via Docker Desktop)"))
-    story.append(para("On Windows, Nix is run inside a Docker container using the official NixOS image."))
-    steps_win = [
-        ("Open the Docker Desktop terminal.", []),
-        ("Navigate to the repository folder:", [r"cd \path\to\Flax-10"]),
-        ("Create a persistent Nix store volume:", ["docker volume create nix-store"]),
-        (
-            f"Launch the NixOS container. In PowerShell, use a backtick ({tt('`')}) for line continuation:",
-            [
-                "docker run --rm -it `",
-                "    -v \"${PWD}:/work\" `",
-                "    -v nix-store:/nix `",
-                "    -w /work `",
-                "    nixos/nix:latest",
-                "",
-                "# Or single-line:",
-                'docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest',
-            ]
-        ),
-        ("Inside the NixOS container, stage the flake file:", ['git -C "/work" add "flake.nix"']),
-        ("Enter the Nix development shell:", ["nix --extra-experimental-features 'nix-command flakes' develop -c bash"]),
-        (
-            f"The container is configured with {tt('--rm')} and will be destroyed upon exit. "
-            "Repeat steps 4–6 for each subsequent session.",
-            []
-        ),
-    ]
-    for i, (desc, cmd) in enumerate(steps_win, 1):
-        story.append(numbered(i, desc))
-        if cmd:
-            story.extend(code_block(cmd))
-
-    story.append(sp(10))
-    story.append(section("4.3  Re-entering the Nix Shell in Future Sessions"))
+    story.append(section("4.2  Re-entering the Nix Shell in Future Sessions"))
     story.append(para("Each time you wish to return to the development environment, run the following from the root of the repository:"))
     story.extend(code_block(["nix --extra-experimental-features 'nix-command flakes' develop -c bash"]))
 
@@ -461,11 +426,6 @@ def build():
         (
             "Coverage module not found.",
             f"Ensure {tt('coverage')} is installed in the virtual environment:"
-        ),
-        (
-            "Windows Docker container exits immediately.",
-            f"Ensure Docker Desktop is running and that the {tt('nix-store')} volume has been "
-            "created before executing the docker run command."
         ),
         (
             "Re-seeding inflates data.",

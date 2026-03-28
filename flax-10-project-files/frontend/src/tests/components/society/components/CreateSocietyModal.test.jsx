@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
 const useToastMock = vi.fn();
+const imageFileMocks = vi.hoisted(() => ({
+    readImageFile: vi.fn(),
+    resetFileInput: vi.fn(),
+}));
 
 vi.mock('../../../../components/society/styles/CreateSocietyModal.module.css', () => ({ default: {} }));
 vi.mock('../../../../components/society/components/AddCollaboratorModal', () => ({
@@ -34,14 +38,6 @@ vi.mock('../../../../components/society/society_detail/RatificationSection', () 
         </button>
     ),
 }));
-vi.mock('../../../../components/society/society_detail/image_handlers/CoverImageModal', () => ({
-    default: ({ onClose, onUpdate }) => (
-        <div data-testid="photo-modal">
-            <button onClick={onClose}>ClosePhoto</button>
-            <button onClick={() => onUpdate(['http://example.com/img.jpg'])}>AddPhoto</button>
-        </div>
-    ),
-}));
 vi.mock('../../../../components/common/tags_selector/TagsSelector', () => ({
     TagsSelector: ({ tags, selectedTags, onSelectionChange, emptyHint }) => (
         <div>
@@ -63,8 +59,13 @@ vi.mock('../../../../components/common/standard_modal/StandardModal', () => ({
 vi.mock('../../../../context/ToastContext', () => ({
     useToast: () => useToastMock(),
 }));
+vi.mock('../../../../utils/imageFile', () => imageFileMocks);
 
 import CreateSocietyModal from '../../../../components/society/components/CreateSocietyModal';
+
+function getCoverImageInput() {
+    return document.querySelector('input[type="file"][accept="image/*"]');
+}
 
 describe('CreateSocietyModal', () => {
     let onClose;
@@ -75,6 +76,8 @@ describe('CreateSocietyModal', () => {
         onCreate = vi.fn();
         useToastMock.mockReset();
         useToastMock.mockReturnValue(undefined);
+        imageFileMocks.readImageFile.mockReset();
+        imageFileMocks.resetFileInput.mockReset();
         vi.clearAllMocks();
     });
 
@@ -195,31 +198,44 @@ describe('CreateSocietyModal', () => {
         expect(screen.getByText('alice')).toBeInTheDocument();
     });
 
-    it('opens photo modal when Add Cover Image is clicked', () => {
+    it('opens the hidden file picker when Add Cover Image is clicked', () => {
+        const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(() => {});
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.click(screen.getByText('+ Add Cover Image'));
-        expect(screen.getByTestId('photo-modal')).toBeInTheDocument();
+        expect(clickSpy).toHaveBeenCalledTimes(1);
+        clickSpy.mockRestore();
     });
 
-    it('closes photo modal when ClosePhoto is clicked', () => {
+    it('passes the selected file to the image reader helper', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Cover Image'));
-        fireEvent.click(screen.getByText('ClosePhoto'));
-        expect(screen.queryByTestId('photo-modal')).not.toBeInTheDocument();
+        const file = new File(['cover'], 'cover.png', { type: 'image/png' });
+        fireEvent.change(getCoverImageInput(), { target: { files: [file] } });
+        expect(imageFileMocks.readImageFile).toHaveBeenCalledWith(file, expect.any(Function), expect.any(Function));
     });
 
-    it('updates images when photo is added via photo modal', () => {
+    it('updates images when a cover image file is selected', () => {
+        imageFileMocks.readImageFile.mockImplementationOnce((file, onLoad, onReset) => {
+            onLoad('http://example.com/img.jpg');
+            onReset();
+        });
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Cover Image'));
-        fireEvent.click(screen.getByText('AddPhoto'));
+        fireEvent.change(getCoverImageInput(), {
+            target: { files: [new File(['cover'], 'cover.png', { type: 'image/png' })] },
+        });
         expect(screen.getByText('(1/1)')).toBeInTheDocument();
+        expect(imageFileMocks.resetFileInput).toHaveBeenCalledTimes(1);
     });
 
-    it('shows Edit Cover Image label after photo added', () => {
+    it('shows Replace Cover Image label after photo added', () => {
+        imageFileMocks.readImageFile.mockImplementationOnce((file, onLoad, onReset) => {
+            onLoad('http://example.com/img.jpg');
+            onReset();
+        });
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Cover Image'));
-        fireEvent.click(screen.getByText('AddPhoto'));
-        expect(screen.getByText('Edit Cover Image')).toBeInTheDocument();
+        fireEvent.change(getCoverImageInput(), {
+            target: { files: [new File(['cover'], 'cover.png', { type: 'image/png' })] },
+        });
+        expect(screen.getByText('Replace Cover Image')).toBeInTheDocument();
     });
 
     it('toggles ratification via the RatificationToggle', () => {

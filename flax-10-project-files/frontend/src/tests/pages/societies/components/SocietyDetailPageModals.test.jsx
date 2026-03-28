@@ -17,15 +17,13 @@ describe("SocietyDetailPage modal props", () => {
     vi.clearAllMocks();
   });
 
-  it("passes the expected image, member, and announcement data into open modals", () => {
+  it("passes the expected member and announcement data into open modals", () => {
     societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(createSocietyDetailPageModalData());
     renderSocietyDetailPage(<SocietyDetailPage societyId={55} onBack={vi.fn()} />);
 
     expect(screen.getByTestId("settings-modal")).toHaveTextContent("2");
     expect(screen.getByTestId("settings-modal")).toHaveTextContent("pending");
-    expect(screen.getByTestId("gallery-modal")).toHaveTextContent("2");
-    expect(screen.getByTestId("gallery-modal")).toHaveTextContent("1");
-    expect(screen.getByTestId("cover-modal")).toHaveTextContent("2");
+    expect(screen.getByTestId("cover-image-input")).toHaveAttribute("accept", "image/*");
     expect(screen.getByTestId("report-modal")).toHaveTextContent("Drama Society");
     expect(screen.getByTestId("members-modal")).toHaveTextContent("Drama Society");
     expect(screen.getByTestId("members-modal")).toHaveTextContent("true");

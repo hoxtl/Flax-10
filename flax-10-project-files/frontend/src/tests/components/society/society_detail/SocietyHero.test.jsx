@@ -41,13 +41,13 @@ describe('SocietyHero', () => {
         expect(container.firstChild).toBeTruthy();
     });
 
-    it('calls onImageClick when clicked (non-edit mode)', () => {
+    it('does not expose a hero click callback in non-edit mode', () => {
         const onImageClick = vi.fn();
         const { container } = render(
             <SocietyHero society={baseSociety} onImageClick={onImageClick} editMode={false} />
         );
         fireEvent.click(container.firstChild);
-        expect(onImageClick).toHaveBeenCalledWith(0);
+        expect(onImageClick).not.toHaveBeenCalled();
     });
 
     it('does not call onImageClick in edit mode', () => {
@@ -81,7 +81,7 @@ describe('SocietyHero', () => {
             <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode onEditImages={onEditImages} />
         );
         fireEvent.mouseEnter(container.firstChild);
-        const editLayer = screen.getByRole('button', { name: 'Click to Edit Cover Images' });
+        const editLayer = screen.getByRole('button', { name: 'Click to Edit Cover Image' });
         fireEvent.click(editLayer);
         expect(onEditImages).toHaveBeenCalledOnce();
     });
@@ -186,9 +186,9 @@ describe('SocietyHero', () => {
             <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode onEditImages={vi.fn()} />
         );
         fireEvent.mouseEnter(container.firstChild);
-        expect(screen.getByRole('button', { name: 'Click to Edit Cover Images' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Click to Edit Cover Image' })).toBeInTheDocument();
         fireEvent.mouseLeave(container.firstChild);
-        expect(screen.queryByRole('button', { name: 'Click to Edit Cover Images' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Click to Edit Cover Image' })).not.toBeInTheDocument();
     });
 
     it('does not set a background image when the society has no images', () => {

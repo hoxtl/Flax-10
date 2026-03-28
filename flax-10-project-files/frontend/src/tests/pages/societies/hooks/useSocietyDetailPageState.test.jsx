@@ -168,8 +168,6 @@ describe("useSocietyDetailPageState", () => {
       expect(page.focusAnnouncementId).toBe("state-2");
       const toggles = [
         ["setEditMode", "editMode"],
-        ["setGalleryOpen", "galleryOpen"],
-        ["setShowCoverModal", "showCoverModal"],
         ["setShowSettings", "showSettings"],
         ["setShowReportModal", "showReportModal"],
         ["setShowMembersModal", "showMembersModal"],
