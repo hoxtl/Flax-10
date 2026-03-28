@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../api/authApi", () => ({
+vi.mock("../../../api/authApi", () => ({
   authService: {
     logout: vi.fn(),
   },
 }));
 
-vi.mock("../../components/Auth/utils/authHelpers", () => ({
+vi.mock("../../../components/Auth/utils/authHelpers", () => ({
   clearUserData: vi.fn(),
 }));
 
@@ -16,12 +16,12 @@ import {
   resolveQuickAddModal,
   shouldBlockTimerNavigation,
   shouldShowBackToTop,
-} from "../../layout/dashboard_layout/dashboardLayoutActions";
+} from "../../../layout/dashboard_layout/dashboardLayoutActions";
 import {
   formatUserYear,
   getStoredUser,
   parseStoredUser,
-} from "../../layout/dashboard_layout/dashboardLayoutUser";
+} from "../../../layout/dashboard_layout/dashboardLayoutUser";
 
 describe("dashboard layout helpers", () => {
   afterEach(() => {
@@ -68,8 +68,8 @@ describe("dashboard layout helpers", () => {
   });
 
   it("handles logout, pending actions, back-to-top visibility, and timer blocking", async () => {
-    const { authService } = await import("../../api/authApi");
-    const { clearUserData } = await import("../../components/Auth/utils/authHelpers");
+    const { authService } = await import("../../../api/authApi");
+    const { clearUserData } = await import("../../../components/Auth/utils/authHelpers");
 
     await handleLogoutClick();
     expect(authService.logout).toHaveBeenCalled();

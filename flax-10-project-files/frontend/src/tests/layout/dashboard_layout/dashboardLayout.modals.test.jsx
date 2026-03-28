@@ -1,35 +1,35 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-vi.mock("../../components/calendar/event_modal/EventModal", () => ({
+vi.mock("../../../components/calendar/event_modal/EventModal", () => ({
   EventModal: () => null,
 }));
-vi.mock("../../components/society/components/CreateSocietyModal", () => ({
+vi.mock("../../../components/society/components/CreateSocietyModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/modules/deadlines/DeadlineModal", () => ({
+vi.mock("../../../components/modules/deadlines/DeadlineModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/modules/readings/ReadingModal", () => ({
+vi.mock("../../../components/modules/readings/ReadingModal", () => ({
   default: () => null,
 }));
-vi.mock("../../components/dashboard/components/QuickAddModal", () => ({
+vi.mock("../../../components/dashboard/components/QuickAddModal", () => ({
   default: () => null,
 }));
-vi.mock("../../pages/tasks/components/CreateTaskModal", () => ({
+vi.mock("../../../pages/tasks/components/CreateTaskModal", () => ({
   default: () => null,
 }));
-vi.mock("../../api/societyApi", () => ({
+vi.mock("../../../api/societyApi", () => ({
   createSociety: vi.fn(),
 }));
-vi.mock("../../api/taskApi", () => ({
+vi.mock("../../../api/taskApi", () => ({
   createTask: vi.fn(),
 }));
-vi.mock("../../layout/dashboard_layout/useDashboardTaskModalOptions", () => ({
+vi.mock("../../../layout/dashboard_layout/useDashboardTaskModalOptions", () => ({
   useDashboardTaskModalOptions: () => ({ lists: [], enrolledModules: [] }),
 }));
 
-vi.mock("../../components/timer/components/TimerPopups", () => ({
+vi.mock("../../../components/timer/components/TimerPopups", () => ({
   LeaveTimerModal: ({ onCancel, onPause, onExit, onTakeBreak, timeLeftSeconds, sessionTotalSeconds }) => (
     <div data-testid="leave-timer-modal">
       <span data-testid="leave-timer-time-left">{timeLeftSeconds}</span>
@@ -42,7 +42,7 @@ vi.mock("../../components/timer/components/TimerPopups", () => ({
   ),
 }));
 
-import { LeaveTimerActions } from "../../layout/dashboard_layout/dashboardLayoutModals";
+import { LeaveTimerActions } from "../../../layout/dashboard_layout/dashboardLayoutModals";
 
 describe("dashboard layout modal helpers", () => {
   it("passes clamped time-left and break-session totals into LeaveTimerModal", () => {

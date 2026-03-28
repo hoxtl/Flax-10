@@ -6,20 +6,20 @@ const getModules = vi.fn();
 const getEnrollments = vi.fn();
 const isEnrolledIn = vi.fn();
 
-vi.mock("../../api/taskApi", () => ({
+vi.mock("../../../api/taskApi", () => ({
   fetchTaskLists: (...args) => fetchTaskLists(...args),
 }));
 
-vi.mock("../../api/moduleApi", () => ({
+vi.mock("../../../api/moduleApi", () => ({
   getModules: (...args) => getModules(...args),
   getEnrollments: (...args) => getEnrollments(...args),
 }));
 
-vi.mock("../../components/modules/utils/moduleUtils", () => ({
+vi.mock("../../../components/modules/utils/moduleUtils", () => ({
   isEnrolledIn: (...args) => isEnrolledIn(...args),
 }));
 
-import { useDashboardTaskModalOptions } from "../../layout/dashboard_layout/useDashboardTaskModalOptions";
+import { useDashboardTaskModalOptions } from "../../../layout/dashboard_layout/useDashboardTaskModalOptions";
 
 describe("useDashboardTaskModalOptions", () => {
   beforeEach(() => {

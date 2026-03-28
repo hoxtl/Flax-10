@@ -53,7 +53,7 @@ function openTimerSettings(options = {}) {
 
 describe("DashboardLayout - society, timer, global task", () => {
   it("society creation error still runs the create flow", async () => {
-    const { createSociety } = await import("../../api/societyApi");
+    const { createSociety } = await import("../../../api/societyApi");
     createSociety.mockRejectedValueOnce(new Error("fail"));
     openSocietyModal();
     fireEvent.click(screen.getByText("Create Society"));
@@ -62,7 +62,7 @@ describe("DashboardLayout - society, timer, global task", () => {
   });
 
   it("society creation success closes modal", async () => {
-    const { createSociety } = await import("../../api/societyApi");
+    const { createSociety } = await import("../../../api/societyApi");
     createSociety.mockResolvedValueOnce({});
     openSocietyModal();
     fireEvent.click(screen.getByText("Create Society"));
@@ -71,7 +71,7 @@ describe("DashboardLayout - society, timer, global task", () => {
   });
 
   it("GlobalTaskModal handleSave error still reaches createTask", async () => {
-    const { createTask } = await import("../../api/taskApi");
+    const { createTask } = await import("../../../api/taskApi");
     createTask.mockRejectedValueOnce(new Error("fail"));
     await openTaskModalAndWait();
     fireEvent.click(screen.getByText("Save Task"));
@@ -115,7 +115,7 @@ describe("DashboardLayout - society, timer, global task", () => {
     fireEvent.click(screen.getByText("Quick Add"));
     expect(screen.getByTestId("leave-timer-modal")).toBeInTheDocument();
     mockTimerContext.isPaused = true;
-    const { default: DashboardLayout } = await import("../../layout/DashboardLayout");
+    const { default: DashboardLayout } = await import("../../../layout/DashboardLayout");
     const { rerender } = renderDashboardLayout({ activeNav: "timer", children: "Timer" });
     rerender(<DashboardLayout activeNav="timer" onNavChange={() => {}}>Timer</DashboardLayout>);
     fireEvent.click(screen.getByText("Pause and Leave"));
@@ -174,8 +174,8 @@ describe("DashboardLayout - society, timer, global task", () => {
   });
 
   it("GlobalTaskModal handles non-array API responses", async () => {
-    const { fetchTaskLists, createTask } = await import("../../api/taskApi");
-    const { getModules, getEnrollments } = await import("../../api/moduleApi");
+    const { fetchTaskLists, createTask } = await import("../../../api/taskApi");
+    const { getModules, getEnrollments } = await import("../../../api/moduleApi");
     fetchTaskLists.mockResolvedValueOnce(null);
     getModules.mockResolvedValueOnce("invalid");
     getEnrollments.mockResolvedValueOnce({});
@@ -186,21 +186,21 @@ describe("DashboardLayout - society, timer, global task", () => {
   });
 
   it("GlobalTaskModal handles fetchTaskLists rejection", async () => {
-    const { fetchTaskLists } = await import("../../api/taskApi");
+    const { fetchTaskLists } = await import("../../../api/taskApi");
     fetchTaskLists.mockRejectedValueOnce(new Error("network error"));
     await openTaskModalAndWait();
   });
 
   it("GlobalTaskModal handles getModules getEnrollments rejection", async () => {
-    const { getModules, getEnrollments } = await import("../../api/moduleApi");
+    const { getModules, getEnrollments } = await import("../../../api/moduleApi");
     getModules.mockRejectedValueOnce(new Error("err"));
     getEnrollments.mockRejectedValueOnce(new Error("err"));
     await openTaskModalAndWait();
   });
 
   it("GlobalTaskModal filters modules by isEnrolledIn so enrolledModules is passed to CreateTaskModal", async () => {
-    const { getModules, getEnrollments } = await import("../../api/moduleApi");
-    const { isEnrolledIn } = await import("../../components/modules/utils/moduleUtils");
+    const { getModules, getEnrollments } = await import("../../../api/moduleApi");
+    const { isEnrolledIn } = await import("../../../components/modules/utils/moduleUtils");
     getModules.mockResolvedValueOnce([{ id: 1, module_code: "CS101" }, { id: 2, module_code: "CS102" }]);
     getEnrollments.mockResolvedValueOnce([{ module: 1 }]);
     isEnrolledIn.mockImplementation((moduleId, enrollments) => enrollments.some((e) => e.module === moduleId));
@@ -210,7 +210,7 @@ describe("DashboardLayout - society, timer, global task", () => {
   });
 
   it("uses fallback selectedDate when useCalendar returns no selectedDate", async () => {
-    const { useCalendar } = await import("../../context/CalendarContext");
+    const { useCalendar } = await import("../../../context/CalendarContext");
     useCalendar.mockReturnValueOnce({});
     setDashboardLayoutViewport(500);
     renderDashboardLayout({ activeNav: "calendar", children: "Calendar" });

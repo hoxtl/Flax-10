@@ -20,7 +20,7 @@ describe("DashboardLayout Modals and Events", () => {
   });
 
   it("shows EventModal when isModalOpen is true", async () => {
-    const { useEventModal } = await import("../../context/CalendarContext");
+    const { useEventModal } = await import("../../../context/CalendarContext");
     useEventModal.mockReturnValue({
       isModalOpen: true,
       closeModal: vi.fn(),
@@ -35,7 +35,7 @@ describe("DashboardLayout Modals and Events", () => {
 
   it("EventModal closeModal is called when Close Event Modal clicked", async () => {
     const closeModal = vi.fn();
-    const { useEventModal } = await import("../../context/CalendarContext");
+    const { useEventModal } = await import("../../../context/CalendarContext");
     useEventModal.mockReturnValue({
       isModalOpen: true,
       closeModal,

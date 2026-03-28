@@ -59,68 +59,68 @@ export const mockTimerContext = {
 
 const mockStore = {};
 
-vi.mock("../../context/CalendarContext", () => ({
+vi.mock("../../../context/CalendarContext", () => ({
   useCalendar: hoistedMocks.useCalendar,
   useEventModal: hoistedMocks.useEventModal,
 }));
 
-vi.mock("../../components/dashboard/components/Sidebar", async () => {
+vi.mock("../../../components/dashboard/components/Sidebar", async () => {
   const { SidebarMock } = await import("./dashboardMocks");
   return { default: SidebarMock };
 });
-vi.mock("../../components/dashboard/components/Topbar", async () => {
+vi.mock("../../../components/dashboard/components/Topbar", async () => {
   const { TopbarMock } = await import("./dashboardMocks");
   return { default: TopbarMock };
 });
-vi.mock("../../components/dashboard/components/QuickAddModal", async () => {
+vi.mock("../../../components/dashboard/components/QuickAddModal", async () => {
   const { QuickAddMock } = await import("./dashboardMocks");
   return { default: QuickAddMock };
 });
-vi.mock("../../components/calendar/event_modal/EventModal", async () => {
+vi.mock("../../../components/calendar/event_modal/EventModal", async () => {
   const { EventModalMock } = await import("./dashboardMocks");
   return { EventModal: EventModalMock };
 });
-vi.mock("../../components/society/components/CreateSocietyModal", async () => {
+vi.mock("../../../components/society/components/CreateSocietyModal", async () => {
   const { CreateSocietyMock } = await import("./dashboardMocks");
   return { default: CreateSocietyMock };
 });
-vi.mock("../../components/modules/deadlines/DeadlineModal", async () => {
+vi.mock("../../../components/modules/deadlines/DeadlineModal", async () => {
   const { DeadlineModalMock } = await import("./dashboardMocks");
   return { default: DeadlineModalMock };
 });
-vi.mock("../../components/modules/readings/ReadingModal", async () => {
+vi.mock("../../../components/modules/readings/ReadingModal", async () => {
   const { ReadingModalMock } = await import("./dashboardMocks");
   return { default: ReadingModalMock };
 });
-vi.mock("../../components/timer/components/TimerPopups", async () => {
+vi.mock("../../../components/timer/components/TimerPopups", async () => {
   const { LeaveTimerMock } = await import("./dashboardMocks");
   return { LeaveTimerModal: LeaveTimerMock };
 });
-vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
+vi.mock("../../../pages/tasks/components/CreateTaskModal", async () => {
   const { CreateTaskMock } = await import("./dashboardMocks");
   return { default: CreateTaskMock };
 });
 
-vi.mock("../../components/dashboard/components/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
-vi.mock("../../components/floating_chat/components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
-vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
-vi.mock("../../api/authApi", () => ({ authService: hoistedMocks.authService }));
-vi.mock("../../components/Auth/utils/authHelpers", () => ({ clearUserData: hoistedMocks.clearUserData }));
+vi.mock("../../../components/dashboard/components/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
+vi.mock("../../../components/floating_chat/components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
+vi.mock("../../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock("../../../api/authApi", () => ({ authService: hoistedMocks.authService }));
+vi.mock("../../../components/Auth/utils/authHelpers", () => ({ clearUserData: hoistedMocks.clearUserData }));
 vi.mock("react-router-dom", () => ({ useLocation: hoistedMocks.useLocation }));
-vi.mock("../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
-vi.mock("../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
-vi.mock("../../api/societyApi", () => ({ createSociety: vi.fn().mockResolvedValue({}) }));
-vi.mock("../../api/taskApi", () => ({
+vi.mock("../../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
+vi.mock("../../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
+vi.mock("../../../api/societyApi", () => ({ createSociety: vi.fn().mockResolvedValue({}) }));
+vi.mock("../../../api/taskApi", () => ({
   createTask: vi.fn().mockResolvedValue({}),
   fetchTaskLists: vi.fn().mockResolvedValue([]),
 }));
-vi.mock("../../api/moduleApi", () => ({
+vi.mock("../../../api/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]),
   getEnrollments: vi.fn().mockResolvedValue([]),
 }));
-vi.mock("../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
+vi.mock("../../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
 
-import DashboardLayout from "../../layout/DashboardLayout";
+import DashboardLayout from "../../../layout/DashboardLayout";
 vi.stubGlobal("localStorage", {
   setItem: (key, val) => {
     mockStore[key] = val.toString();
@@ -132,7 +132,7 @@ vi.stubGlobal("localStorage", {
 });
 
 function setDashboardCalendarMocks(selectedDate, eventModal) {
-  return import("../../context/CalendarContext").then(({ useCalendar, useEventModal }) => {
+  return import("../../../context/CalendarContext").then(({ useCalendar, useEventModal }) => {
     useCalendar.mockReturnValue({ selectedDate });
     useEventModal.mockReturnValue({
       isModalOpen: false,
