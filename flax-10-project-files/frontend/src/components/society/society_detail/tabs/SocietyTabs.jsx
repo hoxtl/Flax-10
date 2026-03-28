@@ -1,30 +1,65 @@
-/** SocietyTabs manages navigation between Calendar, About, and Announcements. */
+/** SocietyTabs manages navigation between Calendar and Announcements. */
 
-import { TabBar } from "../../../common/tab_bar/TabBar";
+import Tabs from "../../../common/tabs/Tabs";
 import styles from "./SocietyTabs.module.css";
 import CalendarTab from "./calendar_tab/CalendarTab";
-import AboutTab from "./AboutTab";
 import AnnouncementsTab from "./announcement_tab/AnnouncementsTab";
 
 const TABS = [
     { id: "calendar", label: "Calendar" },
-    { id: "about", label: "About" },
     { id: "announcements", label: "Announcements" }
 ];
 
 export default function SocietyTabs(props) {
-    const { activeTab, onTabChange, society, editMode, onUpdate, eventHandlers, announcementHandlers, tags, tagHandlers, focusAnnouncementId, onEditAnnouncement } = props;
+    const safeActiveTab = TABS.some((tab) => tab.id === props.activeTab) ? props.activeTab : "calendar";
     return (
-        <div className={styles.container}>
-            <TabBar tabs={TABS} activeTab={activeTab} onTabChange={onTabChange} layoutId="society-tab-underline" variant="compact" />
-            <div className={styles.content}>{renderTabContent(activeTab, props)}</div>
-        </div>
+        <Tabs
+            tabs={buildTabs(props)}
+            activeTab={safeActiveTab}
+            onTabChange={props.onTabChange}
+            layoutId="society-tab"
+            className={styles.container}
+            tabClassName={styles.tabButton}
+        />
     );
 }
 
-function renderTabContent(activeTab, props) {
-    const { society, editMode, onUpdate, eventHandlers, announcementHandlers, tags, tagHandlers, onTabChange, focusAnnouncementId, onEditAnnouncement } = props;
-    if (activeTab === 'about') return <AboutTab about={society.about} adminEmails={society.admin_emails} editMode={editMode} onUpdate={(data) => onUpdate?.(data)} />;
-    if (activeTab === 'announcements') return <AnnouncementsTab announcements={society.announcements} editMode={editMode} handlers={announcementHandlers} tags={tags} societyId={society.id} focusAnnouncementId={focusAnnouncementId} onEdit={onEditAnnouncement} />;
-    return <CalendarTab events={society.events} editMode={editMode} eventHandlers={eventHandlers} tags={tags} tagHandlers={tagHandlers} onViewAnnouncement={(id) => onTabChange('announcements', id)} societyId={society.id} isMember={society.is_member} onEditAnnouncement={onEditAnnouncement} announcements={society.announcements} societyName={society.name} />;
+function buildTabs(props) {
+    const { society, editMode, eventHandlers, announcementHandlers, tags, tagHandlers, onTabChange, focusAnnouncementId, onEditAnnouncement } = props;
+    return [
+        {
+            id: "calendar",
+            label: "Calendar",
+            content: (
+                <CalendarTab
+                    events={society.events}
+                    editMode={editMode}
+                    eventHandlers={eventHandlers}
+                    tags={tags}
+                    tagHandlers={tagHandlers}
+                    onViewAnnouncement={(id) => onTabChange("announcements", id)}
+                    societyId={society.id}
+                    isMember={society.is_member}
+                    onEditAnnouncement={onEditAnnouncement}
+                    announcements={society.announcements}
+                    societyName={society.name}
+                />
+            ),
+        },
+        {
+            id: "announcements",
+            label: "Announcements",
+            content: (
+                <AnnouncementsTab
+                    announcements={society.announcements}
+                    editMode={editMode}
+                    handlers={announcementHandlers}
+                    tags={tags}
+                    societyId={society.id}
+                    focusAnnouncementId={focusAnnouncementId}
+                    onEdit={onEditAnnouncement}
+                />
+            ),
+        },
+    ];
 }

@@ -4,8 +4,10 @@
  */
 
 import { useState, useEffect, useRef } from "react";
+import { Megaphone } from "lucide-react";
 import styles from "../tabs.module.css";
 import { formatShortDate } from "../../../../calendar/utils/dateUtils";
+import SearchEmptyState from "../../../../common/search_empty_state/SearchEmptyState";
 import ImageGalleryModal from "../../image_handlers/ImageGalleryModal";
 import { getImageList } from "./announcementModalHelpers";
 
@@ -33,8 +35,15 @@ function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnounc
 }
 
 function EmptyAnnouncements({ editMode }) {
-    const msg = editMode ? "No announcements yet. Use the sidebar to add one." : "No announcements yet.";
-    return <p className={styles.empty}>{msg}</p>;
+    return (
+        <SearchEmptyState
+            className={styles.announcementEmptyState}
+            title="No announcements yet"
+            hint={editMode ? "Use the sidebar to post the first update for this society." : "Check back soon for society updates, reminders, and event news."}
+            itemLabel="announcements"
+            icon={<Megaphone size={22} aria-hidden="true" />}
+        />
+    );
 }
 
 function useFocusScroll(isFocused, ref) {

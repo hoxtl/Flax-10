@@ -4,39 +4,44 @@
  */
 
 import styles from "./RatificationSection.module.css";
+import PrimaryButton from "../../common/primary_button/PrimaryButton";
 
-export function RatificationSection({ status, isRatified, onRequest }) {
-    if (isRatified) return <RatificationStatus label="Ratified" className={styles.statusApproved} />;
-    if (status === 'pending') return <RatificationStatus label="Pending Approval" className={styles.statusPending} />;
-    if (status === 'rejected') return <RatificationRejected onRequest={onRequest} />;
-    return <RatificationRequest onRequest={onRequest} />;
+export function RatificationSection({ status, isRatified, onRequest, compact = false }) {
+    if (isRatified) return <RatificationStatus label="Ratified" className={styles.statusApproved} compact={compact} />;
+    if (status === 'pending') return <RatificationStatus label="Pending Approval" className={styles.statusPending} compact={compact} />;
+    if (status === 'rejected') return <RatificationRejected onRequest={onRequest} compact={compact} />;
+    return <RatificationRequest onRequest={onRequest} compact={compact} />;
 }
 
-function RatificationStatus({ label, className }) {
+function RatificationStatus({ label, className, compact }) {
     return (
         <div className={styles.section}>
-            <h4 className={styles.title}>Ratification Status</h4>
+            {!compact && <h4 className={styles.title}>Ratification Status</h4>}
+            {compact && <h4 className={styles.compactTitle}>Request ratification to gain official society status.</h4>}
             <span className={className}>{label}</span>
         </div>
     );
 }
 
-function RatificationRejected({ onRequest }) {
+function RatificationRejected({ onRequest, compact }) {
     return (
         <div className={styles.section}>
-            <h4 className={styles.title}>Ratification Status</h4>
+            {!compact && <h4 className={styles.title}>Ratification Status</h4>}
+            {compact && <h4 className={styles.compactTitle}>Request ratification to gain official society status.</h4>}
             <span className={styles.statusRejected}>Rejected</span>
-            <button className={styles.requestBtn} onClick={onRequest}>Request Again</button>
+            <PrimaryButton className={styles.requestBtn} variant="secondary" pill onClick={onRequest}>Request Again</PrimaryButton>
         </div>
     );
 }
 
-function RatificationRequest({ onRequest }) {
+function RatificationRequest({ onRequest, compact }) {
     return (
         <div className={styles.section}>
-            <h4 className={styles.title}>Ratification</h4>
-            <p className={styles.info}>Request ratification to gain official society status.</p>
-            <button className={styles.requestBtn} onClick={onRequest}>Request Ratification</button>
+            {!compact && <h4 className={styles.title}>Ratification</h4>}
+            {compact
+                ? <h4 className={styles.compactTitle}>Request ratification to gain official society status.</h4>
+                : <p className={styles.info}>Request ratification to gain official society status.</p>}
+            <PrimaryButton className={styles.requestBtn} variant="secondary" pill onClick={onRequest}>Request Ratification</PrimaryButton>
         </div>
     );
 }

@@ -1,6 +1,8 @@
 /* Styles for the society event/announcement tag filter container. */
 .filterBar {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.selector {
+    width: 100%;
 }

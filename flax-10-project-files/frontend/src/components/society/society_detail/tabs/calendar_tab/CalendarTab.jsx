@@ -122,7 +122,7 @@ function CalendarControls({ props, selectedDate, setSelectedDate, tagFilters, se
     const { editMode, tags, tagHandlers, societyId, isMember, societyName } = props;
     return (
         <>
-            {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} />}
+            {editMode && <TagManager tags={tags} onAddTag={tagHandlers?.onAddTag} onDeleteTag={tagHandlers?.onDeleteTag} onUpdateTag={tagHandlers?.onUpdateTag} />}
             <CalendarHeader date={selectedDate} setDate={setSelectedDate} societyId={societyId}
                 isMember={isMember} societyName={societyName} />
             <TagFilterBar tags={tags} activeFilters={tagFilters} onFilterChange={setTagFilters} />

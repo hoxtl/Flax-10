@@ -42,10 +42,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 10px;
-    background: var(--bg);
-    border-radius: 16px;
-    font-size: 0.85rem;
+}
+
+.tagChip {
+    min-height: 0;
+    box-shadow: none;
+    cursor: pointer;
 }
 
 .colorDot {
@@ -66,7 +68,7 @@
     font-size: 1rem;
     line-height: 1;
     padding: 0;
-    margin-left: 2px;
+    margin-left: -4px;
 }
 
 .removeBtn:hover {
@@ -80,12 +82,62 @@
     flex-wrap: wrap;
 }
 
+.tagEditor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+    background: color-mix(in srgb, var(--panel) 88%, var(--hover) 12%);
+}
+
+.tagEditorInput {
+    flex: 1;
+    min-width: 140px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.tagEditorInput:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.tagEditorBtn,
+.tagEditorGhostBtn {
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.tagEditorBtn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+}
+
+.tagEditorGhostBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
 .input {
     flex: 1;
     min-width: 120px;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 999px;
     font-size: 0.875rem;
     background: var(--bg);
     color: var(--text);
@@ -141,14 +193,16 @@
 }
 
 .addBtn {
-    padding: 8px 16px;
+    padding: 6px 16px;
     background: var(--primary);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 999px;
     cursor: pointer;
-    font-weight: 500;
-    font-size: 0.875rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .addBtn:disabled {

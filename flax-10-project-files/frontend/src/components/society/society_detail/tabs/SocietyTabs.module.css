@@ -1,45 +1,20 @@
 /* Styles for the SocietyTabs container and buttons. */
 .container {
     background: transparent;
+    width: 100%;
 }
 
-.tabBar {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-}
-
-.tab {
-    padding: 14px 24px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
+.tabButton {
+    min-width: 0;
     font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--muted);
-    position: relative;
-    transition: color 0.2s;
+    font-weight: 600;
 }
 
-.tab:hover {
-    color: var(--text);
+.container :global([class*="tabBar"]) {
+    margin-bottom: 0;
 }
 
-.tab.active {
-    color: var(--primary);
-}
-
-.tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--primary);
-    border-radius: 3px 3px 0 0;
-}
-
-.content {
+.container :global([class*="content"]) {
     padding: 20px 0;
     min-height: 400px;
 }
