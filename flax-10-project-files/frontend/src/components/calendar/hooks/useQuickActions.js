@@ -25,11 +25,12 @@ export function useQuickActions(event) {
     const notify = useNotify();
     const type = getEventType(event);
 
+    if (type !== 'society') return null;
+
     const handleAction = async (e) => {
         if (e) e.stopPropagation();
-        if (type === 'society') await handleSocietyAction(event, refreshTags, loadEvents, notify);
+        await handleSocietyAction(event, refreshTags, loadEvents, notify);
     };
 
-    if (type === 'society') return { label: 'Unsync', onClick: handleAction };
-    return null;
+    return { label: 'Unsync', onClick: handleAction };
 }
