@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
+const useToastMock = vi.fn();
+
 vi.mock('../../../../components/society/styles/CreateSocietyModal.module.css', () => ({ default: {} }));
 vi.mock('../../../../components/society/components/AddCollaboratorModal', () => ({
     default: ({ onClose, onAdd }) => (
@@ -58,6 +60,9 @@ vi.mock('../../../../components/common/standard_modal/StandardModal', () => ({
         </div>
     ),
 }));
+vi.mock('../../../../context/ToastContext', () => ({
+    useToast: () => useToastMock(),
+}));
 
 import CreateSocietyModal from '../../../../components/society/components/CreateSocietyModal';
 
@@ -68,6 +73,8 @@ describe('CreateSocietyModal', () => {
     beforeEach(() => {
         onClose = vi.fn();
         onCreate = vi.fn();
+        useToastMock.mockReset();
+        useToastMock.mockReturnValue(undefined);
         vi.clearAllMocks();
     });
 
@@ -325,5 +332,38 @@ describe('CreateSocietyModal', () => {
         const coverImageLabel = Array.from(labels).find(l => l.textContent.includes('Cover Image'));
         expect(coverImageLabel).toBeTruthy();
         expect(coverImageLabel.textContent).toContain('(0/1)');
+    });
+
+    it('shows the submit error and toast when creation fails with an explicit message', async () => {
+        const showToast = vi.fn();
+        useToastMock.mockReturnValue(showToast);
+        onCreate.mockRejectedValue(new Error('Creation failed'));
+
+        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+        fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
+            target: { value: 'Drama Society' },
+        });
+
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
+
+        expect(screen.getByText('Creation failed')).toBeInTheDocument();
+        expect(showToast).toHaveBeenCalledWith('Creation failed', { variant: 'error' });
+    });
+
+    it('uses the fallback submit error when creation fails without a message', async () => {
+        onCreate.mockRejectedValue({});
+
+        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+        fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
+            target: { value: 'Debate Society' },
+        });
+
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
+
+        expect(screen.getByText("Couldn't create the society just yet.")).toBeInTheDocument();
     });
 });
