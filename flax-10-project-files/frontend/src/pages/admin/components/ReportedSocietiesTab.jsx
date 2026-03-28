@@ -16,10 +16,6 @@ import AdminPagination from "./AdminPagination";
 import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
 import BanReportedSocietyModal from "./BanReportedSocietyModal";
 
-function BanDismissButtons({ busy, onBan, onDismiss }) {
-  return <><button className={styles.banBtn} disabled={busy} onClick={onBan}>Ban</button><button className={styles.dismissBtn} disabled={busy} onClick={onDismiss}>Dismiss</button></>;
-}
-
 function removeReportsBySociety(reports, reportId) {
   const target = reports.find((report) => report.id === reportId);
   return target ? reports.filter((report) => report.society_id !== target.society_id) : reports.filter((report) => report.id !== reportId);
@@ -27,6 +23,10 @@ function removeReportsBySociety(reports, reportId) {
 
 function getReportMeta(report) {
   return <>Reported by <strong>@{report.reporter_username}</strong>{report.reason ? ` · "${report.reason}"` : ""}</>;
+}
+
+function BanDismissButtons({ busy, onBan, onDismiss }) {
+  return <><button className={styles.banBtn} disabled={busy} onClick={onBan}>Ban</button><button className={styles.dismissBtn} disabled={busy} onClick={onDismiss}>Dismiss</button></>;
 }
 
 function ReportRow({ busy, onBan, onDismiss, report }) {
@@ -49,34 +49,32 @@ function ReportedSocietiesContent({ busy, onBan, onDismiss, pagination }) {
   );
 }
 
-export default function ReportedSocietiesTab() {
+function useBanActions(run, setItems) {
   const [banTarget, setBanTarget] = useState(null);
+  const onBanOpen = (report) => setBanTarget(report);
+  const onBanCancel = () => setBanTarget(null);
+  const onBanConfirm = (reason = "") => {
+    if (!banTarget) return;
+    run(banTarget.id, () => banReportedSociety(banTarget.id, reason), () => { setItems((c) => removeReportsBySociety(c, banTarget.id)); setBanTarget(null); }, "Failed to ban society.");
+  };
+  return { banTarget, onBanOpen, onBanCancel, onBanConfirm };
+}
+
+/** Admin tab listing reported societies with ban and dismiss actions. */
+export default function ReportedSocietiesTab() {
   const { error, items, loading, setError, setItems } = useAsyncList(fetchReportedSocieties, "Failed to load reports.");
   const { busy, run } = useAsyncAction(setError);
   const pagination = usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
-  const handleDismiss = (id) => run(id, () => dismissReport(id), () => setItems((current) => current.filter((report) => report.id !== id)), "Failed to dismiss report.");
-  const handleBanOpen = (report) => setBanTarget(report);
-  const handleBanCancel = () => setBanTarget(null);
-  const handleBanConfirm = (reason = "") => {
-    if (!banTarget) return;
-    run(
-      banTarget.id,
-      () => banReportedSociety(banTarget.id, reason),
-      () => {
-        setItems((current) => removeReportsBySociety(current, banTarget.id));
-        setBanTarget(null);
-      },
-      "Failed to ban society.",
-    );
-  };
+  const handleDismiss = (id) => run(id, () => dismissReport(id), () => setItems((c) => c.filter((r) => r.id !== id)), "Failed to dismiss report.");
+  const { banTarget, onBanOpen, onBanCancel, onBanConfirm } = useBanActions(run, setItems);
   return (
     <>
       <SectionCard>
         <CardHeader title="Reported Societies" count={items.length} />
         <ErrorMessage message={error} />
-        {loading ? <LoadingSpinner /> : items.length ? <ReportedSocietiesContent busy={busy} onBan={handleBanOpen} onDismiss={handleDismiss} pagination={pagination} /> : <SearchEmptyState title="No reported societies" hint="Society reports from users will appear here." />}
+        {loading ? <LoadingSpinner /> : items.length ? <ReportedSocietiesContent busy={busy} onBan={onBanOpen} onDismiss={handleDismiss} pagination={pagination} /> : <SearchEmptyState title="No reported societies" hint="Society reports from users will appear here." />}
       </SectionCard>
-      {banTarget ? <BanReportedSocietyModal report={banTarget} busy={busy === banTarget.id} onConfirm={handleBanConfirm} onCancel={handleBanCancel} /> : null}
+      {banTarget ? <BanReportedSocietyModal report={banTarget} busy={busy === banTarget.id} onConfirm={onBanConfirm} onCancel={onBanCancel} /> : null}
     </>
   );
 }
