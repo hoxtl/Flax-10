@@ -28,71 +28,89 @@ const baseSociety = {
 };
 
 describe('SocietyInfo', () => {
+    function renderInfo(societyOverrides = {}, props = {}) {
+        return render(
+            <MemoryRouter>
+                <SocietyInfo
+                    society={{ ...baseSociety, ...societyOverrides }}
+                    editMode={false}
+                    showBio={false}
+                    showLocation={false}
+                    showMeta={false}
+                    {...props}
+                />
+            </MemoryRouter>,
+        );
+    }
+
+    it('renders nothing when no sections are enabled', () => {
+        const { container } = renderInfo();
+        expect(container.firstChild).toBeNull();
+    });
+
     it('renders bio text', () => {
-        render(<SocietyInfo society={baseSociety} editMode={false} />);
+        renderInfo({}, { showBio: true });
         expect(screen.getByText('We play chess')).toBeTruthy();
     });
 
     it('does not render the society insight banner inside SocietyInfo', () => {
-        render(<SocietyInfo society={baseSociety} editMode={false} />);
+        renderInfo({}, { showBio: true, showMeta: true, showLocation: true });
         expect(screen.queryByTestId('society-insight-banner')).not.toBeInTheDocument();
     });
 
     it('renders Join Society button when not a member', () => {
-        render(<SocietyInfo society={baseSociety} editMode={false} onJoin={vi.fn()} />);
+        renderInfo({}, { showMeta: true, onJoin: vi.fn() });
         expect(screen.getByText('Join')).toBeTruthy();
     });
 
-    it('renders Joined button when a member', () => {
-        render(<SocietyInfo society={{ ...baseSociety, is_member: true }} editMode={false} onLeave={vi.fn()} />);
+    it('renders Leave button when a member', () => {
+        renderInfo({ is_member: true }, { showMeta: true, onLeave: vi.fn() });
         expect(screen.getByText('Leave')).toBeTruthy();
     });
 
     it('calls onJoin when Join Society button clicked', () => {
         const onJoin = vi.fn();
-        render(<SocietyInfo society={baseSociety} editMode={false} onJoin={onJoin} />);
+        renderInfo({}, { showMeta: true, onJoin });
         fireEvent.click(screen.getByText('Join'));
         expect(onJoin).toHaveBeenCalledOnce();
     });
 
     it('shows bio placeholder in edit mode with no bio', () => {
-        render(<SocietyInfo society={{ ...baseSociety, bio: '' }} editMode={true} />);
+        renderInfo({ bio: '' }, { showBio: true, editMode: true });
         expect(screen.getByText('Add a bio description...')).toBeTruthy();
     });
 
     it('shows edit icon in edit mode and clicking enters edit mode', () => {
-        render(<SocietyInfo society={baseSociety} editMode={true} onUpdateSociety={vi.fn()} />);
-        // The bio section edit icon is clickable
-        const editIcons = document.querySelectorAll('[class*="editIcon"], [title="Edit"]');
-        expect(editIcons.length).toBeGreaterThanOrEqual(0); // flexible - just verify no crash
+        renderInfo({}, { showBio: true, editMode: true, onUpdateSociety: vi.fn() });
+        fireEvent.click(screen.getByTitle('Edit'));
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
 
     it('renders category display', () => {
-        render(<SocietyInfo society={baseSociety} editMode={false} />);
+        renderInfo({}, { showMeta: true });
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
 
     it('renders empty bio wrapper when no bio and not edit mode', () => {
-        const { container } = render(<SocietyInfo society={{ ...baseSociety, bio: '' }} editMode={false} />);
+        const { container } = renderInfo({ bio: '' }, { showBio: true });
         const wrapper = container.querySelector('[class*="bioWrapper"]');
         expect(wrapper).toBeTruthy();
         expect(wrapper?.textContent?.trim()).toBe('');
     });
 
-    it('BioEditor: enter edit mode, change value, Save calls onUpdateSociety', async () => {
+    it('BioEditor: enter edit mode, change value, Save calls onUpdateSociety', () => {
         const onUpdateSociety = vi.fn();
-        render(<SocietyInfo society={baseSociety} editMode onUpdateSociety={onUpdateSociety} />);
-        const editIcons = document.querySelectorAll('[title="Edit"]');
-        fireEvent.click(editIcons[0]);
-        const textarea = document.querySelector('textarea');
+        renderInfo({}, { showBio: true, editMode: true, onUpdateSociety });
+        fireEvent.click(screen.getByTitle('Edit'));
+        const textarea = screen.getByRole('textbox');
         fireEvent.change(textarea, { target: { value: 'Updated bio' } });
         fireEvent.click(screen.getByText('Save'));
         expect(onUpdateSociety).toHaveBeenCalledWith({ bio: 'Updated bio' });
     });
 
-    it('CategorySection: enter edit, select category, Save calls onUpdateSociety', async () => {
+    it('CategorySection: enter edit, select category, Save calls onUpdateSociety', () => {
         const onUpdateSociety = vi.fn();
-        render(<SocietyInfo society={baseSociety} editMode onUpdateSociety={onUpdateSociety} />);
+        renderInfo({}, { showMeta: true, editMode: true, onUpdateSociety });
         fireEvent.click(screen.getByTestId('edit-category'));
         fireEvent.click(screen.getByText('Select Cat'));
         fireEvent.click(screen.getByText('Save'));
@@ -101,80 +119,74 @@ describe('SocietyInfo', () => {
 
     it('shows NotificationBell and calls onToggleSubscription when member', () => {
         const onToggleSubscription = vi.fn();
-        render(
-            <SocietyInfo
-                society={{ ...baseSociety, is_member: true }}
-                editMode={false}
-                isSubscribed={true}
-                onToggleSubscription={onToggleSubscription}
-            />
+        renderInfo(
+            { is_member: true },
+            { showMeta: true, isSubscribed: true, onToggleSubscription },
         );
-        const bellBtn = document.querySelector('[title="Notifications on"]');
-        expect(bellBtn).toBeTruthy();
+        const bellBtn = screen.getByRole('button', { name: 'Notifications on' });
         fireEvent.click(bellBtn);
         expect(onToggleSubscription).toHaveBeenCalledOnce();
     });
 
     it('NotificationBell shows Notifications off when not subscribed', () => {
-        render(
-            <SocietyInfo
-                society={{ ...baseSociety, is_member: true }}
-                editMode={false}
-                isSubscribed={false}
-                onToggleSubscription={vi.fn()}
-            />
+        renderInfo(
+            { is_member: true },
+            { showMeta: true, isSubscribed: false, onToggleSubscription: vi.fn() },
         );
-        expect(document.querySelector('[title="Notifications off"]')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Notifications off' })).toBeTruthy();
+    });
+
+    it('disables notifications when the user is not a member', () => {
+        renderInfo({}, { showMeta: true, isSubscribed: true, onToggleSubscription: vi.fn() });
+        expect(screen.getByRole('button', { name: 'Join to manage notifications' })).toBeDisabled();
     });
 
     it('does not render the member count in the segmented pill', () => {
-        render(<SocietyInfo society={baseSociety} editMode={false} />);
+        renderInfo({}, { showMeta: true });
         expect(screen.queryByText(/10.*members/)).not.toBeInTheDocument();
     });
 
     it('canEdit shows Edit Society button and toggles edit mode', () => {
         const onToggleEditMode = vi.fn();
-        render(
-            <SocietyInfo society={baseSociety} editMode={false} canEdit onToggleEditMode={onToggleEditMode} />
-        );
+        renderInfo({}, { showMeta: true, canEdit: true, onToggleEditMode });
         fireEvent.click(screen.getByText('Edit Society'));
         expect(onToggleEditMode).toHaveBeenCalledOnce();
     });
 
     it('does not render the insight banner for admins editing the society', () => {
-        render(<SocietyInfo society={{ ...baseSociety, is_admin: true }} editMode={false} canEdit onToggleEditMode={vi.fn()} />);
+        renderInfo({ is_admin: true }, { showMeta: true, canEdit: true, onToggleEditMode: vi.fn() });
         expect(screen.queryByTestId('society-insight-banner')).not.toBeInTheDocument();
     });
 
     it('canEdit shows Done Editing when in edit mode', () => {
-        render(<SocietyInfo society={baseSociety} editMode canEdit onToggleEditMode={vi.fn()} />);
+        renderInfo({}, { showMeta: true, editMode: true, canEdit: true, onToggleEditMode: vi.fn() });
         expect(screen.getByText('Done Editing')).toBeTruthy();
     });
 
     it('calls onLeave when Joined button clicked', () => {
         const onLeave = vi.fn();
-        render(<SocietyInfo society={{ ...baseSociety, is_member: true }} editMode={false} onLeave={onLeave} />);
+        renderInfo({ is_member: true }, { showMeta: true, onLeave });
         fireEvent.click(screen.getByText('Leave'));
         expect(onLeave).toHaveBeenCalledOnce();
     });
 
     it('uses society.category when categories is empty', () => {
-        render(<SocietyInfo society={{ ...baseSociety, categories: undefined, category: 'Sports' }} editMode={false} />);
-        expect(screen.getByTestId('category-display')).toBeTruthy();
+        renderInfo({ categories: undefined, category: 'Sports' }, { showMeta: true });
+        expect(screen.getByTestId('category-display')).toHaveTextContent('Sports');
     });
 
     it('uses empty array when both categories and category are falsy', () => {
-        render(<SocietyInfo society={{ ...baseSociety, categories: undefined, category: undefined }} editMode={false} />);
+        renderInfo({ categories: undefined, category: undefined }, { showMeta: true });
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
 
     it('CategorySection handles null categories prop', () => {
-        render(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />);
+        renderInfo({ categories: null }, { showMeta: true, editMode: true });
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
 
     it('does not render the Ratified label in the metadata pill', () => {
-        render(<SocietyInfo society={{ ...baseSociety, is_ratified: true }} editMode={false} />);
+        renderInfo({ is_ratified: true }, { showMeta: true });
         expect(screen.queryByText('Ratified')).not.toBeInTheDocument();
     });
 
@@ -182,38 +194,66 @@ describe('SocietyInfo', () => {
         const { rerender } = render(
             <SocietyInfo society={{ ...baseSociety, categories: ['Sports'] }} editMode={true} />
         );
-        expect(screen.getByTestId('category-display')).toBeTruthy();
-        rerender(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />);
-        expect(screen.getByTestId('category-display')).toBeTruthy();
+        rerender(
+            <MemoryRouter>
+                <SocietyInfo society={{ ...baseSociety, categories: ['Sports'] }} editMode={true} showMeta />
+            </MemoryRouter>,
+        );
+        expect(screen.getByTestId('category-display')).toHaveTextContent('Sports');
+        rerender(
+            <MemoryRouter>
+                <SocietyInfo society={{ ...baseSociety, categories: ['Arts'] }} editMode={true} showMeta />
+            </MemoryRouter>,
+        );
+        expect(screen.getByTestId('category-display')).toHaveTextContent('Arts');
     });
 
-    it('CategorySection useEffect covers true branch when categories changes to truthy', () => {
-        const { rerender } = render(
-            <SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />
+    it('shows pending membership labels for join and leave actions', () => {
+        const { rerender } = renderInfo({}, { showMeta: true, membershipAction: 'join' });
+        expect(screen.getByRole('button', { name: 'Joining...' })).toBeDisabled();
+        rerender(
+            <MemoryRouter>
+                <SocietyInfo
+                    society={{ ...baseSociety, is_member: true }}
+                    editMode={false}
+                    showMeta
+                    membershipAction="leave"
+                />
+            </MemoryRouter>,
         );
-        rerender(<SocietyInfo society={{ ...baseSociety, categories: ['Arts'] }} editMode={true} />);
-        expect(screen.getByTestId('category-display')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Leaving...' })).toBeDisabled();
+    });
+
+    it('supports the hero layout modifier for the metadata pill', () => {
+        const { rerender } = render(
+            <MemoryRouter>
+                <SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} showMeta layout="hero" />
+            </MemoryRouter>,
+        );
+        expect(document.querySelector('[class*="metaPillHero"]')).toBeTruthy();
+        rerender(
+            <MemoryRouter>
+                <SocietyInfo society={{ ...baseSociety, categories: ['Arts'] }} editMode={true} showMeta layout="hero" />
+            </MemoryRouter>,
+        );
+        expect(screen.getByTestId('category-display')).toHaveTextContent('Arts');
     });
 
     it('initialises an empty bio editor value when the bio is null', () => {
-        render(<SocietyInfo society={{ ...baseSociety, bio: null }} editMode onUpdateSociety={vi.fn()} />);
-        const editIcons = document.querySelectorAll('[title="Edit"]');
-        fireEvent.click(editIcons[0]);
-        expect(document.querySelector('textarea').value).toBe('');
+        renderInfo({ bio: null }, { showBio: true, editMode: true, onUpdateSociety: vi.fn() });
+        fireEvent.click(screen.getByTitle('Edit'));
+        expect(screen.getByRole('textbox')).toHaveValue('');
     });
 
-    it('normalises null categories to an empty array when opening the category editor', () => {
-        render(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode onUpdateSociety={vi.fn()} />);
+    it('opens the category editor when categories are null', () => {
+        renderInfo({ categories: null }, { showMeta: true, editMode: true, onUpdateSociety: vi.fn() });
         fireEvent.click(screen.getByTestId('edit-category'));
+        expect(screen.getByText('Edit Categories')).toBeInTheDocument();
         expect(screen.getByTestId('category-selector')).toBeInTheDocument();
     });
 
     it('renders a map link when the society has a location', () => {
-        render(
-            <MemoryRouter>
-                <SocietyInfo society={{ ...baseSociety, location: 'Bush House' }} editMode={false} />
-            </MemoryRouter>,
-        );
+        renderInfo({ location: 'Bush House' }, { showLocation: true });
         expect(screen.getByLabelText('Open UniMap for Bush House')).toBeInTheDocument();
     });
 });

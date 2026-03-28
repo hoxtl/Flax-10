@@ -65,7 +65,7 @@ describe('SocietyHero', () => {
             <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode onEditImages={onEditImages} />
         );
         fireEvent.mouseEnter(container.firstChild);
-        const editLayer = screen.getByText('Click to Edit Cover Images');
+        const editLayer = screen.getByRole('button', { name: 'Edit Cover Image' });
         fireEvent.click(editLayer);
         expect(onEditImages).toHaveBeenCalledOnce();
     });
