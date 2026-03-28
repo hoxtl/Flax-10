@@ -3,10 +3,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ReadingForm from '../../../components/modules/readings/ReadingForm';
+import { render, screen, fireEvent } from '@testing-library/react';
+import ReadingForm, { buildFormData } from '../../../components/modules/readings/ReadingForm';
+import { fillBaseReadingForm, setChapterValue, setEstimatedMinutes, submitReadingForm } from './readings/readingTestUtils';
 
-vi.mock('../../../components/modules/deadlines/DeadlineForm.module.css', () => ({ default: { } }));
 vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
     default: ({onChange, placeholder }) => (
         <input placeholder={placeholder} onChange={e =>onChange(e.target.value)} />
@@ -18,9 +18,9 @@ describe('ReadingForm', () => {
         vi.clearAllMocks();
     });
 
-    it('renders form fields', () => {
+    it('renders the labelled reading fields', () => {
         render(<ReadingForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
-        expect(screen.getByPlaceholderText(/Software Engineering Module Handbook/))
+        expect(screen.getByPlaceholderText(/Software Engineering Module Handbook/)).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/Chapter 13/)).toBeInTheDocument();
         expect(screen.getByText('Add Reading')).toBeInTheDocument();
     });
@@ -31,7 +31,7 @@ describe('ReadingForm', () => {
         expect(screen.getByText('Update')).toBeInTheDocument();
     });
 
-    it('calls onCancel when cancel button clicked', () => {
+    it('calls onCancel when cancel button is clicked', () => {
         const onCancel = vi.fn();
         render(<ReadingForm onSubmit={vi.fn()} onCancel={onCancel} />);
         fireEvent.click(screen.getByText('Cancel'));
@@ -40,21 +40,59 @@ describe('ReadingForm', () => {
 
     it('shows an error when chapter is negative', () => {
         render(<ReadingForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
-        fireEvent.change(screen.getByPlaceholderText(/Software Engineering Module Handbook/), {target : {value: 'Test Reading'}});
-        fireEvent.change(screen.getByPlaceholderText(/Chapter 13/), {target : {value: '-1'}});
-        fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: '13' } });
-        fireEvent.change(screen.getAllByRole('spinbutton')[1], { target: { value: '63' } });
-        fireEvent.click(screen.getByText('Add Reading'));
-        expect(screen.getByText('Due date cannot be empty.')).toBeInTheDocument();
+        fillBaseReadingForm();
+        setChapterValue('-1');
+        submitReadingForm();
+        expect(screen.getByText('Chapter cannot be negative.')).toBeInTheDocument();
     });
 
-     it('shows an error when end page is less than start page', () => {
+    it('shows an error when end page is less than start page', () => {
         render(<ReadingForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
-        fireEvent.change(screen.getByPlaceholderText(/Software Engineering Module Handbook/), {target : {value: 'Test Reading'}});
+        fillBaseReadingForm();
         fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: '40' } });
         fireEvent.change(screen.getAllByRole('spinbutton')[1], { target: { value: '10' } });
-        fireEvent.click(screen.getByText('Add Reading'));
-        expect(screen.getByText('Due date cannot be empty.')).toBeInTheDocument();
+        submitReadingForm();
+        expect(screen.getByText('End page must be greater than or equal to start page.')).toBeInTheDocument();
+    });
+
+    it('submits a transformed payload with numeric and ISO values', () => {
+        const onSubmit = vi.fn();
+        render(<ReadingForm onSubmit={onSubmit} onCancel={vi.fn()} />);
+        fillBaseReadingForm();
+        submitReadingForm();
+        const isoDeadline = new Date('2026-04-01T09:00').toISOString();
+        expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+            start_page: 10,
+            end_page: 30,
+            estimated_minutes: null,
+            deadline: isoDeadline,
+        }));
+    });
+
+    it('allows manual estimated minutes overrides', () => {
+        const onSubmit = vi.fn();
+        render(<ReadingForm onSubmit={onSubmit} onCancel={vi.fn()} />);
+        fillBaseReadingForm();
+        setEstimatedMinutes('45');
+        submitReadingForm();
+        expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ estimated_minutes: 45 }));
+    });
+
+    it('converts blank inputs to defaults in buildFormData', () => {
+        const payload = buildFormData({
+            title: 'Reading',
+            chapter: '',
+            start_page: '5',
+            end_page: '8',
+            estimated_minutes: '',
+            deadline: '',
+        });
+        expect(payload).toMatchObject({
+            start_page: 5,
+            end_page: 8,
+            estimated_minutes: null,
+            deadline: '',
+        });
     });
 
 });

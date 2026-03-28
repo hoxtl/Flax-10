@@ -5,64 +5,82 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ReadingCard from '../../../components/modules/readings/ReadingCard';
+import { readingFixture } from './readings/readingTestUtils';
 
 vi.mock('../../../components/calendar/utils/dateUtils', () => ({
     formatDate: vi.fn(() => '13 Apr 2026'),
 }));
 
-vi.mock('../../../components/modules/deadlines/DeadlineCard.module.css', () => ({ default: { } }));
+vi.mock('../../../components/modules/shared/moduleCardActions', () => ({
+    ModuleItemCardActions: ({ onEdit, onDelete }) => (
+        <div>
+            <button onClick={onEdit}>Edit reading</button>
+            <button onClick={onDelete}>Delete reading</button>
+        </div>
+    ),
+    ModuleItemDeleteDialog: ({ itemTitle, onConfirm, onCancel }) => (
+        <div>
+            <span>Delete {itemTitle}</span>
+            <button onClick={onConfirm}>Confirm delete</button>
+            <button onClick={onCancel}>Cancel delete</button>
+        </div>
+    ),
+}));
 
-const reading = {
-    id: 1, title: 'Module Handbook', chapter: 'Ch.1',
-    start_page: 13, end_page: 63, page_count: 50,
-    duration_minutes: 60, deadline: '2026-04-13T00:00:00',
+const renderCard = (overrides = {}) => {
+    const props = {
+        reading: { ...readingFixture, ...overrides.reading },
+        isTeacher: overrides.isTeacher ?? true,
+        onEdit: overrides.onEdit ?? vi.fn(),
+        onDelete: overrides.onDelete ?? vi.fn(),
+    };
+    return render(<ReadingCard {...props} />);
 };
 
 describe('ReadingCard', () => {
-    it('should render title', () => {
-        render(<ReadingCard reading={reading} isTeacher={false} onEdit={vi.fn()} />);
-        expect(screen.getByText('Module Handbook')).toBeInTheDocument();
+    it('renders the reading metadata and due date', () => {
+        renderCard({ isTeacher: false });
+        expect(screen.getByText('Module Handbook')).toBeVisible();
+        expect(screen.getByText('Ch.1')).toBeVisible();
+        expect(screen.getByText(/pp 10-30/)).toBeVisible();
+        expect(screen.getByText(/35 mins/)).toBeVisible();
+        expect(screen.getByText('Due 13 Apr 2026')).toBeVisible();
     });
 
-    it('should render chapter if available', () => {
-        render(<ReadingCard reading={reading} isTeacher={false} onEdit={vi.fn()} onDelete={vi.fn()} />);
-        expect(screen.getByText('Ch.1')).toBeInTheDocument();
+    it('omits the chapter label when the value is empty', () => {
+        renderCard({ isTeacher: false, reading: { chapter: '' } });
+        expect(screen.queryByText('Ch.1')).not.toBeInTheDocument();
     });
 
-    it('should render page range', () => {
-        render(<ReadingCard reading={reading} isTeacher={false} onEdit={vi.fn()} onDelete={vi.fn()} />);
-        expect(screen.getByText(/pp 13-63/)).toBeInTheDocument();
-    });
-
-    it('should render estimated minutes', () => {
-        render(<ReadingCard reading={reading} isTeacher={false} onEdit={vi.fn()} onDelete={vi.fn()}  />);
-        expect(screen.getByText(/60 mins/)).toBeInTheDocument();
-    });
-
-    it('should display edit and delete buttons for teacher', async () => {
-        render(<ReadingCard reading={reading} isTeacher={true} onEdit={vi.fn()} onDelete={vi.fn()}  />);
-        expect(screen.getByText('Edit')).toBeInTheDocument();
-        expect(screen.getByText('Delete')).toBeInTheDocument();
-    });
-
-    it('should not display edit and delete buttons for teacher', async () => {
-        render(<ReadingCard reading={reading} isTeacher={false} onEdit={vi.fn()} onDelete={vi.fn()}  />);
-        expect(screen.queryByText('Edit')).not.toBeInTheDocument();
-        expect(screen.queryByText('Delete')).not.toBeInTheDocument();
-    });
-
-    it('should call onEdit when edit is clicked', () => {
+    it('shows teacher controls only for teachers', () => {
         const onEdit = vi.fn();
-        render(<ReadingCard reading={reading} isTeacher={true} onEdit={onEdit} onDelete={vi.fn()}  />);
-        fireEvent.click(screen.getByText('Edit'));
-        expect(onEdit).toHaveBeenCalled();
+        const onDelete = vi.fn();
+        const { rerender } = render(<ReadingCard reading={readingFixture} isTeacher onEdit={onEdit} onDelete={onDelete} />);
+        expect(screen.getByText('Edit reading')).toBeVisible();
+        rerender(<ReadingCard reading={readingFixture} isTeacher={false} onEdit={onEdit} onDelete={onDelete} />);
+        expect(screen.queryByText('Edit reading')).toBeNull();
     });
 
-    it('calls onDelete when delete button is clicked', () => {
+    it('forwards edit clicks to the provided handler', () => {
+        const onEdit = vi.fn();
+        renderCard({ onEdit });
+        fireEvent.click(screen.getByText('Edit reading'));
+        expect(onEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it('confirms deletions and invokes onDelete', () => {
         const onDelete = vi.fn();
-        render(<ReadingCard reading={reading} isTeacher={true} onEdit={vi.fn()} onDelete={onDelete}  />);
-        fireEvent.click(screen.getByText('Delete'));
-        fireEvent.click(screen.getAllByText('Delete')[1]);
-        expect(onDelete).toHaveBeenCalled();
+        renderCard({ onDelete });
+        fireEvent.click(screen.getByText('Delete reading'));
+        fireEvent.click(screen.getByText('Confirm delete'));
+        expect(onDelete).toHaveBeenCalledTimes(1);
+        expect(screen.queryByText(/Delete Module Handbook/)).toBeNull();
+    });
+
+    it('allows canceling the delete confirmation dialog', () => {
+        renderCard();
+        fireEvent.click(screen.getByText('Delete reading'));
+        fireEvent.click(screen.getByText('Cancel delete'));
+        expect(screen.queryByText(/Delete Module Handbook/)).toBeNull();
     });
 });
