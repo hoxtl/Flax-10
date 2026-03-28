@@ -1,5 +1,8 @@
-import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+/*
+ * Tests for homepage intelligence grid widgets.
+ */
+
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { HeroWidget, GridWidgetList, AddWidgetSlot } from "@/pages/homepage/components/IntelligenceGridWidgets";
 import { catalogueWithCustomWidget } from "./testSupport/intelligenceGridFixtures";
@@ -36,7 +39,7 @@ const catalogue = [
   { id: "hero", col: 2, row: 2, minRow: 1, maxRow: 4 },
   { id: "w1", col: 1, row: 1, minRow: 1, maxRow: 3, minCol: 1, maxCol: 2 },
 ];
-const widgetRenderer = (id, size) => <span data-testid={`w-${id}`}>{id}</span>;
+const widgetRenderer = (id) => <span data-testid={`w-${id}`}>{id}</span>;
 const noop = vi.fn();
 
 describe("AddWidgetSlot", () => {
@@ -161,31 +164,23 @@ describe("GridWidgetList", () => {
     expect(onDragStart).toHaveBeenCalled();
   });
 
-  it("forwards drag end and drag over to the shell while editing", () => {
-    const onDragEnd = vi.fn();
+  function renderEditableGrid(overrides = {}) {
+    return render(<GridWidgetList layout={["w1"]} catalogue={catalogue} dragOver={null} dragging={null} edit onDragEnd={noop} onDragOver={noop} onDragStart={noop} onDrop={noop} setLayout={noop} setWidgetSize={noop} styles={styles} widgetRenderer={widgetRenderer} widgetSizes={{}} {...overrides} />);
+  }
+
+  it("forwards drag over to the shell while editing", () => {
     const onDragOver = vi.fn();
-    render(
-      <GridWidgetList
-        layout={["w1"]}
-        catalogue={catalogue}
-        dragOver={null}
-        dragging={null}
-        edit
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-        onDragStart={noop}
-        onDrop={noop}
-        setLayout={noop}
-        setWidgetSize={noop}
-        styles={styles}
-        widgetRenderer={widgetRenderer}
-        widgetSizes={{}}
-      />,
-    );
+    renderEditableGrid({ onDragOver });
     const shell = screen.getByTestId("w-w1").closest("[data-widget-id]");
     fireEvent.dragOver(shell);
-    fireEvent.dragEnd(shell);
     expect(onDragOver).toHaveBeenCalled();
+  });
+
+  it("forwards drag end to the shell while editing", () => {
+    const onDragEnd = vi.fn();
+    renderEditableGrid({ onDragEnd });
+    const shell = screen.getByTestId("w-w1").closest("[data-widget-id]");
+    fireEvent.dragEnd(shell);
     expect(onDragEnd).toHaveBeenCalled();
   });
 

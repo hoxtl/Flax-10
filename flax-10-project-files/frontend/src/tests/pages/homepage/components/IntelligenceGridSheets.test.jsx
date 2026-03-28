@@ -1,3 +1,7 @@
+/*
+ * Tests for the homepage intelligence grid sheet picker.
+ */
+
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -6,7 +10,7 @@ import { AddSheet } from "@/pages/homepage/components/IntelligenceGridSheets";
 const catalogue = [
   { id: "a", label: "Widget A", icon: "🅰️", col: 1, row: 1, section: "Essentials" },
   { id: "b", label: "Widget B", icon: "🅱️", col: 2, row: 2, section: "Planning" },
-  { id: "c", label: "Widget C", icon: "©️", col: 1, row: 1 }, // no section → "Homepage"
+  { id: "c", label: "Widget C", icon: "©️", col: 1, row: 1 }, // No section falls back to "Homepage".
 ];
 
 describe("AddSheet", () => {

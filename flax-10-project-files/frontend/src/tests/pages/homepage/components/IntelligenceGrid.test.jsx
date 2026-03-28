@@ -175,12 +175,9 @@ describe("IntelligenceGrid", () => {
 
   it("closes the add sheet when its dismiss control fires onClose", () => {
     const spy = vi.fn();
-    function Harness() {
+    function CloseHarness() {
       const [open, setOpen] = React.useState(true);
-      const close = (v) => {
-        spy(v);
-        setOpen(v);
-      };
+      const close = (v) => { spy(v); setOpen(v); };
       return (
         <IntelligenceGrid
           catalogue={[{ id: "1" }]}
@@ -196,7 +193,7 @@ describe("IntelligenceGrid", () => {
         />
       );
     }
-    render(<Harness />);
+    render(<CloseHarness />);
     fireEvent.click(screen.getByText("Close"));
     expect(spy).toHaveBeenCalledWith(false);
   });

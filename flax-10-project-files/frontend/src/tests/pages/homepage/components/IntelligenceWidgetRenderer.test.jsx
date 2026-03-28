@@ -1,3 +1,7 @@
+/*
+ * Tests for renderIntelligenceWidget – rendering each widget slot by id.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import React from "react";
@@ -85,29 +89,13 @@ const baseProps = {
   dashboard: {
     edit: true,
     attendance: { pct: 87 },
-    live: {
-      liveContext: "Focused",
-      classesCount: 2,
-      tasksCount: 3,
-      nextStep: "Read",
-      nextStepMeta: "Soon",
-      weeklyProgress: 70,
-      currentStreak: 5,
-    },
+    live: { liveContext: "Focused", classesCount: 2, tasksCount: 3, nextStep: "Read", nextStepMeta: "Soon", weeklyProgress: 70, currentStreak: 5 },
     courseChangeRequest: true,
     teacherRequestPending: false,
     setShowCourseChange: vi.fn(),
     setShowTeacherRequest: vi.fn(),
     tflDelays: [{ id: "delay-1" }],
-    analytics: {
-      loading: false,
-      progressData: { weekly: 4 },
-      data: {
-        summary: { total_hours: 8 },
-        daily_breakdown: [{ day: "Mon", value: 1 }],
-        heatmap: { data: [[10]], hours: ["09"] },
-      },
-    },
+    analytics: { loading: false, progressData: { weekly: 4 }, data: { summary: { total_hours: 8 }, daily_breakdown: [{ day: "Mon", value: 1 }], heatmap: { data: [[10]], hours: ["09"] } } },
   },
 };
 

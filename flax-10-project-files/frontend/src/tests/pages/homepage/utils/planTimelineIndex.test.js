@@ -35,31 +35,23 @@ describe("plan timeline index", () => {
     expect(CAMPUS_DISPLAY.strand).toBe("Strand");
   });
 
-  it("builds, sorts, spaces, groups, inserts now, and injects hour marks for today", () => {
+  it("calls pipeline helpers with correct arguments for today", () => {
     const eventA = { id: "a", start_time: "2026-03-05T09:00:00.000Z", end_time: "2026-03-05T10:00:00.000Z" };
     const eventB = { id: "b", start_time: "2026-03-05T07:00:00.000Z", end_time: "2026-03-05T08:00:00.000Z" };
     filterEventsInWindow.mockReturnValue([eventA, eventB]);
     buildGapOrTinyGap.mockReturnValueOnce({ type: "free", id: "gap-1", startMins: 120, endMins: 180 });
-    buildEventEntry
-      .mockReturnValueOnce({ type: "event", id: "row-a", startMins: 180, endMins: 240 })
+    buildEventEntry.mockReturnValueOnce({ type: "event", id: "row-a", startMins: 180, endMins: 240 })
       .mockReturnValueOnce({ type: "event", id: "row-b", startMins: 60, endMins: 120 });
     addSpacing.mockImplementation((rows) => rows);
     groupOverlappingEvents.mockImplementation((rows) => rows);
-    insertNowMarker.mockImplementation((rows) => [...rows, { type: "now", id: "now-marker" }]);
-    injectHourMarks.mockImplementation((rows) => [{ type: "hourMark", id: "hour-7" }, ...rows]);
-
-    const selectedDate = new Date("2026-03-05T00:00:00.000Z");
+    insertNowMarker.mockImplementation((rows) => rows);
+    injectHourMarks.mockImplementation((rows) => rows);
     const now = new Date("2026-03-05T05:30:00.000Z");
 
-    const result = computePlanTimelineRows(
-      [eventA, eventB],
-      selectedDate,
-      new Date("2026-03-05T06:00:00.000Z"),
-      new Date("2026-03-05T23:00:00.000Z"),
-      now,
-      [{ title: "Essay" }],
-      [{ title: "Lab" }],
-      () => true,
+    computePlanTimelineRows(
+      [eventA, eventB], new Date("2026-03-05T00:00:00.000Z"),
+      new Date("2026-03-05T06:00:00.000Z"), new Date("2026-03-05T23:00:00.000Z"),
+      now, [{ title: "Essay" }], [{ title: "Lab" }], () => true,
     );
 
     expect(filterEventsInWindow).toHaveBeenCalled();
@@ -67,14 +59,27 @@ describe("plan timeline index", () => {
     expect(buildEventEntry).toHaveBeenCalledWith(eventA, [eventA, eventB], now, [{ title: "Essay" }], [{ title: "Lab" }]);
     expect(addSpacing).toHaveBeenCalled();
     expect(groupOverlappingEvents).toHaveBeenCalled();
-    expect(insertNowMarker).toHaveBeenCalledWith(
-      [
-        { type: "event", id: "row-b", startMins: 60, endMins: 120 },
-        { type: "free", id: "gap-1", startMins: 120, endMins: 180 },
-        { type: "event", id: "row-a", startMins: 180, endMins: 240 },
-      ],
-      0,
+  });
+
+  it("sorts rows, inserts now marker, and injects hour marks for today", () => {
+    const eventA = { id: "a", start_time: "2026-03-05T09:00:00.000Z", end_time: "2026-03-05T10:00:00.000Z" };
+    const eventB = { id: "b", start_time: "2026-03-05T07:00:00.000Z", end_time: "2026-03-05T08:00:00.000Z" };
+    filterEventsInWindow.mockReturnValue([eventA, eventB]);
+    buildGapOrTinyGap.mockReturnValueOnce({ type: "free", id: "gap-1", startMins: 120, endMins: 180 });
+    buildEventEntry.mockReturnValueOnce({ type: "event", id: "row-a", startMins: 180, endMins: 240 }).mockReturnValueOnce({ type: "event", id: "row-b", startMins: 60, endMins: 120 });
+    addSpacing.mockImplementation((rows) => rows);
+    groupOverlappingEvents.mockImplementation((rows) => rows);
+    insertNowMarker.mockImplementation((rows) => [...rows, { type: "now", id: "now-marker" }]);
+    injectHourMarks.mockImplementation((rows) => [{ type: "hourMark", id: "hour-7" }, ...rows]);
+
+    const result = computePlanTimelineRows(
+      [eventA, eventB], new Date("2026-03-05T00:00:00.000Z"),
+      new Date("2026-03-05T06:00:00.000Z"), new Date("2026-03-05T23:00:00.000Z"),
+      new Date("2026-03-05T05:30:00.000Z"), [{ title: "Essay" }], [{ title: "Lab" }], () => true,
     );
+
+    const expectedRows = [{ type: "event", id: "row-b", startMins: 60, endMins: 120 }, { type: "free", id: "gap-1", startMins: 120, endMins: 180 }, { type: "event", id: "row-a", startMins: 180, endMins: 240 }];
+    expect(insertNowMarker).toHaveBeenCalledWith(expectedRows, 0);
     expect(injectHourMarks).toHaveBeenCalled();
     expect(result[0]).toEqual({ type: "hourMark", id: "hour-7" });
   });

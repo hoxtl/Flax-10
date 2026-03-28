@@ -1,3 +1,7 @@
+/*
+ * Tests for homepage modal flows and callbacks.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { HomepageModals } from '@/pages/homepage/components/HomepageModals';
@@ -49,24 +53,30 @@ vi.mock('@/pages/tasks/components/TaskCard', () => ({
   ),
 }));
 
-function buildProps(overrides = {}) {
+function createModalActionMocks() {
   return {
-    setShowCreateTaskModal: vi.fn(),
-    setShowCreateListFromTask: vi.fn(),
-    setRescheduleTask: vi.fn(),
-    setPlanTimelineReadItem: vi.fn(),
+    addEvent: vi.fn().mockResolvedValue({}),
     createTask: vi.fn().mockResolvedValue({ id: 1, title: 'T' }),
     createTaskList: vi.fn().mockResolvedValue({ id: 2 }),
-    updateTask: vi.fn().mockResolvedValue({}),
     deleteTask: vi.fn().mockResolvedValue({}),
-    addEvent: vi.fn().mockResolvedValue({}),
-    showToast: vi.fn(),
-    openModal: vi.fn(),
-    handleTimelineDelete: vi.fn().mockResolvedValue({}),
     fetchTaskLists: vi.fn().mockResolvedValue([]),
-    setTaskLists: vi.fn(),
-    setLastCreatedListId: vi.fn(),
+    handleTimelineDelete: vi.fn().mockResolvedValue({}),
+    openModal: vi.fn(),
     refetchTasks: vi.fn(),
+    setLastCreatedListId: vi.fn(),
+    setPlanTimelineReadItem: vi.fn(),
+    setRescheduleTask: vi.fn(),
+    setShowCreateListFromTask: vi.fn(),
+    setShowCreateTaskModal: vi.fn(),
+    setTaskLists: vi.fn(),
+    showToast: vi.fn(),
+    updateTask: vi.fn().mockResolvedValue({}),
+  };
+}
+
+function buildProps(overrides = {}) {
+  return {
+    ...createModalActionMocks(),
     selectedDate: new Date(),
     ...overrides,
   };

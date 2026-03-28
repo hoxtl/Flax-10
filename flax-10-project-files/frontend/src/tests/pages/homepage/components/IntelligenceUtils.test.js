@@ -37,7 +37,7 @@ describe('IntelligenceUtils', () => {
   });
 
   it('getTodayLabel formats the current date string', () => {
-    vi.setSystemTime(new Date('2026-03-24T12:00:00.000Z')); // Tuesday, 24 Mar
+    vi.setSystemTime(new Date('2026-03-24T12:00:00.000Z'));
     expect(getTodayLabel()).toBe('TUESDAY · 24 MAR');
   });
 
@@ -97,37 +97,41 @@ describe('IntelligenceUtils', () => {
     expect(formatEventTime(null)).toBeNull();
   });
 
-  it('getLiveContext builds appropriate context blocks', () => {
+  it('getLiveContext builds context for a current event', () => {
     const now = new Date('2026-03-24T10:00:00.000Z');
-
     const currentEvent = { title: "Lecture", location: "Room 1", start_time: "2026-03-24T09:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" };
     expect(getLiveContext({ currentEvent, now })).toEqual({
       label: "On now", text: "Lecture · Room 1", meta: "Until 11:00", tone: "neutral", iconKey: "Clock3",
     });
+  });
 
+  it('getLiveContext builds context for overlaps and travel disruptions', () => {
+    const now = new Date('2026-03-24T10:00:00.000Z');
     expect(getLiveContext({ overlaps: [{ a: { start_time: "2026-03-24T12:00:00.000Z" } }], now })).toEqual({
-      label: "Attention", text: "You have an overlap in today’s plan.", meta: "Conflict at 12:00", tone: "warning", iconKey: "AlertTriangle",
+      label: "Attention", text: "You have an overlap in today's plan.", meta: "Conflict at 12:00", tone: "warning", iconKey: "AlertTriangle",
     });
-
     const upcomingEvent = { title: "Exam", start_time: "2026-03-24T11:00:00.000Z" };
     const getRelevantDelays = vi.fn().mockReturnValue([{ lineName: "Central", severityDescription: "Severe Delays" }]);
     const isSevereDisruption = vi.fn().mockReturnValue(true);
     expect(getLiveContext({ upcomingEvent, tflDelays: [{}], now, getRelevantDelays, isSevereDisruption })).toEqual({
       label: "Travel", text: "Central line disruption — you may be late for your 11:00 Exam.", meta: "Severe Delays", tone: "warning", iconKey: "Train",
     });
+  });
 
+  it('getLiveContext builds context for upcoming and idle states', () => {
+    const now = new Date('2026-03-24T10:00:00.000Z');
     expect(getLiveContext({ upcomingEvent: { title: "Meeting", start_time: "2026-03-24T18:00:00.000Z" }, now })).toEqual({
       label: "Up next", text: "Meeting", meta: "Starts 18:00", tone: "neutral", iconKey: "Clock3",
     });
-
     expect(getLiveContext({ now })).toEqual({
       label: "Right now", text: "You have breathing room before the next thing starts.", meta: "Use the banner to decide what to move forward next.", tone: "neutral", iconKey: "Clock3",
     });
   });
 
-  it('covers auxiliary live and travel branches', () => {
+  it('getLiveContext handles overlap with missing start time and non-severe travel delays', () => {
     const now = new Date('2026-03-24T10:00:00.000Z');
     expect(getLiveContext({ overlaps: [{ a: {} }], now }).meta).toBeNull();
+
     expect(getLiveContext({
       currentEvent: { title: "Solo", start_time: "2026-03-24T09:00:00.000Z" },
       now,
@@ -136,20 +140,6 @@ describe('IntelligenceUtils', () => {
       isSevereDisruption: () => false,
       tflDelays: [{}],
     }).label).toBe("On now");
-    expect(getLiveContext({
-      upcomingEvent: { title: "TBA", start_time: "2026-03-24T18:00:00.000Z" },
-      now,
-    }).text).toBe("TBA");
-
-    const travelNoLoc = getLiveContext({
-      upcomingEvent: { title: "Exam", start_time: "2026-03-24T11:00:00.000Z" },
-      tflDelays: [{}],
-      now,
-      getRelevantDelays: () => [{ lineName: "Central", severityDescription: "Severe Delays" }],
-      isSevereDisruption: () => true,
-    });
-    expect(travelNoLoc.meta).toBe("Severe Delays");
-    expect(travelNoLoc.text).toContain("your 11:00 Exam");
 
     const travelMild = getLiveContext({
       upcomingEvent: { title: "Quiz", start_time: "2026-03-24T11:00:00.000Z", location: "Campus" },
@@ -160,48 +150,58 @@ describe('IntelligenceUtils', () => {
     });
     expect(travelMild.text).toMatch(/delays —/);
     expect(travelMild.meta).toBe("Minor delays · Campus");
+  });
+
+  it('getLiveContext handles severe travel with no location and no event title', () => {
+    const now = new Date('2026-03-24T10:00:00.000Z');
+    const travelNoLoc = getLiveContext({
+      upcomingEvent: { title: "Exam", start_time: "2026-03-24T11:00:00.000Z" },
+      tflDelays: [{}], now,
+      getRelevantDelays: () => [{ lineName: "Central", severityDescription: "Severe Delays" }],
+      isSevereDisruption: () => true,
+    });
+    expect(travelNoLoc.meta).toBe("Severe Delays");
+    expect(travelNoLoc.text).toContain("your 11:00 Exam");
 
     const travelNoTitle = getLiveContext({
       upcomingEvent: { start_time: "2026-03-24T11:00:00.000Z" },
-      tflDelays: [{}],
-      now,
+      tflDelays: [{}], now,
       getRelevantDelays: () => [{ lineName: "Central", severityDescription: "Alt" }],
       isSevereDisruption: () => false,
     });
     expect(travelNoTitle.text).toContain("your next class");
+  });
 
+  it('getLiveContext handles current event without end time', () => {
+    const now = new Date('2026-03-24T10:00:00.000Z');
     expect(getLiveContext({
       currentEvent: { title: "Remote", start_time: "2026-03-24T09:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
       now,
     }).text).toBe("Remote");
-
     expect(getLiveContext({
       currentEvent: { title: "Drift", start_time: "2026-03-24T09:00:00.000Z" },
       now,
     }).meta).toBeNull();
+  });
 
-    expect(getLiveContext({
-      upcomingEvent: { title: "Lab", location: "Lab 3", start_time: "2026-03-24T18:00:00.000Z" },
-      now,
-    }).text).toBe("Lab · Lab 3");
+  it('getLiveContext handles upcoming event with location and missing start time', () => {
+    const now = new Date('2026-03-24T10:00:00.000Z');
+    expect(getLiveContext({ upcomingEvent: { title: "TBA", start_time: "2026-03-24T18:00:00.000Z" }, now }).text).toBe("TBA");
+    expect(getLiveContext({ upcomingEvent: { title: "Lab", location: "Lab 3", start_time: "2026-03-24T18:00:00.000Z" }, now }).text).toBe("Lab · Lab 3");
+    expect(getLiveContext({ upcomingEvent: { title: "Floating" }, now }).meta).toBeNull();
+  });
 
-    expect(getLiveContext({
-      upcomingEvent: { title: "Floating" },
-      now,
-    }).meta).toBeNull();
-
+  it('getLiveContext prepends sleep emoji when event overlaps sleep window', () => {
+    const now = new Date('2026-03-24T10:00:00.000Z');
     overlapSleepMock.mockReturnValueOnce(true);
     expect(getLiveContext({
       currentEvent: { title: "Late", location: "Hall", start_time: "2026-03-24T09:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
-      sleepWindow: { sleepTime: "23:00", wakeTime: "07:00" },
-      now,
+      sleepWindow: { sleepTime: "23:00", wakeTime: "07:00" }, now,
     }).text).toBe("😴 Late · Hall");
-
     overlapSleepMock.mockReturnValueOnce(true);
     expect(getLiveContext({
       currentEvent: { title: "Tired", start_time: "2026-03-24T09:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
-      sleepWindow: { sleepTime: "23:00", wakeTime: "07:00" },
-      now,
+      sleepWindow: { sleepTime: "23:00", wakeTime: "07:00" }, now,
     }).text).toBe("😴 Tired");
   });
 

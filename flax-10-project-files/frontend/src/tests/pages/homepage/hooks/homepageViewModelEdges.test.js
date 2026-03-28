@@ -175,37 +175,35 @@ describe("homepageViewModel fallbacks", () => {
     ).toEqual(["early-overdue", "late-overdue"]);
   });
 
-  it("handles undefined widget statuses and recommendation fallbacks", () => {
+  it("sorts display list placing overdue before statusless items", () => {
     const sorted = getTaskWidgetDisplayList([], now, [
       { id: "no-status", title: "No status", sortTime: new Date("2026-03-24T10:00:00.000Z") },
       { id: "overdue", title: "Overdue", sortTime: new Date("2026-03-24T09:00:00.000Z"), taskWidgetStatus: "overdue" },
     ]);
     expect(sorted.map((item) => item.id)).toEqual(["overdue", "no-status"]);
+  });
 
+  it("recommendation uses module code as text when no title is available", () => {
     expect(
       getHomepageRecommendation(
         [{ id: 30, title: "Fallback text task", completed: false, module_code: "BIO" }],
         [{ id: 31, start_due_date: "2026-03-24T20:00:00.000Z", module_code: "BIO" }],
         null,
       ),
-    ).toEqual({
-      meta: "BIO · due today",
-      taskTitle: "Fallback text task",
-      text: "Focus on Fallback text task for BIO.",
-    });
+    ).toEqual({ meta: "BIO · due today", taskTitle: "Fallback text task", text: "Focus on Fallback text task for BIO." });
+  });
 
+  it("recommendation falls back to generic deadline text when no module code or title", () => {
     expect(
       getHomepageRecommendation(
         [{ id: 32, title: "Last fallback", completed: false }],
         [{ id: 33, start_due_date: "2026-03-24T20:00:00.000Z" }],
         null,
       ),
-    ).toEqual({
-      meta: "Module · due today",
-      taskTitle: "Last fallback",
-      text: "Focus on Last fallback for upcoming deadline.",
-    });
+    ).toEqual({ meta: "Module · due today", taskTitle: "Last fallback", text: "Focus on Last fallback for upcoming deadline." });
+  });
 
+  it("recommendation returns null when module codes do not match", () => {
     expect(
       getHomepageRecommendation(
         [{ id: 34, title: "No match task", completed: false, module_code: "CHEM" }],
@@ -246,32 +244,22 @@ describe("homepageViewModel fallbacks", () => {
     expect(getTodayFreeWindows(now, [{ id: 1 }])).toEqual([]);
   });
 
-  it("handles complex recommendation logic falls safely", () => {
+  it("recommendation returns null for nullish inputs and no deadlines", () => {
     expect(getHomepageRecommendation(null, null, null)).toBeNull();
+    expect(getHomepageRecommendation([{ id: 8, title: "No window yet", completed: false }], [], null)).toBeNull();
+  });
+
+  it("recommendation picks soonest deadline and formats due-date meta", () => {
     expect(getHomepageRecommendation([{ id: 10, title: "Empty key task", completed: false }], [{ id: 11, title: "Deadline only", start_due_date: "2026-03-28T20:00Z" }], null)).toEqual({ meta: "Module · due in 4d", taskTitle: "Empty key task", text: "Focus on Empty key task for Deadline only." });
     expect(getHomepageRecommendation([{ id: 11, title: "Sort deadlines", completed: false }], [{ id: 12, start_due_date: "2026-03-29T20:00Z" }, { id: 13, title: "Sooner deadline", start_due_date: "2026-03-25T20:00Z" }], null)).toEqual({ meta: "Module · due tomorrow", taskTitle: "Sort deadlines", text: "Focus on Sort deadlines for Sooner deadline." });
-    expect(getHomepageRecommendation([{ id: 8, title: "No window yet", completed: false }], [], null)).toBeNull();
+  });
+
+  it("recommendation uses free window when no deadlines and falls back to generic text", () => {
     expect(
-      getHomepageRecommendation(
-        [{ id: 14, title: "Use free slot", completed: false }],
-        [],
-        "90m",
-      ),
-    ).toEqual({
-      meta: "Best task to move next",
-      taskTitle: "Use free slot",
-      text: "Use the 90m window to move Use free slot forward.",
-    });
+      getHomepageRecommendation([{ id: 14, title: "Use free slot", completed: false }], [], "90m"),
+    ).toEqual({ meta: "Best task to move next", taskTitle: "Use free slot", text: "Use the 90m window to move Use free slot forward." });
     expect(
-      getHomepageRecommendation(
-        [{ id: 15, title: "Fallback deadline task", completed: false }],
-        [{ id: 16, start_due_date: "2026-03-24T20:00:00.000Z" }],
-        null,
-      ),
-    ).toEqual({
-      meta: "Module · due today",
-      taskTitle: "Fallback deadline task",
-      text: "Focus on Fallback deadline task for upcoming deadline.",
-    });
+      getHomepageRecommendation([{ id: 15, title: "Fallback deadline task", completed: false }], [{ id: 16, start_due_date: "2026-03-24T20:00:00.000Z" }], null),
+    ).toEqual({ meta: "Module · due today", taskTitle: "Fallback deadline task", text: "Focus on Fallback deadline task for upcoming deadline." });
   });
 });
