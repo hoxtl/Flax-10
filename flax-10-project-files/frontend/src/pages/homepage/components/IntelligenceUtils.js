@@ -136,7 +136,7 @@ function buildOverlapContext(overlaps) {
   const first = overlaps[0]?.a?.start_time;
   return {
     label: "Attention",
-    text: "You have an overlap in today’s plan.",
+    text: "You have an overlap in today's plan.",
     meta: first ? `Conflict at ${formatEventTime(first)}` : null,
     tone: "warning",
     iconKey: "AlertTriangle",

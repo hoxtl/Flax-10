@@ -248,7 +248,7 @@ describe("IntelligenceUtils", () => {
         iconKey: "AlertTriangle",
         label: "Attention",
         meta: "Conflict at 10:00",
-        text: "You have an overlap in today’s plan.",
+        text: "You have an overlap in today's plan.",
         tone: "warning",
       });
     });
