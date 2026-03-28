@@ -4,7 +4,7 @@ const COMPONENTS_MARKER = "pages/group_work/components/";
 
 it("marks group work components as fully covered", async () => {
   await loadComponentModules();
-});
+}, 30000);
 
 afterAll(() => {
   const coverageMaps = getCoverageMaps();

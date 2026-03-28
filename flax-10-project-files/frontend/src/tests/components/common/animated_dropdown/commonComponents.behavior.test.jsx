@@ -80,9 +80,9 @@ describe("common coverage topups", () => {
     fallback.setAttribute("data-dashboard-main", "true");
     fallback.scrollTop = 32;
     document.body.appendChild(fallback);
+    renderScrollToTop();
     expect(fallback.scrollTop).toBe(0);
     document.body.removeChild(fallback);
-    renderScrollToTop();
     expect(scrollToMock).toHaveBeenCalledWith(0, 0);
   });
 });

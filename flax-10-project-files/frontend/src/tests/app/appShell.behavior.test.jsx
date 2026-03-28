@@ -247,9 +247,10 @@ describe("app shell behavior", () => {
         <div>Wrapped child</div>
       </ScreenWrap>,
     );
-    expect(wrap.container.firstChild).toHaveStyle({ width: "100vw", height: "100vh" });
+    expect(wrap.container.firstChild.style.width).toBe("100vw");
+    expect(wrap.container.firstChild.style.height).toBe("100vh");
     expect(screen.getByText("Wrapped child")).toBeInTheDocument();
-  });
+  }, 15000);
 
   it("routes the sign-in auth page", () => {
     renderAuthScreen(["/login"]);

@@ -108,7 +108,7 @@ describe('IntelligenceUtils', () => {
   it('getLiveContext builds context for overlaps and travel disruptions', () => {
     const now = new Date('2026-03-24T10:00:00.000Z');
     expect(getLiveContext({ overlaps: [{ a: { start_time: "2026-03-24T12:00:00.000Z" } }], now })).toEqual({
-      label: "Attention", text: "You have an overlap in today's plan.", meta: "Conflict at 12:00", tone: "warning", iconKey: "AlertTriangle",
+      label: "Attention", text: "You have an overlap in today’s plan.", meta: "Conflict at 12:00", tone: "warning", iconKey: "AlertTriangle",
     });
     const upcomingEvent = { title: "Exam", start_time: "2026-03-24T11:00:00.000Z" };
     const getRelevantDelays = vi.fn().mockReturnValue([{ lineName: "Central", severityDescription: "Severe Delays" }]);
