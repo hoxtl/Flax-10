@@ -1,15 +1,15 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import StudyStreakWidget from "../../../pages/homepage/components/StudyStreakWidget";
+import StudyStreakWidget from "@/pages/homepage/components/StudyStreakWidget";
 
 const fetchApiMock = vi.fn();
 
-vi.mock("../../../api/client", () => ({
+vi.mock("@/api/client", () => ({
   fetchApi: (...args) => fetchApiMock(...args),
 }));
 
-vi.mock("../../../components/common/widget_header/WidgetHeader", () => ({
+vi.mock("@/components/common/widget_header/WidgetHeader", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
@@ -77,6 +77,13 @@ describe("StudyStreakWidget", () => {
     expect(screen.getByText("Complete a task today to start your streak!")).toBeInTheDocument();
   });
 
+  it("treats null payloads as empty task lists", async () => {
+    fetchApiMock.mockResolvedValue(null);
+    render(<StudyStreakWidget />);
+    await flushWidget();
+    expect(screen.getByText("0")).toBeInTheDocument();
+  });
+
   it("handles paginated task results", async () => {
     fetchApiMock.mockResolvedValue({
       results: [{ id: 1, completed: true, updated_at: "2026-03-24T06:00:00.000Z" }],
@@ -88,5 +95,20 @@ describe("StudyStreakWidget", () => {
 
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("day 🔥")).toBeInTheDocument();
+  });
+
+  it("cancels the request when the widget unmounts before completion", async () => {
+    let resolveFetch;
+    fetchApiMock.mockReturnValue(new Promise((resolve) => { resolveFetch = resolve; }));
+
+    const { unmount } = render(<StudyStreakWidget />);
+    unmount();
+
+    await act(async () => {
+      resolveFetch([{ completed: true, updated_at: "2026-03-24T06:00:00.000Z" }]);
+      await Promise.resolve();
+    });
+
+    expect(fetchApiMock).toHaveBeenCalledWith("/tasks/?completed=true&limit=200");
   });
 });

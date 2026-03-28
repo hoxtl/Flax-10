@@ -40,9 +40,10 @@ function getCardClassName(styles, row) {
 }
 
 function handleCardActivation(event, item, matchTask, isReadOnly, isOverlap, onCardClick, onEdit, onToggleConflict) {
-  if (isOverlap && !isReadOnly) return onToggleConflict();
+  if (isReadOnly) return;
+  if (isOverlap) return onToggleConflict();
   if (onCardClick) return onCardClick(item, matchTask, event.currentTarget.getBoundingClientRect());
-  if (!isReadOnly) onEdit?.(item, item.tag, event.currentTarget.getBoundingClientRect());
+  onEdit?.(item, item.tag, event.currentTarget.getBoundingClientRect());
 }
 
 function getConflictHandlers({ item, durationMins, nextFreeRow, selectedDate, onConflictAutoMove, onPushTomorrow, onEdit, setConflictPopoverRowId }) {

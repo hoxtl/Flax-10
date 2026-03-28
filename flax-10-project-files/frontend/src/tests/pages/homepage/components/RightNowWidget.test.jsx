@@ -16,35 +16,38 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../pages/homepage/hooks/useCountdown', () => ({
-    useCountdown: vi.fn(() => ({ text: '5m' })),
+const useCountdownMock = vi.fn(() => ({ text: '5m' }));
+
+vi.mock('@/pages/homepage/hooks/useCountdown', () => ({
+    useCountdown: (...args) => useCountdownMock(...args),
 }));
 
-vi.mock('../../../pages/homepage/utils/kclTflMapping', () => ({
+vi.mock('@/pages/homepage/utils/kclTflMapping', () => ({
     getRelevantDelays: vi.fn(() => []),
     getTflLinesForLocation: vi.fn(() => []),
     isSevereDisruption: vi.fn(() => false),
 }));
 
-vi.mock('../../../pages/homepage/utils/eventUtils', () => ({
+vi.mock('@/pages/homepage/utils/eventUtils', () => ({
     isNow: vi.fn(() => false),
 }));
 
-vi.mock('../../../api/tflApi', () => ({
+vi.mock('@/api/tflApi', () => ({
     tflService: {
         journeyPlanner: vi.fn().mockResolvedValue(null),
     },
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('@/api/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue(null),
 }));
 
-import { RightNowWidget } from '../../../pages/homepage/components/RightNowWidget';
-import * as eventUtils from '../../../pages/homepage/utils/eventUtils';
-import * as kclTflMapping from '../../../pages/homepage/utils/kclTflMapping';
-import { getHomeAddress } from '../../../api/userApi';
-import { tflService } from '../../../api/tflApi';
+import { RightNowWidget } from '@/pages/homepage/components/RightNowWidget';
+import * as eventUtils from '@/pages/homepage/utils/eventUtils';
+import * as kclTflMapping from '@/pages/homepage/utils/kclTflMapping';
+import * as viewModel from '@/pages/homepage/components/rightNowWidget.viewmodel.js';
+import { getHomeAddress } from '@/api/userApi';
+import { tflService } from '@/api/tflApi';
 
 const baseNow = new Date('2024-03-08T14:00:00Z');
 
@@ -65,6 +68,7 @@ function renderWidget(props = {}) {
 describe('RightNowWidget', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        useCountdownMock.mockImplementation(() => ({ text: '5m' }));
         vi.mocked(getHomeAddress).mockResolvedValue(null);
         vi.mocked(tflService.journeyPlanner).mockResolvedValue(null);
         vi.mocked(eventUtils.isNow).mockReturnValue(false);
@@ -77,20 +81,29 @@ describe('RightNowWidget', () => {
         renderWidget();
         expect(screen.getByText('Right Now')).toBeTruthy();
     });
-
+    it('advances the header clock when the live interval fires', () => {
+        vi.useFakeTimers();
+        try {
+            vi.setSystemTime(new Date('2024-03-08T14:00:00.000Z'));
+            renderWidget();
+            vi.setSystemTime(new Date('2024-03-08T16:05:00.000Z'));
+            vi.advanceTimersByTime(1100);
+        } finally {
+            vi.useRealTimers();
+        }
+        expect(screen.getByText('Right Now')).toBeTruthy();
+    });
     it('shows "Nothing on right now" when no current event', () => {
         // Use a past event so eventCount > 0, skipping the "empty day" branch
         const pastTime = new Date(baseNow.getTime() - 3600000).toISOString();
         renderWidget({ isToday: true, sortedEvents: [{ title: 'Past Event', start_time: pastTime }] });
         expect(screen.getByText('Nothing on right now')).toBeTruthy();
     });
-
     it('shows "No more events today" when no next event', () => {
         const pastTime = new Date(baseNow.getTime() - 3600000).toISOString();
         renderWidget({ isToday: true, sortedEvents: [{ title: 'Past Event', start_time: pastTime }] });
         expect(screen.getByText('No more events today')).toBeTruthy();
     });
-
     it('shows next event title and time', () => {
         const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
         renderWidget({
@@ -99,7 +112,38 @@ describe('RightNowWidget', () => {
         });
         expect(screen.getByText('Lecture')).toBeTruthy();
     });
+    it('leaves the countdown suffix off when the hook returns no text', () => {
+        useCountdownMock.mockImplementation(() => ({ text: '' }));
+        const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
+        renderWidget({
+            isToday: true,
+            sortedEvents: [{ title: 'Seminar', start_time: futureTime }],
+        });
+        expect(screen.getByText('Seminar')).toBeTruthy();
+    });
+    it('shows singular attended events in the end-of-day ribbon', () => {
+        const pastOne = new Date(baseNow.getTime() - 3_600_000).toISOString();
+        renderWidget({
+            isToday: true,
+            navigatorContext: { state: 'endOfDay' },
+            sortedEvents: [{ start_time: pastOne }],
+            taskWidgetItemsOnly: [{ completed: true }, { completed: false }],
+        });
+        expect(screen.getByText(/1\/2 tasks/)).toBeTruthy();
+        expect(screen.getByText(/1 event attended/)).toBeTruthy();
+    });
 
+    it('shows plural attended events in the end-of-day ribbon', () => {
+        const pastA = new Date(baseNow.getTime() - 7_200_000).toISOString();
+        const pastB = new Date(baseNow.getTime() - 3_600_000).toISOString();
+        renderWidget({
+            isToday: true,
+            navigatorContext: { state: 'endOfDay' },
+            sortedEvents: [{ start_time: pastA }, { start_time: pastB }],
+            taskWidgetItemsOnly: [{ completed: true }],
+        });
+        expect(screen.getByText(/2 events attended/)).toBeTruthy();
+    });
     it('renders timer session view when hasTimerSession is true', () => {
         renderWidget({
             hasTimerSession: true,
@@ -113,7 +157,6 @@ describe('RightNowWidget', () => {
         expect(screen.getByText(/Focus/i)).toBeTruthy();
         expect(screen.getByText('Open timer →')).toBeTruthy();
     });
-
     it('calls onOpenTimer when Open timer button is clicked', () => {
         const onOpenTimer = vi.fn();
         renderWidget({
@@ -126,7 +169,6 @@ describe('RightNowWidget', () => {
         fireEvent.click(screen.getByText('Open timer →'));
         expect(onOpenTimer).toHaveBeenCalledTimes(1);
     });
-
     it('renders break mode in timer session', () => {
         renderWidget({
             hasTimerSession: true,
@@ -136,7 +178,6 @@ describe('RightNowWidget', () => {
         });
         expect(screen.getByText(/Break/i)).toBeTruthy();
     });
-
     it('renders non-today view with first event', () => {
         renderWidget({
             isToday: false,
@@ -144,7 +185,6 @@ describe('RightNowWidget', () => {
         });
         expect(screen.getByText('Seminar')).toBeTruthy();
     });
-
     it('renders non-today empty state', () => {
         renderWidget({ isToday: false, sortedEvents: [] });
         expect(screen.getByText('No events for this day.')).toBeTruthy();
@@ -157,6 +197,11 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
         });
         expect(screen.getByText('Day complete — nice work!')).toBeTruthy();
+    });
+
+    it('renders end-of-day task totals when tasks are completed', () => {
+        renderWidget({ isToday: true, navigatorContext: { state: 'endOfDay' }, sortedEvents: [], taskWidgetItemsOnly: [{ completed: true }] });
+        expect(screen.getByText(/1\/1 tasks/)).toBeTruthy();
     });
 
     it('renders empty day when no events today', () => {
@@ -292,6 +337,21 @@ describe('RightNowWidget', () => {
         });
         expect(screen.getByText(/1\/1 tasks/)).toBeTruthy();
         expect(screen.getByText(/1 event attended/)).toBeTruthy();
+    });
+
+    it('renders end-of-day task summary when view props override counts', () => {
+        const spy = vi.spyOn(viewModel, 'buildRightNowViewProps').mockReturnValueOnce({
+            liveClock: '12:00',
+            sortedEvents: [],
+            completedCount: 1,
+            tasksLength: 0,
+            eventsToday: 0,
+            tomorrowFirstEvent: null,
+            tomorrowTime: null,
+        });
+        renderWidget({ isToday: true, navigatorContext: { state: 'endOfDay', overlaps: [] }, sortedEvents: [] });
+        expect(screen.getByText(/1 tasks/)).toBeTruthy();
+        spy.mockRestore();
     });
 
     it('shows single schedule overlap label when one conflict', () => {

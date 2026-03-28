@@ -4,11 +4,11 @@ const isNowMock = vi.fn();
 const getTflLinesForLocationMock = vi.fn();
 const isSevereDisruptionMock = vi.fn();
 
-vi.mock("../../../pages/homepage/utils/eventUtils", () => ({
+vi.mock("@/pages/homepage/utils/eventUtils", () => ({
   isNow: (...args) => isNowMock(...args),
 }));
 
-vi.mock("../../../pages/homepage/utils/kclTflMapping", () => ({
+vi.mock("@/pages/homepage/utils/kclTflMapping", () => ({
   getTflLinesForLocation: (...args) => getTflLinesForLocationMock(...args),
   isSevereDisruption: (...args) => isSevereDisruptionMock(...args),
 }));
@@ -21,7 +21,7 @@ import {
   getNextEvent,
   getTimeLeftBand,
   hasCampusCommute,
-} from "../../../pages/homepage/components/rightNowUtils";
+} from "@/pages/homepage/components/rightNowUtils";
 
 describe("RightNowUtils", () => {
   beforeEach(() => {
@@ -103,6 +103,17 @@ describe("RightNowUtils", () => {
     expect(urgent.message).toContain("Leave now");
   });
 
+  it("handles non-array inputs and default leave-by severities", () => {
+    expect(getNextEvent(null, new Date("2026-03-24T09:00:00.000Z"))).toBeNull();
+    expect(getJourneySummary({ duration: 10 })).toEqual({ duration: "10 min", mode: "journey", lines: [] });
+    const info = getLeaveByInfo(
+      { start_time: "2026-03-24T11:00:00.000Z" },
+      [{ lineName: undefined, severityDescription: undefined }],
+      new Date("2026-03-24T09:00:00.000Z").getTime(),
+    );
+    expect(info.severity).toBe("Delays");
+  });
+
   it("falls back to the default event title and journey mode formatting", () => {
     expect(getJourneySummary({
       duration: 15,
@@ -117,5 +128,9 @@ describe("RightNowUtils", () => {
     expect(info.lineName).toBe("TfL");
     expect(info.eventTitle).toBe("your next event");
     expect(info.message).toContain("your next event");
+  });
+
+  it("ignores missing route options when summarising journeys", () => {
+    expect(getJourneySummary({ duration: 12, legs: [{ mode: "walk" }] })).toEqual({ duration: "12 min", mode: "walk", lines: [] });
   });
 });

@@ -145,13 +145,15 @@ function countUpcomingDeadlines(deadlines = []) {
   return deadlines.filter((deadline) => deadline?.start_due_date).length;
 }
 
-function countUpcomingSocietyEvents(events = [], societies = [], now = new Date()) {
-  const membershipIds = new Set((societies || []).map((society) => society?.society_id ?? society?.id).filter((value) => value != null).map(String));
-  const membershipNames = new Set((societies || []).map((society) => String(society?.name || "").trim().toLowerCase()).filter(Boolean));
+function countUpcomingSocietyEvents(events, societies, nowArg) {
+  const societiesArr = societies || [];
+  const now = nowArg || new Date();
+  const membershipIds = new Set(societiesArr.map((society) => society?.society_id ?? society?.id).filter((value) => value != null).map(String));
+  const membershipNames = new Set(societiesArr.map((society) => String(society?.name || "").trim().toLowerCase()).filter(Boolean));
   const start = new Date(now);
   const end = new Date(now);
   end.setDate(end.getDate() + 14);
-  return events.filter((event) => isMatchingSocietyEvent(event, membershipIds, membershipNames) && isWithinUpcomingWindow(event, start, end)).length;
+  return (events || []).filter((event) => isMatchingSocietyEvent(event, membershipIds, membershipNames) && isWithinUpcomingWindow(event, start, end)).length;
 }
 
 function isWithinUpcomingWindow(event, start, end) {

@@ -6,11 +6,24 @@ import {
   getConflictResolutionPlan,
   getMoveTomorrowWindow,
 } from '../../../../../pages/homepage/components/mini_timeline/ConflictPairRow';
+import { isLecture } from '../../../../../pages/homepage/utils/eventUtils';
 import * as useSleepWarning from '../../../../../components/settings/hooks/useSleepWarning';
 
 vi.mock('../../../../../components/settings/hooks/useSleepWarning', () => ({
   doesEventOverlapSleepWindow: vi.fn(() => false),
 }));
+
+vi.mock('../../../../../components/calendar/utils/eventUtils', () => ({
+  isReadOnlyEvent: vi.fn((item) => (item?.tag_name ?? item?.tag?.name ?? '').toString().toLowerCase() === 'lecture'),
+}));
+
+vi.mock('../../../../../pages/homepage/utils/eventUtils', async () => {
+  const actual = await vi.importActual('../../../../../pages/homepage/utils/eventUtils');
+  return {
+    ...actual,
+    isLecture: vi.fn(() => false),
+  };
+});
 
 const mockStyles = {
   planTimelineRow: 'row',
@@ -68,13 +81,9 @@ const row = {
   endMins: 690,
 };
 
-const rowsWithFreeGap = [
-  row,
-  { type: 'free', gapStartMins: 690, minutes: 60 },
-];
+const rowsWithFreeGap = [row, { type: 'free', gapStartMins: 690, minutes: 60 }];
 
 const rowsNoFree = [row];
-
 function renderConflictPairRow(props = {}) {
   return render(
     <ConflictPairRow
@@ -92,8 +101,8 @@ function renderConflictPairRow(props = {}) {
 describe('ConflictPairRow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(isLecture).mockReturnValue(false);
   });
-
   it('renders both conflict event titles', () => {
     renderConflictPairRow();
     expect(screen.getAllByText('Lecture').length).toBeGreaterThan(0);
@@ -104,7 +113,6 @@ describe('ConflictPairRow', () => {
     renderConflictPairRow();
     expect(screen.getByText('2 events overlap')).toBeTruthy();
   });
-
   it('renders No free window when no free row available', () => {
     renderConflictPairRow({ rows: rowsNoFree });
     expect(screen.getByText('No free window')).toBeTruthy();
@@ -114,14 +122,12 @@ describe('ConflictPairRow', () => {
     renderConflictPairRow({ rows: rowsWithFreeGap });
     expect(screen.getByText('Auto-arrange')).toBeTruthy();
   });
-
   it('renders Move to tomorrow when no free window', () => {
     const onPushTomorrow = vi.fn();
     renderConflictPairRow({ rows: rowsNoFree, onPushTomorrow });
     const buttons = screen.getAllByText('→ Move to tomorrow');
     expect(buttons.length).toBeGreaterThan(0);
   });
-
   it('calls onEdit when card clicked and no onCardClick', () => {
     const onEdit = vi.fn();
     renderConflictPairRow({ onEdit });
@@ -129,21 +135,18 @@ describe('ConflictPairRow', () => {
     fireEvent.click(card);
     expect(onEdit).toHaveBeenCalled();
   });
-
   it('calls onEdit when Edit button clicked', () => {
     const onEdit = vi.fn();
     renderConflictPairRow({ onEdit });
     fireEvent.click(screen.getByTitle('Edit Study session'));
     expect(onEdit).toHaveBeenCalled();
   });
-
   it('calls onConflictAutoMove when Auto-arrange clicked', () => {
     const onConflictAutoMove = vi.fn();
     renderConflictPairRow({ rows: rowsWithFreeGap, onConflictAutoMove });
     fireEvent.click(screen.getByText('Auto-arrange'));
     expect(onConflictAutoMove).toHaveBeenCalled();
   });
-
   it('calls onPushTomorrow when Move to tomorrow clicked', () => {
     const onPushTomorrow = vi.fn();
     renderConflictPairRow({ rows: rowsNoFree, onPushTomorrow });
@@ -151,7 +154,6 @@ describe('ConflictPairRow', () => {
     fireEvent.click(moveButtons[0]);
     expect(onPushTomorrow).toHaveBeenCalled();
   });
-
   it('calls onEventContextMenu on context menu', () => {
     const onEventContextMenu = vi.fn();
     renderConflictPairRow({ onEventContextMenu });
@@ -183,7 +185,6 @@ describe('ConflictPairRow', () => {
     fireEvent.click(card);
     expect(onCardClick).toHaveBeenCalled();
   });
-
   it('allows read-only lecture cards to open with onCardClick', () => {
     const onCardClick = vi.fn();
     renderConflictPairRow({ onCardClick });
@@ -288,7 +289,6 @@ describe('ConflictPairRow', () => {
 
     expect(end.getTime() - start.getTime()).toBe(25 * 60000);
   });
-
   it('uses fallback defaults when sleep window and tag metadata are missing', () => {
     const customRow = {
       ...row,
@@ -304,7 +304,6 @@ describe('ConflictPairRow', () => {
 
     expect(screen.getAllByText('Study session').length).toBeGreaterThan(0);
   });
-
   it('covers priority and duration fallbacks for exported helpers', () => {
     expect(getConflictPriorityRank()).toBe(0);
     expect(getConflictPriorityRank({ priority: 'unknown' })).toBe(0);
@@ -315,7 +314,6 @@ describe('ConflictPairRow', () => {
     });
     expect(end.getTime() - start.getTime()).toBe(25 * 60000);
   });
-
   it('returns null when no row items are available or tomorrow relocation is blocked', () => {
     expect(
       getConflictResolutionPlan({
@@ -333,5 +331,70 @@ describe('ConflictPairRow', () => {
         canRelocateEvent: () => false,
       }),
     ).toBeNull();
+  });
+  it('ignores conflicts tagged as lectures via nested tag metadata', () => {
+    const nestedLectureRow = {
+      ...row,
+      items: [{ ...row.items[1], item: { ...row.items[1].item, tag_name: undefined, tag: { name: 'Lecture' } } }],
+    };
+    const plan = getConflictResolutionPlan({ row: nestedLectureRow, rows: rowsNoFree, selectedDate });
+    expect(plan).toBeNull();
+  });
+  it('falls back to the lecture helper when metadata is missing', () => {
+    vi.mocked(isLecture).mockReturnValueOnce(true);
+    const fallbackRow = {
+      ...row,
+      items: [{ ...row.items[1], item: { ...row.items[1].item, tag_name: 'seminar', tag: null } }],
+    };
+    const plan = getConflictResolutionPlan({ row: fallbackRow, rows: rowsNoFree, selectedDate });
+    expect(plan).toBeNull();
+  });
+
+  it('evaluates lower-priority conflicts before higher ones when relocating', () => {
+    const urgentId = 42;
+    const priorityRow = {
+      ...row,
+      items: [
+        { ...row.items[1], item: { ...row.items[1].item, id: 11, priority: 'low', tag_name: 'focus', start_time: '2024-03-08T08:00:00' } },
+        { ...row.items[1], item: { ...row.items[1].item, id: urgentId, priority: 'urgent', tag_name: 'focus', start_time: '2024-03-08T08:00:00' } },
+      ],
+    };
+    const callOrder = [];
+    const plan = getConflictResolutionPlan({
+      row: priorityRow,
+      rows: rowsNoFree,
+      selectedDate,
+      canRelocateEvent: (item) => {
+        callOrder.push(item.id);
+        return false;
+      },
+    });
+    expect(callOrder).toEqual([11, urgentId]);
+    expect(plan).toBeNull();
+  });
+  it('normalises lecture tags with mixed casing', () => {
+    const upperTagRow = {
+      ...row,
+      items: [{ ...row.items[1], item: { ...row.items[1].item, tag_name: 'LECTURE' } }],
+    };
+    const plan = getConflictResolutionPlan({ row: upperTagRow, rows: rowsNoFree, selectedDate });
+    expect(plan).toBeNull();
+  });
+  it('reads lecture tags from tag metadata objects', () => {
+    const taggedRow = {
+      ...row,
+      items: [{ ...row.items[1], item: { ...row.items[1].item, tag_name: undefined, tag: { name: 'lecture' } } }],
+    };
+    const plan = getConflictResolutionPlan({ row: taggedRow, rows: rowsNoFree, selectedDate });
+    expect(plan).toBeNull();
+  });
+
+  it('calls the lecture helper when tag metadata is absent', () => {
+    const fallbackRow = {
+      ...row,
+      items: [{ ...row.items[1], item: { ...row.items[1].item, tag_name: null, tag: null } }],
+    };
+    getConflictResolutionPlan({ row: fallbackRow, rows: rowsNoFree, selectedDate });
+    expect(vi.mocked(isLecture)).toHaveBeenCalled();
   });
 });

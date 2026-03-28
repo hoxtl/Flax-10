@@ -4,18 +4,18 @@ import { renderHook, waitFor } from "@testing-library/react";
 const getEventsMock = vi.fn();
 const getUpcomingDeadlinesMock = vi.fn();
 
-vi.mock("../../../api/eventApi", () => ({
+vi.mock("@/api/eventApi", () => ({
   getEvents: (...args) => getEventsMock(...args),
 }));
 
-vi.mock("../../../api/deadlineApi", () => ({
+vi.mock("@/api/deadlineApi", () => ({
   getUpcomingDeadlines: (...args) => getUpcomingDeadlinesMock(...args),
 }));
 
 import {
   useSemesterData,
   useSemesterRange,
-} from "../../../pages/homepage/components/useSemesterOverviewData";
+} from "@/pages/homepage/components/useSemesterOverviewData";
 
 describe("useSemesterOverviewData", () => {
   beforeEach(() => {
@@ -47,6 +47,24 @@ describe("useSemesterOverviewData", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(getEventsMock).toHaveBeenCalledWith({ start: "2026-01-01", end: "2026-04-01" });
+    expect(result.current.events).toEqual([]);
+    expect(result.current.deadlines).toEqual([]);
+  });
+
+  it("infers semester start from the midpoint when semesterStart is omitted", () => {
+    const { result } = renderHook(() => useSemesterRange(null, 10));
+    expect(result.current.semStart.getDay()).toBe(1);
+  });
+
+  it("clears semester data when the event request throws", async () => {
+    getEventsMock.mockRejectedValueOnce(new Error("offline"));
+    getUpcomingDeadlinesMock.mockResolvedValueOnce([]);
+
+    const { result } = renderHook(() =>
+      useSemesterData(new Date("2026-01-10T00:00:00.000Z"), new Date("2026-04-10T00:00:00.000Z")),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.events).toEqual([]);
     expect(result.current.deadlines).toEqual([]);
   });

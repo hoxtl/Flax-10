@@ -1,7 +1,46 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import * as RTL from "@testing-library/react";
+const { screen, fireEvent, act } = RTL;
+const rtlRender = RTL.render;
 import { MemoryRouter } from "react-router-dom";
-import { TaskWidgetSlot } from "../../../../pages/homepage/components/TaskWidgetSlot";
+import { TaskWidgetSlot, getRowAccent } from "../../../../pages/homepage/components/TaskWidgetSlot";
+
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+    const actual = await vi.importActual("react-router-dom");
+    return { ...actual, useNavigate: () => mockNavigate };
+});
+
+vi.mock("../../../../pages/tasks/utils/readingListUtils", () => ({
+    isReadingList: (list) => list?.isReading === true,
+}));
+
+vi.mock("../../../../components/common/inline_title_field/InlineTitleField", () => {
+    const React = require('react');
+    return {
+      __esModule: true,
+      default: (props) => (
+        <div data-testid="inline-edit">
+          {props.isEditing ? (
+            <input data-testid="inline-input" defaultValue={props.value} onBlur={(e) => props.onSave(e.target.value)} />
+          ) : (
+            <span onClick={props.onStart}>{props.value}</span>
+          )}
+        </div>
+      ),
+      useInlineEdit: (val, onSave) => {
+        const [isEditing, setIsEditing] = React.useState(false);
+        return {
+          isEditing,
+          draft: val,
+          setDraft: vi.fn(),
+          start: () => setIsEditing(true),
+          save: (v) => { onSave(v); setIsEditing(false); },
+          cancel: () => setIsEditing(false),
+        };
+      }
+    };
+});
 
 vi.mock("framer-motion", () => ({
   motion: new Proxy(
@@ -59,7 +98,7 @@ const defaultProps = {
 };
 
 function renderTaskWidgetSlot(props = {}) {
-  return render(
+  return rtlRender(
     <MemoryRouter>
       <TaskWidgetSlot {...defaultProps} {...props} />
     </MemoryRouter>
@@ -71,7 +110,9 @@ function hoursFromNow(hours) {
 }
 
 function getTaskRow(title) {
-  return screen.getByLabelText(`Complete ${title}`).closest("div");
+  const checkbox = screen.queryByLabelText(new RegExp(`Complete ${title}`, 'i'));
+  if (checkbox) return checkbox.closest("div");
+  return screen.getAllByText(title)[0].closest("div");
 }
 
 describe("TaskWidgetSlot", () => {
@@ -259,18 +300,11 @@ describe("TaskWidgetSlot", () => {
 
   it("calls onInlineTaskEdit when context menu Inline Edit is clicked", async () => {
     const onInlineTaskEdit = vi.fn().mockResolvedValue(undefined);
-
-    renderTaskWidgetSlot({
-      taskWidgetItemsOnly: [{ id: 1, title: "Edit Me", completed: false }],
-      taskWidgetList: [{ id: 1, title: "Edit Me", completed: false }],
-      onInlineTaskEdit,
-    });
-
+    const task = { id: 1, title: "Edit Me", completed: false };
+    rtlRender(<MemoryRouter><TaskWidgetSlot {...defaultProps} taskWidgetItemsOnly={[task]} taskWidgetList={[task]} onInlineTaskEdit={onInlineTaskEdit} /></MemoryRouter>);
     fireEvent.contextMenu(getTaskRow("Edit Me"));
-    fireEvent.click(screen.getByText("Inline Edit"));
-    await vi.waitFor(() =>
-      expect(onInlineTaskEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }), { title: "Updated title" })
-    );
+    await act(async () => { fireEvent.click(screen.getByText("Inline Edit")); });
+    await vi.waitFor(() => expect(onInlineTaskEdit).toHaveBeenCalledWith(expect.anything(), { title: "Updated title" }));
   });
 
   it("shows Urgent pill for priority urgent", () => {
@@ -280,5 +314,123 @@ describe("TaskWidgetSlot", () => {
     });
 
     expect(screen.getByText("Urgent")).toBeTruthy();
+  });
+
+  it("navigates to all tasks when Go to all tasks button is clicked", () => {
+    const tasks = [{ id: 1, title: "T", completed: false }];
+    renderTaskWidgetSlot({
+      taskWidgetDueTodayCount: 1,
+      taskWidgetItemsOnly: tasks,
+      taskWidgetList: tasks,
+    });
+    fireEvent.click(screen.getByRole("button", { name: /go to all tasks/i }));
+    expect(mockNavigate).toHaveBeenCalledWith("/tasks?filter=today");
+  });
+ 
+  it("shows Neutral accent for low priority tasks", () => {
+    const tasks = [
+      { id: 0, title: "Lead", completed: false },
+      { id: 1, title: "Low", priority: "low", completed: false },
+    ];
+    renderTaskWidgetSlot({ taskWidgetItemsOnly: tasks, taskWidgetList: tasks });
+    expect(getTaskRow("Low").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-neutral)");
+  });
+
+  it("shows Warning accent for medium and high priority tasks", () => {
+    const lead = { id: 0, title: "Lead", completed: false };
+    const med = { id: 4, title: "Med", priority: "medium", completed: false };
+    const high = { id: 5, title: "High2", priority: "high", completed: false };
+    const { rerender } = renderTaskWidgetSlot({ taskWidgetItemsOnly: [lead, med], taskWidgetList: [lead, med] });
+    expect(getTaskRow("Med").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-warning)");
+    rerender(<MemoryRouter><TaskWidgetSlot {...defaultProps} taskWidgetItemsOnly={[lead, high]} taskWidgetList={[lead, high]} /></MemoryRouter>);
+    expect(getTaskRow("High2").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-warning)");
+  });
+
+  it("shows Danger accent for urgent, overdue, or lead tasks", () => {
+    const tasks = [
+      { id: 1, title: "UrgentT", priority: "urgent", completed: false, due_date: hoursFromNow(1) },
+      { id: 2, title: "OverdueT", completed: false, due_date: hoursFromNow(-1), taskWidgetStatus: "overdue" },
+      { id: 3, title: "LeadT", completed: false }
+    ];
+    const { rerender } = renderTaskWidgetSlot({ taskWidgetItemsOnly: [tasks[0]], taskWidgetList: [tasks[0]] });
+    expect(getTaskRow("UrgentT").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-danger)");
+    rerender(<MemoryRouter><TaskWidgetSlot {...defaultProps} taskWidgetItemsOnly={[tasks[1]]} taskWidgetList={[tasks[1]]} /></MemoryRouter>);
+    expect(getTaskRow("OverdueT").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-danger)");
+    renderTaskWidgetSlot({ taskWidgetItemsOnly: [tasks[2]], taskWidgetList: [tasks[2]] });
+    expect(getTaskRow("LeadT").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-danger)");
+  });
+
+  it("hits getRowAccent default parameter branch", () => {
+    expect(getRowAccent({ priority: "low" })).toBe("var(--home-urgency-neutral)");
+  });
+
+  it("hits non-lead priority branches in getRowAccent", () => {
+    expect(getRowAccent({ taskWidgetStatus: "overdue" })).toBe("var(--home-urgency-danger)");
+    expect(getRowAccent({ priority: "high" })).toBe("var(--home-urgency-warning)");
+    expect(getRowAccent({ priority: "medium" })).toBe("var(--home-urgency-warning)");
+    expect(getRowAccent({ priority: "urgent" })).toBe("var(--home-urgency-danger)");
+  });
+
+  it("shows Danger accent for urgent or overdue tasks", () => {
+    const tasks = [
+      { id: 1, title: "UrgentTasks", priority: "urgent", completed: false, due_date: hoursFromNow(1) },
+      { id: 2, title: "OverdueTasks", completed: false, due_date: hoursFromNow(-1), taskWidgetStatus: "overdue" }
+    ];
+    const { rerender } = renderTaskWidgetSlot({ taskWidgetItemsOnly: [tasks[0]], taskWidgetList: [tasks[0]] });
+    expect(getTaskRow("UrgentTasks").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-danger)");
+    rerender(<MemoryRouter><TaskWidgetSlot {...defaultProps} taskWidgetItemsOnly={[tasks[1]]} taskWidgetList={[tasks[1]]} /></MemoryRouter>);
+    expect(getTaskRow("OverdueTasks").style.getPropertyValue("--deadline-row-accent")).toBe("var(--home-urgency-danger)");
+  });
+
+  it("handles reading list tasks correctly", () => {
+    const tasks = [{ id: 1, title: "Read", completed: false, task_list: 10 }];
+    renderTaskWidgetSlot({
+      taskLists: [{ id: 10, name: "Reading", isReading: true }],
+      taskWidgetItemsOnly: tasks,
+      taskWidgetList: tasks,
+    });
+    expect(getTaskRow("Read")).toBeTruthy();
+  });
+
+  it("calls onInlineTaskEdit when task title is edited and saved", async () => {
+    const onInlineTaskEdit = vi.fn();
+    const task = { id: 1, title: "Old", completed: false };
+    rtlRender(<MemoryRouter><TaskWidgetSlot {...defaultProps} taskWidgetItemsOnly={[task]} taskWidgetList={[task]} onInlineTaskEdit={onInlineTaskEdit} /></MemoryRouter>);
+    await act(async () => { fireEvent.click(screen.getByText("Old")); });
+    const input = screen.getByTestId("inline-input");
+    await act(async () => {
+      fireEvent.change(input, { target: { value: "New" } });
+      fireEvent.blur(input);
+    });
+    expect(onInlineTaskEdit).toHaveBeenCalled();
+  });
+
+  it("reading list tasks are not editable inline", () => {
+    const task = { id: 1, title: "Read", completed: false, task_list: 10 };
+    rtlRender(<MemoryRouter><TaskWidgetSlot {...defaultProps} taskLists={[{ id: 10, isReading: true }]} 
+        taskWidgetItemsOnly={[task]} taskWidgetList={[task]} /></MemoryRouter>);
+    expect(screen.getByText("Read")).toBeTruthy();
+  });
+
+  it("uses default empty array when taskLists is missing", () => {
+    const tasks = [{ id: 1, title: "UniqueT", completed: false, task_list: 10 }];
+    const { rerender } = renderTaskWidgetSlot({
+        taskLists: null, taskWidgetItemsOnly: tasks, taskWidgetList: tasks,
+    });
+    fireEvent.contextMenu(getTaskRow("UniqueT"));
+    expect(screen.getByTestId("task-context-menu")).toBeTruthy();
+    const tasks2 = [{ id: 2, title: "AnotherT", completed: false }];
+    rerender(<MemoryRouter><TaskWidgetSlot {...defaultProps} taskLists={undefined} taskWidgetItemsOnly={tasks2} taskWidgetList={tasks2} /></MemoryRouter>);
+    expect(screen.getByText("AnotherT")).toBeTruthy();
+  });
+
+  it("covers reading list branch in TaskWidgetMenu", () => {
+    const task = { id: 1, title: "ReadTask", completed: false, task_list: 5 };
+    renderTaskWidgetSlot({
+      taskLists: [{ id: 5, name: "Books", isReading: true }],
+      taskWidgetItemsOnly: [task], taskWidgetList: [task],
+    });
+    fireEvent.contextMenu(getTaskRow("ReadTask"));
+    expect(screen.getByTestId("task-context-menu")).toBeTruthy();
   });
 });

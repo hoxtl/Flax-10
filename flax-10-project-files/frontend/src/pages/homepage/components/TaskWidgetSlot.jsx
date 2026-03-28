@@ -126,7 +126,7 @@ function TaskListRow(props) {
   );
 }
 
-function getRowAccent(task, isLeadTask = false) {
+export function getRowAccent(task, isLeadTask = false) {
   const priority = String(task?.priority || "").toLowerCase();
   if (isLeadTask || task.taskWidgetStatus === "overdue" || priority === "urgent") return "var(--home-urgency-danger)";
   if (priority === "high" || priority === "medium") return "var(--home-urgency-warning)";

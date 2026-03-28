@@ -286,10 +286,11 @@ describe('PlanEventRow', () => {
         expect(link).toHaveAttribute('href', '/tasks?list=5');
     });
 
-    it('renders the module pill instead of a task list link when both moduleCode and matchTask are present', () => {
+    it('renders the module code as a link when both moduleCode and matchTask are present', () => {
         renderRow({ row: { ...baseRow, moduleCode: 'CS101', matchTask: { task_list: 5 } } });
         expect(screen.getByText('CS101')).toBeInTheDocument();
-        expect(screen.queryByRole('link', { name: 'CS101' })).toBeNull();
+        const link = screen.queryByRole('link', { name: 'CS101' });
+        expect(link).toHaveAttribute('href', '/tasks?list=5&module=CS101');
     });
 
     it('does not call onPushTomorrow when disabled', () => {

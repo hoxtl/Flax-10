@@ -21,7 +21,7 @@ vi.mock("lucide-react", () => ({
   ArrowUpRight: () => <svg aria-hidden="true" />,
 }));
 
-vi.mock("../../../pages/homepage/components/rightNowUtils", () => ({
+vi.mock("@/pages/homepage/components/rightNowUtils", () => ({
   getJourneySummary: vi.fn((journey) => journey),
   getTimeLeftBand: vi.fn((minutes) => {
     if (minutes == null) return null;
@@ -37,7 +37,7 @@ import {
   ConflictSummary,
   TflDelayCard,
   fadeIn,
-} from "../../../pages/homepage/components/RightNowSubComponents";
+} from "@/pages/homepage/components/RightNowSubComponents";
 
 describe("RightNowSubComponents", () => {
   beforeEach(() => {
@@ -55,6 +55,10 @@ describe("RightNowSubComponents", () => {
       animate: { opacity: 1, y: 0 },
       transition: { duration: 0.35, delay: 0.5, ease: [0.23, 1, 0.32, 1] },
     });
+  });
+
+  it("defaults fade-in delay to zero", () => {
+    expect(fadeIn()).toMatchObject({ transition: { delay: 0 } });
   });
 
   it("renders active event card with progress, range, and urgency colour band", () => {
@@ -82,6 +86,32 @@ describe("RightNowSubComponents", () => {
     expect(screen.getByText("20m left")).toHaveStyle({ color: "var(--home-urgency-warning)" });
   });
 
+  it("falls back to the neutral urgency colour when no end time exists", () => {
+    render(
+      <ActiveEventCard
+        currentBlock={{ title: "Freeform" }}
+        timeRangeStr="–"
+        timeLeftStr="Focus"
+        currentProgressPct={10}
+      />,
+    );
+    expect(screen.getByText("Focus")).toHaveStyle({ color: "var(--sage)" });
+  });
+
+  it("hides countdown and progress rows when data is missing", () => {
+    render(
+      <ActiveEventCard
+        currentBlock={{ title: "Break", end_time: "2026-03-24T11:30:00.000Z" }}
+        timeRangeStr="11:00 - 12:00"
+        timeLeftStr={null}
+        currentProgressPct={null}
+      />,
+    );
+    expect(screen.queryByText(/left/)).toBeNull();
+    const row = screen.getByText("11:00 - 12:00").closest("div");
+    expect(row?.children.length).toBe(1);
+  });
+
   it("renders and dismisses the TFL delay card", () => {
     const onDismiss = vi.fn();
     render(<TflDelayCard leaveByInfo={{ message: "Leave in 12 minutes" }} onDismiss={onDismiss} />);
@@ -99,6 +129,11 @@ describe("RightNowSubComponents", () => {
 
     rerender(<ConflictSummary conflicts={[{ a: {}, b: {} }, { a: {}, b: {} }]} onDismiss={vi.fn()} />);
     expect(screen.getByText("2 schedule overlaps today")).toBeInTheDocument();
+  });
+
+  it("summarises a single untimed conflict without pluralising", () => {
+    render(<ConflictSummary conflicts={[{ a: {}, b: {} }]} onDismiss={vi.fn()} />);
+    expect(screen.getByText("1 schedule overlap today")).toBeInTheDocument();
   });
 
   it("renders commute context card in loading and success states", () => {
@@ -138,5 +173,16 @@ describe("RightNowSubComponents", () => {
       </MemoryRouter>,
     );
     expect(screen.getByText("Check travel.")).toBeInTheDocument();
+  });
+
+  it("omits commute pills when no journey lines are returned", () => {
+    render(
+      <MemoryRouter>
+        <CommuteContextCard campus={{ shortName: "GLA", name: "Guy's" }} journey={{ duration: "22 min", lines: [] }} loading={false} leaveByInfo={{ leaveByStr: "10:40" }} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("GLA commute")).toBeInTheDocument();
+    expect(screen.getByText(/Leave by 10:40 for Guy's/)).toBeInTheDocument();
+    expect(screen.queryByText(/Northern|Circle|District/)).toBeNull();
   });
 });
