@@ -4,16 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const updateUserSettingsMock = vi.fn();
 
-vi.mock("../../api/client", () => ({
+vi.mock("../../../api/client", () => ({
   fetchApi: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock("../../api/userApi", () => ({
+vi.mock("../../../api/userApi", () => ({
   updateUserSettings: (...args) => updateUserSettingsMock(...args),
 }));
 
-import { ThemeProvider, useTheme } from "../../context/ThemeContext";
-import { THEME_GROUPS } from "../../context/ThemeConstants";
+import { ThemeProvider, useTheme } from "../../../context/ThemeContext";
+import { THEME_GROUPS } from "../../../context/ThemeConstants";
 
 describe("ThemeContext coverage topups", () => {
   beforeEach(() => {
@@ -80,7 +80,7 @@ describe("ThemeContext coverage topups", () => {
       };
     });
 
-    const themeModule = await import("../../context/ThemeContext");
+    const themeModule = await import("../../../context/ThemeContext");
     const DynamicThemeProvider = themeModule.ThemeProvider;
     const dynamicUseTheme = themeModule.useTheme;
     const wrapper = ({ children }) => <DynamicThemeProvider>{children}</DynamicThemeProvider>;

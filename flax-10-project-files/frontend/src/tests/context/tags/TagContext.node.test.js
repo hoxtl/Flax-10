@@ -41,7 +41,7 @@ vi.mock('react', () => ({
   useEffect: (...args) => useEffectMock(...args),
 }));
 
-vi.mock('../../api/tagApi', () => ({
+vi.mock('../../../api/tagApi', () => ({
   getTags: (...args) => getTagsMock(...args),
   createTag: (...args) => createTagMock(...args),
   deleteTag: (...args) => deleteTagMock(...args),
@@ -50,7 +50,7 @@ vi.mock('../../api/tagApi', () => ({
 
 const importModule = async () => {
   vi.resetModules();
-  return import('../../context/TagContext');
+  return import('../../../context/TagContext');
 };
 
 const getValueFromProvider = (mod, presetStates = [[], true], runEffect = false) => {

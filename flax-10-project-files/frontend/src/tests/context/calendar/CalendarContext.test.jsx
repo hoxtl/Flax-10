@@ -1,9 +1,9 @@
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { CalendarProvider, useCalendar, useCalendarDispatch, useEventModal } from '../../context/CalendarContext';
+import { CalendarProvider, useCalendar, useCalendarDispatch, useEventModal } from '../../../context/CalendarContext';
 import { useEffect } from 'react';
 
-vi.mock('../../components/notifications/hooks/useReminderNotifications', () => ({
+vi.mock('../../../components/notifications/hooks/useReminderNotifications', () => ({
   useReminderNotifications: vi.fn(),
 }));
 

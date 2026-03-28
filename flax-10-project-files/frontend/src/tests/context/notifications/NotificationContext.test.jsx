@@ -4,14 +4,14 @@
 
 import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NotificationProvider, useNotifications } from '../../context/NotificationContext';
-import * as api from '../../api/notificationApi';
+import { NotificationProvider, useNotifications } from '../../../context/NotificationContext';
+import * as api from '../../../api/notificationApi';
 
-vi.mock('../../context/AuthContext', () => ({
+vi.mock('../../../context/AuthContext', () => ({
     useAuth: () => ({ refreshProfile: vi.fn() }),
 }));
 
-vi.mock('../../api/notificationApi', () => ({
+vi.mock('../../../api/notificationApi', () => ({
     fetchNotifications: vi.fn(),
     createNotification: vi.fn(),
     deleteNotification: vi.fn(),
@@ -19,12 +19,12 @@ vi.mock('../../api/notificationApi', () => ({
     clearAllNotifications: vi.fn(),
 }));
 
-vi.mock('../../components/notifications/utils/browserNotification', () => ({
+vi.mock('../../../components/notifications/utils/browserNotification', () => ({
     requestPermission: vi.fn(),
     sendBrowserNotification: vi.fn(),
 }));
 
-vi.mock('../../components/notifications/utils/notificationSound', () => ({
+vi.mock('../../../components/notifications/utils/notificationSound', () => ({
     playNotificationSound: vi.fn(),
 }));
 
@@ -215,7 +215,7 @@ describe('NotificationContext', () => {
     });
 
     it('should process new notifications from poll and notify user', async () => {
-        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../../components/notifications/utils/browserNotification');
         vi.useFakeTimers();
         api.fetchNotifications.mockResolvedValueOnce([]);
         render(
@@ -236,7 +236,7 @@ describe('NotificationContext', () => {
     });
 
     it('should not send browser notification for reminder type from poll', async () => {
-        const { sendBrowserNotification } = await import('../../components/notifications/utils/browserNotification');
+        const { sendBrowserNotification } = await import('../../../components/notifications/utils/browserNotification');
         sendBrowserNotification.mockClear();
         vi.useFakeTimers();
         api.fetchNotifications.mockResolvedValueOnce([]);

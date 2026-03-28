@@ -1,10 +1,10 @@
 
 import { render, screen, act, waitFor, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TagProvider, useTags } from '../../context/TagContext';
-import * as TagApi from '../../api/tagApi';
+import { TagProvider, useTags } from '../../../context/TagContext';
+import * as TagApi from '../../../api/tagApi';
 
-vi.mock('../../api/tagApi', () => ({
+vi.mock('../../../api/tagApi', () => ({
     getTags: vi.fn(),
     createTag: vi.fn(),
     deleteTag: vi.fn(),

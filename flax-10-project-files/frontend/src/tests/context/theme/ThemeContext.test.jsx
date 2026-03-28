@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
-import { ThemeProvider, useTheme } from '../../context/ThemeContext';
-import { fetchApi } from '../../api/client';
+import { ThemeProvider, useTheme } from '../../../context/ThemeContext';
+import { fetchApi } from '../../../api/client';
 
-vi.mock('../../api/client', () => ({
+vi.mock('../../../api/client', () => ({
     fetchApi: vi.fn().mockResolvedValue({}),
 }));
 

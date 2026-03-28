@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calendarReducer, initialState } from '../../context/calendarReducer';
+import { calendarReducer, initialState } from '../../../context/calendarReducer';
 
 describe('calendarReducer', () => {
     it('should return initial state for unknown action', () => {

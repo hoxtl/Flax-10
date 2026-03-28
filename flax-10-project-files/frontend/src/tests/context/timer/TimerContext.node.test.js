@@ -35,13 +35,13 @@ vi.mock('react', () => ({
   useState: (...args) => useStateMock(...args),
 }));
 
-vi.mock('../../components/timer/hooks/useTimerLogic', () => ({
+vi.mock('../../../components/timer/hooks/useTimerLogic', () => ({
   useTimerLogic: (...args) => useTimerLogicMock(...args),
 }));
 
 const importModule = async () => {
   vi.resetModules();
-  return import('../../context/TimerContext');
+  return import('../../../context/TimerContext');
 };
 
 const createMockStorage = () => ({ setItem: vi.fn(), removeItem: vi.fn() });
