@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-import AttendanceSummary from "../../../components/analytics/components/AttendanceSummary";
+import AttendanceSummary from "../../../../components/analytics/components/AttendanceSummary";
 
 describe("AttendanceSummary", () => {
   it("renders the attendance rate, counts, and navigation link", () => {

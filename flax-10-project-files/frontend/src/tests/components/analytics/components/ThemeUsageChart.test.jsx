@@ -7,7 +7,7 @@ vi.mock('@mui/x-charts/PieChart', () => ({
     ),
 }));
 
-import ThemeUsageChart from '../../../components/analytics/components/ThemeUsageChart';
+import ThemeUsageChart from '../../../../components/analytics/components/ThemeUsageChart';
 
 describe('ThemeUsageChart', () => {
     it('shows Night Owl badge when dark >= 60%', () => {

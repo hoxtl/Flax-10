@@ -10,7 +10,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../components/common/empty_state/EmptyState", () => ({
+vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => (
     <div data-testid="empty-state">
       <span>{title}</span>
@@ -19,7 +19,7 @@ vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   ),
 }));
 
-import { PeakHoursCard } from "../../../components/analytics/components/PeakHoursCard";
+import { PeakHoursCard } from "../../../../components/analytics/components/PeakHoursCard";
 
 describe("PeakHoursCard", () => {
   it("returns null when heatmap data is missing or malformed", () => {

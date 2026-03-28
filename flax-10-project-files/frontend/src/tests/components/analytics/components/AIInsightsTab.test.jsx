@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
+import { render, screen, fireEvent, waitFor } from '../../../../utils/testUtils';
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
@@ -18,15 +18,15 @@ vi.mock('react-markdown', () => ({
 
 vi.mock('remark-gfm', () => ({ default: () => {} }));
 
-vi.mock('../../../api/analyticsApi', () => ({
+vi.mock('../../../../api/analyticsApi', () => ({
     default: {
         getAiInsights: vi.fn().mockResolvedValue({ insights: 'You study well!' }),
         aiChat: vi.fn().mockResolvedValue({ reply: 'Great question!' }),
     },
 }));
 
-import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/analytics/components/AIInsightsTab';
-import analyticsService from '../../../api/analyticsApi';
+import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../../components/analytics/components/AIInsightsTab';
+import analyticsService from '../../../../api/analyticsApi';
 
 // jsdom doesn't implement scrollIntoView
 Element.prototype.scrollIntoView = vi.fn();

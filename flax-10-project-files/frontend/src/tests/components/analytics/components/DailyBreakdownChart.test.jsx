@@ -7,11 +7,11 @@ vi.mock('@mui/x-charts/BarChart', () => ({
     ),
 }));
 
-vi.mock('../../../context/ThemeContext', () => ({
+vi.mock('../../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-import DailyBreakdownChart from '../../../components/analytics/components/DailyBreakdownChart';
+import DailyBreakdownChart from '../../../../components/analytics/components/DailyBreakdownChart';
 
 const mockData = [
     { date: '2024-03-01', work: 90, break: 20 },

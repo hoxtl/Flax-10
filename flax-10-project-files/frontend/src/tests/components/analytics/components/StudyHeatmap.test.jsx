@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('../../../context/ThemeContext', () => ({
+vi.mock('../../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-import StudyHeatmap from '../../../components/analytics/components/StudyHeatmap';
-import { useTheme } from '../../../context/ThemeContext';
+import StudyHeatmap from '../../../../components/analytics/components/StudyHeatmap';
+import { useTheme } from '../../../../context/ThemeContext';
 
 const mockHeatmapData = {
     data: [

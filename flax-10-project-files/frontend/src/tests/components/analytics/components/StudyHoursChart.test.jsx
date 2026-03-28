@@ -7,12 +7,12 @@ vi.mock('@mui/x-charts/LineChart', () => ({
     ),
 }));
 
-vi.mock('../../../context/ThemeContext', () => ({
+vi.mock('../../../../context/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'light' })),
 }));
 
-import StudyHoursChart from '../../../components/analytics/components/StudyHoursChart';
-import { useTheme } from '../../../context/ThemeContext';
+import StudyHoursChart from '../../../../components/analytics/components/StudyHoursChart';
+import { useTheme } from '../../../../context/ThemeContext';
 
 const mockData = [
     { date: '2024-03-01', work: 120, break: 30 },
