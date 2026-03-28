@@ -17,7 +17,7 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-  }
+  },
   build: {
     manifest: true,
     emptyOutDir: true,
