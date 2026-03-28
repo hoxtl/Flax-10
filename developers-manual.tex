@@ -76,9 +76,6 @@ environment. Installation of the operating system itself is assumed.
     \item \textbf{Git}\\
           \url{https://git-scm.com/downloads}
 
-    \item \textbf{Docker Desktop} (Windows users only)\\
-          \url{https://www.docker.com/products/docker-desktop/}
-
     \item \textbf{PostgreSQL} (only required for manual setup without Nix)\\
           \url{https://www.postgresql.org/download/}
 \end{itemize}
@@ -138,54 +135,6 @@ experimental-features = nix-command flakes
           installs all dependencies. On subsequent runs, it detects the
           existing environment and activates it. You will be returned to
           a \texttt{bash} terminal once setup is complete.
-\end{enumerate}
-
-\section{Windows (via Docker Desktop)}
-
-On Windows, Nix is run inside a Docker container using the official
-NixOS image.
-
-\begin{enumerate}
-    \item Open the Docker Desktop terminal.
-
-    \item Navigate to the repository folder:
-\begin{lstlisting}[language=bash]
-cd \path\to\Flax-10
-\end{lstlisting}
-
-    \item Create a persistent Nix store volume:
-\begin{lstlisting}[language=bash]
-docker volume create nix-store
-\end{lstlisting}
-
-    \item Launch the NixOS container. In PowerShell, use a backtick
-          (\texttt{`}) for line continuation:
-\begin{lstlisting}[language=bash]
-docker run --rm -it `
-    -v "${PWD}:/work" `
-    -v nix-store:/nix `
-    -w /work `
-    nixos/nix:latest
-\end{lstlisting}
-
-          If the above does not work, use the single-line version:
-\begin{lstlisting}[language=bash]
-docker run --rm -it -v "${PWD}:/work" -v nix-store:/nix -w /work nixos/nix:latest
-\end{lstlisting}
-
-    \item Inside the NixOS container, stage the flake file:
-\begin{lstlisting}[language=bash]
-git -C "/work" add "flake.nix"
-\end{lstlisting}
-
-    \item Enter the Nix development shell:
-\begin{lstlisting}[language=bash]
-nix --extra-experimental-features 'nix-command flakes' develop -c bash
-\end{lstlisting}
-
-    \item The container is configured with \texttt{--rm} and will be
-          destroyed upon exit. Repeat steps 4--6 for each subsequent
-          session.
 \end{enumerate}
 
 \section{Re-entering the Nix Shell in Future Sessions}
@@ -351,11 +300,6 @@ python manage.py runserver 8080
 \begin{lstlisting}[language=bash]
 pip install coverage
 \end{lstlisting}
-
-    \item[Windows Docker container exits immediately.]
-    Ensure Docker Desktop is running and that the \texttt{nix-store}
-    volume has been created before executing the \texttt{docker run}
-    command.
 
     \item[Re-seeding inflates data.]
     The Nix shell runs \texttt{python manage.py seed} on every entry,
