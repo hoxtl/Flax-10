@@ -7,7 +7,7 @@ import {
   pixelsToMinutes,
   minutesToPixels,
   getMinuteOffset,
-} from '../../../components/calendar/calendarConstants';
+} from '../../../../components/calendar/calendarConstants';
 
 describe('calendarConstants', () => {
   it('exports base constants', () => {

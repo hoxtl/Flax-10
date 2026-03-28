@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import { SwipeMonthView } from "../../../components/calendar/month_view/SwipeMonthView";
+import { SwipeMonthView } from "../../../../components/calendar/month_view/SwipeMonthView";
 
 const dispatchMock = vi.fn();
 const openPopupMock = vi.fn();
 const swipeNavigationMock = vi.fn();
 
-vi.mock("../../../context/CalendarContext", async () => {
-  const actual = await vi.importActual("../../../context/CalendarContext");
+vi.mock("../../../../context/CalendarContext", async () => {
+  const actual = await vi.importActual("../../../../context/CalendarContext");
   return {
     ...actual,
     useCalendar: vi.fn(() => ({
@@ -24,15 +24,15 @@ vi.mock("../../../context/CalendarContext", async () => {
   };
 });
 
-vi.mock("../../../components/calendar/hooks/useSwipeNavigation", () => ({
+vi.mock("../../../../components/calendar/hooks/useSwipeNavigation", () => ({
   useSwipeNavigation: (...args) => swipeNavigationMock(...args),
 }));
 
-vi.mock("../../../context/TagContext", () => ({
+vi.mock("../../../../context/TagContext", () => ({
   useTags: () => ({ tags: [], getTag: vi.fn(), getTagByName: vi.fn() }),
 }));
 
-vi.mock("../../../components/calendar/hooks/useDragDrop", () => ({
+vi.mock("../../../../components/calendar/hooks/useDragDrop", () => ({
   useDrag: vi.fn(() => ({ dragProps: { draggable: true }, isDragging: false })),
   useDrop: vi.fn(() => ({ dropProps: {}, isOver: false })),
 }));

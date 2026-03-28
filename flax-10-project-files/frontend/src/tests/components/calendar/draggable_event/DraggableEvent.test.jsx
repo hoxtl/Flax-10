@@ -1,29 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DraggableEvent } from '../../../components/calendar/DraggableEvent';
-import * as useDragDrop from '../../../components/calendar/hooks/useDragDrop';
-import * as useEventResize from '../../../components/calendar/hooks/useEventResize';
+import { DraggableEvent } from '../../../../components/calendar/DraggableEvent';
+import * as useDragDrop from '../../../../components/calendar/hooks/useDragDrop';
+import * as useEventResize from '../../../../components/calendar/hooks/useEventResize';
 
-vi.mock('../../../components/calendar/hooks/useDragDrop', () => ({
+vi.mock('../../../../components/calendar/hooks/useDragDrop', () => ({
     useDrag: vi.fn(() => ({ dragProps: {}, isDragging: false })),
 }));
 
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../../components/calendar/hooks/useCalendarEvents', () => ({
     useEventActions: vi.fn(() => ({ editEvent: vi.fn(), removeEvent: vi.fn(), addException: vi.fn() })),
 }));
 
-vi.mock('../../../context/CalendarContext', () => ({
+vi.mock('../../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(() => ({ openModal: vi.fn() })),
     useEventPopup: vi.fn(() => ({ openPopup: mockOpenPopup, closePopup: vi.fn(), popupEvent: null, popupAnchorRect: null })),
     useEventDelete: vi.fn(() => ({ openDelete: vi.fn(), isDeleteOpen: false, deleteEvent: null, deleteType: null, closeDelete: vi.fn() })),
 }));
 
-vi.mock('../../../context/ConfirmContext', () => ({
+vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: vi.fn(() => vi.fn()),
 }));
 
 const { mockOpenPopup } = vi.hoisted(() => ({ mockOpenPopup: vi.fn() }));
-vi.mock('../../../components/calendar/hooks/useEventResize', () => ({
+vi.mock('../../../../components/calendar/hooks/useEventResize', () => ({
     useEventResize: vi.fn(() => ({
         handleResizeStart: vi.fn(),
         isResizing: false,
@@ -31,19 +31,19 @@ vi.mock('../../../components/calendar/hooks/useEventResize', () => ({
     })),
 }));
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
     formatTime: vi.fn((d) => d.toTimeString().slice(0, 5)),
 }));
 
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
     getEventType: vi.fn((event) => event.source || 'personal'),
 }));
 
-vi.mock('../../../context/TagContext', () => ({
+vi.mock('../../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({ tags: [], getTag: vi.fn(() => ({ color: '#000', label: 'None' })) })),
 }));
 
-vi.mock('../../../components/calendar/utils/eventStyleUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventStyleUtils', () => ({
     getEventTheme: vi.fn(() => ({ color: '#3b82f6', background: '#dbeafe' })),
 }));
 
@@ -73,7 +73,7 @@ const timetableEvent = {
     source: 'timetable',
 };
 
-import { getEventType } from '../../../components/calendar/utils/eventUtils';
+import { getEventType } from '../../../../components/calendar/utils/eventUtils';
 
 describe('DraggableEvent', () => {
     beforeEach(() => {

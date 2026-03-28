@@ -1,11 +1,11 @@
-import { render, screen, fireEvent } from '../../../utils/testUtils';
+import { render, screen, fireEvent } from '../../../../utils/testUtils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MonthView } from '../../../components/calendar/month_view/MonthView';
-import * as CalendarContextModule from '../../../context/CalendarContext';
-import { TagProvider } from '../../../context/TagContext';
+import { MonthView } from '../../../../components/calendar/month_view/MonthView';
+import * as CalendarContextModule from '../../../../context/CalendarContext';
+import { TagProvider } from '../../../../context/TagContext';
 
 // Mock TagContext to avoid network calls
-vi.mock('../../../context/TagContext', async () => {
+vi.mock('../../../../context/TagContext', async () => {
     return {
         TagProvider: ({ children }) => <div>{children}</div>,
         useTags: () => ({
@@ -22,16 +22,16 @@ const mockUseMonthDayDrop = vi.fn(() => ({ dropProps: {}, isOver: false }));
 const mockOpenModal = vi.fn();
 const mockDispatch = vi.fn();
 
-vi.mock('../../../components/calendar/hooks/useDragDrop', () => ({
+vi.mock('../../../../components/calendar/hooks/useDragDrop', () => ({
     useDrag: (...args) => mockUseDrag(...args),
 }));
 
-vi.mock('../../../components/calendar/hooks/useMonthDayDrop', () => ({
+vi.mock('../../../../components/calendar/hooks/useMonthDayDrop', () => ({
     useMonthDayDrop: (...args) => mockUseMonthDayDrop(...args),
 }));
 
-vi.mock('../../../context/CalendarContext', async () => {
-    const actual = await vi.importActual('../../../context/CalendarContext');
+vi.mock('../../../../context/CalendarContext', async () => {
+    const actual = await vi.importActual('../../../../context/CalendarContext');
     return {
         ...actual,
         useCalendar: vi.fn(),
@@ -41,7 +41,7 @@ vi.mock('../../../context/CalendarContext', async () => {
     };
 });
 
-vi.mock('../../../components/notifications/hooks/useReminderNotifications', () => ({
+vi.mock('../../../../components/notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 

@@ -12,21 +12,21 @@ import {
     applyCalculatedEventMove,
     handleRecurringMoveChoice,
     moveSingleOccurrenceToWindow,
-} from '../../../components/calendar/hooks/eventMoveUtils';
+} from '../../../../components/calendar/hooks/eventMoveUtils';
 
-vi.mock('../../../components/calendar/utils/overlapUtils', () => ({
+vi.mock('../../../../components/calendar/utils/overlapUtils', () => ({
     checkOverlapWithConfirm: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
     extractBaseEventId: vi.fn((id) => {
         if (typeof id === 'string') return parseInt(id.split('-')[0]) || id;
         return id;
     }),
 }));
 
-const { checkOverlapWithConfirm } = await import('../../../components/calendar/utils/overlapUtils');
-const { extractBaseEventId } = await import('../../../components/calendar/utils/eventUtils');
+const { checkOverlapWithConfirm } = await import('../../../../components/calendar/utils/overlapUtils');
+const { extractBaseEventId } = await import('../../../../components/calendar/utils/eventUtils');
 
 const makeEvent = (overrides = {}) => ({
     id: 1,

@@ -27,7 +27,7 @@ vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
 }));
 
-vi.mock('../../../context/CalendarContext', () => ({
+vi.mock('../../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(),
     useEventPopup: vi.fn(),
     useCalendarDispatch: vi.fn(() => vi.fn()),
@@ -40,7 +40,7 @@ vi.mock('../../../context/CalendarContext', () => ({
     })),
 }));
 
-vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
+vi.mock('../../../../components/calendar/event_modal/EventModal', () => ({
     EventModal: ({ event, onClose }) => (
         <div data-testid="event-modal">
             <span>{event?.title || 'New Event'}</span>
@@ -49,7 +49,7 @@ vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
     ),
 }));
 
-vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
+vi.mock('../../../../components/calendar/event_popover/EventPopover', () => ({
     EventPopover: ({ event, onClose, actions, tag }) => (
         <div data-testid="event-popup">
             <span>{event?.title}</span>
@@ -62,18 +62,18 @@ vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
     ),
 }));
 
-vi.mock('../../../context/TagContext', () => ({
+vi.mock('../../../../context/TagContext', () => ({
     useTags: () => ({
         getTag: vi.fn(() => ({ label: 'TagLabel', color: '#aaa' })),
         refreshTags: mockRefreshTags,
     }),
 }));
 
-vi.mock('../../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../../../components/notifications/hooks/useNotify', () => ({
     useNotify: () => vi.fn(),
 }));
 
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../../components/calendar/hooks/useCalendarEvents', () => ({
     useCalendarEvents: () => ({ loadEvents: mockLoadEvents }),
     useEventActions: () => ({
         removeEvent: mockRemoveEvent,
@@ -81,37 +81,37 @@ vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
     }),
 }));
 
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
     getEventType: vi.fn(() => 'personal'),
     hasRecurrence: vi.fn(() => false),
 }));
 
-vi.mock('../../../components/calendar/utils/formUtils', () => ({
+vi.mock('../../../../components/calendar/utils/formUtils', () => ({
     executeDelete: vi.fn(() => Promise.resolve()),
     deleteRecurrenceOccurrence: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../api/societyApi', () => ({
+vi.mock('../../../../api/societyApi', () => ({
     unsyncCalendar: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../components/modules/hooks/useModuleDisenrollment', () => ({
+vi.mock('../../../../components/modules/hooks/useModuleDisenrollment', () => ({
     useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }),
 }));
 
-vi.mock('../../../context/ConfirmContext', () => ({
+vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: () => mockConfirm,
 }));
 
-vi.mock('../../../context/ToastContext', () => ({
+vi.mock('../../../../context/ToastContext', () => ({
     useToast: () => mockToast,
 }));
 
-import { EventPopups } from '../../../components/calendar/EventPopups';
-import { useEventModal, useEventPopup, useEventDelete } from '../../../context/CalendarContext';
-import { getEventType, hasRecurrence } from '../../../components/calendar/utils/eventUtils';
-import { unsyncCalendar } from '../../../api/societyApi';
-import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/calendar/utils/formUtils';
+import { EventPopups } from '../../../../components/calendar/EventPopups';
+import { useEventModal, useEventPopup, useEventDelete } from '../../../../context/CalendarContext';
+import { getEventType, hasRecurrence } from '../../../../components/calendar/utils/eventUtils';
+import { unsyncCalendar } from '../../../../api/societyApi';
+import { executeDelete, deleteRecurrenceOccurrence } from '../../../../components/calendar/utils/formUtils';
 
 function setupModalClosed() {
     useEventModal.mockReturnValue({

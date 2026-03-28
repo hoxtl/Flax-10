@@ -1,28 +1,28 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
+import { render, screen, fireEvent, waitFor } from '../../../../utils/testUtils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CalendarHeader } from '../../../components/calendar/CalendarHeader';
-import * as CalendarContextModule from '../../../context/CalendarContext';
-import { TagProvider } from '../../../context/TagContext';
-import { importTimetable } from '../../../api/timetableApi';
-import { getEvents } from '../../../api/eventApi';
+import { CalendarHeader } from '../../../../components/calendar/CalendarHeader';
+import * as CalendarContextModule from '../../../../context/CalendarContext';
+import { TagProvider } from '../../../../context/TagContext';
+import { importTimetable } from '../../../../api/timetableApi';
+import { getEvents } from '../../../../api/eventApi';
 
-vi.mock('../../../api/eventApi', () => ({
+vi.mock('../../../../api/eventApi', () => ({
     getEvents: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../api/timetableApi', () => ({
+vi.mock('../../../../api/timetableApi', () => ({
     importTimetable: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../api/tagApi', () => ({
+vi.mock('../../../../api/tagApi', () => ({
     getTags: vi.fn(() => Promise.resolve([])),
     createTag: vi.fn(),
     deleteTag: vi.fn(),
     updateTag: vi.fn(),
 }));
 
-vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
+vi.mock('../../../../components/calendar/header/CalendarHeaderUtils', () => ({
     CalendarNav: ({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) => (
         <div className="nav">
             <button type="button" onClick={onPrev}>&lt;</button>
@@ -60,11 +60,11 @@ vi.mock('../../../components/calendar/header/CalendarHeaderUtils', () => ({
     ScheduleManagerButton: () => <button type="button">Reschedule my events</button>,
 }));
 
-vi.mock('../../../components/notifications/hooks/useReminderNotifications', () => ({
+vi.mock('../../../../components/notifications/hooks/useReminderNotifications', () => ({
     useReminderNotifications: vi.fn(),
 }));
 
-vi.mock('../../../components/schedules/components/TimetableImportModal', () => {
+vi.mock('../../../../components/schedules/components/TimetableImportModal', () => {
     const React = require('react');
     function MockTimetableImportModal({ onClose, onImport }) {
         const [url, setUrl] = React.useState('');
@@ -83,8 +83,8 @@ vi.mock('../../../components/schedules/components/TimetableImportModal', () => {
 const mockDispatch = vi.fn();
 const mockOpenModal = vi.fn();
 
-vi.mock('../../../context/CalendarContext', async () => {
-    const actual = await vi.importActual('../../../context/CalendarContext');
+vi.mock('../../../../context/CalendarContext', async () => {
+    const actual = await vi.importActual('../../../../context/CalendarContext');
     return {
         ...actual,
         useCalendar: vi.fn(),
@@ -94,11 +94,11 @@ vi.mock('../../../context/CalendarContext', async () => {
 });
 
 // Mock useBreakpoint to control mobile mode
-vi.mock('../../../hooks/useBreakpoint', () => ({
+vi.mock('../../../../hooks/useBreakpoint', () => ({
     default: vi.fn(() => false),
 }));
 
-import useBreakpoint from '../../../hooks/useBreakpoint';
+import useBreakpoint from '../../../../hooks/useBreakpoint';
 
 describe('CalendarHeader extra coverage', () => {
     const defaultDate = new Date(2026, 1, 15); // Feb 15 2026

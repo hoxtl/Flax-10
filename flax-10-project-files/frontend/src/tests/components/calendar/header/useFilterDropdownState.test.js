@@ -4,10 +4,10 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useFilterDropdownState } from '../../../components/calendar/header/useFilterDropdownState';
+import { useFilterDropdownState } from '../../../../components/calendar/header/useFilterDropdownState';
 
 // Mock CSS module
-vi.mock('../../../components/calendar/header/CalendarHeaderUtils.module.css', () => ({
+vi.mock('../../../../components/calendar/header/CalendarHeaderUtils.module.css', () => ({
     default: { filterPopup: 'filterPopup' },
 }));
 
@@ -17,7 +17,7 @@ const mockTags = [
     { label: 'work', color: '#111', icon: '💼' }, // duplicate (same label lower)
 ];
 
-vi.mock('../../../context/TagContext', () => ({
+vi.mock('../../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({ tags: mockTags })),
 }));
 

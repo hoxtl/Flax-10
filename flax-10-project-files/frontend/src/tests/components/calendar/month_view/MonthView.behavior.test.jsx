@@ -13,41 +13,41 @@ const useCalendar = vi.fn();
 const dispatch = vi.fn();
 const useSwipeNavigation = vi.fn();
 
-vi.mock("../../../components/calendar/hooks/useMonthDayDrop", () => ({
+vi.mock("../../../../components/calendar/hooks/useMonthDayDrop", () => ({
   useMonthDayDrop: (...args) => useMonthDayDrop(...args),
 }));
 
-vi.mock("../../../context/CalendarContext", () => ({
+vi.mock("../../../../context/CalendarContext", () => ({
   useEventModal: () => ({ openModal }),
   useCalendar: (...args) => useCalendar(...args),
   useCalendarDispatch: () => dispatch,
   useEventPopup: () => ({ openPopup }),
 }));
 
-vi.mock("../../../context/TagContext", () => ({
+vi.mock("../../../../context/TagContext", () => ({
   useTags: (...args) => useTags(...args),
 }));
 
-vi.mock("../../../components/calendar/hooks/useDragDrop", () => ({
+vi.mock("../../../../components/calendar/hooks/useDragDrop", () => ({
   useDrag: (...args) => useDrag(...args),
 }));
 
-vi.mock("../../../components/calendar/utils/eventUtils", () => ({
+vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
   getEventType: (...args) => getEventType(...args),
 }));
 
-vi.mock("../../../components/calendar/utils/eventStyleUtils", () => ({
+vi.mock("../../../../components/calendar/utils/eventStyleUtils", () => ({
   getEventTheme: (...args) => getEventTheme(...args),
 }));
 
-vi.mock("../../../components/calendar/hooks/useSwipeNavigation", () => ({
+vi.mock("../../../../components/calendar/hooks/useSwipeNavigation", () => ({
   useSwipeNavigation: (...args) => useSwipeNavigation(...args),
 }));
 
-import { DayCell } from "../../../components/calendar/month_view/DayCell";
-import { EventDot, MoreEvents } from "../../../components/calendar/month_view/EventDot";
-import { WeekRow } from "../../../components/calendar/month_view/WeekRow";
-import { SwipeMonthView } from "../../../components/calendar/month_view/SwipeMonthView";
+import { DayCell } from "../../../../components/calendar/month_view/DayCell";
+import { EventDot, MoreEvents } from "../../../../components/calendar/month_view/EventDot";
+import { WeekRow } from "../../../../components/calendar/month_view/WeekRow";
+import { SwipeMonthView } from "../../../../components/calendar/month_view/SwipeMonthView";
 
 describe("MonthView parts", () => {
   beforeEach(() => {

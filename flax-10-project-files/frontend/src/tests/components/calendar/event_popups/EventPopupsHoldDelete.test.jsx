@@ -28,7 +28,7 @@ vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
 }));
 
-vi.mock('../../../context/CalendarContext', () => ({
+vi.mock('../../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(),
     useEventPopup: vi.fn(),
     useCalendarDispatch: vi.fn(() => vi.fn()),
@@ -41,18 +41,18 @@ vi.mock('../../../context/CalendarContext', () => ({
     })),
 }));
 
-vi.mock('../../../context/TagContext', () => ({
+vi.mock('../../../../context/TagContext', () => ({
     useTags: () => ({
         getTag: vi.fn(() => ({ label: 'TagLabel', color: '#aaa' })),
         refreshTags: mockRefreshTags,
     }),
 }));
 
-vi.mock('../../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../../../components/notifications/hooks/useNotify', () => ({
     useNotify: () => vi.fn(),
 }));
 
-vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
+vi.mock('../../../../components/calendar/hooks/useCalendarEvents', () => ({
     useCalendarEvents: () => ({ loadEvents: mockLoadEvents }),
     useEventActions: () => ({
         removeEvent: mockRemoveEvent,
@@ -60,33 +60,33 @@ vi.mock('../../../components/calendar/hooks/useCalendarEvents', () => ({
     }),
 }));
 
-vi.mock('../../../components/calendar/utils/eventUtils', () => ({
+vi.mock('../../../../components/calendar/utils/eventUtils', () => ({
     getEventType: vi.fn(() => 'personal'),
     hasRecurrence: vi.fn(() => false),
 }));
 
-vi.mock('../../../components/calendar/utils/formUtils', () => ({
+vi.mock('../../../../components/calendar/utils/formUtils', () => ({
     executeDelete: vi.fn(() => Promise.resolve()),
     deleteRecurrenceOccurrence: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../api/societyApi', () => ({
+vi.mock('../../../../api/societyApi', () => ({
     unsyncCalendar: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../components/modules/hooks/useModuleDisenrollment', () => ({
+vi.mock('../../../../components/modules/hooks/useModuleDisenrollment', () => ({
     useModuleDisenrollment: () => ({ disenrollFromModule: vi.fn() }),
 }));
 
-vi.mock('../../../context/ConfirmContext', () => ({
+vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: () => mockConfirm,
 }));
 
-vi.mock('../../../context/ToastContext', () => ({
+vi.mock('../../../../context/ToastContext', () => ({
     useToast: () => mockToast,
 }));
 
-vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({
+vi.mock('../../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({
     default: ({ title, warningText, onConfirm, onCancel }) => (
         <div data-testid="hold-confirm-modal">
             <span data-testid="hold-title">{title}</span>
@@ -97,9 +97,9 @@ vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => 
     ),
 }));
 
-import { EventPopups } from '../../../components/calendar/EventPopups';
-import { useEventModal, useEventPopup, useEventDelete } from '../../../context/CalendarContext';
-import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/calendar/utils/formUtils';
+import { EventPopups } from '../../../../components/calendar/EventPopups';
+import { useEventModal, useEventPopup, useEventDelete } from '../../../../context/CalendarContext';
+import { executeDelete, deleteRecurrenceOccurrence } from '../../../../components/calendar/utils/formUtils';
 
 function setupModalClosed() {
     useEventModal.mockReturnValue({
