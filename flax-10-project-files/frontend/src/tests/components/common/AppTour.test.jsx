@@ -1,116 +1,100 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import AppTour from "../../../components/common/AppTour/AppTour";
-
-vi.mock("framer-motion", () => ({
-  AnimatePresence: ({ children }) => <>{children}</>,
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-  },
-}));
-
-function getOverlay() {
-  return Array.from(screen.getByRole("dialog", { name: "App tour" }).querySelectorAll("div")).find((element) => {
-    const className = String(element.className || "");
-    return className.includes("overlay") && !className.includes("overlayWrap");
-  });
-}
+import { screen } from "@testing-library/react";
+import "@/tests/mocks/motionAndIconMocks.jsx";
+import {
+  renderAppTour,
+  makeRect,
+  getOverlayElement,
+  findCardByText,
+  findClassFragment,
+} from "./appTourTestUtils";
 
 describe("AppTour", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
   afterEach(() => {
     vi.restoreAllMocks();
-    vi.useRealTimers();
   });
 
-  it("renders the welcome step centered with no back button", () => {
-    render(<AppTour onDone={vi.fn()} />);
-
-    expect(screen.getByRole("dialog", { name: "App tour" })).toBeInTheDocument();
-    expect(screen.getByText("Welcome to StudyFlax")).toBeInTheDocument();
-    expect(screen.getByText("1 / 7")).toBeInTheDocument();
-    expect(screen.queryByText("Back")).toBeNull();
-    expect(screen.getByText("Next")).toBeInTheDocument();
-
-    const overlay = getOverlay();
-    expect(overlay?.style.clipPath).toBe("");
+  it("shows the welcome step centered without a spotlight", () => {
+    renderAppTour();
+    expect(screen.getByText("Welcome to StudyFlax")).toBeVisible();
+    expect(getOverlayElement().style.clipPath).toBe("");
+    expect(findCardByText("Welcome to StudyFlax").style.width).toBe("340px");
+    expect(findClassFragment("spotlightRing")).toBeUndefined();
   });
 
-  const nextStep = async () => {
-    fireEvent.click(screen.getByText("Next"));
-    await act(async () => { vi.advanceTimersByTime(150); });
-  };
-  it("measures targeted steps and applies spotlight", async () => {
-    vi.spyOn(document, "querySelector").mockReturnValue({
-      getBoundingClientRect: () => ({ x: 100, y: 80, width: 60, height: 40 }),
-    });
-    render(<AppTour onDone={vi.fn()} />);
-    await nextStep();
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    const overlay = getOverlay();
-    expect(overlay?.style.clipPath).toContain("polygon");
-    const card = Array.from(screen.getByRole("dialog", { name: "App tour" }).querySelectorAll("div[style]"))
-      .find((element) => element.textContent?.includes("Dashboard") && element.style.left);
-    expect(card?.style.left).toBe("100px");
-  });
-  it("supports back navigation", async () => {
-    render(<AppTour onDone={vi.fn()} />);
-    await nextStep();
-    fireEvent.click(screen.getByText("Back"));
-    expect(screen.getByText("Welcome to StudyFlax")).toBeInTheDocument();
+  it("positions near-top steps below their target with a top arrow", async () => {
+    const helpers = renderAppTour({ targets: { home: makeRect({ x: 90, y: 80, width: 50, height: 20 }) } });
+    await helpers.next();
+    const card = findCardByText("Dashboard");
+    expect(card.className).toContain("hasArrowTop");
+    expect(card.style.top).toBe("118px");
+    expect(getOverlayElement().style.clipPath).toContain("polygon");
   });
 
-  it("calls onDone when the user skips", async () => {
+  it("positions lower steps to the side and renders the spotlight ring", async () => {
+    const helpers = renderAppTour({ targets: { home: makeRect({ x: 50, y: 200, width: 60, height: 40 }) } });
+    await helpers.next();
+    const card = findCardByText("Dashboard");
+    expect(card.className).toContain("hasArrowLeft");
+    expect(card.style.left).toBe("130px");
+    const ring = findClassFragment("spotlightRing");
+    expect(ring.style.left).toBe("38px");
+    expect(ring.style.top).toBe("188px");
+  });
+
+  it("falls back to centered cards when a spotlight target is missing", async () => {
+    const helpers = renderAppTour();
+    await helpers.next();
+    const overlay = getOverlayElement();
+    const card = findCardByText("Dashboard");
+    expect(overlay.style.clipPath).toBe("");
+    expect(card.style.transform).toContain("translate(-50%, -50%)");
+  });
+
+  it("jumps to a selected step via progress dots and renders its icon", async () => {
+    const helpers = renderAppTour({ targets: { calendar: makeRect({ x: 80, y: 150, width: 40, height: 30 }) } });
+    await helpers.jumpTo(2);
+    expect(screen.getByText("Calendar")).toBeVisible();
+    expect(screen.getByTestId("icon-Calendar")).toBeVisible();
+    expect(screen.getByText("3 / 7")).toBeVisible();
+  });
+
+  it("shows back navigation and returns to the welcome step", async () => {
+    const helpers = renderAppTour({ targets: { home: makeRect({ x: 70, y: 150 }) } });
+    await helpers.next();
+    expect(screen.getByText("Back")).toBeVisible();
+    await helpers.back();
+    expect(screen.getByText("Welcome to StudyFlax")).toBeVisible();
+  });
+
+  it("completes the tour on Finish and calls onDone", async () => {
     const onDone = vi.fn();
-    render(<AppTour onDone={onDone} />);
-
-    await nextStep();
-    fireEvent.click(screen.getByText("Skip tour"));
-
+    const helpers = renderAppTour({ onDone, targets: { attendance: makeRect({ x: 40, y: 260, width: 70, height: 50 }) } });
+    await helpers.advanceToFinalStep();
+    expect(screen.getByText("Finish")).toBeVisible();
+    await helpers.next();
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
-  it("handles missing spotlight targets without crashing", async () => {
-    vi.spyOn(document, "querySelector").mockReturnValue(null);
-
-    render(<AppTour onDone={vi.fn()} />);
-    fireEvent.click(screen.getByText("Next"));
-
-    await act(async () => {
-      vi.advanceTimersByTime(100);
-      window.dispatchEvent(new Event("resize"));
-    });
-
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    const overlay = getOverlay();
-    expect(overlay?.style.clipPath).toBe("");
-  });
-
-  it("calls onDone after the final step", async () => {
-    vi.spyOn(document, "querySelector").mockReturnValue({
-      getBoundingClientRect: () => ({ x: 40, y: 60, width: 50, height: 30 }),
-    });
-
+  it("navigates using keyboard shortcuts (Right, Enter, Left, Esc) and handles edge cases", async () => {
     const onDone = vi.fn();
-    render(<AppTour onDone={onDone} />);
+    const helpers = renderAppTour({ onDone });
+    
+    // Press unmapped key (branch coverage)
+    await helpers.key("x");
+    expect(screen.getByText("Welcome to StudyFlax")).toBeVisible();
 
-    for (let i = 0; i < 6; i += 1) {
-      fireEvent.click(screen.getByText("Next"));
-      await act(async () => {
-        vi.advanceTimersByTime(100);
-      });
-    }
+    // Press ArrowLeft on step 0 (branch coverage for prev() limit)
+    await helpers.key("ArrowLeft");
+    expect(screen.getByText("Welcome to StudyFlax")).toBeVisible();
 
-    expect(screen.getByText("My Venio Details")).toBeInTheDocument();
-    expect(screen.getByText("Finish")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText("Finish"));
-
+    await helpers.key("ArrowRight"); // Dashboard
+    expect(screen.getByText("Dashboard")).toBeVisible();
+    await helpers.key("Enter"); // Calendar
+    expect(screen.getByText("Calendar")).toBeVisible();
+    await helpers.key("ArrowLeft"); // Dashboard
+    expect(screen.getByText("Dashboard")).toBeVisible();
+    await helpers.key("Escape"); // Skip
     expect(onDone).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("7 / 7")).toBeInTheDocument();
   });
 });
