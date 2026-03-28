@@ -4,6 +4,10 @@
 @import './styles/Timeline.module.css';
 @import './styles/Overlays.module.css';
 
+.timelineSection {
+  composes: timelineSection from './styles/Timeline.module.css';
+}
+
 .routeSkeleton {
   width: min(1200px, calc(100% - 32px));
   margin: 20px auto 0;
