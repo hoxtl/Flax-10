@@ -136,6 +136,8 @@ export function MyEnrolmentsTabContent({ state }) {
   );
 }
 
+export { MyEnrolmentsTabContent as MyEnrollmentsTabContent };
+
 function MyModulesWithTabs({ state }) {
   const [innerTab, setInnerTab] = useState("overview");
   return (

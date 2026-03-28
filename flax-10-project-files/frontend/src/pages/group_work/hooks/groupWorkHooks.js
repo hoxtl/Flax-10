@@ -132,9 +132,11 @@ function useEagerTaskStats(projectId) {
   const [taskStats, setTaskStats] = useState(getInitialTaskStats());
   useEffect(() => {
     if (!projectId) return;
-    fetch(`/api/tasks/?group_project=${projectId}`, { headers: getAuthHeaders() })
+    const endpoint = new URL(`/api/tasks/?group_project=${projectId}`, globalThis.location?.origin || "http://localhost");
+    fetch(endpoint, { headers: getAuthHeaders() })
       .then((r) => (r.ok ? r.json() : []))
-      .then((tasks) => setTaskStats(calcCompletionSegments(tasks, [])));
+      .then((tasks) => setTaskStats(calcCompletionSegments(tasks, [])))
+      .catch(() => setTaskStats(getInitialTaskStats()));
   }, [projectId]);
   return [taskStats, setTaskStats];
 }
