@@ -199,15 +199,8 @@ describe("account settings helpers", () => {
       requested_course: "Maths",
     });
 
-    const { result } = renderHook(() =>
-      useAccountFormState({
-        first_name: "Ada",
-        last_name: "Lovelace",
-        email: "ada@example.com",
-        year: "Year 2",
-        major: "Computer Science",
-      }),
-    );
+    const adaFull = { first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", year: "Year 2", major: "Computer Science" };
+    const { result } = renderHook(() => useAccountFormState(adaFull));
 
     await waitFor(() => {
       expect(result.current.formData).toEqual({
@@ -233,12 +226,8 @@ describe("account settings helpers", () => {
     setCachedPendingRequest("Cached Course");
     getMyCourseChangeRequest.mockRejectedValueOnce(new Error("offline"));
 
-    const first = renderHook(() =>
-      useAccountFormState({
-        first_name: "Ada",
-        email: "ada@example.com",
-      }),
-    );
+    const adaPartial = { first_name: "Ada", email: "ada@example.com" };
+    const first = renderHook(() => useAccountFormState(adaPartial));
 
     await waitFor(() => {
       expect(first.result.current.pendingRequest).toEqual({
@@ -253,12 +242,8 @@ describe("account settings helpers", () => {
       requested_course: "Physics",
     });
 
-    const second = renderHook(() =>
-      useAccountFormState({
-        username: "ada",
-        email: "ada@example.com",
-      }),
-    );
+    const adaUsername = { username: "ada", email: "ada@example.com" };
+    const second = renderHook(() => useAccountFormState(adaUsername));
 
     await waitFor(() => {
       expect(second.result.current.pendingRequest).toBeNull();
