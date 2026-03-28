@@ -9,108 +9,153 @@
     flex-wrap: wrap;
 }
 
+.infoHero {
+    width: 100%;
+    padding: 0;
+    background: transparent;
+    border: none;
+    justify-content: flex-end;
+}
+
+.metaPillWrap {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
 .bio {
     flex: 1;
     margin: 0;
-    color: var(--text);
-    min-width: 200px;
-}
-
-.stats {
-    display: flex;
-    gap: 16px;
     color: var(--muted);
+    min-width: 200px;
+    font-style: italic;
     font-size: 0.9rem;
-    align-items: center;
 }
 
-.memberCountBtn {
-    background: none;
-    border: none;
-    padding: 0;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    text-decoration-color: transparent;
-    transition: text-decoration-color 0.2s ease, opacity 0.2s ease;
-}
-
-.memberCountBtn:hover {
-    text-decoration-color: currentColor;
-    opacity: 0.8;
-}
-
-.badge {
-    background: color-mix(in srgb, var(--success-text) 16%, white);
-    color: #1b5e20;
-    border-color: color-mix(in srgb, var(--success-text) 28%, transparent);
-    font-weight: 600;
-}
-
-.verifiedIcon {
-    width: 0.95rem;
-    height: 0.95rem;
+.metaPill {
     flex-shrink: 0;
 }
 
-.joinBtn {
-    padding: 10px 24px;
-    background: var(--primary);
-    color: var(--c-white);
+.metaPillHero {
+    width: fit-content;
+    max-width: 100%;
+    background: #ffffff;
+    border-color: rgba(56, 40, 24, 0.12);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 26px rgba(20, 12, 7, 0.16);
+}
+
+.categorySlot {
+    min-width: max-content;
+    background: var(--segmented-active-bg);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 12%, transparent);
+}
+
+.categorySlot :global([class*="display"]) {
+    gap: 0.32rem;
+}
+
+.categorySlot :global([class*="categoryLabel"]) {
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    color: var(--segmented-active-fg);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.categorySlot :global([class*="editBtn"]) {
+    color: var(--segmented-active-fg);
+    opacity: 0.7;
+}
+
+.notificationSegment {
+    min-width: 52px;
+    padding-inline: 8px;
+}
+
+.actionSegment {
+    padding: 0;
+}
+
+.pillActionBtn {
+    background: transparent;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    font: inherit;
+    font-size: 0.85rem;
     font-weight: 600;
-    transition: background 0.2s;
-}
-
-.joinBtn:hover {
-    background: var(--primary-dark, #8a6d4f);
-}
-
-.joinedBtn {
-    padding: 10px 24px;
-    background: var(--pill-bg);
-    color: var(--muted);
-    border: none;
-    border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.joinedBtn:hover {
-    background: var(--primary);
-    color: var(--c-white);
-}
-
-.joinedBtn:hover::after {
-    content: " (Leave)";
-    font-size: 0.8em;
-}
-
-.requestedBtn {
-    padding: 10px 24px;
-    background: var(--pill-bg);
-    color: var(--muted);
-    border: 1px solid var(--border);
+    color: var(--segmented-button-fg);
+    padding: 0 14px;
     border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
+    transition: background 0.15s, color 0.15s, opacity 0.15s;
+    white-space: nowrap;
+    min-width: 104px;
+    height: 32px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    line-height: 1;
 }
 
-.requestedBtn:hover {
-    background: var(--pill-hover);
-    outline: none;
-    border-color: var(--border);
+.pillActionBtn:hover {
+    background: var(--segmented-button-hover-bg);
+    color: var(--segmented-button-hover-fg);
 }
 
-.requestedBtn:hover::after {
-    content: " (Cancel)";
-    font-size: 0.8em;
+.pillActionBtnJoin {
+    color: var(--segmented-active-fg);
+    background: var(--segmented-active-bg);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 12%, transparent);
+}
+
+.pillActionBtnPending {
+    opacity: 0.72;
+    cursor: progress;
+}
+
+.pillActionBtnEditing {
+    color: #2c1c0f;
+    background: color-mix(in srgb, var(--primary) 18%, #ffffff 82%);
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.pillActionBtnEditing:hover {
+    background: color-mix(in srgb, var(--primary) 26%, #ffffff 74%);
+    color: #24170d;
+}
+
+.pillSep {
+    margin: 4px 0;
+}
+
+.metaPillHero .categorySlot {
+    padding-inline: 10px;
+}
+
+.metaPillHero .categorySlot :global([class*="categoryLabel"]) {
+    font-size: 0.82rem;
+}
+
+.metaPillHero .notificationSegment {
+    min-width: 42px;
+    padding-inline: 4px;
+}
+
+.metaPillHero .actionSegment {
+    width: 104px;
+    padding-inline: 0;
+}
+
+.metaPillHero .pillActionBtn {
+    width: 100%;
+    min-width: 100%;
+    padding-inline: 8px;
+    font-size: 0.82rem;
 }
 
 .bioPlaceholder {
@@ -187,8 +232,18 @@
 
 .categoryEditor {
     display: flex;
-    gap: 8px;
-    align-items: flex-end;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.categoryEditorActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.categoryCancelBtn {
+    min-height: 38px;
 }
 
 .notificationBell {
@@ -196,16 +251,24 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    border-radius: 6px;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, color 0.2s, transform 0.15s;
+    width: 36px;
+    height: 36px;
+    transition: background 0.2s, color 0.2s, transform 0.15s, opacity 0.15s;
 }
 
 .notificationBell:hover {
-    background: var(--hover);
+    background: var(--segmented-button-hover-bg);
     transform: scale(1.1);
+}
+
+.notificationBellIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bellActive {
@@ -219,6 +282,17 @@
 
 .bellInactive:hover {
     opacity: 1;
+}
+
+.bellDisabled {
+    color: var(--muted);
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+.bellDisabled:hover {
+    background: transparent;
+    transform: none;
 }
 
 .locationRow {
@@ -242,4 +316,23 @@
 .locationText {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+@media (max-width: 900px) {
+    .infoHero {
+        justify-content: stretch;
+    }
+
+    .metaPillWrap {
+        justify-content: stretch;
+    }
+
+    .metaPillHero {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .pillSep {
+        display: none;
+    }
 }

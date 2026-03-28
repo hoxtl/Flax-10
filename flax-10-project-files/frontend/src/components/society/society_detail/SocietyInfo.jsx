@@ -3,29 +3,106 @@
  */
 
 import { useState } from "react";
-import { Bell, BellOff } from "lucide-react";
-import Badge from "../../common/badge/Badge";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bell, BellOff, Check } from "lucide-react";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import LocationLink from "../../common/location_link/LocationLink";
-import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
+import Tooltip from "../../common/tooltip/Tooltip";
+import StandardModal from "../../common/standard_modal/StandardModal";
+import { SegmentedDivider, SegmentedSlot, SegmentedSlots } from "../../common";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../components/CategorySelector";
 
 /** Primary metadata and action row for the society detail page. */
 
-export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, onViewMembers, isSubscribed, onToggleSubscription }) {
+export default function SocietyInfo({
+    society,
+    editMode,
+    onUpdateSociety,
+    onJoin,
+    onLeave,
+    canEdit,
+    onToggleEditMode,
+    isSubscribed,
+    onToggleSubscription,
+    showBio = true,
+    showLocation = true,
+    showMeta = true,
+    layout = "default",
+    className = "",
+    membershipAction = null,
+}) {
+    const classNames = [styles.info, layout === "hero" ? styles.infoHero : "", className].filter(Boolean).join(" ");
+    const hasLocation = showLocation && Boolean(society.location);
+    const hasVisibleSections = showBio || hasLocation || showMeta;
+
+    if (!hasVisibleSections) return null;
+
+    return (
+        <div className={classNames}>
+            {showBio && <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />}
+            {hasLocation && <LocationRow location={society.location} />}
+            {showMeta && (
+                <SocietyMetaPill
+                    society={society}
+                    editMode={editMode}
+                    onUpdateSociety={onUpdateSociety}
+                    onJoin={onJoin}
+                    onLeave={onLeave}
+                    canEdit={canEdit}
+                    onToggleEditMode={onToggleEditMode}
+                    isSubscribed={isSubscribed}
+                    onToggleSubscription={onToggleSubscription}
+                    membershipAction={membershipAction}
+                    heroVariant={layout === "hero"}
+                />
+            )}
+        </div>
+    );
+}
+
+export function SocietyMetaPill({
+    society,
+    editMode,
+    onUpdateSociety,
+    onJoin,
+    onLeave,
+    canEdit,
+    onToggleEditMode,
+    isSubscribed,
+    onToggleSubscription,
+    membershipAction = null,
+    heroVariant = false,
+}) {
     const categories = society.categories || (society.category ? [society.category] : []);
     return (
-        <div className={styles.info}>
-            <BioSection text={society.bio} editMode={editMode} onSave={(bio) => onUpdateSociety?.({ bio })} />
-            <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
-            {society.location && <LocationRow location={society.location} />}
-            <Stats society={society} onViewMembers={onViewMembers}
-                isSubscribed={isSubscribed} onToggleSubscription={onToggleSubscription} />
-            {!canEdit && !society.is_admin && <SocietyInsightBanner society={society} />}
-            <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
-                onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
-        </div>
+        <motion.div layout className={styles.metaPillWrap}>
+            <SegmentedSlots className={`${styles.metaPill} ${heroVariant ? styles.metaPillHero : ""}`}>
+                <SegmentedSlot className={styles.categorySlot}>
+                    <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
+                </SegmentedSlot>
+                <SegmentedDivider className={styles.pillSep} />
+                <SegmentedSlot className={styles.notificationSegment}>
+                    <NotificationBell
+                        isSubscribed={isSubscribed}
+                        onToggle={onToggleSubscription}
+                        disabled={!society.is_member}
+                    />
+                </SegmentedSlot>
+                <SegmentedDivider className={styles.pillSep} />
+                <SegmentedSlot className={styles.actionSegment}>
+                    <PillActionButton
+                        isMember={society.is_member}
+                        editMode={editMode}
+                        canEdit={canEdit}
+                        onJoin={onJoin}
+                        onLeave={onLeave}
+                        onToggleEditMode={onToggleEditMode}
+                        pendingAction={membershipAction}
+                    />
+                </SegmentedSlot>
+            </SegmentedSlots>
+        </motion.div>
     );
 }
 
@@ -78,17 +155,26 @@ function BioEditor({ initialValue, onSave }) {
 
 function CategorySection({ categories, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
-    if (editing) return <CategoryEditor initialValue={categories} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;
-    return <CategoryDisplay category={categories} editMode={editMode} onEdit={() => setEditing(true)} />;
+    return (
+        <>
+            <CategoryDisplay category={categories} editMode={editMode} onEdit={() => setEditing(true)} />
+            {editing && <CategoryEditor initialValue={categories} onSave={(value) => saveAndClose(value, onSave, setEditing)} onClose={() => setEditing(false)} />}
+        </>
+    );
 }
 
-function CategoryEditor({ initialValue, onSave }) {
+function CategoryEditor({ initialValue, onSave, onClose }) {
     const [value, setValue] = useState(initialValue);
     return (
-        <div className={styles.categoryEditor}>
-            <CategorySelector value={value} onChange={setValue} label="" multiple />
-            <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
-        </div>
+        <StandardModal title="Edit Categories" subtitle="Choose how this society should be grouped." size="sm" onClose={onClose}>
+            <div className={styles.categoryEditor}>
+                <CategorySelector value={value} onChange={setValue} label="" multiple />
+                <div className={styles.categoryEditorActions}>
+                    <PrimaryButton className={styles.categoryCancelBtn} variant="ghost" pill onClick={onClose}>Cancel</PrimaryButton>
+                    <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
+                </div>
+            </div>
+        </StandardModal>
     );
 }
 
@@ -98,71 +184,66 @@ function saveAndClose(value, onSave, setEditing) {
 }
 
 function EditIcon({ onClick }) {
-    return <button className={styles.editIcon} onClick={onClick} title="Edit">✎</button>;
+    return <button type="button" className={styles.editIcon} onClick={onClick} title="Edit">✎</button>;
 }
 
-function Stats({ society, onViewMembers, isSubscribed, onToggleSubscription }) {
-    return (
-        <div className={styles.stats}>
-            {society.is_member && (
-                <NotificationBell isSubscribed={isSubscribed} onToggle={onToggleSubscription} />
-            )}
-            <button className={styles.memberCountBtn} onClick={onViewMembers} title="View Members">
-                {society.member_count} members
-            </button>
-            {society.is_ratified && (
-                <Badge className={styles.badge} tone="success">
-                    <VerifiedIcon />
-                    Ratified
-                </Badge>
-            )}
-        </div>
-    );
-}
-
-function VerifiedIcon() {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            className={styles.verifiedIcon}
-            aria-hidden="true"
+function NotificationBell({ isSubscribed, onToggle, disabled = false }) {
+    const Icon = disabled ? BellOff : isSubscribed ? Bell : BellOff;
+    const title = disabled ? "Join to manage notifications" : isSubscribed ? "Notifications on" : "Notifications off";
+    const className = disabled ? styles.bellDisabled : isSubscribed ? styles.bellActive : styles.bellInactive;
+    const button = (
+        <button
+            type="button"
+            className={`${styles.notificationBell} ${className}`}
+            onClick={onToggle}
+            title={title}
+            aria-label={title}
+            disabled={disabled}
         >
-            <path
-                fill="currentColor"
-                d="m10.9246 13.175 -1.825 -1.9c-0.15 -0.16665 -0.3333 -0.25 -0.55 -0.25 -0.21665 0 -0.4083 0.075 -0.575 0.225 -0.16665 0.16665 -0.25 0.35835 -0.25 0.575 0 0.21665 0.08335 0.40835 0.25 0.575l2.425 2.4c0.15 0.15 0.325 0.225 0.525 0.225s0.375 -0.075 0.525 -0.225l4.575 -4.55c0.15 -0.15 0.225 -0.33335 0.225 -0.55 0 -0.21665 -0.0833 -0.4 -0.25 -0.55 -0.15 -0.13335 -0.32915 -0.19585 -0.5375 -0.1875 -0.2083 0.00835 -0.37915 0.07915 -0.5125 0.2125l-4.025 4Zm-2.625 8.725 -1.55 -2.65 -3.09999 -0.625c-0.183335 -0.03335 -0.3375 -0.13335 -0.4625 -0.3s-0.170835 -0.34165 -0.1375 -0.525l0.35 -3 -1.975 -2.3c-0.133335 -0.13335 -0.2 -0.3 -0.2 -0.5s0.066665 -0.36665 0.2 -0.5l1.975 -2.275 -0.35 -3c-0.033335 -0.18335 0.0125 -0.35835 0.1375 -0.525 0.125 -0.16665 0.279165 -0.26665 0.4625 -0.3l3.09999 -0.625 1.55 -2.675c0.1 -0.16667 0.2417 -0.283335 0.425 -0.35 0.18335 -0.06667 0.3667 -0.058335 0.55 0.025l2.725 1.275 2.725 -1.275c0.18335 -0.083335 0.3667 -0.095835 0.55 -0.0375 0.18335 0.05833 0.325 0.17083 0.425 0.3375l1.575 2.7 3.075 0.625c0.18335 0.03335 0.3375 0.13335 0.4625 0.3s0.17085 0.34165 0.1375 0.525l-0.35 3 1.975 2.275c0.13335 0.13335 0.2 0.3 0.2 0.5s-0.06665 0.36665 -0.2 0.5l-1.975 2.3 0.35 3c0.03335 0.18335 -0.0125 0.35835 -0.1375 0.525 -0.125 0.16665 -0.27915 0.26665 -0.4625 0.3l-3.075 0.625 -1.575 2.675c-0.1 0.16665 -0.24165 0.27915 -0.425 0.3375 -0.1833 0.05835 -0.36665 0.04585 -0.55 -0.0375l-2.725 -1.275 -2.725 1.275c-0.1833 0.08335 -0.36665 0.09165 -0.55 0.025 -0.1833 -0.06665 -0.325 -0.18335 -0.425 -0.35Zm1.025 -1.375 2.675 -1.125 2.75 1.125 1.675 -2.5 2.925 -0.75 -0.3 -2.975 2.025 -2.3 -2.025 -2.35 0.3 -2.975 -2.925 -0.7 -1.725 -2.5 -2.7 1.125 -2.75 -1.125 -1.675 2.5 -2.92499 0.7 0.3 2.975 -2.025 2.35 2.025 2.3 -0.3 3.025 2.92499 0.7 1.75 2.5Z"
-            />
-        </svg>
-    );
-}
-
-function NotificationBell({ isSubscribed, onToggle }) {
-    const Icon = isSubscribed ? Bell : BellOff;
-    const title = isSubscribed ? "Notifications on" : "Notifications off";
-    const className = isSubscribed ? styles.bellActive : styles.bellInactive;
-    return (
-        <button className={`${styles.notificationBell} ${className}`} onClick={onToggle} title={title}>
-            <Icon size={18} />
+            <AnimatePresence initial={false} mode="wait">
+                <motion.span
+                    key={title}
+                    initial={{ opacity: 0.68, scale: 0.88 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0.68, scale: 0.88 }}
+                    transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                    className={styles.notificationBellIcon}
+                >
+                    <Icon size={18} />
+                </motion.span>
+            </AnimatePresence>
         </button>
     );
+
+    return <Tooltip content={title} position="top">{button}</Tooltip>;
 }
 
-function ActionButton({ isMember, editMode, canEdit, onJoin, onLeave, onToggleEditMode }) {
-    if (canEdit) return <EditButton editMode={editMode} onToggle={onToggleEditMode} />;
-    return <MemberButton isMember={isMember} onJoin={onJoin} onLeave={onLeave} />;
-}
-
-function EditButton({ editMode, onToggle }) {
-    const className = editMode ? styles.joinedBtn : styles.joinBtn;
-    const label = editMode ? "Exit Editor" : "Edit Society";
-    const variant = editMode ? "secondary" : "primary";
-    return <PrimaryButton className={className} variant={variant} pill onClick={onToggle}>{label}</PrimaryButton>;
-}
-
-function MemberButton({ isMember, onJoin, onLeave }) {
-    const handleClick = () => isMember ? onLeave?.() : onJoin?.();
-    const className = isMember ? styles.joinedBtn : styles.joinBtn;
-    const label = isMember ? "Joined" : "Join Society";
-    const variant = isMember ? "secondary" : "primary";
-    return <PrimaryButton className={className} variant={variant} pill onClick={handleClick}>{label}</PrimaryButton>;
+function PillActionButton({ isMember, editMode, canEdit, onJoin, onLeave, onToggleEditMode, pendingAction }) {
+    if (canEdit) {
+        const label = editMode ? "Done Editing" : "Edit Society";
+        const adminClassName = editMode ? `${styles.pillActionBtn} ${styles.pillActionBtnEditing}` : styles.pillActionBtn;
+        return <button type="button" className={adminClassName} onClick={onToggleEditMode}>{label}</button>;
+    }
+    const handleClick = () => {
+        if (pendingAction) return;
+        isMember ? onLeave?.() : onJoin?.();
+    };
+    const label = pendingAction === "join"
+        ? "Joining..."
+        : pendingAction === "leave"
+            ? "Leaving..."
+            : isMember
+                ? "Leave"
+                : "Join";
+    return (
+        <button
+            type="button"
+            className={`${styles.pillActionBtn} ${!isMember ? styles.pillActionBtnJoin : ''} ${pendingAction ? styles.pillActionBtnPending : ''}`}
+            onClick={handleClick}
+            disabled={Boolean(pendingAction)}
+        >
+            {isMember && !pendingAction && <Check size={14} strokeWidth={2.6} aria-hidden="true" />}
+            <span>{label}</span>
+        </button>
+    );
 }
