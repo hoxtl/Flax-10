@@ -11308,7 +11308,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Tooltip/Tooltip.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/tooltip/Tooltip.jsx": {
             "lines": 18,
             "tokens": 245,
             "sources": 1,
@@ -11320,7 +11320,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Tabs/Tabs.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/tabs/Tabs.jsx": {
             "lines": 31,
             "tokens": 447,
             "sources": 1,
@@ -11332,7 +11332,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/GridCard.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/GridCard.jsx": {
             "lines": 0,
             "tokens": 29,
             "sources": 1,
@@ -11344,7 +11344,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/Card.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/Card.jsx": {
             "lines": 4,
             "tokens": 52,
             "sources": 1,
@@ -11368,7 +11368,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Badge/Badge.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/badge/Badge.jsx": {
             "lines": 0,
             "tokens": 3,
             "sources": 1,
@@ -28364,7 +28364,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Tooltip/Tooltip.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/tooltip/Tooltip.jsx": {
             "lines": 44,
             "tokens": 596,
             "sources": 1,
@@ -28376,7 +28376,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Tabs/Tabs.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/tabs/Tabs.jsx": {
             "lines": 47,
             "tokens": 628,
             "sources": 1,
@@ -28388,7 +28388,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/GridCard.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/GridCard.jsx": {
             "lines": 14,
             "tokens": 102,
             "sources": 1,
@@ -28400,7 +28400,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/Card.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/Card.jsx": {
             "lines": 22,
             "tokens": 188,
             "sources": 1,
@@ -28424,7 +28424,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Badge/Badge.jsx": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/badge/Badge.jsx": {
             "lines": 11,
             "tokens": 125,
             "sources": 1,
@@ -35320,7 +35320,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Tooltip/Tooltip.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/tooltip/Tooltip.module.css": {
             "lines": 72,
             "tokens": 389,
             "sources": 1,
@@ -35332,7 +35332,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Tabs/Tabs.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/tabs/Tabs.module.css": {
             "lines": 122,
             "tokens": 755,
             "sources": 1,
@@ -35344,7 +35344,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/GridCard.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/GridCard.module.css": {
             "lines": 15,
             "tokens": 113,
             "sources": 1,
@@ -35356,7 +35356,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/CardGrid.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/CardGrid.module.css": {
             "lines": 16,
             "tokens": 91,
             "sources": 1,
@@ -35368,7 +35368,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Card/Card.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/card/Card.module.css": {
             "lines": 42,
             "tokens": 254,
             "sources": 1,
@@ -35392,7 +35392,7 @@
             "newDuplicatedLines": 0,
             "newClones": 0
           },
-          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/Badge/Badge.module.css": {
+          "/Users/hamedlatif/Flax-10/flax-10-project-files/frontend/src/components/common/badge/Badge.module.css": {
             "lines": 37,
             "tokens": 293,
             "sources": 1,
@@ -39720,7 +39720,7 @@
     {
       "format": "jsx",
       "lines": 9,
-      "fragment": ",\n}));\n\nvi.mock(\"../../../pages/group_work/components/MemberAvatar\", () => ({\n  default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\", () => ({\n  default: ({ children,",
+      "fragment": ",\n}));\n\nvi.mock(\"../../../pages/group_work/components/MemberAvatar\", () => ({\n  default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\", () => ({\n  default: ({ children,",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/GroupWorkTaskComponentsExtras.test.jsx",
@@ -39756,7 +39756,7 @@
     {
       "format": "jsx",
       "lines": 8,
-      "fragment": "}</span>,\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/inputs/DateTimePicker\"",
+      "fragment": "}</span>,\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/inputs/DateTimePicker\"",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/GroupWorkTaskComponentsExtras.test.jsx",
@@ -39900,7 +39900,7 @@
     {
       "format": "jsx",
       "lines": 56,
-      "fragment": "= vi.fn();\n\nvi.mock(\"react-dom\", async () => {\n  const actual = await vi.importActual(\"react-dom\");\n  return { ...actual, createPortal: (...args) => createPortal(...args) };\n});\n\nvi.mock(\"../../../pages/group_work/utils/memberAvatarUtils\", () => ({\n  openMemberProfile: (...args) => openMemberProfile(...args),\n  getDisplayName: (...args) => getDisplayName(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/priorityUtils\", () => ({\n  getUserColor: (...args) => getUserColor(...args),\n  getPriorityStyle: (...args) => getPriorityStyle(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskAssigneeUtils\", () => ({\n  shouldShowPopupAbove: (...args) => shouldShowPopupAbove(...args),\n  createPopupCoords: (...args) => createPopupCoords(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskUtils\", () => ({\n  buildToggleAssignee: (...args) => buildToggleAssignee(...args),\n  filterVisibleAssignees: (...args) => filterVisibleAssignees(...args),\n  getDueDateStr: (...args) => getDueDateStr(...args),\n  handleDragStartTask: (...args) => handleDragStartTask(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/components/taskCardEditUtils\", () => ({\n  useTaskTitleEdit: (...args) => useTaskTitleEdit(...args),\n  handleTaskTitleKeyDown: (event, saveEdit, setEditing) => {\n    if (event.key === \"Enter\" && !event.shiftKey) saveEdit();\n    if (event.key === \"Escape\") setEditing(false);\n  },\n}));\n\nvi.mock(\"../../../pages/group_work/components/MemberAvatar\", () => ({\n  default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/inputs/DateTimePicker\", () => ({\n  default: ({ value, onChange, placeholder }) => (\n    <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />\n  ),\n}));\n\nvi.mock(\"../../../components/common/task_priority_pill/TaskPriorityPill\", () => ({\n  default: ({ priority }) => <span>{priority}</span>,\n}));\n\nvi.mock(\"lucide-react\"",
+      "fragment": "= vi.fn();\n\nvi.mock(\"react-dom\", async () => {\n  const actual = await vi.importActual(\"react-dom\");\n  return { ...actual, createPortal: (...args) => createPortal(...args) };\n});\n\nvi.mock(\"../../../pages/group_work/utils/memberAvatarUtils\", () => ({\n  openMemberProfile: (...args) => openMemberProfile(...args),\n  getDisplayName: (...args) => getDisplayName(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/priorityUtils\", () => ({\n  getUserColor: (...args) => getUserColor(...args),\n  getPriorityStyle: (...args) => getPriorityStyle(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskAssigneeUtils\", () => ({\n  shouldShowPopupAbove: (...args) => shouldShowPopupAbove(...args),\n  createPopupCoords: (...args) => createPopupCoords(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskUtils\", () => ({\n  buildToggleAssignee: (...args) => buildToggleAssignee(...args),\n  filterVisibleAssignees: (...args) => filterVisibleAssignees(...args),\n  getDueDateStr: (...args) => getDueDateStr(...args),\n  handleDragStartTask: (...args) => handleDragStartTask(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/components/taskCardEditUtils\", () => ({\n  useTaskTitleEdit: (...args) => useTaskTitleEdit(...args),\n  handleTaskTitleKeyDown: (event, saveEdit, setEditing) => {\n    if (event.key === \"Enter\" && !event.shiftKey) saveEdit();\n    if (event.key === \"Escape\") setEditing(false);\n  },\n}));\n\nvi.mock(\"../../../pages/group_work/components/MemberAvatar\", () => ({\n  default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/inputs/DateTimePicker\", () => ({\n  default: ({ value, onChange, placeholder }) => (\n    <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />\n  ),\n}));\n\nvi.mock(\"../../../components/common/task_priority_pill/TaskPriorityPill\", () => ({\n  default: ({ priority }) => <span>{priority}</span>,\n}));\n\nvi.mock(\"lucide-react\"",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/GroupWorkTaskCards.test.jsx",
@@ -40008,7 +40008,7 @@
     {
       "format": "jsx",
       "lines": 9,
-      "fragment": ", () => ({\n  default: ({ items }) => (\n    <div data-testid=\"stat-strip\">\n      {items.map((item) => `${item.label}:${item.value}${item.suffix || \"\"}`).join(\"|\")}\n    </div>\n  ),\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\"",
+      "fragment": ", () => ({\n  default: ({ items }) => (\n    <div data-testid=\"stat-strip\">\n      {items.map((item) => `${item.label}:${item.value}${item.suffix || \"\"}`).join(\"|\")}\n    </div>\n  ),\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\"",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/GroupWorkPresentationLowCoverage.test.jsx",
@@ -40044,7 +40044,7 @@
     {
       "format": "jsx",
       "lines": 8,
-      "fragment": ">{children}</span>,\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/hold_confirm_modal/HoldConfirmModal\"",
+      "fragment": ">{children}</span>,\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/hold_confirm_modal/HoldConfirmModal\"",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/GroupWorkPagesAndHeaderExtras.test.jsx",
@@ -40404,7 +40404,7 @@
     {
       "format": "jsx",
       "lines": 29,
-      "fragment": "),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/priorityUtils\", () => ({\n  getUserColor: (...args) => getUserColor(...args),\n  getPriorityStyle: (...args) => getPriorityStyle(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskAssigneeUtils\", () => ({\n  shouldShowPopupAbove: (...args) => shouldShowPopupAbove(...args),\n  createPopupCoords: (...args) => createPopupCoords(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskUtils\", () => ({\n  buildToggleAssignee: (...args) => buildToggleAssignee(...args),\n  filterVisibleAssignees: (...args) => filterVisibleAssignees(...args),\n  getDueDateStr: (...args) => getDueDateStr(...args),\n  handleDragStartTask: (...args) => handleDragStartTask(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/components/taskCardEditUtils\", () => ({\n  useTaskTitleEdit: (...args) => useTaskTitleEdit(...args),\n  handleTaskTitleKeyDown: (event, saveEdit, setEditing) => {\n    if (event.key === \"Enter\" && !event.shiftKey) saveEdit();\n    if (event.key === \"Escape\") setEditing(false);\n  },\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\"",
+      "fragment": "),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/priorityUtils\", () => ({\n  getUserColor: (...args) => getUserColor(...args),\n  getPriorityStyle: (...args) => getPriorityStyle(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskAssigneeUtils\", () => ({\n  shouldShowPopupAbove: (...args) => shouldShowPopupAbove(...args),\n  createPopupCoords: (...args) => createPopupCoords(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/utils/taskUtils\", () => ({\n  buildToggleAssignee: (...args) => buildToggleAssignee(...args),\n  filterVisibleAssignees: (...args) => filterVisibleAssignees(...args),\n  getDueDateStr: (...args) => getDueDateStr(...args),\n  handleDragStartTask: (...args) => handleDragStartTask(...args),\n}));\n\nvi.mock(\"../../../pages/group_work/components/taskCardEditUtils\", () => ({\n  useTaskTitleEdit: (...args) => useTaskTitleEdit(...args),\n  handleTaskTitleKeyDown: (event, saveEdit, setEditing) => {\n    if (event.key === \"Enter\" && !event.shiftKey) saveEdit();\n    if (event.key === \"Escape\") setEditing(false);\n  },\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\"",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/GroupWorkCard.test.jsx",
@@ -40440,7 +40440,7 @@
     {
       "format": "jsx",
       "lines": 32,
-      "fragment": ",\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/inputs/DateTimePicker\", () => ({\n  default: ({ value, onChange, placeholder }) => (\n    <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />\n  ),\n}));\n\nvi.mock(\"../../../components/common/task_priority_pill/TaskPriorityPill\", () => ({\n  default: ({ priority }) => <span>{priority}</span>,\n}));\n\nvi.mock(\"lucide-react\", () => ({\n  Check: () => <span>check-icon</span>,\n  X: () => <span>x-icon</span>,\n  Pencil: () => <span>pencil-icon</span>,\n  Trash2: () => <span>trash-icon</span>,\n  Calendar: () => <span>calendar-icon</span>,\n}));\n\nvi.mock(\"framer-motion\", () => ({\n  motion: {\n    div: ({ children, ...props }) => <div {...props}>{children}</div>,\n  },\n}));\n\nimport TaskBoardCard",
+      "fragment": ",\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\", () => ({\n  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,\n}));\n\nvi.mock(\"../../../components/common/inputs/DateTimePicker\", () => ({\n  default: ({ value, onChange, placeholder }) => (\n    <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />\n  ),\n}));\n\nvi.mock(\"../../../components/common/task_priority_pill/TaskPriorityPill\", () => ({\n  default: ({ priority }) => <span>{priority}</span>,\n}));\n\nvi.mock(\"lucide-react\", () => ({\n  Check: () => <span>check-icon</span>,\n  X: () => <span>x-icon</span>,\n  Pencil: () => <span>pencil-icon</span>,\n  Trash2: () => <span>trash-icon</span>,\n  Calendar: () => <span>calendar-icon</span>,\n}));\n\nvi.mock(\"framer-motion\", () => ({\n  motion: {\n    div: ({ children, ...props }) => <div {...props}>{children}</div>,\n  },\n}));\n\nimport TaskBoardCard",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/GroupWorkCard.test.jsx",
@@ -40692,7 +40692,7 @@
     {
       "format": "jsx",
       "lines": 10,
-      "fragment": "</button>\n    </div>\n  ),\n}));\n\nvi.mock(\"../../../components/common/search_empty_state/SearchEmptyState\", () => ({\n  default: ({ title, hint }) => <div>{title} {hint}</div>,\n}));\n\nvi.mock(\"../../../components/common/Tooltip/Tooltip\"",
+      "fragment": "</button>\n    </div>\n  ),\n}));\n\nvi.mock(\"../../../components/common/search_empty_state/SearchEmptyState\", () => ({\n  default: ({ title, hint }) => <div>{title} {hint}</div>,\n}));\n\nvi.mock(\"../../../components/common/tooltip/Tooltip\"",
       "tokens": 0,
       "firstFile": {
         "name": "src/tests/pages/group_work/AvailabilityTab.test.jsx",

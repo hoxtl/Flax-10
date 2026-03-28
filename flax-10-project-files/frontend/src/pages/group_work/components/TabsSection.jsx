@@ -2,10 +2,10 @@
  * GroupWork detail tabs.
  */
 
-import Tabs from "@/components/common/tabs/Tabs";
-import GroupTasksTab from "@/pages/group_work/components/GroupTasksTab";
-import AvailabilityTab from "@/pages/group_work/components/AvailabilityTab";
-import ProjectProgress from "@/pages/group_work/components/ProjectProgress";
+import Tabs from "../../../components/common/tabs/Tabs";
+import GroupTasksTab from "./GroupTasksTab";
+import AvailabilityTab from "./AvailabilityTab";
+import ProjectProgress from "./ProjectProgress";
 import styles from "./TabsSection.module.css";
 
 export default function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdate, taskStats }) {

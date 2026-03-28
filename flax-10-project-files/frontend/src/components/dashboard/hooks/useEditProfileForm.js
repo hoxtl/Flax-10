@@ -6,9 +6,7 @@ import { useEffect, useState } from "react";
 import { updateUserProfile } from "../../../api/userApi";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 
-export function getApiBaseUrl(configuredBaseUrl = import.meta.env.VITE_API_BASE_URL) {
-  return configuredBaseUrl || "http://localhost:8000/api";
-}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 function resolveProfilePhoto(user) {
   return getResolvedUserPhoto(user, {
@@ -27,7 +25,7 @@ function buildFormData(username, bio, profilePhoto, removePhoto) {
 }
 
 async function fetchUsernameAvailable(username, token) {
-  const response = await fetch(`${getApiBaseUrl()}/check-username/`, {
+  const response = await fetch(`${API_BASE_URL}/check-username/`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
     body: JSON.stringify({ username }),
