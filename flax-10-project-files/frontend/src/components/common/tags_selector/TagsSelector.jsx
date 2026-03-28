@@ -39,9 +39,9 @@ function TagDot({ color }) {
   return <span className={styles.tagDot} style={{ backgroundColor: color }} aria-hidden="true" />;
 }
 
-function SelectedTag({ tag, onRemove, className = "" }) {
+function SelectedTag({ tag, onRemove, className }) {
   return (
-    <motion.div className={`${styles.selectedTag} ${className}`.trim()} layoutId={`tag-${tag.id}`} initial={PILL_MOTION.initial} animate={PILL_MOTION.animate} exit={PILL_MOTION.exit} transition={PILL_MOTION.transition}>
+    <motion.div className={[styles.selectedTag, className].filter(Boolean).join(" ")} layoutId={`tag-${tag.id}`} initial={PILL_MOTION.initial} animate={PILL_MOTION.animate} exit={PILL_MOTION.exit} transition={PILL_MOTION.transition}>
       <TagDot color={tag.color} />
       <motion.span layoutId={`tag-label-${tag.id}`} className={styles.tagLabel}>{tag.label}</motion.span>
       <button type="button" className={styles.removeBtn} aria-label={`Remove ${tag.label}`} onClick={() => onRemove(tag.id)}><X size={12} strokeWidth={2.5} /></button>
@@ -49,9 +49,9 @@ function SelectedTag({ tag, onRemove, className = "" }) {
   );
 }
 
-function SelectedTagsRow({ scrollRef, selectedTags, emptyHint, onRemove, className = "", selectedTagClassName = "" }) {
+function SelectedTagsRow({ scrollRef, selectedTags, emptyHint, onRemove, className, selectedTagClassName }) {
   return (
-    <motion.div className={`${styles.selectedRow} ${className}`.trim()} ref={scrollRef} layout>
+    <motion.div className={[styles.selectedRow, className].filter(Boolean).join(" ")} ref={scrollRef} layout>
       <AnimatePresence mode="popLayout">
         {selectedTags.length === 0 ? <span className={styles.emptyHint}>{emptyHint}</span> : selectedTags.map((tag) => <SelectedTag key={tag.id} tag={tag} onRemove={onRemove} className={selectedTagClassName} />)}
       </AnimatePresence>
@@ -59,19 +59,19 @@ function SelectedTagsRow({ scrollRef, selectedTags, emptyHint, onRemove, classNa
   );
 }
 
-function UnselectedPill({ tag, onAdd, className = "" }) {
+function UnselectedPill({ tag, onAdd, className }) {
   return (
-    <motion.button type="button" className={`${styles.pill} ${className}`.trim()} layoutId={`tag-${tag.id}`} initial={PILL_MOTION.initial} animate={PILL_MOTION.animate} exit={PILL_MOTION.exit} transition={PILL_MOTION.transition} onClick={() => onAdd(tag)}>
+    <motion.button type="button" className={[styles.pill, className].filter(Boolean).join(" ")} layoutId={`tag-${tag.id}`} initial={PILL_MOTION.initial} animate={PILL_MOTION.animate} exit={PILL_MOTION.exit} transition={PILL_MOTION.transition} onClick={() => onAdd(tag)}>
       <TagDot color={tag.color} />
       <motion.span layoutId={`tag-label-${tag.id}`} className={styles.tagLabel}>{tag.label}</motion.span>
     </motion.button>
   );
 }
 
-function AvailablePills({ unselected, onAdd, className = "", pillClassName = "" }) {
+function AvailablePills({ unselected, onAdd, className, pillClassName }) {
   if (!unselected.length) return null;
   return (
-    <motion.div className={`${styles.pillsWrap} ${className}`.trim()} layout>
+    <motion.div className={[styles.pillsWrap, className].filter(Boolean).join(" ")} layout>
       <AnimatePresence mode="popLayout">
         {unselected.map((tag) => <UnselectedPill key={tag.id} tag={tag} onAdd={onAdd} className={pillClassName} />)}
       </AnimatePresence>
@@ -79,7 +79,7 @@ function AvailablePills({ unselected, onAdd, className = "", pillClassName = "" 
   );
 }
 
-function useScrollToEnd(scrollRef, deps, enabled = true) {
+function useScrollToEnd(scrollRef, deps, enabled) {
   useEffect(() => {
     if (!enabled) return;
     const node = scrollRef.current;

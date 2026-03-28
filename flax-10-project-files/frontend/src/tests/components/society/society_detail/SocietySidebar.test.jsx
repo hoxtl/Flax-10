@@ -62,6 +62,24 @@ describe('SocietySidebar', () => {
     expect(screen.getByText('Formatted Date')).toBeTruthy();
   });
 
+  it('renders the about section and trims multiple admin contact emails', () => {
+    render(
+      <SocietySidebar
+        society={baseSociety({
+          about: 'We meet weekly to plan events.',
+          admin_emails: ' first@example.com, second@example.com ',
+        })}
+        editMode={false}
+        tags={[]}
+      />,
+    );
+
+    expect(screen.getByText('About')).toBeInTheDocument();
+    expect(screen.getByText('We meet weekly to plan events.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'first@example.com' })).toHaveAttribute('href', 'mailto:first@example.com');
+    expect(screen.getByRole('link', { name: 'second@example.com' })).toHaveAttribute('href', 'mailto:second@example.com');
+  });
+
   it('handles announcement submit flow and unpins conflicting announcement', async () => {
     const onUpdateAnnouncement = vi.fn();
     const onAddAnnouncement = vi.fn();
@@ -136,6 +154,15 @@ describe('SocietySidebar', () => {
 
     expect(onAddAnnouncement).toHaveBeenCalledWith({ title: 'new-announcement' });
     expect(onUpdateAnnouncement).not.toHaveBeenCalled();
+  });
+
+  it('closes the announcement modal without submitting', async () => {
+    render(<SocietySidebar society={baseSociety()} editMode tags={[]} />);
+
+    fireEvent.click(screen.getByText('+ Add Announcement'));
+    fireEvent.click(await screen.findByText('close-announcement'));
+
+    await waitFor(() => expect(screen.queryByText('submit-announcement')).toBeNull());
   });
 
   it('edit mode shows AddButtons even when no pinned or next event', () => {

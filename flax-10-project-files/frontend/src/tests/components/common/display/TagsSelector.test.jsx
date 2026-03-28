@@ -105,4 +105,26 @@ describe("TagsSelector", () => {
     unmount();
     // No error thrown means null ref branch was handled (useEffect cleanup)
   });
+
+  it("renders inline variant classes, keeps scroll disabled, and shows color dots", () => {
+    const colorfulTags = [
+      { id: 1, label: "Lecture", color: "#ff0000" },
+      { id: 2, label: "Lab", color: "#00ff00" },
+    ];
+    const { container } = render(
+      <TagsSelector
+        tags={colorfulTags}
+        selectedTags={[colorfulTags[0]]}
+        onSelectionChange={vi.fn()}
+        variant="inline"
+      />,
+    );
+
+    expect(container.querySelector('[class*="inlineSelectedRow"]')).toBeInTheDocument();
+    expect(container.querySelector('[class*="inlineSelectedTag"]')).toBeInTheDocument();
+    expect(container.querySelector('[class*="inlinePillsWrap"]')).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Lab" }).className).toContain("inlinePill");
+    expect(container.querySelectorAll('[class*="tagDot"]')).toHaveLength(2);
+    expect(Element.prototype.scrollTo).not.toHaveBeenCalled();
+  });
 });
