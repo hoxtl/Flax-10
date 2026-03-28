@@ -84,6 +84,23 @@ describe('useTaskPickerData – initial state', () => {
     expect(result.current.activeFilterTab).toBe('lists');
   });
 
+  it('falls back to a null selected task when sessionStorage access throws', () => {
+    const originalSessionStorage = globalThis.sessionStorage;
+    const blockedStorage = {
+      getItem: vi.fn(() => { throw new Error('blocked'); }),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+    };
+
+    Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: blockedStorage });
+
+    const { result } = renderHook(() => useTaskPickerData());
+    expect(result.current.selectedTaskId).toBeNull();
+
+    Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: originalSessionStorage });
+  });
+
   it('exposes a ref object', () => {
     const { result } = renderHook(() => useTaskPickerData());
     expect(result.current.ref).toBeDefined();
@@ -250,6 +267,15 @@ describe('useTaskPickerData – enrolled modules', () => {
     await act(async () => {});
     expect(getModules).toHaveBeenCalled();
     expect(getEnrollments).toHaveBeenCalled();
+  });
+
+  it('swallows enrolled module fetch failures without mutating state', async () => {
+    getModules.mockRejectedValueOnce(new Error('module load failed'));
+    const { result } = renderHook(() => useTaskPickerData());
+
+    await act(async () => {});
+
+    expect(result.current.enrolledModules).toEqual([]);
   });
 
   it('derives visible filter items, grouped modules, and a recommended task', async () => {
