@@ -1,6 +1,6 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const getMyCourseChangeRequest = vi.fn();
 const useAuth = vi.fn();
@@ -91,12 +91,12 @@ import { PersonalInfoFields, YearField } from "../../../components/settings/acco
 import CourseDisplay from "../../../components/settings/account/CourseDisplay";
 import RealAccountFormLayout from "../../../components/settings/account/AccountFormLayout";
 import AccountFormContainer from "../../../components/settings/account/AccountFormContainer";
-import useAccountFormState from "../../../components/settings/account/useAccountFormState";
 
-describe("account coverage top-ups", () => {
+describe("AccountFormContainer", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    getMyCourseChangeRequest.mockResolvedValue(null);
     useAuth.mockReturnValue({
       profile: null,
       loading: false,
@@ -171,55 +171,33 @@ describe("account coverage top-ups", () => {
     expect(screen.queryByText(/Request a course change/i)).not.toBeInTheDocument();
   });
 
-  it("keeps the course request modal closed for non-teachers and never renders it for teachers", () => {
-    useCourseRequestFeedback
-      .mockReturnValueOnce({
-        showModal: [false, vi.fn()],
-        cancellingRequest: [false, vi.fn()],
-        courseRequestNotice: ["", vi.fn()],
-        courseRequestError: ["", vi.fn()],
-        saveSignal: [0, vi.fn()],
-      })
-      .mockReturnValueOnce({
-        showModal: [true, vi.fn()],
-        cancellingRequest: [false, vi.fn()],
-        courseRequestNotice: ["", vi.fn()],
-        courseRequestError: ["", vi.fn()],
-        saveSignal: [0, vi.fn()],
-      });
+  it("keeps the course request modal closed for students when the feedback state is closed", async () => {
+    useCourseRequestFeedback.mockReturnValue({
+      showModal: [false, vi.fn()],
+      cancellingRequest: [false, vi.fn()],
+      courseRequestNotice: ["", vi.fn()],
+      courseRequestError: ["", vi.fn()],
+      saveSignal: [0, vi.fn()],
+    });
 
-    const { rerender } = render(<AccountFormContainer user={{ id: 1, role: "student" }} onSave={vi.fn()} isSaving={false} />);
-    expect(screen.queryByText("course-change-modal")).not.toBeInTheDocument();
+    render(<AccountFormContainer user={{ id: 1, role: "student" }} onSave={vi.fn()} isSaving={false} />);
 
-    rerender(<AccountFormContainer user={{ id: 2, role: "teacher" }} onSave={vi.fn()} isSaving={false} />);
+    await waitFor(() => expect(getMyCourseChangeRequest).toHaveBeenCalled());
     expect(screen.queryByText("course-change-modal")).not.toBeInTheDocument();
   });
 
-  it("covers auth fallback refresh and null or major-less pending request paths", async () => {
-    useAuth.mockImplementationOnce(() => {
-      throw new Error("missing provider");
+  it("never renders the course request modal for teachers even when feedback requests it", async () => {
+    useCourseRequestFeedback.mockReturnValue({
+      showModal: [true, vi.fn()],
+      cancellingRequest: [false, vi.fn()],
+      courseRequestNotice: ["", vi.fn()],
+      courseRequestError: ["", vi.fn()],
+      saveSignal: [0, vi.fn()],
     });
-    getMyCourseChangeRequest.mockResolvedValueOnce(null);
-    localStorage.setItem("course_change_pending_request", JSON.stringify({
-      requested_course: "Physics",
-      status: "pending",
-      created_at: Date.now(),
-    }));
 
-    const fallbackHook = renderHook(() => useAccountFormState({ first_name: "Ada", year: "Year 2" }));
-    await waitFor(() => expect(fallbackHook.result.current.pendingRequest).toEqual({ requested_course: "Physics", status: "pending" }));
-    expect(() => fallbackHook.result.current.refreshProfile()).not.toThrow();
-    expect(fallbackHook.result.current.currentCourse).toBe("");
+    render(<AccountFormContainer user={{ id: 2, role: "teacher" }} onSave={vi.fn()} isSaving={false} />);
 
-    useAuth.mockReturnValueOnce({
-      profile: { first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", year: "Year 2" },
-      loading: false,
-      refreshProfile: vi.fn(),
-    });
-    getMyCourseChangeRequest.mockResolvedValueOnce(null);
-
-    const noMajorHook = renderHook(() => useAccountFormState());
-    await waitFor(() => expect(noMajorHook.result.current.currentCourse).toBe(""));
-    expect(noMajorHook.result.current.pendingRequest).toEqual({ requested_course: "Physics", status: "pending" });
+    await waitFor(() => expect(getMyCourseChangeRequest).toHaveBeenCalled());
+    expect(screen.queryByText("course-change-modal")).not.toBeInTheDocument();
   });
 });

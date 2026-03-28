@@ -204,7 +204,7 @@ describe("mini timeline parts extras", () => {
           onToggleConflictPopover={toggle}
         />,
       );
-      expect(document.querySelector('a[href="/tasks?list=8&module=CS102"]')).toBeTruthy();
+      expect(screen.getByText("CS102").closest("a")).toHaveAttribute("href", "/tasks?list=8&module=CS102");
     });
 
     it("renders ListPill and ModulePill directly for uncovered helper branches", () => {
@@ -213,7 +213,7 @@ describe("mini timeline parts extras", () => {
       expect(screen.getByText("List")).toBeInTheDocument();
 
       rerender(<ModulePill styles={styles} moduleCode="CS103" matchTask={{ task_list: 11 }} accentColor="#4477aa" />);
-      expect(document.querySelector('a[href="/tasks?list=11&module=CS103"]')).toBeTruthy();
+      expect(screen.getByText("CS103").closest("a")).toHaveAttribute("href", "/tasks?list=11&module=CS103");
     });
 
     it("links module pills through the related task list and stops parent clicks", () => {
