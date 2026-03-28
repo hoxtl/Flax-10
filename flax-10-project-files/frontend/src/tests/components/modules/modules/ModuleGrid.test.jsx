@@ -3,13 +3,8 @@
  */
 
 import { render, screen } from '@testing-library/react';
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/modules/ModuleGrid.test.jsx
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import ModuleGrid from '../../../components/modules/modules/ModuleGrid';
-=======
-import { describe, it, expect, vi } from 'vitest';
 import ModuleGrid from '../../../../components/modules/modules/ModuleGrid';
->>>>>>> origin:flax-10-project-files/frontend/src/tests/components/modules/modules/ModuleGrid.test.jsx
 
 const modulesCardMock = vi.fn();
 
@@ -69,5 +64,21 @@ describe('ModuleGrid', () => {
         expect(screen.getByText('Code Only')).toBeInTheDocument();
         expect(screen.getByText('Index Fallback')).toBeInTheDocument();
         expect(modulesCardMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('uses numeric index when neither id nor module_code exists', () => {
+        render(<ModuleGrid {...mockParameters} modules={[{ module_name: 'Anonymous' }]} />);
+        expect(screen.getByText('Anonymous')).toBeInTheDocument();
+        expect(modulesCardMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses id 0 as a valid key when provided', () => {
+        render(<ModuleGrid {...mockParameters} modules={[{ id: 0, module_name: 'Zero id' }]} />);
+        expect(screen.getByText('Zero id')).toBeInTheDocument();
+    });
+
+    it('prefers module_code when id is explicitly null', () => {
+        render(<ModuleGrid {...mockParameters} modules={[{ id: null, module_code: 'ZED', module_name: 'Null id' }]} />);
+        expect(screen.getByText('Null id')).toBeInTheDocument();
     });
 });
