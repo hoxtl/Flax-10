@@ -135,6 +135,56 @@ describe("mini timeline parts extras", () => {
       expect(screen.getByText("CS101")).toBeInTheDocument();
     });
 
+    it("links module pills through the related task list and stops parent clicks", () => {
+      const outerClick = vi.fn();
+      render(
+        <div onClick={outerClick}>
+          <EventTagSlot
+            styles={styles}
+            isOverlap={false}
+            isReadOnly={false}
+            rowId="row-3"
+            moduleCode="CS101"
+            matchTask={{ task_list: 7 }}
+            taskLists={[]}
+            accentColor="#0099ff"
+            onToggleConflictPopover={vi.fn()}
+          />
+        </div>,
+      );
+
+      const link = screen.getByText("CS101").closest("a");
+      fireEvent.click(link);
+
+      expect(link).toHaveAttribute("href", "/tasks?list=7&module=CS101");
+      expect(outerClick).not.toHaveBeenCalled();
+    });
+
+    it("falls back to the generic list label when task list metadata is missing", () => {
+      const outerClick = vi.fn();
+      render(
+        <div onClick={outerClick}>
+          <EventTagSlot
+            styles={styles}
+            isOverlap={false}
+            isReadOnly={false}
+            rowId="row-4"
+            moduleCode=""
+            matchTask={{ task_list: 99 }}
+            taskLists={undefined}
+            accentColor="#00aa00"
+            onToggleConflictPopover={vi.fn()}
+          />
+        </div>,
+      );
+
+      const link = screen.getByText("List").closest("a");
+      fireEvent.click(link);
+
+      expect(link).toHaveAttribute("href", "/tasks?list=99");
+      expect(outerClick).not.toHaveBeenCalled();
+    });
+
     it("renders duration text only when minutes are positive", () => {
       const { container, rerender } = render(<EventDuration styles={styles} durationMins={0} />);
       expect(container.firstChild).toBeNull();
@@ -189,6 +239,37 @@ describe("mini timeline parts extras", () => {
       expect(onMoveTomorrow).toHaveBeenCalledTimes(1);
       expect(screen.getByLabelText("Scheduled during sleep hours")).toBeInTheDocument();
       expect(screen.getByText("10:00–11:30")).toBeInTheDocument();
+    });
+
+    it("falls back cleanly when conflict times are missing", () => {
+      renderConflictCard({
+        itemRow: { item: { title: "🔥 Clash" } },
+        isSleepTime: false,
+        canMoveTomorrow: false,
+      });
+
+      const card = screen.getByText("Clash").closest('[role="button"]');
+      fireEvent.keyDown(card, { key: "Escape" });
+
+      expect(card).toHaveTextContent("Clash");
+      expect(screen.queryByLabelText("Scheduled during sleep hours")).toBeNull();
+      expect(screen.queryByText("→ Move to tomorrow")).toBeNull();
+    });
+
+    it("does not repeat the time range when start and end times match", () => {
+      renderConflictCard({
+        itemRow: {
+          item: {
+            title: "🔥 Standup",
+            start_time: "2024-03-08T10:00:00",
+            end_time: "2024-03-08T10:00:00",
+          },
+        },
+        isSleepTime: false,
+      });
+
+      expect(screen.getByText("10:00")).toBeInTheDocument();
+      expect(screen.queryByText("10:00–10:00")).toBeNull();
     });
   });
 
