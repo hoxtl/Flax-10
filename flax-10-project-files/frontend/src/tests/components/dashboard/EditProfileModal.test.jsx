@@ -157,4 +157,14 @@ describe('EditProfileModal', () => {
     expect(formData.get('profile_photo')).toEqual(file);
     expect(formData.get('remove_photo')).toBeNull();
   });
+
+  it('ignores photo changes when no file is selected', () => {
+    const userNoPhoto = { username: 'alice', name: 'Alice Bob', bio: 'old bio', profile_photo_url: null };
+    render(<EditProfileModal user={userNoPhoto} isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+
+    fireEvent.change(document.querySelector('input[type="file"]'), { target: { files: [] } });
+
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
+    expect(screen.queryByAltText('Preview')).toBeNull();
+  });
 });

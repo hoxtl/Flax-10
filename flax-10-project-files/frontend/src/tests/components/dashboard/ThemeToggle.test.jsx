@@ -37,6 +37,14 @@ describe('ThemeToggle', () => {
         expect(setMode).toHaveBeenCalledWith('dark');
     });
 
+    it('switches back to light mode when clicked in dark mode', () => {
+        const setMode = vi.fn();
+        useTheme.mockReturnValue({ mode: 'dark', setMode });
+        render(<ThemeToggle />);
+        fireEvent.click(screen.getByRole('button', { name: /toggle theme/i }));
+        expect(setMode).toHaveBeenCalledWith('light');
+    });
+
     it('has correct title in light mode', () => {
         useTheme.mockReturnValue({ mode: 'light', setMode: vi.fn() });
         render(<ThemeToggle />);
