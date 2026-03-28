@@ -77,4 +77,34 @@ describe('CollaboratorList', () => {
         const removeButtons = screen.getAllByTitle('Remove');
         expect(() => fireEvent.click(removeButtons[0])).not.toThrow();
     });
+
+    it('falls back to the collaborator id when a linked user id is missing', () => {
+        const onRoleChange = vi.fn();
+        const onRemove = vi.fn();
+        render(
+            <CollaboratorList
+                collaborators={[{ id: 33, username: 'dora', role: 'editor' }]}
+                onRoleChange={onRoleChange}
+                onRemove={onRemove}
+            />
+        );
+
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'admin' } });
+        fireEvent.click(screen.getByTitle('Remove'));
+
+        expect(onRoleChange).toHaveBeenCalledWith(33, 'admin');
+        expect(onRemove).toHaveBeenCalledWith(33);
+    });
+
+    it('renders collaborators that only have a user field as their stable key path', () => {
+        render(
+            <CollaboratorList
+                collaborators={[{ user: 77, username: 'eve', role: 'editor' }]}
+                onRoleChange={vi.fn()}
+                onRemove={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText('eve')).toBeTruthy();
+    });
 });

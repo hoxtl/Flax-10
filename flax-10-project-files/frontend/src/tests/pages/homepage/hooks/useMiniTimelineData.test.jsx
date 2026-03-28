@@ -110,4 +110,16 @@ describe("useMiniTimelineData", () => {
     const notToday = renderHook(() => useMiniTimelineData({ ...baseProps, hasTimerSession: false }));
     expect(notToday.result.current.currentBlock).toBeNull();
   });
+
+  it("handles missing sorted events when deriving the current block", () => {
+    const { result } = renderHook(() =>
+      useMiniTimelineData({
+        ...baseProps,
+        sortedEvents: undefined,
+        hasTimerSession: false,
+      })
+    );
+
+    expect(result.current.currentBlock).toBeNull();
+  });
 });

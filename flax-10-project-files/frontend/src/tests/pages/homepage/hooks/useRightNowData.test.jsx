@@ -134,4 +134,119 @@ describe("useRightNowData", () => {
     expect(result.current.showTfl).toBe(false);
     expect(journeyPlannerMock).not.toHaveBeenCalled();
   });
+
+  it("uses safe fallbacks for missing props and the Date.now branch", async () => {
+    const nowSpy = vi.spyOn(Date, "now").mockReturnValue(1711111111111);
+    getCurrentBlockMock.mockReturnValue(null);
+    getNextEventMock.mockReturnValue(null);
+
+    const { result } = renderHook(() =>
+      useRightNowData({
+        isToday: true,
+        now: "not-a-date",
+        tflDelays: [{ lineName: "" }],
+      }),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.eventCount).toBe(0);
+    expect(result.current.tasksPending).toBe(0);
+    expect(result.current.isEmptyDay).toBe(true);
+    expect(result.current.isEndOfDay).toBe(false);
+    expect(result.current.conflicts).toEqual([]);
+    expect(result.current.showTfl).toBe(false);
+    expect(result.current.timeLeftStr).toBeNull();
+    expect(nowSpy).toHaveBeenCalled();
+    nowSpy.mockRestore();
+  });
+
+  it("suppresses leave-by info when transport delays have no named lines", async () => {
+    const ne = { id: "next", title: "Lecture", location: "Strand Campus", start_time: "2026-03-25T11:00:00Z" };
+    getNextEventMock.mockReturnValue(ne);
+
+    const { result } = renderHook(() =>
+      useRightNowData({
+        isToday: true,
+        now: new Date("2026-03-25T09:30:00Z"),
+        sortedEvents: [ne],
+        taskWidgetItemsOnly: [],
+        tflDelays: [{ lineName: "" }],
+      }),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.leaveByInfo).toBeNull();
+    expect(result.current.showTfl).toBe(false);
+  });
+
+  it("returns a null journey when the home address lookup fails during an active commute fetch", async () => {
+    const ne = { id: "next", title: "Lecture", location: "Strand Campus", start_time: "2026-03-25T11:00:00Z" };
+    getNextEventMock.mockReturnValue(ne);
+    getHomeAddressMock.mockRejectedValueOnce(new Error("missing home"));
+
+    const { result } = renderHook(() =>
+      useRightNowData({
+        isToday: true,
+        now: new Date("2026-03-25T09:30:00Z"),
+        sortedEvents: [ne],
+        taskWidgetItemsOnly: [],
+        tflDelays: [{ lineName: "Northern" }],
+      }),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.commuteInfo).toBeNull();
+    expect(journeyPlannerMock).not.toHaveBeenCalled();
+  });
+
+  it("does not update commute state after the hook unmounts", async () => {
+    let resolveJourney;
+    const journeyPromise = new Promise((resolve) => {
+      resolveJourney = resolve;
+    });
+    const ne = { id: "next", title: "Lecture", location: "Strand Campus", start_time: "2026-03-25T11:00:00Z" };
+    getNextEventMock.mockReturnValue(ne);
+    journeyPlannerMock.mockReturnValueOnce(journeyPromise);
+
+    const { unmount } = renderHook(() =>
+      useRightNowData({
+        isToday: true,
+        now: new Date("2026-03-25T09:30:00Z"),
+        sortedEvents: [ne],
+        taskWidgetItemsOnly: [],
+        tflDelays: [{ lineName: "Northern" }],
+      }),
+    );
+
+    unmount();
+    resolveJourney({ duration: 18 });
+    await journeyPromise;
+
+    expect(journeyPlannerMock).toHaveBeenCalled();
+  });
+
+  it("handles undefined delays and invalid home coordinates without planning a journey", async () => {
+    const ne = { id: "next", title: "Lecture", location: "Strand Campus", start_time: "2026-03-25T11:00:00Z" };
+    getNextEventMock.mockReturnValue(ne);
+    getHomeAddressMock.mockResolvedValue({ home_latitude: "abc", home_longitude: undefined });
+    journeyPlannerMock.mockClear();
+
+    const { result } = renderHook(() =>
+      useRightNowData({
+        isToday: true,
+        now: new Date("2026-03-25T09:30:00Z"),
+        sortedEvents: [ne],
+        taskWidgetItemsOnly: [],
+      }),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.leaveByInfo).toBeNull();
+    expect(result.current.commuteInfo).toBeNull();
+    expect(journeyPlannerMock).not.toHaveBeenCalled();
+  });
 });

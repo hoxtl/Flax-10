@@ -114,9 +114,8 @@ function getFieldHandlers(form, update) {
     };
 }
 
-function CategoriesField({ value = [], onChange }) {
-    const selected = Array.isArray(value) ? value : [];
-    const selectedTagObjects = CATEGORY_TAGS.filter(t => selected.includes(t.id));
+function CategoriesField({ value, onChange }) {
+    const selectedTagObjects = CATEGORY_TAGS.filter(t => value.includes(t.id));
     const handleSelectionChange = (newSelected) => onChange(newSelected.map(t => t.id));
     return (
         <div className={styles.field}>

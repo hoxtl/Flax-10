@@ -133,4 +133,18 @@ describe("useHomepageActions extra branches", () => {
 
     expect(updateTaskMock).toHaveBeenCalledWith("abc-123", { completed: true });
   });
+
+  it("handles an undefined refetch result after an update failure without showing a toast", async () => {
+    updateTaskMock.mockRejectedValueOnce(new Error("fail"));
+    const props = buildActionsProps({
+      refetchTasks: vi.fn().mockResolvedValue(undefined),
+    });
+    const { result } = renderHook(() => useHomepageActions(props));
+
+    await act(async () => {
+      await result.current.handleTaskWidgetComplete({ id: 18, title: "Essay", completed: false });
+    });
+
+    expect(props.showToast).not.toHaveBeenCalled();
+  });
 });

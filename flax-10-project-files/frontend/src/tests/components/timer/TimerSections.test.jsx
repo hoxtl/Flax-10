@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { startManualTask } from "../../../components/timer/utils/timerTaskActions";
+import { clearManualTask, startManualTask } from "../../../components/timer/utils/timerTaskActions";
+import { applyTaskToTimer } from "../../../components/timer/utils/presetUtils";
 
 import { PopupSection } from "../../../components/timer/sections/PopupSection";
 import { FocusOverlayContent } from "../../../components/timer/sections/FocusOverlayContent";
@@ -58,10 +59,11 @@ vi.mock("../../../components/timer/components/SessionDots", () => ({
 }));
 
 vi.mock("../../../components/timer/components/TaskInput", () => ({
-  TaskInput: ({ onClearTask, onJustStart, onOpenFocus }) => (
+  TaskInput: ({ onClearTask, onJustStart, onOpenFocus, onTaskSelect }) => (
     <>
       <button onClick={onClearTask}>Clear task</button>
       <button onClick={onJustStart}>Just start</button>
+      <button onClick={() => onTaskSelect?.({ id: "picked-task", title: "Picked task" })}>Select task</button>
       <button onClick={onOpenFocus}>Open focus</button>
     </>
   ),
@@ -213,5 +215,15 @@ describe("Timer sections", () => {
     fireEvent.click(screen.getByText("Toggle timer"));
     expect(startManualTask).toHaveBeenCalledWith(t);
     expect(screen.queryByText("View History 📜")).not.toBeInTheDocument();
+  });
+
+  it("wires task clearing and task selection into the timer helpers", () => {
+    render(<MainSection t={t} onOpenHistory={vi.fn()} onOpenFocus={vi.fn()} isMobile={false} />);
+
+    fireEvent.click(screen.getByText("Clear task"));
+    fireEvent.click(screen.getByText("Select task"));
+
+    expect(clearManualTask).toHaveBeenCalledWith(t);
+    expect(applyTaskToTimer).toHaveBeenCalledWith({ id: "picked-task", title: "Picked task" }, t);
   });
 });
