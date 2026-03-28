@@ -1,5 +1,5 @@
 /*
- * App shell behavior tests for routing and shell-only behaviour.
+ * App shell behaviour tests for routing and shell-only behaviour.
  */
 
 import React from "react";

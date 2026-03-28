@@ -79,13 +79,8 @@ describe("FloatingChat launcher", () => {
     expect(screen.getByTestId("chat-fab")).toHaveAttribute("data-minimized", "false");
   });
 
-  it("renders the window and prompt for teachers and forwards child callbacks", () => {
-    const chat = createChat({
-      open: true,
-      showPrompt: true,
-      minimized: true,
-      promptText: "Need help with editing? Talk to Flax",
-    });
+  it("renders the window and prompt for teachers", () => {
+    const chat = createChat({ open: true, showPrompt: true, minimized: true, promptText: "Need help with editing? Talk to Flax" });
     mockUseAuth.mockReturnValue({ profile: { role: "teacher" } });
     mockUseFloatingChatState.mockReturnValue(chat);
 
@@ -95,6 +90,16 @@ describe("FloatingChat launcher", () => {
     expect(chat.renderWindow).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("chat-window")).toBeInTheDocument();
     expect(screen.getByTestId("prompt-bubble")).toHaveTextContent("Need help with editing? Talk to Flax");
+    expect(screen.getByTestId("chat-fab")).toHaveAttribute("data-open", "true");
+    expect(screen.getByTestId("chat-fab")).toHaveAttribute("data-minimized", "true");
+  });
+
+  it("forwards prompt and fab callbacks for teachers", () => {
+    const chat = createChat({ open: true, showPrompt: true, minimized: true });
+    mockUseAuth.mockReturnValue({ profile: { role: "teacher" } });
+    mockUseFloatingChatState.mockReturnValue(chat);
+
+    render(<FloatingChat />);
 
     fireEvent.click(screen.getByText("Ask from prompt"));
     expect(chat.openPrompt).toHaveBeenCalledTimes(1);
@@ -104,7 +109,5 @@ describe("FloatingChat launcher", () => {
 
     fireEvent.click(screen.getByTestId("chat-fab"));
     expect(chat.toggleFab).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("chat-fab")).toHaveAttribute("data-open", "true");
-    expect(screen.getByTestId("chat-fab")).toHaveAttribute("data-minimized", "true");
   });
 });

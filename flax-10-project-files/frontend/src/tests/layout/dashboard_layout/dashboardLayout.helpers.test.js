@@ -1,3 +1,7 @@
+/*
+ * Tests for dashboard layout helper utilities.
+ */
+
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../../api/authApi", () => ({
@@ -36,7 +40,7 @@ describe("dashboard layout helpers", () => {
     expect(formatUserYear("Year 4")).toBe("Year 4");
   });
 
-  it("parses stored users and falls back cleanly", () => {
+  it("parses stored users into the dashboard summary shape", () => {
     expect(
       parseStoredUser({
         first_name: "Ada",
@@ -57,36 +61,38 @@ describe("dashboard layout helpers", () => {
       isAdmin: true,
       role: "teacher",
     });
+  });
 
+  it("reads stored users and falls back cleanly", () => {
     localStorage.setItem("user", JSON.stringify({ username: "sam", year: "Foundation", email: "s@example.com" }));
     expect(getStoredUser()).toMatchObject({ name: "sam", year: "Foundation" });
-
     localStorage.setItem("user", "{bad json");
     expect(getStoredUser()).toBeUndefined();
     localStorage.removeItem("user");
     expect(getStoredUser()).toBeUndefined();
   });
 
-  it("handles logout, pending actions, back-to-top visibility, and timer blocking", async () => {
+  it("handles logout without skipping cached user cleanup", async () => {
     const { authService } = await import("../../../api/authApi");
     const { clearUserData } = await import("../../../components/Auth/utils/authHelpers");
-
     await handleLogoutClick();
     expect(authService.logout).toHaveBeenCalled();
     expect(clearUserData).toHaveBeenCalled();
-
     authService.logout.mockRejectedValueOnce(new Error("boom"));
     await handleLogoutClick();
     expect(clearUserData).toHaveBeenCalledTimes(2);
+  });
 
+  it("shows the back-to-top button and blocks timer navigation only when needed", () => {
     expect(shouldShowBackToTop("settings")).toBe(true);
     expect(shouldShowBackToTop("group-work")).toBe(false);
-
     expect(shouldBlockTimerNavigation("timer", { isActive: true, isPaused: false, mode: "work" })).toBe(true);
     expect(shouldBlockTimerNavigation("timer", { isActive: true, isPaused: true, mode: "work" })).toBe(false);
     expect(shouldBlockTimerNavigation("timer", { isActive: true, isPaused: false, mode: "break" })).toBe(false);
     expect(shouldBlockTimerNavigation("calendar", { isActive: true, isPaused: false })).toBe(false);
+  });
 
+  it("routes pending actions to the right dashboard handler", () => {
     const setShowQuickAdd = vi.fn();
     const onNavChange = vi.fn();
     handlePendingAction("QUICK_ADD", setShowQuickAdd, onNavChange);

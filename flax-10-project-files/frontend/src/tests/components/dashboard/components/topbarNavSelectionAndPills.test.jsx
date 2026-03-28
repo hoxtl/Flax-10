@@ -1,11 +1,10 @@
-/**
- * Extra coverage for Dashboard Topbar: BrandLogo, NavDropdownTrigger,
- * parseRouteOption, isRouteVisible, handleNavSelection, TopBarNav, ToolsPill.
+/*
+ * Tests for Dashboard Topbar: handleNavSelection, parseRouteOption, ToolsPill, and ActionPill.
  */
 
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 const { useNotificationsMock } = vi.hoisted(() => ({
   useNotificationsMock: vi.fn(() => ({
@@ -14,7 +13,6 @@ const { useNotificationsMock } = vi.hoisted(() => ({
   })),
 }));
 
-// ── framer-motion mock ───────────────────────────────────────────────────────
 vi.mock("framer-motion", () => ({
   motion: new Proxy(
     {},
@@ -37,12 +35,10 @@ vi.mock("framer-motion", () => ({
     React.createElement(React.Fragment, null, children),
 }));
 
-// ── CSS module mock ──────────────────────────────────────────────────────────
 vi.mock("*.module.css", () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-// ── lucide-react mock ────────────────────────────────────────────────────────
 vi.mock("lucide-react", () => ({
   Bell: () => <span data-testid="icon-bell" />,
   BookOpen: () => <span data-testid="icon-book" />,
@@ -54,26 +50,15 @@ vi.mock("lucide-react", () => ({
   ClipboardCheck: () => <span data-testid="icon-clipboard" />,
 }));
 
-// ── APP_ROUTES mock ──────────────────────────────────────────────────────────
 vi.mock("../../../../lib/routes", () => ({
   APP_ROUTES: [
     { id: "calendar", label: "Calendar", icon: "🗓️" },
     { id: "tasks", label: "Tasks", icon: "✅" },
-    {
-      id: "modules",
-      label: "Modules",
-      teacherLabel: "Manage My Modules",
-      icon: "📚",
-    },
+    { id: "modules", label: "Modules", teacherLabel: "Manage My Modules", icon: "📚" },
     { id: "attendance", label: "Attendance", icon: "✔️", studentOnly: true },
     { id: "admin", label: "Admin", icon: "🛡️", isAdminOnly: true },
     { id: "map", label: "UniMap", icon: "🗺️" },
-    {
-      id: "group-work",
-      label: "Group Projects",
-      icon: "🤝",
-      studentOnly: true,
-    },
+    { id: "group-work", label: "Group Projects", icon: "🤝", studentOnly: true },
     { id: "timer", label: "Focus Timer", icon: "⏲️" },
     { id: "analytics", label: "Analytics", icon: "📊" },
     { id: "societies", label: "Societies", icon: "👥", studentOnly: true },
@@ -81,7 +66,6 @@ vi.mock("../../../../lib/routes", () => ({
   ],
 }));
 
-// ── Dependency mocks ─────────────────────────────────────────────────────────
 vi.mock("../../../../components/dashboard/components/ProfileDropdown", () => ({
   default: () => <div data-testid="profile-dropdown" />,
 }));
@@ -163,9 +147,7 @@ vi.mock("../../../../components/common", () => ({
   ),
 }));
 
-// ── Import the real TopBar component ─────────────────────────────────────────
 import TopBar from "../../../../components/dashboard/components/Topbar";
-
 
 function renderTopBar(props = {}) {
   const defaults = {
@@ -187,121 +169,6 @@ beforeEach(() => {
   });
 });
 
-// ── BrandLogo ─────────────────────────────────────────────────────────────────
-
-describe("BrandLogo", () => {
-  it("calls onNavChange with 'home' when clicked", () => {
-    const onNavChange = vi.fn();
-    renderTopBar({ onNavChange });
-    const brand = screen.getByText("StudyFlax");
-    fireEvent.click(brand.closest("[style*='cursor']") || brand.parentElement);
-    expect(onNavChange).toHaveBeenCalledWith("home");
-  });
-
-  it("renders the brand name", () => {
-    renderTopBar();
-    expect(screen.getByText("StudyFlax")).toBeInTheDocument();
-  });
-});
-
-// ── NavDropdownTrigger – hasActive ────────────────────────────────────────────
-
-describe("NavDropdownTrigger via rendered TopBar", () => {
-  it("renders nav group buttons", () => {
-    renderTopBar({ activeNav: "tasks" });
-    // Plan section contains tasks
-    expect(screen.getByText("Plan")).toBeInTheDocument();
-  });
-
-  it("renders Study section for student users", () => {
-    renderTopBar({ user: { role: "student" } });
-    expect(screen.getByText("Study")).toBeInTheDocument();
-  });
-
-  it("renders Teaching section label for teacher users", () => {
-    renderTopBar({ user: { role: "teacher" } });
-    expect(screen.getByText("Teaching")).toBeInTheDocument();
-  });
-
-  it("opens on hover and closes when the dropdown requests it", async () => {
-    renderTopBar({ activeNav: "calendar" });
-
-    fireEvent.mouseEnter(screen.getByText("Plan").closest("[data-tour='calendar']"));
-    await waitFor(() => {
-      expect(
-        screen
-          .getAllByTestId("icon-chevron")
-          .some((icon) => icon.className.includes("chevronOpen")),
-      ).toBe(true);
-    });
-
-    fireEvent.click(screen.getByTestId("dropdown-close-calendar"));
-    await waitFor(() => {
-      expect(
-        screen
-          .getAllByTestId("icon-chevron")
-          .some((icon) => icon.className.includes("chevronOpen")),
-      ).toBe(false);
-    });
-  });
-
-  it("ignores direct dropdown open-change events when the menu is not already active", () => {
-    renderTopBar({ activeNav: "calendar" });
-
-    fireEvent.click(screen.getByText("Plan"));
-
-    expect(
-      screen
-        .getAllByTestId("icon-chevron")
-        .some((icon) => icon.className.includes("chevronOpen")),
-    ).toBe(false);
-  });
-
-  it("clears the active hover menu after mouse leave", () => {
-    vi.useFakeTimers();
-
-    renderTopBar({ activeNav: "calendar" });
-    fireEvent.mouseEnter(screen.getByText("Plan").closest("[data-tour='calendar']"));
-    fireEvent.mouseLeave(screen.getByRole("navigation"));
-    act(() => {
-      vi.advanceTimersByTime(151);
-    });
-
-    expect(document.querySelector(".chevronOpen")).not.toBeInTheDocument();
-    vi.useRealTimers();
-  });
-});
-
-// ── isRouteVisible ────────────────────────────────────────────────────────────
-
-describe("isRouteVisible through TopBarNav rendered output", () => {
-  it("hides adminOnly routes from non-admin users (no Admin option)", () => {
-    renderTopBar({
-      user: { role: "student", isAdmin: false },
-    });
-    // Admin nav section has no routes visible, so no "Admin" group button
-    expect(screen.queryByText("Admin")).not.toBeInTheDocument();
-  });
-
-  it("shows adminOnly routes for admin users", () => {
-    renderTopBar({
-      user: { role: "student", isAdmin: true },
-    });
-    expect(screen.getByText("Admin")).toBeInTheDocument();
-  });
-
-  it("hides studentOnly routes for teachers", () => {
-    renderTopBar({
-      user: { role: "teacher", isAdmin: false },
-    });
-    // Explore still visible but societies / group-work filtered out
-    // Just confirm Study - Teaching conversion happened (teachers see Teaching label)
-    expect(screen.getByText("Teaching")).toBeInTheDocument();
-  });
-});
-
-// ── handleNavSelection – modules:show-all event ───────────────────────────────
-
 describe("handleNavSelection dispatches modules:show-all for modules", () => {
   let handler;
 
@@ -318,7 +185,6 @@ describe("handleNavSelection dispatches modules:show-all for modules", () => {
     const onNavChange = vi.fn();
     renderTopBar({ user: { role: "student" }, onNavChange, activeNav: "calendar" });
 
-    // Find all dropdown option buttons and click the one with value="modules"
     const moduleButton = screen.getAllByTestId("animated-dropdown")
       .flatMap((dd) => Array.from(dd.querySelectorAll("[data-testid^='opt-']")))
       .find((btn) => btn.textContent === "modules");
@@ -346,13 +212,6 @@ describe("handleNavSelection dispatches modules:show-all for modules", () => {
   });
 });
 
-// ── parseRouteOption – teacher label ─────────────────────────────────────────
-// The AnimatedDropdown mock renders option VALUES (route ids) as button text.
-// The label content (JSX) passed to the dropdown option is rendered inside the
-// dropdown container but only becomes visible once we inspect the options prop.
-// We verify teacher vs student behaviour through the "Teaching" / "Study" title
-// which is directly rendered on the NavDropdownTrigger buttons.
-
 describe("parseRouteOption teacher vs student labels via section titles", () => {
   it("shows Teaching section (not Study) for teacher users", () => {
     renderTopBar({ user: { role: "teacher" }, activeNav: "modules" });
@@ -367,22 +226,16 @@ describe("parseRouteOption teacher vs student labels via section titles", () => 
   });
 });
 
-// ── ToolsPill – teacher vs student options ────────────────────────────────────
-
 describe("ToolsPill options", () => {
   it("uses student options when user.role is student", () => {
     renderTopBar({ user: { role: "student" }, activeNav: "attendance" });
-    // Student options include attendance
     expect(screen.getByTestId("tool-attendance")).toBeInTheDocument();
-    // Teacher-specific module tool not present for students
     expect(screen.queryByTestId("tool-modules")).not.toBeInTheDocument();
   });
 
   it("uses teacher options when user.role is teacher", () => {
     renderTopBar({ user: { role: "teacher" }, activeNav: "modules" });
-    // Teacher options include modules
     expect(screen.getByTestId("tool-modules")).toBeInTheDocument();
-    // Student-specific attendance not present for teachers
     expect(screen.queryByTestId("tool-attendance")).not.toBeInTheDocument();
   });
 

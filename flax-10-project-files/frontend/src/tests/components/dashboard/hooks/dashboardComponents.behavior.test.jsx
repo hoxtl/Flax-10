@@ -1,4 +1,3 @@
-import React from "react";
 import { fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -44,19 +43,10 @@ describe("dashboard coverage topups", () => {
     const setLoading = vi.fn();
     const setError = vi.fn();
     const setSaveSignal = vi.fn();
-
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
 
     const submit = buildEditProfileSubmitHandler(
-      {
-        username: "new-name",
-        bio: "bio",
-        profilePhoto: null,
-        removePhoto: false,
-        setLoading,
-        setError,
-        setSaveSignal,
-      },
+      { username: "new-name", bio: "bio", profilePhoto: null, removePhoto: false, setLoading, setError, setSaveSignal },
       { username: "old-name" },
       vi.fn(),
       vi.fn(),
@@ -70,10 +60,12 @@ describe("dashboard coverage topups", () => {
     expect(setLoading).toHaveBeenLastCalledWith(false);
   });
 
-  it("uses the configured API base URL for username checks when one is provided", async () => {
+  it("uses the configured API base URL helper when one is provided", () => {
     expect(getApiBaseUrl("https://studyflax.test/api")).toBe("https://studyflax.test/api");
     expect(getApiBaseUrl("")).toBe("http://localhost:8000/api");
+  });
 
+  it("uses the configured API base URL for username checks when one is provided", async () => {
     vi.resetModules();
     vi.stubEnv("VITE_API_BASE_URL", "https://studyflax.test/api");
     const fetchMock = vi.fn().mockResolvedValue({ json: async () => ({ available: true }) });
@@ -81,15 +73,8 @@ describe("dashboard coverage topups", () => {
 
     const { buildEditProfileSubmitHandler: buildHandler } = await import("../../../../components/dashboard/hooks/useEditProfileForm");
     const submit = buildHandler(
-      {
-        username: "fresh-name",
-        bio: "",
-        profilePhoto: null,
-        removePhoto: false,
-        setLoading: vi.fn(),
-        setError: vi.fn(),
-        setSaveSignal: vi.fn(),
-      },
+      { username: "fresh-name", bio: "", profilePhoto: null, removePhoto: false,
+        setLoading: vi.fn(), setError: vi.fn(), setSaveSignal: vi.fn() },
       { username: "old-name" },
       vi.fn(),
       vi.fn(),
