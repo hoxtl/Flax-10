@@ -20,6 +20,13 @@ function hasAssignee(assignees, member) {
     return assignees.some((assignee) => String(assignee) === memberId);
 }
 
+function toggleAssigneeIds(previous, userId) {
+    const nextUserId = normaliseAssigneeId(userId);
+    const hasMatch = previous.some((id) => String(id) === String(nextUserId));
+    if (hasMatch) return previous.filter((id) => String(id) !== String(nextUserId));
+    return [...previous, nextUserId];
+}
+
 function MemberCheckItem({ member, checked, onToggle }) {
     return (
     <SelectableMemberRow
@@ -83,22 +90,28 @@ async function submitTask(title, dueDate, assignees, onAdd, onClose) {
     onClose();
 }
 
-export default function AddTaskModal({ members = [], onAdd, onClose }) {
+function useAddTaskFormState() {
     const [title, setTitle] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [assignees, setAssignees] = useState([]);
-    const toggleAssignee = (userId) => {
-        const nextUserId = normaliseAssigneeId(userId);
-        setAssignees((prev) => (
-            prev.some((id) => String(id) === String(nextUserId))
-                ? prev.filter((id) => String(id) !== String(nextUserId))
-                : [...prev, nextUserId]
-        ));
-    };
-    const handleSubmit = (e) => { e.preventDefault(); submitTask(title, dueDate, assignees, onAdd, onClose); };
+    const toggleAssignee = (userId) => setAssignees((previous) => toggleAssigneeIds(previous, userId));
+    return { assignees, dueDate, setDueDate, setTitle, title, toggleAssignee };
+}
+
+function handleTaskSubmit(event, title, dueDate, assignees, onAdd, onClose) {
+    event.preventDefault();
+    submitTask(title, dueDate, assignees, onAdd, onClose);
+}
+
+/*
+ * Renders the add-task modal for group work projects.
+ */
+export default function AddTaskModal({ members = [], onAdd, onClose }) {
+    const { assignees, dueDate, setDueDate, setTitle, title, toggleAssignee } = useAddTaskFormState();
+    const onSubmit = (event) => handleTaskSubmit(event, title, dueDate, assignees, onAdd, onClose);
     return (
         <StandardModal title="Add new task" onClose={onClose} size="md">
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form onSubmit={onSubmit} className={styles.form}>
                 <TaskTwoColFields title={title} setTitle={setTitle} dueDate={dueDate} setDueDate={setDueDate} />
                 <TaskAssigneesField members={members} assignees={assignees} onToggle={toggleAssignee} />
                 <TaskFormActions title={title} onClose={onClose} />
