@@ -58,7 +58,7 @@ vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../pages/admin/components/AdminFilters", () => ({
+vi.mock("../../../../pages/admin/components/AdminFilters", () => ({
   FilterToggleGroup: ({ ariaLabel, options, onToggle }) => (
     <div aria-label={ariaLabel}>
       {options.map((opt) => (
@@ -68,7 +68,7 @@ vi.mock("../../../pages/admin/components/AdminFilters", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/search_bar/SearchBar", () => ({
+vi.mock("../../../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder || "search"} value={value} onChange={onChange} />
   ),
@@ -96,11 +96,11 @@ vi.mock("../../../../pages/admin/utils/adminNavigation", () => ({
   navigateToProfile: vi.fn(),
 }));
 
-import * as api from "../../../api/adminApi";
-import { useUsersTabState } from "../../../pages/admin/hooks/useUsersTabState";
-import { isProtectedFixtureUser } from "../../../pages/admin/utils/protectedUsers";
-import { navigateToProfile } from "../../../pages/admin/utils/adminNavigation";
-import UsersTab from "../../../pages/admin/components/UsersTab";
+import * as api from "../../../../api/adminApi";
+import { useUsersTabState } from "../../../../pages/admin/hooks/useUsersTabState";
+import { isProtectedFixtureUser } from "../../../../pages/admin/utils/protectedUsers";
+import { navigateToProfile } from "../../../../pages/admin/utils/adminNavigation";
+import UsersTab, { confirmBanHandler } from "../../../../pages/admin/components/UsersTab";
 
 function makeState(overrides = {}) {
   return {
@@ -136,6 +136,13 @@ describe("UsersTab moderation", () => {
   it("renders AdminMarker for staff users in desktop view", () => {
     const staffUser = { id: 2, first_name: "Bob", last_name: "B", username: "bob", email: "b@b.com", role: "admin", is_active: true, is_staff: true, is_superuser: false };
     useUsersTabState.mockReturnValue(makeState({ users: [staffUser] }));
+    render(<UsersTab onNavigate={vi.fn()} />);
+    expect(screen.getAllByText("Admin").length).toBeGreaterThan(0);
+  });
+
+  it("renders AdminMarker for superusers who are not staff-flagged", () => {
+    const superUser = { id: 22, first_name: "Super", last_name: "U", username: "superu", email: "s@s.com", role: "admin", is_active: true, is_staff: false, is_superuser: true };
+    useUsersTabState.mockReturnValue(makeState({ users: [superUser] }));
     render(<UsersTab onNavigate={vi.fn()} />);
     expect(screen.getAllByText("Admin").length).toBeGreaterThan(0);
   });
@@ -214,6 +221,30 @@ describe("UsersTab moderation", () => {
     await waitFor(() => expect(state.setError).toHaveBeenCalledWith("Ban failed"));
   });
 
+  it("uses fallback ban error when the API error message is empty", async () => {
+    const activeUser = { id: 29, first_name: "Empty", last_name: "Msg", username: "emptym", email: "e@e.com", role: "student", is_active: true, is_staff: false, is_superuser: false };
+    const state = makeState({ users: [activeUser], banTarget: activeUser });
+    useUsersTabState.mockReturnValue(state);
+    api.banUser.mockRejectedValue({ message: "" });
+    render(<UsersTab onNavigate={vi.fn()} />);
+    const textarea = screen.getByRole("textbox", { name: /reason for ban/i });
+    fireEvent.change(textarea, { target: { value: "Spam" } });
+    fireEvent.submit(textarea.closest("form"));
+    await waitFor(() => expect(state.setError).toHaveBeenCalledWith("Failed to ban user."));
+  });
+
+  it("uses fallback ban error message when the API error has no message", async () => {
+    const activeUser = { id: 19, first_name: "No", last_name: "Msg", username: "nomsg", email: "n@n.com", role: "student", is_active: true, is_staff: false, is_superuser: false };
+    const state = makeState({ users: [activeUser], banTarget: activeUser });
+    useUsersTabState.mockReturnValue(state);
+    api.banUser.mockRejectedValue({});
+    render(<UsersTab onNavigate={vi.fn()} />);
+    const textarea = screen.getByRole("textbox", { name: /reason for ban/i });
+    fireEvent.change(textarea, { target: { value: "Spam" } });
+    fireEvent.submit(textarea.closest("form"));
+    await waitFor(() => expect(state.setError).toHaveBeenCalledWith("Failed to ban user."));
+  });
+
   it("calls banUser and updates users on ban success", async () => {
     const activeUser = { id: 10, first_name: "Jake", last_name: "J", username: "jake", email: "j@j.com", role: "student", is_active: true, is_staff: false, is_superuser: false };
     const state = makeState({
@@ -228,10 +259,25 @@ describe("UsersTab moderation", () => {
     fireEvent.submit(textarea.closest("form"));
     await waitFor(() => expect(api.banUser).toHaveBeenCalledWith(10, "Valid reason"));
     await waitFor(() => expect(state.setUsers).toHaveBeenCalled());
+    await waitFor(() => expect(state.setBanTarget).toHaveBeenCalledWith(null));
+    await waitFor(() => expect(state.setBusy).toHaveBeenCalledWith(false));
 
-    // Execute state.setUsers callback
     const setUsersUpdater = state.setUsers.mock.calls[0][0];
-    setUsersUpdater([activeUser]); // Hits the line 180 success string!
+    setUsersUpdater([activeUser]);
+  });
+
+  it("returns early from confirmBanHandler when reason is empty", async () => {
+    const activeUser = { id: 12, first_name: "Leo", last_name: "L", username: "leo", email: "l@l.com", role: "student", is_active: true, is_staff: false, is_superuser: false };
+    const state = makeState({
+      users: [activeUser],
+      banTarget: activeUser,
+    });
+    useUsersTabState.mockReturnValue(state);
+    render(<UsersTab onNavigate={vi.fn()} />);
+    const textarea = screen.getByRole("textbox", { name: /reason for ban/i });
+    fireEvent.change(textarea, { target: { value: "" } });
+    fireEvent.submit(textarea.closest("form"));
+    expect(api.banUser).not.toHaveBeenCalled();
   });
 
   it("returns early from confirmBanHandler when reason is whitespace", async () => {
@@ -307,5 +353,18 @@ describe("UsersTab moderation", () => {
     useUsersTabState.mockReturnValue(makeState({ loading: true }));
     const { container } = render(<UsersTab onNavigate={vi.fn()} />);
     expect(container.querySelector(".spinnerWrap")).toBeInTheDocument();
+  });
+
+  it("short-circuits confirmBanHandler when the trimmed reason is empty", () => {
+    const state = {
+      banTarget: { id: 1 },
+      setBusy: vi.fn(),
+      setBanTarget: vi.fn(),
+      setUsers: vi.fn(),
+      setError: vi.fn(),
+    };
+    confirmBanHandler(state, "");
+    expect(api.banUser).not.toHaveBeenCalled();
+    expect(state.setBusy).not.toHaveBeenCalled();
   });
 });
