@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TimetableImportModal from '../../components/schedules/components/TimetableImportModal';
+import TimetableImportModal from '../../../components/schedules/components/TimetableImportModal';
 
 const defaultProps = {
     isOpen: true,

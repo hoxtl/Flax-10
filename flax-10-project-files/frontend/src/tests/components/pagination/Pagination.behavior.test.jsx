@@ -23,7 +23,7 @@ describe("Pagination coverage topup", () => {
       };
     });
 
-    const { Pagination } = await import("../../components/pagination/Pagination");
+    const { Pagination } = await import("../../../components/pagination/Pagination");
     render(<Pagination currentPage={2} totalPages={5} onPageChange={vi.fn()} />);
 
     expect(screen.getByRole("button", { name: "← Previous" })).toBeInTheDocument();

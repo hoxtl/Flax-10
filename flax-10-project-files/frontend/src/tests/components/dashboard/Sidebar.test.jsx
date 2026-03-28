@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Sidebar from '../../components/dashboard/components/Sidebar';
+import Sidebar from '../../../components/dashboard/components/Sidebar';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -14,14 +14,14 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../lib/routes', () => ({
+vi.mock('../../../lib/routes', () => ({
   APP_ROUTES: [
     { id: 'home', label: 'Home', icon: '🏠' },
     { id: 'calendar', label: 'Calendar', icon: '📅' },
   ],
 }));
 
-vi.mock('../../api/deadlineApi', () => ({
+vi.mock('../../../api/deadlineApi', () => ({
   getUpcomingDeadlines: vi.fn().mockResolvedValue([]),
 }));
 

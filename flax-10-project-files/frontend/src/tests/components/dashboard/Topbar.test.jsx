@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TopBar from '../../components/dashboard/components/Topbar';
+import TopBar from '../../../components/dashboard/components/Topbar';
 
-vi.mock('../../components/dashboard/components/ProfileDropdown', () => ({
+vi.mock('../../../components/dashboard/components/ProfileDropdown', () => ({
   default: ({ onSettingsClick, onLogoutClick, onProfileClick }) => (
     <div>
       <button onClick={onSettingsClick}>settings</button>
@@ -12,7 +12,7 @@ vi.mock('../../components/dashboard/components/ProfileDropdown', () => ({
   ),
 }));
 
-vi.mock('../../components/dashboard/components/ExpandableTabs', () => ({
+vi.mock('../../../components/dashboard/components/ExpandableTabs', () => ({
   ExpandableTabs: ({ tabs = [], onChange }) => (
     <div>
       <button data-testid={`tab-${tabs[0]?.title || 'unknown'}`} onClick={() => onChange(0)}>
@@ -23,12 +23,12 @@ vi.mock('../../components/dashboard/components/ExpandableTabs', () => ({
   ),
 }));
 
-vi.mock('../../components/dashboard/components/ThemeToggle', () => ({ default: () => <button>theme</button> }));
-vi.mock('../../components/timer/components/MiniTimer', () => ({ default: () => <div>timer</div> }));
-vi.mock('../../context/NotificationContext', () => ({
+vi.mock('../../../components/dashboard/components/ThemeToggle', () => ({ default: () => <button>theme</button> }));
+vi.mock('../../../components/timer/components/MiniTimer', () => ({ default: () => <div>timer</div> }));
+vi.mock('../../../context/NotificationContext', () => ({
   useNotifications: vi.fn(() => ({ togglePanel: vi.fn(), notifications: [] })),
 }));
-vi.mock('../../components/notifications/components/NotificationPanel', () => ({
+vi.mock('../../../components/notifications/components/NotificationPanel', () => ({
   NotificationPanel: () => <div>notifications</div>
 }));
 
@@ -73,7 +73,7 @@ describe('TopBar', () => {
 
   it('calls togglePanel when notifications tab is clicked', async () => {
     const togglePanel = vi.fn();
-    const { useNotifications } = await import('../../context/NotificationContext');
+    const { useNotifications } = await import('../../../context/NotificationContext');
     useNotifications.mockReturnValue({ togglePanel, notifications: [] });
     render(<TopBar />);
     fireEvent.click(screen.getByTestId('tab-Notifications'));
