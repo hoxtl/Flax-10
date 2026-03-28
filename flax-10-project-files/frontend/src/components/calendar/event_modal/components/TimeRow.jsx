@@ -30,14 +30,16 @@ function TimeFields({ form, update, recurrenceValue, onRecurrenceChange }) {
     const frequency = recurrenceValue?.frequency || 'none';
     const handleFrequencyChange = (val) => onRecurrenceChange?.({ ...recurrenceValue, frequency: val });
     return (
-        <div className="form-row-3">
-            <TimeInput label="Start" value={form.start_time} field="start_time" update={update} isAllDay={isAllDay} />
-            <TimeInput label="End" value={form.end_time} field="end_time" update={update} isAllDay={isAllDay} />
+        <>
+            <div className="form-row-2">
+                <TimeInput label="Start" value={form.start_time} field="start_time" update={update} isAllDay={isAllDay} />
+                <TimeInput label="End" value={form.end_time} field="end_time" update={update} isAllDay={isAllDay} />
+            </div>
             <div className="form-field">
                 <label>Repeat</label>
                 <AnimatedDropdown value={frequency} onChange={handleFrequencyChange} options={FREQUENCY_OPTIONS} placeholder="None" />
             </div>
-        </div>
+        </>
     );
 }
 

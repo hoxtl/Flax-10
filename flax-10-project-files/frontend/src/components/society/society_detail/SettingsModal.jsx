@@ -84,7 +84,7 @@ export default function SettingsModal(props) {
         <AddCollaboratorModal
           onClose={() => logic.setShowAdd(false)}
           onAdd={logic.handleAdd}
-          existingUsernames={collabs.map(c => c.username)}
+          existingUsernames={(props.members || []).map(m => m.username)}
         />
       )}
       {logic.showDeleteConfirm && (

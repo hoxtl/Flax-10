@@ -13,6 +13,7 @@ import styles from "../styles/AddCollaboratorModal.module.css";
 function useCollaboratorSelection(existingUsernames, onAdd, onClose) {
   const [selected, setSelected] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const selectedIds = new Set(selected.map((user) => user.id));
   const existingSet = new Set(existingUsernames.map((username) => username?.toLowerCase()).filter(Boolean));
   const filterUsers = (users = []) => users.filter((user) => !existingSet.has(user.username?.toLowerCase()) && !selectedIds.has(user.id));
@@ -21,14 +22,17 @@ function useCollaboratorSelection(existingUsernames, onAdd, onClose) {
   const onConfirm = async () => {
     if (selected.length === 0 || isSubmitting) return;
     setIsSubmitting(true);
+    setError(null);
     try {
       await onAdd(selected);
       onClose();
+    } catch (err) {
+      setError(err?.message || "Failed to add collaborator. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
-  return { isSubmitting, onConfirm, onRemove, onSelect, selected, filterUsers };
+  return { isSubmitting, error, onConfirm, onRemove, onSelect, selected, filterUsers };
 }
 
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
@@ -39,6 +43,7 @@ export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames
         <CollaboratorSearch filterUsers={selection.filterUsers} onSelect={selection.onSelect} />
         <SelectedUsers onRemove={selection.onRemove} users={selection.selected} />
       </div>
+      {selection.error && <p className={styles.error}>{selection.error}</p>}
       <ModalFooter
         disabled={selection.selected.length === 0 || selection.isSubmitting}
         isSubmitting={selection.isSubmitting}

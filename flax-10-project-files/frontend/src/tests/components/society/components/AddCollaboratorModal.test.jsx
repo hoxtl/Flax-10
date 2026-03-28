@@ -130,6 +130,20 @@ describe('AddCollaboratorModal', () => {
         });
     });
 
+    it('shows error message when onAdd throws', async () => {
+        const onAdd = vi.fn().mockRejectedValue(new Error('Already a member'));
+        const onClose = vi.fn();
+        render(<AddCollaboratorModal onClose={onClose} onAdd={onAdd} />);
+
+        fireEvent.click(screen.getByText('Select Alice'));
+        fireEvent.click(screen.getByText('Add'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Already a member')).toBeTruthy();
+        });
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
     it('uses the filter default users branch and renders the custom empty state content', async () => {
         render(<AddCollaboratorModal onClose={vi.fn()} onAdd={vi.fn()} />);
 

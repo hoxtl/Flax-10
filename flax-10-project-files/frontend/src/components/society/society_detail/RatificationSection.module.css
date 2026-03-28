@@ -36,7 +36,10 @@
 
 .requestBtn {
     margin-top: 0.65rem;
-    min-height: 38px;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 500;
+    box-shadow: none;
 }
 
 .statusApproved {
