@@ -1,17 +1,17 @@
-/**
- * Covers TaskPickerModal open, loading, and filter states.
+/*
+ * Tests timer task picker modal states and helper callbacks.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '../../../../utils/testUtils';
+import { TaskPickerModal } from '../../../../components/timer/task_input/TaskPickerModal';
 import {
-  TaskPickerModal,
   buildFilterPanelProps,
   clearAllFilters,
   closeFilterPanel,
   toggleList,
   toggleModule,
-} from '../../../../components/timer/task_input/TaskPickerModal';
+} from '../../../../components/timer/task_input/TaskPickerModal.helpers';
 
 import { createFnMap } from '../../../utils/testBuilderUtils';
 
@@ -105,6 +105,43 @@ const makeState = (overrides = {}) => ({
   ...createFnMap(taskPickerActionNames),
   ...overrides,
 });
+
+function buildFilterPanelState() {
+  return makeState({
+    activeFilterTab: 'modules',
+    filterQuery: 'math',
+    visibleListItems: [{ id: 5, name: 'Revision' }],
+    filterListIds: ['5'],
+    moduleGroupKeys: ['SCI'],
+    groupedModuleItems: { SCI: [{ code: 'SCI101' }] },
+    filterModuleCodes: ['SCI101'],
+  });
+}
+
+function expectFilterPanelValues(props) {
+  expect(props.activeFilterTab).toBe('modules');
+  expect(props.filterQuery).toBe('math');
+  expect(props.visibleListItems).toEqual([{ id: 5, name: 'Revision' }]);
+  expect(props.filterListIds).toEqual(['5']);
+  expect(props.moduleGroupKeys).toEqual(['SCI']);
+  expect(props.groupedModuleItems).toEqual({ SCI: [{ code: 'SCI101' }] });
+  expect(props.filterModuleCodes).toEqual(['SCI101']);
+}
+
+function triggerFilterPanelActions(props) {
+  props.onTabChange('lists');
+  props.onQueryChange('bio');
+  props.onToggleList(9);
+  props.onToggleModule('ENG202');
+  props.onClearAll();
+}
+
+function expectFilterPanelCallbacks(state) {
+  expect(state.setActiveFilterTab).toHaveBeenCalledWith('lists');
+  expect(state.setFilterQuery).toHaveBeenCalledWith('bio');
+  expect(state.setFilterListIds).toHaveBeenCalledTimes(2);
+  expect(state.setFilterModuleCodes).toHaveBeenCalledTimes(2);
+}
 
 describe('TaskPickerModal – when open', () => {
   it('renders the header title', () => {
@@ -211,37 +248,13 @@ describe('TaskPickerModal helpers', () => {
     vi.clearAllMocks();
   });
 
-  it('builds filter panel props that toggle lists, modules, and clear all filters', () => {
-    const state = makeState({
-      activeFilterTab: 'modules',
-      filterQuery: 'math',
-      visibleListItems: [{ id: 5, name: 'Revision' }],
-      filterListIds: ['5'],
-      moduleGroupKeys: ['SCI'],
-      groupedModuleItems: { SCI: [{ code: 'SCI101' }] },
-      filterModuleCodes: ['SCI101'],
-    });
-
+  it('builds filter panel properties that toggle lists, modules, and clear all filters', () => {
+    const state = buildFilterPanelState();
     const props = buildFilterPanelProps(state);
 
-    expect(props.activeFilterTab).toBe('modules');
-    expect(props.filterQuery).toBe('math');
-    expect(props.visibleListItems).toEqual([{ id: 5, name: 'Revision' }]);
-    expect(props.filterListIds).toEqual(['5']);
-    expect(props.moduleGroupKeys).toEqual(['SCI']);
-    expect(props.groupedModuleItems).toEqual({ SCI: [{ code: 'SCI101' }] });
-    expect(props.filterModuleCodes).toEqual(['SCI101']);
-
-    props.onTabChange('lists');
-    props.onQueryChange('bio');
-    props.onToggleList(9);
-    props.onToggleModule('ENG202');
-    props.onClearAll();
-
-    expect(state.setActiveFilterTab).toHaveBeenCalledWith('lists');
-    expect(state.setFilterQuery).toHaveBeenCalledWith('bio');
-    expect(state.setFilterListIds).toHaveBeenCalledTimes(2);
-    expect(state.setFilterModuleCodes).toHaveBeenCalledTimes(2);
+    expectFilterPanelValues(props);
+    triggerFilterPanelActions(props);
+    expectFilterPanelCallbacks(state);
   });
 
   it('toggleList removes an existing id and adds a missing one', () => {

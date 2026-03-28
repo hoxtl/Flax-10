@@ -31,4 +31,9 @@ describe('SocietiesModal', () => {
     fireEvent.click(screen.getByText('Film'));
     expect(onNavigate).toHaveBeenCalledWith('/societies?id=22');
   });
+
+  it('shows the Society Manager pill for admin/editor societies', () => {
+    render(<SocietiesModal isOpen onClose={vi.fn()} societies={[{ id: 1, name: 'Chess', role: 'admin' }, { id: 2, name: 'Debate', is_admin: true }, { id: 3, name: 'Drama' }]} onNavigate={vi.fn()} />);
+    expect(screen.getAllByText('Society Manager')).toHaveLength(2);
+  });
 });

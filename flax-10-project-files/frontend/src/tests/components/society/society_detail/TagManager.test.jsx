@@ -123,14 +123,8 @@ describe('TagManager', () => {
 
     it('getNextColor falls back to first color if all taken', () => {
         const fullTags = [
-            "var(--color-light-blue)",
-            "var(--color-error)",
-            "var(--gw-priority-low)",
-            "var(--color-amber)",
-            "var(--chart-accent-purple)",
-            "var(--chart-accent-pink)",
-            "var(--color-teal)",
-            "var(--chart-accent-amber)",
+            "#3b82f6", "#ef4444", "#22c55e", "#f59e0b",
+            "#9C27B0", "#ec4899", "#10b981", "#FFD54F",
         ].map((c, i) => ({ id: i, label: `Tag ${i}`, color: c }));
         render(<TagManager tags={fullTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
         expect(screen.getByText('8/7')).toBeInTheDocument();

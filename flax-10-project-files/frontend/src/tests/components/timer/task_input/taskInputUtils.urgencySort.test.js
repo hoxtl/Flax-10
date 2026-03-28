@@ -156,7 +156,7 @@ describe('sortTasks', () => {
     expect(sorted[0].id).toBe(1);
   });
 
-  it('handles missing titles and ids in alpha and date-added sorts', () => {
+  it('handles missing titles in alpha sorts', () => {
     const missingTitleTasks = [
       { id: 2, title: null },
       { id: 1, title: 'Alpha' },
@@ -165,6 +165,13 @@ describe('sortTasks', () => {
       { id: 1, title: 'Alpha' },
       { id: 2, title: null },
     ];
+    expect(sortTasks([...missingTitleTasks], 'alpha')[0].title).toBe(null);
+    expect(sortTasks([...missingRightTitleTasks], 'alpha')[0].title).toBe(null);
+    expect(sortTasks([...missingTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
+    expect(sortTasks([...missingRightTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
+  });
+
+  it('handles missing ids in date-added sorts', () => {
     const missingIdTasks = [
       { id: null, title: 'No id' },
       { id: 3, title: 'Has id' },
@@ -174,10 +181,6 @@ describe('sortTasks', () => {
       { id: null, title: 'No id' },
     ];
 
-    expect(sortTasks([...missingTitleTasks], 'alpha')[0].title).toBe(null);
-    expect(sortTasks([...missingRightTitleTasks], 'alpha')[0].title).toBe(null);
-    expect(sortTasks([...missingTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
-    expect(sortTasks([...missingRightTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
     expect(sortTasks([...missingIdTasks], 'date_added')[0].id).toBe(3);
     expect(sortTasks([...missingRightIdTasks], 'date_added')[0].id).toBe(3);
     expect(sortTasks([...missingIdTasks], 'date_added_asc')[0].id).toBe(null);

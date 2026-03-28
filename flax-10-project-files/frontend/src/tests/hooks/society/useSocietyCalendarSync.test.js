@@ -5,7 +5,7 @@ import { useSocietyCalendarSync } from '../../../components/society/hooks/useSoc
 const getSyncStatusMock = vi.fn();
 const syncCalendarMock = vi.fn();
 const unsyncCalendarMock = vi.fn();
-const useNotifyMock = vi.fn();
+const useToastMock = vi.fn();
 const useTagsMock = vi.fn();
 
 vi.mock('../../../api/societyApi', () => ({
@@ -14,8 +14,8 @@ vi.mock('../../../api/societyApi', () => ({
   unsyncCalendar: (...args) => unsyncCalendarMock(...args),
 }));
 
-vi.mock('../../../components/notifications/hooks/useNotify', () => ({
-  useNotify: () => useNotifyMock(),
+vi.mock('../../../context/ToastContext', () => ({
+  useToast: () => useToastMock(),
 }));
 
 vi.mock('../../../context/TagContext', () => ({
@@ -23,14 +23,14 @@ vi.mock('../../../context/TagContext', () => ({
 }));
 
 describe('useSocietyCalendarSync', () => {
-  let notify;
+  let showToast;
   let refreshTags;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    notify = vi.fn();
+    showToast = vi.fn();
     refreshTags = vi.fn().mockResolvedValue(undefined);
-    useNotifyMock.mockReturnValue(notify);
+    useToastMock.mockReturnValue(showToast);
     useTagsMock.mockReturnValue({ refreshTags });
     getSyncStatusMock.mockResolvedValue({ is_synced: true });
     syncCalendarMock.mockResolvedValue({});
@@ -75,7 +75,7 @@ describe('useSocietyCalendarSync', () => {
 
     expect(syncCalendarMock).toHaveBeenCalledWith(7);
     expect(refreshTags).toHaveBeenCalled();
-    expect(notify).toHaveBeenCalledWith('Sync Successful', 'Calendar for Dance is now synced!');
+    expect(showToast).toHaveBeenCalledWith('Calendar for Dance is now synced!', expect.objectContaining({ title: 'Sync Successful' }));
     expect(result.current.isSynced).toBe(true);
     expect(result.current.loading).toBe(false);
   });
@@ -92,7 +92,7 @@ describe('useSocietyCalendarSync', () => {
 
     expect(unsyncCalendarMock).toHaveBeenCalledWith(8);
     expect(refreshTags).toHaveBeenCalled();
-    expect(notify).toHaveBeenCalledWith('Unsync Successful', 'Calendar for Music is now unsynced.');
+    expect(showToast).toHaveBeenCalledWith('Calendar for Music is now unsynced.', expect.objectContaining({ title: 'Unsync Successful' }));
     expect(result.current.isSynced).toBe(false);
     expect(result.current.loading).toBe(false);
   });

@@ -33,30 +33,25 @@ describe('SocietyInfo', () => {
         expect(screen.getByText('We play chess')).toBeTruthy();
     });
 
-    it('renders member count', () => {
+    it('does not render the society insight banner inside SocietyInfo', () => {
         render(<SocietyInfo society={baseSociety} editMode={false} />);
-        expect(screen.getByText(/10.*members/)).toBeTruthy();
-    });
-
-    it('renders the society insight banner for non-admin viewers', () => {
-        render(<SocietyInfo society={baseSociety} editMode={false} />);
-        expect(screen.getByTestId('society-insight-banner')).toHaveTextContent('Chess Society');
+        expect(screen.queryByTestId('society-insight-banner')).not.toBeInTheDocument();
     });
 
     it('renders Join Society button when not a member', () => {
         render(<SocietyInfo society={baseSociety} editMode={false} onJoin={vi.fn()} />);
-        expect(screen.getByText('Join Society')).toBeTruthy();
+        expect(screen.getByText('Join')).toBeTruthy();
     });
 
     it('renders Joined button when a member', () => {
         render(<SocietyInfo society={{ ...baseSociety, is_member: true }} editMode={false} onLeave={vi.fn()} />);
-        expect(screen.getByText('Joined')).toBeTruthy();
+        expect(screen.getByText('Leave')).toBeTruthy();
     });
 
     it('calls onJoin when Join Society button clicked', () => {
         const onJoin = vi.fn();
         render(<SocietyInfo society={baseSociety} editMode={false} onJoin={onJoin} />);
-        fireEvent.click(screen.getByText('Join Society'));
+        fireEvent.click(screen.getByText('Join'));
         expect(onJoin).toHaveBeenCalledOnce();
     });
 
@@ -132,11 +127,9 @@ describe('SocietyInfo', () => {
         expect(document.querySelector('[title="Notifications off"]')).toBeTruthy();
     });
 
-    it('calls onViewMembers when member count clicked', () => {
-        const onViewMembers = vi.fn();
-        render(<SocietyInfo society={baseSociety} editMode={false} onViewMembers={onViewMembers} />);
-        fireEvent.click(screen.getByText(/10.*members/));
-        expect(onViewMembers).toHaveBeenCalledOnce();
+    it('does not render the member count in the segmented pill', () => {
+        render(<SocietyInfo society={baseSociety} editMode={false} />);
+        expect(screen.queryByText(/10.*members/)).not.toBeInTheDocument();
     });
 
     it('canEdit shows Edit Society button and toggles edit mode', () => {
@@ -153,15 +146,15 @@ describe('SocietyInfo', () => {
         expect(screen.queryByTestId('society-insight-banner')).not.toBeInTheDocument();
     });
 
-    it('canEdit shows Exit Editor when in edit mode', () => {
+    it('canEdit shows Done Editing when in edit mode', () => {
         render(<SocietyInfo society={baseSociety} editMode canEdit onToggleEditMode={vi.fn()} />);
-        expect(screen.getByText('Exit Editor')).toBeTruthy();
+        expect(screen.getByText('Done Editing')).toBeTruthy();
     });
 
     it('calls onLeave when Joined button clicked', () => {
         const onLeave = vi.fn();
         render(<SocietyInfo society={{ ...baseSociety, is_member: true }} editMode={false} onLeave={onLeave} />);
-        fireEvent.click(screen.getByText('Joined'));
+        fireEvent.click(screen.getByText('Leave'));
         expect(onLeave).toHaveBeenCalledOnce();
     });
 
@@ -180,9 +173,9 @@ describe('SocietyInfo', () => {
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
 
-    it('renders Ratified badge when society is ratified', () => {
+    it('does not render the Ratified label in the metadata pill', () => {
         render(<SocietyInfo society={{ ...baseSociety, is_ratified: true }} editMode={false} />);
-        expect(screen.getByText('Ratified')).toBeTruthy();
+        expect(screen.queryByText('Ratified')).not.toBeInTheDocument();
     });
 
     it('CategorySection updates value when categories prop changes', () => {

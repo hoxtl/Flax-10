@@ -78,7 +78,7 @@ describe("SocietyInsightBanner", () => {
 
     await waitFor(() => expect(screen.getByText("Timetable clash detected")).toBeInTheDocument());
     expect(screen.getByText(/overlaps with your OSC22502S lecture/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Open OSC22502S" })).toHaveAttribute("href", "/modules?moduleId=4");
+    expect(screen.getByRole("button", { name: "Open OSC22502S" })).toBeInTheDocument();
   });
 
   it("shows a timer onboarding message when there is no analytics data yet", async () => {
@@ -90,7 +90,7 @@ describe("SocietyInsightBanner", () => {
     renderBanner();
 
     await waitFor(() => expect(screen.getByText("We can personalise this once you use Timer")).toBeInTheDocument());
-    expect(screen.getByRole("link", { name: "Open Timer" })).toHaveAttribute("href", "/timer");
+    expect(screen.getByRole("button", { name: "Open Timer" })).toBeInTheDocument();
   });
 
   it("shows a combined timetable and focus-window warning when both conflicts apply", async () => {
@@ -115,7 +115,7 @@ describe("SocietyInsightBanner", () => {
     renderBanner();
 
     await waitFor(() => expect(screen.getByText("This society could squeeze your best study window")).toBeInTheDocument());
-    expect(screen.getByRole("link", { name: "View Analytics" })).toHaveAttribute("href", "/analytics");
+    expect(screen.getByRole("button", { name: "View Analytics" })).toBeInTheDocument();
   });
 
   it("shows a peak-study warning when an event overlaps a strong study hour", async () => {
@@ -153,7 +153,7 @@ describe("SocietyInsightBanner", () => {
       events: [{ id: 18, title: "Late Study Circle", start_time: "2026-04-06T18:30:00Z" }],
     });
 
-    await waitFor(() => expect(screen.getByRole("link", { name: "View Analytics" })).toHaveAttribute("href", "/analytics"));
+    await waitFor(() => expect(screen.getByRole("button", { name: "View Analytics" })).toBeInTheDocument());
   });
 
   it("shows a positive fit when sessions avoid conflicts and enrolled modules are available", async () => {
@@ -228,7 +228,7 @@ describe("SocietyInsightBanner", () => {
     });
 
     await waitFor(() => expect(screen.getByText("No society sessions scheduled yet")).toBeInTheDocument());
-    expect(screen.getByRole("link", { name: "Open Calendar" })).toHaveAttribute("href", "/calendar");
+    expect(screen.getByRole("button", { name: "Open Calendar" })).toBeInTheDocument();
   });
 
   it("handles societies without an events array", async () => {
@@ -245,7 +245,7 @@ describe("SocietyInsightBanner", () => {
     renderBanner();
 
     await waitFor(() => expect(screen.getByText("We can personalise this once you use Timer")).toBeInTheDocument());
-    expect(screen.getByRole("link", { name: "View Modules" })).toHaveAttribute("href", "/modules");
+    expect(screen.getByRole("button", { name: "View Modules" })).toBeInTheDocument();
   });
 
   it("stays positive when modules or enrollments resolve to null", async () => {

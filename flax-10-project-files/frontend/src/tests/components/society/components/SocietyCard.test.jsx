@@ -12,6 +12,10 @@ const society = {
 };
 
 describe('SocietyCard', () => {
+    function getCardMedia(container) {
+        return container.querySelector('[class*="cardMedia"]');
+    }
+
     it('renders society name', () => {
         render(<SocietyCard society={society} onClick={vi.fn()} />);
         expect(screen.getByText('Chess Club')).toBeTruthy();
@@ -46,30 +50,30 @@ describe('SocietyCard', () => {
 
     it('sets background image style when cover_image is provided', () => {
         const { container } = render(<SocietyCard society={{ ...society, cover_image: '/img.jpg' }} onClick={vi.fn()} />);
-        expect(container.firstChild.style.backgroundImage).toContain('/img.jpg');
+        expect(getCardMedia(container)?.style.backgroundImage).toContain('/img.jpg');
     });
 
     it('uses image when cover_image is not available', () => {
         const { container } = render(<SocietyCard society={{ ...society, image: '/alt.jpg' }} onClick={vi.fn()} />);
-        expect(container.firstChild.style.backgroundImage).toContain('/alt.jpg');
+        expect(getCardMedia(container)?.style.backgroundImage).toContain('/alt.jpg');
     });
 
     it('calls onReport when report button clicked and not reported', () => {
         const onReport = vi.fn();
         render(<SocietyCard society={society} onClick={vi.fn()} onReport={onReport} />);
-        fireEvent.click(screen.getByTitle('Report society'));
+        fireEvent.click(screen.getByRole('button', { name: 'Report society' }));
         expect(onReport).toHaveBeenCalledWith(society);
     });
 
     it('calls onUnreport when report button clicked and already reported', () => {
         const onUnreport = vi.fn();
         render(<SocietyCard society={{ ...society, has_reported: true }} onClick={vi.fn()} onUnreport={onUnreport} />);
-        fireEvent.click(screen.getByTitle(/unreport/i));
+        fireEvent.click(screen.getByRole('button', { name: /unreport/i }));
         expect(onUnreport).toHaveBeenCalledWith(expect.objectContaining({ has_reported: true }));
     });
 
     it('does not throw when report clicked without onReport or onUnreport', () => {
         render(<SocietyCard society={society} onClick={vi.fn()} />);
-        expect(() => fireEvent.click(screen.getByTitle('Report society'))).not.toThrow();
+        expect(() => fireEvent.click(screen.getByRole('button', { name: 'Report society' }))).not.toThrow();
     });
 });

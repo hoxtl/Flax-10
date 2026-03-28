@@ -1,13 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('../../../../components/society/hooks/useCarouselNavigation', () => ({
-    useCarouselNavigation: vi.fn(() => ({ index: 0, prev: vi.fn(), next: vi.fn() })),
-    useCarouselGestures: vi.fn(),
-}));
-
 import SocietyHero from '../../../../components/society/society_detail/SocietyHero';
-import { useCarouselNavigation } from '../../../../components/society/hooks/useCarouselNavigation';
 
 const baseSociety = {
     id: 1,
@@ -20,6 +14,10 @@ const baseSociety = {
 };
 
 describe('SocietyHero', () => {
+    function getHeroMedia(container) {
+        return container.querySelector('[class*="heroMedia"]');
+    }
+
     it('renders without crashing', () => {
         const { container } = render(
             <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode={false} />
@@ -33,7 +31,7 @@ describe('SocietyHero', () => {
             <SocietyHero society={baseSociety} onImageClick={onImageClick} editMode={false} />
         );
         fireEvent.click(container.firstChild);
-        expect(onImageClick).toHaveBeenCalledOnce();
+        expect(onImageClick).toHaveBeenCalledWith(0);
     });
 
     it('does not call onImageClick in edit mode', () => {
@@ -43,23 +41,6 @@ describe('SocietyHero', () => {
         );
         fireEvent.click(container.firstChild);
         expect(onImageClick).not.toHaveBeenCalled();
-    });
-
-    it('shows arrow buttons when multiple images and hovered', () => {
-        useCarouselNavigation.mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
-        const societyWithImages = {
-            ...baseSociety,
-            images: [
-                { url: 'https://example.com/img1.jpg' },
-                { url: 'https://example.com/img2.jpg' },
-            ],
-        };
-        const { container } = render(
-            <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />
-        );
-        fireEvent.mouseEnter(container.firstChild);
-        const buttons = screen.getAllByRole('button');
-        expect(buttons.length).toBeGreaterThan(0);
     });
 
     it('uses images from society.images array', () => {
@@ -89,24 +70,11 @@ describe('SocietyHero', () => {
         expect(onEditImages).toHaveBeenCalledOnce();
     });
 
-    it('hides arrow buttons when only one image', () => {
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
-        const { container } = render(
-            <SocietyHero society={baseSociety} onImageClick={vi.fn()} editMode={false} />
-        );
-        fireEvent.mouseEnter(container.firstChild);
-        const arrows = container.querySelectorAll('[class*="arrowBtn"]');
-        expect(arrows.length).toBe(0);
-    });
-
-    it('shows image counter when multiple images', () => {
-        const societyWithImages = {
-            ...baseSociety,
-            image: null,
-            images: [{ url: 'https://example.com/img1.jpg' }, { url: 'https://example.com/img2.jpg' }],
-        };
-        render(<SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />);
-        expect(screen.getByText(/2 photos/)).toBeTruthy();
+    it('shows the member count chip and opens the member list when clicked', () => {
+        const onViewMembers = vi.fn();
+        render(<SocietyHero society={baseSociety} onImageClick={vi.fn()} onViewMembers={onViewMembers} editMode={false} />);
+        fireEvent.click(screen.getByRole('button', { name: /view members: 42 members/i }));
+        expect(onViewMembers).toHaveBeenCalledOnce();
     });
 
     it('EditableName: enter edit mode, change value, blur calls onUpdateName', async () => {
@@ -147,37 +115,9 @@ describe('SocietyHero', () => {
         expect(container.firstChild).toBeTruthy();
     });
 
-    it('arrow buttons call prev and next without propagating click', () => {
-        const prev = vi.fn();
-        const next = vi.fn();
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 1, prev, next });
-        const societyWithImages = {
-            ...baseSociety,
-            images: [{ url: 'https://a.com/1.jpg' }, { url: 'https://a.com/2.jpg' }],
-        };
-        const { container } = render(
-            <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />
-        );
-        fireEvent.mouseEnter(container.firstChild);
-        const leftBtn = container.querySelector('[class*="leftArrow"]');
-        const rightBtn = container.querySelector('[class*="rightArrow"]');
-        fireEvent.click(leftBtn);
-        fireEvent.click(rightBtn);
-        expect(prev).toHaveBeenCalledOnce();
-        expect(next).toHaveBeenCalledOnce();
-    });
-
-    it('uses images[0] fallback when index out of bounds', () => {
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 99, prev: vi.fn(), next: vi.fn() });
-        const societyWithImages = {
-            ...baseSociety,
-            image: null,
-            images: [{ url: 'https://a.com/1.jpg' }],
-        };
-        const { container } = render(
-            <SocietyHero society={societyWithImages} onImageClick={vi.fn()} editMode={false} />
-        );
-        expect(container.firstChild?.style?.backgroundImage).toContain('1.jpg');
+    it('shows the ratified indicator beside the title when the society is ratified', () => {
+        render(<SocietyHero society={{ ...baseSociety, is_ratified: true }} onImageClick={vi.fn()} editMode={false} />);
+        expect(screen.getByLabelText('Ratified')).toBeInTheDocument();
     });
 
     it('EditableName: does not enter edit mode when editMode is false', () => {
@@ -198,16 +138,11 @@ describe('SocietyHero', () => {
     it('getImages handles images as plain strings without url property', () => {
         const society = { ...baseSociety, images: ['plain-url.jpg', 'another.jpg'], image: null };
         const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
-        expect(container.firstChild?.style?.backgroundImage).toContain('plain-url.jpg');
+        expect(getHeroMedia(container)?.style?.backgroundImage).toContain('plain-url.jpg');
     });
 
-    it('hides controls when mouse leaves hero', () => {
-        vi.mocked(useCarouselNavigation).mockReturnValue({ index: 0, prev: vi.fn(), next: vi.fn() });
-        const society = { ...baseSociety, images: [{ url: 'a.jpg' }, { url: 'b.jpg' }] };
-        const { container } = render(<SocietyHero society={society} onImageClick={vi.fn()} editMode={false} />);
-        fireEvent.mouseEnter(container.firstChild);
-        expect(container.querySelector('[class*="arrowBtn"]')).toBeTruthy();
-        fireEvent.mouseLeave(container.firstChild);
-        expect(container.querySelector('[class*="arrowBtn"]')).toBeNull();
+    it('does not render a photos counter pill', () => {
+        render(<SocietyHero society={{ ...baseSociety, images: [{ url: 'a.jpg' }, { url: 'b.jpg' }] }} onImageClick={vi.fn()} editMode={false} />);
+        expect(screen.queryByText(/photos/)).not.toBeInTheDocument();
     });
 });

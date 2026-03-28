@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 vi.mock('../../../../components/society/styles/CreateSocietyModal.module.css', () => ({ default: {} }));
 vi.mock('../../../../components/society/components/AddCollaboratorModal', () => ({
@@ -119,12 +119,14 @@ describe('CreateSocietyModal', () => {
         expect(onClose).toHaveBeenCalled();
     });
 
-    it('calls onCreate with form data when Create Society is clicked', () => {
+    it('calls onCreate with form data when Create Society is clicked', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
             target: { value: 'Chess Club' },
         });
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({ name: 'Chess Club' })
         );
@@ -234,7 +236,7 @@ describe('CreateSocietyModal', () => {
         expect(bio.value).toBe('A fun photography club');
     });
 
-    it('includes bio in onCreate form data', () => {
+    it('includes bio in onCreate form data', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
             target: { value: 'Society X' },
@@ -242,19 +244,23 @@ describe('CreateSocietyModal', () => {
         fireEvent.change(screen.getByPlaceholderText('What is your society about?'), {
             target: { value: 'About us' },
         });
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({ name: 'Society X', bio: 'About us' })
         );
     });
 
-    it('includes categories in onCreate form data', () => {
+    it('includes categories in onCreate form data', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
             target: { value: 'Tech Society' },
         });
         fireEvent.click(screen.getByText('SelectCategory'));
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({ categories: ['Tech'] })
         );
@@ -270,7 +276,7 @@ describe('CreateSocietyModal', () => {
         expect(screen.queryByText('alice')).not.toBeInTheDocument();
     });
 
-    it('updates collaborator roles before submit', () => {
+    it('updates collaborator roles before submit', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
 
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
@@ -279,7 +285,9 @@ describe('CreateSocietyModal', () => {
         fireEvent.click(screen.getByText('+ Add Collaborators'));
         fireEvent.click(screen.getByText('AddCollab'));
         fireEvent.click(screen.getByText('ChangeRole'));
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
 
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -288,7 +296,7 @@ describe('CreateSocietyModal', () => {
         );
     });
 
-    it('preserves untouched collaborators when roles change and when one collaborator is removed', () => {
+    it('preserves untouched collaborators when roles change and when one collaborator is removed', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
 
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
@@ -299,7 +307,9 @@ describe('CreateSocietyModal', () => {
         fireEvent.click(screen.getByText('AddSecondCollab'));
         fireEvent.click(screen.getAllByText('ChangeRole')[0]);
         fireEvent.click(screen.getAllByText('Remove')[0]);
-        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
 
         expect(onCreate).toHaveBeenCalledWith(
             expect.objectContaining({

@@ -1,5 +1,10 @@
+/*
+ * Covers shared calendar event utility behaviour.
+ */
+
 import { describe, it, expect } from 'vitest';
 import {
+    dedupeEvents,
     extractBaseEventId,
     hasRecurrence,
     isReadOnlyEvent,
@@ -111,6 +116,18 @@ describe('getEffectiveTagName', () => {
 
     it('returns other when no tag', () => {
         expect(getEffectiveTagName({ title: 'Event' })).toBe('other');
+    });
+});
+
+describe('dedupeEvents', () => {
+    it('removes duplicate payload entries while keeping distinct occurrences', () => {
+        const events = [
+            { id: 7, source: 'module_deadline', title: 'Coursework', start_time: '2026-03-28T22:00:00Z', end_time: '2026-03-28T22:15:00Z' },
+            { id: 7, source: 'module_deadline', title: 'Coursework', start_time: '2026-03-28T22:00:00Z', end_time: '2026-03-28T22:15:00Z' },
+            { id: 7, source: 'module_deadline', title: 'Coursework', start_time: '2026-03-29T22:00:00Z', end_time: '2026-03-29T22:15:00Z' },
+        ];
+
+        expect(dedupeEvents(events)).toEqual([events[0], events[2]]);
     });
 });
 

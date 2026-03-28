@@ -116,7 +116,7 @@ describe('AddCollaboratorModal', () => {
         expect(screen.getByText('Add').closest('button')).toBeDisabled();
     });
 
-    it('calls onAdd and onClose when Add is clicked with selected users', () => {
+    it('calls onAdd and onClose when Add is clicked with selected users', async () => {
         const onAdd = vi.fn();
         const onClose = vi.fn();
         render(<AddCollaboratorModal onClose={onClose} onAdd={onAdd} />);
@@ -124,8 +124,10 @@ describe('AddCollaboratorModal', () => {
         fireEvent.click(screen.getByText('Select Alice'));
         fireEvent.click(screen.getByText('Add'));
 
-        expect(onAdd).toHaveBeenCalledWith([{ id: 1, username: 'alice' }]);
-        expect(onClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(onAdd).toHaveBeenCalledWith([{ id: 1, username: 'alice' }]);
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
     });
 
     it('uses the filter default users branch and renders the custom empty state content', async () => {
