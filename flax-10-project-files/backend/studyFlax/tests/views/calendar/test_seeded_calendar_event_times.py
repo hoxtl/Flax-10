@@ -17,13 +17,32 @@ from studyFlax.management.commands.seed_helpers.calendar.event_helpers import (
 )
 
 
+def _make_deadline(deadline_type, start_due_date, title, module_code):
+    return SimpleNamespace(
+        deadline_type=deadline_type,
+        start_due_date=start_due_date,
+        end_due_date=None,
+        title=title,
+        module=SimpleNamespace(module_code=module_code),
+    )
+
+
 class SeededCalendarEventTimingTests(SimpleTestCase):
     """Ensure seeded calendar events avoid the 11 PM slot."""
 
     def setUp(self):
         self.now = datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc)
 
+    def _build_spread_test_deadlines(self, base):
+        return [
+            _make_deadline("coursework", base, "Coursework A", "CS1001"),
+            _make_deadline("coursework", base + timedelta(days=2), "Coursework B", "MA1001"),
+            _make_deadline("coursework", base + timedelta(days=4), "Coursework C", "PH1001"),
+            _make_deadline("quiz", base + timedelta(days=1), "Quiz", "CS1001"),
+        ]
+
     def test_seeded_coursework_deadlines_start_before_11pm(self):
+        """Coursework deadline timing falls within an allowed evening slot before 11 PM."""
         start, end, location = _deadline_timing("coursework", self.now, day_offset=3)
 
         self.assertIn((start.hour, start.minute), SEEDED_DEADLINE_EVENING_SLOTS)
@@ -32,6 +51,7 @@ class SeededCalendarEventTimingTests(SimpleTestCase):
         self.assertIsNone(location)
 
     def test_seeded_quiz_deadlines_start_before_11pm(self):
+        """Quiz deadline timing falls within an allowed evening slot before 11 PM."""
         start, end, location = _deadline_timing("quiz", self.now, day_offset=5)
 
         self.assertIn((start.hour, start.minute), SEEDED_DEADLINE_EVENING_SLOTS)
@@ -40,6 +60,7 @@ class SeededCalendarEventTimingTests(SimpleTestCase):
         self.assertIsNone(location)
 
     def test_seeded_coursework_deadlines_can_use_different_evening_slots(self):
+        """Different slot seeds produce distinct evening times, both within the allowed range."""
         first_start, _, _ = _deadline_timing("coursework", self.now, day_offset=3, slot_seed=0)
         second_start, _, _ = _deadline_timing("coursework", self.now, day_offset=3, slot_seed=1)
 
@@ -51,44 +72,16 @@ class SeededCalendarEventTimingTests(SimpleTestCase):
         self.assertLessEqual(second_start.hour, SEEDED_DEADLINE_LATEST_START_HOUR)
 
     def test_spreads_seeded_coursework_deadlines_to_one_per_week(self):
+        """Coursework deadlines in the same week are shifted so each lands in a distinct week."""
         base = datetime(2026, 3, 30, 20, 30, tzinfo=timezone.utc)
-        deadlines = [
-            SimpleNamespace(
-                deadline_type="coursework",
-                start_due_date=base,
-                end_due_date=None,
-                title="Coursework A",
-                module=SimpleNamespace(module_code="CS1001"),
-            ),
-            SimpleNamespace(
-                deadline_type="coursework",
-                start_due_date=base + timedelta(days=2),
-                end_due_date=None,
-                title="Coursework B",
-                module=SimpleNamespace(module_code="MA1001"),
-            ),
-            SimpleNamespace(
-                deadline_type="coursework",
-                start_due_date=base + timedelta(days=4),
-                end_due_date=None,
-                title="Coursework C",
-                module=SimpleNamespace(module_code="PH1001"),
-            ),
-            SimpleNamespace(
-                deadline_type="quiz",
-                start_due_date=base + timedelta(days=1),
-                end_due_date=None,
-                title="Quiz",
-                module=SimpleNamespace(module_code="CS1001"),
-            ),
-        ]
+        deadlines = self._build_spread_test_deadlines(base)
 
         _spread_coursework_deadlines(deadlines)
 
         coursework_weeks = [
-            deadline.start_due_date.isocalendar()[:2]
-            for deadline in deadlines
-            if deadline.deadline_type == "coursework"
+            d.start_due_date.isocalendar()[:2]
+            for d in deadlines
+            if d.deadline_type == "coursework"
         ]
         self.assertEqual(len(coursework_weeks), len(set(coursework_weeks)))
         self.assertEqual(deadlines[-1].start_due_date, base + timedelta(days=1))

@@ -29,28 +29,30 @@ def _shift_deadline_by_weeks(deadline, weeks):
         deadline.end_due_date += delta
 
 
-def _spread_coursework_deadlines(deadlines):
-    used_coursework_weeks = set()
-    ordered = sorted(
-        deadlines,
-        key=lambda deadline: (
-            deadline.start_due_date,
-            getattr(getattr(deadline, "module", None), "module_code", ""),
-            deadline.title,
-        ),
+def _sort_key(deadline):
+    return (
+        deadline.start_due_date,
+        getattr(getattr(deadline, "module", None), "module_code", ""),
+        deadline.title,
     )
 
-    for deadline in ordered:
-        if (deadline.deadline_type or "").lower() != "coursework":
-            continue
-        while _coursework_week_key(deadline.start_due_date) in used_coursework_weeks:
-            _shift_deadline_by_weeks(deadline, 1)
-        used_coursework_weeks.add(_coursework_week_key(deadline.start_due_date))
 
+def _shift_to_free_week(deadline, used_weeks):
+    while _coursework_week_key(deadline.start_due_date) in used_weeks:
+        _shift_deadline_by_weeks(deadline, 1)
+    used_weeks.add(_coursework_week_key(deadline.start_due_date))
+
+
+def _spread_coursework_deadlines(deadlines):
+    used_weeks = set()
+    coursework = [d for d in sorted(deadlines, key=_sort_key) if (d.deadline_type or "").lower() == "coursework"]
+    for deadline in coursework:
+        _shift_to_free_week(deadline, used_weeks)
     return deadlines
 
 
 def create_deadlines(modules, stdout):
+    """Build and persist seeded deadlines for all modules, spreading coursework to one per week."""
     del stdout
     deadlines_to_create = []
     for module in modules:

@@ -76,11 +76,15 @@ def _create_announcement(society, title, content, pinned):
     )
 
 
+def _seed_announcements_for_society(society):
+    count = random.randint(2, 4)
+    chosen = random.sample(ANNOUNCEMENT_TEMPLATES, min(count, len(ANNOUNCEMENT_TEMPLATES)))
+    for title_template, content, pinned in chosen:
+        _create_announcement(society, title_template.format(name=society.name), content, pinned)
+
+
 def create_society_announcements(stdout):
+    """Seed a random selection of announcements for every society."""
     del stdout
     for society in Society.objects.all():
-        count = random.randint(2, 4)
-        chosen = random.sample(ANNOUNCEMENT_TEMPLATES, min(count, len(ANNOUNCEMENT_TEMPLATES)))
-        for title_template, content, pinned in chosen:
-            title = title_template.format(name=society.name)
-            _create_announcement(society, title, content, pinned)
+        _seed_announcements_for_society(society)
