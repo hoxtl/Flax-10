@@ -1,3 +1,7 @@
+/*
+ * Tests attendance page status, lists, overlays, and segment details.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
@@ -107,6 +111,31 @@ describe("Attendance components", () => {
       attended: index % 2 === 0,
       ...overrides,
     }));
+
+  function renderCourseworkRecordList(onRecorded) {
+    const courseworkOnly = [{ id: 90, title: "Lecture 90", start_time: "2026-03-01T09:00:00Z", event_type: "Coursework" }];
+    return render(<RecordAttendanceList events={courseworkOnly} onRecorded={onRecorded} />);
+  }
+
+  function rerenderLectureRecordList(rerender, onRecorded) {
+    rerender(<RecordAttendanceList events={[{ id: 91, title: "Lecture 91", start_time: "2026-03-01T09:00:00Z", event_type: "Lecture" }]} onRecorded={onRecorded} />);
+  }
+
+  async function expectSubmitFailure(onRecorded) {
+    recordAttendanceMock.mockRejectedValueOnce(new Error("save failed"));
+    fireEvent.click(screen.getByRole("button", { name: "Attended" }));
+    await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(91, true));
+    expect(onRecorded).not.toHaveBeenCalled();
+    expect(showToastMock).toHaveBeenCalledWith("Couldn't mark attendance. Try again.", { variant: "error" });
+  }
+
+  async function expectMissedOverlayToClear() {
+    recordAttendanceMock.mockResolvedValueOnce({});
+    fireEvent.click(screen.getByRole("button", { name: "Missed" }));
+    await waitFor(() => expect(screen.getByText("Missed session noted.")).toBeInTheDocument());
+    expect(showToastMock).toHaveBeenCalledWith("Attendance marked as missed.");
+    await waitFor(() => expect(screen.queryByText("Missed session noted.")).toBeNull(), { timeout: 2000 });
+  }
 
   it("renders the record tab and switches to marked tab", () => {
     const showMarkedTab = vi.fn();
@@ -235,28 +264,11 @@ describe("Attendance components", () => {
 
   it("covers coursework filtering, submit failures, overlay variants, and empty marked lists", async () => {
     const onRecorded = vi.fn();
-    const courseworkOnly = [{ id: 90, title: "Lecture 90", start_time: "2026-03-01T09:00:00Z", event_type: "Coursework" }];
-    const { rerender, container } = render(<RecordAttendanceList events={courseworkOnly} onRecorded={onRecorded} />);
+    const { rerender, container } = renderCourseworkRecordList(onRecorded);
     expect(container).toBeEmptyDOMElement();
-
-    recordAttendanceMock.mockRejectedValueOnce(new Error("save failed"));
-    rerender(
-      <RecordAttendanceList
-        events={[{ id: 91, title: "Lecture 91", start_time: "2026-03-01T09:00:00Z", event_type: "Lecture" }]}
-        onRecorded={onRecorded}
-      />,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Attended" }));
-    await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(91, true));
-    expect(onRecorded).not.toHaveBeenCalled();
-    expect(showToastMock).toHaveBeenCalledWith("Couldn't mark attendance. Try again.", { variant: "error" });
-
-    recordAttendanceMock.mockResolvedValueOnce({});
-    fireEvent.click(screen.getByRole("button", { name: "Missed" }));
-    await waitFor(() => expect(screen.getByText("Missed session noted.")).toBeInTheDocument());
-    expect(showToastMock).toHaveBeenCalledWith("Attendance marked as missed.");
-    await waitFor(() => expect(screen.queryByText("Missed session noted.")).toBeNull(), { timeout: 2000 });
-
+    rerenderLectureRecordList(rerender, onRecorded);
+    await expectSubmitFailure(onRecorded);
+    await expectMissedOverlayToClear();
     rerender(<MarkedAttendanceList markedEvents={[]} />);
     expect(screen.queryByText("Your recorded attendance. Once marked, attendance cannot be changed.")).not.toBeInTheDocument();
   }, 10000);

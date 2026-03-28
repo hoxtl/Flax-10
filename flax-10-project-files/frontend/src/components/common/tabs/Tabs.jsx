@@ -33,30 +33,30 @@ function TabContent({ activeTab, tabs, disableContentAnimation = false, contentP
   );
 }
 
-/** Tabs component with animated indicator and content transitions. */
+function buildContainerClass(compact, className) {
+  return `${styles.container} ${compact ? styles.compact : ""} ${className}`.trim();
+}
 
-export default function Tabs({
-  tabs,
-  activeTab,
-  onTabChange,
-  layoutId = "tabIndicator",
-  compact = false,
-  className = "",
-  tabClassName = "",
-  tabVariant = "default",
-  middle,
-  disableContentAnimation = false,
-  contentPresenceMode = "wait",
-}) {
+function TabBar({ activeTab, layoutId, onTabChange, tabClassName, tabVariant, tabs }) {
+  return (
+    <Motion.div className={styles.tabBar} {...fadeInMotion}>
+      {tabs.map((tab) => (
+        <TabButton key={tab.id} tab={tab} isActive={activeTab === tab.id} onClick={() => onTabChange(tab.id)} layoutId={layoutId} tabClassName={tabClassName} tabVariant={tabVariant} />
+      ))}
+    </Motion.div>
+  );
+}
+
+/*
+ * Renders an animated tab bar with optional content transitions.
+ */
+export default function Tabs(props) {
+  const { tabs, activeTab, onTabChange, layoutId = "tabIndicator", compact = false, className = "", tabClassName = "", tabVariant = "default", middle, disableContentAnimation = false, contentPresenceMode = "wait" } = props;
   if (!tabs?.length) return null;
-  const containerClass = `${styles.container} ${compact ? styles.compact : ""} ${className}`.trim();
+  const containerClass = buildContainerClass(compact, className);
   return (
     <div className={containerClass}>
-      <Motion.div className={styles.tabBar} {...fadeInMotion}>
-        {tabs.map(tab => (
-          <TabButton key={tab.id} tab={tab} isActive={activeTab === tab.id} onClick={() => onTabChange(tab.id)} layoutId={layoutId} tabClassName={tabClassName} tabVariant={tabVariant} />
-        ))}
-      </Motion.div>
+      <TabBar activeTab={activeTab} layoutId={layoutId} onTabChange={onTabChange} tabClassName={tabClassName} tabVariant={tabVariant} tabs={tabs} />
       {middle}
       <TabContent activeTab={activeTab} tabs={tabs} disableContentAnimation={disableContentAnimation} contentPresenceMode={contentPresenceMode} />
     </div>
