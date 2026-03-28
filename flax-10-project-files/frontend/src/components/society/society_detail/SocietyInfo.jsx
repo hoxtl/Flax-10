@@ -58,7 +58,7 @@ export function SocietyMetaPill(props) {
     return <MetaPillLayout {...props} categories={categories} />;
 }
 
-function MetaPillLayout({ categories, society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, isSubscribed, onToggleSubscription, membershipAction, heroVariant = false }) {
+function MetaPillLayout({ categories, society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, isSubscribed, onToggleSubscription, membershipAction, heroVariant }) {
     return (
         <motion.div layout className={styles.metaPillWrap}>
             <SegmentedSlots className={`${styles.metaPill} ${heroVariant ? styles.metaPillHero : ""}`}>
@@ -175,7 +175,7 @@ function EditIcon({ onClick }) {
     return <button type="button" className={styles.editIcon} onClick={onClick} title="Edit">✎</button>;
 }
 
-function getNotificationState(isSubscribed, disabled = false) {
+function getNotificationState(isSubscribed, disabled) {
     return {
         Icon: disabled || !isSubscribed ? BellOff : Bell,
         title: disabled ? "Join to manage notifications" : isSubscribed ? "Notifications on" : "Notifications off",
@@ -183,7 +183,7 @@ function getNotificationState(isSubscribed, disabled = false) {
     };
 }
 
-function NotificationBell({ isSubscribed, onToggle, disabled = false }) {
+function NotificationBell({ isSubscribed, onToggle, disabled }) {
     const state = getNotificationState(isSubscribed, disabled);
     return <Tooltip content={state.title} position="top"><NotificationButton state={state} onToggle={onToggle} disabled={disabled} /></Tooltip>;
 }
@@ -224,7 +224,7 @@ function AdminActionButton({ editMode, onToggleEditMode }) {
 }
 
 function MembershipActionButton({ isMember, onJoin, onLeave, pendingAction }) {
-    const handleClick = () => { if (!pendingAction) (isMember ? onLeave?.() : onJoin?.()); };
+    const handleClick = () => { isMember ? onLeave?.() : onJoin?.(); };
     const className = `${styles.pillActionBtn} ${!isMember ? styles.pillActionBtnJoin : ""} ${pendingAction ? styles.pillActionBtnPending : ""}`.trim();
     return <MembershipActionButtonView className={className} isMember={isMember} label={getPendingLabel(pendingAction, isMember)} pendingAction={pendingAction} onClick={handleClick} />;
 }

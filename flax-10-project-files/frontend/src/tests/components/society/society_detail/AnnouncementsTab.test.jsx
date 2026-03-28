@@ -16,6 +16,10 @@ describe('AnnouncementsTab', () => {
       id: 2, title: 'Multi', content: 'B2',
       created_at: '2026-03-09T10:00:00Z', images: [{ url: 'b.jpg' }, { url: 'c.jpg' }]
     },
+    {
+      id: 3, title: 'Text only', content: 'B3',
+      created_at: '2026-03-09T10:00:00Z'
+    },
   ];
 
   const renderTab = (props = {}) =>
@@ -34,14 +38,7 @@ describe('AnnouncementsTab', () => {
     expect(images).toHaveLength(2);
     expect(images[0]).toHaveAttribute('src', 'a.jpg');
     expect(images[1]).toHaveAttribute('src', 'b.jpg');
-  });
-
-  it('renders only the first image from a multi-image announcement', () => {
-    renderTab({ announcements: announcementsWithMedia });
-    const images = screen.getAllByAltText('Announcement');
-    fireEvent.click(images[1]);
-    expect(images[1]).toHaveAttribute('src', 'b.jpg');
-    expect(screen.queryByAltText('Image 2')).toBeNull();
+    expect(screen.queryByAltText('Text only')).toBeNull();
   });
 
   it('handles edit callback', () => {
@@ -70,13 +67,22 @@ describe('AnnouncementsTab', () => {
     expect(screen.getByText('Use the sidebar to post the first update for this society.')).toBeTruthy();
   });
 
-  it('hides edit controls in view mode', () => {
+  it('uses the first announcement image and hides edit controls in view mode', () => {
     renderTab({ announcements: announcementsWithMedia, editMode: false });
+    const [singleImage, multiImage] = screen.getAllByRole('img');
+    expect(singleImage).toHaveAttribute('src', 'a.jpg');
+    expect(multiImage).toHaveAttribute('src', 'b.jpg');
     expect(screen.queryByTitle('Edit')).toBeNull();
   });
 
   it('uses the default empty announcements prop when none is provided', () => {
     render(<AnnouncementsTab editMode={false} tags={[]} />);
     expect(screen.getByText('No announcements yet')).toBeInTheDocument();
+  });
+
+  it('renders announcement cards when tags are omitted', () => {
+    render(<AnnouncementsTab editMode={false} announcements={[announcementsWithMedia[0]]} />);
+    expect(screen.getByText('S1')).toBeInTheDocument();
+    expect(screen.queryByText('Urgent')).not.toBeInTheDocument();
   });
 });

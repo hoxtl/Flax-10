@@ -1,12 +1,20 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getSummary, getModules, getEnrollments } = vi.hoisted(() => ({
+const { getSummary, getModules, getEnrollments, navigateMock } = vi.hoisted(() => ({
   getSummary: vi.fn(),
   getModules: vi.fn(),
   getEnrollments: vi.fn(),
+  navigateMock: vi.fn(),
 }));
+
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+  };
+});
 
 vi.mock("../../../../api/analyticsApi", () => ({
   default: {
@@ -45,16 +53,13 @@ function createDeferred() {
 }
 
 function renderBanner(society = baseSociety) {
-  return render(
-    <MemoryRouter>
-      <SocietyInsightBanner society={society} />
-    </MemoryRouter>,
-  );
+  return render(<SocietyInsightBanner society={society} />);
 }
 
 describe("SocietyInsightBanner", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    navigateMock.mockReset();
     getSummary.mockResolvedValue({
       summary: { total_sessions: 4, total_study_hours: 6.5 },
       heatmap: { data: Array.from({ length: 7 }, () => Array(24).fill(0)) },
@@ -332,5 +337,17 @@ describe("SocietyInsightBanner", () => {
     });
 
     await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
+  });
+
+  it("navigates through the primary and secondary insight actions", async () => {
+    renderBanner();
+
+    await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: "View Analytics" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Calendar" }));
+
+    expect(navigateMock).toHaveBeenNthCalledWith(1, "/analytics");
+    expect(navigateMock).toHaveBeenNthCalledWith(2, "/calendar");
   });
 });
