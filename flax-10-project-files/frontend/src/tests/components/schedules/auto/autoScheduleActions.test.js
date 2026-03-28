@@ -1,4 +1,4 @@
-okoimport { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const {
   buildScheduleAutoFormMock,
@@ -24,11 +24,7 @@ vi.mock("../../../../api/userApi", () => ({
   getUserSettings: getUserSettingsMock,
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/schedules/autoScheduleActions.test.js
-vi.mock("../../../pages/Homepage/utils/ScheduleAutoForm", () => ({
-=======
 vi.mock("../../../../pages/homepage/utils/scheduleAutoForm", () => ({
->>>>>>> origin:flax-10-project-files/frontend/src/tests/components/schedules/auto/autoScheduleActions.test.js
   buildScheduleAutoForm: buildScheduleAutoFormMock,
 }));
 
@@ -37,11 +33,7 @@ import {
   loadScheduleSettings,
   loadUpcomingDeadlineItems,
   submitAutoScheduleWithPrefs,
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/schedules/autoScheduleActions.test.js
-} from "../../../components/Schedules/auto/autoScheduleActions";
-=======
 } from "../../../../components/schedules/auto/autoScheduleActions";
->>>>>>> origin:flax-10-project-files/frontend/src/tests/components/schedules/auto/autoScheduleActions.test.js
 
 describe("autoScheduleActions", () => {
   beforeEach(() => {
