@@ -28,18 +28,21 @@ describe('Profile Social Modals', () => {
     renderModals({ showSharedWith: true });
     await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
   });
+
   it('renders Shared By modal when showSharedBy true', async () => {
     const { getSharedWithMe } = await import('../../../api/socialApi');
     getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol' }]);
     renderModals({ showSharedBy: true });
     await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
   });
+
   it('renders zero-count titles for empty lists', async () => {
     renderModals({ showSharedWith: true });
     await waitFor(() => expect(screen.getByText('People who can see my calendar events')).toBeTruthy());
     renderModals({ showSharedBy: true });
     await waitFor(() => expect(screen.getByText('People who have shared their calendar events with me')).toBeTruthy());
   });
+
   it('opens shared calendar from Shared By modal', async () => {
     const oN = vi.fn(), sS = vi.fn();
     const { getSharedWithMe } = await import('../../../api/socialApi');
@@ -49,6 +52,7 @@ describe('Profile Social Modals', () => {
     expect(sS).toHaveBeenCalledWith(false);
     expect(oN).toHaveBeenCalledWith('/calendar?user_id=3&shared_name=C+S');
   });
+
   it('uses username when shared calendar owner has no names', async () => {
     const oN = vi.fn();
     const { getSharedWithMe } = await import('../../../api/socialApi');
@@ -57,6 +61,7 @@ describe('Profile Social Modals', () => {
     fireEvent.click(await screen.findByRole('button', { name: /view calendar/i }));
     expect(oN).toHaveBeenCalledWith('/calendar?user_id=3&shared_name=anon');
   });
+
   it('falls back to plain calendar route when shared user has no id', async () => {
     const oN = vi.fn();
     const { getSharedWithMe } = await import('../../../api/socialApi');

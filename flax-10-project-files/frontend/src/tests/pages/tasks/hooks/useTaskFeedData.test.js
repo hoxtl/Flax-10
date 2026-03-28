@@ -43,8 +43,6 @@ describe("useTaskFeedData", () => {
     expect(result.current.later.length).toBe(1);
   });
 
-
-
   it("builds module filter labels from loaded module metadata", async () => {
     getModulesMock.mockResolvedValueOnce([
       { module_code: "cs101", module_name: "Computer Science" },
@@ -164,9 +162,6 @@ describe("useTaskFeedData", () => {
       expect(result.current.completed).toEqual([{ id: 2, title: "Other task", completed: true, task_list: 2 }]);
     });
   });
-
-
-
 
   it("focuses the task input for the n shortcut and blurs editable targets on escape", async () => {
     const { blur, focus, input, textarea } = appendFocusableElements();

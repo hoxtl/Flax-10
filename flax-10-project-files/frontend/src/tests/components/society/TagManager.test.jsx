@@ -82,6 +82,7 @@ describe('TagManager', () => {
         render(<TagManager onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
         expect(screen.getByText('0/7')).toBeTruthy();
     });
+
     it('shows error for duplicate tags', async () => {
         render(<TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
         const input = screen.getByPlaceholderText('Tag name');

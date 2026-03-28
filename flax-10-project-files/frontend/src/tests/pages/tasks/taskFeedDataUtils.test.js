@@ -32,12 +32,15 @@ describe("taskFeedDataUtils", () => {
     it("matches by title", () => {
       expect(matchesSearch({ title: "Hello", task_list: "1" }, "hello", listMap)).toBe(true);
     });
+
     it("matches by description", () => {
       expect(matchesSearch({ title: "X", description: "Secret", task_list: "1" }, "secret", listMap)).toBe(true);
     });
+
     it("matches by list name", () => {
       expect(matchesSearch({ title: "X", task_list: "1" }, "work", listMap)).toBe(true);
     });
+
     it("returns false when no match", () => {
       expect(matchesSearch({ title: "X", task_list: "2" }, "z", {})).toBe(false);
     });
@@ -48,6 +51,7 @@ describe("taskFeedDataUtils", () => {
       const tasks = [{ title: "A", task_list: "1" }];
       expect(filterBySearch(tasks, "", listMap)).toEqual(tasks);
     });
+
     it("filters by search term", () => {
       const tasks = [{ title: "A", task_list: "1" }, { title: "B", task_list: "1" }];
       expect(filterBySearch(tasks, "a", listMap)).toHaveLength(1);
@@ -75,12 +79,14 @@ describe("taskFeedDataUtils", () => {
       expect(getToday(tasks, now, todayEnd)).toHaveLength(1);
       vi.useRealTimers();
     });
+
     it("getThisWeek filters correctly", () => {
       const todayEnd = new Date(2026, 2, 10, 23, 59, 59);
       const weekEnd = new Date(2026, 2, 17, 23, 59, 59);
       const tasks = [{ id: 1, due_date: "2026-03-12T10:00:00", completed: false }];
       expect(getThisWeek(tasks, todayEnd, weekEnd)).toHaveLength(1);
     });
+
     it("getLater includes no-due and far-future", () => {
       const weekEnd = new Date(2026, 2, 17);
       const tasks = [{ id: 1, due_date: null }, { id: 2, due_date: "2026-03-20T10:00:00" }];
@@ -95,12 +101,14 @@ describe("taskFeedDataUtils", () => {
       const completed = [{ due_date: "2026-03-10T14:00:00" }];
       expect(getCompletedTodayCount(completed, dayStart, todayEnd)).toBe(1);
     });
+
     it("getCompletedWeekCount", () => {
       const todayEnd = new Date(2026, 2, 10, 23, 59, 59);
       const weekEnd = new Date(2026, 2, 17, 23, 59, 59);
       const completed = [{ due_date: "2026-03-12T10:00:00" }];
       expect(getCompletedWeekCount(completed, todayEnd, weekEnd)).toBe(1);
     });
+
     it("getCompletedLaterCount", () => {
       const weekEnd = new Date(2026, 2, 17);
       const completed = [{ due_date: null }, { due_date: "2026-03-20T10:00:00" }];
@@ -114,11 +122,13 @@ describe("taskFeedDataUtils", () => {
       getFilterHandlers([], onFilterByList, vi.fn(), vi.fn()).toggleListFilter("1");
       expect(onFilterByList).toHaveBeenCalledWith(["1"]);
     });
+
     it("toggleListFilter remove", () => {
       const onFilterByList = vi.fn();
       getFilterHandlers(["1"], onFilterByList, vi.fn(), vi.fn()).toggleListFilter("1");
       expect(onFilterByList).toHaveBeenCalledWith([]);
     });
+
     it("clearAllFilters", () => {
       const onFilterByList = vi.fn();
       const setFilterModuleCodes = vi.fn();

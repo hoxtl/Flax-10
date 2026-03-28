@@ -18,7 +18,9 @@ const testProgressWork = () => {
 
 describe('timerUtils: getProgress', () => {
     it('returns 100 for break mode', testProgressBreak);
+
     it('returns 100 when timeLeft is <= 0', testProgressZero);
+
     it('calculates correct percentage for work mode', testProgressWork);
 });
 
@@ -104,8 +106,11 @@ describe('timerUtils: useCompletionCheck', () => {
     beforeEach(setupMocks);
     afterEach(() => vi.clearAllMocks());
     it('triggers startNext when breakTime is 0 (Auto-Advance)', testAutoAdvance);
+
     it('triggers Notification BUT continues timer (Overtime) when breakTime > 0', testOvertime);
+
     it('triggers Notification when break ends', testBreakCompletion);
+
     it('does nothing if conditions not met', testNoAction);
 
     it('handles break completion when notify is null', () => {

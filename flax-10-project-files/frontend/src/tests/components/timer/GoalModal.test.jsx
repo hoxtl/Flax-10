@@ -29,6 +29,8 @@ const testMoodPersistence = () => {
 
 describe('GoalModal', () => {
     it('renders correctly', testRender);
+
     it('calls onAction', testAction);
+
     it('persists the selected mood before completing the goal', testMoodPersistence);
 });

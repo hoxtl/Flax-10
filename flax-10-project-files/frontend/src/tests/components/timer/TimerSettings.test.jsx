@@ -93,12 +93,20 @@ const testArrowDownAtMinimum = () => {
 
 describe('TimerSettings', () => {
     it('work input calls onUpdate', testWorkUpdate);
+
     it('break input calls onUpdate', testBreakUpdate);
+
     it('sessions input calls onUpdate', testSessionsUpdate);
+
     it('selects content on focus', testFocus);
+
     it('resets invalid values on blur', testBlur);
+
     it('shows disclaimer on invalid input', testDisclaimerInput);
+
     it('shows disclaimer on arrow down', testDisclaimerArrow);
+
     it('does not show disclaimer on ArrowDown when value above min', testArrowDownWhenValueAboveMin);
+
     it('shows disclaimer on ArrowDown when already at minimum', testArrowDownAtMinimum);
 });

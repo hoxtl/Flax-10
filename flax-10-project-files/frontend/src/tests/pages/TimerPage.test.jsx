@@ -183,12 +183,19 @@ describe('TimerPage Integration', () => {
     beforeEach(setupTests);
     afterEach(cleanupTests);
     it('renders initial state correctly', testInitialState, 15000);
+
     it('starts and stops the timer', testStartStop, 15000);
+
     it('resets the timer', testReset);
+
     it('updates settings', testSettings, 15000);
+
     it('shows break modal when work session finishes', testBreakModalShow, 15000);
+
     it('enters break mode from modal', testBreakModalEnter, 15000);
+
     it('opens history modal when history button is clicked', testHistoryModal, 15000);
+
     it('closes history modal', testHistoryModalClose, 15000);
 
     it('shows Enable Notifications when permission is default and click calls request', () => {

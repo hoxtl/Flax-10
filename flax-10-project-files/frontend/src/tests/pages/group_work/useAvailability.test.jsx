@@ -142,7 +142,6 @@ describe("useAvailability", () => {
     ));
   });
 
-  // --- Coverage gap: onSuggest when res.ok is false ---
   it("does not toast or refetch when suggestion submission fails", async () => {
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
@@ -160,7 +159,6 @@ describe("useAvailability", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  // --- Coverage gap: onDelete when res.ok is false ---
   it("does not refresh or toast when delete API call fails", async () => {
     confirmMock.mockResolvedValue(true);
     vi.stubGlobal("fetch", vi.fn()
@@ -179,7 +177,6 @@ describe("useAvailability", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  // --- Coverage gap: handleVote accepted toast message ---
   it("shows a success toast when accepting a meeting slot", async () => {
     renderAvailability();
     await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
@@ -191,7 +188,6 @@ describe("useAvailability", () => {
     ));
   });
 
-  // --- Coverage gap: handleVote when res.ok is false ---
   it("does not toast or refetch when vote fails", async () => {
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
@@ -209,7 +205,6 @@ describe("useAvailability", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  // --- Coverage gap: handleVote declined when res.ok is false ---
   it("does not toast or refetch when decline vote fails", async () => {
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
@@ -225,7 +220,6 @@ describe("useAvailability", () => {
     expect(toastMock).not.toHaveBeenCalled();
   });
 
-  // --- Coverage gap: suggest function (line 69) clears suggestingSlot ---
   it("clears suggestingSlot after handleSuggestTime resolves", async () => {
     renderAvailability();
     await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
@@ -239,7 +233,6 @@ describe("useAvailability", () => {
     await waitFor(() => expect(screen.getByTestId("slot").textContent).toBe("none"));
   });
 
-  // --- Coverage gap: suggest function clears slot even when submission fails ---
   it("clears suggestingSlot even when suggestion submission fails", async () => {
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce({ ok: true, json: vi.fn().mockResolvedValue(createApiPayload()) })
@@ -257,7 +250,6 @@ describe("useAvailability", () => {
     await waitFor(() => expect(screen.getByTestId("slot").textContent).toBe("none"));
   });
 
-  // --- Coverage gap: onSuggest success path toasts and refetches ---
   it("toasts and refetches after successful suggestion", async () => {
     renderAvailability();
     await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
@@ -268,7 +260,6 @@ describe("useAvailability", () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
   });
 
-  // --- Coverage gap: onDelete success path toasts and refetches ---
   it("toasts and refetches after successful deletion", async () => {
     confirmMock.mockResolvedValue(true);
     renderAvailability();

@@ -57,6 +57,7 @@ describe("AppTour", () => {
       .find((element) => element.textContent?.includes("Dashboard") && element.style.left);
     expect(card?.style.left).toBe("100px");
   });
+
   it("supports back navigation", async () => {
     render(<AppTour onDone={vi.fn()} />);
     await nextStep();

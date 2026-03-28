@@ -96,6 +96,7 @@ describe("profile insights more", () => {
     expect(result.current.state).toBe("idle");
     expect(fetchApiMock).not.toHaveBeenCalled();
   });
+
   it("prevents double submission", async () => {
     fetchApiMock.mockReturnValueOnce(new Promise(() => {}));
     const { result } = renderHook(() => useSuggestionState(42));
@@ -105,6 +106,7 @@ describe("profile insights more", () => {
     act(() => { result.current.submit(); });
     expect(fetchApiMock).toHaveBeenCalledTimes(1);
   });
+
   it("updates state on successful send", async () => {
     let resolve;
     fetchApiMock.mockReturnValueOnce(new Promise(r => { resolve = r; }));

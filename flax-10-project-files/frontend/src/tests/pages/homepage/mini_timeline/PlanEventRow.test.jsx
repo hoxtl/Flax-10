@@ -276,7 +276,6 @@ describe('PlanEventRow', () => {
         expect(setConflictPopoverRowId).toHaveBeenCalledWith(expect.any(Function));
     });
 
-
     it('renders task list link when matchTask has task_list and no moduleCode', () => {
         renderRow({
             row: { ...baseRow, moduleCode: null, matchTask: { task_list: 5 } },

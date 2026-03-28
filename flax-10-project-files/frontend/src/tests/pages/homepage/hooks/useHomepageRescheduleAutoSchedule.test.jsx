@@ -128,6 +128,7 @@ describe("useHomepageReschedule auto-schedule branches", () => {
     expect(props.showToast).toHaveBeenCalledWith(expect.stringContaining("no single window fits"));
     expect(loadScheduleSettingsMock).not.toHaveBeenCalled();
   });
+
   it("loads settings and starts auto-schedule", async () => {
     const props = buildProps({
       sortedEvents: [{ id: "c", start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" }],
@@ -140,6 +141,7 @@ describe("useHomepageReschedule auto-schedule branches", () => {
       deadlines: props.upcomingDeadlines, settings: { density: "balanced" },
     }));
   });
+
   it("refreshes data after auto-schedule success", async () => {
     const props = buildProps({
       sortedEvents: [{ id: "c", start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" }]

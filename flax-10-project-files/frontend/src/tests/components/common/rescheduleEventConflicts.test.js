@@ -284,6 +284,7 @@ describe("rescheduleEventConflicts", () => {
     expect(buildConflictResolutionToastMessage(complex)).toContain("2 moved to tomorrow");
     expect(buildConflictResolutionToastMessage(complex)).toContain("2 fixed overlaps left in place");
   });
+
   it("reports operation failures", async () => {
     const editEvent = vi.fn().mockRejectedValue(new Error("fail"));
     const plan = {
@@ -295,6 +296,7 @@ describe("rescheduleEventConflicts", () => {
     const result = await applyConflictResolutionPlan(plan, editEvent);
     expect(result.failures).toHaveLength(1);
   });
+
   it("ignores non-overlapping personal events", () => {
     const plan = buildConflictResolutionPlan([
       { id: "keep", source: "personal", title: "Keep", start_time: iso("2026-03-23T12:00:00Z") },

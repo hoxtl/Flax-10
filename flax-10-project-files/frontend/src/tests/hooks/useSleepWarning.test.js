@@ -12,10 +12,15 @@ describe('isDuringSleepWindow', () => {
   const sleep = '23:00', wake = '07:00';
 
   it('returns true at 02:00', () => expect(isDuringSleepWindow(sleep, wake, makeDate(2))).toBe(true));
+
   it('returns true at 23:00', () => expect(isDuringSleepWindow(sleep, wake, makeDate(23))).toBe(true));
+
   it('returns true at 06:59', () => expect(isDuringSleepWindow(sleep, wake, makeDate(6, 59))).toBe(true));
+
   it('returns false at 07:00', () => expect(isDuringSleepWindow(sleep, wake, makeDate(7))).toBe(false));
+
   it('returns false at 12:00', () => expect(isDuringSleepWindow(sleep, wake, makeDate(12))).toBe(false));
+
   it('returns false at 22:59', () => expect(isDuringSleepWindow(sleep, wake, makeDate(22, 59))).toBe(false));
 
   it('handles a same-day sleep window during the active range', () => {

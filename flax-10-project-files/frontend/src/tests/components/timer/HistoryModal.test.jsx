@@ -130,12 +130,20 @@ const testUncompletedBlockWithPause = async () => {
 describe('HistoryModal', () => {
     beforeEach(setupWrapper);
     it('renders empty state correctly', testEmptyState);
+
     it('renders history list grouped by study blocks', testHistoryList);
+
     it('clears history when button is clicked', testClearHistory);
+
     it('calls onClose when close button is clicked', testClose);
+
     it('cancels clear via Cancel button', testCancelClear);
+
     it('shows singular Session for exactly 1 completed session', testSingularSession);
+
     it('shows task label when block has a task', testBlockWithTask);
+
     it('cancels clear by clicking confirm overlay', testCancelClearViaOverlay);
+
     it('shows uncompleted and pause pills for incomplete paused blocks', testUncompletedBlockWithPause);
 });

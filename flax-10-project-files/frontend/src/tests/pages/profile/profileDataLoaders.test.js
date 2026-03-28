@@ -13,12 +13,14 @@ describe("profileDataLoaders", () => {
     gAUP.mockResolvedValueOnce({ id: 7 });
     await expect(loadProfile(7)).resolves.toEqual({ id: 7 });
   });
+
   it("clears loading when tryLoadProfile fails", async () => {
     const sL = vi.fn();
     gAUP.mockRejectedValueOnce(new Error("x"));
     await tryLoadProfile(vi.fn(), sL, 9);
     expect(sL).toHaveBeenCalledWith(false);
   });
+
   it("normalizes events on failure", async () => {
     const sAE = vi.fn();
     gE.mockResolvedValueOnce(null);
@@ -27,6 +29,7 @@ describe("profileDataLoaders", () => {
     gE.mockRejectedValueOnce(new Error("x"));
     await tryLoadEvents(sAE, 2);
   });
+
   it("counts incomplete tasks", async () => {
     const sTC = vi.fn();
     fT.mockResolvedValueOnce({ results: [{ completed: false }, { completed: true }] });
@@ -36,6 +39,7 @@ describe("profileDataLoaders", () => {
     await loadTaskCount(sTC);
     expect(sTC).toHaveBeenLastCalledWith(0);
   });
+
   it("falls back to empty count when task results missing", async () => {
     const sTC = vi.fn();
     fT.mockResolvedValueOnce({});

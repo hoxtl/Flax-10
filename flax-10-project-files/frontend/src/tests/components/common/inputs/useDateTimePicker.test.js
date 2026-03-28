@@ -39,6 +39,7 @@ describe("useDateTimePicker", () => {
     expect(setOpen).not.toHaveBeenCalled();
     [ref.current, dRef.current].forEach(el => el.remove());
   });
+
   it("ignores dropdown pointer down", () => {
     const setOpen = vi.fn(), { dropdown, ref, dRef } = setupOutside();
     renderHook(() => useClickOutside(true, ref, dRef, setOpen));
@@ -46,6 +47,7 @@ describe("useDateTimePicker", () => {
     expect(setOpen).not.toHaveBeenCalled();
     [ref.current, dRef.current].forEach(el => el.remove());
   });
+
   it("closes on body pointer down and Escape", () => {
     const setOpen = vi.fn(), { ref, dRef } = setupOutside();
     renderHook(() => useClickOutside(true, ref, dRef, setOpen));
@@ -64,6 +66,7 @@ describe("useDateTimePicker", () => {
     const d = renderHook(() => useDerivedCalendarState(2026, 2, new Date("2026-03-15T10:30:00"), "2026-03-10")).result.current;
     expect(d.days.length).toBeGreaterThan(0);
   });
+
   it("exposes handlers and updates state", () => {
     const sM = vi.fn(), sY = vi.fn(), sD = vi.fn(), sH = vi.fn(), sMin = vi.fn(), oC = vi.fn();
     const h = useDateTimeHandlers(2026, 0, sM, sY, null, sD, 10, sH, 30, sMin, false, false, oC);

@@ -47,6 +47,7 @@ describe("GroupWork task component - Board", () => {
     fireEvent.click(screen.getByText("+ Add card"));
     expect(adding.setAddingToCol).toHaveBeenCalledWith("todo");
   });
+
   it("drops a task into a column", () => {
     const onUpdate = vi.fn();
     const { container } = render(<TaskBoardColumn
@@ -56,6 +57,7 @@ describe("GroupWork task component - Board", () => {
     fireEvent.drop(container.firstChild, { dataTransfer: { getData: vi.fn(() => "9") } });
     expect(onUpdate).toHaveBeenCalledWith(9, { status: "done" });
   });
+
   it("ignores drops without a task id", () => {
     const onUpdate = vi.fn();
     const { container } = render(<TaskBoardColumn
@@ -65,6 +67,7 @@ describe("GroupWork task component - Board", () => {
     fireEvent.drop(container.firstChild, { dataTransfer: { getData: vi.fn(() => "") } });
     expect(onUpdate).not.toHaveBeenCalled();
   });
+
   it("renders the add card editor and accepts drops", () => {
     const adding = setupAdding({ addingToCol: "todo", newCardTitle: "Draft" });
     const col = { id: "todo", title: "To do", tasks: [{ id: 1, title: "Card A" }], className: "c", dotClass: "d", textClass: "t" };

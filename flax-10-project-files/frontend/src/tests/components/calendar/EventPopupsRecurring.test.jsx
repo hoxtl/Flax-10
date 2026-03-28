@@ -32,6 +32,7 @@ describe('EventPopups Recurring', () => {
     fireEvent.click(screen.getByText('Delete'));
     await waitFor(() => expect(oD).toHaveBeenCalledWith(expect.anything(), 'occurrence'));
   });
+
   it('runs recurring occurrence delete flow', async () => {
     const evt = { id: 20, title: 'Recur', source: 'personal' };
     useEventDelete.mockReturnValue({ isDeleteOpen: true, deleteEvent: evt, deleteType: 'occurrence', closeDelete: vi.fn() });

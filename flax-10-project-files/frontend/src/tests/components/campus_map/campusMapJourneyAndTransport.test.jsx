@@ -74,6 +74,7 @@ describe("UserJourneySection", () => {
       { latitude: 51.5, longitude: -0.12 }, { latitude: 51.51, longitude: -0.13 }
     );
   });
+
   it("clears both fields and calls onClearAll", async () => {
     const onClearAll = vi.fn();
     render(<JourneyHarness initialStart="A" initialDestination="B" onClearAll={onClearAll} />);
@@ -286,6 +287,7 @@ describe("CampusMapSidebar", () => {
     expect(props.animate).toBe("open");
     expect(props.drag).toBe("y");
   });
+
   it("uses closed animation state for mobile sheets", () => {
     render(<CampusMapSidebar
       showInitialSkeleton={false} ui={{ isMobile: true, mobileInitialOpen: false }}

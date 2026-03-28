@@ -15,12 +15,14 @@ describe("useHomepageReschedule Actions", () => {
     expect(props.addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: "W" }));
     expect(props.showToast).toHaveBeenCalled();
   });
+
   it("handleQuickStartGap is a no-op when task is null", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
     await act(async () => { await result.current.handleQuickStartGap(new Date(), 30, null); });
     expect(props.addEvent).not.toHaveBeenCalled();
   });
+
   it("handleTimelineDelete deletes a regular event", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
@@ -28,6 +30,7 @@ describe("useHomepageReschedule Actions", () => {
     expect(props.removeEvent).toHaveBeenCalledWith("e6");
     expect(props.showToast).toHaveBeenCalledWith('"W" deleted.');
   });
+
   it("handleTimelineDelete removes a task-sourced event", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
@@ -35,6 +38,7 @@ describe("useHomepageReschedule Actions", () => {
     expect(props.deleteTask).toHaveBeenCalledWith(42);
     expect(props.showToast).toHaveBeenCalledWith('"T" removed.');
   });
+
   it("handleTimelineDelete uses default label for raw id", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));

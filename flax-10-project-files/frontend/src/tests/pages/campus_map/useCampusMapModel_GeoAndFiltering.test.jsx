@@ -250,6 +250,7 @@ describe("useCampusMapModel - extras", () => {
     expect(mockState.selection.startLocation).toBeNull();
     expect(mockState.selection.selectedCampus).toBeNull();
   });
+
   it("clears markers and manual fields", async () => {
     setupMapClearing();
     const startMarker = mockRefs.startMarker.current, startPopup = mockRefs.startPopup.current;
@@ -260,6 +261,7 @@ describe("useCampusMapModel - extras", () => {
     expect(mockState.form.manualStart).toBe("");
     expect(mockState.form.manualDestination).toBe("");
   });
+
   it("clears routes and custom destination", async () => {
     setupMapClearing();
     const { result } = renderHook(() => useCampusMapModel(), { wrapper: wrapperWithEntry() });

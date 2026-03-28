@@ -10,9 +10,11 @@ describe('notificationAction', () => {
             expect(createNotificationAction(null)).toBeNull();
             expect(createNotificationAction('')).toBeNull();
         });
+
         it('returns action object with url and scrollToId', () => {
             expect(createNotificationAction('/timer', 'sec1')).toEqual({ url: '/timer', scrollToId: 'sec1' });
         });
+
         it('defaults scrollToId to null', () => {
             expect(createNotificationAction('/timer')).toEqual({ url: '/timer', scrollToId: null });
         });
@@ -23,6 +25,7 @@ describe('notificationAction', () => {
             expect(createEventPopupAction(null)).toBeNull();
             expect(createEventPopupAction(0)).toBeNull();
         });
+
         it('returns popup action with eventId', () => {
             expect(createEventPopupAction(42)).toEqual({ url: 'calendar', eventId: 42, openPopup: true });
         });
@@ -33,14 +36,17 @@ describe('notificationAction', () => {
             const notif = { action: { url: 'timer' } };
             expect(parseNotificationAction(notif)).toEqual({ url: 'timer' });
         });
+
         it('returns null if no action and no action_url', () => {
             expect(parseNotificationAction({})).toBeNull();
         });
+
         it('builds action from action_url for non-reminder', () => {
             const notif = { action_url: '/timer', scroll_to_id: null };
             const result = parseNotificationAction(notif);
             expect(result).toEqual({ url: '/timer', scrollToId: null });
         });
+
         it('builds popup action for reminder notification', () => {
             const notif = {
                 action_url: '/calendar',
@@ -56,9 +62,11 @@ describe('notificationAction', () => {
         it('returns true when action exists', () => {
             expect(hasNotificationAction({ action: { url: 'x' } })).toBe(true);
         });
+
         it('returns true when action_url exists', () => {
             expect(hasNotificationAction({ action_url: '/x' })).toBe(true);
         });
+
         it('returns false when neither exists', () => {
             expect(hasNotificationAction({})).toBe(false);
         });

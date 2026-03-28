@@ -172,8 +172,6 @@ describe('DraggableEvent Interactions Coverage', () => {
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
     });
 
-    // Recurring event delete flow
-
     it('recurring delete with choice=true calls openDelete(event, "all")', async () => {
         hasRecurrence.mockReturnValue(true);
         mockConfirm.mockResolvedValueOnce(true);
@@ -202,8 +200,6 @@ describe('DraggableEvent Interactions Coverage', () => {
         expect(mockOpenDelete).not.toHaveBeenCalled();
     });
 
-    // resizeEnded.current logic – click is swallowed after resize
-
     it('click after resize is swallowed (resizeEnded flag prevents openPopup)', () => {
         let capturedResizeEnded;
         vi.mocked(useEventResizeModule.useEventResize).mockImplementation((_event, _ref, _editEvent, resizeEnded) => {
@@ -215,8 +211,6 @@ describe('DraggableEvent Interactions Coverage', () => {
         fireEvent.click(container.querySelector('.draggable-event'));
         expect(mockOpenPopup).not.toHaveBeenCalled();
     });
-
-    // Resize handle fires handleResizeStart
 
     it('mousedown on resize handle calls handleResizeStart', () => {
         const mockHandleResizeStart = vi.fn();

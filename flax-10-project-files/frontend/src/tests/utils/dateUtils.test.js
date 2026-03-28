@@ -75,7 +75,6 @@ describe('dateUtils', () => {
             expect(end.getDate()).toBe(31);
         });
 
-
         it('addDays', () => {
             const d = addDays(date, 5);
             expect(d.getDate()).toBe(20);

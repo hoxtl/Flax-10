@@ -97,32 +97,39 @@ describe('Profile Core', () => {
     renderProfile();
     expect(document.querySelectorAll('[class*="skel"]').length).toBeGreaterThan(0);
   });
+
   it('renders not found when no profileData', () => {
     useProfileState.mockReturnValue(makeProfileState({ loading: false, profileData: null }));
     renderProfile({ user: null });
     expect(screen.getByText('Profile unavailable')).toBeTruthy();
   });
+
   it('renders username', async () => {
     renderProfile();
     await waitFor(() => expect(screen.getAllByText('alice').length).toBeGreaterThan(0));
   });
+
   it('renders profile modals', async () => {
     renderProfile();
     await waitFor(() => expect(screen.getByTestId('profile-modals')).toBeTruthy());
   });
+
   it('shows edit profile button for self', async () => {
     renderProfile();
     await waitFor(() => expect(screen.getAllByText(/edit profile/i).length).toBeGreaterThan(0));
   });
+
   it('renders module count', async () => {
     renderProfile();
     await waitFor(() => expect(screen.getAllByText(/modules/i).length).toBeGreaterThan(0));
   });
+
   it('renders achievements section', async () => {
     useProfileSummary.mockReturnValue({ summary: { persona: null, badges: [{ id: 1, name: 'Early Bird', tier: 'bronze', emoji: '🐦', label: 'Early Bird', description: '' }], weekly: null, streaks: null }, loading: false, refetch: vi.fn() });
     renderProfile();
     await waitFor(() => expect(screen.getByRole('button', { name: /View All/i })).toBeTruthy());
   });
+
   it('shows Share button when viewing another profile', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData }, viewedUserId: 2 }));
     useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canEditProfile: false });
@@ -130,11 +137,13 @@ describe('Profile Core', () => {
     await waitFor(() => expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0));
     expect(screen.queryByText(/edit profile/i)).toBeNull();
   });
+
   it('falls back to the current user object when profileData is missing', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: null, viewedUserId: 1 }));
     renderProfile({ user: defaultUser, viewedUserId: 1 });
     expect((await screen.findAllByText('alice')).length).toBeGreaterThan(0);
   });
+
   it('falls back to empty auth modules', async () => {
     const auth = { profile: null, loading: false, authenticated: true, user: { role: 'student' }, refreshProfile: vi.fn() };
     useAuthMock.mockReturnValue(auth);
@@ -144,6 +153,7 @@ describe('Profile Core', () => {
     renderProfile({ user: defaultUser, viewedUserId: 2 });
     expect(await screen.findByText('SHARED CALENDAR')).toBeInTheDocument();
   });
+
   it('falls back to onNavChange when onNavigate is missing', async () => {
     const onNavChange = vi.fn();
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData, is_shared_with_me: true }, viewedUserId: 2 }));
@@ -152,12 +162,14 @@ describe('Profile Core', () => {
     fireEvent.click(await screen.findByText('View their calendar'));
     expect(onNavChange).toHaveBeenCalled();
   });
+
   it('renders a standalone back button when onBack is provided', async () => {
     const onBack = vi.fn();
     renderProfile({ onBack, backLabel: 'Go back' });
     fireEvent.click(screen.getByRole('button', { name: /Go back/i }));
     expect(onBack).toHaveBeenCalledTimes(1);
   });
+
   it('shows shared calendar for mutual profile', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData, is_shared_with_me: true }, viewedUserId: 2 }));
     useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canViewCalendar: true });
@@ -165,6 +177,7 @@ describe('Profile Core', () => {
     await waitFor(() => expect(screen.getByText('SHARED CALENDAR')).toBeInTheDocument());
     expect(screen.getByTestId('profile-calendar')).toBeTruthy();
   });
+
   it('does not show shared calendar without share', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData }, viewedUserId: 2 }));
     useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canViewCalendar: false, canEditProfile: false });

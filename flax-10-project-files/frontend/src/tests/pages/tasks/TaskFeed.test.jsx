@@ -103,50 +103,62 @@ describe('TaskFeed', () => {
         renderFeed();
         expect(screen.getByRole('heading', { name: 'All tasks' })).toBeTruthy();
     });
+
     it('renders "Today" header for today filter', () => {
         renderFeed({ activeFilter: 'today' });
         expect(screen.getByRole('heading', { name: 'Today' })).toBeTruthy();
     });
+
     it('renders "This Week" header for this_week filter', () => {
         renderFeed({ activeFilter: 'this_week' });
         expect(screen.getByRole('heading', { name: 'This Week' })).toBeTruthy();
     });
+
     it('renders "Later" header for later filter', () => {
         renderFeed({ activeFilter: 'later' });
         expect(screen.getByRole('heading', { name: 'Later' })).toBeTruthy();
     });
+
     it('renders "Overdue" header for overdue filter', () => {
         renderFeed({ activeFilter: 'overdue' });
         expect(screen.getByRole('heading', { name: 'Overdue' })).toBeTruthy();
     });
+
     it('shows active list name as header when activeListId provided', () => {
         renderFeed({ activeListId: '1' });
         expect(screen.getByText('Work')).toBeTruthy();
     });
+
     it('does not render EstTimeHelpBanner', () => {
         renderFeed();
         expect(screen.queryByTestId('est-time-banner')).toBeNull();
     });
+
     it('renders CreateTaskBar when onAddTask provided', () => {
         renderFeed();
         expect(screen.getByTestId('create-task-bar')).toBeTruthy();
     });
+
     it('renders Full Planning button when onCreateTask provided', () => {
         renderFeed();
         expect(screen.getByText('Full Planning')).toBeTruthy();
     });
+
     it('renders sort dropdown', () => {
         renderFeed();
         expect(screen.getByTestId('sort-dropdown')).toBeTruthy();
     });
+
     it('renders Filter button', () => {
         renderFeed();
         expect(screen.getByText('Filter')).toBeTruthy();
     });
+
     it('shows search input', () => {
         renderFeed();
         expect(screen.getByPlaceholderText(/search by list or task/i)).toBeTruthy();
     });
+
     it('searches tasks by title', () => {
         renderFeed();
         const input = screen.getByPlaceholderText(/search by list or task/i);
@@ -154,6 +166,7 @@ describe('TaskFeed', () => {
         expect(screen.getByTestId('task-card-1')).toBeTruthy();
         expect(screen.queryByTestId('task-card-3')).toBeNull();
     });
+
     it('shows no tasks message for no-match search', () => {
         renderFeed();
         const input = screen.getByPlaceholderText(/search by list or task/i);
@@ -161,6 +174,7 @@ describe('TaskFeed', () => {
         expect(screen.getByText(/No tasks match/)).toBeTruthy();
         expect(screen.queryByText('No tasks yet. Add one above or use Full Planning.')).toBeNull();
     });
+
     it('searches across all tasks even when a reading list is selected', () => {
         renderFeed({
             activeListId: '1',
@@ -181,6 +195,7 @@ describe('TaskFeed', () => {
         expect(screen.getByTestId('task-card-99')).toBeTruthy();
         expect(screen.queryByText(/No tasks match/)).toBeNull();
     });
+
     it('clears search when clear button clicked', () => {
         renderFeed();
         const input = screen.getByPlaceholderText(/search by list or task/i);
@@ -189,47 +204,56 @@ describe('TaskFeed', () => {
         fireEvent.click(screen.getAllByLabelText('Clear search')[0]);
         expect(input.value).toBe('');
     });
+
     it('opens filter panel when Filter button clicked', () => {
         renderFeed();
         fireEvent.click(screen.getByText('Filter'));
         expect(screen.getByRole('dialog')).toBeTruthy();
     });
+
     it('shows Lists and Modules tabs in filter panel', () => {
         renderFeed();
         fireEvent.click(screen.getByText('Filter'));
         expect(screen.getByText('Lists')).toBeTruthy();
         expect(screen.getByText('Modules')).toBeTruthy();
     });
+
     it('switches to Modules tab in filter panel', () => {
         renderFeed();
         fireEvent.click(screen.getByText('Filter'));
         fireEvent.click(screen.getByText('Modules'));
         expect(screen.getByText('No modules found')).toBeTruthy();
     });
+
     it('renders completed task count', () => {
         renderFeed();
         expect(screen.getByText('1')).toBeTruthy(); // completed count
     });
+
     it('shows completed section', () => {
         renderFeed();
         expect(screen.getByText('Completed')).toBeTruthy();
     });
+
     it('calls onToggleComplete when task Toggle clicked', () => {
         const onToggleComplete = vi.fn();
         renderFeed({ onToggleComplete });
         fireEvent.click(screen.getAllByText('Toggle')[0]);
         expect(onToggleComplete).toHaveBeenCalled();
     });
+
     it('calls onDeleteTask when Delete button clicked', () => {
         const onDeleteTask = vi.fn();
         renderFeed({ onDeleteTask });
         fireEvent.click(screen.getAllByText('Delete')[0]);
         expect(onDeleteTask).toHaveBeenCalled();
     });
+
     it('renders nothing extra without onCreateTask', () => {
         renderFeed({ onCreateTask: undefined });
         expect(screen.queryByText('Full Planning')).toBeNull();
     });
+
     it('renders All Tasks Complete card when today filter and no tasks today', () => {
         const noTodayTasks = [
             { id: 10, title: 'Future Only', completed: false, due_date: nextWeek.toISOString(), priority: 'low', task_list: 1 },
@@ -237,6 +261,7 @@ describe('TaskFeed', () => {
         renderFeed({ tasks: noTodayTasks, activeFilter: 'today' });
         expect(screen.getByTestId('all-complete-card')).toBeTruthy();
     });
+
     it('shows reading completion celebration instead of generic empty state for completed reading lists', () => {
         renderFeed({
             activeListId: '1',
@@ -254,16 +279,19 @@ describe('TaskFeed', () => {
         expect(screen.getByText('No suggested readings left for LW4505 EU Law right now.')).toBeTruthy();
         expect(screen.queryByText('No tasks yet. Add one above or use Full Planning.')).toBeNull();
     });
+
     it('shows list name in header when activeListId and list found', () => {
         renderFeed({ activeListId: '1', lists: [{ id: 1, name: 'My Work List' }] });
         expect(screen.getByText('My Work List')).toBeTruthy();
     });
+
     it('sorts tasks by sort dropdown change', () => {
         renderFeed();
         const dropdown = screen.getByTestId('sort-dropdown');
         fireEvent.change(dropdown, { target: { value: 'alpha' } });
         expect(dropdown.value).toBe('alpha');
     });
+
     it('filters list checkboxes and calls onFilterByList', () => {
         const onFilterByList = vi.fn();
         renderFeed({ onFilterByList, filterListIds: [] });
@@ -271,6 +299,7 @@ describe('TaskFeed', () => {
         fireEvent.click(screen.getByText('Work'));
         expect(onFilterByList).toHaveBeenCalledWith(['1']);
     });
+
     it('filters modules and shows active filter count, then clears all', () => {
         renderFeed({
             tasks: [
@@ -286,6 +315,7 @@ describe('TaskFeed', () => {
         fireEvent.click(screen.getByText('Clear all'));
         expect(screen.getByText('Filter')).toBeTruthy();
     });
+
     it('groups modules by prefix and shows search empty states in filter tabs', () => {
         renderFeed({
             tasks: [
@@ -304,6 +334,7 @@ describe('TaskFeed', () => {
         fireEvent.change(screen.getByPlaceholderText('Search lists...'), { target: { value: 'zzz' } });
         expect(screen.getByText('No lists found')).toBeTruthy();
     });
+
     it('closes filter dialog on outside mousedown', () => {
         renderFeed();
         fireEvent.click(screen.getByText('Filter'));
@@ -311,6 +342,7 @@ describe('TaskFeed', () => {
         fireEvent.mouseDown(document.body);
         expect(screen.queryByRole('dialog')).toBeNull();
     });
+
     it('supports keyboard shortcuts for search focus, quick add focus, and escape clear', async () => {
         const quickInput = document.createElement('input');
         quickInput.setAttribute('aria-label', 'Task name');
@@ -333,6 +365,7 @@ describe('TaskFeed', () => {
 
         document.body.removeChild(quickInput);
     });
+
     it('shows all/less control for long all-tasks section', () => {
         const manyTasks = Array.from({ length: 10 }, (_, i) => ({
             id: i + 100,
@@ -347,6 +380,7 @@ describe('TaskFeed', () => {
         fireEvent.click(screen.getByText('+ Show all 10'));
         expect(screen.getByText('Show less ↑')).toBeTruthy();
     });
+
     it('handles active module code in header and invalid user JSON safely', () => {
         mockStore['user'] = '{invalid';
         renderFeed({ activeListId: '1', activeModuleCode: 'CS9999' });

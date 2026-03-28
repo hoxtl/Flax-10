@@ -72,7 +72,6 @@ describe('CalendarContext', () => {
     expect(screen.getByTestId('view-mode')).toHaveTextContent('month');
   });
 
-
   it('should filter events with string filter', () => {
     render(
       <CalendarProvider>

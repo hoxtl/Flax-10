@@ -65,6 +65,7 @@ describe("CampusMapSidebarContent", () => {
       expect(screen.getByTestId(id)).toBeInTheDocument();
     });
   });
+
   it("forwards props to TflStatusSection", () => {
     render(<CampusMapSidebarContent {...props} />);
     expect(tflStatusMock).toHaveBeenCalledWith({
@@ -72,6 +73,7 @@ describe("CampusMapSidebarContent", () => {
       loading: props.loadingDisruptions
     });
   });
+
   it("forwards props to UserJourneySection", () => {
     render(<CampusMapSidebarContent {...props} />);
     expect(journeyMock).toHaveBeenCalledWith(expect.objectContaining({
@@ -84,6 +86,7 @@ describe("CampusMapSidebarContent", () => {
       locating: props.ui.locating,
     }));
   });
+
   it("forwards props to DestinationSection", () => {
     render(<CampusMapSidebarContent {...props} />);
     expect(destinationMock).toHaveBeenCalledWith(expect.objectContaining({
@@ -96,6 +99,7 @@ describe("CampusMapSidebarContent", () => {
       onSelectEvent: props.handleSelectUpcomingEvent,
     }));
   });
+
   it("forwards props to TransportModesSection", () => {
     render(<CampusMapSidebarContent {...props} />);
     expect(transportMock).toHaveBeenCalledWith(expect.objectContaining({

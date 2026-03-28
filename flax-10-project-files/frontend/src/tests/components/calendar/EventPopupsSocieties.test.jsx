@@ -30,11 +30,13 @@ describe('EventPopups Societies', () => {
     expect(screen.getByText('Unsync')).toBeInTheDocument();
     expect(screen.queryByText('Edit')).not.toBeInTheDocument();
   });
+
   it('uses tag_name and tag_color from society event', () => {
     setupPopup({ id: 11, title: 'Soc M', source: 'society', tag_name: 'Eng', tag_color: '#f50' });
     render(<EventPopups />);
     expect(screen.getByTestId('popup-tag').textContent).toBe('Eng');
   });
+
   it('Unsync action calls unsyncCalendar', async () => {
     setupPopup({ id: 16, title: 'Drama', source: 'society', society_id: 's1', society_name: 'DC' });
     render(<EventPopups />);

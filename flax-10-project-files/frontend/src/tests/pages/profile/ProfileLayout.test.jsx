@@ -56,18 +56,21 @@ describe('Profile Layout', () => {
     renderProfile();
     expect(document.querySelector('[class*="leftTopMetricsRowTeacher"]')).toBeTruthy();
   });
+
   it('renders teacher insights for another teacher', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData, role: 'teacher' }, viewedUserId: 2 }));
     useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canViewAnalytics: false, canViewCalendar: false });
     renderProfile({ viewedUserId: 2 });
     expect(await screen.findByText('CS101')).toBeInTheDocument();
   });
+
   it('renders common ground for students', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData, role: 'student' }, viewedUserId: 2 }));
     useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canViewAnalytics: false, canViewCalendar: false });
     renderProfile({ viewedUserId: 2 });
     expect(await screen.findByText('Common Ground')).toBeInTheDocument();
   });
+
   it('renders compatibility-only when no common ground', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData }, viewedUserId: 2 }));
     useProfileBodyData.mockReturnValue({ modules: [], upcomingEventCount: 0, filteredEvents: [] });
@@ -76,6 +79,7 @@ describe('Profile Layout', () => {
     expect(await screen.findByText('Similar study times')).toBeInTheDocument();
     expect(screen.queryByText('Common Ground')).toBeNull();
   });
+
   it('renders compatibility score', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData }, viewedUserId: 2 }));
     useProfileBodyData.mockReturnValue({ modules: [], upcomingEventCount: 0, filteredEvents: [] });

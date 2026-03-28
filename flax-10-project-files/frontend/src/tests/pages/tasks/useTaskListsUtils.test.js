@@ -32,11 +32,13 @@ describe("useTaskListsUtils", () => {
       expect(mergeListColors(null)).toEqual([]);
       expect(mergeListColors({})).toEqual([]);
     });
+
     it("merges list color with stored when list has no color", () => {
       globalThis.localStorage.getItem = vi.fn((k) => (k === "listColor:1" ? "#abc" : null));
       const out = mergeListColors([{ id: 1, name: "L" }]);
       expect(out[0].color).toBe("#abc");
     });
+
     it("keeps list color when set", () => {
       const out = mergeListColors([{ id: 1, name: "L", color: "#fff" }]);
       expect(out[0].color).toBe("#fff");
@@ -64,6 +66,7 @@ describe("useTaskListsUtils", () => {
       expect(result.color).toBe("#red");
       expect(setLists).toHaveBeenCalledWith(expect.any(Function));
     });
+
     it("adds list without color when data has no color", async () => {
       createTaskList.mockResolvedValue({ id: 5, name: "L" });
       const setLists = vi.fn();

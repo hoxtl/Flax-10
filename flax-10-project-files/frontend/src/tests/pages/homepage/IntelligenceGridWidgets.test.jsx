@@ -85,6 +85,7 @@ describe("IntelligenceGridWidgets", () => {
     expect(onDrop).toHaveBeenCalled();
     expect(onDragEnd).toHaveBeenCalled();
   });
+
   it("applies drag state classes", () => {
     render(<GridWidgetList catalogue={catalogue} edit layout={["timeline"]} setLayout={vi.fn()} widgetRenderer={id => <div>{id}</div>} widgetSizes={{}} setWidgetSize={vi.fn()} onDragEnd={vi.fn()} onDragOver={vi.fn()} onDragStart={vi.fn()} onDrop={vi.fn()} dragOver="timeline" dragging="timeline" />);
     const widget = screen.getByText("timeline").closest("[data-widget-id='timeline']");

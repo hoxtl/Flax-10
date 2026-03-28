@@ -180,8 +180,6 @@ describe("TaskCard coverage", () => {
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
   });
 
-
-
   it("covers routine and repeated completion flows and the study-now fallback color path", () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
     const props = buildProps({ listColor: undefined, searchQuery: "zzz" });
@@ -284,8 +282,6 @@ describe("TaskCard coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: /Edit/i }));
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
   });
-
-
 
   it("renders the edit modal directly with its default list fallback", () => {
     render(

@@ -14,6 +14,7 @@ const testNegativeOvertime = () => {
 
 describe('TimerDisplay', () => {
     it('formats time correctly', testFormatCorrectly);
+
   it('shows negative time for overtime', testNegativeOvertime);
 
   it('applies break styling when the timer is in break mode', () => {

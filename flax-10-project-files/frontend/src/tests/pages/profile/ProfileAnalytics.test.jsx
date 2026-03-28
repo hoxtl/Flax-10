@@ -93,6 +93,7 @@ describe('Profile Analytics', () => {
     renderProfile();
     expect(document.querySelectorAll('[class*="skel"]').length).toBeGreaterThan(0);
   });
+
   it('renders self analytics blocks', async () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: makeHeatmap() });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
@@ -102,6 +103,7 @@ describe('Profile Analytics', () => {
     expect(await screen.findByText('STUDY DNA')).toBeTruthy();
     expect(await screen.findByText('FOCUS HEATMAP')).toBeTruthy();
   });
+
   it('navigates to attendance details', async () => {
     const onNavigate = vi.fn();
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: [] } });
@@ -111,12 +113,14 @@ describe('Profile Analytics', () => {
     fireEvent.click(link);
     expect(onNavigate).toHaveBeenCalledWith('attendance');
   });
+
   it('opens achievements modal', async () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
     fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
   });
+
   it('closes achievements modal when Close clicked', async () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
@@ -125,6 +129,7 @@ describe('Profile Analytics', () => {
     fireEvent.click(screen.getByText('Close'));
     await waitFor(() => expect(screen.queryByTestId('achievements-modal')).not.toBeInTheDocument());
   });
+
   it('saves weekly goal and refetches summary', async () => {
     const refetch = vi.fn();
     useProfileSummary.mockReturnValue({ summary: { persona: null, badges: [], weekly: { percentage: 20, hours_studied: 2, goal_hours: 8 }, streaks: { current: 0, longest: 0 }, session_count: 1 }, loading: false, refetch });
@@ -133,6 +138,7 @@ describe('Profile Analytics', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Save goal' }));
     await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
   });
+
   it('handles getSummary failure without crashing', async () => {
     analyticsService.getSummary.mockRejectedValue(new Error('error'));
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
@@ -140,6 +146,7 @@ describe('Profile Analytics', () => {
     await waitFor(() => expect(analyticsService.getSummary).toHaveBeenCalledWith(90));
     expect(screen.getByText('Night Owl')).toBeInTheDocument();
   });
+
   it('computePeakHour handles all zeros', async () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });

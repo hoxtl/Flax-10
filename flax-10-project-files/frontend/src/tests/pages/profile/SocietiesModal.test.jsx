@@ -15,12 +15,14 @@ describe('SocietiesModal', () => {
     expect(onClose).toHaveBeenCalled();
     expect(onNavigate).toHaveBeenCalledWith('/societies?id=1');
   });
+
   it('navigates to society without id', () => {
     const onNavigate = vi.fn();
     render(<SocietiesModal isOpen onClose={vi.fn()} societies={[{ id: 99, name: 'Mystery' }]} onNavigate={onNavigate} />);
     fireEvent.click(screen.getByText('Mystery'));
     expect(onNavigate).toHaveBeenCalledTimes(1);
   });
+
   it('uses society_id and image fields', () => {
     const onNavigate = vi.fn();
     const socs = [{ society_id: 22, name: 'Film', image: 'f.png' }];

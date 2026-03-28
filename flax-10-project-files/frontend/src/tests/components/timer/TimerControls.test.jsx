@@ -43,7 +43,10 @@ const testPauseIndicator = () => {
 
 describe('TimerControls', () => {
     it('renders correct buttons', testButtons);
+
     it('shows Pause when active', testPause);
+
     it('shows Resume when active and paused', testResume);
+
     it('shows PauseIndicator when paused with totalPaused > 0', testPauseIndicator);
 });

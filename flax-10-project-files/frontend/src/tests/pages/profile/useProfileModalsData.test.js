@@ -22,6 +22,7 @@ describe("useProfileModalsData", () => {
     const { result } = renderHook(() => useSocialUsers(true, 99, socialDataFetchers.sharingWith));
     await waitFor(() => expect(result.current).toEqual([]));
   });
+
   it("useTasksModalData fetches and clears", async () => {
     fT.mockResolvedValueOnce({ results: [{ id: 1 }] });
     const { result, rerender } = renderHook(({ isOpen }) => useTasksModalData(isOpen), { initialProps: { isOpen: true } });
@@ -29,6 +30,7 @@ describe("useProfileModalsData", () => {
     rerender({ isOpen: false });
     expect(result.current.tasks).toEqual([]);
   });
+
   it("useTasksModalData handles empty results", async () => {
     fT.mockResolvedValueOnce({});
     const { result } = renderHook(() => useTasksModalData(true));

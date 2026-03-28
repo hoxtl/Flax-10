@@ -71,6 +71,7 @@ describe("common coverage topups", () => {
     );
     expect(fallback.scrollTop).toBe(0);
   });
+
   it("falls back to dashboard-main containers and window-only scrolling", () => {
     const scrollToMock = vi.fn();
     window.scrollTo = scrollToMock;

@@ -122,32 +122,38 @@ describe('TaskCard', () => {
         renderTaskCard();
         expect(screen.getByText('Buy groceries')).toBeTruthy();
     });
+
     it('renders mark complete button', () => {
         renderTaskCard();
         expect(screen.getByLabelText('Mark complete')).toBeTruthy();
     });
+
     it('renders completed task with different style', () => {
         renderTaskCard({ task: { ...defaultTask, completed: true } });
         expect(screen.getByText('Buy groceries')).toBeTruthy();
     });
+
     it('calls onToggle when mark complete button is clicked', () => {
         const onToggle = vi.fn();
         renderTaskCard({ onToggle });
         fireEvent.click(screen.getByLabelText('Mark complete'));
         expect(onToggle).toHaveBeenCalledTimes(1);
     });
+
     it('shows due date badge when due_date is provided', () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         renderTaskCard({ task: { ...defaultTask, due_date: tomorrow.toISOString() } });
         expect(screen.getByText(/tomorrow/i)).toBeTruthy();
     });
+
     it('shows overdue badge for past tasks', () => {
         const past = new Date();
         past.setDate(past.getDate() - 2);
         renderTaskCard({ task: { ...defaultTask, due_date: past.toISOString() }, isOverdue: true });
         expect(screen.getByText(/overdue/i)).toBeTruthy();
     });
+
     it.each([
         ['medium', 'Medium'],
         ['urgent', 'Urgent'],
@@ -156,20 +162,24 @@ describe('TaskCard', () => {
         renderTaskCard({ task: { ...defaultTask, priority: _ } });
         expect(screen.getByText(label)).toBeTruthy();
     });
+
     it('shows Today for due today', () => {
         const today = new Date();
         renderTaskCard({ task: { ...defaultTask, due_date: today.toISOString() } });
         expect(screen.getByText(/today/i)).toBeTruthy();
     });
+
     it('shows list name badge when listName is provided', () => {
         renderTaskCard({ listName: 'Shopping', hideListBadge: false });
         // list name might appear
         expect(screen.getByText('Buy groceries')).toBeTruthy();
     });
+
     it('does not show list badge when hideListBadge is true', () => {
         renderTaskCard({ hideListBadge: true });
         expect(screen.queryByText('Shopping')).toBeNull();
     });
+
     it('opens context menu on right click', () => {
         renderTaskCard();
         const card = screen.getByText('Buy groceries').closest('[class]');
@@ -177,6 +187,7 @@ describe('TaskCard', () => {
         expect(screen.getByText('Edit')).toBeTruthy();
         expect(screen.getByText('Delete')).toBeTruthy();
     });
+
     it('calls onDelete from context menu', () => {
         const onDelete = vi.fn();
         renderTaskCard({ onDelete });
@@ -184,6 +195,7 @@ describe('TaskCard', () => {
         fireEvent.click(screen.getByText('Delete'));
         expect(onDelete).toHaveBeenCalledTimes(1);
     });
+
     it('opens info modal and closes from footer close button', () => {
         openReadingTaskInfo();
         expect(screen.getByText('Task details')).toBeTruthy();
@@ -197,6 +209,7 @@ describe('TaskCard', () => {
         fireEvent.click(screen.getAllByRole('button', { name: 'Close' })[1]);
         expect(screen.queryByText('Task details')).toBeNull();
     });
+
     it('keeps reading detail pills out of the task card row', () => {
         renderTaskCard({
             task: {
@@ -213,6 +226,7 @@ describe('TaskCard', () => {
         expect(screen.queryByText('Pages')).toBeNull();
         expect(screen.queryByText('1.6 min/page')).toBeNull();
     });
+
     it('handles keyboard open and closes info modal via backdrop', () => {
         renderTaskCard({ task: { ...defaultTask, description: '' } });
         const content = screen.getByText('Buy groceries').closest('[role="button"]');
@@ -221,10 +235,12 @@ describe('TaskCard', () => {
         fireEvent.mouseDown(document.querySelector('[class*="modalBackdrop"]'));
         expect(screen.queryByText('Task details')).toBeNull();
     });
+
     it('shows highlighted search text when query matches', () => {
         renderTaskCard({ task: { ...defaultTask, title: 'Deep Study Session' }, searchQuery: 'study' });
         expect(document.querySelector('mark')).toBeTruthy();
     });
+
     it('navigates to timer and sets active task on Study now', () => {
         renderTaskCard({ task: { ...defaultTask, estimated_blocks: 3 }, listColor: '#123456' });
         fireEvent.click(screen.getByLabelText('Study now'));
@@ -239,6 +255,7 @@ describe('TaskCard', () => {
         );
         expect(navigateMock).toHaveBeenCalledWith('/timer', { state: { fromTaskPlay: true } });
     });
+
     it('shows completed due labels and hides action bar for completed tasks', () => {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
@@ -249,6 +266,7 @@ describe('TaskCard', () => {
         expect(screen.getByText(/Completed yesterday/)).toBeTruthy();
         expect(screen.queryByLabelText('Study now')).toBeNull();
     });
+
     it('handles routine completion without burst animation', () => {
         isRoutineTaskMock.mockReturnValue(true);
         const onToggle = vi.fn();
@@ -257,6 +275,7 @@ describe('TaskCard', () => {
         expect(showCompletionToastMock).toHaveBeenCalledWith('Great job!', { isRoutine: true });
         expect(onToggle).toHaveBeenCalled();
     });
+
     it('uses moduleId and module code links correctly and active timer class', () => {
         sessionStorage.setItem('timerTaskId', '1');
         const { rerender } = renderTaskCard({
@@ -305,38 +324,45 @@ describe('TaskContextMenu', () => {
         render(<TaskContextMenu {...menuProps} />);
         expect(screen.getByText('Edit')).toBeTruthy();
     });
+
     it('renders Delete option', () => {
         render(<TaskContextMenu {...menuProps} />);
         expect(screen.getByText('Delete')).toBeTruthy();
     });
+
     it('calls onEditOpen when Edit is clicked', () => {
         const onEditOpen = vi.fn();
         render(<TaskContextMenu {...menuProps} onEditOpen={onEditOpen} />);
         fireEvent.click(screen.getByText('Edit'));
         expect(onEditOpen).toHaveBeenCalledTimes(1);
     });
+
     it('calls onDelete when Delete is clicked', () => {
         const onDelete = vi.fn();
         render(<TaskContextMenu {...menuProps} onDelete={onDelete} />);
         fireEvent.click(screen.getByText('Delete'));
         expect(onDelete).toHaveBeenCalledTimes(1);
     });
+
     it('shows Move to list when lists provided', () => {
         render(<TaskContextMenu {...menuProps} />);
         expect(screen.getByText('Move to list')).toBeTruthy();
     });
+
     it('shows move view when Move to list is clicked', () => {
         render(<TaskContextMenu {...menuProps} />);
         fireEvent.click(screen.getByText('Move to list'));
         expect(screen.getByText('Shopping')).toBeTruthy();
         expect(screen.getByText('Work')).toBeTruthy();
     });
+
     it('calls onClose when clicking outside', () => {
         const onClose = vi.fn();
         render(<TaskContextMenu {...menuProps} onClose={onClose} />);
         fireEvent.mouseDown(document.body);
         expect(onClose).toHaveBeenCalledTimes(1);
     });
+
     it('calls onEdit when moving to different list', async () => {
         const onEdit = vi.fn().mockResolvedValue({});
         render(<TaskContextMenu {...menuProps} onEdit={onEdit} />);
@@ -344,6 +370,7 @@ describe('TaskContextMenu', () => {
         fireEvent.click(screen.getByText('Work'));
         expect(onEdit).toHaveBeenCalled();
     });
+
     it('supports due date view and clearing due date', async () => {
         const onEdit = vi.fn().mockResolvedValue({});
         const onClose = vi.fn();
@@ -356,6 +383,7 @@ describe('TaskContextMenu', () => {
         ));
         expect(onClose).toHaveBeenCalled();
     });
+
     it('supports due date set with sleep warning check callback', async () => {
         const onEdit = vi.fn().mockResolvedValue({});
         sleepWarningState.checkSleepAndRun = (date, fn) => {
@@ -371,17 +399,20 @@ describe('TaskContextMenu', () => {
             { source: 'context-menu', action: 'set-due-date', dueDate: '2026-03-12T09:00' },
         ));
     });
+
     it('shows sleep warning modal when hook indicates warning', () => {
         sleepWarningState.sleepWarning = true;
         sleepWarningState.sleepWarningProps = { test: true };
         render(<TaskContextMenu {...menuProps} />);
         expect(screen.getByTestId('sleep-warning-modal')).toBeTruthy();
     });
+
     it('uses fallback sleep settings when user settings request fails', async () => {
         getUserSettingsMock.mockRejectedValueOnce(new Error('settings fail'));
         render(<TaskContextMenu {...menuProps} />);
         await waitFor(() => expect(getUserSettingsMock).toHaveBeenCalled());
     });
+
     it('does not render move option when lists are empty', () => {
         render(<TaskContextMenu {...menuProps} lists={[]} />);
         expect(screen.queryByText('Move to list')).toBeNull();

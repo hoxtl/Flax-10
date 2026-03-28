@@ -14,10 +14,12 @@ describe("useProfileAnalytics", () => {
     vi.advanceTimersByTime(300000); // 5 mins in implementation
     vi.useRealTimers();
   });
+
   it("initializes with null data", () => {
     const { result } = renderHook(() => useProfileAnalytics(false));
     expect(result.current).toBeNull();
   });
+
   it("handles fetch error", async () => {
     gS.mockRejectedValueOnce(new Error("err"));
     const { result } = renderHook(() => useProfileAnalytics(true));
