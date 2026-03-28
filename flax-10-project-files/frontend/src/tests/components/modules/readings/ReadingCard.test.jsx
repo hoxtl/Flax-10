@@ -4,14 +4,14 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ReadingCard from '../../../components/modules/readings/ReadingCard';
-import { readingFixture } from './readings/readingTestUtils';
+import ReadingCard from '@/components/modules/readings/ReadingCard';
+import { readingFixture } from './readingTestUtils';
 
-vi.mock('../../../components/calendar/utils/dateUtils', () => ({
+vi.mock('@/components/calendar/utils/dateUtils', () => ({
     formatDate: vi.fn(() => '13 Apr 2026'),
 }));
 
-vi.mock('../../../components/modules/shared/moduleCardActions', () => ({
+vi.mock('@/components/modules/shared/moduleCardActions', () => ({
     ModuleItemCardActions: ({ onEdit, onDelete }) => (
         <div>
             <button onClick={onEdit}>Edit reading</button>

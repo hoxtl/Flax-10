@@ -21,11 +21,11 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../../../pages/homepage/hooks/useRightNowData", () => ({
+vi.mock("@/pages/homepage/hooks/useRightNowData", () => ({
   useRightNowData: (...args) => mockUseRightNowData(...args),
 }));
 
-vi.mock("../../../../pages/homepage/components/RightNowSubComponents", () => ({
+vi.mock("@/pages/homepage/components/RightNowSubComponents", () => ({
   fadeIn: () => ({}),
   ActiveEventCard: ({ currentBlock, timeRangeStr, timeLeftStr, currentProgressPct }) => (
     <div data-testid="active-event">
@@ -51,7 +51,7 @@ vi.mock("../../../../pages/homepage/components/RightNowSubComponents", () => ({
   ),
 }));
 
-import { RightNowWidget } from "../../../../pages/homepage/components/RightNowWidget";
+import { RightNowWidget } from "@/pages/homepage/components/RightNowWidget";
 
 function renderWidget(props = {}) {
   return render(

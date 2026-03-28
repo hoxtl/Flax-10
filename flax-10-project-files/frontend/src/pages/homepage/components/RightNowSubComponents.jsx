@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Train, AlertTriangle, X, MapPinned, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import styles from "./RightNowWidget.module.css";
-import { getTimeLeftBand, getJourneySummary } from "./rightNowUtils";
+import { getTimeLeftBand, getJourneySummary } from "@/pages/homepage/components/rightNowUtils";
 
 export const fadeIn = (delay = 0) => ({
   initial: { opacity: 0, y: 6 },

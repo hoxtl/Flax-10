@@ -8,14 +8,14 @@ import { Clock, Sparkles, Sun } from "lucide-react";
 import SharedWidgetHeader from "../../../components/common/widget_header/WidgetHeader";
 import LocationLink from "../../../components/common/location_link/LocationLink";
 import { formatTime } from "../utils/dateFormatUtils";
-import { useRightNowData } from "../hooks/useRightNowData";
+import { useRightNowData } from "@/pages/homepage/hooks/useRightNowData";
 import {
   ActiveEventCard,
   CommuteContextCard,
   ConflictSummary,
   TflDelayCard,
   fadeIn,
-} from "./RightNowSubComponents";
+} from "@/pages/homepage/components/RightNowSubComponents";
 import {
   buildAlertState,
   buildRightNowDataProps,

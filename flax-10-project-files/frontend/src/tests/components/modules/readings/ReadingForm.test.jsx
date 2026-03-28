@@ -4,10 +4,10 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ReadingForm, { buildFormData } from '../../../components/modules/readings/ReadingForm';
-import { fillBaseReadingForm, setChapterValue, setEstimatedMinutes, submitReadingForm } from './readings/readingTestUtils';
+import ReadingForm, { buildFormData } from '@/components/modules/readings/ReadingForm';
+import { fillBaseReadingForm, setChapterValue, setEstimatedMinutes, submitReadingForm } from './readingTestUtils';
 
-vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
+vi.mock('@/components/common/inputs/DateTimePicker', () => ({
     default: ({onChange, placeholder }) => (
         <input placeholder={placeholder} onChange={e =>onChange(e.target.value)} />
     ),

@@ -1,7 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-<<<<<<< HEAD
 import StudyStreakWidget from "@/pages/homepage/components/StudyStreakWidget";
 
 const fetchApiMock = vi.fn();
@@ -11,17 +10,6 @@ vi.mock("@/api/client", () => ({
 }));
 
 vi.mock("@/components/common/widget_header/WidgetHeader", () => ({
-=======
-import StudyStreakWidget from "../../../../pages/homepage/components/StudyStreakWidget";
-
-const fetchApiMock = vi.fn();
-
-vi.mock("../../../../api/client", () => ({
-  fetchApi: (...args) => fetchApiMock(...args),
-}));
-
-vi.mock("../../../../components/common/widget_header/WidgetHeader", () => ({
->>>>>>> main
   default: ({ title }) => <div>{title}</div>,
 }));
 

@@ -107,7 +107,7 @@ describe("ConflictPopover", () => {
     const onMoveTomorrow = vi.fn();
     render(<ConflictPopover styles={styles} nextFreeRow={null} onMoveTomorrow={onMoveTomorrow} onEdit={vi.fn()} />);
     expect(screen.getByText("No free window")).toBeTruthy();
-    fireEvent.click(screen.getByText("→ Move to tomorrow"));
+    fireEvent.click(screen.getByText(/Move to tomorrow/));
     expect(onMoveTomorrow).toHaveBeenCalled();
   });
 });

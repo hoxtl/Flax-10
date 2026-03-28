@@ -21,31 +21,13 @@ vi.mock("lucide-react", () => ({
   ArrowUpRight: () => <svg aria-hidden="true" />,
 }));
 
-<<<<<<< HEAD
-vi.mock("@/pages/homepage/components/rightNowUtils", () => ({
-=======
-vi.mock("../../../../pages/homepage/components/rightNowUtils", () => ({
->>>>>>> main
-  getJourneySummary: vi.fn((journey) => journey),
-  getTimeLeftBand: vi.fn((minutes) => {
-    if (minutes == null) return null;
-    if (minutes < 10) return "under10";
-    if (minutes <= 30) return "10to30";
-    return "later";
-  }),
-}));
-
 import {
   ActiveEventCard,
   CommuteContextCard,
   ConflictSummary,
   TflDelayCard,
   fadeIn,
-<<<<<<< HEAD
 } from "@/pages/homepage/components/RightNowSubComponents";
-=======
-} from "../../../../pages/homepage/components/RightNowSubComponents";
->>>>>>> main
 
 describe("RightNowSubComponents", () => {
   beforeEach(() => {
@@ -92,6 +74,18 @@ describe("RightNowSubComponents", () => {
       />,
     );
     expect(screen.getByText("20m left")).toHaveStyle({ color: "var(--home-urgency-warning)" });
+  });
+
+  it("uses neutral urgency styling when more than thirty minutes remain", () => {
+    render(
+      <ActiveEventCard
+        currentBlock={{ title: "Long focus", end_time: "2026-03-24T10:40:00.000Z" }}
+        timeRangeStr="09:00 - 11:00"
+        timeLeftStr="40m left"
+        currentProgressPct={20}
+      />,
+    );
+    expect(screen.getByText("40m left")).toHaveStyle({ color: "var(--sage)" });
   });
 
   it("falls back to the neutral urgency colour when no end time exists", () => {
@@ -147,7 +141,12 @@ describe("RightNowSubComponents", () => {
   it("renders commute context card in loading and success states", () => {
     const { rerender } = render(
       <MemoryRouter>
-        <CommuteContextCard campus={{ shortName: "WAT", name: "Waterloo" }} journey={{ duration: "28 min", lines: ["Northern"] }} loading leaveByInfo={null} />
+        <CommuteContextCard
+          campus={{ shortName: "WAT", name: "Waterloo" }}
+          journey={{ duration: 28, legs: [{ mode: "train", routeOptions: [{ name: "Northern" }] }] }}
+          loading
+          leaveByInfo={null}
+        />
       </MemoryRouter>,
     );
     expect(screen.getByText("WAT commute")).toBeInTheDocument();
@@ -155,7 +154,15 @@ describe("RightNowSubComponents", () => {
 
     rerender(
       <MemoryRouter>
-        <CommuteContextCard campus={{ shortName: "STR", name: "Strand" }} journey={{ duration: "18 min", lines: ["Circle", "District"] }} loading={false} leaveByInfo={{ leaveByStr: "10:20" }} />
+        <CommuteContextCard
+          campus={{ shortName: "STR", name: "Strand" }}
+          journey={{
+            duration: 18,
+            legs: [{ mode: "train", routeOptions: [{ name: "Circle" }, { name: "District" }] }],
+          }}
+          loading={false}
+          leaveByInfo={{ leaveByStr: "10:20" }}
+        />
       </MemoryRouter>,
     );
     expect(screen.getByText(/Leave by 10:20 for Strand/)).toBeInTheDocument();
@@ -167,7 +174,7 @@ describe("RightNowSubComponents", () => {
   it("renders commute context card with secondary campus fallbacks", () => {
     render(
       <MemoryRouter>
-        <CommuteContextCard campus={null} journey={{ duration: "35 min", lines: [] }} loading={false} leaveByInfo={null} />
+        <CommuteContextCard campus={null} journey={{ duration: 35, legs: [] }} loading={false} leaveByInfo={null} />
       </MemoryRouter>,
     );
     expect(screen.getByText("Campus commute")).toBeInTheDocument();
@@ -186,7 +193,7 @@ describe("RightNowSubComponents", () => {
   it("omits commute pills when no journey lines are returned", () => {
     render(
       <MemoryRouter>
-        <CommuteContextCard campus={{ shortName: "GLA", name: "Guy's" }} journey={{ duration: "22 min", lines: [] }} loading={false} leaveByInfo={{ leaveByStr: "10:40" }} />
+        <CommuteContextCard campus={{ shortName: "GLA", name: "Guy's" }} journey={{ duration: 22, legs: [] }} loading={false} leaveByInfo={{ leaveByStr: "10:40" }} />
       </MemoryRouter>,
     );
     expect(screen.getByText("GLA commute")).toBeInTheDocument();

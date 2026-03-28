@@ -5,19 +5,11 @@ vi.mock("lucide-react", () => ({
   Target: () => <svg aria-hidden="true" />,
 }));
 
-<<<<<<< HEAD
 vi.mock("@/components/common/widget_header/WidgetHeader", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
 import WeeklyGoalWidget from "@/pages/homepage/components/WeeklyGoalWidget";
-=======
-vi.mock("../../../../components/common/widget_header/WidgetHeader", () => ({
-  default: ({ title }) => <div>{title}</div>,
-}));
-
-import WeeklyGoalWidget from "../../../../pages/homepage/components/WeeklyGoalWidget";
->>>>>>> main
 
 describe("WeeklyGoalWidget", () => {
   beforeEach(() => {

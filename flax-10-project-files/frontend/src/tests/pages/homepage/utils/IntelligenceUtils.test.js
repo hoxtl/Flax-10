@@ -2,11 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const overlapSleepMock = vi.fn();
 
-<<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/components/IntelligenceUtils.test.js
 vi.mock("@/components/settings/hooks/useSleepWarning", () => ({
-========
-vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
->>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/homepage/utils/IntelligenceUtils.test.js
   doesEventOverlapSleepWindow: (...args) => overlapSleepMock(...args),
 }));
 
@@ -21,11 +17,7 @@ import {
   getTodayLabel,
   getTravelContext,
   getUpcomingEvent,
-<<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/components/IntelligenceUtils.test.js
 } from "@/pages/homepage/components/IntelligenceUtils";
-========
-} from "../../../../pages/homepage/components/IntelligenceUtils";
->>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/homepage/utils/IntelligenceUtils.test.js
 
 const pinnedNow = new Date("2026-03-24T09:30:00.000Z");
 const baseLiveContextInput = {
@@ -73,6 +65,7 @@ describe("IntelligenceUtils", () => {
 
     it("renders friendly duration strings", () => {
       expect(formatWindowDuration(-1)).toBeNull();
+      expect(formatWindowDuration(Number.NaN)).toBeNull();
       expect(formatWindowDuration(45)).toBe("45m");
       expect(formatWindowDuration(60)).toBe("1h");
       expect(formatWindowDuration(95)).toBe("1h 35m");
@@ -114,6 +107,7 @@ describe("IntelligenceUtils", () => {
       const windows = [
         { start: new Date("2026-03-24T10:00:00.000Z"), end: new Date("2026-03-24T10:45:00.000Z") },
         { start: new Date("2026-03-24T11:00:00.000Z"), end: new Date("2026-03-24T12:30:00.000Z") },
+        { start: new Date("2026-03-24T09:00:00.000Z") },
       ];
       expect(getNextWindowMeta(windows, pinnedNow)).toEqual({ duration: "45m", label: "Next focus window 10:00" });
       expect(getNextWindowMeta([], pinnedNow)).toBeNull();

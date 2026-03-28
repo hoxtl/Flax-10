@@ -4,15 +4,15 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ReadingModal from '../../../components/modules/readings/ReadingModal';
-import { useReadingModal } from '../../../components/modules/hooks/useReadingModal';
-import { moduleFixture, readingFixture } from './readings/readingTestUtils';
+import ReadingModal from '@/components/modules/readings/ReadingModal';
+import { useReadingModal } from '@/components/modules/hooks/useReadingModal';
+import { moduleFixture, readingFixture } from './readingTestUtils';
 
-vi.mock('../../../components/modules/hooks/useReadingModal', () => ({
+vi.mock('@/components/modules/hooks/useReadingModal', () => ({
     useReadingModal: vi.fn(),
 }));
 
-vi.mock('../../../components/modules/readings/ReadingForm', () => ({
+vi.mock('@/components/modules/readings/ReadingForm', () => ({
     default: ({ initial, onCancel}) => (
         <div>
             <span>ReadingForm {initial?.title || ''}</span>
@@ -21,7 +21,7 @@ vi.mock('../../../components/modules/readings/ReadingForm', () => ({
     ),
 }));
 
-vi.mock('../../../components/modules/readings/ReadingCard', () => ({
+vi.mock('@/components/modules/readings/ReadingCard', () => ({
     default: ({ reading, onEdit, onDelete }) => (
         <div>
             <span>{reading.title}</span>
@@ -31,7 +31,7 @@ vi.mock('../../../components/modules/readings/ReadingCard', () => ({
     ),
 }));
 
-vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
+vi.mock('@/components/common/standard_modal/StandardModal', () => ({
     default: ({title, children, onClose}) => (
         <div> 
             <span>{title}</span>

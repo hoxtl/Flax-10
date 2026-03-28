@@ -4,19 +4,11 @@ const isNowMock = vi.fn();
 const getTflLinesForLocationMock = vi.fn();
 const isSevereDisruptionMock = vi.fn();
 
-<<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/components/RightNowUtils.test.js
 vi.mock("@/pages/homepage/utils/eventUtils", () => ({
   isNow: (...args) => isNowMock(...args),
 }));
 
 vi.mock("@/pages/homepage/utils/kclTflMapping", () => ({
-========
-vi.mock("../../../../pages/homepage/utils/eventUtils", () => ({
-  isNow: (...args) => isNowMock(...args),
-}));
-
-vi.mock("../../../../pages/homepage/utils/kclTflMapping", () => ({
->>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/homepage/utils/RightNowUtils.test.js
   getTflLinesForLocation: (...args) => getTflLinesForLocationMock(...args),
   isSevereDisruption: (...args) => isSevereDisruptionMock(...args),
 }));
@@ -29,11 +21,7 @@ import {
   getNextEvent,
   getTimeLeftBand,
   hasCampusCommute,
-<<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/components/RightNowUtils.test.js
 } from "@/pages/homepage/components/rightNowUtils";
-========
-} from "../../../../pages/homepage/components/rightNowUtils";
->>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/homepage/utils/RightNowUtils.test.js
 
 describe("RightNowUtils", () => {
   beforeEach(() => {
@@ -60,6 +48,13 @@ describe("RightNowUtils", () => {
     expect(getNextEvent([], now)).toBeNull();
   });
 
+  it("returns null when no matching current or future events exist", () => {
+    isNowMock.mockReturnValue(false);
+    expect(getCurrentBlock([{ id: 1, start_time: "x" }, { id: 2 }])).toBeNull();
+    const now = new Date("2026-03-24T09:00:00.000Z");
+    expect(getNextEvent([{ id: 1, start_time: "2026-03-24T08:00:00.000Z" }, { id: 2 }], now)).toBeNull();
+  });
+
   it("detects campus commute, journey summaries, and time-left strings", () => {
     getTflLinesForLocationMock.mockImplementation((value) => (String(value).includes("King's Cross") ? ["Victoria"] : []));
 
@@ -67,6 +62,7 @@ describe("RightNowUtils", () => {
     expect(hasCampusCommute({ title: "King's Cross seminar" })).toBe(true);
     expect(hasCampusCommute({ location: "Other" })).toBe(false);
     expect(hasCampusCommute(null)).toBe(false);
+  expect(hasCampusCommute({ location: " ", title: "" })).toBe(false);
 
     expect(formatTimeLeft(null, Date.now())).toBeNull();
     expect(formatTimeLeft("2026-03-24T09:00:00.000Z", new Date("2026-03-24T09:10:00.000Z").getTime())).toBe("Ended");
@@ -113,6 +109,22 @@ describe("RightNowUtils", () => {
     );
     expect(urgent).toMatchObject({ urgency: "critical", hasSevere: false, lineName: "Victoria" });
     expect(urgent.message).toContain("Leave now");
+  });
+
+  it("returns null journey summaries for missing journeys", () => {
+    expect(getJourneySummary(null)).toBeNull();
+    expect(getJourneySummary(undefined)).toBeNull();
+  });
+
+  it("uses urgent leave-by wording when inside the 15-minute pre-departure window", () => {
+    isSevereDisruptionMock.mockReturnValue(false);
+    const info = getLeaveByInfo(
+      { title: "Lecture", start_time: "2026-03-24T12:00:00.000Z" },
+      [{ lineName: "District", severityDescription: "Minor delays" }],
+      new Date("2026-03-24T11:05:00.000Z").getTime(),
+    );
+    expect(info).toMatchObject({ urgency: "urgent", hasSevere: false });
+    expect(info.message).toContain("Leave in 10 min");
   });
 
   it("handles non-array inputs and default leave-by severities", () => {

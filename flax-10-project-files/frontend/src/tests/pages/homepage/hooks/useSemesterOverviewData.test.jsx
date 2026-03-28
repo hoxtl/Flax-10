@@ -4,30 +4,18 @@ import { renderHook, waitFor } from "@testing-library/react";
 const getEventsMock = vi.fn();
 const getUpcomingDeadlinesMock = vi.fn();
 
-<<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/components/useSemesterOverviewData.test.jsx
 vi.mock("@/api/eventApi", () => ({
   getEvents: (...args) => getEventsMock(...args),
 }));
 
 vi.mock("@/api/deadlineApi", () => ({
-========
-vi.mock("../../../../api/eventApi", () => ({
-  getEvents: (...args) => getEventsMock(...args),
-}));
-
-vi.mock("../../../../api/deadlineApi", () => ({
->>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/homepage/hooks/useSemesterOverviewData.test.jsx
   getUpcomingDeadlines: (...args) => getUpcomingDeadlinesMock(...args),
 }));
 
 import {
   useSemesterData,
   useSemesterRange,
-<<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/pages/homepage/components/useSemesterOverviewData.test.jsx
 } from "@/pages/homepage/components/useSemesterOverviewData";
-========
-} from "../../../../pages/homepage/components/useSemesterOverviewData";
->>>>>>>> main:flax-10-project-files/frontend/src/tests/pages/homepage/hooks/useSemesterOverviewData.test.jsx
 
 describe("useSemesterOverviewData", () => {
   beforeEach(() => {
@@ -61,6 +49,31 @@ describe("useSemesterOverviewData", () => {
     expect(getEventsMock).toHaveBeenCalledWith({ start: "2026-01-01", end: "2026-04-01" });
     expect(result.current.events).toEqual([]);
     expect(result.current.deadlines).toEqual([]);
+  });
+
+  it("recovers gracefully when getUpcomingDeadlines rejects", async () => {
+    getEventsMock.mockResolvedValueOnce([{ id: 1 }]);
+    getUpcomingDeadlinesMock.mockRejectedValueOnce(new Error("fail"));
+
+    const { result } = renderHook(() => useSemesterData("2026-01-01", "2026-04-01"));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.events).toEqual([{ id: 1 }]);
+    expect(result.current.deadlines).toEqual([]);
+  });
+
+  it("loads events and deadlines when data is available", async () => {
+    getEventsMock.mockResolvedValueOnce([{ id: 7 }]);
+    getUpcomingDeadlinesMock.mockResolvedValueOnce([{ id: 8 }]);
+
+    const { result } = renderHook(() =>
+      useSemesterData(new Date("2026-01-01T00:00:00.000Z"), new Date("2026-04-01T00:00:00.000Z")),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.events).toEqual([{ id: 7 }]);
+    expect(result.current.deadlines).toEqual([{ id: 8 }]);
   });
 
   it("infers semester start from the midpoint when semesterStart is omitted", () => {

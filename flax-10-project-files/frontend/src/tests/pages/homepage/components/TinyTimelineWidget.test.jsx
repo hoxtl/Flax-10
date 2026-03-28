@@ -2,7 +2,6 @@ import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-<<<<<<< HEAD
 import TinyTimelineWidget from "@/pages/homepage/components/TinyTimelineWidget";
 
 const navigateMock = vi.fn();
@@ -15,11 +14,6 @@ const multiRowEvents = [
   { id: "d", title: "Slot D", start_time: "2026-03-24T12:00:00.000Z", end_time: "2026-03-24T12:30:00.000Z" },
   { id: "e", title: "Slot E", start_time: "2026-03-24T13:00:00.000Z", end_time: "2026-03-24T13:30:00.000Z" },
 ];
-=======
-import TinyTimelineWidget from "../../../../pages/homepage/components/TinyTimelineWidget";
-
-const navigateMock = vi.fn();
->>>>>>> main
 
 vi.mock("react-router-dom", () => ({
   Link: ({ children, to, ...props }) => <a href={to} {...props}>{children}</a>,
@@ -76,7 +70,6 @@ describe("TinyTimelineWidget", () => {
     render(<TinyTimelineWidget now={new Date("2026-03-24T10:30:00.000Z")} sortedEvents={[]} row={2} />);
     expect(screen.getByText("No events remaining today")).toBeInTheDocument();
   });
-<<<<<<< HEAD
 
   it("falls back to default props when none are provided", () => {
     render(<TinyTimelineWidget />);
@@ -128,6 +121,4 @@ describe("TinyTimelineWidget default export", () => {
     const mod = await import("@/pages/homepage/components/TinyTimelineWidget");
     expect(mod.default).toBe(mod.TinyTimelineWidget);
   });
-=======
->>>>>>> main
 });

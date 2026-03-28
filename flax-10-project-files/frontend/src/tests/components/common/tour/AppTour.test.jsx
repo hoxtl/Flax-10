@@ -7,7 +7,7 @@ import {
   getOverlayElement,
   findCardByText,
   findClassFragment,
-} from "./appTourTestUtils";
+} from "../appTourTestUtils";
 
 describe("AppTour", () => {
   afterEach(() => {

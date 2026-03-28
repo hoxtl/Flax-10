@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import PhotoWidget from "../../../../pages/homepage/components/PhotoWidget";
-import SemesterOverviewWidget from "../../../../pages/homepage/components/SemesterOverviewWidget";
+import SemesterOverviewWidget from "@/pages/homepage/components/SemesterOverviewWidget";
 import WeeklyGoalWidget from "../../../../pages/homepage/components/WeeklyGoalWidget";
 
 const useSemesterData = vi.fn();
@@ -16,7 +16,7 @@ vi.mock("lucide-react", () => ({
   Upload: () => <svg aria-hidden="true" />,
 }));
 
-vi.mock("../../../../pages/homepage/components/useSemesterOverviewData", () => ({
+vi.mock("@/pages/homepage/components/useSemesterOverviewData", () => ({
   useSemesterData: (...args) => useSemesterData(...args),
   useSemesterRange: (...args) => useSemesterRange(...args),
 }));
