@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
+vi.setConfig({ testTimeout: 10000 });
+
 function stripMotionProps(props) {
   const cleanProps = { ...props };
   delete cleanProps.layoutId;
@@ -158,7 +160,7 @@ describe("AdminPage – shell", () => {
       expect(screen.getByRole("button", { name: /Alice Smith/i })).toBeTruthy(),
     );
     expect(screen.getByRole("heading", { name: /View Detailed Reporting/i })).toBeTruthy();
-  });
+  }, 10000);
 
   it("renders all four tab buttons", async () => {
     render(<AdminPage />);

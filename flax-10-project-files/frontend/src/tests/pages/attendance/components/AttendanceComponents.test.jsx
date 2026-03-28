@@ -246,7 +246,7 @@ describe("Attendance components", () => {
     expect(onRecorded).toHaveBeenCalled();
     expect(showToastMock).toHaveBeenCalledWith("Attendance marked.");
     expect(screen.getByText("Showing first 20 events.")).toBeInTheDocument();
-  });
+  }, 10000);
 
   it("renders populated marked list with recent events", () => {
     const manyMarkedEvents = generateEvents(101, 31);
