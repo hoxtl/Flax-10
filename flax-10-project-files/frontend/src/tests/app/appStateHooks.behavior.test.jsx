@@ -47,7 +47,7 @@ describe("app state hooks behavior", () => {
       authenticated: true,
       loading: false,
       profile: { id: 7, major: "CS" },
-      user: { id: 7, name: "Ava" },
+      user: { id: 7, name: "Ava", has_completed_onboarding: true },
     });
     readActiveNavMock.mockReturnValue("tasks");
     hasSeenWelcomeMock.mockReturnValue(true);
@@ -65,7 +65,7 @@ describe("app state hooks behavior", () => {
 
     expect(result.current.activeNav).toBe("tasks");
     expect(result.current.authed).toBe(true);
-    expect(result.current.user).toEqual({ id: 7, name: "Ava" });
+    expect(result.current.user).toEqual({ id: 7, name: "Ava", has_completed_onboarding: true });
     expect(result.current.profile).toEqual({ id: 7, major: "CS" });
     expect(result.current.showWelcome).toBe(false);
     expect(result.current.isBanned).toBe(false);
@@ -170,6 +170,7 @@ describe("app state hooks behavior", () => {
     useAuthMock.mockReturnValueOnce({
       loading: false,
       profile: {},
+      user: {},
     });
 
     const { result } = renderHook(() => useTourCheck());
@@ -178,6 +179,18 @@ describe("app state hooks behavior", () => {
 
     expect(localStorage.getItem("flax_tour_done_undefined")).toBeNull();
     expect(localStorage.getItem("flax_tour_done_7")).toBeNull();
+    expect(result.current[0]).toBe(false);
+  });
+
+  it("keeps the tour hidden for users who did not just complete onboarding", () => {
+    useAuthMock.mockReturnValueOnce({
+      loading: false,
+      profile: { id: 8, major: "Computer Science" },
+      user: { id: 8, name: "Jane" },
+    });
+
+    const { result } = renderHook(() => useTourCheck());
+
     expect(result.current[0]).toBe(false);
   });
 });
