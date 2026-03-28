@@ -90,10 +90,10 @@ function ImagePreview({ src, onRemove }) {
 function ImagePicker({ fileRef, onFile, hasImage }) {
     const label = hasImage ? "Replace image" : "+ Add image";
     return (
-        <button type="button" className={styles.addImageBtn} onClick={() => fileRef.current?.click()}>
+        <PrimaryButton type="button" className={styles.addImageBtn} variant="secondary" pill onClick={() => fileRef.current?.click()}>
             <input ref={fileRef} type="file" accept="image/*" onChange={onFile} hidden />
-            <span>{label}</span>
-        </button>
+            {label}
+        </PrimaryButton>
     );
 }
 

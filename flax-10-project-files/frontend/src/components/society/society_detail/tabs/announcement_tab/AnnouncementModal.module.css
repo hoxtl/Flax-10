@@ -54,26 +54,14 @@
 }
 
 .addImageBtn {
-    min-height: 44px;
-    padding: 10px 16px;
-    border: 1px dashed var(--border);
-    border-radius: 10px;
-    display: inline-flex;
-    align-items: center;
+    min-height: 38px;
+    width: 100%;
     justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text);
-    background: var(--surface);
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .addImageBtn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface-alt, rgba(0, 0, 0, 0.02));
+    border-color: var(--primary-color, #9E7E5D);
+    color: var(--primary-color, #9E7E5D);
 }
 
 .removeBtn {
