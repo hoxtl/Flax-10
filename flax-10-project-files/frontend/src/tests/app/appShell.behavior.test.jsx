@@ -1,5 +1,5 @@
 /*
- * App shell coverage tests for routing and shell-only behaviour.
+ * App shell behavior tests for routing and shell-only behaviour.
  */
 
 import React from "react";
@@ -185,7 +185,7 @@ function renderAppScreen(activeNav) {
   );
 }
 
-describe("app shell coverage", () => {
+describe("app shell behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useNavHandlerMock.mockReturnValue(vi.fn());

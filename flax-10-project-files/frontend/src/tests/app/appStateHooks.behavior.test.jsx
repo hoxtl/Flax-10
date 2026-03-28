@@ -39,7 +39,7 @@ import { useAppState } from "../../app/hooks/useAppState";
 import { useThemeState } from "../../app/hooks/useThemeState";
 import { useTourCheck } from "../../app/hooks/useTourCheck";
 
-describe("app state hooks coverage", () => {
+describe("app state hooks behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();

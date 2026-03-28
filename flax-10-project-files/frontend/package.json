@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:audit-dead": "node ./scripts/find-dead-tests.mjs",
+    "test:check-spacing": "node ./scripts/check-test-spacing.mjs",
+    "test:fix-spacing": "node ./scripts/check-test-spacing.mjs --fix",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
