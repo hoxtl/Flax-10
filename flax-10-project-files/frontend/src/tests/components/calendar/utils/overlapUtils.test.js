@@ -36,6 +36,12 @@ describe('eventsOverlap', () => {
         const e2 = makeEvent(2, '2026-03-15T10:00:00Z', '2026-03-15T11:00:00Z');
         expect(eventsOverlap(e1, e2)).toBe(true);
     });
+
+    it('treats zero-length events at the same start time as overlapping visual cards', () => {
+        const e1 = makeEvent(1, '2026-03-15T23:59:00Z', '2026-03-15T23:59:00Z');
+        const e2 = makeEvent(2, '2026-03-15T23:59:00Z', '2026-03-15T23:59:00Z');
+        expect(eventsOverlap(e1, e2)).toBe(true);
+    });
 });
 
 describe('findOverlappingEvents', () => {
@@ -139,5 +145,15 @@ describe('calculateEventColumns', () => {
         const result = calculateEventColumns(events);
         // event 3 starts when event 1 ends, so it can reuse column 0
         expect(result.get(getEventKey(events[2])).column).toBe(0);
+    });
+
+    it('splits simultaneous zero-length events into separate columns', () => {
+        const events = [
+            makeEvent(1, '2026-03-15T23:59:00Z', '2026-03-15T23:59:00Z'),
+            makeEvent(2, '2026-03-15T23:59:00Z', '2026-03-15T23:59:00Z'),
+        ];
+        const result = calculateEventColumns(events);
+        expect(result.get(getEventKey(events[0]))).toEqual({ column: 0, totalColumns: 2 });
+        expect(result.get(getEventKey(events[1]))).toEqual({ column: 1, totalColumns: 2 });
     });
 });

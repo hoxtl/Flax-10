@@ -39,10 +39,9 @@
   height: 42px;
   border-radius: 14px;
   cursor: pointer;
-  color: rgba(20, 12, 6, 0.82);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  font-size: 1.1rem;
+  color: var(--text);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 15%, transparent);
   transition: all 0.2s;
   display: flex;
   align-items: center;

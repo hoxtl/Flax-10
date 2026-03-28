@@ -52,7 +52,7 @@
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.65rem;
   font-weight: 500;
-  color: rgba(107, 83, 68, 0.65);
+  color: color-mix(in srgb, var(--primary-strong) 65%, transparent);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -80,7 +80,7 @@
 .planTimelineGapSlotCta {
   font-size: 0.72rem;
   font-weight: 500;
-  color: rgba(107, 83, 68, 0.75);
+  color: color-mix(in srgb, var(--primary-strong) 75%, transparent);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -128,9 +128,9 @@
   margin-top: 4px;
   padding: 10px 12px;
   background: var(--widget-card-bg-glass);
-  border: 1px solid rgba(210, 180, 140, 0.55);
+  border: 1px solid color-mix(in srgb, var(--primary) 55%, transparent);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--primary) 8%, transparent);
   z-index: 10;
   display: flex;
   flex-direction: column;

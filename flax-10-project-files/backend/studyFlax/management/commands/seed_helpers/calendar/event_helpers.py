@@ -228,6 +228,19 @@ def build_lecture_events(user, module, lecture_tag):
     valid = [c for c in candidates if not _in_reading_week(c)][:10]
     return [(user, module, c, c + timedelta(hours=2), lecture_tag) for c in valid]
 PRIORITY_DEADLINE_OFFSETS = [-5, 3, 7]
+SEEDED_DEADLINE_EVENING_SLOTS = [
+    (18, 0),
+    (19, 30),
+    (20, 30),
+    (21, 30),
+    (22, 0),
+]
+SEEDED_DAYTIME_DEADLINE_SLOTS = [
+    (9, 0),
+    (11, 0),
+    (14, 0),
+    (16, 0),
+]
 
 def _get_random_offset(used_offsets, index=None):
     if index is not None and index < len(PRIORITY_DEADLINE_OFFSETS):
@@ -239,12 +252,19 @@ def _get_random_offset(used_offsets, index=None):
     used_offsets.add(chosen)
     return chosen
 
-def _deadline_timing(deadline_type, now, day_offset):
+def _deadline_slot_seed(module_code, deadline_type, index, day_offset):
+    code_value = sum(ord(char) for char in (module_code or ""))
+    type_value = sum(ord(char) for char in deadline_type)
+    return code_value + type_value + (index * 7) + day_offset
+
+
+def _deadline_timing(deadline_type, now, day_offset, slot_seed=0):
 
     # Keep seeded deadlines out of the 11 PM slot because the late-night row
     # renders differently in the calendar UI for demo users.
-    hour = SEEDED_DEADLINE_LATEST_START_HOUR if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
-    start = now.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
+    slots = SEEDED_DEADLINE_EVENING_SLOTS if deadline_type in ("coursework", "quiz") else SEEDED_DAYTIME_DEADLINE_SLOTS
+    hour, minute = slots[slot_seed % len(slots)]
+    start = now.replace(hour=hour, minute=minute, second=0, microsecond=0) + timedelta(days=day_offset)
     end = start + timedelta(hours=2) if deadline_type in ("exam", "presentation") else None
     location = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None
     return start, end, location
@@ -253,7 +273,8 @@ def _build_single_deadline(module, deadline_type, title, description, now, used_
     if Deadline.objects.filter(module=module, title=title).exists():
         return None
     day_offset = _get_random_offset(used_offsets, index=index)
-    start, end, location = _deadline_timing(deadline_type, now, day_offset)
+    slot_seed = _deadline_slot_seed(module.module_code, deadline_type, index or 0, day_offset)
+    start, end, location = _deadline_timing(deadline_type, now, day_offset, slot_seed=slot_seed)
     return Deadline(
         module=module, title=title, deadline_type=deadline_type,
         description=description, start_due_date=start,

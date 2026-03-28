@@ -236,8 +236,9 @@ describe("IntelligenceUtils", () => {
       expect(getLiveContext(context)).toEqual({
         iconKey: "Clock3",
         label: "On now",
+        location: "Library",
         meta: "Until 10:30",
-        text: "😴 Deep work · Library",
+        text: "😴 Deep work",
         tone: "neutral",
       });
     });

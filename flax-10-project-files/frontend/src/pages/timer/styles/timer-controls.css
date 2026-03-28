@@ -156,8 +156,8 @@
 .configInsetPanel {
     width: 100%;
     border-radius: 16px;
-    background: color-mix(in srgb, var(--surface-card) 92%, #f5efe7);
-    border: 1px solid color-mix(in srgb, var(--border) 84%, #d6d3d1);
+    background: color-mix(in srgb, var(--surface-card) 92%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
     box-shadow: none;
     padding: 0.8rem 0.75rem 0.7rem;
     display: flex;
@@ -166,8 +166,8 @@
 }
 
 :global([data-mode="dark"]) .configInsetPanel {
-    background: color-mix(in srgb, var(--surface-card) 94%, #17130f);
-    border-color: color-mix(in srgb, var(--border) 84%, #3a342d);
+    background: color-mix(in srgb, var(--surface-card) 94%, var(--color-bg));
+    border-color: color-mix(in srgb, var(--border) 84%, transparent);
 }
 
 .settings {

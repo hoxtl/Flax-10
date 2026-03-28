@@ -128,7 +128,7 @@
   background: var(--color-primary);
   color: white;
   border-color: var(--color-primary);
-  box-shadow: 0 4px 14px rgba(123, 103, 81, 0.25);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 25%, transparent);
 }
 
 .editBtnWrap {

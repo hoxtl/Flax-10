@@ -96,6 +96,7 @@ function JourneyInputs({ destCoords, locating, manualDestination, manualStart, o
 }
 
 /** Section component for planning a custom journey between two locations on campus. */
+
 export function UserJourneySection(props) {
   const [startCoords, setStartCoords] = useState(null);
   const [destCoords, setDestCoords] = useState(null);

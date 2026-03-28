@@ -17,14 +17,14 @@
 }
 
 .moduleCode {
-    --feature-accent: color-mix(in srgb, var(--modules-accent-ink-strong) 78%, var(--color-highlight, #d0ab73) 22%);
+    --feature-accent: color-mix(in srgb, var(--modules-accent-ink-strong) 78%, var(--color-highlight) 22%);
     padding: 0.24rem 0.58rem;
     font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, white 18%, transparent),
-        0 6px 14px color-mix(in srgb, black 10%, transparent);
+        0 6px 14px color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .departmentChip {
@@ -34,7 +34,7 @@
     letter-spacing: 0.03em;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, white 16%, transparent),
-        0 4px 10px color-mix(in srgb, black 8%, transparent);
+        0 4px 10px color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .courseChip {
@@ -44,7 +44,7 @@
     letter-spacing: 0.02em;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, white 14%, transparent),
-        0 4px 10px color-mix(in srgb, black 8%, transparent);
+        0 4px 10px color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .enrolledBadge {

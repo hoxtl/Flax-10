@@ -1,4 +1,5 @@
 /* Plan timeline now-marker row. */
+
 import { DAY_START_HOUR } from "../../utils/timelineUtils";
 import { formatHour12h } from "../../utils/dateFormatUtils";
 import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "./parts/TimelineRowLayout";

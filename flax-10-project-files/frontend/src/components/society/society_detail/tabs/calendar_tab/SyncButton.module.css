@@ -5,9 +5,9 @@
 }
 
 .syncBtn.synced:not(:disabled) {
-    background: linear-gradient(180deg, rgba(84, 60, 39, 0.98), rgba(60, 41, 26, 0.98));
+    background: linear-gradient(180deg, var(--color-primary), var(--color-primary-strong));
     color: rgba(255, 255, 255, 0.96);
-    border-color: rgba(74, 52, 33, 0.38);
+    border-color: var(--color-primary-strong);
 }
 
 .syncBtn.synced:not(:disabled):hover {

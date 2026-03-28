@@ -1,6 +1,7 @@
 /*
  * Tests for ScheduleCard and all its internal sub-components.
  */
+
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { ScheduleCard } from "../../../../../components/calendar/header/schedule_manager/ScheduleCard";

@@ -107,7 +107,7 @@
   background: var(--color-card);
   border: 1.5px dashed var(--widget-border) !important;
   border-radius: var(--card-radius);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 7%, transparent) !important;
 }
 
 .widgetWrapper.dragging {
@@ -117,8 +117,8 @@
 .widgetWrapper.dragOver {
   border-color: var(--color-primary);
   box-shadow:
-    0 0 0 3px rgba(123, 103, 81, 0.1),
-    0 8px 32px rgba(0, 0, 0, 0.13);
+    0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent),
+    0 8px 32px color-mix(in srgb, var(--primary) 13%, transparent);
 }
 
 .widgetContent {
@@ -157,7 +157,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.35);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--urgent) 35%, transparent);
   padding: 0;
   line-height: 1;
 }
@@ -230,7 +230,7 @@
 .addSheetOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(20, 14, 8, 0.4);
+  background: color-mix(in srgb, var(--primary-strong) 40%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -244,7 +244,7 @@
   max-height: min(82vh, 700px);
   padding: 20px 22px 30px;
   overflow-y: auto;
-  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 -12px 48px color-mix(in srgb, var(--primary) 14%, transparent);
   animation: slideUp 0.3s ease-out;
 }
 

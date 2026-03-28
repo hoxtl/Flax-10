@@ -195,7 +195,7 @@
 .focusModeTransitionText {
     font-size: 2.8rem;
     font-weight: 700;
-    color: var(--color-primary, #7B6751);
+    color: var(--primary);
     letter-spacing: 0.04em;
     text-transform: lowercase;
     position: relative;
@@ -295,7 +295,7 @@
 }
 
 .timerResumeBtn:hover {
-    background: rgba(139, 166, 143, 0.12);
+    background: color-mix(in srgb, var(--color-sage-primary) 12%, transparent);
 }
 
 .timerResumeBtnActive {

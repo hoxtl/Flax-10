@@ -1,6 +1,7 @@
 /*
  * Tests for AdminBadges, BanUserModal, BanReportedSocietyModal, and adminTabs.
  */
+
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 

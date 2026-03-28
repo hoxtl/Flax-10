@@ -350,6 +350,7 @@ function TourFrame(props) {
 }
 
 /** Interactive onboarding tour for the app's main areas. */
+
 export default function AppTour({ onDone }) {
   const [step, setStep] = useState(0);
   const currentStep = TOUR_STEPS[step];

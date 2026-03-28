@@ -44,6 +44,42 @@ import {
     hydrateTasks,
 } from '../../../../components/timer/task_input/taskInputUtils';
 
+const alphaSortCases = {
+    leftMissing: [
+        { id: 2, title: null },
+        { id: 1, title: 'Alpha' },
+    ],
+    rightMissing: [
+        { id: 1, title: 'Alpha' },
+        { id: 2, title: null },
+    ],
+};
+
+const dateAddedSortCases = {
+    leftMissing: [
+        { id: null, title: 'No id' },
+        { id: 3, title: 'Has id' },
+    ],
+    rightMissing: [
+        { id: 3, title: 'Has id' },
+        { id: null, title: 'No id' },
+    ],
+};
+
+function expectAlphaSortFallbacks() {
+    expect(sortTasks([...alphaSortCases.leftMissing], 'alpha')[0].title).toBe(null);
+    expect(sortTasks([...alphaSortCases.rightMissing], 'alpha')[0].title).toBe(null);
+    expect(sortTasks([...alphaSortCases.leftMissing], 'alpha_desc')[0].title).toBe('Alpha');
+    expect(sortTasks([...alphaSortCases.rightMissing], 'alpha_desc')[0].title).toBe('Alpha');
+}
+
+function expectDateAddedSortFallbacks() {
+    expect(sortTasks([...dateAddedSortCases.leftMissing], 'date_added')[0].id).toBe(3);
+    expect(sortTasks([...dateAddedSortCases.rightMissing], 'date_added')[0].id).toBe(3);
+    expect(sortTasks([...dateAddedSortCases.leftMissing], 'date_added_asc')[0].id).toBe(null);
+    expect(sortTasks([...dateAddedSortCases.rightMissing], 'date_added_asc')[0].id).toBe(null);
+}
+
 beforeEach(async () => {
     vi.clearAllMocks();
     const { normalizeModuleCode, getModuleCodePrefix } = await import('../../../../utils/moduleCodeUtils');
@@ -146,46 +182,20 @@ describe('sortTasks', () => {
         expect(sorted[0].id).toBe(2);
     });
 
-  it('sorts in reverse alphabetical order', () => {
-    const sorted = sortTasks([...tasks], 'alpha_desc');
-    expect(sorted[0].title).toBe('Zebra');
-  });
+    it('sorts in reverse alphabetical order', () => {
+        const sorted = sortTasks([...tasks], 'alpha_desc');
+        expect(sorted[0].title).toBe('Zebra');
+    });
 
-  it('sorts by date added ascending', () => {
-    const sorted = sortTasks([...tasks], 'date_added_asc');
-    expect(sorted[0].id).toBe(1);
-  });
+    it('sorts by date added ascending', () => {
+        const sorted = sortTasks([...tasks], 'date_added_asc');
+        expect(sorted[0].id).toBe(1);
+    });
 
-  it('handles missing titles in alpha sorts', () => {
-    const missingTitleTasks = [
-      { id: 2, title: null },
-      { id: 1, title: 'Alpha' },
-    ];
-    const missingRightTitleTasks = [
-      { id: 1, title: 'Alpha' },
-      { id: 2, title: null },
-    ];
-    expect(sortTasks([...missingTitleTasks], 'alpha')[0].title).toBe(null);
-    expect(sortTasks([...missingRightTitleTasks], 'alpha')[0].title).toBe(null);
-    expect(sortTasks([...missingTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
-    expect(sortTasks([...missingRightTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
-  });
-
-  it('handles missing ids in date-added sorts', () => {
-    const missingIdTasks = [
-      { id: null, title: 'No id' },
-      { id: 3, title: 'Has id' },
-    ];
-    const missingRightIdTasks = [
-      { id: 3, title: 'Has id' },
-      { id: null, title: 'No id' },
-    ];
-
-    expect(sortTasks([...missingIdTasks], 'date_added')[0].id).toBe(3);
-    expect(sortTasks([...missingRightIdTasks], 'date_added')[0].id).toBe(3);
-    expect(sortTasks([...missingIdTasks], 'date_added_asc')[0].id).toBe(null);
-    expect(sortTasks([...missingRightIdTasks], 'date_added_asc')[0].id).toBe(null);
-  });
+    it('handles missing titles and ids in alpha and date-added sorts', () => {
+        expectAlphaSortFallbacks();
+        expectDateAddedSortFallbacks();
+    });
 
     it('falls back to priority sort for unknown sort type', () => {
         const sorted = sortTasks([...tasks], 'unknown');
@@ -224,19 +234,19 @@ describe('hydrateTasks', () => {
         expect(hydrateTasks(undefined, undefined)).toEqual([]);
     });
 
-  it('assigns default color from FOCUS_BLOCK_COLOURS_HEX when list has no color', () => {
-    const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
-    const lists = [{ id: 1, name: 'Work' }];
-    const result = hydrateTasks(tasks, lists);
-    expect(result[0].list_color).toBeTruthy();
-  });
+    it('assigns default color from FOCUS_BLOCK_COLOURS_HEX when list has no color', () => {
+        const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
+        const lists = [{ id: 1, name: 'Work' }];
+        const result = hydrateTasks(tasks, lists);
+        expect(result[0].list_color).toBeTruthy();
+    });
 
-  it('uses "Other" when a known list is missing its name', () => {
-    const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
-    const lists = [{ id: 1, color: '#abcdef' }];
-    const result = hydrateTasks(tasks, lists);
+    it('uses "Other" when a known list is missing its name', () => {
+        const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
+        const lists = [{ id: 1, color: '#abcdef' }];
+        const result = hydrateTasks(tasks, lists);
 
-    expect(result[0].list_name).toBe('Other');
-    expect(result[0].list_color).toBe('#abcdef');
-  });
+        expect(result[0].list_name).toBe('Other');
+        expect(result[0].list_color).toBe('#abcdef');
+    });
 });
