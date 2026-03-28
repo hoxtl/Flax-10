@@ -90,10 +90,16 @@ describe('buildModuleItems', () => {
         expect(result.filter((item) => item.value === 'CS1001')).toHaveLength(1);
     });
 
-    it('shows label with code only when no name', () => {
+  it('shows label with code only when no name', () => {
         const modules = [{ code: 'XY999', name: '' }];
         const result = buildModuleItems(modules, []);
         expect(result[0].label).toBe('XY999');
+    });
+
+    it('uses the empty-string fallback when task module_name is missing', () => {
+        const tasks = [{ module_code: 'xy123', module_name: null }];
+        const result = buildModuleItems([], tasks);
+        expect(result).toEqual([{ value: 'XY123', label: 'XY123' }]);
     });
 
     it('sorts module options by code and ignores blank normalised task codes', () => {
@@ -239,9 +245,9 @@ describe('filterTasks', () => {
 });
 
 describe('getRecommendedTask', () => {
-    it('returns null for empty list', () => {
-        expect(getRecommendedTask([])).toBeNull();
-    });
+  it('returns null for empty list', () => {
+    expect(getRecommendedTask([])).toBeNull();
+  });
 
     it('returns the highest urgency task', () => {
         const yesterday = new Date(Date.now() - 86400000).toISOString();
@@ -254,10 +260,26 @@ describe('getRecommendedTask', () => {
         expect(result.id).toBe(2);
     });
 
-    it('returns first task when list has one item', () => {
-        const tasks = [{ id: 1, title: 'Only Task' }];
-        expect(getRecommendedTask(tasks).id).toBe(1);
-    });
+  it('returns first task when list has one item', () => {
+    const tasks = [{ id: 1, title: 'Only Task' }];
+    expect(getRecommendedTask(tasks).id).toBe(1);
+  });
+
+  it('breaks urgency ties with due date order', () => {
+    const nearFuture = new Date(Date.now() + 72 * 3600000);
+    const earlier = new Date(nearFuture.getTime() + 3600000).toISOString();
+    const later = new Date(nearFuture.getTime() + 7200000).toISOString();
+    const tasks = [
+      { id: 1, title: 'Later cool task', due_date: later },
+      { id: 2, title: 'Earlier cool task', due_date: earlier },
+    ];
+
+    expect(getRecommendedTask(tasks).id).toBe(2);
+  });
+
+  it('returns null when the first sorted task is undefined', () => {
+    expect(getRecommendedTask([undefined])).toBeNull();
+  });
 });
 
 describe('mapEnrolledModules', () => {
@@ -292,11 +314,19 @@ describe('mapEnrolledModules', () => {
         expect(result).toHaveLength(0);
     });
 
-    it('falls back to module title when module_name is missing', async () => {
+  it('falls back to module title when module_name is missing', async () => {
         const { isEnrolledIn } = await import('../../../../components/modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValue(true);
         const result = mapEnrolledModules([{ id: 1, module_code: 'cs55', title: 'Title fallback' }], [1]);
         expect(result).toEqual([{ code: 'CS55', name: 'Title fallback' }]);
+    });
+
+    it('falls back to an empty name and empty enrollments array when names are missing', async () => {
+        const { isEnrolledIn } = await import('../../../../components/modules/utils/moduleUtils');
+        isEnrolledIn.mockReturnValue(true);
+        const result = mapEnrolledModules([{ id: 1, module_code: 'cs77' }], null);
+        expect(result).toEqual([{ code: 'CS77', name: '' }]);
+        expect(isEnrolledIn).toHaveBeenCalledWith(1, []);
     });
 });
 
