@@ -21,6 +21,7 @@ export function getEventTheme(event, tags) {
  * @param {{ getTagByName: (name: string) => object|null } | { tags: object[] }} tagsCtx
  *   Accepts a context object with a getTagByName method, or a plain object with a tags array.
  */
+
 function resolveTagByName(tagName, tagsCtx) {
     if (!tagsCtx || !tagName) return null;
     if (typeof tagsCtx.getTagByName === 'function') return tagsCtx.getTagByName(tagName);

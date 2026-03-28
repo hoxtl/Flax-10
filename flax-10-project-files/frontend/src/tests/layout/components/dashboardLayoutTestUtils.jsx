@@ -170,12 +170,14 @@ function setDashboardUser(user) {
 }
 
 /** Sets the viewport width used by dashboard layout tests. */
+
 export function setDashboardLayoutViewport(width) {
   window.innerWidth = width;
   window.dispatchEvent(new Event("resize"));
 }
 
 /** Prepares mocked dashboard layout state before rendering. */
+
 export async function prepareDashboardLayoutTest({
   user = mockUser,
   selectedDate = new Date(),
@@ -193,6 +195,7 @@ export async function prepareDashboardLayoutTest({
 }
 
 /** Renders the dashboard layout with default test props. */
+
 export function renderDashboardLayout({
   activeNav = "home",
   onNavChange = () => {},

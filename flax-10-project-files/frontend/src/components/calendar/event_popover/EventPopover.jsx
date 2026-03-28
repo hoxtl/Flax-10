@@ -1,4 +1,5 @@
 /* Event details popover with dynamic positioning and actions. */
+
 import { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Pencil, Trash2, MapPin, Clock, AlignLeft } from 'lucide-react';
@@ -140,6 +141,7 @@ function PopoverPortal({ popoverRef, pos, arrowStyle, event, tag, actions, onClo
 }
 
 /* Event details popover with dynamic positioning. */
+
 export function EventPopover({ event, anchorRect, onClose, actions, tag, readOnly, viewMode }) {
   const popoverRef = useRef(null);
   const pos = usePopoverPosition(popoverRef, anchorRect, event, viewMode);

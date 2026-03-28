@@ -86,6 +86,7 @@ function ModulesTab({ moduleGroupKeys, groupedModuleItems, filterModuleCodes, on
 }
 
 /* Dropdown panel for filtering tasks by list or module. */
+
 export default function TaskFilterPanel(props) {
   const { profile } = useAuth();
   const isTeacher = profile?.role === "teacher";

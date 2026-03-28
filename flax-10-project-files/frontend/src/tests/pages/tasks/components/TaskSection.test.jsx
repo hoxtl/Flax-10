@@ -1,4 +1,5 @@
 /* Tests for TaskSection component rendering, collapsing, and empty state */
+
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import TaskSection from "../../../../pages/tasks/components/TaskSection";

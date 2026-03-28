@@ -102,7 +102,6 @@ def _print_success_footer(stdout, style):
     stdout.write(style.SUCCESS("  ✅  Database cleared"))
     stdout.write(style.SUCCESS(div))
     stdout.write("")
-    stdout.write("  Run  python manage.py seed  to reseed.")
     stdout.write("")
 
 def confirm_truncate(stdout):

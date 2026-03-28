@@ -1,4 +1,5 @@
 /* Plan timeline hour-mark row. */
+
 import { formatHour12h } from "../../utils/dateFormatUtils";
 
 export function HourMarkRow({ row, styles }) {

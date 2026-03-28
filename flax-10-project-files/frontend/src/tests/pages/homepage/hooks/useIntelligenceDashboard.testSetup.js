@@ -74,6 +74,7 @@ vi.mock("../../../../pages/analytics/hooks/useAnalyticsOverview", () => ({
 }));
 
 /** Resets intelligence dashboard mocks to their default behaviour. */
+
 export function resetIntelligenceDashboardMocks() {
   vi.clearAllMocks();
   localStorage.clear();
@@ -92,6 +93,7 @@ export function resetIntelligenceDashboardMocks() {
 }
 
 /** Builds the populated profile used by the dashboard hook tests. */
+
 export function buildFullProfile() {
   return {
     id: 9,
@@ -105,6 +107,7 @@ export function buildFullProfile() {
 }
 
 /** Builds a standard slot-five payload for the dashboard hook tests. */
+
 export function buildFullSlot5() {
   return {
     sortedEvents: [{ id: 1, source: "timetable", title: "Lecture", start_time: "2026-03-26T09:00:00Z", end_time: "2026-03-26T10:00:00Z" }],
@@ -115,6 +118,7 @@ export function buildFullSlot5() {
 }
 
 /** Builds a dashboard profile with sensible default homepage settings. */
+
 export function createDashboardProfile(id, settings = {}) {
   return {
     id,
