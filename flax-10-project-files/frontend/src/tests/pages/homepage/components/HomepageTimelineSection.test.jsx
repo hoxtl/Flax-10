@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for the homepage timeline section widget behaviour.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -78,43 +81,44 @@ const baseStyles = {
   timelineTrackContent: "ttc",
 };
 
+const defaultSectionProps = {
+  dayTasks: [],
+  deadlineSuggestions: [],
+  getTag: () => ({ name: "lecture" }),
+  handleAutoSchedule: vi.fn(),
+  handleConflictAutoMove: vi.fn(),
+  handleConflictPushTomorrow: vi.fn(),
+  handleQuickStartGap: vi.fn(),
+  handleReschedule: vi.fn(),
+  handleResolveTimelineConflicts: vi.fn().mockResolvedValue(undefined),
+  handleTaskToggle: vi.fn(),
+  handleTimelineDelete: vi.fn(),
+  hasTimerSession: false,
+  isWidget: false,
+  openModal: vi.fn(),
+  openTimelinePopup: vi.fn(),
+  resolveConflictsLoading: false,
+  sortedEvents: [],
+  styles: baseStyles,
+  suggestableTasks: [],
+  taskLists: [],
+  tasksDueToday: [],
+  timeLeft: 0,
+  timerMode: "work",
+  timerTask: null,
+};
+
 function renderSection(overrides = {}) {
-  const setCompleted = vi.fn((fn) => (typeof fn === "function" ? fn(new Set()) : fn));
   const props = {
+    ...defaultSectionProps,
     completedEventIds: new Set(),
-    dayTasks: [],
-    deadlineSuggestions: [],
-    getTag: () => ({ name: "lecture" }),
-    handleAutoSchedule: vi.fn(),
-    handleConflictAutoMove: vi.fn(),
-    handleConflictPushTomorrow: vi.fn(),
-    handleQuickStartGap: vi.fn(),
-    handleReschedule: vi.fn(),
-    handleResolveTimelineConflicts: vi.fn().mockResolvedValue(undefined),
-    handleTaskToggle: vi.fn(),
-    handleTimelineDelete: vi.fn(),
-    hasTimerSession: false,
-    isWidget: false,
     now: new Date("2026-03-28T10:00:00.000Z"),
-    openModal: vi.fn(),
-    openTimelinePopup: vi.fn(),
-    resolveConflictsLoading: false,
     selectedDate: new Date("2026-03-28T12:00:00.000Z"),
-    setCompletedEventIds: setCompleted,
-    sortedEvents: [],
-    styles: baseStyles,
-    suggestableTasks: [],
-    taskLists: [],
-    tasksDueToday: [],
-    timeLeft: 0,
-    timerMode: "work",
-    timerTask: null,
+    setCompletedEventIds: vi.fn((fn) => (typeof fn === "function" ? fn(new Set()) : fn)),
     ...overrides,
   };
-
   return render(
     <MemoryRouter>
-      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
       <HomepageTimelineSection {...props} />
     </MemoryRouter>,
   );
@@ -127,36 +131,14 @@ describe("HomepageTimelineSection", () => {
     isTodayMock.mockReturnValue(true);
   });
 
-  it("wraps TimelineContent with animation unless rendered as a widget", () => {
-    const { rerender } = renderSection({});
+  it("wraps TimelineContent with animation when not a widget", () => {
+    renderSection({});
     expect(screen.getByTestId("timeline-motion")).toBeInTheDocument();
     expect(screen.getByTestId("timeline-motion")).toHaveAttribute("id", "timeline-section");
+  });
 
-    rerender(
-      <MemoryRouter>
-        <HomepageTimelineSection
-          completedEventIds={new Set()}
-          dayTasks={[]}
-          deadlineSuggestions={[]}
-          getTag={() => ({})}
-          handleQuickStartGap={vi.fn()}
-          handleTaskToggle={vi.fn()}
-          hasTimerSession={false}
-          isWidget
-          now={new Date()}
-          openModal={vi.fn()}
-          openTimelinePopup={vi.fn()}
-          selectedDate={new Date()}
-          setCompletedEventIds={vi.fn()}
-          sortedEvents={[]}
-          styles={baseStyles}
-          suggestableTasks={[]}
-          taskLists={[]}
-          tasksDueToday={[]}
-        />
-      </MemoryRouter>,
-    );
-
+  it("omits animation wrapper when rendered as a widget", () => {
+    renderSection({ isWidget: true, getTag: () => ({}) });
     expect(screen.queryByTestId("timeline-motion")).toBeNull();
   });
 
@@ -178,37 +160,13 @@ describe("HomepageTimelineSection", () => {
     expect(screen.queryByRole("button", { name: /auto schedule study time/i })).toBeNull();
   });
 
-  it("shows spinner copy while auto scheduling or conflict resolution runs", () => {
-    const { rerender } = renderSection({ autoScheduleLoading: true, handleAutoSchedule: vi.fn() });
+  it("shows scheduling spinner copy while auto schedule is loading", () => {
+    renderSection({ autoScheduleLoading: true, handleAutoSchedule: vi.fn() });
     expect(screen.getByRole("button", { name: /auto schedule study time/i })).toHaveTextContent("Scheduling…");
+  });
 
-    rerender(
-      <MemoryRouter>
-        <HomepageTimelineSection
-          autoScheduleLoading={false}
-          completedEventIds={new Set()}
-          dayTasks={[]}
-          deadlineSuggestions={[]}
-          getTag={() => ({})}
-          handleAutoSchedule={vi.fn()}
-          handleQuickStartGap={vi.fn()}
-          handleResolveTimelineConflicts={vi.fn()}
-          handleTaskToggle={vi.fn()}
-          hasTimerSession={false}
-          now={new Date("2026-03-28T10:00:00.000Z")}
-          openModal={vi.fn()}
-          openTimelinePopup={vi.fn()}
-          resolveConflictsLoading
-          selectedDate={new Date("2026-03-28T12:00:00.000Z")}
-          setCompletedEventIds={vi.fn()}
-          sortedEvents={[]}
-          styles={baseStyles}
-          suggestableTasks={[]}
-          taskLists={[]}
-          tasksDueToday={[]}
-        />
-      </MemoryRouter>,
-    );
+  it("shows rescheduling spinner copy while conflict resolution is loading", () => {
+    renderSection({ getTag: () => ({}), handleResolveTimelineConflicts: vi.fn(), resolveConflictsLoading: true });
     expect(screen.getByRole("button", { name: /reschedule my events/i })).toHaveTextContent("Rescheduling…");
   });
 
