@@ -237,6 +237,7 @@ vi.mock("../../../../components/common/back_button/BackButton.jsx", () => ({ def
 vi.mock("../../../../pages/societies/components/SocietySkeletons", () => ({ SocietyDetailSkeleton: SocietySkeletonMock }));
 
 /** Builds the open-modal overrides used by interaction tests. */
+
 export function createSocietyDetailPageInteractiveOverrides() {
   return {
     modals: {
@@ -255,6 +256,7 @@ export function createSocietyDetailPageInteractiveOverrides() {
 }
 
 /** Renders the society detail page inside a memory router. */
+
 export function renderSocietyDetailPage(ui, { routeState } = {}) {
   const initialEntries = routeState ? [{ pathname: "/societies/1", state: routeState }] : ["/societies/1"];
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
@@ -286,6 +288,7 @@ function createOpenModalDefaults(overrides = {}) {
 }
 
 /** Builds default society detail page hook data for tests. */
+
 export function createSocietyDetailPageData(overrides = {}) {
   return {
     ...mergeNested(BASE_DETAIL_DATA, overrides, DETAIL_NESTED_KEYS),
@@ -294,6 +297,7 @@ export function createSocietyDetailPageData(overrides = {}) {
 }
 
 /** Builds society detail data with every modal open for prop tests. */
+
 export function createSocietyDetailPageModalData(overrides = {}) {
   return createSocietyDetailPageData({
     ...overrides,

@@ -3,6 +3,7 @@ Deadline and enrolment seeding for modules.
 """
 
 from collections import defaultdict
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -16,11 +17,45 @@ from ..module_event_builders import collect_all_enrollments_and_events
 User = get_user_model()
 
 
+def _coursework_week_key(dt):
+    iso = dt.isocalendar()
+    return iso.year, iso.week
+
+
+def _shift_deadline_by_weeks(deadline, weeks):
+    delta = timedelta(weeks=weeks)
+    deadline.start_due_date += delta
+    if deadline.end_due_date:
+        deadline.end_due_date += delta
+
+
+def _spread_coursework_deadlines(deadlines):
+    used_coursework_weeks = set()
+    ordered = sorted(
+        deadlines,
+        key=lambda deadline: (
+            deadline.start_due_date,
+            getattr(getattr(deadline, "module", None), "module_code", ""),
+            deadline.title,
+        ),
+    )
+
+    for deadline in ordered:
+        if (deadline.deadline_type or "").lower() != "coursework":
+            continue
+        while _coursework_week_key(deadline.start_due_date) in used_coursework_weeks:
+            _shift_deadline_by_weeks(deadline, 1)
+        used_coursework_weeks.add(_coursework_week_key(deadline.start_due_date))
+
+    return deadlines
+
+
 def create_deadlines(modules, stdout):
     del stdout
     deadlines_to_create = []
     for module in modules:
         deadlines_to_create.extend(build_deadlines_for_module(module))
+    _spread_coursework_deadlines(deadlines_to_create)
     Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
 
 def _prefetch_deadlines_by_module(modules):
@@ -40,4 +75,3 @@ def create_enrollments(modules, tags, stdout):
     all_enrolments, all_events = collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module)
     Enrollment.objects.bulk_create(all_enrolments, ignore_conflicts=True, batch_size=500)
     CalendarEvent.objects.bulk_create(all_events, ignore_conflicts=True, batch_size=500)
-

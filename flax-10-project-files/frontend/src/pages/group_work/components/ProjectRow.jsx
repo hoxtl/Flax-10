@@ -53,6 +53,7 @@ function useProjectRowViewModel(project, onClick) {
 }
 
 /** Clickable row for a single group work project. */
+
 export default function ProjectRow({ project, onClick }) {
   const { data, isOwner, label, handleKeyDown, containerClassName } = useProjectRowViewModel(
     project,

@@ -50,6 +50,7 @@ function TabBar({ activeTab, layoutId, onTabChange, tabClassName, tabVariant, ta
 /*
  * Renders an animated tab bar with optional content transitions.
  */
+
 export default function Tabs(props) {
   const { tabs, activeTab, onTabChange, layoutId = "tabIndicator", compact = false, className = "", tabClassName = "", tabVariant = "default", middle, disableContentAnimation = false, contentPresenceMode = "wait" } = props;
   if (!tabs?.length) return null;

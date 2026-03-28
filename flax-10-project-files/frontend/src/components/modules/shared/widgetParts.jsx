@@ -5,6 +5,7 @@
 import ExpandablePillButton from "../../common/expandable_pill_button/ExpandablePillButton";
 
 /* Shared panel header for module dashboard widgets. */
+
 export function WidgetHeader({ icon, title, count, styles }) {
     const HeaderIcon = icon;
     return (
@@ -19,6 +20,7 @@ export function WidgetHeader({ icon, title, count, styles }) {
 }
 
 /* Shared expand and collapse button for module dashboard widgets. */
+
 export function ShowMoreButton({ expanded, hiddenCount, onToggle, styles }) {
     return (
         <ExpandablePillButton

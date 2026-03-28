@@ -44,6 +44,42 @@ import {
     hydrateTasks,
 } from '../../../../components/timer/task_input/taskInputUtils';
 
+const alphaSortCases = {
+    leftMissing: [
+        { id: 2, title: null },
+        { id: 1, title: 'Alpha' },
+    ],
+    rightMissing: [
+        { id: 1, title: 'Alpha' },
+        { id: 2, title: null },
+    ],
+};
+
+const dateAddedSortCases = {
+    leftMissing: [
+        { id: null, title: 'No id' },
+        { id: 3, title: 'Has id' },
+    ],
+    rightMissing: [
+        { id: 3, title: 'Has id' },
+        { id: null, title: 'No id' },
+    ],
+};
+
+function expectAlphaSortFallbacks() {
+    expect(sortTasks([...alphaSortCases.leftMissing], 'alpha')[0].title).toBe(null);
+    expect(sortTasks([...alphaSortCases.rightMissing], 'alpha')[0].title).toBe(null);
+    expect(sortTasks([...alphaSortCases.leftMissing], 'alpha_desc')[0].title).toBe('Alpha');
+    expect(sortTasks([...alphaSortCases.rightMissing], 'alpha_desc')[0].title).toBe('Alpha');
+}
+
+function expectDateAddedSortFallbacks() {
+    expect(sortTasks([...dateAddedSortCases.leftMissing], 'date_added')[0].id).toBe(3);
+    expect(sortTasks([...dateAddedSortCases.rightMissing], 'date_added')[0].id).toBe(3);
+    expect(sortTasks([...dateAddedSortCases.leftMissing], 'date_added_asc')[0].id).toBe(null);
+    expect(sortTasks([...dateAddedSortCases.rightMissing], 'date_added_asc')[0].id).toBe(null);
+}
+
 beforeEach(async () => {
     vi.clearAllMocks();
     const { normalizeModuleCode, getModuleCodePrefix } = await import('../../../../utils/moduleCodeUtils');
@@ -157,31 +193,8 @@ describe('sortTasks', () => {
     });
 
     it('handles missing titles and ids in alpha and date-added sorts', () => {
-        const missingTitleTasks = [
-            { id: 2, title: null },
-            { id: 1, title: 'Alpha' },
-        ];
-        const missingRightTitleTasks = [
-            { id: 1, title: 'Alpha' },
-            { id: 2, title: null },
-        ];
-        const missingIdTasks = [
-            { id: null, title: 'No id' },
-            { id: 3, title: 'Has id' },
-        ];
-        const missingRightIdTasks = [
-            { id: 3, title: 'Has id' },
-            { id: null, title: 'No id' },
-        ];
-
-        expect(sortTasks([...missingTitleTasks], 'alpha')[0].title).toBe(null);
-        expect(sortTasks([...missingRightTitleTasks], 'alpha')[0].title).toBe(null);
-        expect(sortTasks([...missingTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
-        expect(sortTasks([...missingRightTitleTasks], 'alpha_desc')[0].title).toBe('Alpha');
-        expect(sortTasks([...missingIdTasks], 'date_added')[0].id).toBe(3);
-        expect(sortTasks([...missingRightIdTasks], 'date_added')[0].id).toBe(3);
-        expect(sortTasks([...missingIdTasks], 'date_added_asc')[0].id).toBe(null);
-        expect(sortTasks([...missingRightIdTasks], 'date_added_asc')[0].id).toBe(null);
+        expectAlphaSortFallbacks();
+        expectDateAddedSortFallbacks();
     });
 
     it('falls back to priority sort for unknown sort type', () => {

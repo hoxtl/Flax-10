@@ -1,31 +1,9 @@
-/*
- * Modal for adding a new group task with title, due date, and assignees.
- */
-
-import { useState } from "react";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import SelectableMemberRow from "./SelectableMemberRow";
+import { handleTaskSubmit, hasAssignee, useAddTaskFormState } from "./addTaskModalState";
 import styles from "./AddTaskModal.module.css";
-
-function normaliseAssigneeId(value) {
-    const trimmed = String(value ?? "").trim();
-    if (!trimmed) return "";
-    return /^-?\d+$/.test(trimmed) ? Number(trimmed) : trimmed;
-}
-
-function hasAssignee(assignees, member) {
-    const memberId = String(member?.user ?? member?.id ?? "");
-    return assignees.some((assignee) => String(assignee) === memberId);
-}
-
-function toggleAssigneeIds(previous, userId) {
-    const nextUserId = normaliseAssigneeId(userId);
-    const hasMatch = previous.some((id) => String(id) === String(nextUserId));
-    if (hasMatch) return previous.filter((id) => String(id) !== String(nextUserId));
-    return [...previous, nextUserId];
-}
 
 function MemberCheckItem({ member, checked, onToggle }) {
     return (
@@ -83,29 +61,10 @@ function TaskFormActions({ title, onClose }) {
     );
 }
 
-async function submitTask(title, dueDate, assignees, onAdd, onClose) {
-    const trimmed = title.trim();
-    if (!trimmed) return;
-    await onAdd({ title: trimmed, due_date: dueDate || null, assigned_to: assignees.filter((assignee) => assignee !== "") });
-    onClose();
-}
-
-function useAddTaskFormState() {
-    const [title, setTitle] = useState("");
-    const [dueDate, setDueDate] = useState("");
-    const [assignees, setAssignees] = useState([]);
-    const toggleAssignee = (userId) => setAssignees((previous) => toggleAssigneeIds(previous, userId));
-    return { assignees, dueDate, setDueDate, setTitle, title, toggleAssignee };
-}
-
-function handleTaskSubmit(event, title, dueDate, assignees, onAdd, onClose) {
-    event.preventDefault();
-    submitTask(title, dueDate, assignees, onAdd, onClose);
-}
-
 /*
  * Renders the add-task modal for group work projects.
  */
+
 export default function AddTaskModal({ members = [], onAdd, onClose }) {
     const { assignees, dueDate, setDueDate, setTitle, title, toggleAssignee } = useAddTaskFormState();
     const onSubmit = (event) => handleTaskSubmit(event, title, dueDate, assignees, onAdd, onClose);

@@ -19,7 +19,21 @@ const dU = { id: 1, username: 'alice' };
 const dM = ['CS101'];
 const dE = [{ title: 'M', start_time: '2024-03-08T10:00:00Z' }];
 const dV = { canEditProfile: true, canViewModules: true, canViewTasks: true, canViewSharedWith: true, canViewEvents: true };
-const renderModals = (s = {}, oN = vi.fn()) => render(<ProfileModals user={dU} state={makeState(s)} modules={dM} filteredEvents={dE} visibility={dV} onNavChange={oN} />);
+
+function buildModalProps(stateOverrides = {}, onNavChange = vi.fn()) {
+  return {
+    user: dU,
+    state: makeState(stateOverrides),
+    modules: dM,
+    filteredEvents: dE,
+    visibility: dV,
+    onNavChange,
+  };
+}
+
+function renderModals(s = {}, oN = vi.fn()) {
+  return render(<ProfileModals {...buildModalProps(s, oN)} />);
+}
 describe('Profile Social Modals', () => {
   beforeEach(() => { vi.clearAllMocks(); });
   it('renders sharing modal when showSharedWith is true', async () => {

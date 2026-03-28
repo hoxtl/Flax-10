@@ -1,4 +1,5 @@
 /* Tests for ListSidebar component rendering, selection, and list management */
+
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '../../../../utils/testUtils';
 import ListSidebar from '../../../../pages/tasks/components/ListSidebar';

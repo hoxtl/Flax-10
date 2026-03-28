@@ -134,7 +134,7 @@ function walkDir(dir, callback) {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
-      if (!["node_modules", "coverage", "build", "dist", ".git"].includes(file)) {
+      if (!["node_modules", "coverage", "build", "dist", ".git", "report", "jscpd-report"].includes(file)) {
         walkDir(filePath, callback);
       }
     } else {
