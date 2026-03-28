@@ -100,7 +100,12 @@ vi.mock("../../../components/pagination/Pagination.jsx", () => ({
 }));
 
 vi.mock("../../../components/modules/modules/ModuleCourseFilter", () => ({
-  default: () => <div>CourseFilter</div>,
+  default: ({ onToggleCourse }) => (
+    <div>
+      <div>CourseFilter</div>
+      <button onClick={() => onToggleCourse("CS")}>toggle course</button>
+    </div>
+  ),
 }));
 
 vi.mock("../../../components/modules/modules/ModuleGrid.jsx", () => ({
@@ -230,6 +235,19 @@ describe("ModulesPageResults coverage", () => {
     expect(search.onFilterChange).toHaveBeenCalledWith("all");
   });
 
+  it("falls back to the generic modules empty state when browsing has no results", () => {
+    const search = {
+      query: "",
+      filter: "all",
+      onQueryChange: vi.fn(),
+      onFilterChange: vi.fn(),
+    };
+
+    render(<EmptyResults search={search} sorting={buildSorting({ results: [], selectedCourses: [] })} isTeacher={false} />);
+
+    expect(screen.getByText("search-empty")).toBeInTheDocument();
+  });
+
   it("renders module results with pagination and passes delete/edit actions through", () => {
     const state = buildTestState();
     const sorting = buildSorting({
@@ -269,6 +287,44 @@ describe("ModulesPageResults coverage", () => {
     expect(filterModulesMock).toHaveBeenCalledWith(state.hook.modules, state.hook.enrollments, "", "enrolled");
   });
 
+  it("shows the enrolled-modules empty state and clears its local search", () => {
+    useModuleSortingMock.mockReturnValue(buildSorting({ results: [], pageModules: [] }));
+    filterModulesMock.mockReturnValue([]);
+
+    render(<MyEnrollmentsTabContent state={{ hook: { modules: [], enrollments: [], toggleEnrollment: vi.fn(), taskCountsByModule: {} } }} />);
+
+    expect(screen.getByText("search-empty")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+  });
+
+  it("passes view, edit, and delete actions through the enrollments grid", () => {
+    const state = buildTestState({
+      isTeacher: false,
+      hook: {
+        modules: [{ id: 2, module_code: "CS202" }],
+        enrollments: [{ module: 2 }],
+        toggleEnrollment: vi.fn(),
+        taskCountsByModule: {},
+      },
+    });
+    filterModulesMock.mockReturnValue([{ id: 2, module_code: "CS202" }]);
+    useModuleSortingMock.mockReturnValue(buildSorting({
+      results: [{ id: 2, module_code: "CS202" }],
+      pageModules: [{ id: 2, module_code: "CS202" }],
+    }));
+
+    render(<MyEnrollmentsTabContent state={state} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "view" }));
+    fireEvent.click(screen.getByRole("button", { name: "edit" }));
+    fireEvent.click(screen.getByRole("button", { name: "delete" }));
+
+    expect(state.setViewingModule).toHaveBeenCalledWith({ id: 2, module_code: "CS202" });
+    expect(state.setEditingModule).toHaveBeenCalledWith({ id: 2, module_code: "CS202" });
+    expect(state.setShowForm).toHaveBeenCalledWith(true);
+    expect(state.setDeletingModule).toHaveBeenCalledWith({ id: 2, module_code: "CS202" });
+  });
+
   it("shows the my-modules toolbar placeholder and student transition wrapper in production mode", () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
@@ -282,5 +338,64 @@ describe("ModulesPageResults coverage", () => {
     render(<MainView state={state} />);
     expect(screen.getByTestId("page-transition")).toBeInTheDocument();
     process.env.NODE_ENV = originalEnv;
+  });
+
+  it("handles undefined course filters in toolbar and empty states", () => {
+    const search = {
+      query: "",
+      filter: "all",
+      onQueryChange: vi.fn(),
+      onFilterChange: vi.fn(),
+    };
+    const sorting = buildSorting({ selectedCourses: undefined, toggleCourse: undefined });
+
+    render(
+      <>
+        <ModuleToolbar search={search} sorting={sorting} isTeacher={false} isMyModules={false} />
+        <EmptyResults search={search} sorting={sorting} isTeacher={false} />
+      </>
+    );
+
+    expect(screen.getByText("CourseFilter")).toBeInTheDocument();
+    expect(screen.getByText("search-empty")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "toggle course" }));
+  });
+
+  it("opens the create-module flow from the teacher page action", () => {
+    const state = buildTestState({ isTeacher: true });
+
+    render(<MainView state={state} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Create Module" }));
+
+    expect(state.setEditingModule).toHaveBeenCalledWith(null);
+    expect(state.setShowForm).toHaveBeenCalledWith(true);
+  });
+
+  it("renders the student overview tabs and switches to the enrollments tab", () => {
+    useMainModuleViewMock.mockReturnValueOnce({
+      search: { query: "", filter: "enrolled", onQueryChange: vi.fn(), onFilterChange: vi.fn() },
+      sorting: buildSorting(),
+    });
+
+    const state = buildTestState({
+      isTeacher: false,
+      hook: {
+        modules: [{ id: 1, module_code: "CS101" }],
+        enrollments: [{ module: 1 }],
+        toggleEnrollment: vi.fn(),
+        taskCountsByModule: {},
+      },
+    });
+
+    render(<MainView state={state} />);
+
+    expect(screen.getByText("MyModulesDashboard")).toBeInTheDocument();
+    expect(screen.getByText("BackToTop")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /My Enrolments/i }));
+
+    expect(screen.getByPlaceholderText("Search your enrolled modules...")).toBeInTheDocument();
+    expect(screen.getByTestId("module-grid")).toBeInTheDocument();
   });
 });

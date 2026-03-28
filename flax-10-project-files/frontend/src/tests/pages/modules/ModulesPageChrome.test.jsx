@@ -31,9 +31,12 @@ vi.mock("../../../components/modules/modules/ModuleForm.jsx", () => ({
 }));
 
 vi.mock("../../../components/modules/modules/ModuleDetails.jsx", () => ({
-  default: ({ module, onBack, onEnroll, onUnenroll }) => (
+  default: ({ module, onBack, onEnroll, onUnenroll, is_enrolled, is_core, is_teacher }) => (
     <div>
       <div>{module.module_code}</div>
+      <div>{`enrolled:${String(is_enrolled)}`}</div>
+      <div>{`core:${String(is_core)}`}</div>
+      <div>{`teacher:${String(is_teacher)}`}</div>
       <button onClick={onBack}>Back from details</button>
       <button onClick={onEnroll}>Enroll now</button>
       <button onClick={onUnenroll}>Leave now</button>
@@ -144,6 +147,19 @@ describe("ModulesPageChrome", () => {
     expect(state.hook.handleDisenrol).toHaveBeenCalledWith(state.viewingModule);
     expect(state.setViewingModule).toHaveBeenCalledWith(null);
     expect(state.setSearchQuery).toHaveBeenCalledWith("");
+  });
+
+  it("passes enrolled-core details through when the viewed module is a core enrollment", () => {
+    const state = buildState({
+      isTeacher: true,
+      hook: buildHookState({ enrollments: [{ module: 1, is_core: true }] }),
+    });
+
+    render(<DetailsView state={state} />);
+
+    expect(screen.getByText("enrolled:true")).toBeInTheDocument();
+    expect(screen.getByText("core:true")).toBeInTheDocument();
+    expect(screen.getByText("teacher:true")).toBeInTheDocument();
   });
 
   it("renders and closes modals", () => {
