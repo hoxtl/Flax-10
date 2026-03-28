@@ -94,20 +94,20 @@ button:focus-visible {
 [data-mode="dark"] input,
 [data-mode="dark"] select,
 [data-mode="dark"] textarea {
-  background: rgba(180, 164, 144, 0.07);
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
   border-color: var(--border);
   color: var(--text);
 }
 
 [data-mode="dark"] input::placeholder,
 [data-mode="dark"] textarea::placeholder {
-  color: rgba(180, 164, 144, 0.55);
+  color: color-mix(in srgb, var(--primary) 55%, transparent);
 }
 
 [data-mode="dark"] input:focus,
 [data-mode="dark"] select:focus,
 [data-mode="dark"] textarea:focus {
-  border-color: rgba(183, 146, 107, 0.55);
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
   box-shadow: var(--focus-ring);
 }
 
@@ -152,6 +152,6 @@ body.focusShieldActive.focusShieldTerracotta {
 
 @keyframes notificationPulse {
   0%, 100% { box-shadow: none; }
-  25%, 75% { box-shadow: 0 0 0 4px rgba(158, 126, 93, 0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(158, 126, 93, 0.6); }
+  25%, 75% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 40%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 60%, transparent); }
 }

@@ -94,7 +94,7 @@
 }
 
 .analyticsLink:hover {
-  color: #4a3421;
+  color: var(--primary-strong);
 }
 
 .liveContextStack {
@@ -118,8 +118,8 @@
 }
 
 .liveContextCardWarning {
-  background: rgba(255, 248, 244, 0.78);
-  border-color: rgba(192, 113, 78, 0.14);
+  background: color-mix(in srgb, var(--surface-card) 78%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 14%, transparent);
 }
 
 .liveContextInlineAlert {
@@ -144,7 +144,7 @@
 }
 
 .liveContextIcon {
-  color: rgba(192, 113, 78, 0.78);
+  color: color-mix(in srgb, var(--primary) 78%, transparent);
   flex-shrink: 0;
 }
 
@@ -154,13 +154,13 @@
   border-radius: 999px;
   background: radial-gradient(
     circle at 35% 35%,
-    #f0b29d 0%,
-    #c0714e 55%,
-    #b83232 100%
+    color-mix(in srgb, var(--primary) 60%, white) 0%,
+    var(--primary) 55%,
+    var(--danger) 100%
   );
   box-shadow:
-    0 0 0 4px rgba(192, 113, 78, 0.1),
-    0 0 14px rgba(192, 113, 78, 0.42);
+    0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent),
+    0 0 14px color-mix(in srgb, var(--primary) 42%, transparent);
   animation: liveAlertDotPulse 2s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -185,7 +185,7 @@
   font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(132, 87, 72, 0.72);
+  color: color-mix(in srgb, var(--primary-strong) 72%, transparent);
 }
 
 .liveContextInlineAlert .liveContextTop {
@@ -197,14 +197,14 @@
   100% {
     transform: scale(1);
     box-shadow:
-      0 0 0 4px rgba(192, 113, 78, 0.1),
-      0 0 14px rgba(192, 113, 78, 0.42);
+      0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent),
+      0 0 14px color-mix(in srgb, var(--primary) 42%, transparent);
   }
   50% {
     transform: scale(1.08);
     box-shadow:
-      0 0 0 6px rgba(192, 113, 78, 0.08),
-      0 0 18px rgba(192, 113, 78, 0.5);
+      0 0 0 6px color-mix(in srgb, var(--primary) 8%, transparent),
+      0 0 18px color-mix(in srgb, var(--primary) 50%, transparent);
   }
 }
 

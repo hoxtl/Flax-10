@@ -6,14 +6,14 @@
 .intRowFocusMore {
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
-  color: #8a7d76;
+  color: var(--muted);
   padding: 2px 0;
 }
 
 .intRowFocusMicroStats {
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
-  color: #8a7d76;
+  color: var(--muted);
   margin: 0;
   line-height: 1.4;
 }
@@ -27,7 +27,7 @@
 }
 
 .intRowFocusMicroStatsSep {
-  color: #c4b8b0;
+  color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .intRowFocusFooterLink {
@@ -35,7 +35,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.75rem;
   font-weight: 500;
-  color: #a8a29e;
+  color: var(--muted);
   background: none;
   border: none;
   cursor: pointer;
@@ -46,7 +46,7 @@
 }
 
 .intRowFocusFooterLink:hover {
-  color: #57534e;
+  color: var(--text);
   text-decoration: underline;
 }
 
@@ -64,13 +64,13 @@
   flex-direction: column;
   gap: 3px;
   padding: 7px 10px 7px 13px;
-  border-left: 2px solid #d4c9c2;
+  border-left: 2px solid var(--border);
   border-radius: 0 6px 6px 0;
   background: transparent;
   transition: background 0.15s;
 }
 .intRowDeadlineRow2:hover {
-  background: rgba(74, 55, 40, 0.04);
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
 }
 
 /* Urgency: <7 days red, 7–14 amber, 14+ green — border + subtle bg, slightly muted */
@@ -96,7 +96,7 @@
   background: #f0fdf4;
 }
 .intRowDeadlineRow2Grey {
-  border-left-color: #d4c9c2;
+  border-left-color: var(--border);
   background: transparent;
 }
 
@@ -117,8 +117,8 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 10px;
   font-weight: 700;
-  color: #5a4a3a;
-  background: rgba(74, 55, 40, 0.08);
+  color: var(--primary-strong);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
   padding: 1px 5px;
   border-radius: 4px;
   letter-spacing: 0.04em;
@@ -162,7 +162,7 @@
   font-size: 0.75rem;
   font-weight: 500;
   flex-shrink: 0;
-  color: #8a7d76;
+  color: var(--muted);
 }
 .intRowDeadline2DaysRed {
   color: #b91c1c;
@@ -174,7 +174,7 @@
   color: #16a34a;
 }
 .intRowDeadline2DaysGrey {
-  color: #8a7d76;
+  color: var(--muted);
 }
 
 .intRowDeadline2Title {
@@ -198,7 +198,7 @@
 .intRowDeadline2BarTrack {
   width: 60px;
   height: 3px;
-  background: rgba(74, 55, 40, 0.1);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
   border-radius: 2px;
   flex-shrink: 0;
   overflow: hidden;
@@ -207,7 +207,7 @@
 .intRowDeadline2BarFill {
   height: 100%;
   border-radius: 2px;
-  background: #8a7d76;
+  background: var(--muted);
   transition: width 0.4s ease;
 }
 .intRowDeadline2BarFillRed {
@@ -220,18 +220,18 @@
   background: #6b8f71;
 }
 .intRowDeadline2BarFillGrey {
-  background: #8a7d76;
+  background: var(--muted);
 }
 
 .intRowDeadline2TaskCount {
   font-size: 0.625rem;
-  color: #8a7d76;
+  color: var(--muted);
   white-space: nowrap;
 }
 
 .intRowDeadline2NotStarted {
   font-size: 0.625rem;
-  color: #c4b8b0;
+  color: color-mix(in srgb, var(--primary) 30%, transparent);
   font-style: italic;
   margin-top: 1px;
 }
@@ -247,7 +247,7 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.6rem;
   font-weight: 500;
-  color: #9a8778;
+  color: var(--muted);
   letter-spacing: 0.02em;
 }
 
@@ -256,7 +256,7 @@
 }
 
 .intRowProgressBreakdownOverdue {
-  color: #c0714e;
+  color: var(--danger);
   font-weight: 700;
 }
 
@@ -270,7 +270,7 @@
 .intRowTimeAllocBar {
   height: 6px;
   border-radius: 99px;
-  background: rgba(123, 103, 81, 0.08);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
   overflow: hidden;
   display: flex;
 }
@@ -289,7 +289,7 @@
 
 .intRowTimeAllocSegOther {
   height: 100%;
-  background: #a08b72;
+  background: var(--primary);
   transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -335,8 +335,8 @@
 }
 
 .intRowTimeAllocLegendOther {
-  color: #9a8778;
+  color: var(--muted);
 }
 .intRowTimeAllocLegendOther::before {
-  background: #a08b72;
+  background: var(--primary);
 }

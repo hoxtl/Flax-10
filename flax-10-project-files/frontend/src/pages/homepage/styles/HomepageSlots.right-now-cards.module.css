@@ -11,7 +11,7 @@
   font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 0.63rem;
   font-weight: 500;
-  color: #9b3a2a;
+  color: var(--danger);
   letter-spacing: 0.01em;
 }
 .intRowNowTflRow strong {
@@ -22,19 +22,19 @@
 .intRowNowNudge {
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(123, 103, 81, 0.06);
-  border-left: 2px solid rgba(123, 103, 81, 0.3);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--primary) 30%, transparent);
   font-family: var(--font-sans, "Lexend", sans-serif);
   font-size: 0.73rem;
   font-weight: 500;
   font-style: italic;
-  color: #6b5040;
+  color: var(--primary-strong);
   line-height: 1.45;
 }
 .intRowNowNudgeTask {
   font-style: normal;
   font-weight: 700;
-  color: #4a3421;
+  color: var(--primary-strong);
 }
 
 /* Day recap stat row — endOfDay state */
@@ -45,11 +45,11 @@
   font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 0.63rem;
   font-weight: 500;
-  color: #9a8778;
+  color: var(--muted);
   letter-spacing: 0.03em;
 }
 .intRowNowDayRecapDot {
-  color: rgba(154, 135, 120, 0.5);
+  color: color-mix(in srgb, var(--muted) 50%, transparent);
 }
 
 /* Today vs yesterday comparison — endOfDay state */
@@ -58,16 +58,16 @@
   font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #9a8778;
+  color: var(--muted);
 }
 .intRowNowVsYesterdayUp {
   color: #5a8a65;
 }
 .intRowNowVsYesterdayDown {
-  color: #c0714e;
+  color: var(--danger);
 }
 .intRowNowVsYesterdayFlat {
-  color: #9a8778;
+  color: var(--muted);
 }
 
 /* Tomorrow preview block — endOfDay state */
@@ -78,8 +78,8 @@
   gap: 4px;
   padding: 6px 8px;
   border-radius: 8px;
-  background: rgba(123, 103, 81, 0.05);
-  border: 1px solid rgba(123, 103, 81, 0.12);
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
 }
 .intRowNowTomorrowLabel {
   font-family: var(--font-mono, "JetBrains Mono", monospace);
@@ -87,7 +87,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #7b6751;
+  color: var(--primary);
   flex-shrink: 0;
 }
 .intRowNowTomorrowEvent {
@@ -105,7 +105,7 @@
   font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 0.6rem;
   font-weight: 500;
-  color: #9a8778;
+  color: var(--muted);
   flex-shrink: 0;
 }
 
@@ -119,8 +119,8 @@
     color 0.15s;
 }
 .intRowDeadlinePillLink:hover {
-  background: rgba(74, 52, 33, 0.14);
-  color: #4a3421;
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary-strong);
 }
 
 .intRowDeadlinePillBtn {
@@ -162,11 +162,11 @@
 }
 
 .intRowNowBadgeNow {
-  color: #5c4d3e;
+  color: var(--primary-strong);
 }
 
 .intRowNowBadgeNext {
-  color: #7b6751;
+  color: var(--primary);
 }
 
 /* "Upcoming" section container */
@@ -182,7 +182,7 @@
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: #b0a59e;
+  color: var(--muted);
   margin-bottom: 4px;
 }
 
@@ -194,7 +194,7 @@
 
 .intRowNowBadgeConflict {
   background: rgba(192, 113, 78, 0.12);
-  color: #c0714e;
+  color: var(--danger);
   border: 1px solid rgba(192, 113, 78, 0.3);
 }
 

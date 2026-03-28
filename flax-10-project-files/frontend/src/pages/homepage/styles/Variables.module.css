@@ -3,8 +3,8 @@
 
   .page {
     /* Dashboard: warm notebook — one base, accents only for data */
-    --home-student-surface-page: #F8F5F2;
-    --home-student-surface-card: #FFFCFA;
+    --home-student-surface-page: var(--color-bg);
+    --home-student-surface-card: var(--color-card);
     --home-student-surface-inner: color-mix(in srgb, var(--home-student-surface-card) 30%, var(--home-student-surface-page));
     --dash-base: var(--color-bg);
     --dash-green: var(--sage);
@@ -63,14 +63,14 @@
       radial-gradient(circle at bottom left, color-mix(in srgb, var(--color-primary) 12%, transparent) 0%, transparent 38%),
       linear-gradient(
         135deg,
-        color-mix(in srgb, var(--surface-card) 96%, #f7efe5 4%) 0%,
+        color-mix(in srgb, var(--surface-card) 96%, var(--primary) 4%) 0%,
         color-mix(in srgb, var(--surface-card) 90%, var(--color-highlight) 10%) 48%,
         color-mix(in srgb, var(--surface-card) 88%, var(--color-primary) 12%) 100%
       );
     --home-hero-border: color-mix(in srgb, var(--color-highlight) 22%, var(--widget-border));
     --home-hero-shadow:
       0 18px 36px rgba(0, 0, 0, 0.045),
-      0 0 0 1px color-mix(in srgb, #fff2d9 56%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--color-highlight) 56%, transparent),
       0 0 34px color-mix(in srgb, var(--color-highlight) 12%, transparent);
     --home-hero-panel-bg: color-mix(in srgb, var(--surface-card) 94%, transparent);
     --home-hero-panel-border: color-mix(in srgb, var(--widget-border) 84%, var(--color-highlight) 16%);
@@ -79,7 +79,7 @@
       inset 0 1px 0 color-mix(in srgb, var(--surface-card) 88%, transparent);
     --home-hero-glow-ring: color-mix(in srgb, var(--color-highlight) 74%, transparent);
     --home-hero-glow-shadow: color-mix(in srgb, var(--color-highlight) 38%, transparent);
-    --home-hero-glow-inner: color-mix(in srgb, #fff4df 82%, transparent);
+    --home-hero-glow-inner: color-mix(in srgb, var(--color-highlight) 82%, transparent);
     --home-hero-aura:
       radial-gradient(circle at 18% 24%, color-mix(in srgb, var(--color-highlight) 26%, transparent) 0%, transparent 32%),
       radial-gradient(circle at 78% 28%, color-mix(in srgb, var(--sage) 18%, transparent) 0%, transparent 34%),
@@ -90,9 +90,9 @@
     --home-hero-shimmer: linear-gradient(
       115deg,
       transparent 0%,
-      color-mix(in srgb, #fff8ee 42%, transparent) 14%,
+      color-mix(in srgb, var(--color-highlight) 42%, transparent) 14%,
       color-mix(in srgb, var(--color-highlight) 42%, transparent) 46%,
-      color-mix(in srgb, #fff4df 58%, transparent) 57%,
+      color-mix(in srgb, var(--color-highlight) 58%, transparent) 57%,
       color-mix(in srgb, var(--color-primary) 24%, transparent) 72%,
       transparent 100%
     );
@@ -113,7 +113,7 @@
     --home-timeline-success-border: color-mix(in srgb, var(--home-urgency-success) 42%, transparent);
     --home-timeline-success-surface: color-mix(in srgb, var(--home-urgency-success) 34%, white 66%);
     --home-timeline-success-surface-strong: color-mix(in srgb, var(--home-urgency-success) 44%, white 56%);
-    --home-timeline-success-surface-border: color-mix(in srgb, var(--home-urgency-success) 58%, #afc7b2 42%);
+    --home-timeline-success-surface-border: color-mix(in srgb, var(--home-urgency-success) 58%, var(--border) 42%);
     --home-timeline-success-surface-shadow: color-mix(in srgb, var(--home-urgency-success) 24%, transparent);
     --home-timeline-warning: var(--home-urgency-warning);
     --home-timeline-warning-soft: color-mix(in srgb, var(--home-urgency-warning) 10%, transparent);

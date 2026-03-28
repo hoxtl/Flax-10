@@ -182,20 +182,20 @@ describe('sortTasks', () => {
         expect(sorted[0].id).toBe(2);
     });
 
-  it('sorts in reverse alphabetical order', () => {
-    const sorted = sortTasks([...tasks], 'alpha_desc');
-    expect(sorted[0].title).toBe('Zebra');
-  });
+    it('sorts in reverse alphabetical order', () => {
+        const sorted = sortTasks([...tasks], 'alpha_desc');
+        expect(sorted[0].title).toBe('Zebra');
+    });
 
-  it('sorts by date added ascending', () => {
-    const sorted = sortTasks([...tasks], 'date_added_asc');
-    expect(sorted[0].id).toBe(1);
-  });
+    it('sorts by date added ascending', () => {
+        const sorted = sortTasks([...tasks], 'date_added_asc');
+        expect(sorted[0].id).toBe(1);
+    });
 
-  it('handles missing titles and ids in alpha and date-added sorts', () => {
-    expectAlphaSortFallbacks();
-    expectDateAddedSortFallbacks();
-  });
+    it('handles missing titles and ids in alpha and date-added sorts', () => {
+        expectAlphaSortFallbacks();
+        expectDateAddedSortFallbacks();
+    });
 
     it('falls back to priority sort for unknown sort type', () => {
         const sorted = sortTasks([...tasks], 'unknown');
@@ -234,19 +234,19 @@ describe('hydrateTasks', () => {
         expect(hydrateTasks(undefined, undefined)).toEqual([]);
     });
 
-  it('assigns default color from FOCUS_BLOCK_COLOURS_HEX when list has no color', () => {
-    const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
-    const lists = [{ id: 1, name: 'Work' }];
-    const result = hydrateTasks(tasks, lists);
-    expect(result[0].list_color).toBeTruthy();
-  });
+    it('assigns default color from FOCUS_BLOCK_COLOURS_HEX when list has no color', () => {
+        const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
+        const lists = [{ id: 1, name: 'Work' }];
+        const result = hydrateTasks(tasks, lists);
+        expect(result[0].list_color).toBeTruthy();
+    });
 
-  it('uses "Other" when a known list is missing its name', () => {
-    const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
-    const lists = [{ id: 1, color: '#abcdef' }];
-    const result = hydrateTasks(tasks, lists);
+    it('uses "Other" when a known list is missing its name', () => {
+        const tasks = [{ id: 1, title: 'Task', completed: false, task_list: 1 }];
+        const lists = [{ id: 1, color: '#abcdef' }];
+        const result = hydrateTasks(tasks, lists);
 
-    expect(result[0].list_name).toBe('Other');
-    expect(result[0].list_color).toBe('#abcdef');
-  });
+        expect(result[0].list_name).toBe('Other');
+        expect(result[0].list_color).toBe('#abcdef');
+    });
 });

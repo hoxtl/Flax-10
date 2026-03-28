@@ -88,7 +88,7 @@
     align-items: flex-start;
     justify-content: space-between;
     padding: 20px 24px 16px;
-    border-bottom: 1px solid rgba(74, 52, 33, 0.08);
+    border-bottom: 1px solid color-mix(in srgb, var(--primary) 8%, transparent);
     flex-shrink: 0;
 }
 
@@ -131,14 +131,14 @@
 
 .taskPickCloseBtn:hover {
     color: var(--text, #374151);
-    background: var(--hover, rgba(74, 52, 33, 0.06));
+    background: var(--hover, color-mix(in srgb, var(--primary) 6%, transparent));
 }
 
 .taskPickSearchRow {
     display: flex;
     align-items: center;
     padding: 14px 20px;
-    border-bottom: 1px solid rgba(74, 52, 33, 0.07);
+    border-bottom: 1px solid color-mix(in srgb, var(--primary) 7%, transparent);
     flex-shrink: 0;
 }
 
@@ -148,9 +148,8 @@
     gap: 0.6rem;
     flex: 1;
     padding: 10px 14px;
-    border: 1.5px solid rgba(74, 52, 33, 0.12);
-    border-radius: 10px;
-    background: var(--bg, #F8F5F2);
+    border: 1.5px solid color-mix(in srgb, var(--primary) 12%, transparent);
+    background: var(--bg);
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -169,8 +168,8 @@
     flex-direction: column;
     gap: 0;
     padding: 12px 20px 14px;
-    border-bottom: 1px solid rgba(74, 52, 33, 0.07);
-    background: var(--surface-card, #faf7f3);
+    border-bottom: 1px solid color-mix(in srgb, var(--primary) 7%, transparent);
+    background: var(--surface-card);
     overflow: visible;
     position: relative;
     z-index: 10;
@@ -300,7 +299,7 @@
 }
 
 :global([data-mode="dark"]) .currentTaskCard {
-    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 22%, var(--border) 78%);
+    border-color: color-mix(in srgb, var(--color-highlight) 22%, var(--border) 78%);
     background: linear-gradient(
         180deg,
         color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%),
@@ -312,7 +311,7 @@
 }
 
 :global([data-mode="dark"]) .currentTaskLabel {
-    color: color-mix(in srgb, var(--text-secondary) 64%, var(--color-highlight, #d0ab73) 36%);
+    color: color-mix(in srgb, var(--text-secondary) 64%, var(--color-highlight) 36%);
 }
 
 :global([data-mode="dark"]) .taskClearBtn {
@@ -322,7 +321,7 @@
         color-mix(in srgb, var(--surface-raised, var(--surface-card)) 94%, var(--surface-inner) 6%),
         color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%)
     ) !important;
-    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 18%, var(--border) 82%) !important;
+    border-color: color-mix(in srgb, var(--color-highlight) 18%, var(--border) 82%) !important;
     box-shadow:
         0 14px 24px rgba(0, 0, 0, 0.18),
         inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;

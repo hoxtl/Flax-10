@@ -38,7 +38,7 @@
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
   color: var(--accent);
   font-weight: 700;
-  box-shadow: 0 6px 14px rgba(74, 52, 33, 0.07);
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--primary) 7%, transparent);
 }
 
 .mobileDrawerNavIcon {

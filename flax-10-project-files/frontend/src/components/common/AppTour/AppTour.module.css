@@ -21,22 +21,22 @@
 .spotlightRing {
   position: absolute;
   border-radius: 10px;
-  border: 2px solid rgba(123, 103, 81, 0.55);
-  box-shadow: 0 0 0 4px rgba(123, 103, 81, 0.12), 0 0 20px rgba(123, 103, 81, 0.2);
+  border: 2px solid color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent), 0 0 20px color-mix(in srgb, var(--primary) 20%, transparent);
   pointer-events: none;
   animation: ringPulse 2s ease-in-out infinite;
 }
 
 @keyframes ringPulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(123, 103, 81, 0.12), 0 0 20px rgba(123, 103, 81, 0.2); }
-  50% { box-shadow: 0 0 0 7px rgba(123, 103, 81, 0.08), 0 0 28px rgba(123, 103, 81, 0.28); }
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent), 0 0 20px color-mix(in srgb, var(--primary) 20%, transparent); }
+  50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--primary) 8%, transparent), 0 0 28px color-mix(in srgb, var(--primary) 28%, transparent); }
 }
 
 /* ── Card shell ── */
 .card {
   position: fixed;
-  background: var(--surface-paper, #fffcfa);
-  border: 1px solid rgba(74, 52, 33, 0.1);
+  background: var(--surface-paper);
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
   border-radius: 20px;
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.13),
@@ -57,7 +57,7 @@
   height: 0;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  border-right: 10px solid var(--surface-paper, #fffcfa);
+  border-right: 10px solid var(--surface-paper);
   filter: drop-shadow(-2px 0 1px rgba(0,0,0,0.06));
 }
 
@@ -70,20 +70,20 @@
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-bottom: 10px solid var(--surface-paper, #fffcfa);
+  border-bottom: 10px solid var(--surface-paper);
   filter: drop-shadow(0 -2px 1px rgba(0,0,0,0.06));
 }
 
 /* ── Progress bar at top of card ── */
 .progressTrack {
   height: 3px;
-  background: rgba(74, 52, 33, 0.08);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
   width: 100%;
 }
 
 .progressFill {
   height: 100%;
-  background: var(--primary, #7b6751);
+  background: var(--primary);
   border-radius: 0 2px 2px 0;
 }
 
@@ -99,12 +99,12 @@
   width: 72px;
   height: 72px;
   border-radius: 22px;
-  background: var(--color-highlight-soft, #e8dcc8);
+  background: var(--color-highlight-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.1rem;
-  box-shadow: 0 4px 14px rgba(123, 103, 81, 0.18);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .welcomeIcon {
@@ -143,11 +143,11 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--color-highlight-soft, #e8dcc8);
+  background: var(--color-highlight-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary, #7b6751);
+  color: var(--primary);
   flex-shrink: 0;
 }
 
@@ -212,7 +212,7 @@
 /* ── Buttons ── */
 .prevBtn {
   background: none;
-  border: 1px solid var(--border, rgba(74, 52, 33, 0.15));
+  border: 1px solid var(--border, color-mix(in srgb, var(--primary) 15%, transparent));
   padding: 0.38rem 0.85rem;
   border-radius: 999px;
   font-size: 0.775rem;
@@ -228,7 +228,7 @@
 }
 
 .nextBtn {
-  background: var(--primary, #7b6751);
+  background: var(--primary);
   border: none;
   padding: 0.38rem 1rem;
   border-radius: 999px;
@@ -255,7 +255,7 @@
 }
 
 .finishBtn {
-  background: var(--color-primary-strong, #5c4d3e);
+  background: var(--primary-strong);
 }
 
 /* ── Progress dots ── */
@@ -269,7 +269,7 @@
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: var(--border, rgba(74, 52, 33, 0.15));
+  background: var(--border, color-mix(in srgb, var(--primary) 15%, transparent));
   border: none;
   padding: 0;
   cursor: pointer;
@@ -284,12 +284,12 @@
 
 .dotActive {
   width: 18px;
-  background: var(--primary, #7b6751);
+  background: var(--primary);
   transform: none;
   cursor: default;
 }
 
 .dotActive:hover {
   transform: none;
-  background: var(--primary, #7b6751);
+  background: var(--primary);
 }

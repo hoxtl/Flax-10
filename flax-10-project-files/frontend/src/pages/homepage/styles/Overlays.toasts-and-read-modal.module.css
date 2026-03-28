@@ -129,10 +129,10 @@
 }
 .actionHubReadModal {
   position: relative;
-  background: #F9F8F6;
-  border: 1px solid rgba(210, 180, 140, 0.55);
+  background: var(--surface-raised, #F9F8F6);
+  border: 1px solid color-mix(in srgb, var(--primary) 55%, transparent);
   border-radius: var(--home-card-radius);
-  box-shadow: 0 8px 32px rgba(74, 52, 33, 0.12);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--primary) 12%, transparent);
   padding: 1.25rem 1.5rem;
   max-width: 360px;
   width: 90%;
@@ -175,13 +175,13 @@
   font-size: var(--home-font-meta);
   font-weight: 600;
   background: transparent;
-  color: var(--restoration-earth, #6B5344);
-  border: 1px solid var(--restoration-earth, #6B5344);
+  color: var(--primary-strong);
+  border: 1px solid var(--primary-strong);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 .actionHubReadBtn:hover {
-  background: rgba(107, 83, 68, 0.1);
+  background: color-mix(in srgb, var(--primary-strong) 10%, transparent);
 }
 .actionHubReadBtnDanger {
   padding: 0.4rem 0.9rem;

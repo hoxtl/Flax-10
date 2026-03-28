@@ -121,9 +121,9 @@
 
 .promptCta {
   flex-shrink: 0;
-  background: linear-gradient(180deg, #5D4037, #4A3428) !important;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-primary-strong)) !important;
   color: #FAF9F6 !important;
-  border-color: #4A3428 !important;
+  border-color: var(--color-primary-strong) !important;
 }
 
 

@@ -16,7 +16,7 @@
   overflow: hidden;
 }
 
-.card:hover { background: rgba(123, 103, 81, 0.03); }
+.card:hover { background: color-mix(in srgb, var(--primary) 3%, transparent); }
 
 .cardAccentUrgent {
   border-left-color: #ef4444;
@@ -172,13 +172,13 @@
 
 .actionBarBtnPlay {
   background: transparent !important;
-  color: var(--primary, #7b6751);
+  color: var(--primary);
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .actionBarBtnPlay:hover {
   background: transparent !important;
-  color: var(--primary-strong, #5d4037);
+  color: var(--primary-strong);
   transform: scale(1.12);
 }
 
@@ -279,8 +279,8 @@
 
 .titleDone {
   text-decoration: line-through;
-  text-decoration-color: var(--c-greige, #b4a490);
-  color: var(--c-greige, #b4a490);
+  text-decoration-color: var(--muted);
+  color: var(--muted);
 }
 
 .titleDone.titleClickable:hover { text-decoration: line-through; }
@@ -291,7 +291,7 @@
 }
 
 .searchHighlight {
-  background: rgba(196, 154, 75, 0.2);
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
   border-radius: 2px;
   padding: 0 1px;
 }
