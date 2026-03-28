@@ -1,3 +1,7 @@
+/*
+ * Tests for user search dropdown and shell behaviour.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -60,105 +64,71 @@ vi.mock("../../../../components/social/utils/userSearchShared", () => ({
 import { SearchDropdown } from "../../../../components/social/components/UserSearchLists";
 import { FilterSection, GlobalSearchBar } from "../../../../components/social/components/UserSearchShell";
 
+function buildDropdownProps(overrides = {}) {
+  return {
+    loading: false,
+    query: "",
+    setQuery: vi.fn(),
+    userResults: [],
+    onUserSelect: vi.fn(),
+    compact: false,
+    ...overrides,
+  };
+}
+
+function renderDropdown(overrides = {}) {
+  return render(<SearchDropdown {...buildDropdownProps(overrides)} />);
+}
+
 describe("UserSearchLists and shell", () => {
-  it("renders loading, query-empty, and query-empty-compact states", () => {
+  it("renders the loading state", () => {
     const setQuery = vi.fn();
-    const { rerender, container } = render(
-      <SearchDropdown
-        loading
-        query=""
-        setQuery={setQuery}
-        userResults={[]}
-        onUserSelect={vi.fn()}
-        compact={false}
-      />,
-    );
+    renderDropdown({ loading: true, setQuery });
     expect(screen.getByText("Searching users")).toBeInTheDocument();
+  });
 
-    rerender(
-      <SearchDropdown
-        loading={false}
-        query=""
-        setQuery={setQuery}
-        userResults={[]}
-        onUserSelect={vi.fn()}
-        compact={false}
-      />,
-    );
+  it("renders the start state when the query is empty", () => {
+    renderDropdown();
     expect(screen.getByText("Start typing")).toBeInTheDocument();
+  });
 
-    rerender(
-      <SearchDropdown
-        loading={false}
-        query=""
-        setQuery={setQuery}
-        userResults={[]}
-        onUserSelect={vi.fn()}
-        compact
-      />,
-    );
+  it("renders nothing for empty compact results", () => {
+    const { container } = renderDropdown({ compact: true });
     expect(container.firstChild).toBeNull();
   });
 
-  it("renders custom empty state, inline mode, and selectable results", () => {
+  it("uses the custom empty state renderer", () => {
     const setQuery = vi.fn();
-    const onUserSelect = vi.fn();
-    const { rerender } = render(
-      <SearchDropdown
-        loading={false}
-        query="abc"
-        setQuery={setQuery}
-        userResults={[]}
-        onUserSelect={onUserSelect}
-        compact={false}
-        dropdownMode="inline"
-        renderEmptyState={({ clear }) => (
-          <button type="button" onClick={clear}>Custom empty</button>
-        )}
-      />,
-    );
-
+    renderDropdown({
+      query: "abc",
+      setQuery,
+      dropdownMode: "inline",
+      renderEmptyState: ({ clear }) => <button type="button" onClick={clear}>Custom empty</button>,
+    });
     expect(screen.getByText("Custom empty")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Custom empty"));
     expect(setQuery).toHaveBeenCalledWith("");
+  });
 
-    rerender(
-      <SearchDropdown
-        loading={false}
-        query="abc"
-        setQuery={setQuery}
-        userResults={[{ id: 1, username: "ada" }]}
-        onUserSelect={onUserSelect}
-        compact
-      />,
-    );
-
+  it("selects compact search results", () => {
+    const onUserSelect = vi.fn();
+    renderDropdown({ query: "abc", userResults: [{ id: 1, username: "ada" }], onUserSelect, compact: true });
     fireEvent.click(screen.getByText("ada"));
     expect(onUserSelect).toHaveBeenCalledWith({ id: 1, username: "ada" });
   });
 
   it("renders result rows that fall back to the array index when a user id is missing", () => {
     const onUserSelect = vi.fn();
-    render(
-      <SearchDropdown
-        loading={false}
-        query="anon"
-        setQuery={vi.fn()}
-        userResults={[{ username: "fallback-user" }]}
-        onUserSelect={onUserSelect}
-        compact={false}
-      />,
-    );
-
+    renderDropdown({ query: "anon", userResults: [{ username: "fallback-user" }], onUserSelect });
     fireEvent.click(screen.getByText("fallback-user"));
     expect(onUserSelect).toHaveBeenCalledWith({ username: "fallback-user" });
   });
 
-  it("renders the global search bar with dropdown only when requested", () => {
+  it("renders the global search bar and forwards focus and change events", () => {
     const setQuery = vi.fn();
     const setFocus = vi.fn();
     const containerRef = { current: null };
-    const { rerender } = render(
+    render(
       <GlobalSearchBar
         query=""
         setQuery={setQuery}
@@ -173,19 +143,20 @@ describe("UserSearchLists and shell", () => {
         placeholder="Search people"
       />,
     );
-
     fireEvent.focus(screen.getByTestId("search-bar"));
     fireEvent.change(screen.getByTestId("search-bar"), { target: { value: "ali" } });
     expect(setFocus).toHaveBeenCalled();
     expect(setQuery).toHaveBeenCalledWith("ali");
     expect(screen.getByPlaceholderText("Search people")).toBeInTheDocument();
+  });
 
-    rerender(
+  it("renders the global dropdown only when requested", () => {
+    render(
       <GlobalSearchBar
         query="ali"
-        setQuery={setQuery}
-        setFocus={setFocus}
-        containerRef={containerRef}
+        setQuery={vi.fn()}
+        setFocus={vi.fn()}
+        containerRef={{ current: null }}
         showDropdown
         loading={false}
         userResults={[]}

@@ -1,3 +1,7 @@
+/*
+ * Tests for the user search filter dropdown.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -49,24 +53,28 @@ vi.mock("../../../../components/social/utils/userSearchShared", () => ({
 
 import { FilterDropdown } from "../../../../components/social/components/FilterDropdown";
 
+const baseFilterProps = {
+  activeFilterTab: "courses",
+  courseGroups: { Science: ["A", "B", "C", "D", "E", "F"] },
+  courseResults: ["A", "B", "C", "D", "E", "F"],
+  filterQuery: "",
+  roleResults: [{ value: "teacher", label: "Professor" }],
+  selectedCourses: [],
+  selectedRoles: [],
+  selectedSocieties: [],
+  selectedYears: [],
+  societyResults: [{ id: 1, name: "Chess", categories: ["sports"] }],
+  yearResults: ["Year 1"],
+};
+
 function buildProps(overrides = {}) {
   return {
-    activeFilterTab: "courses",
+    ...baseFilterProps,
     setActiveFilterTab: vi.fn(),
-    filterQuery: "",
     setFilterQuery: vi.fn(),
-    courseGroups: { Science: ["A", "B", "C", "D", "E", "F"] },
-    courseResults: ["A", "B", "C", "D", "E", "F"],
-    selectedCourses: [],
     toggleCourse: vi.fn(),
-    yearResults: ["Year 1"],
-    selectedYears: [],
     toggleYear: vi.fn(),
-    roleResults: [{ value: "teacher", label: "Professor" }],
-    selectedRoles: [],
     toggleRole: vi.fn(),
-    societyResults: [{ id: 1, name: "Chess", categories: ["sports"] }],
-    selectedSocieties: [],
     toggleSociety: vi.fn(),
     ...overrides,
   };

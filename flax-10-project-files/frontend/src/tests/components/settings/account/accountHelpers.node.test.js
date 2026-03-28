@@ -1,8 +1,11 @@
+/*
+ * Tests for account helper modules and course request actions.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const getMyCourseChangeRequest = vi.fn();
 const cancelCourseChangeRequest = vi.fn();
-const clearUserData = vi.fn();
 
 vi.mock("../../../../api/adminApi", () => ({
   getMyCourseChangeRequest: (...args) => getMyCourseChangeRequest(...args),
@@ -33,66 +36,41 @@ describe("account helper modules", () => {
     Object.defineProperty(globalThis, "localStorage", {
       configurable: true,
       value: {
-      store: {},
-      getItem(key) {
-        return this.store[key] ?? null;
-      },
-      setItem(key, value) {
-        this.store[key] = String(value);
-      },
-      removeItem(key) {
-        delete this.store[key];
-      },
-      clear() {
-        this.store = {};
-      },
+        store: {},
+        getItem(key) { return this.store[key] ?? null; },
+        setItem(key, value) { this.store[key] = String(value); },
+        removeItem(key) { delete this.store[key]; },
+        clear() { this.store = {}; },
       },
     });
     localStorage.clear();
   });
 
-  it("covers course-request helpers and account form config", () => {
+  it("covers normaliseCourseRequest variants", () => {
     expect(groupedCourses.length).toBeGreaterThan(0);
     expect(YEAR_OPTIONS).toHaveLength(5);
 
     expect(normaliseCourseRequest(null)).toBeNull();
     expect(normaliseCourseRequest("bad")).toBeNull();
-    expect(
-      normaliseCourseRequest({
-        request_status: "PENDING",
-        requestedCourse: "Computer Science",
-      }),
-    ).toMatchObject({
+    expect(normaliseCourseRequest({ request_status: "PENDING", requestedCourse: "Computer Science" })).toMatchObject({
       status: "pending",
       requested_course: "Computer Science",
     });
-    expect(
-      normaliseCourseRequest([
-        { status: "approved", desired_course: "Old" },
-        { request_status: "pending", new_course: "Law" },
-      ]),
-    ).toMatchObject({
-      status: "pending",
-      requested_course: "Law",
-    });
-    expect(
-      normaliseCourseRequest([
-        { status: "approved", desired_course: "Fallback Course" },
-      ]),
-    ).toMatchObject({
-      status: "approved",
-      requested_course: "Fallback Course",
-    });
+    expect(normaliseCourseRequest([
+      { status: "approved", desired_course: "Old" },
+      { request_status: "pending", new_course: "Law" },
+    ])).toMatchObject({ status: "pending", requested_course: "Law" });
+    expect(normaliseCourseRequest([
+      { status: "approved", desired_course: "Fallback Course" },
+    ])).toMatchObject({ status: "approved", requested_course: "Fallback Course" });
     expect(normaliseCourseRequest([null])).toBeNull();
-    expect(
-      normaliseCourseRequest({
-        desired_course: "History",
-      }),
-    ).toMatchObject({
+    expect(normaliseCourseRequest({ desired_course: "History" })).toMatchObject({
       status: "",
       requested_course: "History",
     });
+  });
 
+  it("covers cache helpers and account form config", () => {
     expect(getCachedPendingRequest()).toBeNull();
     setCachedPendingRequest("Physics");
     expect(getCachedPendingRequest()).toEqual({ status: "pending", requested_course: "Physics" });
@@ -103,70 +81,69 @@ describe("account helper modules", () => {
     clearCachedPendingRequest();
     expect(localStorage.getItem("course_change_pending_request")).toBeNull();
 
-    expect(getInitialAccountData()).toEqual({
-      firstName: "",
-      lastName: "",
-      email: "",
-      year: "",
-    });
-    expect(
-      getInitialAccountData({
-        first_name: "Ada",
-        last_name: "Lovelace",
-        email: "ada@example.com",
-        year: "Year 2",
-      }),
-    ).toEqual({
-      firstName: "Ada",
-      lastName: "Lovelace",
-      email: "ada@example.com",
-      year: "Year 2",
-    });
+    expect(getInitialAccountData()).toEqual({ firstName: "", lastName: "", email: "", year: "" });
+    expect(getInitialAccountData({
+      first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", year: "Year 2",
+    })).toEqual({ firstName: "Ada", lastName: "Lovelace", email: "ada@example.com", year: "Year 2" });
     expect(hasAccountChanges({ firstName: "A", lastName: "", email: "", year: "" }, getInitialAccountData())).toBe(true);
     expect(hasAccountChanges(getInitialAccountData(), getInitialAccountData())).toBe(false);
   });
 
-  it("covers account submit, cancel, and course-request success handlers", async () => {
-    const event = { preventDefault: vi.fn() };
-    const onSave = vi.fn().mockResolvedValue(true);
-    const setInitialFormData = vi.fn();
-    const setSaveSignal = vi.fn();
-    const refreshProfile = vi.fn();
+  function createAccountSubmitContext(overrides = {}) {
+    return {
+      event: { preventDefault: vi.fn() },
+      onSave: vi.fn().mockResolvedValue(true),
+      refreshProfile: vi.fn(),
+      setInitialFormData: vi.fn(),
+      setSaveSignal: vi.fn(),
+      ...overrides,
+    };
+  }
 
+  it("skips submit work when there are no unsaved account changes", async () => {
+    const context = createAccountSubmitContext();
     await createAccountSubmitHandler({
       hasUnsaved: false,
-      onSave,
+      onSave: context.onSave,
       formData: { firstName: "Ada" },
-      setInitialFormData,
-      setSaveSignal,
-      refreshProfile,
-    })(event);
-    expect(onSave).not.toHaveBeenCalled();
+      setInitialFormData: context.setInitialFormData,
+      setSaveSignal: context.setSaveSignal,
+      refreshProfile: context.refreshProfile,
+    })(context.event);
+    expect(context.onSave).not.toHaveBeenCalled();
+  });
 
+  it("stops after a failed account save", async () => {
+    const context = createAccountSubmitContext({ onSave: vi.fn().mockResolvedValue(false) });
     await createAccountSubmitHandler({
       hasUnsaved: true,
-      onSave: vi.fn().mockResolvedValue(false),
+      onSave: context.onSave,
       formData: { firstName: "Ada" },
-      setInitialFormData,
-      setSaveSignal,
-      refreshProfile,
-    })(event);
-    expect(setInitialFormData).not.toHaveBeenCalled();
+      setInitialFormData: context.setInitialFormData,
+      setSaveSignal: context.setSaveSignal,
+      refreshProfile: context.refreshProfile,
+    })(context.event);
+    expect(context.setInitialFormData).not.toHaveBeenCalled();
+  });
 
+  it("updates account state after a successful save", async () => {
+    const context = createAccountSubmitContext();
     await createAccountSubmitHandler({
       hasUnsaved: true,
-      onSave,
+      onSave: context.onSave,
       formData: { firstName: "Ada" },
-      setInitialFormData,
-      setSaveSignal,
-      refreshProfile,
-    })(event);
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(setInitialFormData).toHaveBeenCalledWith({ firstName: "Ada" });
-    expect(setSaveSignal).toHaveBeenCalledWith(expect.any(Function));
-    expect(setSaveSignal.mock.calls[0][0](4)).toBe(5);
-    expect(refreshProfile).toHaveBeenCalled();
+      setInitialFormData: context.setInitialFormData,
+      setSaveSignal: context.setSaveSignal,
+      refreshProfile: context.refreshProfile,
+    })(context.event);
+    expect(context.event.preventDefault).toHaveBeenCalled();
+    expect(context.setInitialFormData).toHaveBeenCalledWith({ firstName: "Ada" });
+    expect(context.setSaveSignal).toHaveBeenCalledWith(expect.any(Function));
+    expect(context.setSaveSignal.mock.calls[0][0](4)).toBe(5);
+    expect(context.refreshProfile).toHaveBeenCalled();
+  });
 
+  it("covers cancel course-request handler success branches", async () => {
     const cancelContext = {
       setCancellingRequest: vi.fn(),
       setCourseRequestNotice: vi.fn(),
@@ -184,15 +161,22 @@ describe("account helper modules", () => {
     cancelCourseChangeRequest.mockResolvedValueOnce(undefined);
     getMyCourseChangeRequest.mockResolvedValueOnce({ status: "pending", requested_course: "Biology" });
     await createCancelCourseRequestHandler(cancelContext)();
-    expect(cancelContext.setPendingRequest).toHaveBeenCalledWith({
-      status: "pending",
-      requested_course: "Biology",
-    });
+    expect(cancelContext.setPendingRequest).toHaveBeenCalledWith({ status: "pending", requested_course: "Biology" });
 
     cancelCourseChangeRequest.mockResolvedValueOnce(undefined);
     getMyCourseChangeRequest.mockRejectedValueOnce(new Error("refresh failed"));
     await createCancelCourseRequestHandler(cancelContext)();
     expect(cancelContext.setPendingRequest).toHaveBeenCalledWith(null);
+  });
+
+  it("covers cancel course-request handler error branches", async () => {
+    const cancelContext = {
+      setCancellingRequest: vi.fn(),
+      setCourseRequestNotice: vi.fn(),
+      setCourseRequestError: vi.fn(),
+      setPendingRequest: vi.fn(),
+      refreshProfile: vi.fn(),
+    };
 
     cancelCourseChangeRequest.mockRejectedValueOnce(new Error("No pending request to cancel"));
     await createCancelCourseRequestHandler(cancelContext)();
@@ -205,19 +189,21 @@ describe("account helper modules", () => {
     cancelCourseChangeRequest.mockRejectedValueOnce({});
     await createCancelCourseRequestHandler(cancelContext)();
     expect(cancelContext.setCourseRequestError).toHaveBeenCalledWith("Failed to cancel request. Please try again.");
+  });
 
-    const successContext = {
+  function createSuccessContext() {
+    return {
       setPendingRequest: vi.fn(),
       setShowModal: vi.fn(),
       setCourseRequestError: vi.fn(),
       setCourseRequestNotice: vi.fn(),
       refreshProfile: vi.fn(),
     };
+  }
 
-    createCourseRequestSuccessHandler(successContext)(
-      { request_status: "pending", desired_course: "Chemistry" },
-      "Ignored",
-    );
+  it("stores a successful course request in component state", () => {
+    const successContext = createSuccessContext();
+    createCourseRequestSuccessHandler(successContext)({ request_status: "pending", desired_course: "Chemistry" }, "Ignored");
     expect(successContext.setPendingRequest).toHaveBeenCalledWith({
       request_status: "pending",
       desired_course: "Chemistry",
@@ -225,10 +211,12 @@ describe("account helper modules", () => {
       requested_course: "Chemistry",
     });
     expect(successContext.setShowModal).toHaveBeenCalledWith(false);
+  });
 
+  it("stores and clears cached course request fallbacks", () => {
+    const successContext = createSuccessContext();
     createCourseRequestSuccessHandler(successContext)(null, "History");
     expect(getCachedPendingRequest()).toEqual({ status: "pending", requested_course: "History" });
-
     clearCachedPendingRequest();
     createCourseRequestSuccessHandler(successContext)(null, "");
     expect(getCachedPendingRequest()).toBeNull();

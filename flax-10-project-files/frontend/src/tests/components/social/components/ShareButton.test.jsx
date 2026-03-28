@@ -55,30 +55,10 @@ describe('ShareButton', () => {
         expect(screen.getByText('Shared')).toBeTruthy();
     });
 
-    it('renders custom variants and labels based on the sharing state', () => {
-        const { rerender } = render(
-            <ShareButton
-                userId={1}
-                initialIsSharing={false}
-                shareVariant="ghost"
-                sharedVariant="success"
-                shareLabel="Start Sharing"
-                sharedLabel="Already Shared"
-            />
-        );
-
+    it('renders custom labels based on the sharing state', () => {
+        const { rerender } = render(<ShareButton userId={1} initialIsSharing={false} shareVariant="ghost" sharedVariant="success" shareLabel="Start Sharing" sharedLabel="Already Shared" />);
         expect(screen.getByText('Start Sharing')).toBeTruthy();
-
-        rerender(
-            <ShareButton
-                userId={1}
-                initialIsSharing={true}
-                shareVariant="ghost"
-                sharedVariant="success"
-                shareLabel="Start Sharing"
-                sharedLabel="Already Shared"
-            />
-        );
+        rerender(<ShareButton userId={1} initialIsSharing={true} shareVariant="ghost" sharedVariant="success" shareLabel="Start Sharing" sharedLabel="Already Shared" />);
         expect(screen.getByText('Already Shared')).toBeTruthy();
     });
 

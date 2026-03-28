@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for account form container display branches.
+ */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
@@ -135,38 +138,31 @@ describe("AccountFormContainer", () => {
     expect(onChange).toHaveBeenCalled();
   });
 
-  it("renders pending requests without a requested-course subtitle and omits empty success notices", () => {
-    render(
-      <>
-        <CourseDisplay
-          course="Physics"
-          pendingRequest={{ requested_course: "" }}
-          onRequestClick={vi.fn()}
-          onCancelRequest={vi.fn()}
-          cancellingRequest={false}
-          successMessage=""
-        />
-        <RealAccountFormLayout
-          onSubmit={vi.fn((event) => event.preventDefault())}
-          formData={{ firstName: "Ada", lastName: "Lovelace", email: "ada@example.com", year: "Year 2" }}
-          handleChange={vi.fn()}
-          currentCourse="Physics"
-          pendingRequest={null}
-          onRequestClick={vi.fn()}
-          onCancelRequest={vi.fn()}
-          cancellingRequest={false}
-          courseRequestNotice=""
-          courseRequestError=""
-          isSaving={false}
-          hasUnsaved={false}
-          saveSignal={0}
-          isTeacher
-        />
-      </>,
-    );
-
+  it("renders pending requests without a requested-course subtitle", () => {
+    render(<CourseDisplay course="Physics" pendingRequest={{ requested_course: "" }} onRequestClick={vi.fn()} onCancelRequest={vi.fn()} cancellingRequest={false} successMessage="" />);
     expect(screen.getByText(/An admin will review your request shortly/)).toBeInTheDocument();
     expect(screen.queryByText("✓ ")).not.toBeInTheDocument();
+  });
+
+  it("hides year and course request controls for teachers", () => {
+    render(
+      <RealAccountFormLayout
+        onSubmit={vi.fn((event) => event.preventDefault())}
+        formData={{ firstName: "Ada", lastName: "Lovelace", email: "ada@example.com", year: "Year 2" }}
+        handleChange={vi.fn()}
+        currentCourse="Physics"
+        pendingRequest={null}
+        onRequestClick={vi.fn()}
+        onCancelRequest={vi.fn()}
+        cancellingRequest={false}
+        courseRequestNotice=""
+        courseRequestError=""
+        isSaving={false}
+        hasUnsaved={false}
+        saveSignal={0}
+        isTeacher
+      />,
+    );
     expect(screen.queryByLabelText("Year")).not.toBeInTheDocument();
     expect(screen.queryByText(/Request a course change/i)).not.toBeInTheDocument();
   });
