@@ -169,4 +169,34 @@ describe('UserListModal', () => {
     render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
     expect(document.body.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
   });
+
+  it('falls back to the render index when both id and username are missing', () => {
+    const anonymousUsers = [
+      { first_name: 'Mystery', last_name: 'Guest', is_sharing: false },
+      { id: 7, username: 'shared', first_name: 'Shared', last_name: 'User', is_sharing: true },
+    ];
+
+    render(<UserListModal title="People" users={anonymousUsers} onClose={vi.fn()} />);
+    expect(screen.getByText('Mystery Guest')).toBeInTheDocument();
+  });
+
+  it('keeps sharing users ahead of non-sharing users across multiple input orders', () => {
+    localStorage.setItem('user', JSON.stringify({ id: 99, username: 'other' }));
+    const permutations = [
+      [
+        { id: 1, username: 'a', first_name: 'A', last_name: 'A', is_sharing: false },
+        { id: 2, username: 'b', first_name: 'B', last_name: 'B', is_sharing: true },
+      ],
+      [
+        { id: 3, username: 'c', first_name: 'C', last_name: 'C', is_sharing: true },
+        { id: 4, username: 'd', first_name: 'D', last_name: 'D', is_sharing: false },
+      ],
+    ];
+
+    permutations.forEach((list) => {
+      const { unmount } = render(<UserListModal title="People" users={list} onClose={vi.fn()} />);
+      expect(screen.getAllByText(/@/)[0].textContent).toMatch(/@b|@c/);
+      unmount();
+    });
+  });
 });

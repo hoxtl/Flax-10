@@ -115,6 +115,16 @@ describe("groupWorkHooks", () => {
     expect(screen.getByTestId("detail-task-stats").textContent).toContain('"percent":0');
   });
 
+  it("uses the built-in sort default when no initial sort is provided", () => {
+    function DefaultSortHarness() {
+      const sortState = useGroupProjectSort();
+      return <div data-testid="sort">{sortState.sortBy}</div>;
+    }
+
+    render(<DefaultSortHarness />);
+    expect(screen.getByTestId("sort").textContent).toBe("most-members");
+  });
+
   it("updates sort state and project actions", async () => {
     const onUpdate = vi.fn();
     const onDelete = vi.fn();

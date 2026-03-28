@@ -87,4 +87,10 @@ describe("useLandingPageState", () => {
     });
     expect(cancelAnimationFrameSpy).toHaveBeenCalled();
   });
+
+  it("falls back to empty top pills and an empty positions list when config fields are omitted", () => {
+    const { result } = renderHook(() => useLandingPageState([{ id: "hero" }], {}));
+    expect(result.current.topPills).toEqual([]);
+    expect(result.current.displayTransform).toBe("");
+  });
 });

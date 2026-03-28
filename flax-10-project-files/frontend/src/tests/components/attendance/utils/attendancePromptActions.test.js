@@ -1,11 +1,11 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { submitAttendancePromptAnswer } from "../../../../components/attendance/utils/attendancePromptActions";
+import { dismissAttendancePrompt, submitAttendancePromptAnswer } from "../../../../components/attendance/utils/attendancePromptActions";
 import { useAttendanceResource } from "../../../../pages/attendance/hooks/useAttendanceResource";
 import { ATTENDANCE_UPDATED_EVENT } from "../../../../lib/attendanceEvents";
 import { recordAttendance } from "../../../../api/attendanceApi";
-import { setPromptedId } from "../../../../components/attendance/utils/attendancePromptStorage";
+import { setPromptedId, setSessionDismissedId } from "../../../../components/attendance/utils/attendancePromptStorage";
 
 vi.mock("../../../../api/attendanceApi", () => ({
   recordAttendance: vi.fn(),
@@ -92,6 +92,52 @@ describe("attendancePromptActions", () => {
 
     await Promise.resolve();
     vi.advanceTimersByTime(5);
+    await expect(promise).resolves.toBe(true);
+    vi.useRealTimers();
+  });
+
+  it("dismisses the prompt and records the session dismissal only when an event exists", () => {
+    const setEvent = vi.fn();
+
+    dismissAttendancePrompt({ id: 9 }, setEvent);
+    dismissAttendancePrompt(null, setEvent);
+
+    expect(setSessionDismissedId).toHaveBeenCalledWith(9);
+    expect(setEvent.mock.calls).toEqual([[null], [null]]);
+  });
+
+  it("returns false immediately when there is no event or a submission is already in progress", async () => {
+    const setEvent = vi.fn();
+    const setSubmitting = vi.fn();
+
+    await expect(submitAttendancePromptAnswer(null, true, false, setEvent, setSubmitting)).resolves.toBe(false);
+    await expect(submitAttendancePromptAnswer({ id: 4 }, true, true, setEvent, setSubmitting)).resolves.toBe(false);
+
+    expect(recordAttendance).not.toHaveBeenCalled();
+    expect(setSubmitting).not.toHaveBeenCalled();
+  });
+
+  it("handles successful submissions without an afterSuccess callback", async () => {
+    const setEvent = vi.fn();
+    const setSubmitting = vi.fn();
+    recordAttendance.mockResolvedValue({});
+
+    await expect(
+      submitAttendancePromptAnswer({ id: 15 }, true, false, setEvent, setSubmitting, { closeDelayMs: 0 }),
+    ).resolves.toBe(true);
+
+    expect(setPromptedId).toHaveBeenCalledWith(15);
+  });
+
+  it("uses the default close delay when no options object is provided", async () => {
+    vi.useFakeTimers();
+    const setEvent = vi.fn();
+    const setSubmitting = vi.fn();
+    recordAttendance.mockResolvedValue({});
+
+    const promise = submitAttendancePromptAnswer({ id: 18 }, true, false, setEvent, setSubmitting);
+    await Promise.resolve();
+    vi.advanceTimersByTime(250);
     await expect(promise).resolves.toBe(true);
     vi.useRealTimers();
   });
