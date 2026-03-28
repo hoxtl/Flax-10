@@ -83,10 +83,12 @@ describe("userSearchUtils", () => {
     const items = [
       { name: "Ada Lovelace", username: "ada" },
       { name: "Grace Hopper", username: "grace" },
+      { name: "Unknown" },
     ];
 
     expect(filterObj(items, "", ["name"])).toEqual(items);
     expect(filterObj(items, "HOP", ["name", "username"])).toEqual([items[1]]);
+    expect(filterObj(items, "zzz", ["username"])).toEqual([]);
   });
 
   it("filters course groups by department name or course value", () => {
