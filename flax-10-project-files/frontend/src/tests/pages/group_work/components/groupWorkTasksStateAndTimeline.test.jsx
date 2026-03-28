@@ -287,6 +287,88 @@ describe("group tasks state extras", () => {
       expect(body.status).toBe("todo");
     });
 
+    it("supports addTask without an options object", async () => {
+      const newTask = { id: 13, title: "Default options", assignees_info: [], status: "todo" };
+      const { hook } = await renderTasksHook([mockJsonResponse(newTask)]);
+
+      await act(async () => {
+        await hook.result.current.taskActions.addTask("Default options");
+      });
+
+      const postCall = global.fetch.mock.calls.find((call) => call[1]?.method === "POST");
+      expect(JSON.parse(postCall[1].body)).toMatchObject({
+        title: "Default options",
+        group_project: 9,
+        priority: "medium",
+        status: "todo",
+      });
+    });
+
+    it("ignores delete requests when the task cannot be found", async () => {
+      const { hook } = await renderTasksHook();
+      vi.useFakeTimers();
+      try {
+        act(() => {
+          hook.result.current.taskActions.deleteTask(999);
+        });
+
+        await act(async () => {
+          vi.advanceTimersByTime(3200);
+          await Promise.resolve();
+        });
+
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("preserves non-target tasks during updates and safely filters missing assignees and titles", async () => {
+      global.fetch.mockReset();
+      global.fetch
+        .mockResolvedValueOnce(mockJsonResponse([
+          { id: 1, title: undefined, assignees_info: null, status: "todo" },
+          { id: 2, title: "Beta task", assignees_info: [{ id: 4 }], status: "todo" },
+        ]))
+        .mockResolvedValueOnce(mockJsonResponse({ id: 2, title: "Updated Beta", assignees_info: [{ id: 4 }], status: "done" }));
+
+      const onStatsUpdate = vi.fn();
+      const hook = renderHook(() => useGroupTasksTabState(9, [{ id: 4 }], onStatsUpdate));
+      await waitFor(() => expect(hook.result.current.taskActions.loading).toBe(false));
+
+      act(() => {
+        hook.result.current.setFilterUsers(["4"]);
+        hook.result.current.setSearchTerm("updated");
+      });
+
+      await act(async () => {
+        await hook.result.current.taskActions.updateTask(2, { status: "done" });
+      });
+
+      expect(hook.result.current.taskActions.tasks.find((task) => task.id === 1).title).toBeUndefined();
+      expect(hook.result.current.sortedTasks).toEqual([
+        expect.objectContaining({ id: 2, title: "Updated Beta" }),
+      ]);
+    });
+
+    it("ignores undo requests for missing pending deletes and safely searches untitled tasks", async () => {
+      global.fetch.mockReset();
+      global.fetch.mockResolvedValueOnce(mockJsonResponse([
+        { id: 1, title: undefined, assignees_info: [], status: "todo" },
+      ]));
+
+      const onStatsUpdate = vi.fn();
+      const hook = renderHook(() => useGroupTasksTabState(9, [], onStatsUpdate));
+      await waitFor(() => expect(hook.result.current.taskActions.loading).toBe(false));
+
+      act(() => {
+        hook.result.current.taskActions.undoDelete(999);
+        hook.result.current.setSearchTerm("alpha");
+      });
+
+      expect(hook.result.current.sortedTasks).toEqual([]);
+    });
+
     it("useSearchFilteredTasks filters tasks by searchTerm", async () => {
       global.fetch.mockReset();
       global.fetch.mockResolvedValueOnce(mockJsonResponse([
