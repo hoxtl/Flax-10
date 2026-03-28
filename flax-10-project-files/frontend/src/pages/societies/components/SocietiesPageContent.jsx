@@ -31,11 +31,20 @@ const PAGE_SIZE = 15;
 
 export function SocietiesPageContent({ state }) {
     if (state.loading) return <SocietiesSkeleton />;
-    if (state.selectedSocietyId) return <SelectedSocietyView state={state} />;
     return (
         <>
-            <SocietiesViewSwitch state={state} />
-            <SocietiesModals state={state} />
+            <AnimatePresence initial={false}>
+                {state.selectedSocietyId ? (
+                    <PageTransition key={`society-detail-${state.selectedSocietyId}`}>
+                        <SelectedSocietyView state={state} />
+                    </PageTransition>
+                ) : (
+                    <PageTransition key={`society-view-${state.view}`}>
+                        <SocietiesViewSwitch state={state} />
+                    </PageTransition>
+                )}
+            </AnimatePresence>
+            {!state.selectedSocietyId && <SocietiesModals state={state} />}
         </>
     );
 }

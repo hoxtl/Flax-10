@@ -4,22 +4,29 @@
 .list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    padding: 0.25rem 0;
 }
 
 .row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    background: var(--hover, #f9fafb);
-    border-radius: 6px;
+    padding: 0.7rem 0.8rem;
+    background: color-mix(in srgb, var(--panel, #fff) 72%, var(--hover, #f9fafb) 28%);
+    border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border, #e5e7eb));
+    border-radius: 16px;
 }
 
 .name {
     flex: 1;
     color: var(--text, #1f2937);
-    font-size: 0.9rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.roleDropdown {
+    min-width: 112px;
 }
 
 .select {
@@ -48,6 +55,6 @@
 .empty {
     color: var(--muted, #6b7280);
     font-size: 0.9rem;
-    text-align: center;
-    padding: 1rem 0;
+    line-height: 1.45;
+    padding: 0.75rem 0 0.25rem;
 }

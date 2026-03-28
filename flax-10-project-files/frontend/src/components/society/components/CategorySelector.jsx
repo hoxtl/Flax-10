@@ -56,10 +56,21 @@ export function CategoryDisplay({ category, editMode, onEdit }) {
 
     return (
         <div className={styles.display}>
-            {categories.map(cat => <CategoryBadge key={cat} category={cat} />)}
+            {categories.map((cat, index) => (
+                <CategoryFragment key={cat} category={cat} showDivider={index > 0} />
+            ))}
             {categories.length === 0 && <span className={styles.noCat}>No category</span>}
             {editMode && <button className={styles.editBtn} onClick={onEdit}>✎</button>}
         </div>
+    );
+}
+
+function CategoryFragment({ category, showDivider }) {
+    return (
+        <>
+            {showDivider && <span className={styles.categoryDivider} aria-hidden="true">|</span>}
+            <CategoryBadge category={category} />
+        </>
     );
 }
 

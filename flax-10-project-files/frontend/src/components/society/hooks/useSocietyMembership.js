@@ -2,47 +2,54 @@
  * useSocietyMembership handles joining and leaving societies.
  */
 
+import { useState } from "react";
 import * as api from '../../../api/societyApi';
 import { useTags } from '../../../context/TagContext';
-import { useConfirm } from '../../../context/ConfirmContext';
+import { useToast } from '../../../context/ToastContext';
 
-const updateMemberState = (setSociety, isMember, delta) =>
-    setSociety(prev => ({
-        ...prev,
-        is_member: isMember,
-        is_subscribed: isMember ? prev.is_subscribed : false,
-        member_count: Math.max(0, (prev.member_count || 0) + delta)
-    }));
-
-const promptSubscription = async (confirm, id, setSociety) => {
-    const result = await confirm({
-        title: 'Turn on notifications?',
-        message: 'Stay updated with announcements and events.'
+const updateMemberState = (setSociety, isMember, delta) => {
+    let name = "this society";
+    setSociety(prev => {
+        name = prev?.name || name;
+        const nextCount = Math.max(0, (prev.member_count || 0) + delta);
+        return {
+            ...prev,
+            is_member: isMember,
+            is_subscribed: isMember ? prev.is_subscribed : false,
+            member_count: nextCount
+        };
     });
-    if (!result) return;
-    await api.toggleSubscription(id, true);
-    setSociety(prev => ({ ...prev, is_subscribed: true }));
+    return name;
 };
 
-const makeJoinSociety = (id, setSociety, confirm, onMembershipChange) =>
+const makeJoinSociety = (id, setSociety, onMembershipChange, toast, setPendingAction) =>
     async () => {
+        setPendingAction("join");
         try {
             await api.joinSociety(id);
-            updateMemberState(setSociety, true, 1);
-            await promptSubscription(confirm, id, setSociety);
+            const societyName = updateMemberState(setSociety, true, 1);
+            toast?.(`Joined ${societyName}`);
             onMembershipChange?.();
         } catch (err) {
+            toast?.("Couldn't join this society.", { variant: "error" });
+        } finally {
+            setPendingAction(null);
         }
     };
 
-const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
+const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange, toast, setPendingAction) =>
     async () => {
+        setPendingAction("leave");
         try {
             await api.leaveSociety(id, 'me');
-            updateMemberState(setSociety, false, -1);
+            const societyName = updateMemberState(setSociety, false, -1);
             refreshTags();
+            toast?.(`Left ${societyName}`);
             onMembershipChange?.();
         } catch (err) {
+            toast?.("Couldn't leave this society.", { variant: "error" });
+        } finally {
+            setPendingAction(null);
         }
     };
 
@@ -53,12 +60,14 @@ const makeRequestRatification = (id, setSociety) =>
     };
 
 export const useSocietyMembership = (id, setSociety, onMembershipChange) => {
+    const [membershipAction, setMembershipAction] = useState(null);
     const { refreshTags } = useTags();
-    const confirm = useConfirm();
+    const toast = useToast();
     return {
-        joinSociety: makeJoinSociety(id, setSociety, confirm, onMembershipChange),
-        leaveSociety: makeLeaveSociety(id, setSociety, refreshTags, onMembershipChange),
+        joinSociety: makeJoinSociety(id, setSociety, onMembershipChange, toast, setMembershipAction),
+        leaveSociety: makeLeaveSociety(id, setSociety, refreshTags, onMembershipChange, toast, setMembershipAction),
         requestRatification: makeRequestRatification(id, setSociety),
         publishChanges: async (changes) => api.publishChanges(id, changes),
+        membershipAction,
     };
 };

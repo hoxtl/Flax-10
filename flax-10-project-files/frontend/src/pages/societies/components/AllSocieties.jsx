@@ -30,7 +30,7 @@ export default function AllSocieties({ onBack, onSelect, societies = [], onRepor
     return (
         <div className={styles.container}>
             <BrowseHeader onBack={onBack} filterState={filterState} societies={societies} />
-            <SocietyBrowseResults items={filtered} search={filterState.search} setSearch={filterState.setSearch} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
+            <SocietyBrowseResults items={filtered} search={filterState.search} setSearch={filterState.setSearch} onClear={() => { filterState.setSearch(""); filterState.clearFilters(); }} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             <BackToTop />
         </div>
     );

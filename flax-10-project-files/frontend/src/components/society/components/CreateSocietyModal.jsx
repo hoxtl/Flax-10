@@ -14,6 +14,7 @@ import { TagsSelector } from "../../common/tags_selector/TagsSelector";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import StandardModal from "../../common/standard_modal/StandardModal";
 import TextInput from "../../common/text_input/TextInput";
+import { useToast } from "../../../context/ToastContext";
 
 const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map(c => ({ id: c.id, label: c.label }));
 
@@ -29,7 +30,8 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
         <>
             <StandardModal title="Create Society" onClose={onClose} modalClassName={styles.modalPanel} contentClassName={styles.modalContent}>
                 <FormFields form={logic.form} update={logic.update} setModals={logic.setModals} />
-                <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} />
+                {logic.submitError && <p className={styles.submitError}>{logic.submitError}</p>}
+                <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} isSubmitting={logic.isSubmitting} />
             </StandardModal>
             {collab && <AddCollaboratorModal {...logic.collabModalProps} />}
             {photo && <CoverImageModal {...logic.photoModalProps} />}
@@ -42,6 +44,9 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 function useCreateSocietyForm(onCreate) {
     const [form, setForm] = useState(initialForm());
     const [modals, setModals] = useState({ collab: false, photo: false });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+    const showToast = useToast();
     const update = (field, value) => setForm(p => ({ ...p, [field]: value }));
 
     const handleAddCollabs = (users) => {
@@ -51,11 +56,26 @@ function useCreateSocietyForm(onCreate) {
 
     const isInvalid = !form.name.trim() || !allEmailsValid(form.adminEmails);
 
+    const handleSubmit = async () => {
+        if (isInvalid || isSubmitting) return;
+        setSubmitError("");
+        setIsSubmitting(true);
+        try {
+            await onCreate(form);
+        } catch (error) {
+            const message = error?.message || "Couldn't create the society just yet.";
+            setSubmitError(message);
+            showToast?.(message, { variant: "error" });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return {
-        form, update, modals, setModals, isCreateDisabled: isInvalid,
+        form, update, modals, setModals, isCreateDisabled: isInvalid || isSubmitting, isSubmitting, submitError,
         collabModalProps: getCollabModalProps(form, setModals, handleAddCollabs),
         photoModalProps: getPhotoModalProps(form, setModals, update),
-        handleSubmit: () => onCreate(form)
+        handleSubmit
     };
 }
 
@@ -80,7 +100,7 @@ function getPhotoModalProps(form, setModals, update) {
     return {
         images: form.images,
         onClose: () => setModals(m => ({ ...m, photo: false })),
-        onUpdate: (imgs) => update("images", imgs)
+        onUpdate: (imgs) => update("images", imgs.slice(0, 1))
     };
 }
 
@@ -109,8 +129,8 @@ function getFieldHandlers(form, update) {
         categories: v => update("categories", v),
         adminEmails: v => update("adminEmails", v),
         ratification: v => update("requestRatification", v),
-        role: (id, role) => update("collaborators", form.collaborators.map(c => c.id === id ? { ...c, role } : c)),
-        remove: id => update("collaborators", form.collaborators.filter(c => c.id !== id))
+        role: (id, role) => update("collaborators", form.collaborators.map(c => (c.user || c.id) === id ? { ...c, role } : c)),
+        remove: id => update("collaborators", form.collaborators.filter(c => (c.user || c.id) !== id))
     };
 }
 
@@ -165,16 +185,17 @@ function AdminEmailsField({ value, onChange, invalid }) {
 
 function PhotosField({ images, onOpen }) {
     const hasPhotos = images.length > 0;
+    const coverImage = images[0];
     return (
         <div className={styles.field}>
-            <label className={styles.label}>Photos <span className={styles.optional}>({images.length}/5)</span></label>
+            <label className={styles.label}>Cover Image <span className={styles.optional}>({hasPhotos ? 1 : 0}/1)</span></label>
             {hasPhotos && <div className={styles.photoSummary}>
-                {images.map((img, i) => <div key={i} className={styles.summaryCard} style={{ backgroundImage: `url("${img}")` }} />)}
+                <div className={styles.summaryCard} style={{ backgroundImage: `url("${coverImage}")` }} />
             </div>}
             <PrimaryButton type="button" className={styles.addCollabBtn} variant="secondary" pill onClick={onOpen}>
-                {hasPhotos ? "Manage Photos" : "+ Add Photos"}
+                {hasPhotos ? "Edit Cover Image" : "+ Add Cover Image"}
             </PrimaryButton>
-            <p className={styles.hint}>Recommended: Upload a cover photo and some gallery images</p>
+            <p className={styles.hint}>Use one clear image for the society card and banner.</p>
         </div>
     );
 }
@@ -191,12 +212,12 @@ function CollaboratorsField({ collaborators, onOpen, onRoleChange, onRemove }) {
     );
 }
 
-function ModalFooter({ onClose, onCreate, disabled }) {
+function ModalFooter({ onClose, onCreate, disabled, isSubmitting }) {
     return (
         <div className={styles.footer}>
             <PrimaryButton className={styles.cancelBtn} onClick={onClose} type="button" variant="secondary" pill>Cancel</PrimaryButton>
             <PrimaryButton className={styles.createBtn} onClick={onCreate} type="button" disabled={disabled} pill>
-                Create Society
+                {isSubmitting ? "Creating..." : "Create Society"}
             </PrimaryButton>
         </div>
     );

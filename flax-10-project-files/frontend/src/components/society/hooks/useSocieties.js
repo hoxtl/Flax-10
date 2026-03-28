@@ -15,8 +15,16 @@ function toSnakeCase(obj) {
 }
 
 async function addCollaboratorsToSociety(societyId, collaborators) {
-    if (!collaborators?.length) return;
-    for (const c of collaborators) await addCollaborator(societyId, c.username, c.role);
+    const failures = [];
+    if (!collaborators?.length) return failures;
+    for (const c of collaborators) {
+        try {
+            await addCollaborator(societyId, c.username, c.role);
+        } catch (error) {
+            failures.push({ username: c.username, message: error.message });
+        }
+    }
+    return failures;
 }
 
 const loadSocieties = async (setState, setSocieties) => {
@@ -31,9 +39,21 @@ const makeHandleCreate = (setSocieties) =>
     async (formData) => {
         const { collaborators, requestRatification: shouldRequest, ...rest } = formData;
         const newSociety = await createSociety(toSnakeCase(rest));
-        await addCollaboratorsToSociety(newSociety.id, collaborators);
-        if (shouldRequest) await requestRatification(newSociety.id);
-        const societyWithAdminFlag = { ...newSociety, is_admin: true, role: 'admin' };
+        const collaboratorFailures = await addCollaboratorsToSociety(newSociety.id, collaborators);
+        let ratificationError = null;
+        if (shouldRequest) {
+            try {
+                await requestRatification(newSociety.id);
+            } catch (error) {
+                ratificationError = error.message;
+            }
+        }
+        const societyWithAdminFlag = {
+            ...newSociety,
+            is_admin: true,
+            role: 'admin',
+            create_meta: { collaboratorFailures, ratificationError },
+        };
         setSocieties(prev => [...prev, societyWithAdminFlag]);
         return societyWithAdminFlag;
     };

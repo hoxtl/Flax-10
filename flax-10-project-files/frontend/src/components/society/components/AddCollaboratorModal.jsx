@@ -12,12 +12,23 @@ import styles from "../styles/AddCollaboratorModal.module.css";
 
 function useCollaboratorSelection(existingUsernames, onAdd, onClose) {
   const [selected, setSelected] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const selectedIds = new Set(selected.map((user) => user.id));
-  const filterUsers = (users = []) => users.filter((user) => !existingUsernames.includes(user.username) && !selectedIds.has(user.id));
+  const existingSet = new Set(existingUsernames.map((username) => username?.toLowerCase()).filter(Boolean));
+  const filterUsers = (users = []) => users.filter((user) => !existingSet.has(user.username?.toLowerCase()) && !selectedIds.has(user.id));
   const onSelect = (user) => !selectedIds.has(user.id) && setSelected((current) => [...current, user]);
   const onRemove = (id) => setSelected((current) => current.filter((user) => user.id !== id));
-  const onConfirm = () => { onAdd(selected); onClose(); };
-  return { onConfirm, onRemove, onSelect, selected, filterUsers };
+  const onConfirm = async () => {
+    if (selected.length === 0 || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onAdd(selected);
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  return { isSubmitting, onConfirm, onRemove, onSelect, selected, filterUsers };
 }
 
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
@@ -28,14 +39,19 @@ export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames
         <CollaboratorSearch filterUsers={selection.filterUsers} onSelect={selection.onSelect} />
         <SelectedUsers onRemove={selection.onRemove} users={selection.selected} />
       </div>
-      <ModalFooter disabled={selection.selected.length === 0} onCancel={onClose} onConfirm={selection.onConfirm} />
+      <ModalFooter
+        disabled={selection.selected.length === 0 || selection.isSubmitting}
+        isSubmitting={selection.isSubmitting}
+        onCancel={onClose}
+        onConfirm={selection.onConfirm}
+      />
     </StandardModal>
   );
 }
 
 function CollaboratorSearch({ filterUsers, onSelect }) {
   return (
-    <UserSearch onUserSelect={onSelect} filterUsers={filterUsers} fullWidth hideFilter compact renderEmptyState={renderEmptyState} />
+    <UserSearch onUserSelect={onSelect} filterUsers={filterUsers} fullWidth hideFilter compact renderEmptyState={renderEmptyState} dropdownMode="inline" />
   );
 }
 
@@ -61,11 +77,11 @@ function UserChip({ user, onRemove }) {
   );
 }
 
-function ModalFooter({ disabled, onCancel, onConfirm }) {
+function ModalFooter({ disabled, isSubmitting, onCancel, onConfirm }) {
   return (
     <div className={styles.footer}>
-      <PrimaryButton className={styles.footerBtn} variant="ghost" size="small" pill onClick={onCancel}>Cancel</PrimaryButton>
-      <PrimaryButton className={styles.footerBtn} size="small" pill onClick={onConfirm} disabled={disabled}>Add</PrimaryButton>
+      <PrimaryButton className={styles.footerBtn} variant="ghost" size="small" pill onClick={onCancel} disabled={isSubmitting}>Cancel</PrimaryButton>
+      <PrimaryButton className={styles.footerBtn} size="small" pill onClick={onConfirm} disabled={disabled}>{isSubmitting ? "Adding..." : "Add"}</PrimaryButton>
     </div>
   );
 }

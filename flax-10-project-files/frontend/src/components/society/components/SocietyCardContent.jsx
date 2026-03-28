@@ -2,30 +2,34 @@
  * SocietyCardContent renders the informational content inside a society card.
  */
 
+import { motion } from "framer-motion";
 import styles from '../styles/SocietyCard.module.css';
 import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip';
+import { SOCIETY_SHARED_TRANSITION } from "../utils/societyMotion";
 
-export function SocietyCardContent({ society, hasImage, RatifiedBadge }) {
-    const content = <CardInfo society={society} RatifiedBadge={RatifiedBadge} />;
+export function SocietyCardContent({ society, hasImage, RatifiedBadge, titleLayoutId }) {
+    const content = <CardInfo society={society} RatifiedBadge={RatifiedBadge} titleLayoutId={titleLayoutId} />;
     return hasImage ? content : <div className={styles.overlay}>{content}</div>;
 }
 
-function CardInfo({ society, RatifiedBadge }) {
+function CardInfo({ society, RatifiedBadge, titleLayoutId }) {
     const relatedCounts = getRelatedCounts(society);
     return (
         <div className={styles.info}>
-            <CardTitle society={society} RatifiedBadge={RatifiedBadge} />
+            <CardTitle society={society} RatifiedBadge={RatifiedBadge} titleLayoutId={titleLayoutId} />
             <p className={styles.count}>{society.member_count} members</p>
             <RelatedLinks society={society} relatedCounts={relatedCounts} />
         </div>
     );
 }
 
-function CardTitle({ society, RatifiedBadge }) {
+function CardTitle({ society, RatifiedBadge, titleLayoutId }) {
     return (
         <h3 className={styles.name}>
             <EntityLinkChip to={`/societies?id=${society.id}`} className={styles.nameChip}>
-                {society.name}
+                <motion.span className={styles.nameLabel} layoutId={titleLayoutId} transition={SOCIETY_SHARED_TRANSITION}>
+                    {society.name}
+                </motion.span>
             </EntityLinkChip>
             {RatifiedBadge && <RatifiedBadge isRatified={society.is_ratified} />}
         </h3>
