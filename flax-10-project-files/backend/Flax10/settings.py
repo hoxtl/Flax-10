@@ -4,7 +4,7 @@ Django settings for the backend project.
 
 from pathlib import Path
 import os
-
+import dj_database_url
 
 try:
     from dotenv import load_dotenv
