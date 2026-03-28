@@ -179,6 +179,25 @@ describe("Attendance components", () => {
     expect(showRecordTab).toHaveBeenCalled();
   });
 
+  it("renders populated marked tab content and marked badge count", () => {
+    render(
+      <AttendanceListColumn
+        model={{
+          eventsLoading: false,
+          listTab: "marked",
+          unmarkedEvents: [],
+          markedEvents: generateEvents(401, 2),
+          refetchAll: vi.fn(),
+          showRecordTab: vi.fn(),
+          showMarkedTab: vi.fn(),
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Active tab: marked")).toBeInTheDocument();
+    expect(screen.getByText("Your recorded attendance. Once marked, attendance cannot be changed.")).toBeInTheDocument();
+  });
+
   it("renders empty and populated record and marked lists and records changes", async () => {
     const onRecorded = vi.fn();
     const manyEvents = generateEvents(1, 21, { start_time: "2024-03-01T09:00:00Z" });
@@ -198,6 +217,12 @@ describe("Attendance components", () => {
     expect(screen.queryByRole("button", { name: "Change" })).not.toBeInTheDocument();
     expect(screen.getAllByText("Attended").length).toBeGreaterThan(0);
     expect(screen.getByText(/Showing 30 most recent/)).toBeInTheDocument();
+  });
+
+  it("renders a marked list without the truncation footer when under the limit", () => {
+    render(<MarkedAttendanceList markedEvents={generateEvents(501, 2)} />);
+    expect(screen.getByText("Your recorded attendance. Once marked, attendance cannot be changed.")).toBeInTheDocument();
+    expect(screen.queryByText(/Showing 30 most recent/)).not.toBeInTheDocument();
   });
 
   it("covers coursework filtering, submit failures, overlay variants, and empty marked lists", async () => {
@@ -267,5 +292,10 @@ describe("Attendance components", () => {
     expect(screen.getByText("2 events")).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole("button", { name: "Missed" }).at(-1));
     await waitFor(() => expect(onToggleStatus).toHaveBeenCalledWith(4, true));
+  });
+
+  it("renders the empty segment detail state", () => {
+    render(<SegmentDetailList events={[]} toggling={{}} onToggleStatus={vi.fn()} />);
+    expect(screen.getByText("No records found for this segment.")).toBeInTheDocument();
   });
 });

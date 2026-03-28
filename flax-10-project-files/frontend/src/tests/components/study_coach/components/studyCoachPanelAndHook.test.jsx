@@ -231,6 +231,19 @@ describe("useStudyCoachPanel", () => {
     expect(preventDefault).toHaveBeenCalled();
   });
 
+  it("ignores non-submit keyboard combinations", async () => {
+    const { result } = renderHook(() => useStudyCoachPanel("", 30));
+    const preventDefault = vi.fn();
+
+    await act(async () => {
+      result.current.handleKeyDown({ key: "Escape", shiftKey: false, preventDefault });
+      result.current.handleKeyDown({ key: "Enter", shiftKey: true, preventDefault });
+    });
+
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(aiChat).not.toHaveBeenCalled();
+  });
+
   it("ignores empty/loading sends and surfaces API errors", async () => {
     aiChat.mockRejectedValueOnce(new Error("nope"));
     const { result } = renderHook(() => useStudyCoachPanel("", 30));
