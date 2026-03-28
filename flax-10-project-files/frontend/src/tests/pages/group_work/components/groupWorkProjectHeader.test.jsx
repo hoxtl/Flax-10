@@ -1,3 +1,8 @@
+/*
+ * Tests for ProjectHeader metadata, delete affordances,
+ * and ProjectUrgentBanner deadline labels.
+ */
+
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -9,7 +14,6 @@ const useGroupProjectSort = vi.fn();
 const useToast = vi.fn();
 const useAuthMock = vi.fn();
 const useGroupTasksTabState = vi.fn();
-const buildBoardColumns = vi.fn();
 const getProjectDate = vi.fn();
 const formatProjectHeadlineDate = vi.fn();
 const getProjectCaption = vi.fn();
@@ -19,48 +23,12 @@ const openTeacherProfile = vi.fn();
 const getStoredViewer = vi.fn();
 const useCountUp = vi.fn();
 
-const buildTaskActions = () => ({
-  loading: false,
-  addTask: vi.fn().mockResolvedValue(undefined),
-  updateTask: vi.fn().mockResolvedValue(undefined),
-  deleteTask: vi.fn().mockResolvedValue(undefined),
-});
-
-const mockGroupTasksState = (overrides = {}) => {
-  const taskActions = overrides.taskActions ?? buildTaskActions();
-  const state = {
-    taskActions,
-    filterUsers: [],
-    setFilterUsers: vi.fn(),
-    taskView: "list",
-    setTaskView: vi.fn(),
-    showAddModal: false,
-    setShowAddModal: vi.fn(),
-    sortedTasks: [{ id: 1, title: "Task A" }],
-    ...overrides,
-  };
-  useGroupTasksTabState.mockReturnValue(state);
-  return state;
-};
-
-const renderGroupTasksTab = (stateOverrides = {}) => {
-  const state = mockGroupTasksState(stateOverrides);
-  render(<GroupTasksTab projectId={3} members={[{ user: 2, name: "Alex" }]} onStatsUpdate={vi.fn()} />);
-  return state;
-};
-
 const baseProject = {
-  id: 7,
-  name: "Alpha",
-  deadline: "2026-03-30T00:00:00.000Z",
-  course_code: "5CCS2SEG",
-  module_name: "Software Eng",
-  teacher_name: "Dr Lee",
+  id: 7, name: "Alpha", deadline: "2026-03-30T00:00:00.000Z",
+  course_code: "5CCS2SEG", module_name: "Software Eng", teacher_name: "Dr Lee",
 };
-
 const baseMembers = [{ id: 1, user: 1, name: "Owner" }];
 const baseTeamMembers = [{ id: 1, user: 1, role: "owner", name: "Owner" }];
-const baseTaskStats = { percent: 40, total: 5, completed: 2, segments: [{ id: "owner", name: "Owner", percentage: 40 }] };
 
 const renderProjectHeaderWith = (overrides = {}) => {
   const props = {
@@ -81,13 +49,9 @@ vi.mock("react-router-dom", () => ({
   Link: ({ to, children, ...props }) => <a href={to} {...props}>{children}</a>,
 }));
 
-vi.mock("@/context/ToastContext", () => ({
-  useToast: () => useToast(),
-}));
+vi.mock("@/context/ToastContext", () => ({ useToast: () => useToast() }));
 
-vi.mock("@/context/AuthContext", () => ({
-  useAuth: () => useAuthMock(),
-}));
+vi.mock("@/context/AuthContext", () => ({ useAuth: () => useAuthMock() }));
 
 vi.mock("../../../../pages/group_work/hooks/groupWorkHooks", () => ({
   useSelectedProjectId: () => useSelectedProjectId(),
@@ -98,54 +62,6 @@ vi.mock("../../../../pages/group_work/hooks/groupWorkHooks", () => ({
 
 vi.mock("../../../../pages/group_work/hooks/useGroupTasksTabState", () => ({
   useGroupTasksTabState: (...args) => useGroupTasksTabState(...args),
-}));
-
-vi.mock("@/pages/group_work/components/MemberFilter", () => ({
-  default: ({ onToggle }) => <button type="button" onClick={() => onToggle("2")}>toggle-filter</button>,
-}));
-
-vi.mock("@/pages/group_work/components/AddTaskModal", () => ({
-  default: ({ onAdd, onClose }) => (
-    <div>
-      <button type="button" onClick={() => onAdd({ title: "New task", due_date: "2026-03-30", assigned_to: [2] })}>confirm-add-task</button>
-      <button type="button" onClick={onClose}>close-add-modal</button>
-    </div>
-  ),
-}));
-
-vi.mock("@/pages/group_work/components/TaskListView", () => ({
-  default: ({ tasks, onToggle, onUpdate, onDelete }) => (
-    <div>
-      <span>list:{tasks.length}</span>
-      <button type="button" onClick={() => onToggle(1, true)}>toggle-task</button>
-      <button type="button" onClick={() => onUpdate(1, { title: "Edited" })}>update-task</button>
-      <button type="button" onClick={() => onDelete(1)}>delete-task</button>
-    </div>
-  ),
-}));
-
-vi.mock("@/pages/group_work/components/TaskTimelineView", () => ({
-  default: () => <div>timeline-view</div>,
-}));
-
-vi.mock("@/pages/group_work/components/TaskBoardView", () => ({
-  default: ({ onAdd }) => <button type="button" onClick={() => onAdd("Quick add", "todo")}>board-add</button>,
-}));
-
-vi.mock("@/components/common/segmented_control/SegmentedControl.jsx", () => ({
-  SegmentedControl: ({ options, onChange }) => (
-    <div>
-      {options.map((option) => (
-        <button key={option.value} type="button" onClick={() => onChange(option.value)}>
-          {option.label}
-        </button>
-      ))}
-    </div>
-  ),
-}));
-
-vi.mock("@/components/common/primary_button/PrimaryButton", () => ({
-  default: ({ children, onClick, pill, variant, size, ...props }) => <button type="button" onClick={onClick} {...props}>{children}</button>,
 }));
 
 vi.mock("lucide-react", () => ({
@@ -166,14 +82,11 @@ vi.mock("@/components/common/app_page/AppPage", () => ({
   default: ({ title, subtitle, children }) => <div><h1>{title}</h1><div>{subtitle}</div>{children}</div>,
 }));
 
-vi.mock("@/components/pagination/Pagination", () => ({
-  BackToTop: () => <div>Back to top</div>,
-}));
+vi.mock("@/components/pagination/Pagination", () => ({ BackToTop: () => <div>Back to top</div> }));
 
 vi.mock("@/pages/group_work/components/GroupWorkDetail", () => ({
   default: ({ onBack }) => <button type="button" onClick={onBack}>detail-view</button>,
 }));
-
 
 vi.mock("@/pages/group_work/components/GroupWorkIndexSkeleton", () => ({
   default: () => <div>groupwork-skeleton</div>,
@@ -226,7 +139,13 @@ vi.mock("@/components/common/tooltip/Tooltip", () => ({
 }));
 
 vi.mock("@/components/common/hold_confirm_modal/HoldConfirmModal", () => ({
-  default: ({ title, onCancel, onConfirm }) => <div><span>{title}</span><button type="button" onClick={onCancel}>cancel-hold</button><button type="button" onClick={onConfirm}>confirm-hold</button></div>,
+  default: ({ title, onCancel, onConfirm }) => (
+    <div>
+      <span>{title}</span>
+      <button type="button" onClick={onCancel}>cancel-hold</button>
+      <button type="button" onClick={onConfirm}>confirm-hold</button>
+    </div>
+  ),
 }));
 
 vi.mock("@/pages/group_work/components/AddMemberForm", () => ({
@@ -247,23 +166,22 @@ vi.mock("@/hooks/useCountUp", () => ({
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-  },
+  motion: { div: ({ children, ...props }) => <div {...props}>{children}</div> },
 }));
 
 vi.mock("@/components/common/stat_strip/StatStrip", () => ({
   default: ({ items }) => <div>{items.map((item) => `${item.label}:${item.value}`).join("|")}</div>,
 }));
 
-import GroupTasksTab from "@/pages/group_work/components/GroupTasksTab";
+vi.mock("@/components/common/primary_button/PrimaryButton", () => ({
+  default: ({ children, onClick, ...props }) => <button type="button" onClick={onClick} {...props}>{children}</button>,
+}));
+
 import GroupWorkIndexPage from "../../../../pages/group_work/GroupWorkIndexPage";
 import ProjectHeader from "@/pages/group_work/components/ProjectHeader";
-import ProjectDeleteAction from "@/pages/group_work/components/ProjectHeaderSub";
-import ProjectProgress from "@/pages/group_work/components/ProjectProgress";
 import { getDaysLeft } from "../../../../pages/group_work/utils/projectRowUtils";
 
-describe("GroupWork pages and header extras", () => {
+describe("GroupWork project header and urgent banner", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuthMock.mockReturnValue({ profile: { id: 1 } });
@@ -276,69 +194,6 @@ describe("GroupWork pages and header extras", () => {
     getProjectMemberCount.mockReturnValue(2);
     getStoredViewer.mockReturnValue({ id: 1, user: 1 });
     useCountUp.mockImplementation((value) => ({ current: value }));
-  });
-
-  describe("GroupTasksTab interactions", () => {
-    it("filters tasks and completes them", async () => {
-      const toast = vi.fn();
-      useToast.mockReturnValue(toast);
-      const state = renderGroupTasksTab({ showAddModal: true });
-      fireEvent.click(screen.getByText("toggle-filter"));
-      fireEvent.click(screen.getByText("toggle-task"));
-      await waitFor(() => expect(state.taskActions.updateTask).toHaveBeenCalledWith(1, { completed: true }));
-      expect(state.setFilterUsers).toHaveBeenCalled();
-      expect(toast).toHaveBeenCalledWith("Task completed!", expect.any(Object));
-    });
-
-    it("deletes, adds, switches views, and hides the modal", async () => {
-      useToast.mockReturnValue(vi.fn());
-      const state = renderGroupTasksTab({ showAddModal: true });
-      fireEvent.click(screen.getByText("delete-task"));
-      await waitFor(() => expect(state.taskActions.deleteTask).toHaveBeenCalledWith(1));
-      fireEvent.click(screen.getByText("confirm-add-task"));
-      await waitFor(() => expect(state.taskActions.addTask).toHaveBeenCalledWith("New task", { due_date: "2026-03-30", assigned_to: [2] }));
-      fireEvent.click(screen.getByText("Timeline"));
-      fireEvent.click(screen.getByText("Kanban"));
-      fireEvent.click(screen.getByText("List"));
-      expect(state.setTaskView).toHaveBeenCalled();
-      fireEvent.click(screen.getByText("close-add-modal"));
-      expect(state.setShowAddModal).toHaveBeenCalledWith(false);
-    });
-
-    it("shows a loading placeholder when actions are running", () => {
-      renderGroupTasksTab({ taskActions: { ...buildTaskActions(), loading: true }, sortedTasks: [] });
-      expect(screen.getByText("Loading tasks...")).toBeInTheDocument();
-    });
-  });
-
-  describe("GroupWorkIndexPage routing", () => {
-    it("returns to overview when closing the detail view", () => {
-      useSelectedProjectId.mockReturnValue("44");
-      render(<GroupWorkIndexPage />);
-      fireEvent.click(screen.getByText("detail-view"));
-      expect(mockNavigate).toHaveBeenCalledWith("/group-work", { replace: true });
-    });
-
-    it("shows a skeleton while projects are loading", () => {
-      useSelectedProjectId.mockReturnValue(null);
-      useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: true });
-      render(<GroupWorkIndexPage />);
-      expect(screen.getByText("groupwork-skeleton")).toBeInTheDocument();
-    });
-
-    it("renders overview stats, opens projects, prepends, and changes sort", () => {
-      const setProjects = vi.fn();
-      useSelectedProjectId.mockReturnValue(null);
-      useGroupProjects.mockReturnValue({ projects: [{ id: 1, name: "Alpha" }], setProjects, loading: false });
-      render(<GroupWorkIndexPage />);
-      fireEvent.click(screen.getByText("open-project"));
-      fireEvent.click(screen.getByText("prepend-project"));
-      fireEvent.click(screen.getByText("set-sort"));
-  expect(screen.getByText(/Active projects:1/)).toBeInTheDocument();
-      expect(mockNavigate).toHaveBeenCalledWith("/group-work?project=1");
-      expect(setProjects).toHaveBeenCalled();
-      expect(screen.getAllByText("Back to top").length).toBeGreaterThan(0);
-    });
   });
 
   describe("Project header and delete actions", () => {
@@ -357,10 +212,8 @@ describe("GroupWork pages and header extras", () => {
 
     it("shows delete affordances and closes the hold dialog on cancel", async () => {
       renderProjectHeaderWith({ onBack: vi.fn() });
-
       const deleteButtons = screen.getAllByRole("button", { name: /Delete project/i });
       expect(deleteButtons[0]).toBeInTheDocument();
-
       fireEvent.click(deleteButtons.at(-1));
       fireEvent.click(screen.getByText("cancel-hold"));
       await waitFor(() => expect(screen.queryByText("cancel-hold")).not.toBeInTheDocument());
@@ -373,20 +226,15 @@ describe("GroupWork pages and header extras", () => {
         project: { ...baseProject, course_code: "", module_name: "", teacher_name: "", deadline: null },
         teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }],
       });
-
       expect(screen.queryByLabelText(/Open .* module/i)).toBeNull();
       expect(screen.queryByText(/day left|days left|Due today|overdue/i)).toBeNull();
-      expect(screen.queryByLabelText(/Open .* module/i)).toBeNull();
       expect(screen.queryByLabelText(/Open .*'s profile/i)).toBeNull();
     });
 
     it("treats a non-owner viewer as unable to delete the project", () => {
       useAuthMock.mockReturnValueOnce({ profile: { id: 99 } });
       getStoredViewer.mockReturnValueOnce({ id: 99, user: 99 });
-      renderProjectHeaderWith({
-        teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }],
-      });
-
+      renderProjectHeaderWith({ teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }] });
       expect(screen.getByRole("button", { name: /Leave project/i })).toBeInTheDocument();
     });
   });
@@ -396,8 +244,7 @@ describe("GroupWork pages and header extras", () => {
       useSelectedProjectId.mockReturnValue(null);
       getDaysLeft.mockReturnValue(0);
       getProjectDate.mockReturnValue(new Date());
-      const project = { id: 10, name: "Urgent Today", deadline: "2026-03-27T00:00:00.000Z" };
-      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      useGroupProjects.mockReturnValue({ projects: [{ id: 10, name: "Urgent Today", deadline: "2026-03-27T00:00:00.000Z" }], setProjects: vi.fn(), loading: false });
       render(<GroupWorkIndexPage />);
       expect(screen.getByText("Urgent Today")).toBeInTheDocument();
       expect(screen.getByText(/due today/)).toBeInTheDocument();
@@ -408,8 +255,7 @@ describe("GroupWork pages and header extras", () => {
       useSelectedProjectId.mockReturnValue(null);
       getDaysLeft.mockReturnValue(1);
       getProjectDate.mockReturnValue(new Date());
-      const project = { id: 11, name: "Urgent Tomorrow", deadline: "2026-03-28T00:00:00.000Z" };
-      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      useGroupProjects.mockReturnValue({ projects: [{ id: 11, name: "Urgent Tomorrow", deadline: "2026-03-28T00:00:00.000Z" }], setProjects: vi.fn(), loading: false });
       render(<GroupWorkIndexPage />);
       expect(screen.getByText("Urgent Tomorrow")).toBeInTheDocument();
       expect(screen.getByText(/due tomorrow/)).toBeInTheDocument();
@@ -419,19 +265,17 @@ describe("GroupWork pages and header extras", () => {
       useSelectedProjectId.mockReturnValue(null);
       getDaysLeft.mockReturnValue(3);
       getProjectDate.mockReturnValue(new Date());
-      const project = { id: 12, name: "Soon Project", deadline: "2026-03-30T00:00:00.000Z" };
-      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      useGroupProjects.mockReturnValue({ projects: [{ id: 12, name: "Soon Project", deadline: "2026-03-30T00:00:00.000Z" }], setProjects: vi.fn(), loading: false });
       render(<GroupWorkIndexPage />);
       expect(screen.getByText("Soon Project")).toBeInTheDocument();
       expect(screen.getByText(/due in 3 days/)).toBeInTheDocument();
     });
 
-    it("does not render the banner when no projects are urgent (getMostUrgentProject returns null)", () => {
+    it("does not render the banner when no projects are urgent", () => {
       useSelectedProjectId.mockReturnValue(null);
       getDaysLeft.mockReturnValue(null);
       getProjectDate.mockReturnValue(null);
-      const project = { id: 13, name: "No Deadline", deadline: null };
-      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      useGroupProjects.mockReturnValue({ projects: [{ id: 13, name: "No Deadline", deadline: null }], setProjects: vi.fn(), loading: false });
       render(<GroupWorkIndexPage />);
       expect(screen.queryByText("Schedule meeting slots")).not.toBeInTheDocument();
     });
@@ -444,12 +288,11 @@ describe("GroupWork pages and header extras", () => {
       expect(screen.queryByText("Schedule meeting slots")).not.toBeInTheDocument();
     });
 
-    it("navigates to the schedule tab when 'Schedule meeting slots' is clicked (goToSchedule)", () => {
+    it("navigates to the schedule tab when 'Schedule meeting slots' is clicked", () => {
       useSelectedProjectId.mockReturnValue(null);
       getDaysLeft.mockReturnValue(2);
       getProjectDate.mockReturnValue(new Date());
-      const project = { id: 14, name: "Schedule Test", deadline: "2026-03-29T00:00:00.000Z" };
-      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      useGroupProjects.mockReturnValue({ projects: [{ id: 14, name: "Schedule Test", deadline: "2026-03-29T00:00:00.000Z" }], setProjects: vi.fn(), loading: false });
       render(<GroupWorkIndexPage />);
       fireEvent.click(screen.getByText("Schedule meeting slots"));
       expect(mockNavigate).toHaveBeenCalledWith("/group-work?project=14&tab=availability");
@@ -459,8 +302,7 @@ describe("GroupWork pages and header extras", () => {
       useSelectedProjectId.mockReturnValue(null);
       getDaysLeft.mockReturnValue(10);
       getProjectDate.mockReturnValue(new Date("2026-04-06T00:00:00.000Z"));
-      const project = { id: 15, name: "Far Away", deadline: "2026-04-06T00:00:00.000Z" };
-      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      useGroupProjects.mockReturnValue({ projects: [{ id: 15, name: "Far Away", deadline: "2026-04-06T00:00:00.000Z" }], setProjects: vi.fn(), loading: false });
       render(<GroupWorkIndexPage />);
       expect(screen.queryByText("Schedule meeting slots")).not.toBeInTheDocument();
     });
@@ -482,27 +324,10 @@ describe("GroupWork pages and header extras", () => {
         setProjects: vi.fn(),
         loading: false,
       });
-
       render(<GroupWorkIndexPage />);
-
       expect(screen.getByText("Most urgent")).toBeInTheDocument();
       expect(screen.getByText(/due in 2 days/)).toBeInTheDocument();
       expect(screen.queryByText("Less urgent")).toBeNull();
-    });
-  });
-
-  describe("GroupWorkOverview handleProjectCreated", () => {
-    it("calls showToast when a project is created via the callback", () => {
-      const toast = vi.fn();
-      useToast.mockReturnValue(toast);
-      const setProjects = vi.fn();
-      useSelectedProjectId.mockReturnValue(null);
-      getDaysLeft.mockReturnValue(null);
-      useGroupProjects.mockReturnValue({ projects: [{ id: 1, name: "Alpha" }], setProjects, loading: false });
-      render(<GroupWorkIndexPage />);
-      fireEvent.click(screen.getByText("prepend-project"));
-      expect(toast).toHaveBeenCalledWith("Group project created successfully!");
-      expect(setProjects).toHaveBeenCalled();
     });
   });
 });

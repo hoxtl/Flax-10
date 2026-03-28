@@ -37,21 +37,10 @@ afterEach(() => {
 
 it("renders ProjectProgress and passes tab config into Tabs", () => {
   const setActiveTab = vi.fn();
-  render(
-    <TabsSection
-      activeTab="tasks"
-      setActiveTab={setActiveTab}
-      projectId={7}
-      members={[{ id: 1 }]}
-      onStatsUpdate={vi.fn()}
-      taskStats={{ percent: 40 }}
-    />
-  );
-
+  render(<TabsSection activeTab="tasks" setActiveTab={setActiveTab} projectId={7} members={[{ id: 1 }]} onStatsUpdate={vi.fn()} taskStats={{ percent: 40 }} />);
   expect(screen.getByTestId("project-progress")).toHaveTextContent("40%");
   expect(screen.getByText("Tasks")).toBeInTheDocument();
   expect(screen.getByText("Schedule meeting slots")).toBeInTheDocument();
-
   const received = tabsPropsMock.mock.calls.at(-1)?.[0];
   expect(received.tabs).toHaveLength(2);
   expect(received.tabs[0].id).toBe("tasks");
