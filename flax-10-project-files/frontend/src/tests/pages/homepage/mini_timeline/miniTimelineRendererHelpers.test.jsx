@@ -53,13 +53,14 @@ describe("mini timeline renderer helper coverage", () => {
   it("renders direct list and module link helpers", () => {
     const outerClick = vi.fn();
     const { rerender } = render(<div onClick={outerClick}><ListPill taskListId={42} /></div>);
-    expect(document.querySelector('a[href="/tasks?list=42"]')).toBeTruthy();
-    expect(screen.getByText("List")).toBeInTheDocument();
+    const listLink = screen.getByText("List").closest("a");
+    expect(listLink).toHaveAttribute("href", "/tasks?list=42");
     fireEvent.click(screen.getByText("List"));
     expect(outerClick).not.toHaveBeenCalled();
 
     rerender(<div onClick={outerClick}><ModulePill styles={styles} moduleCode="CS103" matchTask={{ task_list: 11 }} accentColor="#4477aa" /></div>);
-    expect(document.querySelector('a[href="/tasks?list=11&module=CS103"]')).toBeTruthy();
+    const moduleLink = screen.getByText("CS103").closest("a");
+    expect(moduleLink).toHaveAttribute("href", "/tasks?list=11&module=CS103");
     fireEvent.click(screen.getByText("CS103"));
     expect(outerClick).not.toHaveBeenCalled();
   });
