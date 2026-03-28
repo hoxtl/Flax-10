@@ -83,7 +83,7 @@ function ModulePickerGrid({ onSelect }) {
   );
 }
 
-function useQuickAddLogic(onSelectType, initialView = 'type') {
+function useQuickAddLogic(onSelectType, initialView) {
   const { tags } = useTags();
   const [view, setView] = useState(normalizeQuickAddView(initialView));
 

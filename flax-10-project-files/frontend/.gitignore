@@ -31,3 +31,6 @@ coverage-*/
 # Test output
 vitest-results.json
 test-output.txt
+
+# Local test-runtime helpers
+vitest.node.config.js

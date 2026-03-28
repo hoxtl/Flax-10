@@ -50,6 +50,8 @@ describe('DeadlineModal', () => {
         vi.clearAllMocks();
         mockModal.showForm = false;
         mockModal.deadlines = [];
+        mockModal.editing = null;
+        mockModal.handleSubmit = vi.fn();
     });
 
     it('should successfully render module code in header', () => {
@@ -123,5 +125,34 @@ describe('DeadlineModal', () => {
             expect(mockModal.handleSubmit).toHaveBeenCalled();
             expect(onClose).toHaveBeenCalled();
         });
+    });
+
+    it('wires card edit and delete callbacks to the selected deadline', () => {
+        const deadline = { id: 12, title: 'Lab report', deadline_type: 'coursework', start_due_date: '2026-03-01' };
+        mockModal.deadlines = [deadline];
+
+        render(<DeadlineModal module={module} onClose={vi.fn()} />);
+
+        fireEvent.click(screen.getByText('Edit'));
+        fireEvent.click(screen.getByText('Delete'));
+
+        expect(mockModal.openEdit).toHaveBeenCalledWith(deadline);
+        expect(mockModal.handleDelete).toHaveBeenCalledWith(deadline.id);
+    });
+
+    it('does not close after submit when creating mode is already editing an existing deadline', async () => {
+        mockModal.showForm = true;
+        mockModal.editing = { id: 3, title: 'Existing deadline' };
+        mockModal.handleSubmit = vi.fn().mockResolvedValue(undefined);
+        const onClose = vi.fn();
+
+        render(<DeadlineModal module={module} onClose={onClose} startCreating={true} />);
+
+        fireEvent.click(screen.getByText('Submit'));
+
+        await vi.waitFor(() => {
+            expect(mockModal.handleSubmit).toHaveBeenCalledWith({});
+        });
+        expect(onClose).not.toHaveBeenCalled();
     });
 });

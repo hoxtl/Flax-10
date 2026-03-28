@@ -49,6 +49,25 @@ import {
     getTaskDurationLabel,
 } from '../../../components/timer/task_input/taskInputUtils';
 
+beforeEach(async () => {
+    vi.clearAllMocks();
+    const { normalizeModuleCode, getModuleCodePrefix } = await import('../../../utils/moduleCodeUtils');
+    const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
+    const { compareTaskDue, compareTaskEstimatedTime, compareTaskPriority, getTaskDurationMinutes } = await import('../../../lib/focusPlanner');
+
+    normalizeModuleCode.mockImplementation((code) => (code ? String(code).toUpperCase().trim() : null));
+    getModuleCodePrefix.mockImplementation((code) => (code ? String(code).slice(0, 2) : ''));
+    isEnrolledIn.mockImplementation((id, enrollments) => enrollments.some((e) => e.module_id === id || e === id));
+    compareTaskDue.mockImplementation((a, b) => {
+        const da = a.due_date ? new Date(a.due_date).getTime() : Infinity;
+        const db = b.due_date ? new Date(b.due_date).getTime() : Infinity;
+        return da - db;
+    });
+    compareTaskEstimatedTime.mockImplementation((a, b) => (a.estimated_blocks || 1) - (b.estimated_blocks || 1));
+    compareTaskPriority.mockImplementation(() => 0);
+    getTaskDurationMinutes.mockImplementation((task) => (task.estimated_blocks || 1) * 25);
+});
+
 describe('getTaskUrgencyTone', () => {
     it('returns "cool" when no due date', () => {
         expect(getTaskUrgencyTone({})).toBe('cool');
@@ -135,6 +154,16 @@ describe('sortTasks', () => {
         expect(sorted[0].id).toBe(2);
     });
 
+    it('sorts in reverse alphabetical order', () => {
+        const sorted = sortTasks([...tasks], 'alpha_desc');
+        expect(sorted[0].title).toBe('Zebra');
+    });
+
+    it('sorts by date added ascending', () => {
+        const sorted = sortTasks([...tasks], 'date_added_asc');
+        expect(sorted[0].id).toBe(1);
+    });
+
     it('falls back to priority sort for unknown sort type', () => {
         const sorted = sortTasks([...tasks], 'unknown');
         expect(sorted).toHaveLength(3); // just doesn't throw
@@ -207,6 +236,16 @@ describe('buildModuleItems', () => {
         const result = buildModuleItems(modules, []);
         expect(result[0].label).toBe('XY999');
     });
+
+    it('sorts module options by code and ignores blank normalized task codes', () => {
+        const tasks = [
+            { module_code: 'zz100', module_name: 'Later code' },
+            { module_code: null, module_name: 'Ignore me' },
+            { module_code: 'aa100', module_name: 'Earlier code' },
+        ];
+        const result = buildModuleItems([], tasks);
+        expect(result.map((item) => item.value)).toEqual(['AA100', 'ZZ100']);
+    });
 });
 
 describe('buildListItems', () => {
@@ -252,6 +291,13 @@ describe('groupModuleItems', () => {
     it('returns empty object when no matches', () => {
         const result = groupModuleItems(items, 'xyz-nonexistent');
         expect(Object.keys(result)).toHaveLength(0);
+    });
+
+    it('trims the filter query before grouping', () => {
+        const result = groupModuleItems(items, '  intro ');
+        const allItems = Object.values(result).flat();
+        expect(allItems).toHaveLength(1);
+        expect(allItems[0].value).toBe('CS1001');
     });
 });
 
@@ -318,6 +364,13 @@ describe('filterTasks', () => {
         expect(result.length).toBeGreaterThanOrEqual(1);
     });
 
+    it('combines module and list filters together', () => {
+        const state = { search: '', filterListIds: ['1'], filterModuleCodes: ['CS1001'] };
+        const result = filterTasks(tasks, state);
+        expect(result).toHaveLength(1);
+        expect(result[0].title).toBe('CS Assignment');
+    });
+
     it('combines search and list filter', () => {
         const state = { search: 'assignment', filterListIds: ['1'], filterModuleCodes: [] };
         const result = filterTasks(tasks, state);
@@ -378,6 +431,13 @@ describe('mapEnrolledModules', () => {
         const allModules = [{ id: 1, module_code: null, title: 'No Code Module' }];
         const result = mapEnrolledModules(allModules, [1]);
         expect(result).toHaveLength(0);
+    });
+
+    it('falls back to module title when module_name is missing', async () => {
+        const { isEnrolledIn } = await import('../../../components/modules/utils/moduleUtils');
+        isEnrolledIn.mockReturnValue(true);
+        const result = mapEnrolledModules([{ id: 1, module_code: 'cs55', title: 'Title fallback' }], [1]);
+        expect(result).toEqual([{ code: 'CS55', name: 'Title fallback' }]);
     });
 });
 

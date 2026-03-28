@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCalendarEvents, useEventActions } from '../../components/calendar/hooks/useCalendarEvents';
 
@@ -91,6 +91,92 @@ describe('useCalendarEvents', () => {
     });
   });
 
+  it('computes date keys for null, day, week, and year views', async () => {
+    const states = [
+      { selectedDate: null, viewMode: 'month' },
+      { selectedDate: new Date(2026, 2, 9).toISOString(), viewMode: 'day' },
+      { selectedDate: new Date(2026, 2, 9).toISOString(), viewMode: 'week' },
+      { selectedDate: new Date(2026, 2, 9).toISOString(), viewMode: 'year' },
+    ];
+
+    for (let index = 0; index < states.length; index += 1) {
+      useCalendarMock.mockReturnValue({
+        events: [],
+        reloadKey: 0,
+        sharedCalendarUserId: null,
+        ...states[index],
+      });
+
+      const { unmount } = renderHook(() => useCalendarEvents());
+      await waitFor(() => expect(getEventsMock).toHaveBeenCalledTimes(index + 1));
+      unmount();
+    }
+  });
+
+  it('skips duplicate fetches for the same date key across mounts', async () => {
+    const calendarState = {
+      events: [],
+      selectedDate: new Date(2026, 6, 9).toISOString(),
+      viewMode: 'month',
+      reloadKey: 0,
+      sharedCalendarUserId: null,
+    };
+    useCalendarMock.mockImplementation(() => calendarState);
+
+    const first = renderHook(() => useCalendarEvents());
+    await waitFor(() => expect(getEventsMock).toHaveBeenCalledTimes(1));
+    first.unmount();
+
+    renderHook(() => useCalendarEvents());
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(getEventsMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips concurrent fetches and reloads when reloadKey changes', async () => {
+    let resolveEvents;
+    const pendingEvents = new Promise((resolve) => {
+      resolveEvents = resolve;
+    });
+    let calendarState = {
+      events: [],
+      selectedDate: new Date(2026, 7, 9).toISOString(),
+      viewMode: 'month',
+      reloadKey: 0,
+      sharedCalendarUserId: null,
+    };
+    useCalendarMock.mockImplementation(() => calendarState);
+    getEventsMock
+      .mockReturnValueOnce(pendingEvents)
+      .mockResolvedValueOnce([{ id: 20 }]);
+
+    const { rerender, result } = renderHook(() => useCalendarEvents());
+
+    await act(async () => {
+      await result.current.loadEvents();
+    });
+
+    calendarState = {
+      ...calendarState,
+      selectedDate: new Date(2026, 7, 10).toISOString(),
+    };
+    rerender();
+
+    expect(getEventsMock).toHaveBeenCalledTimes(1);
+
+    resolveEvents([{ id: 19 }]);
+    await waitFor(() => {
+      expect(dispatch).toHaveBeenCalledWith({ type: 'SET_EVENTS', payload: [{ id: 19 }] });
+    });
+
+    calendarState = { ...calendarState, reloadKey: 1 };
+    rerender();
+
+    await waitFor(() => expect(getEventsMock).toHaveBeenCalledTimes(2));
+  });
+
   it('addEvent creates and reloads events', async () => {
     const { result } = renderHook(() => useEventActions());
 
@@ -128,5 +214,20 @@ describe('useCalendarEvents', () => {
 
     expect(addExceptionDateMock).toHaveBeenCalledWith(11, '2026-03-10');
     expect(getEventsMock).toHaveBeenCalled();
+  });
+
+  it('reloads shared-calendar mutations with the viewed user id', async () => {
+    useCalendarMock.mockReturnValue({
+      selectedDate: new Date(2026, 2, 9).toISOString(),
+      viewMode: 'week',
+      sharedCalendarUserId: '84',
+    });
+    const { result } = renderHook(() => useEventActions());
+
+    await act(async () => {
+      await result.current.addEvent({ title: 'Shared item' });
+    });
+
+    expect(getEventsMock).toHaveBeenCalledWith({ start: '2026-03-01', end: '2026-03-31', user_id: '84' });
   });
 });

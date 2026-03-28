@@ -183,7 +183,7 @@ describe("GroupWork extra components", () => {
           <MembersSection members={[]} onRemove={onRemove} />
         </>
       );
-      fireEvent.click(screen.getByLabelText("Open Owner profile"));
+      fireEvent.click(screen.getByTitle("Open Owner profile"));
       fireEvent.click(screen.getByText("Leave project"));
       fireEvent.click(screen.getByText("Remove"));
       expect(openMemberProfileMock).toHaveBeenCalled();

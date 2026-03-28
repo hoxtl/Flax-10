@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { getDeadlines, createDeadline, updateDeadline, deleteDeadline } from '../../../api/deadlineApi';
+import { useToast } from '../../../context/ToastContext';
 
 function useDeadlineList(module_id) {
     const [deadlines, setDeadlines] = useState([]);
@@ -32,16 +33,19 @@ async function saveDeadline(module_id, editing, data) {
 export function useDeadlineModal(module_id, startCreating) {
     const list = useDeadlineList(module_id);
     const form = useDeadlineForm(startCreating);
+    const showToast = useToast();
 
     const handleSubmit = async (data) => {
         const saved = await saveDeadline(module_id, form.editing, data);
         form.editing ? list.update(saved) : list.add(saved);
+        showToast(form.editing ? 'Deadline updated.' : 'Deadline added.', { variant: 'success' });
         form.close();
     };
 
     const handleDelete = async (id) => {
         await deleteDeadline(module_id, id);
         list.remove(id);
+        showToast('Deadline deleted.', { variant: 'success' });
     };
 
     return { ...list, ...form, handleSubmit, handleDelete };

@@ -16,7 +16,7 @@ function getRingState(t, radius, activeColor) {
 }
 
 function buildGuideDashPattern(strokeWidth) {
-  const width = Number(strokeWidth) || 4;
+  const width = Number(strokeWidth);
   const dash = Math.max(3, Math.round(width));
   return `${dash} ${Math.max(9, dash * 2.8)}`;
 }
@@ -27,7 +27,7 @@ function TimerRingSvg({ cx, cy, radius, ringState, trackColor, strokeWidth, acti
   return (
     <svg className={styles.timerRingSvg} viewBox={`0 0 ${cx * 2} ${cy * 2}`} aria-hidden="true">
       <circle cx={cx} cy={cy} r={radius} fill="none" stroke={trackColor} strokeWidth={strokeWidth} />
-      <circle cx={cx} cy={cy} r={radius} fill="none" stroke={ringState.color} strokeWidth={Math.max(1.5, (Number(strokeWidth) || 4) - 1.1)} strokeLinecap="round" strokeDasharray={buildGuideDashPattern(strokeWidth)} className={guideClassName} />
+      <circle cx={cx} cy={cy} r={radius} fill="none" stroke={ringState.color} strokeWidth={Math.max(1.5, Number(strokeWidth) - 1.1)} strokeLinecap="round" strokeDasharray={buildGuideDashPattern(strokeWidth)} className={guideClassName} />
       <circle cx={cx} cy={cy} r={radius} fill="none" stroke={ringState.color} strokeWidth={strokeWidth} strokeLinecap="round" strokeDasharray={`${ringState.dash} ${ringState.circumference - ringState.dash}`} strokeDashoffset={ringState.circumference * 0.25} className={`${activeClass} ${styles.timerProgressRing}`} />
     </svg>
   );

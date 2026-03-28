@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fadeUp, rowAnim, stagger } from '../../../pages/admin/utils/adminMotion';
 import { emitAdminNavigation, navigateToSociety, navigateToProfile } from '../../../pages/admin/utils/adminNavigation';
 import {
+  getUserRoleValue,
   toggleArrayValue,
   createEmptyUserFilters,
   hasActiveUserFilters,
@@ -40,16 +41,28 @@ describe('adminMotion', () => {
 
 describe('adminNavigation', () => {
   let dispatchedEvents;
+  let originalWindow;
+  let originalCustomEvent;
 
   beforeEach(() => {
     dispatchedEvents = [];
-    vi.spyOn(window, 'dispatchEvent').mockImplementation((event) => {
+    originalWindow = globalThis.window;
+    originalCustomEvent = globalThis.CustomEvent;
+    globalThis.window = { dispatchEvent: vi.fn((event) => {
       dispatchedEvents.push(event);
-    });
+    }) };
+    globalThis.CustomEvent = class MockCustomEvent {
+      constructor(type, init) {
+        this.type = type;
+        this.detail = init?.detail;
+      }
+    };
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    globalThis.window = originalWindow;
+    globalThis.CustomEvent = originalCustomEvent;
   });
 
   it('emitAdminNavigation dispatches a navigate custom event with the given detail', () => {
@@ -82,6 +95,18 @@ describe('userFilters – toggleArrayValue', () => {
 
   it('removes a value already in the array', () => {
     expect(toggleArrayValue(['a', 'b', 'c'], 'b')).toEqual(['a', 'c']);
+  });
+});
+
+describe('userFilters – getUserRoleValue', () => {
+  it('normalises staff, superuser, and explicit admin users to admin', () => {
+    expect(getUserRoleValue({ role: 'student', is_staff: true })).toBe('admin');
+    expect(getUserRoleValue({ role: 'teacher', is_superuser: true })).toBe('admin');
+    expect(getUserRoleValue({ role: 'admin' })).toBe('admin');
+  });
+
+  it('returns the original role for non-admin users', () => {
+    expect(getUserRoleValue({ role: 'teacher', is_staff: false, is_superuser: false })).toBe('teacher');
   });
 });
 
@@ -121,6 +146,15 @@ describe('userFilters – matchesRoleFilter', () => {
   it('does not match student against teacher filter', () => {
     expect(matchesRoleFilter({ role: 'student' }, ['teacher'])).toBe(false);
   });
+
+  it('matches admin filters for staff and superusers', () => {
+    expect(matchesRoleFilter({ role: 'student', is_staff: true }, ['admin'])).toBe(true);
+    expect(matchesRoleFilter({ role: 'teacher', is_superuser: true }, ['admin'])).toBe(true);
+  });
+
+  it('returns false for unknown role filters when a filter is active', () => {
+    expect(matchesRoleFilter({ role: 'student' }, ['unknown-role'])).toBe(false);
+  });
 });
 
 describe('userFilters – matchesStatusFilter', () => {
@@ -139,6 +173,10 @@ describe('userFilters – matchesStatusFilter', () => {
   it('does not match active user against banned filter', () => {
     expect(matchesStatusFilter({ is_active: true }, ['banned'])).toBe(false);
   });
+
+  it('returns false for unknown status filters when a filter is active', () => {
+    expect(matchesStatusFilter({ is_active: true }, ['mystery'])).toBe(false);
+  });
 });
 
 describe('userFilters – matchesAllUserFilters', () => {
@@ -150,6 +188,10 @@ describe('userFilters – matchesAllUserFilters', () => {
 
   it('returns false when role filter excludes the user', () => {
     expect(matchesAllUserFilters(user, { roles: ['teacher'], status: [] })).toBe(false);
+  });
+
+  it('returns false when the status filter excludes the user', () => {
+    expect(matchesAllUserFilters(user, { roles: [], status: ['banned'] })).toBe(false);
   });
 });
 
@@ -171,6 +213,11 @@ describe('userFilters – matchesUserSearch', () => {
   it('returns false for non-matching search', () => {
     expect(matchesUserSearch(user, 'zzz')).toBe(false);
   });
+
+  it('matches an empty search string and handles mixed-case whitespace-like input safely', () => {
+    expect(matchesUserSearch(user, '')).toBe(true);
+    expect(matchesUserSearch({ username: 'A', email: '', first_name: '', last_name: '' }, 'a')).toBe(true);
+  });
 });
 
 describe('userFilters – filterUsers', () => {
@@ -191,6 +238,15 @@ describe('userFilters – filterUsers', () => {
     const result = filterUsers(users, '', { roles: ['teacher'], status: [] });
     expect(result).toHaveLength(1);
     expect(result[0].username).toBe('bob');
+  });
+
+  it('combines search, role, and status filters', () => {
+    const result = filterUsers(users, 'bob', { roles: ['teacher'], status: ['banned'] });
+    expect(result).toEqual([users[1]]);
+  });
+
+  it('returns an empty list when no users match all filters', () => {
+    expect(filterUsers(users, 'alice', { roles: ['teacher'], status: [] })).toEqual([]);
   });
 });
 
@@ -217,6 +273,11 @@ describe('userState', () => {
   it('does not mutate the original users array', () => {
     banUserState(users, 1, 'Test');
     expect(users[0].is_active).toBe(true);
+  });
+
+  it('returns the original list contents when the user id is missing', () => {
+    expect(banUserState(users, 999, 'No change')).toEqual(users);
+    expect(unbanUserState(users, 999)).toEqual(users);
   });
 });
 

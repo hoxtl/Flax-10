@@ -195,4 +195,76 @@ describe("ListSidebar coverage", () => {
     expect(screen.getByText('Delete "this list"')).toBeInTheDocument();
     expect(screen.getByText('Permanently Delete "this list"')).toBeInTheDocument();
   });
+
+  it("covers society labels, list clicks, context menus, and archive item actions", () => {
+    const state = buildState({ showArchived: true });
+    const props = buildProps({
+      lists: [
+        { id: 5, name: "Robotics Society Admin", category: "society" },
+        { id: 3, name: "Inbox" },
+      ],
+      archivedLists: [{ id: 10, name: "Old inbox" }],
+    });
+    sidebarStateMock.mockReturnValue(state);
+
+    render(<ListSidebar {...props} />);
+
+    expect(screen.getByText("Robotics Society")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Inbox" }));
+    expect(props.onSelectList).toHaveBeenCalledWith(3);
+    expect(props.onSelectFilter).toHaveBeenCalledWith("all");
+
+    fireEvent.contextMenu(screen.getByRole("button", { name: "Inbox" }));
+    expect(state.handleCtxMenu).toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Restore" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+    expect(props.onUnarchiveList).toHaveBeenCalledWith(10);
+    expect(state.setPermDeleteId).toHaveBeenCalledWith(10);
+  });
+
+  it("renders smart-filter counts and parsed module reading labels", () => {
+    sidebarStateMock.mockReturnValue(
+      buildState({
+        smartFilters: [
+          { id: "overdue", label: "Overdue", emoji: "🔥", count: 2, danger: true },
+          { id: "later", label: "Later", emoji: "⏳", count: 0, danger: false },
+        ],
+      }),
+    );
+
+    render(
+      <ListSidebar
+        {...buildProps({
+          activeListId: null,
+          activeFilter: "overdue",
+          lists: [{ id: 2, name: "CS101 - Systems" }],
+          archivedLists: [],
+        })}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /Overdue/i })).toHaveTextContent("2");
+    expect(screen.getByRole("button", { name: /Later/i })).not.toHaveTextContent("0");
+    expect(screen.getByText("Systems (CS101)")).toBeInTheDocument();
+  });
+
+  it("fires smart-filter callbacks and executes the archive toggle updater", () => {
+    const state = buildState({ showArchived: true, archivedLists: undefined });
+    sidebarStateMock.mockReturnValue(state);
+    const props = buildProps();
+
+    render(<ListSidebar {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /All tasks/i }));
+
+    expect(props.onSelectList).toHaveBeenCalledWith(null);
+    expect(props.onSelectFilter).toHaveBeenCalledWith("all");
+
+    fireEvent.click(screen.getByRole("button", { name: /Archived/i }));
+    const toggleUpdater = state.setShowArchived.mock.calls.at(-1)?.[0];
+    expect(toggleUpdater(true)).toBe(false);
+  });
 });

@@ -15,7 +15,7 @@ function renderStaticRow(row, styles, attachNowRow) {
   return <NowRow row={row} styles={styles} nowRowRef={attachNowRow} />;
 }
 
-function renderFreeRow(row, props) {
+export function renderFreeRow(row, props) {
   return <PlanFreeRow row={row} deadlineSuggestions={props.gapDeadlineFallbacks[row.id] ? [props.gapDeadlineFallbacks[row.id]] : []} onQuickStart={props.onQuickStart} selectedDate={props.selectedDate} styles={props.styles} slotPopoverRef={props.slotPopoverRef} slotPopoverRowId={props.slotPopoverRowId} setSlotPopoverRowId={props.setSlotPopoverRowId} isBestGap={row.id === props.bestFreeRowId} assignedTask={props.assignedGapTasks.map[row.id] || null} nextAssignedTask={props.assignedGapTasks.nextMap[row.id] || null} onSkipTask={(taskId) => props.onSkipGapTask(row.id, taskId)} />;
 }
 

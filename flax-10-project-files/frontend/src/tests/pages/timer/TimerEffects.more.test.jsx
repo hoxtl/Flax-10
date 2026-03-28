@@ -71,6 +71,28 @@ describe("timer effect extra coverage", () => {
     expect(setShowShortcuts).toHaveBeenCalled();
   });
 
+  it("closes focus mode with F and ignores unknown shortcuts", () => {
+    const setFocusMode = vi.fn();
+    const openFocusMode = vi.fn();
+    const togglePause = vi.fn();
+
+    renderHook(() => useTimerShortcuts({
+      t: { isActive: true, setIsActive: vi.fn(), togglePause, resetTimer: vi.fn() },
+      setShowShortcuts: vi.fn(),
+      setFocusMode,
+      openFocusMode,
+      closeOverlays: vi.fn(),
+      focusMode: true,
+    }));
+
+    fireEvent.keyDown(window, { key: "F" });
+    fireEvent.keyDown(window, { key: "x" });
+
+    expect(setFocusMode).toHaveBeenCalledWith(false);
+    expect(openFocusMode).not.toHaveBeenCalled();
+    expect(togglePause).not.toHaveBeenCalled();
+  });
+
   it("clears transient flags after minimum skeleton duration", async () => {
     vi.useFakeTimers();
     const setShowPageSkeleton = vi.fn(), setShowFocusTransition = vi.fn();

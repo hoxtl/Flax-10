@@ -82,12 +82,12 @@ describe('AnalyticsPage', () => {
 
     it('renders page title', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => expect(screen.getByText('Analytics')).toBeTruthy());
+        await waitFor(() => expect(screen.getAllByText('Analytics').length).toBeGreaterThan(0));
     });
 
     it('renders period toggle buttons', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => screen.getByText('Analytics'));
+        await waitFor(() => screen.getAllByText('Analytics'));
         expect(screen.getByText('7d')).toBeTruthy();
         expect(screen.getByText('30d')).toBeTruthy();
         expect(screen.getByText('90d')).toBeTruthy();
@@ -95,7 +95,7 @@ describe('AnalyticsPage', () => {
 
     it('renders tab buttons', async () => {
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
-        await waitFor(() => screen.getByText('Analytics'));
+        await waitFor(() => screen.getAllByText('Analytics'));
         expect(screen.getByText(/Overview/)).toBeTruthy();
         expect(screen.getByText(/AI Insights/)).toBeTruthy();
     });
@@ -140,5 +140,41 @@ describe('AnalyticsPage', () => {
         analyticsService.getThemeStats.mockRejectedValueOnce({});
         render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
         await waitFor(() => expect(screen.getByText(/Failed to load analytics data/)).toBeTruthy());
+    });
+
+    it('shows the no-sessions empty state and dispatches navigation to timer', async () => {
+        analyticsService.getSummary.mockResolvedValueOnce({
+            summary: {
+                total_study_hours: 0,
+                total_sessions: 0,
+                avg_session_minutes: 0,
+                current_streak_days: 0,
+                longest_session_minutes: 0,
+                active_days: 0,
+            },
+            period_days: 30,
+        });
+        analyticsService.getProgress.mockResolvedValueOnce({});
+        analyticsService.getThemeStats.mockResolvedValueOnce({});
+        const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
+
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
+
+        await waitFor(() => expect(screen.getByText('No study data yet')).toBeTruthy());
+        fireEvent.click(screen.getByText('Open Timer'));
+        expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'navigate',
+            detail: 'timer',
+        }));
+    });
+
+    it('treats missing summary totals as empty analytics data', async () => {
+        analyticsService.getSummary.mockResolvedValueOnce({ period_days: 30 });
+        analyticsService.getProgress.mockResolvedValueOnce({});
+        analyticsService.getThemeStats.mockResolvedValueOnce({});
+
+        render(<MemoryRouter><AnalyticsPage /></MemoryRouter>);
+
+        await waitFor(() => expect(screen.getByText('No study data yet')).toBeTruthy());
     });
 });

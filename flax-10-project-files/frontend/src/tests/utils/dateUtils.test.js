@@ -1,10 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
     getWeekDays, getMonthDays, getStartOfWeek, getStartOfMonth, getEndOfMonth,
+    getStartOfYear, getEndOfYear,
     addDays, isSameDay, isSameMonth, addWeeks, addMonths, startOfDay, isToday,
     formatTime, formatDate, formatMonthYear, formatDayLabel, getGreeting,
     parseDateInput, formatDateTime, formatShortDate, formatDateWithYear,
-    formatDateRange, formatTimeRange, addHourToTime
+    formatDateRange, formatTimeRange, addHourToTime, getMonthWeeks
 } from '../../components/calendar/utils/dateUtils';
 
 describe('dateUtils', () => {
@@ -39,6 +40,16 @@ describe('dateUtils', () => {
         });
     });
 
+    describe('getMonthWeeks', () => {
+        it('builds full calendar weeks for a month grid', () => {
+            const weeks = getMonthWeeks(new Date(2026, 2, 15));
+            expect(weeks.length).toBeGreaterThan(4);
+            expect(weeks[0]).toHaveLength(7);
+            expect(weeks[0][0].getDay()).toBe(0);
+            expect(weeks[weeks.length - 1][6].getDay()).toBe(6);
+        });
+    });
+
     describe('Helpers', () => {
         it('getStartOfWeek', () => {
             const d = getStartOfWeek(new Date(2026, 1, 18));
@@ -53,6 +64,15 @@ describe('dateUtils', () => {
         it('getEndOfMonth', () => {
             const d = getEndOfMonth(date);
             expect(d.getDate()).toBe(28);
+        });
+
+        it('getStartOfYear and getEndOfYear', () => {
+            const start = getStartOfYear(date);
+            const end = getEndOfYear(date);
+            expect(start.getMonth()).toBe(0);
+            expect(start.getDate()).toBe(1);
+            expect(end.getMonth()).toBe(11);
+            expect(end.getDate()).toBe(31);
         });
 
 
@@ -156,6 +176,21 @@ describe('dateUtils', () => {
             const end = new Date(2026, 1, 16, 0, 0);
             const result = formatDateRange(start, end, true);
             expect(result).toMatch(/2026/);
+        });
+
+        it('formatDateRange: midnight check handles mixed midnight and non-midnight values', () => {
+            const start = new Date(2026, 1, 15, 0, 0);
+            const end = new Date(2026, 1, 16, 9, 0);
+            const result = formatDateRange(start, end, true);
+            expect(result).toContain('2026');
+            expect(result).toContain('–');
+        });
+
+        it('formatDateRange: non-all-day midnight values still evaluate the midnight helper fully', () => {
+            const start = new Date(2026, 1, 15, 0, 0);
+            const end = new Date(2026, 1, 15, 1, 0);
+            const result = formatDateRange(start, end, false);
+            expect(result).toContain('2026');
         });
 
         it('formatTimeRange: normal', () => {

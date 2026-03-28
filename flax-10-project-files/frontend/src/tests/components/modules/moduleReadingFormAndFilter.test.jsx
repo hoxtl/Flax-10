@@ -30,8 +30,9 @@ vi.mock("../../../components/modules/shared/moduleFormParts", () => ({
     setError(message);
     return false;
   },
-  ModuleFormActions: ({ onCancel, isEditing, createLabel }) => (
+  ModuleFormFooter: ({ onCancel, isEditing, createLabel, error }) => (
     <div>
+      {error ? <div>{error}</div> : null}
       <button type="submit">{isEditing ? "Save Reading" : createLabel}</button>
       <button type="button" onClick={onCancel}>Cancel</button>
     </div>

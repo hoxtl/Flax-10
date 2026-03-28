@@ -44,6 +44,13 @@ describe('CategorySelector (single)', () => {
 });
 
 describe('CategorySelector (multiple)', () => {
+    it('handles an omitted value by using the default empty array', () => {
+        const onChange = vi.fn();
+        render(<CategorySelector onChange={onChange} multiple />);
+        fireEvent.click(screen.getAllByRole('button')[0]);
+        expect(onChange).toHaveBeenCalledWith(expect.any(Array));
+    });
+
     it('renders pill buttons for each category', () => {
         render(<CategorySelector value={[]} onChange={vi.fn()} multiple />);
         const buttons = screen.getAllByRole('button');
@@ -112,6 +119,11 @@ describe('CategoryDisplay', () => {
     it('handles string category (not array)', () => {
         render(<CategoryDisplay category="sports" editMode={false} />);
         expect(screen.getByText('Sports')).toBeTruthy();
+    });
+
+    it('treats null like no category when editing', () => {
+        render(<CategoryDisplay category={null} editMode={true} />);
+        expect(screen.getByText('No category')).toBeTruthy();
     });
 
     it('falls back to raw id for unknown category', () => {

@@ -241,4 +241,39 @@ describe('HoldConfirmModal', () => {
     act(() => { vi.advanceTimersByTime(2000); });
     expect(onConfirm).not.toHaveBeenCalled();
   });
+
+  it('stops the hold timer when mouse is released before completion', () => {
+    const onConfirm = vi.fn();
+    render(<HoldConfirmModal title="Delete" holdDuration={1200} onConfirm={onConfirm} onCancel={vi.fn()} />);
+    const holdButton = screen.getByText('Hold to Delete').closest('button');
+    act(() => { fireEvent.mouseDown(holdButton); });
+    act(() => { vi.advanceTimersByTime(300); });
+    expect(screen.getByText('Hold…')).toBeInTheDocument();
+    act(() => { fireEvent.mouseUp(holdButton); });
+    act(() => { vi.advanceTimersByTime(1500); });
+    expect(screen.getByText('Hold to Delete')).toBeInTheDocument();
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('supports touch interactions and custom cancel labels', () => {
+    const onConfirm = vi.fn();
+    const onCancel = vi.fn();
+    render(
+      <HoldConfirmModal
+        title="Delete"
+        cancelLabel="Cancel"
+        holdDuration={200}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />,
+    );
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(onCancel).toHaveBeenCalled();
+
+    const holdButton = screen.getByText('Hold to Delete').closest('button');
+    act(() => { fireEvent.touchStart(holdButton); });
+    act(() => { vi.advanceTimersByTime(260); });
+    expect(onConfirm).toHaveBeenCalled();
+  });
 });

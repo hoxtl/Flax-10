@@ -7,6 +7,7 @@ const getReadingsMock = vi.fn();
 const createReadingMock = vi.fn();
 const updateReadingMock = vi.fn();
 const deleteReadingMock = vi.fn();
+const showToastMock = vi.fn();
 
 function deferred() {
   let resolve;
@@ -23,6 +24,10 @@ vi.mock("../../api/readingApi", () => ({
   createReading: (...args) => createReadingMock(...args),
   updateReading: (...args) => updateReadingMock(...args),
   deleteReading: (...args) => deleteReadingMock(...args),
+}));
+
+vi.mock("../../context/ToastContext", () => ({
+  useToast: () => showToastMock,
 }));
 
 describe("useReadingModal", () => {
@@ -57,17 +62,20 @@ describe("useReadingModal", () => {
       await result.current.handleSubmit({ title: "New reading" });
     });
     expect(createReadingMock).toHaveBeenCalledWith(9, { title: "New reading" });
+    expect(showToastMock).toHaveBeenCalledWith("Reading added.", { variant: "success" });
 
     act(() => result.current.openEdit({ id: 1, title: "Week 1" }));
     await act(async () => {
       await result.current.handleSubmit({ title: "Updated reading" });
     });
     expect(updateReadingMock).toHaveBeenCalledWith(9, 1, { title: "Updated reading" });
+    expect(showToastMock).toHaveBeenCalledWith("Reading updated.", { variant: "success" });
 
     await act(async () => {
       await result.current.handleDelete(1);
     });
     expect(deleteReadingMock).toHaveBeenCalledWith(9, 1);
+    expect(showToastMock).toHaveBeenCalledWith("Reading deleted.", { variant: "success" });
     expect(getReadingsMock).toHaveBeenCalledTimes(4);
   });
 

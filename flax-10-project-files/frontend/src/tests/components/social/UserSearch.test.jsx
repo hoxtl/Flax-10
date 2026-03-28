@@ -218,6 +218,28 @@ describe('UserSearch', () => {
         await waitFor(() => expect(screen.getByText('No users found')).toBeTruthy());
     });
 
+    it('supports filtering displayed results before rendering them', async () => {
+        searchUsers.mockResolvedValueOnce({
+            results: [
+                { id: 1, first_name: 'Alice', last_name: 'Smith', username: 'asmith' },
+                { id: 2, first_name: 'Bob', last_name: 'Brown', username: 'bbrown' },
+            ],
+        });
+
+        render(
+            <UserSearch
+                onUserSelect={vi.fn()}
+                filterUsers={(users) => users.filter((user) => user.username === 'bbrown')}
+            />
+        );
+
+        fireEvent.focus(screen.getByTestId('search-bar'));
+        fireEvent.change(screen.getByTestId('search-bar'), { target: { value: 'b' } });
+
+        await waitFor(() => expect(screen.getByText('Bob Brown')).toBeTruthy());
+        expect(screen.queryByText('Alice Smith')).toBeNull();
+    });
+
     it('renders custom empty state when provided', async () => {
         searchUsers.mockResolvedValueOnce([]);
         render(
@@ -290,6 +312,22 @@ describe('UserSearch', () => {
         expect(screen.getByText('Courses')).toBeTruthy();
         fireEvent.mouseDown(document.body);
         expect(screen.queryByText('Courses')).toBeNull();
+    });
+
+    it('hides the filter panel entirely when hideFilter is true', () => {
+        render(<UserSearch onUserSelect={vi.fn()} hideFilter />);
+        expect(screen.queryByText('Filter')).toBeNull();
+    });
+
+    it('does not show the dropdown on empty focus when openOnEmptyQuery is false', async () => {
+        vi.useFakeTimers();
+        render(<UserSearch onUserSelect={vi.fn()} openOnEmptyQuery={false} />);
+        fireEvent.focus(screen.getByTestId('search-bar'));
+        await act(async () => {
+            vi.advanceTimersByTime(350);
+            await vi.runOnlyPendingTimersAsync();
+        });
+        expect(screen.queryByText('Start typing')).toBeNull();
     });
 
     it('filter search filters courses by query', async () => {

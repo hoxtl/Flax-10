@@ -161,6 +161,15 @@ describe("DashboardLayout", () => {
     expect(screen.getByTestId("create-task-modal")).toBeTruthy();
   });
 
+  it("opens CreateTask modal from QuickCommandBar", () => {
+    renderDashboardLayout();
+    act(() => {
+      window.dispatchEvent(new Event("quick-actions:open"));
+    });
+    fireEvent.click(screen.getByRole("button", { name: /add taskopen quick task modal/i }));
+    expect(screen.getByTestId("create-task-modal")).toBeInTheDocument();
+  });
+
   it("does not show Topbar on mobile", () => {
     setDashboardLayoutViewport(500);
     renderDashboardLayout();

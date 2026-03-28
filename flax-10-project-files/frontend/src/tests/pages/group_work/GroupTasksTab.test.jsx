@@ -44,6 +44,7 @@ vi.mock('lucide-react', () => ({
   Square: () => <div data-testid="square-icon" />,
   ChevronDown: () => <div data-testid="chevron-down-icon" />,
   Plus: () => <div data-testid="plus-icon" />,
+  Search: () => <div data-testid="search-icon" />,
 }));
 
 const mockMembers = [

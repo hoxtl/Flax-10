@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 import {
@@ -30,7 +30,8 @@ import {
 
 const convertReadingToTaskMock = vi.fn();
 const createTaskMock = vi.fn();
-const useToastMock = vi.fn();
+const getUrgencyTierMock = vi.fn(() => "upcoming");
+let toastImpl = vi.fn();
 
 vi.mock("../../../../api/readingApi", () => ({
   convertReadingToTask: (...args) => convertReadingToTaskMock(...args),
@@ -40,8 +41,12 @@ vi.mock("../../../../api/taskApi", () => ({
   createTask: (...args) => createTaskMock(...args),
 }));
 
+vi.mock("../../../../components/modules/deadlines/upcomingDeadlinesUtils", () => ({
+  getUrgencyTier: (...args) => getUrgencyTierMock(...args),
+}));
+
 vi.mock("../../../../context/ToastContext", () => ({
-  useToast: () => useToastMock,
+  useToast: () => toastImpl,
 }));
 
 vi.mock("../../../../components/common/confirm_modal/ConfirmModal", () => ({
@@ -57,13 +62,13 @@ vi.mock("../../../../components/common/confirm_modal/ConfirmModal", () => ({
 
 vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, disabled, className }) => (
-    <button onClick={onClick} disabled={disabled} className={className}>{children}</button>
+    <button onClick={onClick} data-disabled={disabled} className={className}>{children}</button>
   ),
 }));
 
 vi.mock("framer-motion", () => ({
   motion: {
-    button: ({ children, ...props }) => <button {...props}>{children}</button>,
+    button: ({ children, whileHover: _whileHover, whileTap: _whileTap, ...props }) => <button {...props}>{children}</button>,
     span: ({ children, ...props }) => <span {...props}>{children}</span>,
   },
 }));
@@ -161,6 +166,13 @@ const renderDeadlineButton = (deadline = baseDeadline, props = {}) => {
 };
 
 describe("module shared helpers", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    toastImpl = vi.fn();
+    getUrgencyTierMock.mockReset();
+    getUrgencyTierMock.mockReturnValue("upcoming");
+  });
+
   describe("card actions", () => {
     it("triggers edit and delete handlers", () => {
       const { onEdit, onDelete } = renderCardActions();
@@ -227,7 +239,7 @@ describe("module shared helpers", () => {
       fireEvent.click(screen.getByText("+ Add to tasks"));
       expect(await screen.findByText("✓ Added")).toBeInTheDocument();
       expect(onAdded).toHaveBeenCalledWith(44);
-      expect(useToastMock).toHaveBeenCalledWith("Reading added to tasks!");
+      expect(toastImpl).toHaveBeenCalledWith("Reading added to tasks!");
     });
 
     it("shows toast when deadline creation fails", async () => {
@@ -236,7 +248,7 @@ describe("module shared helpers", () => {
       fireEvent.click(screen.getByText("+ Add to tasks"));
       await waitFor(() => expect(createTaskMock).toHaveBeenCalled());
       await waitFor(() =>
-        expect(useToastMock).toHaveBeenCalledWith("Failed to add deadline.", { variant: "error" }),
+        expect(toastImpl).toHaveBeenCalledWith("Failed to add deadline.", { variant: "error" }),
       );
     });
 
@@ -270,7 +282,101 @@ describe("module shared helpers", () => {
         })),
       );
       await waitFor(() => expect(onAdded).toHaveBeenCalledWith(99));
-      await waitFor(() => expect(useToastMock).toHaveBeenCalledWith("Deadline added to tasks!"));
+      await waitFor(() => expect(toastImpl).toHaveBeenCalledWith("Deadline added to tasks!"));
+    });
+
+    it("maps urgent deadlines to medium-priority tasks", async () => {
+      getUrgencyTierMock.mockReturnValueOnce("urgent");
+      createTaskMock.mockResolvedValueOnce({});
+
+      renderDeadlineButton({
+        id: 12,
+        title: "Quiz prep",
+        start_due_date: "2099-01-03",
+        module: 4,
+        module_code: "CS4",
+        module_name: "Systems",
+      });
+
+      fireEvent.click(screen.getByText("+ Add to tasks"));
+
+      await waitFor(() =>
+        expect(createTaskMock).toHaveBeenCalledWith(expect.objectContaining({
+          title: "Quiz prep",
+          priority: "medium",
+          due_date: "2099-01-03",
+          module: 4,
+          module_code: "CS4",
+          module_name: "Systems",
+        })),
+      );
+    });
+
+    it("maps critical deadlines to high-priority tasks and prefers assessment titles", async () => {
+      getUrgencyTierMock.mockReturnValueOnce("critical");
+      createTaskMock.mockResolvedValueOnce({});
+
+      renderDeadlineButton({
+        id: 21,
+        title: "Fallback title",
+        assessment_title: "Capstone demo",
+        start_due_date: "2099-01-04",
+      });
+
+      fireEvent.click(screen.getByText("+ Add to tasks"));
+
+      await waitFor(() =>
+        expect(createTaskMock).toHaveBeenCalledWith(expect.objectContaining({
+          title: "Capstone demo",
+          priority: "high",
+        })),
+      );
+    });
+
+    it("falls back to an upcoming task with no due date when the deadline has no start date", async () => {
+      createTaskMock.mockResolvedValueOnce({});
+
+      renderDeadlineButton({
+        id: 33,
+        title: "Plan revision",
+        start_due_date: "",
+      });
+
+      fireEvent.click(screen.getByText("+ Add to tasks"));
+
+      await waitFor(() =>
+        expect(createTaskMock).toHaveBeenCalledWith(expect.objectContaining({
+          priority: "low",
+          due_date: null,
+        })),
+      );
+      expect(getUrgencyTierMock).not.toHaveBeenCalled();
+    });
+
+    it("ignores duplicate loading clicks for deadlines", async () => {
+      let release;
+      createTaskMock.mockImplementationOnce(() => new Promise((resolve) => {
+        release = resolve;
+      }));
+
+      renderDeadlineButton();
+      fireEvent.click(screen.getByText("+ Add to tasks"));
+      fireEvent.click(screen.getByText("Adding…"));
+
+      expect(createTaskMock).toHaveBeenCalledTimes(1);
+
+      release({});
+      expect(await screen.findByText("✓ Added")).toBeInTheDocument();
+    });
+
+    it("handles missing toast and added callbacks safely", async () => {
+      toastImpl = undefined;
+      convertReadingToTaskMock.mockResolvedValueOnce({});
+
+      render(<AddReadingToTasksButton readingId={77} styles={styles} />);
+      fireEvent.click(screen.getByText("+ Add to tasks"));
+
+      expect(await screen.findByText("✓ Added")).toBeInTheDocument();
     });
   });
 });

@@ -36,3 +36,9 @@
   color: var(--text-secondary);
   border-color: color-mix(in srgb, var(--muted) 16%, transparent);
 }
+
+.flax {
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary-strong);
+  border-color: color-mix(in srgb, var(--primary) 24%, transparent);
+}

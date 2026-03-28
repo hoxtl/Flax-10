@@ -174,17 +174,19 @@ describe("Attendance components", () => {
         }}
       />,
     );
-    expect(screen.getByText("No marked events yet.")).toBeInTheDocument();
+    expect(screen.getByText("No marked events yet")).toBeInTheDocument();
     fireEvent.click(screen.getByText("record"));
     expect(showRecordTab).toHaveBeenCalled();
   });
 
   it("renders empty and populated record and marked lists and records changes", async () => {
     const onRecorded = vi.fn();
-    const manyEvents = generateEvents(1, 21);
+    const manyEvents = generateEvents(1, 21, { start_time: "2024-03-01T09:00:00Z" });
     
-    const { rerender } = render(<RecordAttendanceList events={manyEvents} onRecorded={onRecorded} />);
-    fireEvent.click(screen.getAllByRole("button", { name: "Attended" })[0]);
+    render(<RecordAttendanceList events={manyEvents} onRecorded={onRecorded} />);
+    const firstAttendButton = screen.getAllByRole("button", { name: "Attended" })[0];
+    expect(firstAttendButton).toBeEnabled();
+    fireEvent.click(firstAttendButton);
     await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(1, true));
     expect(onRecorded).toHaveBeenCalled();
     expect(screen.getByText("Showing first 20 events.")).toBeInTheDocument();

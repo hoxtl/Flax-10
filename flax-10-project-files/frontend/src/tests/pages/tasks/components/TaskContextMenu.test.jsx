@@ -1,8 +1,8 @@
 /* Tests for TaskContextMenu */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { TaskContextMenu } from "../../../../pages/tasks/components/TaskCard";
+import { TaskContextMenu, useDueViewHandlers, useTaskContextMenuEffects, useTaskContextMenuState } from "../../../../pages/tasks/components/TaskCard";
 import { createRejectablePromise } from "../hooks/taskHookTestUtils";
 
 const sleepWarningHookMock = vi.hoisted(() => vi.fn());
@@ -98,5 +98,79 @@ describe("TaskContextMenu", () => {
     const m2 = renderTaskContextMenu();
     m2.unmount();
     await act(async () => { rejectPromise(new Error("late failure")); });
+  });
+
+  it("covers delete actions and confirmed due-date updates", async () => {
+    const onDelete = vi.fn();
+    const onEdit = vi.fn();
+    const onClose = vi.fn();
+    const checkSleepAndRun = vi.fn((_date, callback) => callback());
+    sleepWarningHookMock.mockReturnValue({
+      sleepWarning: false,
+      sleepWarningProps: {},
+      checkSleepAndRun,
+    });
+
+    renderTaskContextMenu({ onDelete, onEdit, onClose });
+
+    fireEvent.click(screen.getByRole("button", { name: /^Delete$/i }));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    const dueView = renderTaskContextMenu({ onEdit, onClose });
+    fireEvent.click(screen.getAllByRole("button", { name: /Set due date/i })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: /Set date/i })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: /Set date/i })[1]);
+
+    expect(checkSleepAndRun).toHaveBeenCalledWith("2026-03-10T10:00", expect.any(Function));
+    expect(onEdit).toHaveBeenCalledWith(
+      { due_date: "2026-03-10T10:00" },
+      { source: "context-menu", action: "set-due-date", dueDate: "2026-03-10T10:00" },
+    );
+    dueView.unmount();
+  });
+
+  it("covers hook-only fallback branches for empty due values and missing initial due dates", () => {
+    const { result: stateResult } = renderHook(() => useTaskContextMenuState({}));
+    expect(stateResult.current.dueValue).toBe("");
+
+    const setDueValue = vi.fn();
+    const onEdit = vi.fn();
+    const onClose = vi.fn();
+    const checkSleepAndRun = vi.fn();
+    const { result } = renderHook(() =>
+      useDueViewHandlers({ dueValue: "", setDueValue, onEdit, onClose, checkSleepAndRun }),
+    );
+
+    act(() => {
+      result.current.onConfirm();
+    });
+
+    expect(checkSleepAndRun).not.toHaveBeenCalled();
+    expect(onEdit).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("ignores inside-menu document clicks in the context-menu effects hook", async () => {
+    getUserSettings.mockResolvedValueOnce({ sleep_time: "22:30", wake_time: "06:45" });
+    const onClose = vi.fn();
+    const setSleepSettings = vi.fn();
+    const menuNode = document.createElement("div");
+    const child = document.createElement("button");
+    menuNode.appendChild(child);
+    document.body.appendChild(menuNode);
+    const menuRef = { current: menuNode };
+
+    const { unmount } = renderHook(() => useTaskContextMenuEffects(menuRef, onClose, setSleepSettings));
+
+    child.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+    expect(onClose).not.toHaveBeenCalled();
+
+    await waitFor(() =>
+      expect(setSleepSettings).toHaveBeenCalledWith({ sleep_time: "22:30", wake_time: "06:45" }),
+    );
+
+    unmount();
+    menuNode.remove();
   });
 });

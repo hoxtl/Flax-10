@@ -7,6 +7,7 @@ import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../uti
 import AnimatedDropdown from '../../common/animated_dropdown';
 import styles from './DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
+import LocationAutocomplete from '../../common/inputs/LocationAutocomplete';
 import { buildValidationState, failValidation, finishValidation, ModuleFormField, ModuleFormFooter, requireFieldValue } from '../shared/moduleFormParts';
 const EMPTY_FORM = { title: '', deadline_type: 'coursework', start_due_date: '', end_due_date: '', location: '', description: '' };
 
@@ -37,18 +38,19 @@ function StartDateField({ value, onChange, deadlineType }) {
     );
 }
 
-function EndDateField({ value, onChange }) {
+function EndDateField({ value, onChange, minDate }) {
     return (
         <Field label="End Time">
             <DateTimePicker
-                value={value} onChange={val => onChange('end_due_date', val)} placeholder="Pick date & time"   
+                value={value} onChange={val => onChange('end_due_date', val)} placeholder="Pick date & time"
+                minDate={minDate}
             />
         </Field>
     );
 }
 
 function LocationField({ value, onChange }) {
-    return <Field label="Location"><input className={styles.input} type="text" value={value} onChange={e => onChange('location', e.target.value)} /></Field>;
+    return <Field label="Location"><LocationAutocomplete value={value} onChange={(val) => onChange('location', val)} inputClassName={styles.input} /></Field>;
 }
 
 function DescriptionField({ value, onChange }) {
@@ -92,7 +94,7 @@ export default function DeadlineForm({ initial, onSubmit, onCancel }) {
             <TitleField value={form.title} onChange={onChange} />
             <TypeField value={form.deadline_type} onChange={onChange} />
             <StartDateField value={form.start_due_date} onChange={onChange} deadlineType={form.deadline_type} />
-            {TYPES_WITH_END_DATE.includes(form.deadline_type) && <EndDateField value={form.end_due_date} onChange={onChange} />}
+            {TYPES_WITH_END_DATE.includes(form.deadline_type) && <EndDateField value={form.end_due_date} onChange={onChange} minDate={form.start_due_date ? new Date(form.start_due_date) : undefined} />}
             {TYPES_WITH_LOCATION.includes(form.deadline_type) && <LocationField value={form.location} onChange={onChange} />}
             <DescriptionField value={form.description} onChange={onChange} />
             <ModuleFormFooter createLabel="Add Deadline" error={error} isEditing={!!initial} onCancel={onCancel} styles={styles} />

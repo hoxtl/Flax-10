@@ -127,9 +127,9 @@ describe('Profile Analytics', () => {
   });
   it('saves weekly goal and refetches summary', async () => {
     const refetch = vi.fn();
-    useProfileSummary.mockReturnValue({ summary: { persona: null, badges: [], weekly: { percentage: 20, hours_studied: 2, goal_hours: 8 }, streaks: { current: 0, longest: 0 } }, loading: false, refetch });
+    useProfileSummary.mockReturnValue({ summary: { persona: null, badges: [], weekly: { percentage: 20, hours_studied: 2, goal_hours: 8 }, streaks: { current: 0, longest: 0 }, session_count: 1 }, loading: false, refetch });
     renderProfile();
-    fireEvent.click(screen.getAllByRole('button', { name: /2h\/8h/ })[0]);
+    fireEvent.click(screen.getByText('2h').closest('button'));
     fireEvent.click(await screen.findByRole('button', { name: 'Save goal' }));
     await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
   });

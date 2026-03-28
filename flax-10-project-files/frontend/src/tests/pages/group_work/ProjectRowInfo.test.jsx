@@ -29,6 +29,8 @@ vi.mock("../../../pages/group_work/utils/projectRowUtils", () => ({
 vi.mock("../../../pages/group_work/utils/memberAvatarUtils", () => ({
   getDisplayName: (...args) => getDisplayName(...args),
   openMemberProfile: (...args) => openMemberProfile(...args),
+  getMemberKey: vi.fn((member) => String(member?.user || member?.id || "")),
+  getCurrentMember: vi.fn(() => null),
 }));
 
 import ProjectRowInfo, { ProjectModuleBadge } from "../../../pages/group_work/components/ProjectRowInfo";

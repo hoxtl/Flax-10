@@ -89,6 +89,16 @@ describe("TimerConfigPanel", () => {
     expect(screen.getByTestId("auto-start-toggle")).toBeInTheDocument();
   });
 
+  it("falls back to a 25 minute base when the current work time is missing", () => {
+    const timer = createTimer({ workTime: 0 });
+    render(<TimerConfigPanel t={timer} />);
+
+    fireEvent.click(screen.getByText("+5m"));
+
+    expect(timer.updateTime).toHaveBeenCalledWith("work", 30);
+    expect(timer.setTimeLeft).toHaveBeenCalledWith(1800);
+  });
+
   it("disables adjustments while the timer is actively running", () => {
     const timer = createTimer({ isActive: true, isPaused: false, workTime: 25 });
     render(<TimerConfigPanel t={timer} embedded />);

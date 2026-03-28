@@ -20,6 +20,12 @@ describe("TimerComponents helpers", () => {
     expect(onError).toHaveBeenNthCalledWith(2, false);
   });
 
+  it("supports input changes without an error callback", () => {
+    const setLocal = vi.fn();
+    handleInput({ target: { value: "7" } }, 1, setLocal);
+    expect(setLocal).toHaveBeenCalledWith("7");
+  });
+
   it("commits changed values and keeps matching values quiet", () => {
     const setLocal = vi.fn();
     const onUpdate = vi.fn();
@@ -35,6 +41,16 @@ describe("TimerComponents helpers", () => {
     expect(onError).toHaveBeenLastCalledWith(false);
   });
 
+  it("commits values without requiring an error callback", () => {
+    const setLocal = vi.fn();
+    const onUpdate = vi.fn();
+
+    commitInput("4", 1, 1, setLocal, onUpdate);
+
+    expect(setLocal).toHaveBeenCalledWith(4);
+    expect(onUpdate).toHaveBeenCalledWith(4);
+  });
+
   it("covers key handling branches", () => {
     const onError = vi.fn();
     const blur = vi.fn();
@@ -48,5 +64,11 @@ describe("TimerComponents helpers", () => {
     expect(blur).toHaveBeenCalledTimes(1);
     expect(preventDefault).toHaveBeenCalledTimes(1);
     expect(onError).toHaveBeenCalledWith(true);
+  });
+
+  it("supports key handling without an error callback", () => {
+    const preventDefault = vi.fn();
+    handleKey({ key: "ArrowDown", preventDefault, target: { blur: vi.fn() } }, "", 1);
+    expect(preventDefault).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,7 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 
 const mockRefreshProfile = vi.fn();
+const getInitialsMock = vi.fn((name) => {
+    if (!name) return '';
+    return name
+        .split(' ')
+        .filter(Boolean)
+        .map((part) => part[0]?.toUpperCase() || '')
+        .join('')
+        .slice(0, 2);
+});
+const getResolvedUserPhotoMock = vi.fn(() => '');
 let mockProfileData = {
     year: 'Year 2',
     major: 'Computer Science',
@@ -13,6 +23,20 @@ vi.mock('../../../context/AuthContext', () => ({
         profile: mockProfileData,
         refreshProfile: mockRefreshProfile,
     }),
+}));
+
+vi.mock('../../../components/Auth/utils/userUtils', () => ({
+    getInitials: (...args) => getInitialsMock(...args),
+}));
+
+vi.mock('../../../utils/tutorPhotoFallback', () => ({
+    getResolvedUserPhoto: (...args) => getResolvedUserPhotoMock(...args),
+}));
+
+vi.mock('lucide-react', () => ({
+    LogOut: () => <svg aria-hidden="true" />,
+    Settings: () => <svg aria-hidden="true" />,
+    UserRound: () => <svg aria-hidden="true" />,
 }));
 
 import ProfileDropdown from '../../../components/dashboard/components/ProfileDropdown';
@@ -34,11 +58,13 @@ function renderDropdown(props = {}) {
 describe('ProfileDropdown', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.useRealTimers();
         mockProfileData = {
             year: 'Year 2',
             major: 'Computer Science',
             profile_photo_url: null,
         };
+        getResolvedUserPhotoMock.mockReturnValue('');
     });
 
     it('renders avatar button', () => {
@@ -121,5 +147,65 @@ describe('ProfileDropdown', () => {
         render(<ProfileDropdown user={defaultUser} onSettingsClick={vi.fn()} onLogoutClick={vi.fn()} onProfileClick={vi.fn()} />);
         fireEvent.mouseDown(document.body);
         expect(screen.queryByText('Settings')).toBeNull();
+    });
+
+    it('keeps the menu open when mouse down happens inside the dropdown', () => {
+        renderDropdown();
+        fireEvent.click(screen.getByLabelText('User menu'));
+
+        fireEvent.mouseDown(screen.getByText('Settings'));
+
+        expect(screen.getByText('Settings')).toBeInTheDocument();
+    });
+
+    it('opens on hover, delays closing, and cancels a queued close on re-entry', () => {
+        vi.useFakeTimers();
+        const { container } = renderDropdown();
+        const wrapper = container.firstChild;
+
+        act(() => {
+            fireEvent.mouseEnter(wrapper);
+        });
+        expect(screen.getByText('Profile')).toBeInTheDocument();
+
+        act(() => {
+            fireEvent.mouseLeave(wrapper);
+            vi.advanceTimersByTime(100);
+            fireEvent.mouseEnter(wrapper);
+            vi.advanceTimersByTime(200);
+        });
+        expect(screen.getByText('Profile')).toBeInTheDocument();
+
+        act(() => {
+            fireEvent.mouseLeave(wrapper);
+            vi.advanceTimersByTime(181);
+        });
+        expect(screen.queryByText('Profile')).toBeNull();
+    });
+
+    it('uses the resolved fallback photo when auth data has no profile image', async () => {
+        getResolvedUserPhotoMock.mockReturnValue('https://example.com/fallback.jpg');
+        mockProfileData = { year: 'Year 3', major: '', profile_photo_url: null };
+
+        renderDropdown({ user: { first_name: 'Ava', last_name: 'Stone' } });
+        fireEvent.click(screen.getByLabelText('User menu'));
+
+        await waitFor(() => expect(screen.getByText('Ava Stone')).toBeInTheDocument());
+        expect(screen.queryByText('Computer Science')).toBeNull();
+        expect(getResolvedUserPhotoMock).toHaveBeenCalledWith(
+            expect.objectContaining({ first_name: 'Ava', last_name: 'Stone', major: '' }),
+            { allowGeneric: false },
+        );
+    });
+
+    it('falls back to question-mark initials and safely closes when callbacks are omitted', () => {
+        render(<ProfileDropdown user={{}} />);
+
+        expect(screen.getByLabelText('User menu')).toHaveTextContent('?');
+
+        fireEvent.click(screen.getByLabelText('User menu'));
+        fireEvent.click(screen.getByText('Profile'));
+
+        expect(screen.queryByText('Profile')).toBeNull();
     });
 });

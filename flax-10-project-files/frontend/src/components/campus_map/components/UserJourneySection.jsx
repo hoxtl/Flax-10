@@ -117,10 +117,7 @@ function JourneyInputs({ props, startCoords, destCoords, setStartCoords, setDest
     onClearAll?.();
   };
   const canCalculate = Boolean(startCoords && destCoords);
-  const handleCalculate = () => {
-    if (!canCalculate) return;
-    onCalculate?.(startCoords, destCoords);
-  };
+  const handleCalculate = () => onCalculate?.(startCoords, destCoords);
   return (
     <div className={styles.manualJourneyInputs}>
       <FromField value={manualStart} onChange={setManualStart} onGeolocate={onGeolocateStart} locating={locating} />
@@ -128,7 +125,7 @@ function JourneyInputs({ props, startCoords, destCoords, setStartCoords, setDest
       <JourneyActions
         canCalculate={canCalculate}
         hasValue={manualStart || manualDestination}
-        onCalculate={handleCalculate}
+        onCalculate={canCalculate ? handleCalculate : undefined}
         onClear={handleClear}
       />
     </div>

@@ -113,7 +113,9 @@ describe('CampusMap', () => {
     }
 
     function getDestinationCampusButton(name) {
-        return within(getDestinationSection()).getByRole('button', { name: new RegExp(`^${name}$`, 'i') });
+        fireEvent.click(within(getDestinationSection()).getByRole('button', { name: /select campus/i }));
+        const menu = document.body.querySelector('[data-dropdown-portal="true"]');
+        return within(menu).getByRole('button', { name: new RegExp(`^${name}$`, 'i') });
     }
 
     function getJourneySection() {
@@ -301,7 +303,7 @@ describe('CampusMap', () => {
         await renderLoadedCampusMap();
         fireEvent.click(getStartLocationButton());
         fireEvent.click(getDestinationCampusButton('Strand'));
-        await waitFor(() => expect(screen.getByText(/Public Transport/)).toBeInTheDocument());
+        await waitFor(() => expect(screen.getAllByText(/Public Transport/)[0]).toBeInTheDocument());
         fireEvent.click(screen.getByText(/Show step-by-step directions/));
         await waitFor(() => expect(screen.getByText(/Northern/)).toBeTruthy());
     }, 15000);

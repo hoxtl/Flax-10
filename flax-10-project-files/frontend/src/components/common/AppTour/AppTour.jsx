@@ -256,8 +256,9 @@ function WelcomeTourContent({ step, stepIndex, total, onNext, onJump }) {
       </Motion.div>
       <h2 className={`${styles.cardTitle} ${styles.welcomeTitle}`}>{step.title}</h2>
       <p className={`${styles.cardDescription} ${styles.welcomeDescription}`}>{step.description}</p>
+      <span className={styles.stepCount}>{stepIndex + 1} / {total}</span>
       <div className={`${styles.cardActions} ${styles.cardActionsCentered}`}>
-        <button className={`${styles.nextBtn} ${styles.welcomeStartBtn}`} onClick={onNext}>Start tour</button>
+        <button className={`${styles.nextBtn} ${styles.welcomeStartBtn}`} onClick={onNext}>Next</button>
       </div>
       <ProgressDots total={total} current={stepIndex} onJump={onJump} />
     </div>
@@ -281,9 +282,9 @@ function GuidedTourHeader({ StepIcon, stepIndex, total, onSkip }) {
     <div className={styles.cardHeader}>
       <div className={styles.stepHeaderLeft}>
         {StepIcon ? <StepBadge StepIcon={StepIcon} stepIndex={stepIndex} /> : null}
-        <span className={styles.stepCount}>{stepIndex} / {total - 1}</span>
+        <span className={styles.stepCount}>{stepIndex + 1} / {total}</span>
       </div>
-      <button className={styles.skipBtn} onClick={onSkip}>Skip</button>
+      <button className={styles.skipBtn} onClick={onSkip}>Skip tour</button>
     </div>
   );
 }
@@ -310,7 +311,7 @@ function GuidedTourFooter({ stepIndex, total, onJump, onNext, onPrev }) {
       <div className={styles.cardActions}>
         {stepIndex > 0 ? <button className={styles.prevBtn} onClick={onPrev}>Back</button> : null}
         <button className={`${styles.nextBtn}${isLast ? ` ${styles.finishBtn}` : ""}`} onClick={onNext}>
-          {isLast ? "Finish" : "Next →"}
+          {isLast ? "Finish" : "Next"}
         </button>
       </div>
     </div>

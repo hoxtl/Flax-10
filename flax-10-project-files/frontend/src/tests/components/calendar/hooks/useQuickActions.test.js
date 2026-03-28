@@ -44,4 +44,15 @@ describe('useQuickActions', () => {
         expect(mockLoadEvents).toHaveBeenCalled();
         expect(mockNotify).toHaveBeenCalled();
     });
+
+    it('handles missing click events and missing society names in the notification copy', async () => {
+        const { result } = renderHook(() => useQuickActions({ id: 2, society_id: 8 }));
+        await act(async () => result.current.onClick());
+
+        expect(mockUnsync).toHaveBeenCalledWith(8);
+        expect(mockNotify).toHaveBeenCalledWith(
+            'Unsync Successful',
+            'Calendar for this society is now unsynced.',
+        );
+    });
 });

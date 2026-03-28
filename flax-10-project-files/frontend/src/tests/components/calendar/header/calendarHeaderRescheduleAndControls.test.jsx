@@ -82,6 +82,12 @@ vi.mock("../../../../context/ToastContext", () => ({
   useToast: () => mockToast,
 }));
 
+vi.mock("../../../../context/AuthContext", () => ({
+  useAuth: () => ({
+    profile: { role: "student" },
+  }),
+}));
+
 vi.mock("../../../../components/calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent: mockEditEvent }),
   useCalendarEvents: () => ({ loadEvents: vi.fn() }),

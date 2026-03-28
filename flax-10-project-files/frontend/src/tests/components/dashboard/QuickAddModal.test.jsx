@@ -104,11 +104,11 @@ describe('QuickAddModal', () => {
         expect(screen.getByText('Module Options')).toBeTruthy();
     });
 
-    it('navigates to module picker when Add Deadline is clicked', () => {
+    it('navigates to module picker when Add Deadline is clicked', async () => {
         renderModal({ isTeacher: true });
         fireEvent.click(screen.getByText('Module'));
         fireEvent.click(screen.getByText('Add Deadline'));
-        expect(screen.getByText('Select Module')).toBeTruthy();
+        expect(await screen.findByText('Select Module')).toBeTruthy();
     });
 
     it('calls onSelectType with tag id when tag is selected in tag view', () => {
@@ -124,6 +124,7 @@ describe('QuickAddModal', () => {
         renderModal({ isTeacher: true, onSelectType });
         fireEvent.click(screen.getByText('Module'));
         fireEvent.click(screen.getByText('Add Deadline'));
+        await screen.findByText('Select Module');
         await vi.waitFor(() => expect(screen.getByText('CS101')).toBeTruthy());
         fireEvent.click(screen.getByText('CS101'));
         expect(onSelectType).toHaveBeenCalledWith('add_deadline', { id: 1, module_code: 'CS101', module_name: 'Intro to CS' });
@@ -164,5 +165,42 @@ describe('QuickAddModal', () => {
         renderModal({ initialView: 'schedule_manual' });
         expect(screen.getByText('Quick Add')).toBeTruthy();
         expect(screen.getByText(/What would you like to add/i)).toBeTruthy();
+    });
+
+    it('redirects legacy auto schedule view back to the main quick-add chooser', () => {
+        renderModal({ initialView: 'schedule_auto' });
+        expect(screen.getByText('Quick Add')).toBeTruthy();
+        expect(screen.getByText(/What would you like to add/i)).toBeTruthy();
+    });
+
+    it('falls back to the main chooser when initial view is empty', () => {
+        renderModal({ initialView: '' });
+        expect(screen.getByText('Quick Add')).toBeTruthy();
+        expect(screen.getByText(/What would you like to add/i)).toBeTruthy();
+    });
+
+    it('calls onSelectType with add_reading and module when reading module is selected in picker', async () => {
+        const onSelectType = vi.fn();
+        renderModal({ isTeacher: true, onSelectType });
+
+        fireEvent.click(screen.getByText('Module'));
+        fireEvent.click(screen.getByText('Add Reading'));
+
+        await waitFor(() => expect(screen.getByText('Which module is this reading for?')).toBeTruthy());
+        await waitFor(() => expect(screen.getByText('CS101')).toBeTruthy());
+        fireEvent.click(screen.getByText('CS101'));
+
+        expect(onSelectType).toHaveBeenCalledWith('add_reading', { id: 1, module_code: 'CS101', module_name: 'Intro to CS' });
+    });
+
+    it('handles module loading failures by showing the empty picker state', async () => {
+        const { getModules } = await import('../../../api/moduleApi');
+        getModules.mockRejectedValueOnce(new Error('boom'));
+
+        renderModal({ isTeacher: true });
+        fireEvent.click(screen.getByText('Module'));
+        fireEvent.click(screen.getByText('Add Deadline'));
+
+        await waitFor(() => expect(screen.getByText(/Loading or no modules/)).toBeTruthy());
     });
 });

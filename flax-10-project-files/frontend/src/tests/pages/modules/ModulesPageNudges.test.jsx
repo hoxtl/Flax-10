@@ -46,4 +46,37 @@ describe("ModulesPageNudges", () => {
     fireEvent.click(screen.getByText("Add reading"));
     expect(addReadingAddedMock).toHaveBeenCalledWith(2);
   });
+
+  it("returns nothing when deadlines and readings are missing", () => {
+    getDayCountMock.mockImplementation(() => 1);
+    const { container } = render(<SmartNudge deadlines={undefined} readings={undefined} onReadingAdded={vi.fn()} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("uses deadline-title and due-date fallbacks, then hides nudges after they are dismissed", () => {
+    getDayCountMock.mockImplementation((value) => {
+      if (value === "reading-date") return 0;
+      if (value === "deadline-date") return 2;
+      return 20;
+    });
+
+    const onReadingAdded = vi.fn();
+
+    render(
+      <SmartNudge
+        deadlines={[{ id: 7, title: "Fallback title", start_due_date: "deadline-date" }]}
+        readings={[{ id: 9, title: "Reading fallback", due_date: "reading-date" }]}
+        onReadingAdded={onReadingAdded}
+      />
+    );
+
+    expect(screen.getByText(/Reading fallback/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Add reading"));
+    expect(onReadingAdded).toHaveBeenCalledWith(9);
+    expect(screen.getByText(/Fallback title/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Add deadline"));
+    expect(screen.queryByText(/Fallback title/)).not.toBeInTheDocument();
+  });
 });

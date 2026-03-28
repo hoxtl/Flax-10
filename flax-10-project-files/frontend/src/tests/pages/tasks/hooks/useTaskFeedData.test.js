@@ -1,12 +1,13 @@
 /* Tests for useTaskFeedData hook filtering, sorting, and navigation logic */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { act, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import {
   getTaskFeedDataMocks,
   renderTaskFeedData,
   resetTaskFeedDataUtils,
 } from "./taskFeedDataTestSetup";
 import * as taskFeedDataUtils from "../../../../pages/tasks/utils/taskFeedDataUtils";
+import useTaskFeedData from "../../../../pages/tasks/hooks/useTaskFeedData";
 
 const { getModulesMock } = getTaskFeedDataMocks();
 
@@ -213,6 +214,23 @@ describe("useTaskFeedData", () => {
       await waitFor(() => expect(result.current.isFilterOpen).toBe(false));
       outside.remove();
     });
+
+    it("ignores outside clicks when the filter ref is unset", async () => {
+      const { result } = renderTaskFeedData();
+      const outside = document.createElement("button");
+      document.body.appendChild(outside);
+
+      act(() => {
+        result.current.setIsFilterOpen(true);
+      });
+
+      act(() => {
+        outside.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+      });
+
+      expect(result.current.isFilterOpen).toBe(true);
+      outside.remove();
+    });
   });
 
   it("handles missing tasks, lists, and module metadata defaults", async () => {
@@ -226,12 +244,31 @@ describe("useTaskFeedData", () => {
     expect(result.current.headerTitle).toBe("Header");
   });
 
+  it("clears the module name map when module metadata loading fails before unmount", async () => {
+    getModulesMock.mockRejectedValueOnce(new Error("metadata down"));
+
+    const { result } = renderTaskFeedData({
+      tasks: [{ id: 1, completed: false, module_code: "CS1", module_name: "" }],
+    });
+
+    await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([{ value: "CS1", label: "CS1" }]));
+  });
+
   it("uses default task and list collections when the hook props omit them", async () => {
     const { result } = renderTaskFeedData({ activeListId: 999 });
 
     await waitFor(() => expect(result.current.listMap).toEqual({}));
     expect(result.current.pending).toEqual([]);
     expect(result.current.completed).toEqual([]);
+  });
+
+  it("applies hook-level default props when optional collections are omitted entirely", async () => {
+    const { result } = renderHook(() => useTaskFeedData({ activeFilter: "all", activeListId: null }));
+
+    await waitFor(() => expect(result.current.listMap).toEqual({}));
+    expect(result.current.pending).toEqual([]);
+    expect(result.current.completed).toEqual([]);
+    expect(result.current.filterListIds).toEqual([]);
   });
 
   it("ignores late module metadata responses after unmount", async () => {

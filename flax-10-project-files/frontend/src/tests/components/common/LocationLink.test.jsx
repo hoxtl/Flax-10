@@ -1,5 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+
+const navigateMock = vi.fn();
 
 vi.mock("lucide-react", () => ({
     MapPin: ({ className, size, ...props }) => <svg data-testid="map-pin" data-size={size} className={className} {...props} />,
@@ -9,19 +11,7 @@ vi.mock("react-router-dom", async () => {
     const actual = await vi.importActual("react-router-dom");
     return {
         ...actual,
-        Link: ({ to, className, children, onClick, "aria-label": ariaLabel }) => (
-            <a
-                href={to}
-                className={className}
-                aria-label={ariaLabel}
-                onClick={(event) => {
-                    event.preventDefault();
-                    onClick?.(event);
-                }}
-            >
-                {children}
-            </a>
-        ),
+        useNavigate: () => navigateMock,
     };
 });
 
@@ -30,32 +20,56 @@ vi.mock("../../../components/common/location_link/LocationLink.module.css", () =
 import LocationLink from "../../../components/common/location_link/LocationLink";
 
 describe("LocationLink", () => {
+    beforeEach(() => {
+        navigateMock.mockReset();
+    });
+
     it("returns null when location is missing", () => {
         const { container } = render(<LocationLink />);
         expect(container.firstChild).toBeNull();
     });
 
-    it("builds a default map link with icon and classes", () => {
+    it("builds a default map button with icon and classes", () => {
+        const dispatchSpy = vi.spyOn(window, "dispatchEvent");
         render(<LocationLink location="Bush House" className="extra" iconClassName="icon-extra" textClassName="text-extra" iconSize={20} onClick={vi.fn()} />);
 
-        const link = screen.getByRole("link", { name: "Open UniMap for Bush House" });
-        expect(link).toHaveAttribute("href", "/map?destination=Bush%20House");
-        expect(link.className).toContain("link");
-        expect(link.className).toContain("extra");
+        const button = screen.getByRole("button", { name: "Open UniMap for Bush House" });
+        fireEvent.click(button);
+        expect(button.className).toContain("link");
+        expect(button.className).toContain("extra");
         expect(screen.getByTestId("map-pin")).toHaveAttribute("data-size", "20");
         expect(screen.getByTestId("map-pin").getAttribute("class")).toContain("icon-extra");
         expect(screen.getByText("Bush House").getAttribute("class")).toContain("text-extra");
+        expect(navigateMock).toHaveBeenCalledWith("/map?destination=Bush%20House", { replace: false });
+        const navEvent = dispatchSpy.mock.calls.find(([event]) => event.type === "navigate")?.[0];
+        expect(navEvent?.detail).toBe("map");
+        dispatchSpy.mockRestore();
     });
 
     it("supports a custom destination and hides the icon", () => {
         const onClick = vi.fn();
         render(<LocationLink location="Waterloo" to="/custom" showIcon={false} onClick={onClick} />);
 
-        fireEvent.click(screen.getByRole("link", { name: "Open UniMap for Waterloo" }));
+        fireEvent.click(screen.getByRole("button", { name: "Open UniMap for Waterloo" }));
         expect(onClick).toHaveBeenCalled();
         expect(screen.queryByTestId("map-pin")).toBeNull();
-        expect(screen.getByRole("link")).toHaveAttribute("href", "/custom");
+        expect(navigateMock).toHaveBeenCalledWith("/custom", { replace: false });
     });
+
+    it("passes the original click event to the optional onClick handler", () => {
+        const onClick = vi.fn();
+        render(<LocationLink location="Somerset House" onClick={onClick} />);
+
+        const button = screen.getByRole("button", { name: "Open UniMap for Somerset House" });
+    fireEvent.click(button);
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0]).toMatchObject({
+        type: "click",
+        target: button,
+    });
+    expect(navigateMock).toHaveBeenCalledWith("/map?destination=Somerset%20House", { replace: false });
+  });
 
     it("uses the default icon size and class names when optional props are omitted", () => {
         render(<LocationLink location="Strand Campus" />);

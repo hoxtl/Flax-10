@@ -71,6 +71,17 @@ describe('DeadlineCard', () => {
         expect(onDelete).toHaveBeenCalled();
     });
 
+    it('closes the delete confirmation without deleting when cancel is clicked', () => {
+        const onDelete = vi.fn();
+        renderCard({ deadline, is_teacher: true, onEdit: vi.fn(), onDelete });
+
+        fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getByText('Cancel'));
+
+        expect(onDelete).not.toHaveBeenCalled();
+        expect(screen.queryByText(`Are you sure you want to delete "${deadline.title}"? This action cannot be undone.`)).not.toBeInTheDocument();
+    });
+
     it('should render the location if it has been filled in', () => {
         renderCard({ deadline: { ...deadline, location: 'Bush House, 2.01' }, is_teacher: false, onEdit: vi.fn(), onDelete: vi.fn() });
         expect(screen.getByText(/Bush House, 2.01/)).toBeInTheDocument();

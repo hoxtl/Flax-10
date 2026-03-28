@@ -1,0 +1,34 @@
+.wrap {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 100;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+}
+
+.option {
+  padding: 7px 10px;
+  font-size: 0.86rem;
+  color: var(--text);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: var(--hover);
+  color: var(--primary);
+}

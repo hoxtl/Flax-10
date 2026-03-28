@@ -28,7 +28,7 @@ function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
 }
 
-function getNextDeadline(deadlines = []) {
+function getNextDeadline(deadlines) {
     const now = new Date();
     const sorted = getSortedDeadlines(deadlines);
     return sorted.find((d) => new Date(d.start_due_date) >= now) || sorted[0] || null;
@@ -49,7 +49,7 @@ function getUrgencyText(kind) {
     return "Later";
 }
 
-function getTimelineProgress(deadlines = []) {
+function getTimelineProgress(deadlines) {
     if (deadlines.length < 2) return null;
     const dates = deadlines.map((d) => new Date(d.start_due_date)).filter((d) => !Number.isNaN(d.getTime()));
     if (dates.length < 2) return null;
@@ -228,7 +228,7 @@ function ModuleProjectsCard({ moduleCode }) {
         <article className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>Study Projects</h2>
             <div className={deadlineStyles.deadlinesList}>
-                {projects.map((p, i) => <ProjectRow key={p.id} project={p} index={i} />)}
+                {projects.map((p, i) => <ProjectRow key={p.id ?? `${p.name || "project"}-${i}`} project={p} index={i} />)}
             </div>
         </article>
     );
@@ -336,7 +336,7 @@ function DeadlinesSection({ deadlines }) {
     if (!deadlines?.length) return <p className={deadlineStyles.emptyText}>No assignments yet.</p>;
     return (
         <div className={deadlineStyles.deadlinesList}>
-            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} />)}
+            {deadlines.map((d, i) => <DeadlineItem key={d.id ?? `${d.title || "deadline"}-${d.start_due_date || i}-${i}`} deadline={d} index={i} />)}
         </div>
     );
 }
@@ -346,7 +346,7 @@ function ReadingsSection({ readings }) {
     const sorted = [...readings].sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
     return (
         <div className={deadlineStyles.deadlinesList}>
-            {sorted.map((r, i) => <ReadingRow key={r.id} reading={r} index={i} />)}
+            {sorted.map((r, i) => <ReadingRow key={r.id ?? `${r.title || "reading"}-${r.deadline || i}-${i}`} reading={r} index={i} />)}
         </div>
     );
 }

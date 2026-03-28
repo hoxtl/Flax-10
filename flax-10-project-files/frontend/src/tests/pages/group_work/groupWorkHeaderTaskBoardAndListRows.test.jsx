@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 const toastMock = vi.fn();
+const useAuthMock = vi.fn();
 const openMemberProfileMock = vi.fn();
 const openTeacherProfileMock = vi.fn();
 const getStoredViewerMock = vi.fn();
@@ -33,10 +34,16 @@ vi.mock("../../../context/ToastContext", () => ({
   useToast: () => toastMock,
 }));
 
+vi.mock("../../../context/AuthContext", () => ({
+  useAuth: () => useAuthMock(),
+}));
+
 vi.mock("../../../pages/group_work/utils/memberAvatarUtils", () => ({
   getDisplayName: (...args) => getDisplayNameMock(...args),
   getStoredViewer: (...args) => getStoredViewerMock(...args),
   openMemberProfile: (...args) => openMemberProfileMock(...args),
+  getCurrentMember: vi.fn(() => null),
+  getMemberKey: vi.fn((member) => String(member?.user || member?.id || "")),
 }));
 
 vi.mock("../../../pages/group_work/utils/projectRowUtils", () => ({
@@ -139,6 +146,7 @@ import TaskListRow from "../../../pages/group_work/components/TaskListRow";
 describe("GroupWork low coverage components", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthMock.mockReturnValue({ profile: { id: 1 } });
     getStoredViewerMock.mockReturnValue({ id: 1, username: "owner" });
     openMemberProfileMock.mockReset();
     openTeacherProfileMock.mockReset();
@@ -186,6 +194,7 @@ describe("GroupWork low coverage components", () => {
   });
 
   it("hides project team controls for non-owners and no-op metadata is empty", () => {
+    useAuthMock.mockReturnValue({ profile: { id: 9 } });
     getStoredViewerMock.mockReturnValue({ id: 9, username: "guest" });
 
     const { container, rerender } = render(
@@ -230,10 +239,11 @@ describe("GroupWork low coverage components", () => {
   it("handles owner and non-owner delete actions", async () => {
     const onDelete = vi.fn().mockResolvedValue(true);
 
-    const { rerender } = render(<ProjectDeleteAction onDelete={onDelete} isOwner={false} />);
-    expect(screen.getByRole("button", { name: /Delete project/i })).toBeDisabled();
+    const onMemberRemove = vi.fn().mockResolvedValue(true);
+    const { rerender } = render(<ProjectDeleteAction onDelete={onDelete} onMemberRemove={onMemberRemove} isOwner={false} teamMembers={[{ id: 2, user: 2, role: "member" }]} />);
+    expect(screen.getByRole("button", { name: /Leave project/i })).toBeInTheDocument();
 
-    rerender(<ProjectDeleteAction onDelete={onDelete} isOwner />);
+    rerender(<ProjectDeleteAction onDelete={onDelete} onMemberRemove={onMemberRemove} isOwner teamMembers={[{ id: 1, user: 1, role: "owner" }]} />);
     fireEvent.click(screen.getByRole("button", { name: /Delete project/i }));
 
     expect(screen.getByTestId("hold-confirm-modal")).toBeInTheDocument();
@@ -350,7 +360,6 @@ describe("GroupWork low coverage components", () => {
       />,
     );
     fireEvent.click(screen.getByTitle("Delete task"));
-    fireEvent.click(screen.getByText("Hold to delete"));
     await waitFor(() => expect(onDelete).toHaveBeenCalledWith(22));
   });
 

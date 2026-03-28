@@ -101,6 +101,7 @@ vi.mock("../../../api/userApi", () => ({
 }));
 
 vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
   motion: {
     aside: ({ children, ...p }) => (
       <aside {...stripMotionProps(p)}>{children}</aside>
@@ -178,8 +179,8 @@ describe("CampusMap", () => {
 
   it("selecting a campus shows campus name in chip", async () => {
     await renderLoadedCampusMap();
-    const strandButtons = await screen.findAllByRole("button", { name: /Strand/ });
-    fireEvent.click(strandButtons[0]);
+    fireEvent.click(screen.getByRole("button", { name: /select campus/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: /^Strand$/i }).at(-1));
     await waitFor(() => expect(screen.getByPlaceholderText("Enter a destination")).toHaveValue("Strand Campus"));
     expect(screen.getAllByText("Strand Campus").length).toBeGreaterThan(0);
   });

@@ -53,7 +53,7 @@ describe("Tasks section coverage", () => {
 
     expect(onToggle).toHaveBeenCalledWith(1);
     expect(onDelete).toHaveBeenCalledWith(1);
-    expect(onEdit).toHaveBeenCalledWith(1, { title: "Renamed" });
+    expect(onEdit).toHaveBeenCalledWith(1, { title: "Renamed" }, { source: "test" });
 
     unmount();
     render(<CompletedTasksSection tasks={[{ id: 2, title: "Reading", task_list: 2, completed: true }]} sortBy="priority" listMap={{ "2": { idx: 1, name: "CS101 - Systems" } }} lists={[{ id: 2, name: "CS101 - Systems", color: "#eee" }]} onToggleComplete={onToggle} onDeleteTask={onDelete} onEditTask={onEdit} />);
@@ -76,5 +76,60 @@ describe("Tasks section coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: /\+ Add as task/i }));
     await waitFor(() => expect(convertReadingToTask).toHaveBeenCalledWith(1));
     await waitFor(() => expect(screen.queryByText("Matching reading")).not.toBeInTheDocument());
+  });
+
+  it("falls back to empty readings and null speed data when loading suggestions fails", async () => {
+    getSuggestedReadings.mockRejectedValueOnce(new Error("readings down"));
+    getReadingSpeed.mockRejectedValueOnce(new Error("speed down"));
+
+    render(
+      <SuggestedReadingsSection
+        activeList={{ id: 7, name: "PH4505 - Astrophysics" }}
+        taskCount={2}
+        pendingTasks={[]}
+        completedTasks={[]}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Suggested reading list/i })).toBeInTheDocument(),
+    );
+    expect(screen.queryByText("Matching reading")).not.toBeInTheDocument();
+  });
+
+  it("shows all suggestions for a non-reading list and calls onTaskAdded after converting", async () => {
+    getSuggestedReadings.mockResolvedValue([
+      { id: 11, title: "Any module reading", module_code: "CS101", module_name: "Systems", page_count: 20 },
+    ]);
+    convertReadingToTask.mockResolvedValue({});
+    const onTaskAdded = vi.fn();
+
+    render(
+      <SuggestedReadingsSection
+        activeList={{ id: 3, name: "Inbox" }}
+        onTaskAdded={onTaskAdded}
+        taskCount={3}
+        pendingTasks={[]}
+        completedTasks={[]}
+      />,
+    );
+
+    expect(await screen.findByText("Any module reading")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /\+ Add as task/i }));
+
+    await waitFor(() => expect(convertReadingToTask).toHaveBeenCalledWith(11));
+    await waitFor(() => expect(onTaskAdded).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.queryByText("Any module reading")).not.toBeInTheDocument());
+  });
+
+  it("handles missing active list and null suggestions payloads", async () => {
+    getSuggestedReadings.mockResolvedValueOnce(null);
+    getReadingSpeed.mockResolvedValueOnce(null);
+
+    render(<SuggestedReadingsSection taskCount={4} />);
+
+    expect(await screen.findByRole("button", { name: /Suggested reading list/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /\+ Add as task/i })).not.toBeInTheDocument();
   });
 });

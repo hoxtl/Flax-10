@@ -13,13 +13,13 @@ vi.mock('../../../api/moduleApi', () => ({
 
 vi.mock('../../../components/timer/task_input/taskInputUtils', () => ({
   buildListItems: vi.fn((lists) => lists.map((l) => ({ id: String(l.id), label: l.name }))),
-  buildModuleItems: vi.fn(() => []),
-  filterListItems: vi.fn((items) => items),
-  filterTasks: vi.fn((tasks) => tasks),
+  buildModuleItems: vi.fn((modules) => modules.map((m) => ({ value: m.code, label: m.name || m.code }))),
+  filterListItems: vi.fn((items, query) => query ? items.filter((item) => item.label.toLowerCase().includes(query.toLowerCase())) : items),
+  filterTasks: vi.fn((tasks, state) => state.search ? tasks.filter((task) => task.title.toLowerCase().includes(state.search.toLowerCase())) : tasks),
   getRecommendedTask: vi.fn((tasks) => tasks[0] || null),
-  groupModuleItems: vi.fn(() => ({})),
+  groupModuleItems: vi.fn((items) => items.reduce((acc, item) => ({ ...acc, [item.value.slice(0, 2)]: [...(acc[item.value.slice(0, 2)] || []), item] }), {})),
   hydrateTasks: vi.fn((tasks) => tasks),
-  mapEnrolledModules: vi.fn(() => []),
+  mapEnrolledModules: vi.fn(() => [{ code: 'CS', name: 'Computer Science' }]),
   sortTasks: vi.fn((tasks) => tasks),
 }));
 
@@ -250,5 +250,35 @@ describe('useTaskPickerData – enrolled modules', () => {
     await act(async () => {});
     expect(getModules).toHaveBeenCalled();
     expect(getEnrollments).toHaveBeenCalled();
+  });
+
+  it('derives visible filter items, grouped modules, and a recommended task', async () => {
+    const { result } = renderHook(() => useTaskPickerData());
+
+    await act(async () => {
+      await result.current.loadTasks();
+    });
+
+    act(() => {
+      result.current.setSearch('task');
+      result.current.setFilterQuery('work');
+    });
+
+    expect(result.current.visibleListItems).toEqual([{ id: '1', label: 'Work' }]);
+    expect(result.current.groupedModuleItems).toEqual({ CS: [{ value: 'CS', label: 'Computer Science' }] });
+    expect(result.current.moduleGroupKeys).toEqual(['CS']);
+    expect(result.current.filteredTasks).toEqual(TASKS);
+    expect(result.current.recommendedTask).toEqual(TASKS[0]);
+  });
+
+  it('ignores outside-close clicks when the ref is not mounted', () => {
+    const { result } = renderHook(() => useTaskPickerData());
+
+    act(() => result.current.setOpen(true));
+    act(() => {
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+
+    expect(result.current.open).toBe(true);
   });
 });

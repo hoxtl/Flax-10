@@ -58,16 +58,14 @@ function useThemePreferences(initialTheme, initialMode) {
   return { mode, setModeState, theme, setThemeState };
 }
 
-function usePersistedAttribute(attribute, storageKey, value) {
+function usePersistedMode(mode) {
   useEffect(() => {
-    document.documentElement.setAttribute(attribute, value);
-    localStorage.setItem(storageKey, value);
+    document.documentElement.setAttribute("data-mode", mode);
+    localStorage.setItem("mode", mode);
     // Explicitly declare color-scheme so the browser never applies automatic
     // dark-mode inversion (e.g. Chrome "Auto Dark Mode for Web Contents").
-    if (attribute === "data-mode") {
-      document.documentElement.style.colorScheme = value;
-    }
-  }, [attribute, storageKey, value]);
+    document.documentElement.style.colorScheme = mode;
+  }, [mode]);
 }
 
 function usePersistedTheme(theme) {
@@ -103,7 +101,7 @@ export function ThemeProvider({ children, initialTheme, initialMode }) {
   const { mode, setModeState, theme, setThemeState } = useThemePreferences(initialTheme, initialMode);
   const { applyModeChange } = useThemeSession(mode, setModeState);
   const controls = useThemeControls(mode, applyModeChange, theme, setThemeState);
-  usePersistedAttribute("data-mode", "mode", mode);
+  usePersistedMode(mode);
   usePersistedTheme(theme);
   useThemePersistence(mode, theme);
   return <ThemeContext.Provider value={{ mode, theme, ...controls }}>{children}</ThemeContext.Provider>;

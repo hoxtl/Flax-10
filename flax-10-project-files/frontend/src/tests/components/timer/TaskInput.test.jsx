@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../../../utils/testUtils';
+import { act } from '@testing-library/react';
 import { TaskInput } from '../../../components/timer/components/TimerComponents';
+import { openPicker, pickRecommendedTask } from '../../../components/timer/components/TaskInput';
 
 // Keep dropdowns testable (native controls)
 vi.mock('../../../components/common/animated_dropdown', () => ({
@@ -65,7 +67,7 @@ describe('TaskInput', () => {
     });
 
     expect(screen.getByText('Select a Task')).toBeTruthy();
-    expect(screen.getByText('Urgent task')).toBeTruthy();
+    expect(await screen.findByText('Urgent task')).toBeTruthy();
     expect(screen.getByText('High task')).toBeTruthy();
   });
 
@@ -125,5 +127,80 @@ describe('TaskInput', () => {
     fireEvent.click(screen.getByText('Urgent task'));
     expect(onChange).toHaveBeenCalledWith('Urgent task');
     expect(onTaskSelect).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+  });
+
+  it('smart-picks the recommended task from the modal', async () => {
+    const onChange = vi.fn();
+    const onTaskSelect = vi.fn();
+    renderTaskInput({ onChange, onTaskSelect });
+
+    fireEvent.click(screen.getByText('Choose a task to focus'));
+    await waitFor(() => expect(fetchApi).toHaveBeenCalled());
+    expect(await screen.findByText('Urgent task')).toBeTruthy();
+
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByText('✦ Smart Pick — choose a task for me'));
+    act(() => {
+      vi.advanceTimersByTime(140);
+    });
+
+    expect(onChange).toHaveBeenCalled();
+    expect(onTaskSelect).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('only loads tasks when the picker is opened from a closed state', () => {
+    const closedState = { open: false, loadTasks: vi.fn(), setOpen: vi.fn() };
+    const openState = { open: true, loadTasks: vi.fn(), setOpen: vi.fn() };
+
+    openPicker(closedState);
+    openPicker(openState);
+
+    expect(closedState.loadTasks).toHaveBeenCalledTimes(1);
+    expect(openState.loadTasks).not.toHaveBeenCalled();
+    expect(closedState.setOpen).toHaveBeenCalledTimes(1);
+    expect(openState.setOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('picks the recommended task after the smart-pick delay', () => {
+    vi.useFakeTimers();
+    const recommendedTask = { id: 9, title: 'Recommended task' };
+    const state = {
+      recommendedTask,
+      setRecommendedTaskId: vi.fn(),
+      setSelectedTaskId: vi.fn(),
+      setOpen: vi.fn(),
+    };
+    const onChange = vi.fn();
+    const onTaskSelect = vi.fn();
+
+    pickRecommendedTask(state, onChange, onTaskSelect);
+    expect(state.setRecommendedTaskId).toHaveBeenCalledWith(9);
+
+    vi.advanceTimersByTime(140);
+
+    expect(state.setSelectedTaskId).toHaveBeenCalledWith(9);
+    expect(onChange).toHaveBeenCalledWith('Recommended task');
+    expect(state.setOpen).toHaveBeenCalledWith(false);
+    expect(onTaskSelect).toHaveBeenCalledWith(recommendedTask);
+    vi.useRealTimers();
+  });
+
+  it('does nothing when there is no recommended task to pick', () => {
+    vi.useFakeTimers();
+    const state = {
+      recommendedTask: null,
+      setRecommendedTaskId: vi.fn(),
+      setSelectedTaskId: vi.fn(),
+      setOpen: vi.fn(),
+    };
+
+    pickRecommendedTask(state, vi.fn(), vi.fn());
+    vi.runAllTimers();
+
+    expect(state.setRecommendedTaskId).not.toHaveBeenCalled();
+    expect(state.setSelectedTaskId).not.toHaveBeenCalled();
+    expect(state.setOpen).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

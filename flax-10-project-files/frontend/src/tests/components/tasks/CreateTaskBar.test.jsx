@@ -74,9 +74,9 @@ describe('CreateTaskBar', () => {
         expect(screen.getByLabelText('Add task')).toBeTruthy();
     });
 
-    it('calls onAddTask on form submit', async () => {
+  it('calls onAddTask on form submit', async () => {
         const onAddTask = vi.fn().mockResolvedValue({ id: 1, title: 'My task' });
-        const { container } = render(<CreateTaskBar lists={defaultLists} onAddTask={onAddTask} />);
+        const { container } = render(<CreateTaskBar lists={defaultLists} onAddTask={onAddTask} defaultListId={1} />);
         const input = screen.getByPlaceholderText('Quick add: what needs to be done?');
         fireEvent.change(input, { target: { value: 'My task' } });
         fireEvent.submit(container.querySelector('form'));
@@ -95,9 +95,9 @@ describe('CreateTaskBar', () => {
         expect(onAddTask).not.toHaveBeenCalled();
     });
 
-    it('clears input after submit', async () => {
+  it('clears input after submit', async () => {
         const onAddTask = vi.fn().mockResolvedValue({ id: 1, title: 'My task' });
-        const { container } = render(<CreateTaskBar lists={defaultLists} onAddTask={onAddTask} />);
+        const { container } = render(<CreateTaskBar lists={defaultLists} onAddTask={onAddTask} defaultListId={1} />);
         const input = screen.getByPlaceholderText('Quick add: what needs to be done?');
         fireEvent.change(input, { target: { value: 'My task' } });
         fireEvent.submit(container.querySelector('form'));
@@ -128,9 +128,9 @@ describe('CreateTaskBar', () => {
         expect(btn50.getAttribute('aria-pressed')).toBe('true');
     });
 
-    it('passes estimated_blocks to onAddTask', async () => {
+  it('passes estimated_blocks to onAddTask', async () => {
         const onAddTask = vi.fn().mockResolvedValue({ id: 1, title: 'Task' });
-        const { container } = render(<CreateTaskBar lists={defaultLists} onAddTask={onAddTask} />);
+        const { container } = render(<CreateTaskBar lists={defaultLists} onAddTask={onAddTask} defaultListId={1} />);
         focusQuickAddInput();
         fireEvent.click(screen.getByLabelText('50 minutes (2 Pomodoro blocks)'));
         const input = screen.getByPlaceholderText('Quick add: what needs to be done?');

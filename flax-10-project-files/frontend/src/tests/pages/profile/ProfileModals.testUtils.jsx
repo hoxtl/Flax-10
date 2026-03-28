@@ -6,12 +6,12 @@ import { render } from "@testing-library/react";
 import { vi } from "vitest";
 import { createFnMap } from "../../utils/testBuilderUtils";
 
-vi.mock("../../../components/dashboard/EditProfileModal", () => ({
+vi.mock("../../../components/dashboard/components/EditProfileModal", () => ({
   default: ({ isOpen, onClose }) =>
     isOpen ? <div data-testid="edit-profile-modal"><button onClick={onClose}>Close Edit</button></div> : null,
 }));
 
-vi.mock("../../../components/social/UserListModal", () => ({
+vi.mock("../../../components/social/components/UserListModal", () => ({
   default: ({ title, users, onClose, onUserClick, onUserCalendarClick, showCalendarAction }) => (
     <div data-testid="user-list-modal">
       <span>{title}</span>
@@ -51,10 +51,11 @@ vi.mock("../../../pages/profile/hooks/useProfileModalsData", async () => {
   };
 });
 
-import ProfileModals, { SocietiesModal } from "../../../pages/profile/ProfileModals";
+import ProfileModals, { SocietiesModal } from "../../../pages/profile/components/ProfileModals";
+import { getModules } from "../../../api/moduleApi";
 import { useTasksModalData } from "../../../pages/profile/hooks/useProfileModalsData";
 
-export { useTasksModalData };
+export { getModules, useTasksModalData };
 
 const modalStateDefaults = {
   showEditProfile: false,

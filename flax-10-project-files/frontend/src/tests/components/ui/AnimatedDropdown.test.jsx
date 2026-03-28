@@ -160,6 +160,26 @@ describe('AnimatedDropdown', () => {
     expect(screen.getByText('Try a different search term')).toBeInTheDocument();
   });
 
+  it('stops search input clicks from bubbling to parent containers', () => {
+    const parentClick = vi.fn();
+
+    render(
+      <div onClick={parentClick}>
+        <AnimatedDropdown
+          value=""
+          onChange={vi.fn()}
+          placeholder="Search"
+          options={OPTIONS}
+          searchable
+          isOpen={true}
+        />
+      </div>,
+    );
+
+    fireEvent.click(screen.getByPlaceholderText('Search...'));
+    expect(parentClick).not.toHaveBeenCalled();
+  });
+
   it('renders grouped options with the current item checked', () => {
     const grouped = [
       { label: 'Letters', options: [{ value: 'a1', label: 'Alpha' }, { value: 'a2', label: 'Beta' }] },

@@ -133,6 +133,8 @@ describe("timer hook extras", () => {
       expect(endEarly).toHaveBeenCalled();
       goalHandlers.overtimeBreak();
       expect(startNext).toHaveBeenCalled();
+      goalHandlers.autoBreakDone();
+      expect(timer.setIsActive).toHaveBeenCalledWith(false);
     });
 
     it("auto-starts breaks when preference is enabled", async () => {

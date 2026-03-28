@@ -56,11 +56,17 @@ describe("profile insights more", () => {
   });
 
   it("returns null peak hour for empty heatmaps and all-zero totals", () => {
+    const { result: missing } = renderHook(() => usePeakHour(null));
+    expect(missing.current).toBeNull();
+
     const { result: empty } = renderHook(() => usePeakHour([]));
     expect(empty.current).toBeNull();
 
     const { result: zeroes } = renderHook(() => usePeakHour([[0, 0, 0], [0, 0, 0]]));
     expect(zeroes.current).toBeNull();
+
+    const { result: peak } = renderHook(() => usePeakHour([[0, 4, 1], [0, 2, 3]]));
+    expect(peak.current).toBe(1);
   });
 
   it("does not fetch the current-user summary when viewing yourself and swallows failures otherwise", async () => {

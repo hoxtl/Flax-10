@@ -73,10 +73,17 @@ describe('OnboardingForm', () => {
     expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
 
-  it('reports when a dropdown opens', () => {
+  it('reports when the year dropdown opens', () => {
     const onDropdownOpenChange = vi.fn();
     renderForm({ onDropdownOpenChange });
     fireEvent.click(screen.getByText('Select your year-open'));
     expect(onDropdownOpenChange).toHaveBeenCalledWith('year', true);
+  });
+
+  it('reports when the course dropdown opens', () => {
+    const onDropdownOpenChange = vi.fn();
+    renderForm({ onDropdownOpenChange });
+    fireEvent.click(screen.getByText('Select your course-open'));
+    expect(onDropdownOpenChange).toHaveBeenCalledWith('course', true);
   });
 });

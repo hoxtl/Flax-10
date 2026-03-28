@@ -144,7 +144,7 @@ describe("UserJourneySection", () => {
       await Promise.resolve();
     });
 
-    expect(screen.getByRole("button", { name: /enter both locations/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /calculate route/i })).toBeDisabled();
   });
 
   it("geocodes text input and keeps calculate disabled until both locations resolve", async () => {
@@ -154,10 +154,26 @@ describe("UserJourneySection", () => {
 
     render(<JourneyHarness initialStart="Bush House" initialDestination="Waterloo" />);
 
-    expect(screen.getByRole("button", { name: /enter both locations/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /calculate route/i })).toBeDisabled();
     await waitFor(() => expect(geocodeAddressMock).toHaveBeenCalledWith("Bush House"));
     await waitFor(() => expect(geocodeAddressMock).toHaveBeenCalledWith("Waterloo"));
     await waitFor(() => expect(screen.getByRole("button", { name: /calculate route/i })).toBeEnabled());
+  });
+
+  it("guards the calculate handler when coordinates are still unresolved", () => {
+    const onCalculate = vi.fn();
+    geocodeAddressMock.mockImplementation(() => new Promise(() => {}));
+
+    render(<JourneyHarness initialStart="Bush House" initialDestination="Waterloo" onCalculate={onCalculate} />);
+
+    const calculateButton = screen.getByRole("button", { name: /calculate route/i });
+    expect(calculateButton).toBeDisabled();
+
+    calculateButton.disabled = false;
+    calculateButton.removeAttribute("disabled");
+    fireEvent.click(calculateButton);
+
+    expect(onCalculate).not.toHaveBeenCalled();
   });
 
   it("disables geolocation buttons while locating", () => {
@@ -276,6 +292,6 @@ describe("CampusMapSidebar", () => {
       disruptions={[]} loadingDisruptions={false}
     />);
     const props = JSON.parse(screen.getByTestId("sidebar").dataset.props);
-    expect(props.animate).toBeUndefined();
+    expect(props.animate).toBe("closed");
   });
 });

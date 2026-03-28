@@ -7,6 +7,7 @@ const useSelectedProjectId = vi.fn();
 const useGroupProjects = vi.fn();
 const useGroupProjectSort = vi.fn();
 const useToast = vi.fn();
+const useAuthMock = vi.fn();
 const useGroupTasksTabState = vi.fn();
 const buildBoardColumns = vi.fn();
 const getProjectDate = vi.fn();
@@ -84,6 +85,10 @@ vi.mock("../../../context/ToastContext", () => ({
   useToast: () => useToast(),
 }));
 
+vi.mock("../../../context/AuthContext", () => ({
+  useAuth: () => useAuthMock(),
+}));
+
 vi.mock("../../../pages/group_work/hooks/groupWorkHooks", () => ({
   useSelectedProjectId: () => useSelectedProjectId(),
   useGroupProjects: () => useGroupProjects(),
@@ -152,6 +157,9 @@ vi.mock("lucide-react", () => ({
   BookOpen: () => <span>book-open</span>,
   UserRound: () => <span>user-round</span>,
   Trash2: () => <span>trash-icon</span>,
+  LogOut: () => <span>logout-icon</span>,
+  Settings: () => <span>settings-icon</span>,
+  Search: () => <span>search-icon</span>,
 }));
 
 vi.mock("../../../components/common/app_page/AppPage", () => ({
@@ -193,12 +201,15 @@ vi.mock("../../../pages/group_work/utils/projectRowUtils", () => ({
   getProjectTeacherName: (...args) => getProjectTeacherName(...args),
   getProjectMemberCount: (...args) => getProjectMemberCount(...args),
   openTeacherProfile: (...args) => openTeacherProfile(...args),
+  getDaysLeft: vi.fn(() => 5),
 }));
 
 vi.mock("../../../pages/group_work/utils/memberAvatarUtils", () => ({
   getDisplayName: vi.fn((member) => member.name || member.username || "Member"),
   openMemberProfile: vi.fn(),
   getStoredViewer: (...args) => getStoredViewer(...args),
+  getCurrentMember: vi.fn(() => null),
+  getMemberKey: vi.fn((member) => String(member?.user || member?.id || "")),
 }));
 
 vi.mock("../../../components/common/deadline_countdown/DeadlineCountdown", () => ({
@@ -253,10 +264,12 @@ import GroupWorkIndexPage from "../../../pages/group_work/GroupWorkIndexPage";
 import ProjectHeader from "../../../pages/group_work/components/ProjectHeader";
 import ProjectDeleteAction from "../../../pages/group_work/components/ProjectHeaderSub";
 import ProjectProgress from "../../../pages/group_work/components/ProjectProgress";
+import { getDaysLeft } from "../../../pages/group_work/utils/projectRowUtils";
 
 describe("GroupWork pages and header extras", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthMock.mockReturnValue({ profile: { id: 1 } });
     useToast.mockReturnValue(vi.fn());
     useGroupProjectSort.mockReturnValue({ sortBy: "deadline", setSortBy: vi.fn() });
     getProjectDate.mockReturnValue(new Date("2026-03-30T00:00:00.000Z"));
@@ -371,12 +384,128 @@ describe("GroupWork pages and header extras", () => {
     });
 
     it("treats a non-owner viewer as unable to delete the project", () => {
+      useAuthMock.mockReturnValueOnce({ profile: { id: 99 } });
       getStoredViewer.mockReturnValueOnce({ id: 99, user: 99 });
       renderProjectHeaderWith({
         teamMembers: [{ id: 2, user: 2, role: "member", name: "Member" }],
       });
 
-      expect(screen.getByRole("button", { name: /Delete project/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /Leave project/i })).toBeInTheDocument();
+    });
+  });
+
+  describe("ProjectUrgentBanner and deadline labels", () => {
+    it("renders 'due today' when the most urgent project has 0 days left", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(0);
+      getProjectDate.mockReturnValue(new Date());
+      const project = { id: 10, name: "Urgent Today", deadline: "2026-03-27T00:00:00.000Z" };
+      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      render(<GroupWorkIndexPage />);
+      expect(screen.getByText("Urgent Today")).toBeInTheDocument();
+      expect(screen.getByText(/due today/)).toBeInTheDocument();
+      expect(screen.getByText("Schedule meeting slots")).toBeInTheDocument();
+    });
+
+    it("renders 'due tomorrow' when the most urgent project has 1 day left", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(1);
+      getProjectDate.mockReturnValue(new Date());
+      const project = { id: 11, name: "Urgent Tomorrow", deadline: "2026-03-28T00:00:00.000Z" };
+      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      render(<GroupWorkIndexPage />);
+      expect(screen.getByText("Urgent Tomorrow")).toBeInTheDocument();
+      expect(screen.getByText(/due tomorrow/)).toBeInTheDocument();
+    });
+
+    it("renders 'due in N days' for projects with 2-7 days left", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(3);
+      getProjectDate.mockReturnValue(new Date());
+      const project = { id: 12, name: "Soon Project", deadline: "2026-03-30T00:00:00.000Z" };
+      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      render(<GroupWorkIndexPage />);
+      expect(screen.getByText("Soon Project")).toBeInTheDocument();
+      expect(screen.getByText(/due in 3 days/)).toBeInTheDocument();
+    });
+
+    it("does not render the banner when no projects are urgent (getMostUrgentProject returns null)", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(null);
+      getProjectDate.mockReturnValue(null);
+      const project = { id: 13, name: "No Deadline", deadline: null };
+      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      render(<GroupWorkIndexPage />);
+      expect(screen.queryByText("Schedule meeting slots")).not.toBeInTheDocument();
+    });
+
+    it("does not render the banner when projects list is empty", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(null);
+      useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: false });
+      render(<GroupWorkIndexPage />);
+      expect(screen.queryByText("Schedule meeting slots")).not.toBeInTheDocument();
+    });
+
+    it("navigates to the schedule tab when 'Schedule meeting slots' is clicked (goToSchedule)", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(2);
+      getProjectDate.mockReturnValue(new Date());
+      const project = { id: 14, name: "Schedule Test", deadline: "2026-03-29T00:00:00.000Z" };
+      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      render(<GroupWorkIndexPage />);
+      fireEvent.click(screen.getByText("Schedule meeting slots"));
+      expect(mockNavigate).toHaveBeenCalledWith("/group-work?project=14&tab=availability");
+    });
+
+    it("does not render the banner when project deadline is beyond 7 days", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(10);
+      getProjectDate.mockReturnValue(new Date("2026-04-06T00:00:00.000Z"));
+      const project = { id: 15, name: "Far Away", deadline: "2026-04-06T00:00:00.000Z" };
+      useGroupProjects.mockReturnValue({ projects: [project], setProjects: vi.fn(), loading: false });
+      render(<GroupWorkIndexPage />);
+      expect(screen.queryByText("Schedule meeting slots")).not.toBeInTheDocument();
+    });
+
+    it("chooses the most urgent project when several qualify", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      getProjectDate.mockImplementation((deadline) => new Date(deadline));
+      getDaysLeft.mockImplementation((date) => {
+        const day = date.getUTCDate();
+        if (day === 30) return 3;
+        if (day === 29) return 2;
+        return null;
+      });
+      useGroupProjects.mockReturnValue({
+        projects: [
+          { id: 21, name: "Less urgent", deadline: "2026-03-30T00:00:00.000Z" },
+          { id: 22, name: "Most urgent", deadline: "2026-03-29T00:00:00.000Z" },
+        ],
+        setProjects: vi.fn(),
+        loading: false,
+      });
+
+      render(<GroupWorkIndexPage />);
+
+      expect(screen.getByText("Most urgent")).toBeInTheDocument();
+      expect(screen.getByText(/due in 2 days/)).toBeInTheDocument();
+      expect(screen.queryByText("Less urgent")).toBeNull();
+    });
+  });
+
+  describe("GroupWorkOverview handleProjectCreated", () => {
+    it("calls showToast when a project is created via the callback", () => {
+      const toast = vi.fn();
+      useToast.mockReturnValue(toast);
+      const setProjects = vi.fn();
+      useSelectedProjectId.mockReturnValue(null);
+      getDaysLeft.mockReturnValue(null);
+      useGroupProjects.mockReturnValue({ projects: [{ id: 1, name: "Alpha" }], setProjects, loading: false });
+      render(<GroupWorkIndexPage />);
+      fireEvent.click(screen.getByText("prepend-project"));
+      expect(toast).toHaveBeenCalledWith("Group project created successfully!");
+      expect(setProjects).toHaveBeenCalled();
     });
   });
 });

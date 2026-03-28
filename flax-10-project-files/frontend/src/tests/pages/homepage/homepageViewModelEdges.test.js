@@ -20,6 +20,7 @@ vi.mock("../../../pages/homepage/utils", () => ({
 }));
 
 import {
+  buildTaskWidgetItem,
   getDeadlineSuggestions,
   getEnrolledModules,
   getHomepageRecommendation,
@@ -90,6 +91,7 @@ describe("homepageViewModel fallbacks", () => {
     expect(getSortedEvents(null)).toEqual([]);
     expect(getSortedEvents([{ id: 10, start_time: "2026-03-24T09:00:00.000Z" }])).toEqual([{ id: 10, start_time: "2026-03-24T09:00:00.000Z" }]);
     expect(getSortedEvents([{ id: 9, title: "Lunch" }])).toEqual([{ id: 9, title: "Lunch" }]);
+    expect(getSortedEvents([{ id: 11, title: "Lunch", start_time: null }])).toEqual([{ id: 11, title: "Lunch", start_time: null }]);
     expect(getPastItems(null, new Date("2026-03-24T10:00:00.000Z"))).toEqual([]);
     expect(Array.from(getPastIdsShownInTimeline(null, null))).toEqual([]);
     expect(getUpcomingItems(null, [])).toEqual([]);
@@ -99,6 +101,12 @@ describe("homepageViewModel fallbacks", () => {
   it("skips past items when the item is active 'now'", () => {
     isNowMock.mockReturnValue(true);
     expect(getPastItems([{ id: 1, start_time: "2026-03-24T08:00:00.000Z", end_time: "2026-03-24T09:00:00.000Z" }], new Date("2026-03-24T10:00:00.000Z"))).toEqual([]);
+  });
+
+  it("uses start_time as the past-item fallback end when end_time is missing", () => {
+    expect(
+      getPastItems([{ id: 40, start_time: "2026-03-24T08:00:00.000Z" }], new Date("2026-03-24T10:00:00.000Z")),
+    ).toEqual([{ id: 40, start_time: "2026-03-24T08:00:00.000Z" }]);
   });
 
   it("filters shown timeline history ids cleanly", () => {
@@ -140,18 +148,87 @@ describe("homepageViewModel fallbacks", () => {
     expect(getTaskWidgetList(null, now)).toEqual([]);
     expect(getTaskWidgetList([{ id: 2, title: "No due date", completed: false }], now)).toEqual([]);
     expect(getTaskWidgetList([{ id: 1, title: "Done", completed: true, due_date: "2026-03-24T11:00:00.000Z", priority: "low" }], now)).toEqual([expect.objectContaining({ id: 1, taskWidgetStatus: "completed" })]);
+    expect(
+      getTaskWidgetList([
+        { id: 3, title: "Overdue today card", completed: false, due_date: "2026-03-24T00:00:00.000Z", priority: "high", estimated_blocks: 0 },
+      ], now),
+    ).toEqual([expect.objectContaining({ id: 3, taskWidgetStatus: "upcoming", priority: "high", endTime: new Date("2026-03-24T00:25:00.000Z") })]);
   });
 
   it("keeps only the supplied today widget items", () => {
     const getDisp = (itemsOnly, allTasks = []) => getTaskWidgetDisplayList(allTasks, now, itemsOnly).map(t => t.id);
     expect(getDisp([{ id: "overdue", due_date: "2026-03-24T08:00Z", sortTime: new Date("2026-03-24T08:00Z"), taskWidgetStatus: "overdue" }, { id: "upcoming", due_date: "2026-03-24T12:00Z", sortTime: new Date("2026-03-24T12:00Z"), taskWidgetStatus: "upcoming" }])).toEqual(["overdue", "upcoming"]);
     expect(getDisp([{ id: "today", due_date: "2026-03-24T12:00Z", sortTime: new Date("2026-03-24T12:00Z"), taskWidgetStatus: "upcoming" }], [{ id: "future", due_date: "2026-03-28T12:00Z" }])).toEqual(["today"]);
+    expect(getTaskWidgetDisplayList([], now)).toEqual([]);
+    expect(getTaskWidgetDisplayList([], now, null)).toEqual([]);
   });
 
   it("sorts display candidates tightly", () => {
     const list = getTaskWidgetDisplayList([], now, [{ id: "u2", due_date: "2026-03-24T12:00Z", taskWidgetStatus: "upcoming" }, { id: "u1", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }, { id: "u3", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }]);
     expect(list.map(t => t.id)).toContain("u1");
     expect(getTaskWidgetDisplayList([], now, [{ id: "named", title: "Named", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }, { id: "untitled", due_date: "2026-03-24T10:00Z", taskWidgetStatus: "upcoming" }]).map(t => t.id)).toContain("untitled");
+    expect(
+      getTaskWidgetDisplayList([], now, [
+        { id: "late-overdue", title: "Late", sortTime: new Date("2026-03-24T11:00:00.000Z"), taskWidgetStatus: "overdue", priority: "high" },
+        { id: "early-overdue", title: "Early", sortTime: new Date("2026-03-24T09:00:00.000Z"), taskWidgetStatus: "overdue", priority: "high" },
+      ]).map((t) => t.id),
+    ).toEqual(["early-overdue", "late-overdue"]);
+  });
+
+  it("handles undefined widget statuses and recommendation fallbacks", () => {
+    const sorted = getTaskWidgetDisplayList([], now, [
+      { id: "no-status", title: "No status", sortTime: new Date("2026-03-24T10:00:00.000Z") },
+      { id: "overdue", title: "Overdue", sortTime: new Date("2026-03-24T09:00:00.000Z"), taskWidgetStatus: "overdue" },
+    ]);
+    expect(sorted.map((item) => item.id)).toEqual(["overdue", "no-status"]);
+
+    expect(
+      getHomepageRecommendation(
+        [{ id: 30, title: "Fallback text task", completed: false, module_code: "BIO" }],
+        [{ id: 31, start_due_date: "2026-03-24T20:00:00.000Z", module_code: "BIO" }],
+        null,
+      ),
+    ).toEqual({
+      meta: "BIO · due today",
+      taskTitle: "Fallback text task",
+      text: "Focus on Fallback text task for BIO.",
+    });
+
+    expect(
+      getHomepageRecommendation(
+        [{ id: 32, title: "Last fallback", completed: false }],
+        [{ id: 33, start_due_date: "2026-03-24T20:00:00.000Z" }],
+        null,
+      ),
+    ).toEqual({
+      meta: "Module · due today",
+      taskTitle: "Last fallback",
+      text: "Focus on Last fallback for upcoming deadline.",
+    });
+
+    expect(
+      getHomepageRecommendation(
+        [{ id: 34, title: "No match task", completed: false, module_code: "CHEM" }],
+        [{ id: 35, start_due_date: "2026-03-24T20:00:00.000Z", module_code: "BIO" }],
+        null,
+      ),
+    ).toBeNull();
+  });
+
+  it("builds direct overdue widget items through the exported helper", () => {
+    const item = buildTaskWidgetItem(
+      { id: 99, title: "Direct overdue", completed: false, due_date: "2026-03-23T23:00:00.000Z", priority: "low", estimated_blocks: 0 },
+      new Date("2026-03-24T23:59:59.999Z"),
+    );
+
+    expect(item).toEqual(
+      expect.objectContaining({
+        id: 99,
+        taskWidgetStatus: "overdue",
+        priority: "medium",
+        endTime: new Date("2026-03-23T23:25:00.000Z"),
+      }),
+    );
   });
 
   it("calculates widget percentages and counts securely", () => {
@@ -174,5 +251,27 @@ describe("homepageViewModel fallbacks", () => {
     expect(getHomepageRecommendation([{ id: 10, title: "Empty key task", completed: false }], [{ id: 11, title: "Deadline only", start_due_date: "2026-03-28T20:00Z" }], null)).toEqual({ meta: "Module · due in 4d", taskTitle: "Empty key task", text: "Focus on Empty key task for Deadline only." });
     expect(getHomepageRecommendation([{ id: 11, title: "Sort deadlines", completed: false }], [{ id: 12, start_due_date: "2026-03-29T20:00Z" }, { id: 13, title: "Sooner deadline", start_due_date: "2026-03-25T20:00Z" }], null)).toEqual({ meta: "Module · due tomorrow", taskTitle: "Sort deadlines", text: "Focus on Sort deadlines for Sooner deadline." });
     expect(getHomepageRecommendation([{ id: 8, title: "No window yet", completed: false }], [], null)).toBeNull();
+    expect(
+      getHomepageRecommendation(
+        [{ id: 14, title: "Use free slot", completed: false }],
+        [],
+        "90m",
+      ),
+    ).toEqual({
+      meta: "Best task to move next",
+      taskTitle: "Use free slot",
+      text: "Use the 90m window to move Use free slot forward.",
+    });
+    expect(
+      getHomepageRecommendation(
+        [{ id: 15, title: "Fallback deadline task", completed: false }],
+        [{ id: 16, start_due_date: "2026-03-24T20:00:00.000Z" }],
+        null,
+      ),
+    ).toEqual({
+      meta: "Module · due today",
+      taskTitle: "Fallback deadline task",
+      text: "Focus on Fallback deadline task for upcoming deadline.",
+    });
   });
 });
