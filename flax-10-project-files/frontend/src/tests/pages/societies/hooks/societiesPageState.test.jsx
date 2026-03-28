@@ -16,15 +16,15 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("../../components/society/hooks/useSocieties", () => ({
+vi.mock("../../../../components/society/hooks/useSocieties", () => ({
   useSocieties: () => useSocietiesMock(),
 }));
 
-vi.mock("../../components/society/hooks/useUnreportSociety", () => ({
+vi.mock("../../../../components/society/hooks/useUnreportSociety", () => ({
   useUnreportSociety: (...args) => useUnreportSocietyMock(...args),
 }));
 
-import { useSocietiesPage } from "../../pages/societies/hooks/societiesPageState";
+import { useSocietiesPage } from "../../../../pages/societies/hooks/societiesPageState";
 
 describe("useSocietiesPage", () => {
   beforeEach(() => {

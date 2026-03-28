@@ -10,7 +10,7 @@ import {
   societyDetailPageStateMocks,
 } from "./societyDetailPageTestUtils.jsx";
 
-import SocietyDetailPage from "../../pages/societies/components/SocietyDetailPage";
+import SocietyDetailPage from "../../../../pages/societies/components/SocietyDetailPage";
 
 describe("SocietyDetailPage modal props", () => {
   beforeEach(() => {

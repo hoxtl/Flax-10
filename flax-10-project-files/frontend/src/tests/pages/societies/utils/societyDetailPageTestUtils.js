@@ -4,7 +4,7 @@
 
 import { vi } from "vitest";
 
-import { createFnMap } from "../utils/testBuilderUtils";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 
 const actionNames = [
   "updateSociety",
