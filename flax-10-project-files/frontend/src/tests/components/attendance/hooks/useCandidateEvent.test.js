@@ -1,29 +1,29 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useCandidateEvent } from "../../../components/attendance/hooks/useCandidateEvent";
-import { getEvents } from "../../../api/eventApi";
+import { useCandidateEvent } from "../../../../components/attendance/hooks/useCandidateEvent";
+import { getEvents } from "../../../../api/eventApi";
 import {
   getLastPromptShownAt,
   getSkippedIds,
   setLastPromptShownAt,
-} from "../../../components/attendance/utils/attendancePromptStorage";
+} from "../../../../components/attendance/utils/attendancePromptStorage";
 import {
   findCandidateEvent,
   getDateRangeForPrompt,
-} from "../../../components/attendance/utils/attendancePromptUtils";
+} from "../../../../components/attendance/utils/attendancePromptUtils";
 
-vi.mock("../../../api/eventApi", () => ({
+vi.mock("../../../../api/eventApi", () => ({
   getEvents: vi.fn(),
 }));
 
-vi.mock("../../../components/attendance/utils/attendancePromptStorage", () => ({
+vi.mock("../../../../components/attendance/utils/attendancePromptStorage", () => ({
   getLastPromptShownAt: vi.fn(),
   getSkippedIds: vi.fn(),
   setLastPromptShownAt: vi.fn(),
 }));
 
-vi.mock("../../../components/attendance/utils/attendancePromptUtils", () => ({
+vi.mock("../../../../components/attendance/utils/attendancePromptUtils", () => ({
   findCandidateEvent: vi.fn(),
   getDateRangeForPrompt: vi.fn(),
 }));

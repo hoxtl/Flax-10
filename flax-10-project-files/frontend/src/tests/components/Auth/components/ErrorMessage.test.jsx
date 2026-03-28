@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { ErrorMessage } from '../../../components/Auth/components/ErrorMessage';
+import { ErrorMessage } from '../../../../components/Auth/components/ErrorMessage';
 
 describe('ErrorMessage', () => {
     it('renders nothing when error is null', () => {

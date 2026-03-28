@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import AuthHeroGeometric from '../../../components/Auth/components/AuthHeroGeometric';
+import AuthHeroGeometric from '../../../../components/Auth/components/AuthHeroGeometric';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -10,7 +10,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../components/Auth/styles/AuthHeroGeometric.module.css', () => ({
+vi.mock('../../../../components/Auth/styles/AuthHeroGeometric.module.css', () => ({
   default: {
     hero: 'hero',
     glow: 'glow',

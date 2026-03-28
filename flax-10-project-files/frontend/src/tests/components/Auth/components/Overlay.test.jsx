@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AuthOverlay } from '../../../components/Auth/components/Overlay';
+import { AuthOverlay } from '../../../../components/Auth/components/Overlay';
 
 describe('AuthOverlay', () => {
     it('renders "Already have an account?" when signIn is false', () => {

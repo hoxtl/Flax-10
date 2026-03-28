@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent } from "@testing-library/react";
 
-import { render, screen } from "../../../utils/testUtils";
+import { render, screen } from "../../../../utils/testUtils";
 
 const dismissAttendancePromptMock = vi.fn();
 const submitAttendancePromptAnswerMock = vi.fn();
 const candidateState = { setValue: vi.fn(), value: null };
 
-vi.mock("../../../components/attendance/components/AttendancePromptModal", () => ({
+vi.mock("../../../../components/attendance/components/AttendancePromptModal", () => ({
   default: ({ onAnswer, onDismiss }) => (
     <div>
       <button type="button" onClick={() => onAnswer(true, { closeDelayMs: 0 })}>
@@ -20,16 +20,16 @@ vi.mock("../../../components/attendance/components/AttendancePromptModal", () =>
   ),
 }));
 
-vi.mock("../../../components/attendance/utils/attendancePromptActions", () => ({
+vi.mock("../../../../components/attendance/utils/attendancePromptActions", () => ({
   dismissAttendancePrompt: (...args) => dismissAttendancePromptMock(...args),
   submitAttendancePromptAnswer: (...args) => submitAttendancePromptAnswerMock(...args),
 }));
 
-vi.mock("../../../components/attendance/hooks/useCandidateEvent", () => ({
+vi.mock("../../../../components/attendance/hooks/useCandidateEvent", () => ({
   useCandidateEvent: () => [candidateState.value, candidateState.setValue],
 }));
 
-import AttendancePrompt from "../../../components/attendance/components/AttendancePrompt";
+import AttendancePrompt from "../../../../components/attendance/components/AttendancePrompt";
 
 describe("AttendancePrompt bindings", () => {
   beforeEach(() => {
