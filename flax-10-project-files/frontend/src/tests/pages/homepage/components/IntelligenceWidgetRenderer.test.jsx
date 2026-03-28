@@ -4,7 +4,7 @@ import React from "react";
 
 const getEventTypeMock = vi.fn((event) => event.kind || "other");
 
-vi.mock("../../../../pages/homepage/components/IntelligenceWidgets", () => ({
+vi.mock("@/pages/homepage/components/IntelligenceWidgets", () => ({
   IntelligenceHero: (props) => (
     <div data-testid="hero">
       <button type="button" onClick={props.onDismissCourseChange}>dismiss-course-change</button>
@@ -13,60 +13,60 @@ vi.mock("../../../../pages/homepage/components/IntelligenceWidgets", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/homepage/components/RightNowWidget", () => ({
+vi.mock("@/pages/homepage/components/RightNowWidget", () => ({
   RightNowWidget: (props) => <div data-testid="right-now">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../pages/homepage/components/HomepageTimelineSection", () => ({
+vi.mock("@/pages/homepage/components/HomepageTimelineSection", () => ({
   HomepageTimelineSection: (props) => <div data-testid="big-timeline">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../pages/homepage/components/SemesterOverviewWidget", () => ({
+vi.mock("@/pages/homepage/components/SemesterOverviewWidget", () => ({
   default: (props) => <div data-testid="semester">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../pages/homepage/components/StudyStreakWidget", () => ({
+vi.mock("@/pages/homepage/components/StudyStreakWidget", () => ({
   default: () => <div data-testid="study-streak">study streak</div>,
 }));
 
-vi.mock("../../../../pages/homepage/components/WeeklyGoalWidget", () => ({
+vi.mock("@/pages/homepage/components/WeeklyGoalWidget", () => ({
   default: () => <div data-testid="weekly-goal">weekly goal</div>,
 }));
 
-vi.mock("../../../../pages/homepage/components/PhotoWidget", () => ({
+vi.mock("@/pages/homepage/components/PhotoWidget", () => ({
   default: (props) => <div data-testid="photo">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../components/analytics/components/ProductivityCards", () => ({
+vi.mock("@/components/analytics/components/ProductivityCards", () => ({
   default: (props) => <div data-testid="productivity-cards">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../components/analytics/components/DailyBreakdownChart", () => ({
+vi.mock("@/components/analytics/components/DailyBreakdownChart", () => ({
   default: (props) => <div data-testid="daily-breakdown">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../components/analytics/components/StudyHeatmap", () => ({
+vi.mock("@/components/analytics/components/StudyHeatmap", () => ({
   default: (props) => <div data-testid="heatmap">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../components/analytics/components/AttendanceChart", () => ({
+vi.mock("@/components/analytics/components/AttendanceChart", () => ({
   default: () => <div data-testid="attendance-chart">attendance</div>,
 }));
 
-vi.mock("../../../../components/analytics/components/InsightCards", () => ({
+vi.mock("@/components/analytics/components/InsightCards", () => ({
   ConsistencyScore: (props) => <div data-testid="consistency">{JSON.stringify(props)}</div>,
   PeakHoursCard: (props) => <div data-testid="peak-hours">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../pages/homepage/components/TinyTimelineWidget", () => ({
+vi.mock("@/pages/homepage/components/TinyTimelineWidget", () => ({
   TinyTimelineWidget: (props) => <div data-testid="tiny-timeline">{JSON.stringify(props)}</div>,
 }));
 
-vi.mock("../../../../components/calendar/utils/eventUtils", () => ({
+vi.mock("@/components/calendar/utils/eventUtils", () => ({
   getEventType: (...args) => getEventTypeMock(...args),
 }));
 
-import { renderIntelligenceWidget } from "../../../../pages/homepage/components/IntelligenceWidgetRenderer";
+import { renderIntelligenceWidget } from "@/pages/homepage/components/IntelligenceWidgetRenderer";
 
 function Slot6Marker(props) {
   return <div data-testid="slot6-base">{JSON.stringify(props)}</div>;
@@ -187,6 +187,16 @@ describe("IntelligenceWidgetRenderer", () => {
     expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":2');
   });
 
+  it("counts society events when no memberships are provided", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [{ id: 91, kind: "society", start_time: "2024-03-10T10:00:00Z" }],
+      profile: { role: "student", summary: { societies: [] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
   it("falls back to empty hero counts when the supporting data is missing", () => {
     const props = {
       ...baseProps,
@@ -210,6 +220,26 @@ describe("IntelligenceWidgetRenderer", () => {
     expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
   });
 
+  it("accepts hero society filters when memberships omit ids but include blank names", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [{ id: 61, kind: "society", society_id: 12, start_time: "2024-03-10T10:00:00.000Z" }],
+      profile: { role: "student", summary: { societies: [{ name: "   " }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
+  it("handles missing profile summary when counting society events", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [{ id: 71, kind: "society", start_time: "2024-03-10T10:00:00Z" }],
+      profile: { role: "student", summary: null },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
   it("counts society memberships from the timeline fallback using the id fallback", () => {
     const props = {
       ...baseProps,
@@ -219,6 +249,26 @@ describe("IntelligenceWidgetRenderer", () => {
         sortedEvents: [{ id: 51, kind: "society", society_id: 99, start_time: "2024-03-10T10:00:00Z" }],
       },
       profile: { role: "student", summary: { societies: [{ id: 99, name: "" }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+  });
+
+  it("excludes society events that do not match known memberships", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [{ id: 71, kind: "society", society_id: 1, start_time: "2024-03-10T10:00:00Z" }],
+      profile: { role: "student", summary: { societies: [{ society_id: 2, name: "Chess" }] } },
+    };
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":0');
+  });
+
+  it("ignores blank society rows when building membership id sets", () => {
+    const props = {
+      ...baseProps,
+      calendarEvents: [{ id: 81, kind: "society", society_id: 5, start_time: "2024-03-10T10:00:00Z" }],
+      profile: { role: "student", summary: { societies: [{ id: null, society_id: null }, { society_id: 5 }] } },
     };
     renderWidget("hero", props);
     expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');

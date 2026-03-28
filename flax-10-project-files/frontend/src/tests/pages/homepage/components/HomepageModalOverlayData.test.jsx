@@ -93,7 +93,7 @@ vi.mock("../../../../pages/homepage/components/PlanReadDetailModal", () => ({
 
 import { HomepageModals } from "../../../../pages/homepage/components/HomepageModals";
 import { HomepageOverlays } from "../../../../pages/homepage/components/HomepageOverlays";
-import { useSemesterData, useSemesterRange } from "../../../../pages/homepage/components/useSemesterOverviewData";
+import { useSemesterData, useSemesterRange } from "@/pages/homepage/components/useSemesterOverviewData";
 
 const styles = new Proxy({}, { get: (_, key) => key });
 const overlayModule = { id: 7, module_code: "CS101", module_name: "Algorithms", description: "A".repeat(140), module_leader: "Dr Ada", department: "Computing" };
@@ -292,5 +292,15 @@ describe("Homepage modal, overlay, and semester-data extras", () => {
     await waitFor(() => expect(failure.result.current.loading).toBe(false));
     expect(failure.result.current.events).toEqual([]);
     expect(failure.result.current.deadlines).toEqual([]);
+  });
+
+  it("keeps events when only the deadlines request rejects", async () => {
+    vi.useRealTimers();
+    getEvents.mockResolvedValueOnce([{ id: 1 }]);
+    getUpcomingDeadlines.mockRejectedValueOnce(new Error("deadline service down"));
+    const { result } = renderHook(() => useSemesterData(new Date("2026-01-01"), new Date("2026-04-01")));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.events).toEqual([{ id: 1 }]);
+    expect(result.current.deadlines).toEqual([]);
   });
 });

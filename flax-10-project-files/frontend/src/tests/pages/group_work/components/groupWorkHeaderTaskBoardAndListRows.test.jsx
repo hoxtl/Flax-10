@@ -30,15 +30,15 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-vi.mock("../../../../context/ToastContext", () => ({
+vi.mock("@/context/ToastContext", () => ({
   useToast: () => toastMock,
 }));
 
-vi.mock("../../../../context/AuthContext", () => ({
+vi.mock("@/context/AuthContext", () => ({
   useAuth: () => useAuthMock(),
 }));
 
-vi.mock("../../../../pages/group_work/utils/memberAvatarUtils", () => ({
+vi.mock("../../../pages/group_work/utils/memberAvatarUtils", () => ({
   getDisplayName: (...args) => getDisplayNameMock(...args),
   getStoredViewer: (...args) => getStoredViewerMock(...args),
   openMemberProfile: (...args) => openMemberProfileMock(...args),
@@ -46,22 +46,22 @@ vi.mock("../../../../pages/group_work/utils/memberAvatarUtils", () => ({
   getMemberKey: vi.fn((member) => String(member?.user || member?.id || "")),
 }));
 
-vi.mock("../../../../pages/group_work/utils/projectRowUtils", () => ({
+vi.mock("../../../pages/group_work/utils/projectRowUtils", () => ({
   getProjectMemberCount: vi.fn((members) => members.length),
   getProjectTeacherName: vi.fn((project) => project.teacher_name || null),
   openTeacherProfile: (...args) => openTeacherProfileMock(...args),
   getVisibleMembers: vi.fn((members) => members),
 }));
 
-vi.mock("../../../../components/common/badge/Badge", () => ({
-  default: ({ children, ...props }) => <span {...props}>{children}</span>,
+vi.mock("@/components/common/badge/Badge", () => ({
+  default: ({ children, pill, ...props }) => <span {...props}>{children}</span>,
 }));
 
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <span title={content}>{children}</span>,
 }));
 
-vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () => ({
+vi.mock("@/components/common/hold_confirm_modal/HoldConfirmModal", () => ({
   default: ({ title, warningBanner, warningText, cancelLabel, holdLabel, onCancel, onConfirm }) => (
     <div data-testid="hold-confirm-modal">
       <div>{title}</div>
@@ -77,19 +77,19 @@ vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () 
   ),
 }));
 
-vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
-  default: ({ children, onClick, disabled, ...props }) => (
+vi.mock("@/components/common/primary_button/PrimaryButton", () => ({
+  default: ({ children, onClick, disabled, pill, ...props }) => (
     <button type="button" onClick={onClick} disabled={disabled} {...props}>
       {children}
     </button>
   ),
 }));
 
-vi.mock("../../../../pages/group_work/components/AddMemberForm", () => ({
+vi.mock("@/pages/group_work/components/AddMemberForm", () => ({
   default: ({ projectId }) => <div data-testid="add-member-form">add members for {projectId}</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/MembersSection", () => ({
+vi.mock("@/pages/group_work/components/MembersSection", () => ({
   default: ({ members, onRemove, canRemove, allowOwnerRemove }) => (
     <div data-testid="members-section" data-can-remove={String(canRemove)} data-allow-owner-remove={String(allowOwnerRemove)}>
       <div>{members.map((member) => member.name || member.username || member.user_name).join(",")}</div>
@@ -100,11 +100,11 @@ vi.mock("../../../../pages/group_work/components/MembersSection", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberAvatar", () => ({
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskAssigneePopup", () => ({
+vi.mock("@/pages/group_work/components/TaskAssigneePopup", () => ({
   default: ({ isOpen, members, onToggleAssignee, onClose }) =>
     isOpen ? (
       <div data-testid="task-assignee-popup">
@@ -118,15 +118,15 @@ vi.mock("../../../../pages/group_work/components/TaskAssigneePopup", () => ({
     ) : null,
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskAvatarStack", () => ({
+vi.mock("@/pages/group_work/components/TaskAvatarStack", () => ({
   default: ({ assignees }) => <div>{`avatars:${assignees.length}`}</div>,
 }));
 
-vi.mock("../../../../components/common/task_priority_pill/TaskPriorityPill", () => ({
+vi.mock("@/components/common/task_priority_pill/TaskPriorityPill", () => ({
   default: ({ priority }) => <div>{priority}</div>,
 }));
 
-vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
+vi.mock("@/components/common/inputs/DateTimePicker", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input
       aria-label={placeholder}
@@ -136,12 +136,12 @@ vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
   ),
 }));
 
-import { ProjectHeaderMeta } from "../../../../pages/group_work/components/ProjectHeaderMeta";
-import { ProjectTeacherMeta } from "../../../../pages/group_work/components/ProjectHeaderMeta";
-import ProjectDeleteAction from "../../../../pages/group_work/components/ProjectHeaderSub";
-import TaskBoardCard from "../../../../pages/group_work/components/TaskBoardCard";
-import TaskContextMenu from "../../../../pages/group_work/components/TaskContextMenu";
-import TaskListRow from "../../../../pages/group_work/components/TaskListRow";
+import { ProjectHeaderMeta } from "@/pages/group_work/components/ProjectHeaderMeta";
+import { ProjectTeacherMeta } from "@/pages/group_work/components/ProjectHeaderMeta";
+import ProjectDeleteAction from "@/pages/group_work/components/ProjectHeaderSub";
+import TaskBoardCard from "@/pages/group_work/components/TaskBoardCard";
+import TaskContextMenu from "@/pages/group_work/components/TaskContextMenu";
+import TaskListRow from "@/pages/group_work/components/TaskListRow";
 
 describe("GroupWork low coverage components", () => {
   beforeEach(() => {
@@ -157,9 +157,9 @@ describe("GroupWork low coverage components", () => {
     render(
       <MemoryRouter>
         <>
-          <ProjectTeacherMeta project={{ teacher_name: "Dr Ada" }} />
+          <ProjectTeacherMeta project={{ module_tutor_name: "Dr Ada" }} />
           <ProjectHeaderMeta
-            project={{ id: 8, teacher_name: "Dr Ada" }}
+            project={{ id: 8, module_tutor_name: "Dr Ada" }}
             members={[{ id: 1, user: 1, name: "Alex", role: "owner" }]}
             teamMembers={[{ id: 1, user: 1, name: "Alex", role: "owner" }]}
             onMemberAdded={vi.fn()}
@@ -367,7 +367,6 @@ describe("GroupWork low coverage components", () => {
     const onClose = vi.fn();
     const onDelete = vi.fn();
     const onEditStart = vi.fn();
-
     render(
       <TaskContextMenu
         pos={{ x: 20, y: 30 }}
@@ -377,13 +376,10 @@ describe("GroupWork low coverage components", () => {
         onEditStart={onEditStart}
       />,
     );
-
     fireEvent.mouseDown(document.body);
     expect(onClose).toHaveBeenCalled();
-
     fireEvent.click(screen.getByText("Edit"));
     expect(onEditStart).toHaveBeenCalled();
-
     fireEvent.click(screen.getByText("Delete"));
     expect(onDelete).toHaveBeenCalledWith(9);
   });

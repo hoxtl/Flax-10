@@ -2,8 +2,8 @@
  * Right Now data helpers.
  */
 
-import { isNow } from "../utils/eventUtils";
-import { getTflLinesForLocation, isSevereDisruption } from "../utils/kclTflMapping";
+import { isNow } from "@/pages/homepage/utils/eventUtils";
+import { getTflLinesForLocation, isSevereDisruption } from "@/pages/homepage/utils/kclTflMapping";
 
 export function getTimeLeftBand(minutesLeft) {
   if (minutesLeft == null || minutesLeft < 0) return "over";

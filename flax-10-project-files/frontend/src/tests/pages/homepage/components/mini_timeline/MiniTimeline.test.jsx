@@ -63,11 +63,15 @@ vi.mock('../../../../../pages/homepage/components/mini_timeline/NowRow', () => (
 }));
 
 vi.mock('../../../../../pages/homepage/components/mini_timeline/PlanFreeRow', () => ({
-  PlanFreeRow: ({ row, isBestGap, assignedTask, setSlotPopoverRowId, slotPopoverRowId, slotPopoverRef, onQuickStart }) => (
+  PlanFreeRow: ({ row, isBestGap, assignedTask, setSlotPopoverRowId, slotPopoverRowId, slotPopoverRef, onQuickStart, onSkipTask }) => (
     <div>
       <div>FREE:{row.id}{isBestGap ? ':BEST' : ''}{assignedTask ? `:${assignedTask.title}` : ''}</div>
+      <button type="button" onClick={() => onSkipTask?.(7)}>skip-gap-task</button>
       <button type="button" onClick={() => setSlotPopoverRowId(row.id)}>open-slot</button>
       <button type="button" onClick={() => onQuickStart?.(new Date('2026-03-25T10:00:00Z'), 25, { estimated_blocks: 1 }, null)}>quick-start-fallback</button>
+      <button type="button" onClick={() => onQuickStart?.(new Date('2026-03-25T10:00:00Z'), 25, { id: 42 }, null)}>quick-start-id-only</button>
+      <button type="button" onClick={() => onQuickStart?.(new Date('2026-03-25T10:00:00Z'), 25, { title: 'Solo' }, null)}>quick-start-title-only</button>
+      <button type="button" onClick={() => onQuickStart?.(new Date('2026-03-25T10:00:00Z'), 25, { id: 3, title: 'Both' }, null)}>quick-start-id-and-title</button>
       {slotPopoverRowId === row.id && (
         <div ref={slotPopoverRef} data-testid="slot-popover">SLOT_POPOVER</div>
       )}
@@ -231,6 +235,52 @@ describe('MiniTimeline', () => {
       { estimated_blocks: 1 },
       null,
     );
+  });
+
+  it('runs quick start branch when the task only carries an id', () => {
+    const onQuickStart = vi.fn();
+    mockRows = [{ id: 'free', type: 'free', minutes: 20 }];
+    renderTL({ onQuickStart });
+    fireEvent.click(screen.getByText('quick-start-id-only'));
+    expect(onQuickStart).toHaveBeenCalledWith(
+      new Date('2026-03-25T10:00:00.000Z'),
+      25,
+      { id: 42 },
+      null,
+    );
+  });
+
+  it('runs quick start branch when the task only carries a title', () => {
+    const onQuickStart = vi.fn();
+    mockRows = [{ id: 'free', type: 'free', minutes: 20 }];
+    renderTL({ onQuickStart });
+    fireEvent.click(screen.getByText('quick-start-title-only'));
+    expect(onQuickStart).toHaveBeenCalledWith(
+      new Date('2026-03-25T10:00:00.000Z'),
+      25,
+      { title: 'Solo' },
+      null,
+    );
+  });
+
+  it('records both slotting hooks when quick start receives id and title', () => {
+    const onQuickStart = vi.fn();
+    mockRows = [{ id: 'free', type: 'free', minutes: 25 }];
+    renderTL({ onQuickStart });
+    fireEvent.click(screen.getByText('quick-start-id-and-title'));
+    expect(onQuickStart).toHaveBeenCalledWith(
+      new Date('2026-03-25T10:00:00.000Z'),
+      25,
+      { id: 3, title: 'Both' },
+      null,
+    );
+  });
+
+  it('runs the internal skip-gap handler when a free row requests it', () => {
+    mockRows = [{ id: 'gap-x', type: 'free', minutes: 15 }];
+    renderTL({});
+    fireEvent.click(screen.getByText('skip-gap-task'));
+    expect(screen.getByText(/FREE:gap-x/)).toBeTruthy();
   });
 
   it('opens event context menu and calls onDelete', async () => {

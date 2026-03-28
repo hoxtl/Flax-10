@@ -151,7 +151,7 @@ function syncRemovedMemberTags(currentTags, nextTags, onRemove) {
     .forEach((tag) => onRemove(tag.id));
 }
 
-function RequiredLabel({ text }) {
+export function RequiredLabel({ text }) {
   return (
     <>
       {text} <span className={styles.requiredMark}>*</span>

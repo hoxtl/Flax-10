@@ -44,7 +44,7 @@ vi.mock("../../../../pages/group_work/utils/taskUtils", () => ({
   handleDragStartTask: (...args) => handleDragStartTask(...args),
 }));
 
-vi.mock("../../../../pages/group_work/components/taskCardEditUtils", () => ({
+vi.mock("@/pages/group_work/components/taskCardEditUtils", () => ({
   useTaskTitleEdit: (...args) => useTaskTitleEdit(...args),
   handleTaskTitleKeyDown: (event, saveEdit, setEditing) => {
     if (event.key === "Enter" && !event.shiftKey) saveEdit();
@@ -52,17 +52,17 @@ vi.mock("../../../../pages/group_work/components/taskCardEditUtils", () => ({
   },
 }));
 
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
-vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
+vi.mock("@/components/common/inputs/DateTimePicker", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
   ),
 }));
 
-vi.mock("../../../../components/common/task_priority_pill/TaskPriorityPill", () => ({
+vi.mock("@/components/common/task_priority_pill/TaskPriorityPill", () => ({
   default: ({ priority }) => <span>{priority}</span>,
 }));
 
@@ -80,8 +80,8 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-import TaskBoardCard from "../../../../pages/group_work/components/TaskBoardCard";
-import { TimelineCard, UnscheduledCard } from "../../../../pages/group_work/components/TaskTimelineCards";
+import TaskBoardCard from "@/pages/group_work/components/TaskBoardCard";
+import { TimelineCard, UnscheduledCard } from "@/pages/group_work/components/TaskTimelineCards";
 
 describe("GroupWork task component - Cards", () => {
   beforeEach(() => {

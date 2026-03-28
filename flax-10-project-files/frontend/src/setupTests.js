@@ -1,4 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import '@testing-library/jest-dom';
+
+const coverageTmpDir = path.resolve(process.cwd(), 'coverage/.tmp');
+try {
+    fs.mkdirSync(coverageTmpDir, { recursive: true });
+} catch (error) {
+    // Ignore filesystem race conditions while preparing coverage output directories.
+}
 
 global.ResizeObserver = global.ResizeObserver || class ResizeObserver {
   constructor(cb) { this.cb = cb; }

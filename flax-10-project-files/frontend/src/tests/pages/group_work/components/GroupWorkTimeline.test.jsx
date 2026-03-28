@@ -21,13 +21,13 @@ vi.mock("../../../../pages/group_work/utils/taskTimelineUtils", () => ({
   )),
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskTimelineCards", () => ({
+vi.mock("@/pages/group_work/components/TaskTimelineCards", () => ({
   TimelineCard: ({ task }) => <div>Timeline:{task.title}</div>,
   UnscheduledCard: ({ task }) => <div>Unscheduled:{task.title}</div>,
 }));
 
-import TaskTimelineView from "../../../../pages/group_work/components/TaskTimelineView";
-import { useDragHandlers, useTaskTimelineState } from "../../../../pages/group_work/components/useTaskTimelineState";
+import TaskTimelineView from "@/pages/group_work/components/TaskTimelineView";
+import { useDragHandlers, useTaskTimelineState } from "@/pages/group_work/components/useTaskTimelineState";
 
 describe("GroupWork task component - Timeline", () => {
   it("renders TaskTimelineView and basic headers", () => {

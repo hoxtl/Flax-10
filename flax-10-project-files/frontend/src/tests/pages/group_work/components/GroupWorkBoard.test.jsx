@@ -11,11 +11,11 @@ vi.mock("../../../../pages/group_work/utils/taskBoardUtils", () => ({
   buildBoardColumns: (...args) => buildBoardColumns(...args),
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskBoardCard", () => ({
+vi.mock("@/pages/group_work/components/TaskBoardCard", () => ({
   default: ({ task }) => <div>{task.title}</div>,
 }));
 
-vi.mock("../../../../components/common/search_empty_state/SearchEmptyState", () => ({
+vi.mock("@/components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
@@ -24,8 +24,8 @@ vi.mock("lucide-react", () => ({
   Pencil: () => <span>pencil-icon</span>,
 }));
 
-import TaskBoardColumn from "../../../../pages/group_work/components/TaskBoardColumn";
-import TaskBoardView from "../../../../pages/group_work/components/TaskBoardView";
+import TaskBoardColumn from "@/pages/group_work/components/TaskBoardColumn";
+import TaskBoardView from "@/pages/group_work/components/TaskBoardView";
 
 describe("GroupWork task component - Board", () => {
   beforeEach(() => {

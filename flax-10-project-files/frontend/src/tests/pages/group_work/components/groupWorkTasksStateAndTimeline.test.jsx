@@ -18,15 +18,15 @@ vi.mock("../../../../pages/group_work/utils/taskUtils", () => ({
   sortTasks: (...args) => sortTasks(...args),
 }));
 
-vi.mock("../../../../components/common/search_empty_state/SearchEmptyState", () => ({
+vi.mock("@/components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ title, hint }) => <div>{title}:{hint}</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskListRow", () => ({
+vi.mock("@/pages/group_work/components/TaskListRow", () => ({
   default: ({ task }) => <div>{task.title}</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskBoardColumn", () => ({
+vi.mock("@/pages/group_work/components/TaskBoardColumn", () => ({
   default: ({ column, adding }) => (
     <div>
       <span>{column.title}</span>
@@ -53,10 +53,10 @@ vi.mock("../../../../pages/group_work/utils/taskTimelineUtils", () => ({
 }));
 
 import { useGroupTasksTabState } from "../../../../pages/group_work/hooks/useGroupTasksTabState";
-import { handleTaskTitleKeyDown, useTaskTitleEdit } from "../../../../pages/group_work/components/taskCardEditUtils";
-import TaskListView from "../../../../pages/group_work/components/TaskListView";
-import TaskBoardView from "../../../../pages/group_work/components/TaskBoardView";
-import { useDragHandlers, useTaskTimelineState } from "../../../../pages/group_work/components/useTaskTimelineState";
+import { handleTaskTitleKeyDown, useTaskTitleEdit } from "@/pages/group_work/components/taskCardEditUtils";
+import TaskListView from "@/pages/group_work/components/TaskListView";
+import TaskBoardView from "@/pages/group_work/components/TaskBoardView";
+import { useDragHandlers, useTaskTimelineState } from "@/pages/group_work/components/useTaskTimelineState";
 
 const defaultTasksResponse = [{ id: 2, title: "B", assignees_info: [{ id: 4 }], status: "todo" }];
 const mockJsonResponse = (payload) => ({ ok: true, json: async () => payload });

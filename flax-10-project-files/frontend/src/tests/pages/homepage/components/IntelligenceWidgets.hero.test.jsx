@@ -17,11 +17,11 @@ vi.mock("framer-motion", () => ({
   }),
 }));
 
-vi.mock("../../../../components/welcome/WelcomeBackgroundPaths", () => ({
+vi.mock("@/components/welcome/WelcomeBackgroundPaths", () => ({
   default: () => <div data-testid="hero-paths" />,
 }));
 
-vi.mock("../../../../hooks/useCountUp", () => ({
+vi.mock("@/hooks/useCountUp", () => ({
   useCountUp: () => null,
 }));
 
@@ -46,12 +46,12 @@ vi.mock("lucide-react", () => {
   };
 });
 
-vi.mock("../../../../pages/homepage/components/IntelligenceUtils", () => ({
+vi.mock("@/pages/homepage/components/IntelligenceUtils", () => ({
   getGreeting: (name) => `Hello ${name || "there"}`,
   getTodayLabel: () => "MONDAY · 24 MAR",
 }));
 
-import { IntelligenceHero } from "../../../../pages/homepage/components/IntelligenceWidgets";
+import { IntelligenceHero, StatusBanner } from "@/pages/homepage/components/IntelligenceWidgets";
 
 describe("IntelligenceHero", () => {
   it("renders the greeting, live context, and basic stats", () => {
@@ -105,5 +105,23 @@ describe("IntelligenceHero", () => {
     render(<MemoryRouter><IntelligenceHero isTeacher /></MemoryRouter>);
     expect(screen.getByText("Teaching today")).toBeInTheDocument();
     expect(screen.getByText("Teaching deadlines")).toBeInTheDocument();
+  });
+
+  it("renders status banner text without an icon when icon is omitted", () => {
+    render(
+      <MemoryRouter>
+        <StatusBanner cta="/tasks" icon={null} onDismiss={vi.fn()} text="Banner only" />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("Banner only")).toBeInTheDocument();
+  });
+
+  it("applies warning styling to teacher deadline stats when counts are positive", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <IntelligenceHero isTeacher deadlinesCount={2} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('[class*="valueWarning"]')).toBeTruthy();
   });
 });

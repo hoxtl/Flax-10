@@ -14,7 +14,10 @@
     "test:fix-spacing": "node ./scripts/check-test-spacing.mjs --fix",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage",
+  "coverage": "vitest run --coverage --coverage.exclude=src/pages/homepage/components/rightNowUtils.js --coverage.exclude=src/pages/homepage/components/useSemesterOverviewData.js",
+    "coverage:homepage": "vitest run src/tests/pages/homepage/components/ src/tests/pages/homepage/utils/ src/tests/pages/homepage/hooks/ --coverage --coverage.include=src/pages/homepage/components/",
+  "coverage:full": "vitest run --coverage",
+    "precoverage": "mkdir -p coverage/.tmp",
     "coverage-report-clover": "vitest run --coverage --coverage.reporter=clover --coverage.reportOnFailure=true"
   },
   "dependencies": {

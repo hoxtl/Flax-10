@@ -8,11 +8,11 @@ vi.mock("lucide-react", () => ({
   Upload: () => <svg aria-hidden="true" />,
 }));
 
-vi.mock("../../../../components/common/widget_header/WidgetHeader", () => ({
+vi.mock("@/components/common/widget_header/WidgetHeader", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
-import PhotoWidget from "../../../../pages/homepage/components/PhotoWidget";
+import PhotoWidget from "@/pages/homepage/components/PhotoWidget";
 
 describe("PhotoWidget", () => {
   beforeEach(() => {
@@ -111,5 +111,30 @@ describe("PhotoWidget", () => {
     fireEvent.click(screen.getByText(/Change/));
 
     expect(inputClickSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears storage when Remove is pressed in edit mode", () => {
+    localStorage.setItem("homepage_photo_src", "data:abc");
+    localStorage.setItem("homepage_photo_caption", "Hi");
+
+    render(<PhotoWidget editMode />);
+    fireEvent.click(screen.getByText("Remove"));
+
+    expect(localStorage.getItem("homepage_photo_src")).toBeNull();
+    expect(localStorage.getItem("homepage_photo_caption")).toBeNull();
+    expect(screen.queryByAltText("Your photo")).toBeNull();
+  });
+
+  it("lets editors add a caption from scratch via the add button", async () => {
+    localStorage.setItem("homepage_photo_src", "data:abc");
+
+    render(<PhotoWidget editMode />);
+    fireEvent.click(screen.getByText("+ Caption"));
+    fireEvent.change(screen.getByPlaceholderText("Add a caption…"), { target: { value: "Studio day" } });
+    fireEvent.blur(screen.getByPlaceholderText("Add a caption…"));
+
+    await waitFor(() => expect(screen.queryByPlaceholderText("Add a caption…")).toBeNull());
+    expect(screen.getByText("Studio day")).toBeInTheDocument();
+    expect(localStorage.getItem("homepage_photo_caption")).toBe("Studio day");
   });
 });

@@ -118,6 +118,10 @@ describe('memberAvatarUtils – buildMemberColorMap', () => {
       '2': MEMBER_PALETTE[1],
     });
   });
+
+  it('handles default empty members list', () => {
+    expect(buildMemberColorMap()).toEqual({});
+  });
 });
 
 describe('memberAvatarUtils – getMemberColor', () => {
@@ -130,6 +134,10 @@ describe('memberAvatarUtils – getMemberColor', () => {
   it('falls back to the first palette entry when the member has no key or is missing from the map', () => {
     expect(getMemberColor({}, [{ user: 1 }])).toBe(MEMBER_PALETTE[0]);
     expect(getMemberColor({ user: 99 }, [{ user: 1 }])).toBe(MEMBER_PALETTE[0]);
+  });
+
+  it('handles default empty members list', () => {
+    expect(getMemberColor({ user: 1 })).toBe(MEMBER_PALETTE[0]);
   });
 });
 
@@ -192,6 +200,17 @@ describe('memberAvatarUtils – getStoredViewer', () => {
     window.localStorage.setItem('user', '{bad json');
     expect(getStoredViewer()).toEqual({});
   });
+
+  it('handles window undefined in getStoredViewer', () => {
+    const originalWindow = globalThis.window;
+    // @ts-ignore
+    delete globalThis.window;
+    try {
+      expect(getStoredViewer()).toEqual({});
+    } finally {
+      globalThis.window = originalWindow;
+    }
+  });
 });
 
 describe('memberAvatarUtils – getCurrentMember', () => {
@@ -206,6 +225,12 @@ describe('memberAvatarUtils – getCurrentMember', () => {
 
     window.localStorage.setItem('user', JSON.stringify({ id: 9 }));
     expect(getCurrentMember([{ user: 1 }])).toBeNull();
+  });
+
+  it('handles default empty members list and missing id branches', () => {
+    window.localStorage.setItem('user', JSON.stringify({ id: 1 }));
+    expect(getCurrentMember()).toBeNull();
+    expect(getCurrentMember([{}])).toBeNull();
   });
 });
 

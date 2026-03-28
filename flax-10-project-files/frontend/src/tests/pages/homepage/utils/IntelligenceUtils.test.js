@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const overlapSleepMock = vi.fn();
 
-vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
+vi.mock("@/components/settings/hooks/useSleepWarning", () => ({
   doesEventOverlapSleepWindow: (...args) => overlapSleepMock(...args),
 }));
 
@@ -17,7 +17,7 @@ import {
   getTodayLabel,
   getTravelContext,
   getUpcomingEvent,
-} from "../../../../pages/homepage/components/IntelligenceUtils";
+} from "@/pages/homepage/components/IntelligenceUtils";
 
 const pinnedNow = new Date("2026-03-24T09:30:00.000Z");
 const baseLiveContextInput = {
@@ -50,13 +50,22 @@ describe("IntelligenceUtils", () => {
       expect(getGreeting("Ava", false)).toBe("Good Morning, Ava.");
     });
 
+    it("covers afternoon and evening greetings", () => {
+      vi.setSystemTime(new Date("2026-03-24T14:30:00.000Z"));
+      expect(getGreeting("Leo")).toContain("Afternoon");
+      vi.setSystemTime(new Date("2026-03-24T20:00:00.000Z"));
+      expect(getGreeting(null)).toContain("Evening");
+    });
+
     it("formats today label and event times", () => {
       expect(getTodayLabel()).toContain("TUESDAY");
       expect(formatEventTime("2026-03-24T11:15:00.000Z")).toBe("11:15");
+      expect(formatEventTime()).toBeNull();
     });
 
     it("renders friendly duration strings", () => {
       expect(formatWindowDuration(-1)).toBeNull();
+      expect(formatWindowDuration(Number.NaN)).toBeNull();
       expect(formatWindowDuration(45)).toBe("45m");
       expect(formatWindowDuration(60)).toBe("1h");
       expect(formatWindowDuration(95)).toBe("1h 35m");
@@ -85,15 +94,40 @@ describe("IntelligenceUtils", () => {
     it("returns the next upcoming event", () => {
       expect(getUpcomingEvent([currentEvent, upcomingEvent], pinnedNow)).toEqual(upcomingEvent);
       expect(getUpcomingEvent([{ id: 4, start_time: "2026-03-24T08:00:00.000Z" }], pinnedNow)).toBeNull();
+      expect(getUpcomingEvent([{ id: 5 }], pinnedNow)).toBeNull();
+    });
+
+    it("sorts several future events to the earliest start", () => {
+      const late = { id: 9, start_time: "2026-03-24T16:00:00.000Z", end_time: "2026-03-24T17:00:00.000Z" };
+      const early = { id: 8, start_time: "2026-03-24T12:30:00.000Z", end_time: "2026-03-24T13:00:00.000Z" };
+      expect(getUpcomingEvent([late, early], pinnedNow)).toEqual(early);
     });
 
     it("describes the next focus window duration", () => {
       const windows = [
-        { start: new Date("2026-03-24T08:00:00.000Z"), end: new Date("2026-03-24T08:30:00.000Z") },
+        { start: new Date("2026-03-24T10:00:00.000Z"), end: new Date("2026-03-24T10:45:00.000Z") },
         { start: new Date("2026-03-24T11:00:00.000Z"), end: new Date("2026-03-24T12:30:00.000Z") },
+        { start: new Date("2026-03-24T09:00:00.000Z") },
       ];
-      expect(getNextWindowMeta(windows, pinnedNow)).toEqual({ duration: "1h 30m", label: "Next focus window 11:00" });
+      expect(getNextWindowMeta(windows, pinnedNow)).toEqual({ duration: "45m", label: "Next focus window 10:00" });
       expect(getNextWindowMeta([], pinnedNow)).toBeNull();
+    });
+
+    it("sorts multiple future windows so the nearest start wins", () => {
+      const laterFirst = [
+        { start: new Date("2026-03-24T15:00:00.000Z"), end: new Date("2026-03-24T16:00:00.000Z") },
+        { start: new Date("2026-03-24T13:00:00.000Z"), end: new Date("2026-03-24T14:00:00.000Z") },
+      ];
+      expect(getNextWindowMeta(laterFirst, pinnedNow)?.label).toContain("13:00");
+    });
+
+    it("uses default args for getCurrentEvent and getUpcomingEvent", () => {
+      expect(getCurrentEvent()).toBeNull();
+      expect(getUpcomingEvent()).toBeNull();
+    });
+
+    it("getNextWindowMeta uses defaults", () => {
+      expect(getNextWindowMeta()).toBeNull();
     });
   });
 
@@ -132,6 +166,16 @@ describe("IntelligenceUtils", () => {
       });
     });
 
+    it("uses mild delay wording when severity stays below the disruption threshold", () => {
+      const mild = { lineName: "District", severityDescription: "Minor delays" };
+      expect(getTravelContext({
+        ...baseTravelInput,
+        getRelevantDelays: () => [mild],
+        isSevereDisruption: () => false,
+        tflDelays: [mild],
+      })?.text).toMatch(/delays —/);
+    });
+
     it("returns null when no relevant delays exist", () => {
       expect(getTravelContext({ ...baseTravelInput, tflDelays: [] })).toBeNull();
     });
@@ -139,6 +183,41 @@ describe("IntelligenceUtils", () => {
     it("returns null when the event is too far away", () => {
       const futureEvent = { ...baseTravelInput.upcomingEvent, start_time: "2026-03-24T14:00:00.000Z" };
       expect(getTravelContext({ ...baseTravelInput, upcomingEvent: futureEvent, tflDelays: [delay] })).toBeNull();
+    });
+
+    it("returns null when relevant delays filtering removes every row", () => {
+      const result = getTravelContext({
+        ...baseTravelInput,
+        getRelevantDelays: () => [],
+        tflDelays: [delay],
+      });
+      expect(result).toBeNull();
+    });
+
+    it("falls back to TfL defaults when the event metadata is sparse", () => {
+      const context = getTravelContext({
+        ...baseTravelInput,
+        upcomingEvent: { start_time: "2026-03-24T09:45:00.000Z" },
+        getRelevantDelays: () => [{}],
+        isSevereDisruption: () => false,
+        now: new Date("2026-03-24T09:15:00.000Z"),
+        tflDelays: [{}],
+      });
+      expect(context?.text).toContain("TfL line delays");
+      expect(context?.text).toContain("your next class");
+      expect(context?.meta).toBe("Delays");
+    });
+
+    it("returns null when travel prerequisites are missing", () => {
+      const now = new Date("2026-03-24T09:15:00.000Z");
+      const shared = {
+        getRelevantDelays: () => [{ severityDescription: "Minor delays" }],
+        isSevereDisruption: () => false,
+        now,
+      };
+      expect(getTravelContext({ ...shared, upcomingEvent: { title: "Seminar" }, tflDelays: [{ severityDescription: "Minor delays" }] })).toBeNull();
+      expect(getTravelContext({ ...shared, upcomingEvent: { title: "Seminar", start_time: "2026-03-24T10:00:00.000Z" }, tflDelays: null })).toBeNull();
+      expect(getTravelContext({ ...shared, upcomingEvent: { title: "Seminar", start_time: "2026-03-24T10:00:00.000Z" }, tflDelays: [], getRelevantDelays: () => [] })).toBeNull();
     });
   });
 
@@ -172,6 +251,11 @@ describe("IntelligenceUtils", () => {
         text: "You have an overlap in today’s plan.",
         tone: "warning",
       });
+    });
+
+    it("handles overlap without a valid start time", () => {
+      const context = buildLiveContextInput({ overlaps: [{ a: {} }] });
+      expect(getLiveContext(context).meta).toBeNull();
     });
 
     it("surfaces travel disruptions when no current event exists", () => {
@@ -208,6 +292,33 @@ describe("IntelligenceUtils", () => {
         text: "You have breathing room before the next thing starts.",
         tone: "neutral",
       });
+    });
+
+    it("drops upcoming meta when the next event has no start time", () => {
+      const context = buildLiveContextInput({
+        upcomingEvent: { location: "Hall", title: "TBA" },
+      });
+      expect(getLiveContext(context).meta).toBeNull();
+    });
+
+    it("omits the sleep prefix and meta when the current block lacks details", () => {
+      overlapSleepMock.mockReturnValue(false);
+      const context = buildLiveContextInput({ currentEvent: { title: "Focus" } });
+      const result = getLiveContext(context);
+      expect(result.text).toBe("Focus");
+      expect(result.meta).toBeNull();
+    });
+
+    it("describes an upcoming event that has no location", () => {
+      const context = buildLiveContextInput({
+        upcomingEvent: {
+          start_time: "2026-03-24T11:00:00.000Z",
+          title: "Solo work",
+        },
+      });
+      const result = getLiveContext(context);
+      expect(result.text).toBe("Solo work");
+      expect(result.meta).toBe("Starts 11:00");
     });
   });
 });

@@ -9,7 +9,7 @@ import GroupProjectDetail from "./components/GroupWorkDetail";
 import AppPage from "../../components/common/app_page/AppPage";
 import { BackToTop } from "../../components/pagination/Pagination";
 import GroupWorkStats from "./components/GroupWorkStats";
-import GroupWorkIndexSkeleton from "./components/GroupWorkIndexSkeleton";
+import GroupWorkIndexSkeleton from "@/pages/group_work/components/GroupWorkIndexSkeleton";
 import GroupWorkContent from "./components/GroupWorkContent";
 import { useToast } from "../../context/ToastContext";
 import { getProjectDate, getDaysLeft } from "./utils/projectRowUtils";

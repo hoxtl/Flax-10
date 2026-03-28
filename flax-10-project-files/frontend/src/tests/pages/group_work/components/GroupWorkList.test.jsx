@@ -16,15 +16,15 @@ vi.mock("../../../../pages/group_work/utils/taskUtils", () => ({
   filterVisibleAssignees: vi.fn((a) => a),
 }));
 
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
-vi.mock("../../../../components/common/task_priority_pill/TaskPriorityPill", () => ({
+vi.mock("@/components/common/task_priority_pill/TaskPriorityPill", () => ({
   default: ({ priority }) => <span>{priority}</span>,
 }));
 
-vi.mock("../../../../components/common/inline_title_field/InlineTitleField", () => ({
+vi.mock("@/components/common/inline_title_field/InlineTitleField", () => ({
   default: ({ value, onStart, onSave, onCancel }) => (
     <div>
       <span>{value}</span>
@@ -36,7 +36,7 @@ vi.mock("../../../../components/common/inline_title_field/InlineTitleField", () 
   useInlineEdit: (...args) => useInlineEdit(...args),
 }));
 
-vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () => ({
+vi.mock("@/components/common/hold_confirm_modal/HoldConfirmModal", () => ({
   default: ({ onCancel, onConfirm, title }) => (
     <div>
       <span>{title}</span>
@@ -46,7 +46,7 @@ vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () 
   ),
 }));
 
-vi.mock("../../../../components/common/search_empty_state/SearchEmptyState", () => ({
+vi.mock("@/components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ title, hint }) => <div>{title} {hint}</div>,
 }));
 
@@ -58,12 +58,12 @@ vi.mock("lucide-react", () => ({
   Calendar: () => <span>calendar-icon</span>,
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberAvatar", () => ({
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,
 }));
 
-import TaskListRow from "../../../../pages/group_work/components/TaskListRow";
-import TaskListView from "../../../../pages/group_work/components/TaskListView";
+import TaskListRow from "@/pages/group_work/components/TaskListRow";
+import TaskListView from "@/pages/group_work/components/TaskListView";
 
 describe("GroupWork task component - List", () => {
   beforeEach(() => {

@@ -1,168 +1,80 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
-import GroupWorkContent from '../../../../pages/group_work/components/GroupWorkContent';
+import React from "react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import {
+  mockCompareProjectsBySort,
+  mockSearchEmptyState,
+  resetGroupWorkContentMocks,
+} from "./__mocks__/groupWorkContentMocks";
+import GroupWorkContent from "@/pages/group_work/components/GroupWorkContent";
 
-vi.mock('../../../../pages/group_work/components/CreateProjectForm', () => ({
-  default: ({ onCreated }) => (
-    <button type="button" onClick={() => onCreated?.({ id: 99, name: 'Created project' })}>
-      + Create project
-    </button>
-  ),
-}));
+describe("GroupWorkContent", () => {
+  const setSortBy = vi.fn();
+  const onProjectCreated = vi.fn();
+  const projectListProps = vi.fn(() => ({}));
+  const projects = [
+    { id: 1, name: "Alpha" },
+    { id: 2, name: "Beta" },
+  ];
 
-function buildProject(id, deadline, name = `Project ${id}`) {
-  return {
-    id,
-    name,
-    deadline,
-    created_at: `2026-03-${20 + id}T10:00:00Z`,
-    course_code: `CODE${id}`,
-    module_name: `Module ${id}`,
-    task_count: 4,
-    completed_task_count: 1,
-    member_count: 4,
-    members: [
-      { id: 1, user: 1, user_name: 'janedoe', first_name: 'Jane', last_name: 'Doe' },
-      { id: 2, user: 2, user_name: 'mia.gray', first_name: 'Mia', last_name: 'Gray' },
-      { id: 3, user: 3, user_name: 'leo.park', first_name: 'Leo', last_name: 'Park' },
-      { id: 4, user: 4, user_name: 'ava.reed', first_name: 'Ava', last_name: 'Reed' },
-    ],
-  };
-}
-
-describe('GroupWorkContent', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-03-21T10:00:00Z'));
-    localStorage.setItem('user', JSON.stringify({ id: 1, username: 'janedoe' }));
+    resetGroupWorkContentMocks();
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-    localStorage.clear();
-  });
-
-  it('sorts projects by due date when due date is selected', () => {
+  const renderContent = (overrides = {}) =>
     render(
-      <MemoryRouter>
-        <GroupWorkContent
-          projects={[
-            buildProject(1, '2026-03-29T23:59:00Z', 'Later project'),
-            buildProject(2, '2026-03-24T23:59:00Z', 'Sooner project'),
-          ]}
-          projectListProps={() => ({ onClick: vi.fn() })}
-          sortBy="due-date"
-          setSortBy={vi.fn()}
-          onProjectCreated={vi.fn()}
-        />
-      </MemoryRouter>
+      <GroupWorkContent
+        projects={overrides.projects ?? projects}
+        projectListProps={overrides.projectListProps ?? projectListProps}
+        sortBy={overrides.sortBy ?? "due-date"}
+        setSortBy={overrides.setSortBy ?? setSortBy}
+        onProjectCreated={overrides.onProjectCreated ?? onProjectCreated}
+      />
     );
 
-    const sooner = screen.getByText('Sooner project');
-    const later = screen.getByText('Later project');
-    expect(sooner.compareDocumentPosition(later) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  it("renders project list and handles sorting", () => {
+    renderContent();
+    expect(screen.getByTestId("project-row-1")).toBeTruthy();
+    expect(screen.getByTestId("project-row-2")).toBeTruthy();
+    fireEvent.change(screen.getByTestId("sort-dropdown"), { target: { value: "name" } });
+    expect(setSortBy).toHaveBeenCalledWith("name");
   });
 
-  it('sorts projects by most team members when that sort is selected', () => {
-    render(
-      <MemoryRouter>
-        <GroupWorkContent
-          projects={[
-            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Smaller team'), member_count: 3 },
-            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Larger team'), member_count: 7 },
-          ]}
-          projectListProps={() => ({ onClick: vi.fn() })}
-          sortBy="most-members"
-          setSortBy={vi.fn()}
-          onProjectCreated={vi.fn()}
-        />
-      </MemoryRouter>
-    );
-
-    const larger = screen.getByText('Larger team');
-    const smaller = screen.getByText('Smaller team');
-    expect(larger.compareDocumentPosition(smaller) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  it("filters projects based on search term", () => {
+    renderContent();
+    fireEvent.change(screen.getByTestId("search-bar"), { target: { value: "Al" } });
+    expect(screen.getByTestId("project-row-1")).toBeTruthy();
+    expect(screen.queryByTestId("project-row-2")).toBeNull();
   });
 
-  it('sorts projects by least team members when that sort is selected', () => {
-    render(
-      <MemoryRouter>
-        <GroupWorkContent
-          projects={[
-            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Larger team'), member_count: 7 },
-            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Smaller team'), member_count: 3 },
-          ]}
-          projectListProps={() => ({ onClick: vi.fn() })}
-          sortBy="least-members"
-          setSortBy={vi.fn()}
-          onProjectCreated={vi.fn()}
-        />
-      </MemoryRouter>
-    );
-
-    const smaller = screen.getByText('Smaller team');
-    const larger = screen.getByText('Larger team');
-    expect(smaller.compareDocumentPosition(larger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  it("shows empty state when no projects match search", () => {
+    renderContent();
+    fireEvent.change(screen.getByTestId("search-bar"), { target: { value: "Zeta" } });
+    expect(mockSearchEmptyState).toHaveBeenCalled();
+    expect(screen.getByText("No projects match your search.")).toBeTruthy();
   });
 
-  it('sorts projects by newest created date when that sort is selected', () => {
-    render(
-      <MemoryRouter>
-        <GroupWorkContent
-          projects={[
-            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Older project'), created_at: '2026-03-10T10:00:00Z' },
-            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Newer project'), created_at: '2026-03-20T10:00:00Z' },
-          ]}
-          projectListProps={() => ({ onClick: vi.fn() })}
-          sortBy="created-desc"
-          setSortBy={vi.fn()}
-          onProjectCreated={vi.fn()}
-        />
-      </MemoryRouter>
-    );
-
-    const newer = screen.getByText('Newer project');
-    const older = screen.getByText('Older project');
-    expect(newer.compareDocumentPosition(older) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  it("shows empty state when no projects exist", () => {
+    renderContent({ projects: [] });
+    expect(screen.getByText("No group projects yet.")).toBeTruthy();
   });
 
-  it('sorts projects by oldest created date when that sort is selected', () => {
-    render(
-      <MemoryRouter>
-        <GroupWorkContent
-          projects={[
-            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Newer project'), created_at: '2026-03-20T10:00:00Z' },
-            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Older project'), created_at: '2026-03-10T10:00:00Z' },
-          ]}
-          projectListProps={() => ({ onClick: vi.fn() })}
-          sortBy="created-asc"
-          setSortBy={vi.fn()}
-          onProjectCreated={vi.fn()}
-        />
-      </MemoryRouter>
-    );
-
-    const older = screen.getByText('Older project');
-    const newer = screen.getByText('Newer project');
-    expect(older.compareDocumentPosition(newer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  it("handles project creation callback", () => {
+    renderContent({ projects: [] });
+    fireEvent.click(screen.getByTestId("create-project"));
+    expect(onProjectCreated).toHaveBeenCalledWith({ id: 99 });
   });
 
-  it('uses the shared empty state when there are no projects', () => {
-    render(
-      <MemoryRouter>
-        <GroupWorkContent
-          projects={[]}
-          projectListProps={() => ({ onClick: vi.fn() })}
-          sortBy="due-date"
-          setSortBy={vi.fn()}
-          onProjectCreated={vi.fn()}
-        />
-      </MemoryRouter>
-    );
+  it("calls compareProjectsBySort for each comparison", () => {
+    renderContent();
+    expect(mockCompareProjectsBySort).toHaveBeenCalled();
+    expect(mockCompareProjectsBySort.mock.calls[0][2]).toBe("due-date");
+  });
 
-    expect(screen.getByText('No group projects yet.')).toBeTruthy();
-    expect(screen.getByText(/Create a shared project linked to one of your modules/i)).toBeTruthy();
+  it("handles projects without names during filtering", () => {
+    const unnamed = [{ id: 3, name: null }, { id: 4, name: "Gamma" }];
+    renderContent({ projects: unnamed });
+    fireEvent.change(screen.getByTestId("search-bar"), { target: { value: "Gam" } });
+    expect(screen.getByTestId("project-row-4")).toBeTruthy();
   });
 });

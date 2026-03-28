@@ -5,11 +5,11 @@ vi.mock("lucide-react", () => ({
   Target: () => <svg aria-hidden="true" />,
 }));
 
-vi.mock("../../../../components/common/widget_header/WidgetHeader", () => ({
+vi.mock("@/components/common/widget_header/WidgetHeader", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
-import WeeklyGoalWidget from "../../../../pages/homepage/components/WeeklyGoalWidget";
+import WeeklyGoalWidget from "@/pages/homepage/components/WeeklyGoalWidget";
 
 describe("WeeklyGoalWidget", () => {
   beforeEach(() => {
@@ -87,5 +87,25 @@ describe("WeeklyGoalWidget", () => {
     render(<WeeklyGoalWidget />);
 
     expect(screen.getByText("0.0h done · 10.0h left")).toBeInTheDocument();
+  });
+
+  it("reflects mid-week progress and persists an edited hourly goal", () => {
+    vi.setSystemTime(new Date("2026-03-25T12:00:00.000Z"));
+    localStorage.setItem("weeklyStudyGoalHours", "8");
+    localStorage.setItem("pomodoroSessions", JSON.stringify([
+      { endedAt: "2026-03-24T10:00:00.000Z", durationMins: 120 },
+      { endedAt: "2026-03-10T10:00:00.000Z", durationMins: 180 },
+    ]));
+
+    render(<WeeklyGoalWidget />);
+    expect(screen.getByText("8h")).toBeInTheDocument();
+    expect(screen.getByText("2.0h done · 6.0h left")).toBeInTheDocument();
+    expect(screen.getByText("25%")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTitle("Click to edit goal"));
+    fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "12" } });
+    fireEvent.click(screen.getByText("Save"));
+    expect(localStorage.getItem("weeklyStudyGoalHours")).toBe("12");
+    expect(screen.getByText("12h")).toBeInTheDocument();
   });
 });

@@ -9,7 +9,7 @@ import { buildValidationState, failValidation, ModuleFormField, ModuleFormFooter
 
 const EMPTY_FORM = { title: '', chapter: '', start_page: '', end_page:'', deadline: '', estimated_minutes: '',};
 
-const buildFormData = (form) => ({
+export const buildFormData = (form) => ({
     ...form,
     start_page: Number(form.start_page),
     end_page: Number(form.end_page),

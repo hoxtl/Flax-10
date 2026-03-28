@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import SkeletonBlock from "../../../components/common/loading_state/SkeletonBlock";
+import SkeletonBlock from "@/components/common/loading_state/SkeletonBlock";
 import styles from "./GroupWorkIndexSkeleton.module.css";
 
 export default function GroupWorkIndexSkeleton() {
