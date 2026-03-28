@@ -78,6 +78,10 @@ describe("landingPageUtils", () => {
 
     expect(getNearestSectionIndex(refs, 210)).toBe(2);
     expect(getNearestSectionIndex([{ getBoundingClientRect: () => ({ top: 0, height: 100 }) }], 50)).toBe(0);
+    expect(getNearestSectionIndex([
+      { getBoundingClientRect: () => ({ top: 0, height: 100 }) },
+      { getBoundingClientRect: () => ({ top: 400, height: 100 }) },
+    ], 50)).toBe(0);
   });
 
   it("calculates target sections and interpolations in both directions", () => {
