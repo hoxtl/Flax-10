@@ -25,6 +25,50 @@
       packages = eachSystem (system:
         let
           pkgs = import nixpkgs { inherit system; };
+
+          # Initialise and start a project-local PostgreSQL cluster.
+          # Exports POSTGRES_* variables so Django connects to it.
+          pgScript = ''
+            PGDATA_DIR="$WORK_DIR/.postgres/data"
+
+            if [ ! -f "$PGDATA_DIR/PG_VERSION" ]; then
+              echo "Initialising local PostgreSQL cluster..."
+              mkdir -p "$PGDATA_DIR"
+              initdb -D "$PGDATA_DIR" --no-locale --encoding=UTF8 --auth=trust
+              echo "listen_addresses = '127.0.0.1'" >> "$PGDATA_DIR/postgresql.conf"
+              echo "port = 5433"                    >> "$PGDATA_DIR/postgresql.conf"
+            fi
+
+            if ! pg_ctl -D "$PGDATA_DIR" status > /dev/null 2>&1; then
+              echo "Starting local PostgreSQL..."
+              pg_ctl -D "$PGDATA_DIR" -l "$PGDATA_DIR/logfile" start
+              until pg_isready -h 127.0.0.1 -p 5433 > /dev/null 2>&1; do
+                sleep 0.2
+              done
+            fi
+
+            CURRENT_USER="$(id -un)"
+            createdb -h 127.0.0.1 -p 5433 -U "$CURRENT_USER" flax10 2>/dev/null || true
+
+            export POSTGRES_HOST="127.0.0.1"
+            export POSTGRES_PORT="5433"
+            export POSTGRES_USER="$CURRENT_USER"
+            export POSTGRES_PASSWORD=""
+            export POSTGRES_DB="flax10"
+          '';
+
+          # On Linux, make shared libraries visible to pip-installed C-extension
+          # wheels (Pillow, psycopg-binary, etc.) that use manylinux bundles.
+          ldLibScript = pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+            export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath (with pkgs; [
+              stdenv.cc.cc.lib
+              zlib
+              libpng
+              libjpeg
+              openssl
+            ])}:''${LD_LIBRARY_PATH:-}"
+          '';
+
         in {
 
           # ─── nix run .#init ───────────────────────────────────────────────
@@ -37,9 +81,11 @@
               python312Packages.virtualenv
               nodejs_20
               git
+              postgresql
             ];
             text = ''
               ${commonScript}
+              ${ldLibScript}
               VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
               FRONTEND_DIR="$WORK_DIR/flax-10-project-files/frontend"
               BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
@@ -48,10 +94,13 @@
               echo "Entering Flax-10 wonderland..."
               echo ""
 
+              # ── PostgreSQL setup ────────────────────────────────────────
+              ${pgScript}
+
               # ── Python virtual environment ──────────────────────────────
               if [ ! -d "$VENV_DIR" ]; then
                 echo "Creating virtual environment..."
-                python -m venv "$VENV_DIR"
+                virtualenv "$VENV_DIR"
               fi
 
               # shellcheck disable=SC1091
@@ -105,12 +154,17 @@ with connection.cursor() as cursor:
             runtimeInputs = with pkgs; [
               python312
               nodejs_20
+              postgresql
             ];
             text = ''
               ${commonScript}
+              ${ldLibScript}
               VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
               FRONTEND_DIR="$WORK_DIR/flax-10-project-files/frontend"
               BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
+
+              # ── PostgreSQL setup ────────────────────────────────────────
+              ${pgScript}
 
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
@@ -173,12 +227,17 @@ PY
             runtimeInputs = with pkgs; [
               python312
               nodejs_20
+              postgresql
             ];
             text = ''
               ${commonScript}
+              ${ldLibScript}
               VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
               FRONTEND_DIR="$WORK_DIR/flax-10-project-files/frontend"
               BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
+
+              # ── PostgreSQL setup ────────────────────────────────────────
+              ${pgScript}
 
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
@@ -214,11 +273,13 @@ PY
           # Removes all seed data and allows immediate re-seeding.
           unseed = pkgs.writeShellApplication {
             name = "unseed";
-            runtimeInputs = with pkgs; [ python312 ];
+            runtimeInputs = with pkgs; [ python312 postgresql ];
             text = ''
               ${commonScript}
+              ${ldLibScript}
               VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
               BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
+              ${pgScript}
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
               cd "$BACKEND_DIR"
@@ -231,11 +292,13 @@ PY
           # Seeds the database without full initialisation.
           seed = pkgs.writeShellApplication {
             name = "seed";
-            runtimeInputs = with pkgs; [ python312 ];
+            runtimeInputs = with pkgs; [ python312 postgresql ];
             text = ''
               ${commonScript}
+              ${ldLibScript}
               VENV_DIR="$WORK_DIR/flax-10-project-files/venv"
               BACKEND_DIR="$WORK_DIR/flax-10-project-files/backend"
+              ${pgScript}
               # shellcheck disable=SC1091
               source "$VENV_DIR/bin/activate"
               cd "$BACKEND_DIR"
@@ -259,6 +322,7 @@ PY
               python312Packages.virtualenv
               nodejs_20
               git
+              postgresql
             ];
             shellHook = ''
               echo ""
