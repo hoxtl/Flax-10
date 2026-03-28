@@ -48,10 +48,10 @@ const NUDGE_DEADLINE = {
   description: "Quiz prep",
 };
 
-function renderDashboard() {
+function renderDashboard(props = {}) {
   return render(
     <MemoryRouter>
-      <MyModulesDashboard modules={[]} enrollments={[]} />
+      <MyModulesDashboard modules={[]} enrollments={[]} {...props} />
     </MemoryRouter>
   );
 }
@@ -177,6 +177,18 @@ describe("MyModulesDashboard", () => {
     });
   });
 
+  it("falls back to empty arrays when the dashboard APIs resolve undefined", async () => {
+    getUpcomingDeadlines.mockResolvedValue(undefined);
+    getSuggestedReadings.mockResolvedValue(undefined);
+
+    renderDashboard();
+
+    await waitFor(() => {
+      expect(screen.getByText(/No readings assigned/i)).toBeInTheDocument();
+      expect(screen.getByText(/No upcoming deadlines/i)).toBeInTheDocument();
+    });
+  });
+
   it("handles missing module and enrollment inputs", async () => {
     getUpcomingDeadlines.mockResolvedValue([]);
     getSuggestedReadings.mockResolvedValue([]);
@@ -206,5 +218,65 @@ describe("MyModulesDashboard", () => {
     await waitFor(() => {
       expect(screen.getAllByText("Enrolled modules")[0]).toBeInTheDocument();
     });
+  });
+
+  it("ignores module-code clicks when no view handler was provided", async () => {
+    getUpcomingDeadlines.mockResolvedValue([NUDGE_DEADLINE]);
+    getSuggestedReadings.mockResolvedValue([]);
+
+    renderDashboard({ modules: [{ id: 42, module_code: "LS4404" }] });
+
+    fireEvent.click(await screen.findByRole("button", { name: /LS4404/i }));
+    expect(screen.getAllByText(/Renal Physiology KEATS Quiz/i).length).toBeGreaterThan(0);
+  });
+
+  it("only opens modules when a clicked deadline code matches an available module", async () => {
+    getUpcomingDeadlines.mockResolvedValue([NUDGE_DEADLINE]);
+    getSuggestedReadings.mockResolvedValue([]);
+    const onViewModule = vi.fn();
+
+    const { rerender } = renderDashboard({ modules: null, onViewModule });
+
+    fireEvent.click(await screen.findByRole("button", { name: /LS4404/i }));
+    expect(onViewModule).not.toHaveBeenCalled();
+
+    rerender(
+      <MemoryRouter>
+        <MyModulesDashboard
+          modules={[{ id: 42, module_code: "LS4404", module_name: "Renal Physiology" }]}
+          enrollments={[]}
+          onViewModule={onViewModule}
+        />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: /LS4404/i }));
+    expect(onViewModule).toHaveBeenCalledWith({ id: 42, module_code: "LS4404", module_name: "Renal Physiology" });
+  });
+
+  it("removes a reading after the smart nudge adds it to tasks", async () => {
+    getUpcomingDeadlines.mockResolvedValue([]);
+    getSuggestedReadings.mockResolvedValue([
+      {
+        id: 11,
+        title: "Due-date reading",
+        module_name: "Intro",
+        module_code: "CS101",
+        due_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        start_page: 3,
+        end_page: 18,
+      },
+    ]);
+
+    renderDashboard();
+
+    expect(await screen.findByText("Due-date reading")).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: /\+ add to tasks/i })[0]);
+
+    await waitFor(() => {
+      expect(convertReadingToTask).toHaveBeenCalledWith(11);
+      expect(toastMock).toHaveBeenCalledWith("Reading added to tasks!");
+    });
+    await waitFor(() => expect(screen.queryByText("Due-date reading")).not.toBeInTheDocument());
   });
 });

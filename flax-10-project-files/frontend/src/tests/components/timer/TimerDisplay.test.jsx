@@ -16,6 +16,12 @@ describe('TimerDisplay', () => {
     it('formats time correctly', testFormatCorrectly);
   it('shows negative time for overtime', testNegativeOvertime);
 
+  it('applies break styling when the timer is in break mode', () => {
+    const { container } = render(<TimerDisplay timeLeft={300} mode="break" isOvertime={false} />);
+    expect(screen.getByText('05:00')).toBeInTheDocument();
+    expect(container.firstChild.className).toContain('break');
+  });
+
   it('uses the compact font size for long times', () => {
     const { container } = render(<TimerDisplay timeLeft={-6000} mode="work" isOvertime={true} />);
     expect(screen.getByText('+100:00')).toBeInTheDocument();

@@ -98,6 +98,48 @@ The system's architecture is illustrated across the two component diagrams below
 
 \FloatBarrier
 
+\clearpage
+
+\subsection*{Frontend Design Analysis}
+
+\textbf{High Cohesion:} \\
+The frontend demonstrates high cohesion through a careful separation of responsibilities
+across its architectural layers, as illustrated in Figure~\ref{fig:component_frontend}.
+Each module encapsulates a single, well-defined concern within the system: page-level
+components are responsible only for UI composition, shared state is centralised within
+dedicated contexts such as \texttt{CalendarContext} and \texttt{AuthState}, and
+domain-specific custom hooks encapsulate reusable behaviour independently of UI
+components. As a concrete example, \texttt{useCalendarEvents} encapsulates all calendar
+data-fetching behaviour and exposes it to \texttt{StudentPages} without those pages
+requiring any knowledge of the underlying API calls or state management implementation.
+This organised approach is consistently applied across all feature areas including
+calendar, tasks, timer, and notifications, ensuring that related logic and presentation
+are grouped together within their respective modules. Each layer therefore has a
+well-defined purpose, improving readability, maintainability, and testability across the
+codebase.
+
+\vspace{0.5cm}
+
+\textbf{Low Coupling:} \\
+The frontend enforces low coupling through the implementation of clear interaction
+boundaries between components and layers. Communication between modules occurs through
+well-defined interfaces: props for UI components, context providers for shared state, and
+service abstractions within the \texttt{APILayer} for backend communication. By extracting
+domain logic into custom hooks and delegating data access to service modules, components
+avoid direct dependencies on the implementation details of other parts of the system. For
+example, page components depend on context and hooks rather than directly invoking API
+calls, reducing tight coupling between the UI and data-fetching logic. The
+\texttt{HttpClient} serves as the single point of communication between the frontend and
+the Django backend, ensuring that changes to the backend interface require updates only
+within the \texttt{APILayer} rather than propagating throughout the component tree. This
+separation ensures that changes within a given module have minimal impact on other modules,
+provided that external interfaces remain stable, reinforcing modularity, scalability, and
+ease of refactoring across the frontend codebase.
+
+\clearpage
+
+\FloatBarrier
+
 \begin{landscape}
 \begin{figure}[!htbp]
     \centering
@@ -111,6 +153,33 @@ The system's architecture is illustrated across the two component diagrams below
 \end{landscape}
 
 \FloatBarrier
+
+\clearpage
+
+\subsection*{Backend Design Analysis}
+
+\textbf{High Cohesion:} \\
+The backend also observes high cohesion by grouping related responsibilities in clearly defined layers and feature-oriented subpackages, which can be seen in Figure~\ref{fig:component_backend}. Within the \texttt{studyFlax} application, domain
+models are organised under specific subdirectories such as \texttt{auth},
+\texttt{calendar}, \texttt{modules}, \texttt{tasks}, \texttt{society}, \texttt{timer},
+\texttt{notifications}, and \texttt{groupwork}, whereas additional concerns such as
+serialisers, views, URLs, signals, and utilities are stored and maintained in their own dedicated modules. As a result, each backend file or package serves one principal purpose: persisting domain state, validating API data, transforming API data, handling request logic, or wiring routes. To provide an example, the \texttt{SignalHandlers} layer is exclusively responsible for event-driven side effects such as creating notifications when a society announcement is published or a group work suggestion is replied to, keeping the logic separate from view and serialiser code. This organisation supports high cohesion
+because code that changes for the same reason is kept together, making the backend easier
+to navigate and extend without blurring the responsibilities of individual
+components.
+
+\vspace{0.5cm}
+
+\textbf{Low Coupling:} \\
+The backend enforces low coupling by mediating interactions between parts of the system through interfaces, instead of having tightly coupled implementations. This is visible in the structure of Figure~\ref{fig:component_backend}. URL configuration
+delegates incoming requests to specific view modules; these views then rely on serialisers and the ORM for validation and persistence, whereas additional concerns such as creating notifications, handling emails and external service communications are extracted into dedicated signals and service modules, avoiding duplication across request handlers.
+As an example, the \texttt{ORM} layer serves as the single point of database access for both
+the \texttt{Serialisers} and \texttt{Services} layers independently, meaning neither
+layer is aware of the other's existence or implementation. Moreover, the feature-based
+package structure reduces unnecessary cross-domain dependencies, since calendar logic,
+task logic, society logic, and authentication logic are each strongly encapsulated within their own backend areas. This ensures that modifications within one domain have minimal impact on other parts of the system, provided that external interfaces remain unchanged. Such a structural approach encourages separation of concerns, maintainability, and ease of independent testing across the backend codebase.
+
+\clearpage
 
 \section{Entity Relationship Diagrams}
 

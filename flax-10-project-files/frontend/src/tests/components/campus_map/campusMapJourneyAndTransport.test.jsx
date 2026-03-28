@@ -160,6 +160,22 @@ describe("UserJourneySection", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: /calculate route/i })).toBeEnabled());
   });
 
+  it("guards the calculate handler when coordinates are still unresolved", () => {
+    const onCalculate = vi.fn();
+    geocodeAddressMock.mockImplementation(() => new Promise(() => {}));
+
+    render(<JourneyHarness initialStart="Bush House" initialDestination="Waterloo" onCalculate={onCalculate} />);
+
+    const calculateButton = screen.getByRole("button", { name: /calculate route/i });
+    expect(calculateButton).toBeDisabled();
+
+    calculateButton.disabled = false;
+    calculateButton.removeAttribute("disabled");
+    fireEvent.click(calculateButton);
+
+    expect(onCalculate).not.toHaveBeenCalled();
+  });
+
   it("disables geolocation buttons while locating", () => {
     render(<JourneyHarness locating />);
 

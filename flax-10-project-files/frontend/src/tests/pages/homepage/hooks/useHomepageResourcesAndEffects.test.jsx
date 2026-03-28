@@ -167,6 +167,22 @@ describe("Homepage hooks", () => {
     vi.useRealTimers();
   });
 
+  it("treats missing calendar events like an empty calendar during bootstrap", () => {
+    vi.useFakeTimers();
+    const loadEvents = vi.fn();
+
+    renderHook(() =>
+      useHomepageEventBootstrap(undefined, loadEvents, new Date("2026-03-24T00:00:00Z"))
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(220);
+    });
+
+    expect(loadEvents).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
   it("plays the completion chime only when a work timer reaches zero", () => {
     const { rerender } = renderHook(
       ({ hasTimerSession, timeLeft, timerMode }) =>

@@ -11,15 +11,21 @@ vi.mock('../../../components/social/components/UserSearch', () => ({
             { id: 3, username: 'charlie' }
         ];
         const filtered = filterUsers ? filterUsers(dummyResults) : dummyResults;
+        const defaultFiltered = filterUsers ? filterUsers() : [];
+        const emptyState = renderEmptyState ? renderEmptyState({ clear: vi.fn(), query: 'nobody' }) : null;
 
         return (
             <div data-testid="mock-user-search">
                 <div data-testid="filtered-results">
                     {filtered.map(u => u.username).join(',')}
                 </div>
+                <div data-testid="default-filtered-results">
+                    {defaultFiltered.map(u => u.username).join(',')}
+                </div>
                 <div data-testid="custom-empty-state">
                     {renderEmptyState ? 'has-custom-empty-state' : 'no-custom-empty-state'}
                 </div>
+                <div data-testid="rendered-empty-state">{emptyState}</div>
                 <button onClick={() => onUserSelect({ id: 1, username: 'alice' })}>Select Alice</button>
                 <button onClick={() => onUserSelect({ id: 2, username: 'bob' })}>Select Bob</button>
                 <button onClick={() => onUserSelect({ id: 3, username: 'charlie' })}>Select Charlie</button>
@@ -120,5 +126,14 @@ describe('AddCollaboratorModal', () => {
 
         expect(onAdd).toHaveBeenCalledWith([{ id: 1, username: 'alice' }]);
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses the filter default users branch and renders the custom empty state content', async () => {
+        render(<AddCollaboratorModal onClose={vi.fn()} onAdd={vi.fn()} />);
+
+        expect(screen.getByTestId('default-filtered-results').textContent).toBe('');
+        await waitFor(() => {
+            expect(screen.getByTestId('rendered-empty-state').textContent).toContain('No users found');
+        });
     });
 });

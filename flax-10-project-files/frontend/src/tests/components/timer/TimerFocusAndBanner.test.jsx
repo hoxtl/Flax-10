@@ -120,6 +120,23 @@ describe("Timer focus and banner", () => {
     expect(onStreakData).toHaveBeenCalledWith({ current_streak_days: 8, total_sessions: 4 });
   });
 
+  it("falls back to empty summary values when analytics data is missing or rejected", async () => {
+    getSummary
+      .mockResolvedValueOnce({})
+      .mockRejectedValueOnce(new Error("week failed"))
+      .mockResolvedValueOnce({ summary: { total_sessions: 12, current_streak_days: 3, total_study_hours: 4.5 } });
+
+    const { hook, onStreakData } = await renderBannerHook();
+
+    expect(hook.result.current).toMatchObject({
+      streak: 3,
+      sessions: 12,
+      weeklyGoalDays: 0,
+      focusHours: 4.5,
+    });
+    expect(onStreakData).toHaveBeenCalledWith({ current_streak_days: 3, total_sessions: 0 });
+  });
+
   it("refreshes banner metrics when timer history events fire", async () => {
     let refreshHistory;
     listenToTimerHistoryEvents.mockImplementation((refresh) => {

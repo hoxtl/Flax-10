@@ -142,6 +142,14 @@ describe("app state hooks coverage", () => {
     expect(result.current[0]).toBe(false);
   });
 
+  it("keeps the tour hidden when it was already completed for the current profile", () => {
+    localStorage.setItem("flax_tour_done_7", "1");
+
+    const { result } = renderHook(() => useTourCheck());
+
+    expect(result.current[0]).toBe(false);
+  });
+
   it("skips the tour while loading or without a profile id", () => {
     useAuthMock.mockReturnValueOnce({
       loading: true,
@@ -156,5 +164,20 @@ describe("app state hooks coverage", () => {
     });
     const missingId = renderHook(() => useTourCheck());
     expect(missingId.result.current[0]).toBe(false);
+  });
+
+  it("can complete the tour without persisting when there is no profile id", () => {
+    useAuthMock.mockReturnValueOnce({
+      loading: false,
+      profile: {},
+    });
+
+    const { result } = renderHook(() => useTourCheck());
+
+    act(() => result.current[1]());
+
+    expect(localStorage.getItem("flax_tour_done_undefined")).toBeNull();
+    expect(localStorage.getItem("flax_tour_done_7")).toBeNull();
+    expect(result.current[0]).toBe(false);
   });
 });

@@ -7,6 +7,7 @@ vi.mock('../../../components/society/components/AddCollaboratorModal', () => ({
         <div data-testid="collab-modal">
             <button onClick={onClose}>CloseCollab</button>
             <button onClick={() => onAdd([{ id: 'u1', username: 'alice' }])}>AddCollab</button>
+            <button onClick={() => onAdd([{ id: 'u2', username: 'bob' }])}>AddSecondCollab</button>
         </div>
     ),
 }));
@@ -267,6 +268,44 @@ describe('CreateSocietyModal', () => {
         // Now remove it
         fireEvent.click(screen.getByText('Remove'));
         expect(screen.queryByText('alice')).not.toBeInTheDocument();
+    });
+
+    it('updates collaborator roles before submit', () => {
+        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+
+        fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
+            target: { value: 'Role Test Society' },
+        });
+        fireEvent.click(screen.getByText('+ Add Collaborators'));
+        fireEvent.click(screen.getByText('AddCollab'));
+        fireEvent.click(screen.getByText('ChangeRole'));
+        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+
+        expect(onCreate).toHaveBeenCalledWith(
+            expect.objectContaining({
+                collaborators: [expect.objectContaining({ id: 'u1', role: 'viewer' })],
+            })
+        );
+    });
+
+    it('preserves untouched collaborators when roles change and when one collaborator is removed', () => {
+        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+
+        fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
+            target: { value: 'Team Society' },
+        });
+        fireEvent.click(screen.getByText('+ Add Collaborators'));
+        fireEvent.click(screen.getByText('AddCollab'));
+        fireEvent.click(screen.getByText('AddSecondCollab'));
+        fireEvent.click(screen.getAllByText('ChangeRole')[0]);
+        fireEvent.click(screen.getAllByText('Remove')[0]);
+        fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+
+        expect(onCreate).toHaveBeenCalledWith(
+            expect.objectContaining({
+                collaborators: [expect.objectContaining({ id: 'u2', role: 'editor' })],
+            })
+        );
     });
 
     it('shows Photos (0/5) label initially', () => {
