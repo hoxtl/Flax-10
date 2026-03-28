@@ -73,14 +73,9 @@ vi.mock('../../../../context/TagContext', () => ({
     })),
 }));
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/calendar/DraggableEventStyles.test.jsx
 const mockGetEventTheme = vi.fn(() => ({ color: '#3b82f6', background: '#dbeafe' }));
-vi.mock('../../../components/calendar/utils/eventStyleUtils', () => ({
-    getEventTheme: (...args) => mockGetEventTheme(...args),
-=======
 vi.mock('../../../../components/calendar/utils/eventStyleUtils', () => ({
-    getEventTheme: vi.fn(() => ({ color: '#3b82f6', background: '#dbeafe' })),
->>>>>>> origin:flax-10-project-files/frontend/src/tests/components/calendar/draggable_event/DraggableEventStyles.test.jsx
+    getEventTheme: (...args) => mockGetEventTheme(...args),
 }));
 
 // CSS module mock
@@ -247,7 +242,6 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(mockOpenPopup).toHaveBeenCalledWith(societyEvent, expect.anything(), true);
     });
 
-<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/calendar/DraggableEventStyles.test.jsx
     it('treats non-numeric heights as zero for read-only cards', () => {
         getEventType.mockReturnValue('society');
         const { container } = render(<DraggableEvent event={societyEvent} style={{ height: 'auto', width: '100%' }} />);
@@ -260,10 +254,6 @@ describe('DraggableEvent Styles Coverage', () => {
         expect(mockOpenPopup).toHaveBeenCalledWith(personalEvent, expect.anything());
     });
 
-    // dragging class applied while isDragging
-
-=======
->>>>>>> origin:flax-10-project-files/frontend/src/tests/components/calendar/draggable_event/DraggableEventStyles.test.jsx
     it('applies dragging class when isDragging is true', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: true });
         const { container } = render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
