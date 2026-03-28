@@ -188,32 +188,31 @@ describe('CreateSocietyModal', () => {
         expect(screen.getByText('alice')).toBeInTheDocument();
     });
 
-    it('opens photo modal when Add Photos is clicked', () => {
+    it('opens photo modal when Add Cover Image is clicked', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         expect(screen.getByTestId('photo-modal')).toBeInTheDocument();
     });
 
     it('closes photo modal when ClosePhoto is clicked', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         fireEvent.click(screen.getByText('ClosePhoto'));
         expect(screen.queryByTestId('photo-modal')).not.toBeInTheDocument();
     });
 
     it('updates images when photo is added via photo modal', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         fireEvent.click(screen.getByText('AddPhoto'));
-        // After adding a photo, the label should show (1/5)
-        expect(screen.getByText('(1/5)')).toBeInTheDocument();
+        expect(screen.getByText('(1/1)')).toBeInTheDocument();
     });
 
-    it('shows Manage Photos label after photo added', () => {
+    it('shows Edit Cover Image label after photo added', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        fireEvent.click(screen.getByText('+ Add Photos'));
+        fireEvent.click(screen.getByText('+ Add Cover Image'));
         fireEvent.click(screen.getByText('AddPhoto'));
-        expect(screen.getByText('Manage Photos')).toBeInTheDocument();
+        expect(screen.getByText('Edit Cover Image')).toBeInTheDocument();
     });
 
     it('toggles ratification via the RatificationToggle', () => {
@@ -318,13 +317,13 @@ describe('CreateSocietyModal', () => {
         );
     });
 
-    it('shows Photos (0/5) label initially', () => {
+    it('shows Cover Image (0/1) label initially', () => {
         const { container } = render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        const addPhotosBtn = screen.getByText('+ Add Photos');
-        expect(addPhotosBtn).toBeInTheDocument();
+        const addCoverImageBtn = screen.getByText('+ Add Cover Image');
+        expect(addCoverImageBtn).toBeInTheDocument();
         const labels = container.querySelectorAll('label');
-        const photosLabel = Array.from(labels).find(l => l.textContent.includes('Photos'));
-        expect(photosLabel).toBeTruthy();
-        expect(photosLabel.textContent).toContain('0');
+        const coverImageLabel = Array.from(labels).find(l => l.textContent.includes('Cover Image'));
+        expect(coverImageLabel).toBeTruthy();
+        expect(coverImageLabel.textContent).toContain('(0/1)');
     });
 });

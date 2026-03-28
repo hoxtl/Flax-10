@@ -54,7 +54,8 @@ const makeHandleCreate = (setSocieties) =>
             role: 'admin',
             create_meta: { collaboratorFailures, ratificationError },
         };
-        setSocieties(prev => [...prev, societyWithAdminFlag]);
+        const { create_meta, ...societyForList } = societyWithAdminFlag;
+        setSocieties(prev => [...prev, societyForList]);
         return societyWithAdminFlag;
     };
 

@@ -47,7 +47,7 @@ const ModalsContainer = ({ state, data, handlers, societyId }) => {
     const urls = getImageUrls(data.society?.images);
     return (
         <>
-            {state.showSettings && <SettingsModal onClose={() => handlers.setS(false)} onDelete={handlers.onDelete} members={data.members} onFetchMembers={handlers.fetchM} onUpdateRole={data.updateMemberRole} onRemoveMember={handlers.removeM} onAddCollaborator={data.addCollaborator} ratificationStatus={data.society.ratification_status} isRatified={data.society.is_ratified} onRequestRatification={data.requestRatification} />}
+            {state.showSettings && <SettingsModal onClose={() => handlers.setS(false)} onDelete={handlers.onDelete} members={data.members} onFetchMembers={handlers.fetchM} onUpdateRole={data.updateMemberRole} onRemoveMember={handlers.removeM} onAddCollaborator={data.addCollaborator} ratificationStatus={data.society.ratification_status} isRatified={data.society.is_ratified} isAdmin={isAdmin} onRequestRatification={data.requestRatification} />}
             {state.showReportModal && <ReportSocietyModal society={data.society} onClose={() => handlers.setR(false)} onReportSuccess={() => handlers.updateLS({ has_reported: true })} />}
             {state.galleryOpen && <ImageGalleryModal images={urls} initialIndex={state.galleryOpen?.index} onClose={() => handlers.setG(null)} />}
             {state.showCoverModal && <CoverImageModal images={urls} onClose={() => handlers.setCE(false)} onUpdate={(imgs) => handlers.updateS({ images: imgs, image: imgs[0] || null })} />}
@@ -160,6 +160,7 @@ function ReportButton({ hasReported, onReport, onUnreport }) {
                 className={`${styles.settingsBtn} ${styles.reportBtn} ${hasReported ? styles.reportedBtn : ''}`}
                 onClick={hasReported ? onUnreport : onReport}
                 aria-label={title}
+                title={title}
                 type="button"
             >
                 <Flag className={styles.reportBtnIcon} size={24} fill={hasReported ? "currentColor" : "none"} strokeWidth={hasReported ? 1 : 2} />

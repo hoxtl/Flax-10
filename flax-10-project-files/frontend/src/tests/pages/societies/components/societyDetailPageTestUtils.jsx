@@ -109,21 +109,25 @@ function createMutations() {
   return mutations;
 }
 
-function SocietyHeroMock({ society, onUpdateName, onImageClick, onEditImages }) {
+function SocietyHeroMock({ society, onUpdateName, onImageClick, onEditImages, onViewMembers, actionContent, metaContent }) {
   return (
     <div data-testid="hero">
       <span>{society.name}</span>
       <button type="button" onClick={() => onUpdateName("Renamed Society")}>rename-society</button>
       <button type="button" onClick={() => onImageClick(1)}>open-gallery</button>
       <button type="button" onClick={onEditImages}>edit-images</button>
+      <button type="button" onClick={onViewMembers}>view-members</button>
+      {actionContent}
+      {metaContent}
     </div>
   );
 }
 
-function SocietyInfoMock({ onViewMembers, onToggleEditMode }) {
+function SocietyInfoMock({ onViewMembers, onToggleEditMode, showMeta = true }) {
+  if (!showMeta) return null;
+
   return (
     <div data-testid="info">
-      <button type="button" onClick={onViewMembers}>view-members</button>
       <button type="button" onClick={onToggleEditMode}>toggle-edit-mode</button>
     </div>
   );

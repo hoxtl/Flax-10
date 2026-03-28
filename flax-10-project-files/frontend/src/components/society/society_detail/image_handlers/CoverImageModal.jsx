@@ -1,69 +1,57 @@
 /*
- * CoverImageModal manages a single society cover image with an explicit save flow.
+ * CoverImageModal manages society cover images where the first image is the
+ * primary cover shown across the society surfaces.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import StandardModal from "../../../common/standard_modal/StandardModal";
-import PrimaryButton from "../../../common/primary_button/PrimaryButton";
+import { ImageGrid, ImageHeader } from "./ImageManagerComponents";
 import styles from "./ImageManagerComponents.module.css";
 
-function readSelectedImage(file, onLoad) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => onLoad(event.target?.result || "");
-    reader.readAsDataURL(file);
+function buildPinnedImages(images, index) {
+    if (index <= 0 || index >= images.length) return images;
+    const nextImages = [...images];
+    const [selected] = nextImages.splice(index, 1);
+    nextImages.unshift(selected);
+    return nextImages;
 }
 
-export default function CoverImageModal({ images = [], onClose, onUpdate }) {
-    const fileRef = useRef(null);
-    const [draftImage, setDraftImage] = useState(images[0] || "");
+function buildImagesWithoutIndex(images, index) {
+    return images.filter((_, currentIndex) => currentIndex !== index);
+}
+
+function buildImagesWithUpload(images, uploadedImage) {
+    return [...images, uploadedImage].slice(0, 5);
+}
+
+export default function CoverImageModal({ images = [], availablePhotos = [], onClose, onUpdate }) {
+    const [draftImages, setDraftImages] = useState(images);
 
     useEffect(() => {
-        setDraftImage(images[0] || "");
+        setDraftImages(images);
     }, [images]);
 
-    const handleSave = () => {
-        onUpdate?.(draftImage ? [draftImage] : []);
-        onClose?.();
+    const updateImages = (nextImages) => {
+        setDraftImages(nextImages);
+        onUpdate?.(nextImages);
     };
 
     return (
         <StandardModal
-            title="Edit Cover Image"
-            subtitle="Use one image for the society card and banner."
+            hideHeader
             onClose={onClose}
             size="md"
-            modalClassName={styles.modalShellWide}
-            contentClassName={styles.modalContent}
+            modalClassName={styles.modal}
         >
-            <div className={styles.singleCoverBody}>
-                <button
-                    type="button"
-                    className={`${styles.coverPreview} ${draftImage ? styles.coverPreviewFilled : ""}`}
-                    onClick={() => fileRef.current?.click()}
-                >
-                    {draftImage ? <img src={draftImage} alt="Cover preview" className={styles.coverPreviewImage} /> : <span className={styles.coverPreviewLabel}>Upload cover image</span>}
-                </button>
-                <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={(event) => readSelectedImage(event.target.files?.[0], setDraftImage)}
-                />
-                <div className={styles.singleCoverActions}>
-                    <PrimaryButton type="button" variant="secondary" pill onClick={() => fileRef.current?.click()}>
-                        {draftImage ? "Replace Image" : "Choose Image"}
-                    </PrimaryButton>
-                    <PrimaryButton type="button" variant="ghost" pill onClick={() => setDraftImage("")} disabled={!draftImage}>
-                        Remove
-                    </PrimaryButton>
-                </div>
-                <div className={styles.singleCoverFooter}>
-                    <PrimaryButton type="button" variant="ghost" pill onClick={onClose}>Cancel</PrimaryButton>
-                    <PrimaryButton type="button" pill onClick={handleSave}>Done</PrimaryButton>
-                </div>
-            </div>
+            <ImageHeader title="Manage Cover Images" onClose={onClose} />
+            <p className={styles.hint}>First image is shown on society card and banner. Up to 5 images.</p>
+            <ImageGrid
+                images={draftImages}
+                availablePhotos={availablePhotos}
+                onPin={(index) => updateImages(buildPinnedImages(draftImages, index))}
+                onDelete={(index) => updateImages(buildImagesWithoutIndex(draftImages, index))}
+                onAdd={(uploadedImage) => updateImages(buildImagesWithUpload(draftImages, uploadedImage))}
+            />
         </StandardModal>
     );
 }

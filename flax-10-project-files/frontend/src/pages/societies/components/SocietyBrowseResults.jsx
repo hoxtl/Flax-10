@@ -4,6 +4,7 @@
 
 import SocietyCard from "../../../components/society/components/SocietyCard";
 import gridStyles from "../../../components/common/card/CardGrid.module.css";
+import EmptyState from "../../../components/common/empty_state/EmptyState";
 import SearchEmptyState from "../../../components/common/search_empty_state/SearchEmptyState";
 import { Pagination } from "../../../components/pagination/Pagination";
 import { usePagination } from "../../../hooks/usePagination";
@@ -11,7 +12,10 @@ import { usePagination } from "../../../hooks/usePagination";
 const PAGE_SIZE = 15;
 
 export function SocietyBrowseResults({ items, search, setSearch, onClear, onSelect, onReport, onUnreport }) {
-    if (!items.length) return <BrowseEmptyState search={search} onClear={onClear || (() => setSearch(""))} />;
+    if (!items.length) {
+        return <BrowseEmptyState search={search} onClear={onClear || (() => setSearch(""))} />;
+    }
+
     return (
         <PaginatedResults
             items={items}
@@ -23,9 +27,20 @@ export function SocietyBrowseResults({ items, search, setSearch, onClear, onSele
 }
 
 function BrowseEmptyState({ search, onClear }) {
+    const trimmedSearch = search.trim();
+
+    if (!trimmedSearch) {
+        return (
+            <EmptyState
+                title="No societies found"
+                description="Try adjusting your search or filters."
+            />
+        );
+    }
+
     return (
         <SearchEmptyState
-            query={search}
+            query={trimmedSearch}
             itemLabel="societies"
             hint="Try adjusting your search or filters"
             alwaysShowClear
