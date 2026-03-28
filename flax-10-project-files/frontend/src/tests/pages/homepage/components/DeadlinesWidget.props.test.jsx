@@ -67,29 +67,24 @@ describe("DeadlinesWidget homepage props", () => {
     }));
   });
 
-  it("switches to the teacher copy and remaps module clicks", () => {
+  it("switches to the teacher copy", () => {
     const onSelectModule = vi.fn();
-
-    render(
-      <DeadlinesWidget
-        deadlines={[{ id: 1, module_code: "CS101" }]}
-        isTeacher
-        onSelectModule={onSelectModule}
-      />,
-    );
-
+    render(<DeadlinesWidget deadlines={[{ id: 1, module_code: "CS101" }]} isTeacher onSelectModule={onSelectModule} />);
     const props = upcomingWidgetProps.mock.calls[0][0];
-
     expect(props).toEqual(expect.objectContaining({
       deadlines: [{ id: 1, module_code: "CS101" }],
       emptyMessage: "No teaching deadlines upcoming.",
       emptySub: "Deadlines from modules you teach will show up here.",
       title: "Teaching Deadlines",
     }));
+  });
 
+  it("remaps teacher module clicks", () => {
+    const onSelectModule = vi.fn();
+    render(<DeadlinesWidget deadlines={[{ id: 1, module_code: "CS101" }]} isTeacher onSelectModule={onSelectModule} />);
+    const props = upcomingWidgetProps.mock.calls[0][0];
     props.onModuleCodeClick("CS101");
     expect(onSelectModule).toHaveBeenCalledWith({ code: "CS101" });
-
     expect(emptyStateCardProps.mock.calls[0][0]).toEqual(expect.objectContaining({
       message: "No teaching deadlines upcoming.",
     }));

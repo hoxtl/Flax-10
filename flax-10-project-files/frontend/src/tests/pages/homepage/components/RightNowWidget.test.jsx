@@ -94,7 +94,6 @@ describe('RightNowWidget', () => {
         expect(screen.getByText('Right Now')).toBeTruthy();
     });
     it('shows "Nothing on right now" when no current event', () => {
-        // Use a past event so eventCount > 0, skipping the "empty day" branch
         const pastTime = new Date(baseNow.getTime() - 3600000).toISOString();
         renderWidget({ isToday: true, sortedEvents: [{ title: 'Past Event', start_time: pastTime }] });
         expect(screen.getByText('Nothing on right now')).toBeTruthy();

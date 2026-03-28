@@ -1,4 +1,3 @@
-import React from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -138,8 +137,8 @@ describe("RightNowSubComponents", () => {
     expect(screen.getByText("1 schedule overlap today")).toBeInTheDocument();
   });
 
-  it("renders commute context card in loading and success states", () => {
-    const { rerender } = render(
+  it("renders the commute context loading state", () => {
+    render(
       <MemoryRouter>
         <CommuteContextCard
           campus={{ shortName: "WAT", name: "Waterloo" }}
@@ -151,8 +150,10 @@ describe("RightNowSubComponents", () => {
     );
     expect(screen.getByText("WAT commute")).toBeInTheDocument();
     expect(screen.getByText("Checking route...")).toBeInTheDocument();
+  });
 
-    rerender(
+  it("renders the commute context success state", () => {
+    render(
       <MemoryRouter>
         <CommuteContextCard
           campus={{ shortName: "STR", name: "Strand" }}

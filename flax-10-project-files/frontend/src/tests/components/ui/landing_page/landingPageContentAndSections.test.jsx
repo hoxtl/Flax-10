@@ -18,56 +18,47 @@ vi.mock("../../../../components/ui/components/globe", () => ({
 
 const styles = new Proxy({}, { get: (_, key) => key });
 
-describe("LandingPageContent and landing sections", () => {
-  it("renders the composed landing layout, mixed section states, and globe defaults", () => {
-    const primaryAction = vi.fn();
-    const secondaryAction = vi.fn();
-    const containerRef = { current: null };
-    const sectionRefs = { current: [] };
-    const sections = [
-      {
-        id: "hero",
-        title: "Hero",
-        subtitle: "Everything in one place",
-        description: "A focused overview",
-        align: "center",
-        badge: "01",
-        features: [
-          { title: "Track progress", description: "Stay on top of the day." },
-        ],
-        content: <div>Inline content</div>,
-        actions: [
-          { label: "Get started", onClick: primaryAction },
-          { label: "Learn more", variant: "secondary", onClick: secondaryAction },
-        ],
-      },
-      {
-        id: "details",
-        title: "Details",
-        description: "A second section",
-        align: "right",
-      },
-      {
-        id: "finish",
-        title: "Finish",
-        description: "The final step",
-      },
-    ];
+const primaryAction = vi.fn();
+const secondaryAction = vi.fn();
 
-    const { container } = render(
-      <LandingPageContent
-        activeSection={1}
-        className="extra-shell"
-        containerRef={containerRef}
-        displayTransform="translate3d(10vw, 20vh, 0)"
-        globeOpacity={0.5}
-        scrollProgress={0.35}
-        sectionRefs={sectionRefs}
-        sections={sections}
-        styles={styles}
-        topPills={["Plan", "Focus"]}
-      />,
-    );
+const sections = [
+  {
+    id: "hero", title: "Hero", subtitle: "Everything in one place", description: "A focused overview",
+    align: "center", badge: "01",
+    features: [{ title: "Track progress", description: "Stay on top of the day." }],
+    content: <div>Inline content</div>,
+    actions: [
+      { label: "Get started", onClick: primaryAction },
+      { label: "Learn more", variant: "secondary", onClick: secondaryAction },
+    ],
+  },
+  { id: "details", title: "Details", description: "A second section", align: "right" },
+  { id: "finish", title: "Finish", description: "The final step" },
+];
+
+const containerRef = { current: null };
+const sectionRefs = { current: [] };
+
+function renderLanding() {
+  return render(
+    <LandingPageContent
+      activeSection={1}
+      className="extra-shell"
+      containerRef={containerRef}
+      displayTransform="translate3d(10vw, 20vh, 0)"
+      globeOpacity={0.5}
+      scrollProgress={0.35}
+      sectionRefs={sectionRefs}
+      sections={sections}
+      styles={styles}
+      topPills={["Plan", "Focus"]}
+    />,
+  );
+}
+
+describe("LandingPageContent and landing sections", () => {
+  it("renders the composed landing layout, globe defaults, and section content", () => {
+    renderLanding();
 
     expect(defaultGlobeConfig.positions).toHaveLength(4);
     expect(screen.getByTestId("landing-globe")).toBeInTheDocument();
@@ -83,7 +74,10 @@ describe("LandingPageContent and landing sections", () => {
     expect(primaryAction).toHaveBeenCalledTimes(1);
     expect(secondaryAction).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Learn more")).toHaveAttribute("data-variant", "secondary");
+  });
 
+  it("applies correct section classes and styles", () => {
+    const { container } = renderLanding();
     const renderedSections = container.querySelectorAll("section");
     expect(renderedSections).toHaveLength(3);
     expect(renderedSections[0].className).toContain("sectionFirst");
@@ -99,7 +93,10 @@ describe("LandingPageContent and landing sections", () => {
     expect(renderedSections[1].querySelector(".featureGrid")).toBeNull();
     expect(renderedSections[1].querySelector(".sectionContent")).toBeNull();
     expect(renderedSections[1].querySelector(".actionRow")).toBeNull();
+  });
 
+  it("populates section refs and wrapper styles", () => {
+    const { container } = renderLanding();
     expect(sectionRefs.current).toHaveLength(3);
     expect(sectionRefs.current[1]?.id).toBe("details");
     expect(container.querySelector(".wrapper")).toHaveClass("extra-shell");

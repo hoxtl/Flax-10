@@ -55,20 +55,23 @@ describe("RightNowUtils", () => {
     expect(getNextEvent([{ id: 1, start_time: "2026-03-24T08:00:00.000Z" }, { id: 2 }], now)).toBeNull();
   });
 
-  it("detects campus commute, journey summaries, and time-left strings", () => {
+  it("detects campus commute from locations and titles", () => {
     getTflLinesForLocationMock.mockImplementation((value) => (String(value).includes("King's Cross") ? ["Victoria"] : []));
-
     expect(hasCampusCommute({ location: "King's Cross Station" })).toBe(true);
     expect(hasCampusCommute({ title: "King's Cross seminar" })).toBe(true);
     expect(hasCampusCommute({ location: "Other" })).toBe(false);
     expect(hasCampusCommute(null)).toBe(false);
-  expect(hasCampusCommute({ location: " ", title: "" })).toBe(false);
+    expect(hasCampusCommute({ location: " ", title: "" })).toBe(false);
+  });
 
+  it("formats time-left strings for ended and active events", () => {
     expect(formatTimeLeft(null, Date.now())).toBeNull();
     expect(formatTimeLeft("2026-03-24T09:00:00.000Z", new Date("2026-03-24T09:10:00.000Z").getTime())).toBe("Ended");
     expect(formatTimeLeft("2026-03-24T09:25:00.000Z", new Date("2026-03-24T09:00:00.000Z").getTime())).toBe("25m left");
     expect(formatTimeLeft("2026-03-24T11:05:00.000Z", new Date("2026-03-24T09:00:00.000Z").getTime())).toBe("2h 5m left");
+  });
 
+  it("builds journey summaries from route options", () => {
     expect(
       getJourneySummary({
         duration: 42,
@@ -78,7 +81,6 @@ describe("RightNowUtils", () => {
         ],
       }),
     ).toEqual({ duration: "42 min", mode: "train", lines: ["Central", "Northern"] });
-
     expect(getJourneySummary({ duration: Number.NaN, legs: [] })).toEqual({ duration: null, mode: "journey", lines: [] });
   });
 

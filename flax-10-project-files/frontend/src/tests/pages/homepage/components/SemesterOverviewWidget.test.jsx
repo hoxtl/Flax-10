@@ -1,4 +1,3 @@
-import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import SemesterOverviewWidget from "@/pages/homepage/components/SemesterOverviewWidget";
@@ -194,32 +193,30 @@ describe("SemesterOverviewWidget", () => {
     expect(container.querySelector('[class*="barLecture"]')).toBeNull();
   });
 
-  it("renders reading weeks, mixed classifications, and a deadline cluster warning", () => {
-    useSemesterData.mockReturnValue({
-      deadlines: [
-        { due_date: "2026-03-16T12:00:00.000Z" },
-        { due_date: "2026-03-18T12:00:00.000Z" },
-        { start_due_date: "2026-03-17T12:00:00.000Z" },
-      ],
-      events: [
-        { date: "2026-03-15T10:00:00.000Z", title: "Society social" },
-        { source: "timetable", start_time: "2026-03-17T09:00:00.000Z", title: "Lab work" },
-        { start_time: "2026-03-19T09:00:00.000Z", title: "Final assessment preparation" },
-      ],
-      loading: false,
-    });
+  const readingWeekData = {
+    deadlines: [
+      { due_date: "2026-03-16T12:00:00.000Z" },
+      { due_date: "2026-03-18T12:00:00.000Z" },
+      { start_due_date: "2026-03-17T12:00:00.000Z" },
+    ],
+    events: [
+      { date: "2026-03-15T10:00:00.000Z", title: "Society social" },
+      { source: "timetable", start_time: "2026-03-17T09:00:00.000Z", title: "Lab work" },
+      { start_time: "2026-03-19T09:00:00.000Z", title: "Final assessment preparation" },
+    ],
+    loading: false,
+  };
 
-    render(
-      <SemesterOverviewWidget
-        numWeeks={3}
-        readingWeekIndices={[1]}
-        semesterLabel="Term A"
-        semesterStart="2026-03-02"
-      />,
-    );
-
+  it("renders reading weeks and mixed classifications", () => {
+    useSemesterData.mockReturnValue(readingWeekData);
+    render(<SemesterOverviewWidget numWeeks={3} readingWeekIndices={[1]} semesterLabel="Term A" semesterStart="2026-03-02" />);
     expect(screen.getByText("Term A")).toBeInTheDocument();
     expect(screen.getByText("RW")).toBeInTheDocument();
+  });
+
+  it("shows a deadline cluster warning when the week is dense", () => {
+    useSemesterData.mockReturnValue(readingWeekData);
+    render(<SemesterOverviewWidget numWeeks={3} readingWeekIndices={[1]} semesterLabel="Term A" semesterStart="2026-03-02" />);
     expect(screen.getByText(/Deadline cluster/i)).toBeInTheDocument();
   });
 
