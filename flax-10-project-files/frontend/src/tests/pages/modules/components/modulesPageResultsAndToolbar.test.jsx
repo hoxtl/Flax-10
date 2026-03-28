@@ -352,8 +352,102 @@ describe("ModulesPageResults coverage", () => {
     expect(screen.getByText("BackToTop")).toBeInTheDocument();
   });
 
-  it("switches the student overview to the enrolments tab", () => {
+  it("renders the teacher page title and opens the create module form", () => {
     const state = buildTestState({
+      isTeacher: true,
+      hook: {
+        modules: [{ id: 1, module_code: "CS101" }],
+        enrollments: [],
+        toggleEnrollment: vi.fn(),
+        taskCountsByModule: {},
+      },
+    });
+
+    render(<MainView state={state} />);
+
+    expect(screen.getByText("Modules")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /\+ Create Module/i }));
+    expect(state.setEditingModule).toHaveBeenCalledWith(null);
+    expect(state.setShowForm).toHaveBeenCalledWith(true);
+  });
+
+  it("renders the student browse view title, subtitle, and toolbar placeholder", () => {
+    useMainModuleViewMock.mockReturnValueOnce({
+      search: { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() },
+      sorting: buildSorting(),
+    });
+    const state = buildTestState({
+      isTeacher: false,
+      hook: {
+        modules: [{ id: 3, module_code: "CS303" }],
+        enrollments: [],
+        toggleEnrollment: vi.fn(),
+        taskCountsByModule: {},
+      },
+    });
+
+    render(<MainView state={state} />);
+
+    expect(screen.getByRole("heading", { name: "Browse Modules" })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search King's modules by name or code...")).toBeInTheDocument();
+    expect(screen.getByText("My Modules")).toBeInTheDocument();
+    expect(screen.getAllByText("Browse Modules").length).toBeGreaterThan(0);
+  });
+
+  it("uses the enrolled-modules placeholder and hides the course filter for my-modules views", () => {
+    const search = { query: "", onQueryChange: vi.fn() };
+    const sorting = buildSorting({ selectedCourses: undefined, toggleCourse: undefined });
+
+    render(<ModuleToolbar search={search} sorting={sorting} isTeacher={false} isMyModules />);
+
+    expect(screen.getByPlaceholderText("Search your modules by name or code...")).toBeInTheDocument();
+    expect(screen.queryByText("CourseFilter")).not.toBeInTheDocument();
+  });
+
+  it("falls back to a safe no-op course toggle when the sorting hook does not provide one", () => {
+    const search = { query: "", onQueryChange: vi.fn() };
+    const sorting = buildSorting({ selectedCourses: undefined, toggleCourse: undefined });
+
+    render(<ModuleToolbar search={search} sorting={sorting} isTeacher={false} isMyModules={false} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "toggle course" }));
+    expect(screen.getByText("CourseFilter")).toBeInTheDocument();
+  });
+
+  it("treats an undefined selectedCourses list as no active filters", () => {
+    const search = { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() };
+    render(<EmptyResults search={search} sorting={buildSorting({ selectedCourses: undefined })} isTeacher={false} />);
+    expect(screen.getByText("search-empty")).toBeInTheDocument();
+  });
+
+  it("wraps the student browse view in a page transition outside the test environment", () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+
+    useMainModuleViewMock.mockReturnValueOnce({
+      search: { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() },
+      sorting: buildSorting(),
+    });
+
+    const state = buildTestState({
+      isTeacher: false,
+      hook: {
+        modules: [{ id: 4, module_code: "CS404" }],
+        enrollments: [],
+        toggleEnrollment: vi.fn(),
+        taskCountsByModule: {},
+      },
+    });
+
+    render(<MainView state={state} />);
+
+    expect(screen.getByTestId("page-transition")).toBeInTheDocument();
+
+    process.env.NODE_ENV = originalNodeEnv;
+  });
+
+  it("switches the student overview to the enrolments tab", () => {
+    const initialState = buildTestState({
       isTeacher: false,
       hook: {
         modules: [{ id: 2, module_code: "CS202" }],
@@ -367,17 +461,7 @@ describe("ModulesPageResults coverage", () => {
       sorting: buildSorting(),
     });
 
-    const state = buildTestState({
-      isTeacher: false,
-      hook: {
-        modules: [{ id: 1, module_code: "CS101" }],
-        enrollments: [{ module: 1 }],
-        toggleEnrollment: vi.fn(),
-        taskCountsByModule: {},
-      },
-    });
-
-    render(<MainView state={state} />);
+    render(<MainView state={initialState} />);
     fireEvent.click(screen.getByRole("button", { name: /My Enrolments/i }));
     expect(screen.getByPlaceholderText("Search your enrolled modules...")).toBeInTheDocument();
     expect(screen.getByTestId("module-grid")).toBeInTheDocument();

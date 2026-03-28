@@ -119,7 +119,7 @@ describe("useLandingPageState behavior", () => {
       { id: "middle" },
       { id: "finish" },
     ];
-    const { unmount } = render(
+    const utils = render(
       <LandingStateHarness
         sections={sections}
         globeConfig={{

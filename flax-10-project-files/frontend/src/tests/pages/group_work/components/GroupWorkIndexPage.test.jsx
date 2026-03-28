@@ -139,7 +139,12 @@ vi.mock("@/components/common/app_page/AppPage", () => ({
 vi.mock("@/components/pagination/Pagination", () => ({ BackToTop: () => <div>Back to top</div> }));
 
 vi.mock("@/pages/group_work/components/GroupWorkDetail", () => ({
-  default: ({ onBack }) => <button type="button" onClick={onBack}>detail-view</button>,
+  default: ({ onBack, onDelete }) => (
+    <div>
+      <button type="button" onClick={onBack}>detail-view</button>
+      <button type="button" onClick={onDelete}>delete-detail</button>
+    </div>
+  ),
 }));
 
 vi.mock("@/pages/group_work/components/GroupWorkIndexSkeleton", () => ({
@@ -234,6 +239,13 @@ describe("GroupWork index page and tasks tab", () => {
       expect(mockNavigate).toHaveBeenCalledWith("/group-work", { replace: true });
     });
 
+    it("returns to overview when the detail route deletes a project", () => {
+      useSelectedProjectId.mockReturnValue("44");
+      render(<GroupWorkIndexPage />);
+      fireEvent.click(screen.getByText("delete-detail"));
+      expect(mockNavigate).toHaveBeenCalledWith("/group-work", { replace: true });
+    });
+
     it("shows a skeleton while projects are loading", () => {
       useSelectedProjectId.mockReturnValue(null);
       useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: true });
@@ -243,15 +255,19 @@ describe("GroupWork index page and tasks tab", () => {
 
     it("renders overview stats, opens projects, prepends, and changes sort", () => {
       const setProjects = vi.fn();
+      const setSortBy = vi.fn();
       useSelectedProjectId.mockReturnValue(null);
       useGroupProjects.mockReturnValue({ projects: [{ id: 1, name: "Alpha" }], setProjects, loading: false });
+      useGroupProjectSort.mockReturnValue({ sortBy: "deadline", setSortBy });
       render(<GroupWorkIndexPage />);
       fireEvent.click(screen.getByText("open-project"));
       fireEvent.click(screen.getByText("prepend-project"));
       fireEvent.click(screen.getByText("set-sort"));
-      expect(screen.getByText(/Active projects:1/)).toBeInTheDocument();
+      expect(screen.getByText("content:1")).toBeInTheDocument();
+      expect(screen.getByText("Active projects")).toBeInTheDocument();
       expect(mockNavigate).toHaveBeenCalledWith("/group-work?project=1");
       expect(setProjects).toHaveBeenCalled();
+      expect(setSortBy).toHaveBeenCalledWith("name");
       expect(screen.getAllByText("Back to top").length).toBeGreaterThan(0);
     });
   });
