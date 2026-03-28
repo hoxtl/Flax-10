@@ -3,7 +3,7 @@
  */
 
 import { motion } from 'framer-motion';
-import Tooltip from '../../common/Tooltip/Tooltip';
+import Tooltip from '../../common/tooltip/Tooltip';
 import styles from '../styles/InsightCards.module.css';
 
 const MotionCircle = motion.circle;
