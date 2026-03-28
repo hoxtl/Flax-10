@@ -59,7 +59,7 @@ describe('Tabs', () => {
     expect(container.firstChild.className).toContain('compact');
     expect(container.firstChild.className).toContain('outer');
     expect(screen.getByText('Middle block')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '1One' }).className).toContain('tab-extra');
-    expect(screen.getByRole('button', { name: '1One' }).className).toContain('headingTab');
+    expect(screen.getByRole('button', { name: '1 One' }).className).toContain('tab-extra');
+    expect(screen.getByRole('button', { name: '1 One' }).className).toContain('headingTab');
   });
 });

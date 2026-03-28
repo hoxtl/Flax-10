@@ -85,6 +85,46 @@ describe("useProfileStatePieces", () => {
     expect(tryLoadProfileMock).toHaveBeenCalledWith(expect.any(Function), expect.any(Function), "9", false);
   });
 
+  it("updates optimistic sharing only when profile data exists", async () => {
+    const { result: emptyResult } = renderHook(() => useProfileData("9"));
+    act(() => {
+      emptyResult.current.setOptimisticShare(true);
+    });
+    expect(emptyResult.current.profileData).toBeNull();
+
+    tryLoadProfileMock.mockImplementationOnce(async (setProfileData, setLoading, userId) => {
+      setProfileData({ id: userId, is_sharing: false, username: "remote" });
+      setLoading(false);
+    });
+
+    const { result } = renderHook(() => useProfileData("9"));
+    await waitFor(() => expect(result.current.profileData).toEqual({ id: "9", is_sharing: false, username: "remote" }));
+
+    act(() => {
+      result.current.setOptimisticShare(true);
+    });
+
+    expect(result.current.profileData).toEqual({ id: "9", is_sharing: true, username: "remote" });
+  });
+
+  it("polls remote profiles on an interval and clears it on unmount", async () => {
+    vi.useFakeTimers();
+    const clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
+    const { unmount } = renderHook(() => useProfileData("12"));
+    expect(tryLoadProfileMock).toHaveBeenCalledWith(expect.any(Function), expect.any(Function), "12");
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(tryLoadProfileMock).toHaveBeenCalledWith(expect.any(Function), expect.any(Function), "12", true);
+
+    unmount();
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
   it("skips task count loading for remote profiles", () => {
     const { result } = renderHook(() => useTaskCountData(22));
 

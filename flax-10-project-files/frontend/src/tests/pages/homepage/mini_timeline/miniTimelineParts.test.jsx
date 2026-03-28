@@ -21,16 +21,55 @@ vi.mock("../../../../pages/homepage/utils/eventUtils", () => ({
   stripEmojiFromTitle: (title) => String(title || "").replace("🔥 ", ""),
 }));
 
+const doesEventOverlapSleepWindow = vi.fn(() => false);
+
+vi.mock("../../../../components/settings/hooks/useSleepWarning", () => ({
+  doesEventOverlapSleepWindow: (...args) => doesEventOverlapSleepWindow(...args),
+}));
+
+vi.mock("../../../../pages/homepage/components/mini_timeline/ConflictPairRow", () => ({
+  ConflictPairRow: ({ row }) => <div>conflict-row:{row.id}</div>,
+}));
+
+vi.mock("../../../../pages/homepage/components/mini_timeline/HourMarkRow", () => ({
+  HourMarkRow: ({ row }) => <div>hour-row:{row.id}</div>,
+}));
+
+vi.mock("../../../../pages/homepage/components/mini_timeline/NowRow", () => ({
+  NowRow: ({ row }) => <div>now-row:{row.id}</div>,
+}));
+
+vi.mock("../../../../pages/homepage/components/mini_timeline/PlanEventRow", () => ({
+  PlanEventRow: ({ row }) => <div>event-row:{row.id}</div>,
+}));
+
+vi.mock("../../../../pages/homepage/components/mini_timeline/PlanFreeRow", () => ({
+  PlanFreeRow: ({ row, deadlineSuggestions, assignedTask, nextAssignedTask, isBestGap }) => (
+    <div>
+      free-row:{row.id}:{deadlineSuggestions.length}:{assignedTask ? "assigned" : "none"}:{nextAssignedTask ? "next" : "no-next"}:{String(isBestGap)}
+    </div>
+  ),
+}));
+
+vi.mock("../../../../pages/homepage/components/mini_timeline/TinyGapRow", () => ({
+  TinyGapRow: ({ row }) => <div>tiny-row:{row.id}</div>,
+}));
+
 const styles = new Proxy({}, { get: (_, key) => key });
 
 import {
   ConflictPopover,
   EventDuration,
   EventTagSlot,
+  ListPill,
+  ModulePill,
 } from "../../../../pages/homepage/components/mini_timeline/parts/PlanEventRowParts";
 import { ConflictActions, ConflictCard } from "../../../../pages/homepage/components/mini_timeline/parts/ConflictPairParts";
 import { PlanFreeRowContent } from "../../../../pages/homepage/components/mini_timeline/parts/PlanFreeRowContent";
 import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "../../../../pages/homepage/components/mini_timeline/parts/TimelineRowLayout";
+import { MiniTimelineRowRenderer, renderFreeRow as renderMiniTimelineFreeRow } from "../../../../pages/homepage/components/mini_timeline/MiniTimelineRowRenderer";
+import { NowStrip } from "../../../../pages/homepage/components/mini_timeline/NowStrip";
+import { getEventAccentColor } from "../../../../pages/homepage/components/mini_timeline/helpers/eventAccent";
 
 const conflictActionItems = [
   { id: "a", item: { title: "🔥 Lecture", tag: "x" }, isReadOnly: false },
@@ -135,6 +174,48 @@ describe("mini timeline parts extras", () => {
       expect(screen.getByText("CS101")).toBeInTheDocument();
     });
 
+    it("falls back to a generic list badge and links module pills when a task list exists", () => {
+      const toggle = vi.fn();
+      const { rerender } = render(
+        <EventTagSlot
+          styles={styles}
+          isOverlap={false}
+          isReadOnly={false}
+          rowId="row-3"
+          moduleCode=""
+          matchTask={{ task_list: 99 }}
+          taskLists={[]}
+          accentColor="#228833"
+          onToggleConflictPopover={toggle}
+        />,
+      );
+      expect(screen.getByText("List").closest("a")).toHaveAttribute("href", "/tasks?list=99");
+
+      rerender(
+        <EventTagSlot
+          styles={styles}
+          isOverlap={false}
+          isReadOnly={false}
+          rowId="row-4"
+          moduleCode="CS102"
+          matchTask={{ task_list: 8 }}
+          taskLists={[]}
+          accentColor="#228833"
+          onToggleConflictPopover={toggle}
+        />,
+      );
+      expect(document.querySelector('a[href="/tasks?list=8&module=CS102"]')).toBeTruthy();
+    });
+
+    it("renders ListPill and ModulePill directly for uncovered helper branches", () => {
+      const { rerender } = render(<ListPill taskListId={42} />);
+      expect(document.querySelector('a[href="/tasks?list=42"]')).toBeTruthy();
+      expect(screen.getByText("List")).toBeInTheDocument();
+
+      rerender(<ModulePill styles={styles} moduleCode="CS103" matchTask={{ task_list: 11 }} accentColor="#4477aa" />);
+      expect(document.querySelector('a[href="/tasks?list=11&module=CS103"]')).toBeTruthy();
+    });
+
     it("links module pills through the related task list and stops parent clicks", () => {
       const outerClick = vi.fn();
       render(
@@ -220,6 +301,16 @@ describe("mini timeline parts extras", () => {
       fireEvent.click(screen.getByTitle("Edit Lecture"));
       expect(onEdit).toHaveBeenCalledWith(conflictActionItems[0].item, "x");
     });
+
+    it("shows the auto-arrange title when a free row exists and skips edit handlers without onEdit", () => {
+      renderConflictActions({
+        freeRow: { id: "gap-1" },
+        movable: { item: { title: "Movable lecture" } },
+        onEdit: undefined,
+      });
+      expect(screen.getByRole("button", { name: "Auto-arrange" })).toHaveAttribute("title", 'Move "Movable lecture" to next free window');
+      fireEvent.click(screen.getByTitle("Edit Lecture"));
+    });
   });
 
   describe("conflict cards", () => {
@@ -239,6 +330,17 @@ describe("mini timeline parts extras", () => {
       expect(onMoveTomorrow).toHaveBeenCalledTimes(1);
       expect(screen.getByLabelText("Scheduled during sleep hours")).toBeInTheDocument();
       expect(screen.getByText("10:00–11:30")).toBeInTheDocument();
+    });
+
+    it("renders empty times and hides move-tomorrow controls when unavailable", () => {
+      renderConflictCard({
+        itemRow: { item: { title: "🔥 Clash", start_time: "", end_time: "" } },
+        isSleepTime: false,
+        canMoveTomorrow: false,
+      });
+      expect(screen.queryByLabelText("Scheduled during sleep hours")).toBeNull();
+      expect(screen.queryByText("→ Move to tomorrow")).toBeNull();
+      expect(screen.getByText("Clash")).toBeInTheDocument();
     });
 
     it("falls back cleanly when conflict times are missing", () => {
@@ -389,6 +491,87 @@ describe("mini timeline parts extras", () => {
       expect(screen.getByText("10:00")).toBeInTheDocument();
       rerender(<TimelineSpineCell styles={styles} />);
       expect(container.querySelector(`.${styles.planTimelineSpineCell}`)).toBeTruthy();
+    });
+  });
+
+  describe("row renderer, strip, and accent helpers", () => {
+    it("renders the free row branch without fallback suggestions or assigned tasks", () => {
+      render(
+        <MiniTimelineRowRenderer
+          row={{ id: "free-1", type: "free" }}
+          rows={[]}
+          props={{
+            styles,
+            gapDeadlineFallbacks: {},
+            onQuickStart: vi.fn(),
+            selectedDate: "2026-03-28",
+            slotPopoverRef: { current: null },
+            slotPopoverRowId: null,
+            setSlotPopoverRowId: vi.fn(),
+            bestFreeRowId: "other-row",
+            assignedGapTasks: { map: {}, nextMap: {} },
+            onSkipGapTask: vi.fn(),
+          }}
+        />,
+      );
+      expect(screen.getByText("free-row:free-1:0:none:no-next:false")).toBeInTheDocument();
+    });
+
+    it("renders the exported free-row helper directly", () => {
+      render(
+        renderMiniTimelineFreeRow(
+          { id: "free-2", type: "free" },
+          {
+            styles,
+            gapDeadlineFallbacks: {},
+            onQuickStart: vi.fn(),
+            selectedDate: "2026-03-28",
+            slotPopoverRef: { current: null },
+            slotPopoverRowId: null,
+            setSlotPopoverRowId: vi.fn(),
+            bestFreeRowId: "other-row",
+            assignedGapTasks: { map: {}, nextMap: {} },
+            onSkipGapTask: vi.fn(),
+          },
+        ),
+      );
+      expect(screen.getByText("free-row:free-2:0:none:no-next:false")).toBeInTheDocument();
+    });
+
+    it("renders timer and current-block strip fallback states", () => {
+      doesEventOverlapSleepWindow.mockReturnValueOnce(true);
+      const { rerender } = render(
+        <NowStrip
+          hasTimerSession
+          timerMode="break"
+          timerTask=""
+          styles={styles}
+        />,
+      );
+      expect(screen.getByText("Break")).toBeInTheDocument();
+      expect(screen.getByText("Session in progress")).toBeInTheDocument();
+      expect(screen.getByText("00:00")).toBeInTheDocument();
+
+      rerender(
+        <NowStrip
+          hasTimerSession={false}
+          currentBlock={{
+            title: "🔥 Night block",
+            start_time: "2026-03-28T22:00:00",
+            end_time: "2026-03-28T23:00:00",
+          }}
+          sleepWindow={{ sleepTime: "", wakeTime: "" }}
+          styles={styles}
+        />,
+      );
+      expect(screen.getByText("Now")).toBeInTheDocument();
+      expect(screen.getByText("Night block 😴")).toBeInTheDocument();
+      expect(screen.getByText("23:00")).toBeInTheDocument();
+    });
+
+    it("covers nullish event accent context fallbacks", () => {
+      expect(getEventAccentColor(undefined, undefined)).toBeTruthy();
+      expect(getEventAccentColor(undefined, "study")).toBeTruthy();
     });
   });
 });

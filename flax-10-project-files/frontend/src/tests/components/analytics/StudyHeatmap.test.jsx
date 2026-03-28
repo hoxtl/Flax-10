@@ -41,4 +41,37 @@ describe('StudyHeatmap', () => {
         const { container } = render(<StudyHeatmap heatmapData={mockHeatmapData} />);
         expect(container.firstChild).toBeTruthy();
     });
+
+    it('normalizes sparse or invalid heatmap rows into a full grid', () => {
+        useTheme.mockReturnValue({ mode: 'light' });
+        render(
+            <StudyHeatmap
+                heatmapData={{
+                    data: [null],
+                    days: ['Mon', 'Tue', 'Wed'],
+                    hours: [0, 1, 2],
+                }}
+            />,
+        );
+
+        expect(screen.getByText('Wed')).toBeInTheDocument();
+        expect(screen.getByText('12am')).toBeInTheDocument();
+        expect(screen.getAllByTitle(/minutes$/)).toHaveLength(9);
+    });
+
+    it('normalizes completely missing heatmap data into an empty grid', () => {
+        render(
+            <StudyHeatmap
+                heatmapData={{
+                    data: null,
+                    days: ['Thu', 'Fri'],
+                    hours: [0, 1],
+                }}
+            />,
+        );
+
+        expect(screen.getByText('Thu')).toBeInTheDocument();
+        expect(screen.getByText('Fri')).toBeInTheDocument();
+        expect(screen.getAllByTitle(/minutes$/)).toHaveLength(4);
+    });
 });

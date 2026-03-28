@@ -75,4 +75,15 @@ describe("SocietyDetailPage", () => {
     fireEvent.click(screen.getByTitle("You have reported this society. Click to unreport."));
     expect(memberData.handleUnreport).toHaveBeenCalledWith(memberData.society);
   });
+
+  it("falls back to a generic breadcrumb label when the society has no name", () => {
+    const data = createSocietyDetailPageData({
+      society: { name: "" },
+    });
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(data);
+
+    renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+
+    expect(screen.getByText("Society")).toBeInTheDocument();
+  });
 });

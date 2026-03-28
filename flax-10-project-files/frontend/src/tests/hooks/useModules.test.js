@@ -41,6 +41,7 @@ vi.mock('../../context/ConfirmContext.jsx', () => ({
 }));
 
 import { useNotifications } from '../../context/NotificationContext.jsx';
+import { useTags } from '../../context/TagContext.jsx';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi.js';
 import { fetchTasks } from '../../api/taskApi.js';
 import { isEnrolledIn, getEnrollmentId } from '../../components/modules/utils/moduleUtils.js';
@@ -64,6 +65,7 @@ describe('useModules', () => {
         createNotify.mockReturnValue(mockNotify);
         useConfirm.mockReturnValue(mockConfirmFn);
         useNotifications.mockReturnValue({ addNotification: vi.fn() });
+        useTags.mockReturnValue({ refreshTags: vi.fn(async () => {}) });
         getModules.mockResolvedValue(mockModules);
         getEnrollments.mockResolvedValue(mockEnrollments);
         isEnrolledIn.mockReturnValue(false);
@@ -145,6 +147,34 @@ describe('useModules', () => {
             await result.current.handleEnrollment(mockModules[1]);
         });
         expect(mockNotify).toHaveBeenCalledWith('Enroll failed', 'error');
+    });
+
+    it('handles enrollment when tag refresh is unavailable', async () => {
+        useTags.mockReturnValue({});
+        const { result } = renderHook(() => useModules());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        await act(async () => {
+            await result.current.handleEnrollment(mockModules[1]);
+        });
+
+        expect(enrollInModule).toHaveBeenCalledWith(2);
+        expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('Physics'), 'success');
+    });
+
+    it('swallows tag refresh failures after successful enrollment', async () => {
+        const refreshTags = vi.fn().mockRejectedValueOnce(new Error('refresh failed'));
+        useTags.mockReturnValue({ refreshTags });
+        const { result } = renderHook(() => useModules());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        await act(async () => {
+            await result.current.handleEnrollment(mockModules[1]);
+        });
+
+        expect(refreshTags).toHaveBeenCalledTimes(1);
+        expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('Physics'), 'success');
+        expect(mockNotify).not.toHaveBeenCalledWith('refresh failed', 'error');
     });
 
     it('handleDisenrol disenrols user from a module', async () => {

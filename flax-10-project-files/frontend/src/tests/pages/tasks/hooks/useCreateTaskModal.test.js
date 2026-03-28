@@ -92,6 +92,22 @@ describe("useCreateTaskModal coverage", () => {
     expect(result.current.sortedModules.map((m) => m.module_code)).toEqual(["KCL1", "KCL2"]);
   });
 
+  it("prefers explicit estimated minutes when they are positive", async () => {
+    const initialTask = {
+      title: "Timed task",
+      estimated_minutes: 95,
+      estimated_blocks: 1,
+    };
+
+    const { result } = renderHook(() =>
+      useCreateTaskModal(buildProps({ initialTask })),
+    );
+
+    await waitFor(() => expect(getUserSettings).toHaveBeenCalled());
+    expect(result.current.form.estimated_minutes).toBe(95);
+    expect(result.current.form.estimated_blocks).toBeGreaterThan(1);
+  });
+
   it("applies a newly created list id on the next microtask", async () => {
     const { result } = renderHook(() =>
       useCreateTaskModal(buildProps({ newListIdCreated: 99 })),

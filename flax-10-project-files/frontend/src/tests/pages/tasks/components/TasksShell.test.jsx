@@ -87,4 +87,25 @@ describe("Tasks shell coverage", () => {
 
     expect(screen.getByTestId("toast-info")).toBeInTheDocument();
   });
+
+  it("renders and clears the error toast variant", () => {
+    const setToastError = vi.fn();
+    render(
+      <TasksPageToasts
+        toastUndo={null}
+        toastDelete={false}
+        toastInfo={null}
+        toastError="Could not save task."
+        handleUndoAddTask={vi.fn()}
+        setToastUndo={vi.fn()}
+        setToastDelete={vi.fn()}
+        setToastInfo={vi.fn()}
+        setToastError={setToastError}
+      />,
+    );
+
+    expect(screen.getByTestId("toast-error")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close toast" }));
+    expect(setToastError).toHaveBeenCalledWith(null);
+  });
 });
