@@ -33,13 +33,13 @@ vi.mock("*.module.css", () => ({
 }));
 
 vi.mock(
-  "../../../components/common/motion/CelebrationEmoji",
+  "../../../../components/common/motion/CelebrationEmoji",
   () => ({
     default: ({ emoji }) => <span data-testid="celebration-emoji">{emoji}</span>,
   })
 );
 
-vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
+vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, disabled }) => (
     <button onClick={onClick} disabled={disabled}>
       {children}
@@ -47,7 +47,7 @@ vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/filter_checkbox/FilterCheckbox", () => ({
+vi.mock("../../../../components/common/filter_checkbox/FilterCheckbox", () => ({
   default: ({ checked, onChange }) => (
     <input
       type="checkbox"
@@ -58,7 +58,7 @@ vi.mock("../../../components/common/filter_checkbox/FilterCheckbox", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/animated_dropdown", () => ({
+vi.mock("../../../../components/common/animated_dropdown", () => ({
   default: ({ placeholder, onChange, onOpenChange }) => (
     <div>
       <button onClick={() => onChange("changed")}>{placeholder}</button>
@@ -67,7 +67,7 @@ vi.mock("../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../components/onboarding/components/WarningBox", () => ({
+vi.mock("../../../../components/onboarding/components/WarningBox", () => ({
   default: ({ major, confirmed, onConfirm }) => (
     <div>
       <span>{`Warning for ${major}`}</span>
@@ -81,9 +81,9 @@ vi.mock("../../../components/onboarding/components/WarningBox", () => ({
   ),
 }));
 
-import SuccessScreen from "../../../components/onboarding/components/SuccessScreen";
-import WarningBox from "../../../components/onboarding/components/WarningBox";
-import OnboardingForm from "../../../components/onboarding/components/OnboardingForm";
+import SuccessScreen from "../../../../components/onboarding/components/SuccessScreen";
+import WarningBox from "../../../../components/onboarding/components/WarningBox";
+import OnboardingForm from "../../../../components/onboarding/components/OnboardingForm";
 
 
 describe("SuccessScreen", () => {

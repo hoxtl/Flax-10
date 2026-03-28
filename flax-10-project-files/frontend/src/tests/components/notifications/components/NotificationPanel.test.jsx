@@ -1,17 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { NotificationPanel } from '../../../components/notifications/components/NotificationPanel';
+import { NotificationPanel } from '../../../../components/notifications/components/NotificationPanel';
 
 const useNotificationsMock = vi.fn();
 const executeNotificationActionMock = vi.fn();
 const parseNotificationActionMock = vi.fn(() => ({ type: 'NAVIGATE' }));
 const hasNotificationActionMock = vi.fn(() => false);
 
-vi.mock('../../../context/NotificationContext', () => ({
+vi.mock('../../../../context/NotificationContext', () => ({
   useNotifications: () => useNotificationsMock(),
 }));
 
-vi.mock('../../../components/notifications/utils/notificationAction', () => ({
+vi.mock('../../../../components/notifications/utils/notificationAction', () => ({
   executeNotificationAction: (...args) => executeNotificationActionMock(...args),
   parseNotificationAction: (...args) => parseNotificationActionMock(...args),
   hasNotificationAction: (...args) => hasNotificationActionMock(...args),

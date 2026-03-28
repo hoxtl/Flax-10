@@ -23,7 +23,7 @@ vi.mock('*.module.css', () => ({
   default: new Proxy({}, { get: (_, k) => k }),
 }));
 
-vi.mock('../../../components/common/filter_checkbox/FilterCheckbox', () => ({
+vi.mock('../../../../components/common/filter_checkbox/FilterCheckbox', () => ({
   default: ({ checked, onChange }) => (
     <input
       type="checkbox"
@@ -35,7 +35,7 @@ vi.mock('../../../components/common/filter_checkbox/FilterCheckbox', () => ({
 }));
 
 import React from 'react';
-import WarningBox from '../../../components/onboarding/components/WarningBox';
+import WarningBox from '../../../../components/onboarding/components/WarningBox';
 
 describe('WarningBox', () => {
   it('renders the "Just so you know" heading and the major name', () => {
