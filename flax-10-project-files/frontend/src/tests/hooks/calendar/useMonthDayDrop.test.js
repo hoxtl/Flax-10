@@ -126,4 +126,15 @@ describe('useMonthDayDrop', () => {
     expect(addEvent).toHaveBeenCalledWith(expect.objectContaining({ title: 'Lecture', location: 'room' }));
     expect(editEvent).not.toHaveBeenCalled();
   });
+
+  it('ignores read-only events', async () => {
+    isReadOnlyEventMock.mockReturnValue(true);
+    renderMonthDayDrop();
+
+    await dropEvent({ id: 88, start_time: '2026-03-09T10:00:00Z', end_time: '2026-03-09T11:00:00Z' });
+
+    expect(editEvent).not.toHaveBeenCalled();
+    expect(addEvent).not.toHaveBeenCalled();
+    expect(addException).not.toHaveBeenCalled();
+  });
 });

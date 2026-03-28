@@ -142,4 +142,15 @@ describe('useEventResize', () => {
     expect(confirmFn).toHaveBeenCalled();
     expect(editEvent).toHaveBeenCalledWith(77, expect.objectContaining({ end_time: expect.any(String) }));
   });
+
+  it('skips the resize-ended marker when no ref is provided', async () => {
+    const { result } = renderHook(() => useEventResize(baseEvent, eventRef, editEvent));
+
+    await act(async () => {
+      result.current.handleResizeStart({ clientY: 120, stopPropagation: vi.fn() });
+      await captured.onEnd(30);
+    });
+
+    expect(editEvent).toHaveBeenCalledWith(123, expect.objectContaining({ end_time: expect.any(String) }));
+  });
 });

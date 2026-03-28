@@ -53,6 +53,23 @@ describe('RatificationSection', () => {
         fireEvent.click(btn);
         expect(onRequest).toHaveBeenCalled();
     });
+
+    it('renders the compact status and rejected layouts', () => {
+        const onRequest = vi.fn();
+        const { rerender } = render(<RatificationSection isRatified={true} compact />);
+        expect(screen.getByText('Request ratification to gain official society status.')).toBeInTheDocument();
+        expect(screen.queryByText('Ratification Status')).not.toBeInTheDocument();
+
+        rerender(<RatificationSection status="rejected" isRatified={false} onRequest={onRequest} compact />);
+        fireEvent.click(screen.getByText('Request Again'));
+        expect(onRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders the compact request copy', () => {
+        render(<RatificationSection isRatified={false} compact onRequest={vi.fn()} />);
+        expect(screen.getByText('Request ratification to gain official society status.')).toBeInTheDocument();
+        expect(screen.queryByText('Ratification')).not.toBeInTheDocument();
+    });
 });
 
 describe('RatificationToggle', () => {
