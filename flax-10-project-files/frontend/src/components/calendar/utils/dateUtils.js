@@ -160,7 +160,7 @@ export function getMonthWeeks(date) {
     const weeks = [];
     const current = getMonthGridStartDate(date);
     const last = getEndOfMonth(date);
-    while (current <= last || current.getDay() !== 0) {
+    while (current <= last) {
         weeks.push(generateMonthWeek(current));
     }
     return weeks;

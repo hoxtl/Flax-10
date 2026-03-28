@@ -19,7 +19,7 @@ function TabButton({ tab, isActive, onClick, layoutId, tabClassName, tabVariant 
   );
 }
 
-function TabContent({ activeTab, tabs, disableContentAnimation = false, contentPresenceMode = "wait" }) {
+function TabContent({ activeTab, tabs, disableContentAnimation, contentPresenceMode }) {
   const activeContent = tabs.find((tab) => tab.id === activeTab)?.content;
   if (disableContentAnimation) {
     return <div className={styles.content}>{activeContent}</div>;
