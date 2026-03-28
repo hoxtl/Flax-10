@@ -1,6 +1,6 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "../../../utils/testUtils";
+import { fireEvent, render, screen } from "../../../../utils/testUtils";
 
 const useAuth = vi.fn();
 const useStudyCoachPanel = vi.fn();
@@ -10,7 +10,7 @@ const sendMessage = vi.fn();
 const clearMessages = vi.fn();
 const bottomRef = { current: null };
 
-vi.mock("../../../context/AuthContext", async (importOriginal) => {
+vi.mock("../../../../context/AuthContext", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -18,7 +18,7 @@ vi.mock("../../../context/AuthContext", async (importOriginal) => {
   };
 });
 
-vi.mock("../../../components/study_coach/hooks/useStudyCoachPanel", () => ({
+vi.mock("../../../../components/study_coach/hooks/useStudyCoachPanel", () => ({
   useStudyCoachPanel: (...args) => useStudyCoachPanel(...args),
 }));
 
@@ -44,24 +44,24 @@ vi.mock("remark-gfm", () => ({
   default: {},
 }));
 
-vi.mock("../../../components/study_coach/components/ScheduleImportPanel", () => ({
+vi.mock("../../../../components/study_coach/components/ScheduleImportPanel", () => ({
   default: ({ events }) => <div>schedule-import:{events.length}</div>,
 }));
 
-vi.mock("../../../components/study_coach/utils/studyCoachMarkdown.jsx", () => ({
+vi.mock("../../../../components/study_coach/utils/studyCoachMarkdown.jsx", () => ({
   STUDY_COACH_MARKDOWN: {},
 }));
 
-vi.mock("../../../components/study_coach/utils/studyCoachSuggestions", () => ({
+vi.mock("../../../../components/study_coach/utils/studyCoachSuggestions", () => ({
   STUDY_COACH_SUGGESTIONS: ["Help me plan", "What should I revise?"],
   TEACHER_COACH_SUGGESTIONS: ["Plan my next lesson", "Help me prep a lecture"],
 }));
 
-import TypingIndicator from "../../../components/study_coach/components/TypingIndicator";
-import StudyCoachComposer from "../../../components/study_coach/components/StudyCoachComposer";
-import StudyCoachHeader from "../../../components/study_coach/components/StudyCoachHeader";
-import StudyCoachMessages from "../../../components/study_coach/components/StudyCoachMessages";
-import StudyCoachPanelView from "../../../components/study_coach/components/StudyCoachPanelView";
+import TypingIndicator from "../../../../components/study_coach/components/TypingIndicator";
+import StudyCoachComposer from "../../../../components/study_coach/components/StudyCoachComposer";
+import StudyCoachHeader from "../../../../components/study_coach/components/StudyCoachHeader";
+import StudyCoachMessages from "../../../../components/study_coach/components/StudyCoachMessages";
+import StudyCoachPanelView from "../../../../components/study_coach/components/StudyCoachPanelView";
 
 describe("study coach component coverage", () => {
   beforeEach(() => {

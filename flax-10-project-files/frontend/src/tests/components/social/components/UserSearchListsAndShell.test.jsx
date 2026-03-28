@@ -14,7 +14,7 @@ vi.mock("framer-motion", () => ({
   }),
 }));
 
-vi.mock("../../../components/common/search_bar/SearchBar", () => ({
+vi.mock("../../../../components/common/search_bar/SearchBar", () => ({
   default: ({ value, onChange, onFocus, placeholder, className }) => (
     <input
       data-testid="search-bar"
@@ -27,11 +27,11 @@ vi.mock("../../../components/common/search_bar/SearchBar", () => ({
   ),
 }));
 
-vi.mock("../../../components/social/components/FilterDropdown", () => ({
+vi.mock("../../../../components/social/components/FilterDropdown", () => ({
   FilterDropdown: ({ filterName = "filters" }) => <div>{filterName}</div>,
 }));
 
-vi.mock("../../../components/common/empty_state/EmptyState", () => ({
+vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => (
     <div data-testid="empty-state">
       <span>{title}</span>
@@ -40,7 +40,7 @@ vi.mock("../../../components/common/empty_state/EmptyState", () => ({
   ),
 }));
 
-vi.mock("../../../components/social/components/UserSearchItems", () => ({
+vi.mock("../../../../components/social/components/UserSearchItems", () => ({
   UserResultItem: ({ user, onSelect }) => (
     <button type="button" onClick={onSelect}>
       {user.username}
@@ -48,7 +48,7 @@ vi.mock("../../../components/social/components/UserSearchItems", () => ({
   ),
 }));
 
-vi.mock("../../../components/social/utils/userSearchShared", () => ({
+vi.mock("../../../../components/social/utils/userSearchShared", () => ({
   SEARCH_EMPTY_CONFIG: {
     loading: { icon: "x", title: "Searching users", description: "Loading" },
     users: { icon: "x", title: "No users found", description: "Try a different search" },
@@ -57,8 +57,8 @@ vi.mock("../../../components/social/utils/userSearchShared", () => ({
   styles: new Proxy({}, { get: (_, key) => key }),
 }));
 
-import { SearchDropdown } from "../../../components/social/components/UserSearchLists";
-import { FilterSection, GlobalSearchBar } from "../../../components/social/components/UserSearchShell";
+import { SearchDropdown } from "../../../../components/social/components/UserSearchLists";
+import { FilterSection, GlobalSearchBar } from "../../../../components/social/components/UserSearchShell";
 
 describe("UserSearchLists and shell", () => {
   it("renders loading, query-empty, and query-empty-compact states", () => {

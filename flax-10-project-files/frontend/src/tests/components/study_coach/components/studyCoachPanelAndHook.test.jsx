@@ -1,6 +1,6 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, renderHook, screen, waitFor } from "../../../utils/testUtils";
+import { act, fireEvent, render, renderHook, screen, waitFor } from "../../../../utils/testUtils";
 
 const createEvent = vi.fn();
 const useCalendarDispatch = vi.fn();
@@ -8,15 +8,15 @@ const aiChat = vi.fn();
 const scrollIntoView = vi.fn();
 const authProfile = { current: { role: "student" } };
 
-vi.mock("../../../api/eventApi", () => ({
+vi.mock("../../../../api/eventApi", () => ({
   createEvent: (...args) => createEvent(...args),
 }));
 
-vi.mock("../../../context/CalendarContext", () => ({
+vi.mock("../../../../context/CalendarContext", () => ({
   useCalendarDispatch: (...args) => useCalendarDispatch(...args),
 }));
 
-vi.mock("../../../context/AuthContext", async (importOriginal) => {
+vi.mock("../../../../context/AuthContext", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -24,7 +24,7 @@ vi.mock("../../../context/AuthContext", async (importOriginal) => {
   };
 });
 
-vi.mock("../../../api/analyticsApi", () => ({
+vi.mock("../../../../api/analyticsApi", () => ({
   default: { aiChat: (...args) => aiChat(...args) },
 }));
 
@@ -49,20 +49,20 @@ vi.mock("lucide-react", () => ({
   MessageCircle: () => <span>message-icon</span>,
 }));
 
-vi.mock("../../../components/study_coach/utils/studyCoachMarkdown.jsx", () => ({
+vi.mock("../../../../components/study_coach/utils/studyCoachMarkdown.jsx", () => ({
   STUDY_COACH_MARKDOWN: {},
 }));
 
-vi.mock("../../../components/study_coach/utils/studyCoachSuggestions", () => ({
+vi.mock("../../../../components/study_coach/utils/studyCoachSuggestions", () => ({
   STUDY_COACH_SUGGESTIONS: ["Help me plan", "What should I revise?"],
   TEACHER_COACH_SUGGESTIONS: ["Plan my next lesson", "Help me prep a lecture"],
 }));
 
-vi.mock("../../../components/study_coach/components/TypingIndicator", () => ({
+vi.mock("../../../../components/study_coach/components/TypingIndicator", () => ({
   default: () => <div>typing-indicator</div>,
 }));
 
-vi.mock("../../../components/study_coach/components/StudyCoachHeader", () => ({
+vi.mock("../../../../components/study_coach/components/StudyCoachHeader", () => ({
   default: ({ onClear, onClose, title, subtitle, hasMessages }) => (
     <div>
       <span>{title}</span>
@@ -74,7 +74,7 @@ vi.mock("../../../components/study_coach/components/StudyCoachHeader", () => ({
   ),
 }));
 
-vi.mock("../../../components/study_coach/components/StudyCoachComposer", () => ({
+vi.mock("../../../../components/study_coach/components/StudyCoachComposer", () => ({
   default: ({ input, onChange, onKeyDown, onSend, placeholder, loading }) => (
     <div>
       <input aria-label={placeholder} value={input} onChange={onChange} onKeyDown={onKeyDown} />
@@ -84,9 +84,9 @@ vi.mock("../../../components/study_coach/components/StudyCoachComposer", () => (
   ),
 }));
 
-import ScheduleImportPanel from "../../../components/study_coach/components/ScheduleImportPanel";
-import StudyCoachMessages from "../../../components/study_coach/components/StudyCoachMessages";
-import StudyCoachPanelView from "../../../components/study_coach/components/StudyCoachPanelView";
+import ScheduleImportPanel from "../../../../components/study_coach/components/ScheduleImportPanel";
+import StudyCoachMessages from "../../../../components/study_coach/components/StudyCoachMessages";
+import StudyCoachPanelView from "../../../../components/study_coach/components/StudyCoachPanelView";
 import {
   STUDY_COACH_ERROR,
   buildNextMessages,
@@ -97,8 +97,8 @@ import {
   resetStatuses,
   trimMessage,
   updateStatusAtIndex,
-} from "../../../components/study_coach/utils/studyCoachHelpers";
-import { useStudyCoachPanel } from "../../../components/study_coach/hooks/useStudyCoachPanel";
+} from "../../../../components/study_coach/utils/studyCoachHelpers";
+import { useStudyCoachPanel } from "../../../../components/study_coach/hooks/useStudyCoachPanel";
 
 describe("StudyCoach extras", () => {
   beforeEach(() => {

@@ -15,22 +15,22 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../../api/userApi', () => ({
     searchUsers: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../api/societyApi', () => ({
+vi.mock('../../../../api/societyApi', () => ({
     fetchSocieties: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../lib/kclCourses', () => ({
+vi.mock('../../../../lib/kclCourses', () => ({
     KCL_DEPARTMENTS: {
         'Natural, Mathematical & Engineering Sciences': ['Computer Science', 'Artificial Intelligence'],
         'Arts & Humanities': ['History'],
     },
 }));
 
-vi.mock('../../../components/common/search_bar/SearchBar', () => ({
+vi.mock('../../../../components/common/search_bar/SearchBar', () => ({
     default: ({ value, onChange, placeholder, onFocus }) => (
         <input
             value={value}
@@ -42,10 +42,10 @@ vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     ),
 }));
 
-import UserSearch, { useSearchInit, FilterSection } from '../../../components/social/components/UserSearch';
+import UserSearch, { useSearchInit, FilterSection } from '../../../../components/social/components/UserSearch';
 
-import { searchUsers } from '../../../api/userApi';
-import { fetchSocieties } from '../../../api/societyApi';
+import { searchUsers } from '../../../../api/userApi';
+import { fetchSocieties } from '../../../../api/societyApi';
 
 describe('UserSearch', () => {
     beforeEach(() => {

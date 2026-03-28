@@ -7,7 +7,7 @@ import {
   YEAR_OPTIONS,
   allCourses,
   styles,
-} from "../../../components/social/utils/userSearchShared";
+} from "../../../../components/social/utils/userSearchShared";
 
 describe("userSearchShared", () => {
   it("exports the shared course and filter metadata", () => {

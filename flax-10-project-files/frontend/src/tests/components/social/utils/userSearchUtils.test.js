@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const searchUsersMock = vi.fn();
 
-vi.mock("../../../api/userApi", () => ({
+vi.mock("../../../../api/userApi", () => ({
   searchUsers: (...args) => searchUsersMock(...args),
 }));
 
@@ -14,7 +14,7 @@ import {
   handleErr,
   matchCat,
   toggleArr,
-} from "../../../components/social/utils/userSearchUtils";
+} from "../../../../components/social/utils/userSearchUtils";
 
 describe("userSearchUtils", () => {
   beforeEach(() => {
