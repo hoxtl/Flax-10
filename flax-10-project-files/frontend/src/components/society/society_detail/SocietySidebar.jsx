@@ -21,7 +21,7 @@ export default function SocietySidebar({ society, editMode, onAddAnnouncement, o
             {editMode && <AddButtons onAnnouncement={() => setShowAnnounce(true)} onEvent={() => setShowEvent(true)} />}
             {showAnnounce && <SidebarAnnouncementModal society={society} tags={tags}
                 onAdd={onAddAnnouncement} onUpdate={onUpdateAnnouncement} onClose={() => setShowAnnounce(false)} />}
-            {showEvent && <EventModal onClose={() => setShowEvent(false)} showReminder={false}
+            {showEvent && <EventModal onClose={() => setShowEvent(false)} showReminder={false} showTagManager={false}
                 customTags={tags} onSubmit={(d) => { onAddEvent?.(d); setShowEvent(false); }} />}
         </aside>
     );

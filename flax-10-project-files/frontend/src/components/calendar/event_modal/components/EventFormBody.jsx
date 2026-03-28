@@ -16,14 +16,14 @@ function Privacy({ value, onChange }) {
         </div>
     );
 }
-export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, showReminder = true, tags }) {
+export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, showReminder = true, showTagManager = true, tags }) {
     const update = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
     const set = (field, val) => setForm(f => ({ ...f, [field]: val }));
     return (
         <form onSubmit={onSubmit}>
             <FormField label="Title" value={form.title} onChange={update('title')} required placeholder="e.g. Team Meeting" />
             <FormField label="Description (optional)" type="textarea" value={form.description} onChange={update('description')} placeholder="Add a description…" />
-            <TagField value={form.tag} onChange={update('tag')} customTags={tags} />
+            <TagField value={form.tag} onChange={update('tag')} customTags={tags} showManager={showTagManager} />
             <Privacy value={form.is_private} onChange={(v) => set('is_private', v)} />
             <div className="form-field"><label>Location</label>
                 <LocationAutocomplete value={form.location || ''} onChange={(v) => set('location', v)} placeholder='e.g. Strand Campus, London' />
