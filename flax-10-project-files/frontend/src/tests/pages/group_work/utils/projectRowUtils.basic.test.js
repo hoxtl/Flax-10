@@ -97,17 +97,20 @@ describe('projectRowUtils – getProjectMemberCount', () => {
 });
 
 describe('projectRowUtils – formatProjectCountdownText', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('returns empty string when date is null', () => {
     expect(formatProjectCountdownText(null)).toBe('');
   });
 
   it('returns overdue text for past dates', () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    expect(formatProjectCountdownText(yesterday)).toBe('1 day overdue');
-    const longAgo = new Date();
-    longAgo.setDate(longAgo.getDate() - 5);
-    expect(formatProjectCountdownText(longAgo)).toBe('5 days overdue');
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-25T12:00:00Z'));
+
+    expect(formatProjectCountdownText(new Date('2026-03-24T12:00:00Z'))).toBe('1 day overdue');
+    expect(formatProjectCountdownText(new Date('2026-03-20T12:00:00Z'))).toBe('5 days overdue');
   });
 
   it('identifies relative deadlines with fake timers', () => {
@@ -117,7 +120,6 @@ describe('projectRowUtils – formatProjectCountdownText', () => {
     expect(formatProjectCountdownText(new Date('2026-03-25T12:00:00Z'))).toBe('Due today');
     expect(formatProjectCountdownText(new Date('2026-03-26T12:00:00Z'))).toBe('1 day left');
     expect(formatProjectCountdownText(new Date('2026-04-01T12:00:00Z'))).toBe('7 days left');
-    vi.useRealTimers();
   });
 });
 
