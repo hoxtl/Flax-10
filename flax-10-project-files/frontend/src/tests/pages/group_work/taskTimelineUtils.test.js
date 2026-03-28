@@ -82,4 +82,37 @@ describe('taskTimelineUtils – placeTasksIntoWeeks', () => {
     expect(layout[0].flat()).toHaveLength(0);
     expect(Object.values(layout).flat(2)).toHaveLength(0);
   });
+
+  it('skips tasks due on Sundays', () => {
+    const anchor = getTimelineAnchor();
+    const weeks = buildWeeks(anchor);
+    const sunday = new Date(anchor.getTime() + 6 * DAY_MS);
+    const layout = placeTasksIntoWeeks([{ id: 7, due_date: sunday.toISOString() }], weeks);
+    Object.values(layout).forEach(wk => {
+      for (let i = 0; i < 6; i++) {
+        expect(wk[i].filter(t => t.id === 7)).toHaveLength(0);
+      }
+    });
+  });
+
+  it('skips layout for Sunday tasks', () => {
+    const anchor = getTimelineAnchor();
+    const weeks = buildWeeks(anchor);
+    const sunday = new Date(anchor);
+    sunday.setDate(sunday.getDate() + 6);
+    const tasks = [{ id: 101, due_date: sunday.toISOString() }];
+    const layout = placeTasksIntoWeeks(tasks, weeks);
+    // Sunday is skipped by the week-finder since endTs is midnight Sunday.
+    Object.values(layout).forEach(wk => {
+      wk.forEach(day => expect(day.filter(t => t.id === 101)).toHaveLength(0));
+    });
+  });
+
+  it('skips layout for Sunday even if the week covers it (forces line 44 branch)', () => {
+    const mockWeek = { id: 'm1', startTs: 0, endTs: 10 * 86400000 };
+    const sundayTs = 3 * 86400000; // 1970-01-04 (Sunday)
+    const tasks = [{ id: 999, due_date: new Date(sundayTs).toISOString() }];
+    const layout = placeTasksIntoWeeks(tasks, [mockWeek]);
+    expect(layout['m1'][6]).toBeUndefined();
+  });
 });

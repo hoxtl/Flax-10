@@ -84,6 +84,12 @@ describe('taskUtils – getDeadlineLabel', () => {
   it('returns a locale date string for far future deadlines', () => {
     expect(getDeadlineLabel('2099-01-01')).toMatch(/\d{1,2}\/\d{1,2}\/\d{4}/);
   });
+
+  it('returns "Due today" when diffDays is zero', () => {
+    const today = new Date();
+    const result = getDeadlineLabel(today.toISOString());
+    expect(result).toBe('Due today');
+  });
 });
 
 describe('taskUtils – sortTasks', () => {
@@ -100,17 +106,42 @@ describe('taskUtils – sortTasks', () => {
     const tasks = [
       { completed: false, priority: 'low', created_at: '2026-01-01' },
       { completed: false, priority: 'urgent', created_at: '2026-01-01' },
+      { completed: false, priority: null, created_at: '2026-01-02' },
     ];
     const sorted = sortTasks(tasks);
     expect(sorted[0].priority).toBe('urgent');
+    expect(sorted[1].priority).toBe(null);
+    expect(sorted[2].priority).toBe('low');
   });
 
-  it('uses created_at as a final tie breaker', () => {
+  it('covers all status differences in sort', () => {
     const tasks = [
-      { completed: false, priority: 'medium', created_at: '2026-01-02' },
-      { completed: false, priority: 'medium', created_at: '2026-01-01' },
+      { id: 1, completed: true, priority: 'high', created_at: '2026-01-01' },
+      { id: 2, completed: false, priority: 'low', created_at: '2026-01-01' },
     ];
+    // a=true, b=false -> returns 1
+    expect(sortTasks(tasks)[0].id).toBe(2);
+    // a=false, b=true -> returns -1
+    expect(sortTasks([...tasks].reverse())[0].id).toBe(2);
+  });
+
+  it('falls back to zero for unknown and missing priorities', () => {
+    const tasks = [
+      { completed: false, priority: 'invalid', id: 1 },
+      { completed: false, priority: null, id: 2 },
+      { completed: false, priority: 'low', id: 3 },
+    ];
+    // invalid (0), null (2 - medium), low (1)
     const sorted = sortTasks(tasks);
-    expect(sorted[0].created_at).toBe('2026-01-01');
+    expect(sorted[0].id).toBe(2); // medium (2)
+    expect(sorted[1].id).toBe(3); // low (1)
+    expect(sorted[2].id).toBe(1); // invalid (0)
+  });
+
+  it('covers both wA and wB priority fallbacks in comparisons', () => {
+    // a null (med=2), b invalid (0) -> returns 2
+    expect(sortTasks([{ priority: null, id: 1 }, { priority: 'invalid', id: 2 }])[0].id).toBe(1);
+    // a invalid (0), b null (med=2) -> returns -2
+    expect(sortTasks([{ priority: 'invalid', id: 1 }, { priority: null, id: 2 }])[0].id).toBe(2);
   });
 });

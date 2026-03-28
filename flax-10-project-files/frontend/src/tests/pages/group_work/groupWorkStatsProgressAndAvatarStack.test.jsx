@@ -1,49 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-
-const mockUseCountUp = vi.fn();
-const mockGetProgressStats = vi.fn();
-const mockGetNextDeadline = vi.fn();
-const mockOpenMemberProfile = vi.fn();
-
-vi.mock("framer-motion", () => ({
-  motion: {
-    div: ({ children, ...props }) => {
-      const { initial, animate, transition, ...rest } = props;
-      return <div {...rest}>{children}</div>;
-    },
-  },
-}));
-
-vi.mock("../../../hooks/useCountUp", () => ({
-  useCountUp: (...args) => mockUseCountUp(...args),
-}));
-
-vi.mock("../../../components/common/stat_strip/StatStrip", () => ({
-  default: ({ items }) => (
-    <div data-testid="stat-strip">
-      {items.map((item) => `${item.label}:${item.value}${item.suffix || ""}`).join("|")}
-    </div>
-  ),
-}));
-
-vi.mock("../../../components/common/tooltip/Tooltip", () => ({
-  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
-}));
-
-vi.mock("../../../pages/group_work/utils/projectStatsUtils", () => ({
-  getProgressStats: (...args) => mockGetProgressStats(...args),
-  getNextDeadline: (...args) => mockGetNextDeadline(...args),
-}));
-
-vi.mock("../../../pages/group_work/components/MemberAvatar", () => ({
-  default: ({ member, size }) => <div data-testid="member-avatar">{member.name}|{size}</div>,
-}));
-
-vi.mock("../../../pages/group_work/utils/memberAvatarUtils", () => ({
-  getDisplayName: (member) => member.name,
-  openMemberProfile: (...args) => mockOpenMemberProfile(...args),
-}));
+import {
+  mockUseCountUp,
+  mockGetProgressStats,
+  mockGetNextDeadline,
+  resetGroupWorkStatsMocks,
+} from "./components/__mocks__/groupWorkStatsMocks.jsx";
+import "./components/__mocks__/motionAndTooltipMocks.jsx";
+import {
+  openMemberProfileMock,
+  resetMemberAvatarHarness,
+} from "./components/__mocks__/memberAvatarHarness.jsx";
 
 import GroupWorkStats from "../../../pages/group_work/components/GroupWorkStats";
 import ProjectProgress from "../../../pages/group_work/components/ProjectProgress";
@@ -52,6 +19,8 @@ import TaskAvatarStack from "../../../pages/group_work/components/TaskAvatarStac
 describe("GroupWork presentation low-coverage components", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetGroupWorkStatsMocks();
+    resetMemberAvatarHarness();
     mockUseCountUp.mockImplementation(() => ({ current: null }));
     mockGetProgressStats.mockReturnValue({ percent: 42 });
     mockGetNextDeadline.mockReturnValue({ project: { name: "Alpha" }, days: 3 });
@@ -94,6 +63,6 @@ describe("GroupWork presentation low-coverage components", () => {
     expect(screen.getByText("+1")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Open Ava profile" }));
-    expect(mockOpenMemberProfile).toHaveBeenCalledWith(expect.any(Object), assignees[0]);
+    expect(openMemberProfileMock).toHaveBeenCalledWith(expect.any(Object), assignees[0]);
   });
 });

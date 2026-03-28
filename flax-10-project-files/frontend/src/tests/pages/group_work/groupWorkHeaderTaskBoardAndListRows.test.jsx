@@ -54,7 +54,7 @@ vi.mock("../../../pages/group_work/utils/projectRowUtils", () => ({
 }));
 
 vi.mock("../../../components/common/badge/Badge", () => ({
-  default: ({ children, ...props }) => <span {...props}>{children}</span>,
+  default: ({ children, pill, ...props }) => <span {...props}>{children}</span>,
 }));
 
 vi.mock("../../../components/common/tooltip/Tooltip", () => ({
@@ -78,7 +78,7 @@ vi.mock("../../../components/common/hold_confirm_modal/HoldConfirmModal", () => 
 }));
 
 vi.mock("../../../components/common/primary_button/PrimaryButton", () => ({
-  default: ({ children, onClick, disabled, ...props }) => (
+  default: ({ children, onClick, disabled, pill, ...props }) => (
     <button type="button" onClick={onClick} disabled={disabled} {...props}>
       {children}
     </button>
@@ -367,7 +367,6 @@ describe("GroupWork low coverage components", () => {
     const onClose = vi.fn();
     const onDelete = vi.fn();
     const onEditStart = vi.fn();
-
     render(
       <TaskContextMenu
         pos={{ x: 20, y: 30 }}
@@ -377,13 +376,10 @@ describe("GroupWork low coverage components", () => {
         onEditStart={onEditStart}
       />,
     );
-
     fireEvent.mouseDown(document.body);
     expect(onClose).toHaveBeenCalled();
-
     fireEvent.click(screen.getByText("Edit"));
     expect(onEditStart).toHaveBeenCalled();
-
     fireEvent.click(screen.getByText("Delete"));
     expect(onDelete).toHaveBeenCalledWith(9);
   });

@@ -121,6 +121,10 @@ describe('priorityUtils – getUserColor', () => {
 });
 
 describe('taskStatsUtils', () => {
+  it('handles empty task list', () => {
+    expect(calcCompletionSegments([], [])).toEqual({ percent: 0, completed: 0, total: 0, segments: [] });
+  });
+
   it('calculates completion segments correctly', () => {
     const tasks = [{ completed: true }, { completed: false }, { completed: true }];
     const result = calcCompletionSegments(tasks, []);
@@ -133,5 +137,41 @@ describe('taskStatsUtils', () => {
         percentage: expect.closeTo((2 / 3) * 100, 5),
       }),
     ]);
+  });
+
+  it('handles sorting segments for members missing from the members list', () => {
+    const tasks = [
+      { completed: true, assignees_info: [{ id: 999, name: "Missing" }] },
+      { completed: true, assignees_info: [{ id: 1, name: "Alice" }] },
+    ];
+    const members = [{ id: 1, user_name: "Alice" }];
+    const result = calcCompletionSegments(tasks, members);
+    expect(result.segments[0].id).toBe(1);
+    expect(result.segments[1].id).toBe(999);
+    const singleTask = [{ completed: true, assignees_info: [{ id: 888 }] }];
+    const singleResult = calcCompletionSegments(singleTask, []);
+    expect(singleResult.segments[0].id).toBe(888);
+    const multiTask = [
+      { completed: true, assignees_info: [{ id: 888 }] },
+      { completed: true, assignees_info: [{ id: 777 }] },
+    ];
+    const multiResult = calcCompletionSegments(multiTask, []);
+    expect(multiResult.segments).toHaveLength(2);
+  });
+
+  it('covers tooltip pluralization and unassigned segments', () => {
+    const tasks = [
+      { completed: true, assignees_info: [{ id: 1, name: 'Alice' }] },
+      { completed: true, assignees_info: [{ id: 2, name: 'Bob' }] },
+      { completed: true, assignees_info: [{ id: 2, name: 'Bob' }] },
+      { completed: true, assignees_info: [] },
+      { completed: true, assignees_info: [] },
+    ];
+    const members = [{ id: 1, user_name: 'Alice' }, { id: 2, user_name: 'Bob' }];
+    const res = calcCompletionSegments(tasks, members);
+
+    expect(res.segments.find(s => s.id === 1).tooltip).toContain('1 task completed');
+    expect(res.segments.find(s => s.id === 2).tooltip).toContain('2 tasks completed');
+    expect(res.segments.find(s => s.id === 'unassigned').tooltip).toContain('2 tasks completed');
   });
 });

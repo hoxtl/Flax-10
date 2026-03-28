@@ -96,7 +96,7 @@ export function getProjectTeacherName(project) {
 /** Returns two-letter initials for the module teacher, stripping honorifics. */
 
 export function getProjectTeacherInitials(project) {
-  const teacherName = String(getProjectTeacherName(project) || "").trim();
+  const teacherName = String(getProjectTeacherName(project)).trim();
   const rawParts = teacherName
     .split(/[\s._-]+/)
     .map((part) => part.replace(/[^a-z0-9]/gi, ""))
@@ -171,16 +171,16 @@ export function getVisibleMembers(members = []) {
 
 function compareCompletion(left, right) {
   const percentDiff = getProjectPercent(left) - getProjectPercent(right);
-  if (percentDiff !== 0) return percentDiff;
+  if (percentDiff) return percentDiff;
   const completedDiff = getProjectCompletedCount(left) - getProjectCompletedCount(right);
-  if (completedDiff !== 0) return completedDiff;
+  if (completedDiff) return completedDiff;
   return compareNames(left, right);
 }
 
 function compareMemberCounts(left, right) {
   const memberDiff = getProjectMemberCount(left) - getProjectMemberCount(right);
-  if (memberDiff !== 0) return memberDiff;
-  return compareCompletion(right, left) || compareDeadlines(left, right) || compareNames(left, right);
+  if (memberDiff) return memberDiff;
+  return compareCompletion(right, left) || compareDeadlines(left, right);
 }
 
 function compareNames(left, right) {
@@ -188,12 +188,13 @@ function compareNames(left, right) {
 }
 
 function compareDeadlines(left, right) {
-  return getDeadlineValue(left?.deadline) - getDeadlineValue(right?.deadline);
+  const deadlineDiff = getDeadlineValue(left?.deadline) - getDeadlineValue(right?.deadline);
+  return Number.isNaN(deadlineDiff) ? 0 : deadlineDiff;
 }
 
 function compareCreatedDates(left, right) {
   const createdDiff = getCreatedValue(left?.created_at) - getCreatedValue(right?.created_at);
-  if (createdDiff !== 0) return createdDiff;
+  if (createdDiff) return createdDiff;
   return compareDeadlines(left, right) || compareNames(left, right);
 }
 
@@ -219,5 +220,5 @@ function getOrdinalSuffix(day) {
 }
 
 function isHonorific(part) {
-  return ["dr", "mr", "mrs", "ms", "miss", "prof", "professor"].includes(String(part || "").toLowerCase());
+  return ["dr", "mr", "mrs", "ms", "prof", "professor"].includes(part.toLowerCase());
 }
