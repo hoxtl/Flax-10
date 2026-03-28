@@ -73,7 +73,7 @@ vi.mock('../../../../components/calendar/EventPopups', () => ({ EventPopups: () 
 vi.mock('../../../../components/common/back_to_top/BackToTop', () => ({ __esModule: true, default: () => <div data-testid="back-to-top" /> }));
 vi.mock('../../../../components/tags/components/PillFilters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
 vi.mock('../../../../pages/tasks/components/TaskCard', async () => {
-  const actual = await vi.importActual('../../../../pages/Tasks/components/TaskCard');
+  const actual = await vi.importActual('../../../../pages/tasks/components/TaskCard');
   const { EditTaskModalMock } = await import('../homepageMocks');
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });

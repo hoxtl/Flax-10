@@ -19,7 +19,7 @@ vi.mock("../../../../components/common", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/Card/GridCard", () => ({
+vi.mock("../../../../components/common/card/GridCard", () => ({
   default: ({ children, onClick }) => <div data-testid="grid-card" onClick={onClick}>{children}</div>,
 }));
 

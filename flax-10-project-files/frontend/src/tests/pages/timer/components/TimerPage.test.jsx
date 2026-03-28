@@ -11,7 +11,7 @@ const { mockGetHistory } = vi.hoisted(() => ({
 }));
 
 vi.mock('../../../../components/timer/utils/historyUtils', async () => {
-    const actual = await vi.importActual('../../../../components/Timer/utils/historyUtils');
+    const actual = await vi.importActual('../../../../components/timer/utils/historyUtils');
     return {
         ...actual,
         getHistory: mockGetHistory,
@@ -63,7 +63,7 @@ vi.mock('react-router-dom', () => ({
 let mockNotificationPermission = 'granted';
 const mockRequestPermission = vi.fn();
 vi.mock('../../../../components/timer/utils/timerUtils', async () => {
-    const actual = await vi.importActual('../../../../components/Timer/utils/timerUtils');
+    const actual = await vi.importActual('../../../../components/timer/utils/timerUtils');
     return {
         ...actual,
         useNotificationPermission: () => ({ permission: mockNotificationPermission, request: mockRequestPermission }),

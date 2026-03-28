@@ -22,7 +22,7 @@ vi.mock("../../../../components/timer/presets/AutoStartToggle", () => ({
 }));
 
 vi.mock("../../../../components/timer/utils/presetUtils", async () => {
-  const actual = await vi.importActual("../../../../components/Timer/utils/presetUtils");
+  const actual = await vi.importActual("../../../../components/timer/utils/presetUtils");
   return {
     ...actual,
     applyPreset: (...args) => applyPresetMock(...args),

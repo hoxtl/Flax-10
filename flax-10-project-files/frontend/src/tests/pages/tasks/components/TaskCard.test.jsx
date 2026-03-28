@@ -104,7 +104,7 @@ vi.mock("../../../../components/common/animated_dropdown", () => ({
 }));
 
 vi.mock("../../../../pages/tasks/utils/taskCardUtils", async () => {
-  const actual = await vi.importActual("../../../../pages/Tasks/utils/taskCardUtils");
+  const actual = await vi.importActual("../../../../pages/tasks/utils/taskCardUtils");
   return {
     ...actual,
     formatDueDate: vi.fn(() => ({ label: "Today", status: "today" })),

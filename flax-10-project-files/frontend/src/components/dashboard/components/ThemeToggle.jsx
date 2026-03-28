@@ -1,5 +1,5 @@
 import { useTheme } from '../../../context/ThemeContext';
-import Tooltip from '../../common/Tooltip/Tooltip';
+import Tooltip from '../../common/tooltip/Tooltip';
 import styles from '../styles/ThemeToggle.module.css';
 
 export default function ThemeToggle() {

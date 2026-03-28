@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "../../calendar/event_modal/components/LocationAutoComplete";
-import Tooltip from "../../common/Tooltip/Tooltip";
+import Tooltip from "../../common/tooltip/Tooltip";
 import { geocodeAddress } from "../../../api/geocodeApi";
 import styles from "../styles/UserJourneySection.module.css";
 

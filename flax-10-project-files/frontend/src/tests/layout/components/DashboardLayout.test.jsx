@@ -166,7 +166,7 @@ describe("DashboardLayout", () => {
     act(() => {
       window.dispatchEvent(new Event("quick-actions:open"));
     });
-    fireEvent.click(screen.getByRole("button", { name: /add taskopen quick task modal/i }));
+    fireEvent.click(screen.getByRole("button", { name: /add task open quick task modal/i }));
     expect(screen.getByTestId("create-task-modal")).toBeInTheDocument();
   });
 
