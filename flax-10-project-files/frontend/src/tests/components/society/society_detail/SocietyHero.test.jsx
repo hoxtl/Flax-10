@@ -237,16 +237,9 @@ describe('SocietyHero', () => {
         expect(document.querySelector('[class*="heroBioButton"]')).toBeNull();
     });
 
-    it('lets editors cancel and save bio updates, including a null bio', () => {
+    it('lets editors cancel bio updates', () => {
         const onUpdateBio = vi.fn();
-        render(
-            <SocietyHero
-                society={{ ...baseSociety, bio: null }}
-                onImageClick={vi.fn()}
-                editMode
-                onUpdateBio={onUpdateBio}
-            />
-        );
+        render(<SocietyHero society={{ ...baseSociety, bio: null }} onImageClick={vi.fn()} editMode onUpdateBio={onUpdateBio} />);
 
         fireEvent.click(screen.getByRole('button', { name: /add a short society bio/i }));
         const textarea = screen.getByRole('textbox');
@@ -254,8 +247,14 @@ describe('SocietyHero', () => {
 
         fireEvent.change(textarea, { target: { value: 'Draft bio' } });
         fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+        
         expect(onUpdateBio).not.toHaveBeenCalled();
         expect(screen.getByRole('button', { name: /add a short society bio/i })).toBeInTheDocument();
+    });
+
+    it('lets editors save bio updates including a null bio', () => {
+        const onUpdateBio = vi.fn();
+        render(<SocietyHero society={{ ...baseSociety, bio: null }} onImageClick={vi.fn()} editMode onUpdateBio={onUpdateBio} />);
 
         fireEvent.click(screen.getByRole('button', { name: /add a short society bio/i }));
         fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Saved bio' } });

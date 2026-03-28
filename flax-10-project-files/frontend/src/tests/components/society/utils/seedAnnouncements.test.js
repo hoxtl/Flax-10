@@ -35,23 +35,15 @@ describe("getSeedAnnouncements", () => {
     expect(getSeedAnnouncements({ id: 1, name: "Chess", announcements: [], events: [] })).toEqual([]);
   });
 
-  it("creates welcome and upcoming announcements with formatted event details", () => {
-    const nextEvent = {
-      id: 5,
-      title: "Practice Night",
-      start_time: "2026-04-01T18:45:00.000Z",
-      tag_data: { id: 12 },
-    };
-
+  it("creates a welcome announcement with society bio", () => {
     const announcements = getSeedAnnouncements({
       id: 7,
       name: "Chess Society",
       bio: "We play chess every week.",
       announcements: [],
-      events: [nextEvent],
+      events: [],
     });
 
-    expect(announcements).toHaveLength(2);
     expect(announcements[0]).toEqual(expect.objectContaining({
       id: "seed-welcome-7",
       title: "Welcome to Chess Society",
@@ -60,6 +52,21 @@ describe("getSeedAnnouncements", () => {
       created_at: "2026-03-28T12:00:00.000Z",
       updated_at: "2026-03-28T12:00:00.000Z",
     }));
+  });
+
+  it("creates an upcoming announcement with formatted event details", () => {
+    const nextEvent = {
+        id: 5,
+        title: "Practice Night",
+        start_time: "2026-04-01T18:45:00.000Z",
+        tag_data: { id: 12 },
+    };
+    const announcements = getSeedAnnouncements({
+      id: 7,
+      announcements: [],
+      events: [nextEvent],
+    });
+
     expect(announcements[1]).toEqual(expect.objectContaining({
       id: "seed-up-next-7",
       event_id: 5,

@@ -34,7 +34,7 @@ describe("group work utility coverage gaps", () => {
     ).toContain("the module");
   });
 
-  it("uses due-date sort tie-breakers for completion first and names last", () => {
+  it("uses due-date sort tie-breakers based on completion counts", () => {
     const lessComplete = {
       name: "Beta",
       deadline: "2026-06-01",
@@ -47,6 +47,11 @@ describe("group work utility coverage gaps", () => {
       task_count: 10,
       completed_task_count: 8,
     };
+
+    expect(compareProjectsBySort(lessComplete, moreComplete, "due-date-desc")).toBeGreaterThan(0);
+  });
+
+  it("uses due-date sort tie-breakers for identical completion counts fallback to name", () => {
     const sameCompletionA = {
       name: "Match",
       deadline: "2026-06-01",
@@ -60,7 +65,6 @@ describe("group work utility coverage gaps", () => {
       completed_task_count: 5,
     };
 
-    expect(compareProjectsBySort(lessComplete, moreComplete, "due-date-desc")).toBeGreaterThan(0);
     expect(compareProjectsBySort(sameCompletionA, sameCompletionB, "due-date-desc")).toBe(0);
   });
 
