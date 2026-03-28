@@ -97,11 +97,6 @@ describe("WelcomeLanding", () => {
     expect(onBackToAuth).toHaveBeenCalledTimes(1);
   });
 
-  it("tutorial button is disabled", () => {
-    render(<WelcomeLanding {...defaultProps()} />);
-    expect(screen.getByText(/Watch tutorial/i)).toBeDisabled();
-  });
-
   it("renders footer version note", () => {
     render(<WelcomeLanding {...defaultProps()} />);
     expect(screen.getByText("v1")).toBeInTheDocument();

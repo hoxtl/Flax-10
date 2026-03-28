@@ -120,17 +120,6 @@
   border-color: color-mix(in srgb, var(--primary) 45%, transparent) !important;
 }
 
-.secondaryBtn {
-  background: color-mix(in srgb, var(--surface-card) 88%, transparent) !important;
-  color: var(--text) !important;
-  border-color: color-mix(in srgb, var(--border) 85%, transparent) !important;
-}
-
-.secondaryBtn:disabled {
-  opacity: 0.78 !important;
-  color: var(--text-secondary) !important;
-}
-
 .tertiaryBtn {
   background: color-mix(in srgb, var(--surface-panel) 72%, transparent) !important;
   color: var(--text) !important;
