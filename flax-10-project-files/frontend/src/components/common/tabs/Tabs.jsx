@@ -2,7 +2,7 @@
  * Animated tab bar with sliding indicator and fade-in content panel.
  */
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import { fadeInMotion, tabContentMotion } from "../motion/transitions";
 import styles from "./Tabs.module.css";
 
@@ -14,35 +14,51 @@ function TabButton({ tab, isActive, onClick, layoutId, tabClassName, tabVariant 
     <button className={cls} onClick={onClick} data-active={isActive ? "true" : "false"}>
       {tab.icon && <span>{tab.icon}</span>}
       <span>{tab.label}</span>
-      {isActive && <motion.div className={styles.tabIndicator} layoutId={layoutId} />}
+      {isActive && <Motion.div className={styles.tabIndicator} layoutId={layoutId} />}
     </button>
   );
 }
 
-function TabContent({ activeTab, tabs }) {
+function TabContent({ activeTab, tabs, disableContentAnimation = false, contentPresenceMode = "wait" }) {
+  const activeContent = tabs.find((tab) => tab.id === activeTab)?.content;
+  if (disableContentAnimation) {
+    return <div className={styles.content}>{activeContent}</div>;
+  }
   return (
-    <AnimatePresence mode="wait">
-      <motion.div key={activeTab} {...tabContentMotion} className={styles.content}>
-        {tabs.find(t => t.id === activeTab)?.content}
-      </motion.div>
+    <AnimatePresence mode={contentPresenceMode}>
+      <Motion.div key={activeTab} {...tabContentMotion} className={styles.content}>
+        {activeContent}
+      </Motion.div>
     </AnimatePresence>
   );
 }
 
 /** Tabs component with animated indicator and content transitions. */
 
-export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndicator", compact = false, className = "", tabClassName = "", tabVariant = "default", middle }) {
+export default function Tabs({
+  tabs,
+  activeTab,
+  onTabChange,
+  layoutId = "tabIndicator",
+  compact = false,
+  className = "",
+  tabClassName = "",
+  tabVariant = "default",
+  middle,
+  disableContentAnimation = false,
+  contentPresenceMode = "wait",
+}) {
   if (!tabs?.length) return null;
   const containerClass = `${styles.container} ${compact ? styles.compact : ""} ${className}`.trim();
   return (
     <div className={containerClass}>
-      <motion.div className={styles.tabBar} {...fadeInMotion}>
+      <Motion.div className={styles.tabBar} {...fadeInMotion}>
         {tabs.map(tab => (
           <TabButton key={tab.id} tab={tab} isActive={activeTab === tab.id} onClick={() => onTabChange(tab.id)} layoutId={layoutId} tabClassName={tabClassName} tabVariant={tabVariant} />
         ))}
-      </motion.div>
+      </Motion.div>
       {middle}
-      <TabContent activeTab={activeTab} tabs={tabs} />
+      <TabContent activeTab={activeTab} tabs={tabs} disableContentAnimation={disableContentAnimation} contentPresenceMode={contentPresenceMode} />
     </div>
   );
 }

@@ -146,6 +146,50 @@
   line-height: 1;
 }
 
+.listLoadingRows {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.listLoadingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.15rem 0;
+}
+
+.listLoadingInfo {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.listLoadingTitle {
+  height: 16px;
+  width: min(220px, 72%);
+  border-radius: 999px;
+}
+
+.listLoadingMeta {
+  height: 12px;
+  width: min(120px, 42%);
+  border-radius: 999px;
+}
+
+.listLoadingActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.listLoadingAction {
+  height: 34px;
+  width: 84px;
+  border-radius: 999px;
+}
+
 @media (max-width: 860px) {
   .page {
     height: auto;

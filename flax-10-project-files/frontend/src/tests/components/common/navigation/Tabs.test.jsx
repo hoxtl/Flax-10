@@ -63,4 +63,14 @@ describe('Tabs', () => {
 	    expect(headingTab.className).toContain('tab-extra');
 	    expect(headingTab.className).toContain('headingTab');
 	  });
+
+  it('can render active content without motion swapping when disabled', () => {
+    const tabs = [
+      { id: 'one', label: 'One', content: <span>Content One</span> },
+      { id: 'two', label: 'Two', content: <span>Content Two</span> },
+    ];
+    render(<Tabs tabs={tabs} activeTab="two" onTabChange={vi.fn()} disableContentAnimation />);
+    expect(screen.getByText('Content Two')).toBeInTheDocument();
+    expect(screen.queryByText('Content One')).not.toBeInTheDocument();
+  });
 	});

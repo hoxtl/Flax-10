@@ -17,9 +17,14 @@ import SegmentDetailHeader from "../../../../pages/attendance/components/Segment
 import SegmentDetailList from "../../../../pages/attendance/components/SegmentDetailList";
 
 const recordAttendanceMock = vi.fn();
+const showToastMock = vi.fn();
 
 vi.mock("../../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendanceMock(...args),
+}));
+
+vi.mock("../../../../context/ToastContext", () => ({
+  useToast: () => showToastMock,
 }));
 
 vi.mock("../../../../components/common/loading_state/SkeletonBlock", () => ({
@@ -59,6 +64,7 @@ describe("Attendance components", () => {
     vi.useRealTimers();
     recordAttendanceMock.mockReset();
     recordAttendanceMock.mockResolvedValue({});
+    showToastMock.mockReset();
   });
 
   it("renders loading and error states for the status component", () => {
@@ -144,8 +150,8 @@ describe("Attendance components", () => {
     expect(clearSegment).toHaveBeenCalled();
   });
 
-  it("shows nothing while events are loading", () => {
-    const { container } = render(
+  it("shows a loading panel while events are loading", () => {
+    render(
       <AttendanceListColumn
         model={{
           eventsLoading: true,
@@ -157,7 +163,8 @@ describe("Attendance components", () => {
         }}
       />,
     );
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByText("Loading attendance events...")).toBeInTheDocument();
+    expect(screen.getByLabelText("Loading attendance events")).toBeInTheDocument();
   });
 
   it("renders empty marked list and switches to record tab", () => {
@@ -208,6 +215,7 @@ describe("Attendance components", () => {
     fireEvent.click(firstAttendButton);
     await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(1, true));
     expect(onRecorded).toHaveBeenCalled();
+    expect(showToastMock).toHaveBeenCalledWith("Attendance marked.");
     expect(screen.getByText("Showing first 20 events.")).toBeInTheDocument();
   });
 
@@ -241,10 +249,12 @@ describe("Attendance components", () => {
     fireEvent.click(screen.getByRole("button", { name: "Attended" }));
     await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(91, true));
     expect(onRecorded).not.toHaveBeenCalled();
+    expect(showToastMock).toHaveBeenCalledWith("Couldn't mark attendance. Try again.", { variant: "error" });
 
     recordAttendanceMock.mockResolvedValueOnce({});
     fireEvent.click(screen.getByRole("button", { name: "Missed" }));
     await waitFor(() => expect(screen.getByText("Missed session noted.")).toBeInTheDocument());
+    expect(showToastMock).toHaveBeenCalledWith("Attendance marked as missed.");
     await waitFor(() => expect(screen.queryByText("Missed session noted.")).toBeNull(), { timeout: 2000 });
 
     rerender(<MarkedAttendanceList markedEvents={[]} />);
@@ -292,6 +302,26 @@ describe("Attendance components", () => {
     expect(screen.getByText("2 events")).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole("button", { name: "Missed" }).at(-1));
     await waitFor(() => expect(onToggleStatus).toHaveBeenCalledWith(4, true));
+  });
+
+  it("shows a toast after toggling a segment detail attendance state", async () => {
+    const onToggleStatus = vi.fn().mockResolvedValue(undefined);
+    render(
+      <AttendanceListColumn
+        model={{
+          eventsLoading: false,
+          selectedSegment,
+          segmentLabel: "Overall: Attended",
+          segmentEvents: [segmentEvent],
+          handleToggleStatus: onToggleStatus,
+          clearSegment: vi.fn(),
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Attended" }));
+    await waitFor(() => expect(onToggleStatus).toHaveBeenCalledWith(2, false));
+    expect(showToastMock).toHaveBeenCalledWith("Attendance marked as missed.");
   });
 
   it("renders the empty segment detail state", () => {
