@@ -109,11 +109,12 @@ function createMutations() {
   return mutations;
 }
 
-function SocietyHeroMock({ society, onUpdateName, onImageClick, onEditImages, onViewMembers, actionContent, metaContent }) {
+function SocietyHeroMock({ society, onUpdateName, onUpdateBio, onImageClick, onEditImages, onViewMembers, actionContent, metaContent }) {
   return (
     <div data-testid="hero">
       <span>{society.name}</span>
       <button type="button" onClick={() => onUpdateName("Renamed Society")}>rename-society</button>
+      <button type="button" onClick={() => onUpdateBio("Updated bio")}>rewrite-bio</button>
       <button type="button" onClick={() => onImageClick(1)}>open-gallery</button>
       <button type="button" onClick={onEditImages}>edit-images</button>
       <button type="button" onClick={onViewMembers}>view-members</button>

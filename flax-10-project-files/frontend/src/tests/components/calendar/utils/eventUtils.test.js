@@ -5,6 +5,7 @@ import {
     isReadOnlyEvent,
     getEventType,
     getEffectiveTagName,
+    dedupeEvents,
     getVisibleEventsInView,
     sortByStartTime,
     isAllDay,
@@ -110,6 +111,10 @@ describe('getEventType', () => {
         expect(getEventType({ source: 'society' })).toBe('society');
     });
 
+    it('returns "group_meeting" for source=group_meeting', () => {
+        expect(getEventType({ source: 'group_meeting' })).toBe('group_meeting');
+    });
+
     it('returns "module" for source starting with module_', () => {
         expect(getEventType({ source: 'module_CS101' })).toBe('module');
     });
@@ -208,6 +213,10 @@ describe('getEffectiveTagName', () => {
         expect(getEffectiveTagName({ source: 'society' })).toBe('societies');
     });
 
+    it('returns "group study" for group meetings', () => {
+        expect(getEffectiveTagName({ source: 'group_meeting' })).toBe('group study');
+    });
+
     it('returns lowercase tag_name when present', () => {
         expect(getEffectiveTagName({ tag_name: 'Work' })).toBe('work');
     });
@@ -234,6 +243,60 @@ describe('getEffectiveTagName', () => {
 
     it('returns tag.name when tag_name is not present', () => {
         expect(getEffectiveTagName({ tag: { name: 'Exercise' } })).toBe('exercise');
+    });
+});
+
+
+describe('dedupeEvents', () => {
+    it('returns an empty array for non-array input', () => {
+        expect(dedupeEvents(null)).toEqual([]);
+    });
+
+    it('returns the original array when it has zero or one event', () => {
+        const single = [{ id: 1, start_time: '2026-03-10T09:00:00', end_time: '2026-03-10T10:00:00' }];
+        expect(dedupeEvents(single)).toBe(single);
+        expect(dedupeEvents([])).toEqual([]);
+    });
+
+    it('deduplicates events across id, external id, and fallback identity keys', () => {
+        const events = [
+            { id: 1, source: 'personal', start_time: '2026-03-10T09:00:00', end_time: '2026-03-10T10:00:00' },
+            { id: 1, source: 'personal', start_time: '2026-03-10T09:00:00', end_time: '2026-03-10T10:00:00' },
+            { source: 'external', external_id: 'sync-1', start_time: 'not-a-date', end_time: null },
+            { source: 'external', external_id: 'sync-1', start_time: 'not-a-date', end_time: null },
+            { source: 'personal', title: 'Study Session', location: 'Library', description: 'Focus block' },
+            { source: 'personal', title: 'Study Session', location: 'Library', description: 'Focus block' },
+            { id: 1, source: 'personal', start_time: '2026-03-10T11:00:00', end_time: '2026-03-10T12:00:00' },
+        ];
+
+        expect(dedupeEvents(events)).toEqual([
+            events[0],
+            events[2],
+            events[4],
+            events[6],
+        ]);
+    });
+
+    it('uses default identity sources when source is missing', () => {
+        const events = [
+            { id: 9, start_time: '2026-03-10T09:00:00', end_time: '2026-03-10T10:00:00' },
+            { id: 9, start_time: '2026-03-10T09:00:00', end_time: '2026-03-10T10:00:00' },
+            { external_id: 'feed-1', start_time: 'not-a-date', end_time: null },
+            { external_id: 'feed-1', start_time: 'not-a-date', end_time: null },
+            { title: 'Solo Study', location: 'Library', description: 'Review notes' },
+            { title: 'Solo Study', location: 'Library', description: 'Review notes' },
+        ];
+
+        expect(dedupeEvents(events)).toEqual([events[0], events[2], events[4]]);
+    });
+
+    it('falls back to empty identity fields when title, location, and description are missing', () => {
+        const events = [
+            { source: 'manual' },
+            { source: 'manual' },
+        ];
+
+        expect(dedupeEvents(events)).toEqual([events[0]]);
     });
 });
 

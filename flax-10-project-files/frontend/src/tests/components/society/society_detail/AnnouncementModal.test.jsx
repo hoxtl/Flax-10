@@ -17,7 +17,7 @@ vi.mock('../../../../api/societyApi', () => ({ fetchSocietyEvent: (...args) => f
 vi.mock('../../../../context/ConfirmContext', () => ({ useConfirm: () => confirmMock }));
 
 vi.mock('../../../../components/society/society_detail/tabs/announcement_tab/announcementModalHelpers', () => ({
-  MAX_IMAGES: 2,
+  MAX_IMAGES: 1,
   getInitialForm: (a) => ({
     id: a?.id, title: a?.title || '', content: a?.content || '', tag: a?.tag || '', images: a?.images || [],
     pinned: !!a?.pinned, addAsEvent: false, start_time: '', end_time: '', recurrence: 'none', all_day: false,
@@ -127,9 +127,9 @@ describe('AnnouncementModal', () => {
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()}
       announcement={{ id: 10, title: 'Edit', content: 'x', event_id: 12, images: ['a.jpg'] }} societyId={6} announcements={[]} />);
     fireEvent.change(document.querySelector('input[type="file"]'), { target: { files: [new File(['x'], 'pic.png', { type: 'image/png' })] } });
-    expect(await screen.findAllByAltText('Preview')).toHaveLength(2);
+    expect(await screen.findAllByAltText('Preview')).toHaveLength(1);
     fireEvent.click(screen.getAllByRole('button', { name: '×' })[0]);
-    await waitFor(() => expect(screen.getAllByAltText('Preview')).toHaveLength(1));
+    await waitFor(() => expect(screen.queryByAltText('Preview')).toBeFalsy());
   });
 
   it('delete without linked event shows simple message', () => {

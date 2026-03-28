@@ -36,6 +36,16 @@ describe("SocietyDetailPage", () => {
     expect(screen.getByTestId("sidebar")).toBeInTheDocument();
   });
 
+  it("forwards hero bio edits into the society updater", () => {
+    const data = createSocietyDetailPageData();
+    societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValue(data);
+
+    renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("rewrite-bio"));
+
+    expect(data.updateSociety).toHaveBeenCalledWith({ bio: "Updated bio" });
+  });
+
   it("renders loading and not-found states", () => {
     societyDetailPageStateMocks.useSocietyPageDataMock.mockReturnValueOnce(createSocietyDetailPageData({ loading: true }));
     const { unmount } = renderSocietyDetailPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);

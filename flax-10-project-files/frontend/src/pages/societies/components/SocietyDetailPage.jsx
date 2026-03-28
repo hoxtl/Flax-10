@@ -2,13 +2,12 @@
  * Society detail page with hero, content tabs, sidebar, and modal controls.
  */
 
+import { useRef } from "react";
 import styles from "../styles/SocietyDetailPage.module.css";
 import SocietyHero from "../../../components/society/society_detail/SocietyHero";
 import SocietyInfo from "../../../components/society/society_detail/SocietyInfo";
 import SocietyTabs from "../../../components/society/society_detail/tabs/SocietyTabs";
 import SocietySidebar from "../../../components/society/society_detail/SocietySidebar";
-import CoverImageModal from "../../../components/society/society_detail/image_handlers/CoverImageModal";
-import ImageGalleryModal from "../../../components/society/society_detail/image_handlers/ImageGalleryModal";
 import SettingsModal from "../../../components/society/society_detail/SettingsModal";
 import AnnouncementModal from "../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal";
 import ReportSocietyModal from "../../../components/society/society_detail/ReportSocietyModal";
@@ -23,13 +22,14 @@ import { useLocation } from "react-router-dom";
 import { getSeedAnnouncements } from "../../../components/society/utils/seedAnnouncements.js";
 import { useSocietyInit, useSocietyPageData } from "../hooks/useSocietyDetailPageState";
 import { getImageUrls } from "../utils/societyDetailPageUtils";
+import { readImageFile, resetFileInput } from "../../../utils/imageFile";
 
 function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;
     return {
         state: modals,
-        setS: modals.setShowSettings, setR: modals.setShowReportModal, setG: modals.setGalleryOpen,
-        setCE: modals.setShowCoverModal, setM: modals.setShowMembersModal, setEA: modals.setEditingAnnouncement,
+    setS: modals.setShowSettings, setR: modals.setShowReportModal,
+        setM: modals.setShowMembersModal, setEA: modals.setEditingAnnouncement,
         updateS: updateSociety, updateLS: updateLocalSociety, fetchM: fetchMembers, removeM: removeMember,
         onDelete: async () => { await deleteSociety(); onDeleteCallback?.(); onBack(); },
         onReport: () => modals.setShowReportModal(true),
@@ -57,8 +57,6 @@ const ModalsContainer = ({ state, data, handlers, societyId }) => {
         <>
             {state.showSettings && <SettingsModal onClose={() => handlers.setS(false)} onDelete={handlers.onDelete} members={data.members} onFetchMembers={handlers.fetchM} onUpdateRole={data.updateMemberRole} onRemoveMember={handlers.removeM} onAddCollaborator={data.addCollaborator} ratificationStatus={data.society.ratification_status} isRatified={data.society.is_ratified} onRequestRatification={data.requestRatification} />}
             {state.showReportModal && <ReportSocietyModal society={data.society} onClose={() => handlers.setR(false)} onReportSuccess={() => handlers.updateLS({ has_reported: true })} />}
-            {state.galleryOpen && <ImageGalleryModal images={urls} initialIndex={state.galleryOpen?.index} onClose={() => handlers.setG(null)} />}
-            {state.showCoverModal && <CoverImageModal images={urls} onClose={() => handlers.setCE(false)} onUpdate={(images) => handlers.updateS({ images, image: images[0] || null })} />}
             {state.showMembersModal && <MemberDirectoryModal societyName={data.society.name} members={data.members} onFetchMembers={handlers.fetchM} onRemoveMember={handlers.removeM} isAdmin={isAdmin} onClose={() => handlers.setM(false)} />}
             {state.editingAnnouncement && <AnnouncementModal announcements={data.society.announcements} announcement={state.editingAnnouncement} societyId={societyId} onClose={() => handlers.setEA(null)} onSubmit={(announcement, conflict) => handlers.onAnnounceSubmit(announcement, conflict)} onDelete={(id) => handlers.onAnnounceDelete(id)} tags={data.society.tags} />}
         </>
@@ -100,10 +98,10 @@ const DetailMainContent = ({ data, isAdmin, society }) => (
     </>
 );
 
-function DetailHero({ data, handlers, isAdmin, society }) {
+function DetailHero({ data, handlers, isAdmin, society, onEditCover }) {
     const infoProps = buildInfoProps(data, society);
     return (
-        <SocietyHero society={society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })} onUpdateBio={(bio) => data.updateSociety({ bio })} onViewMembers={() => handlers.setM(true)} onImageClick={(index) => handlers.setG({ index })} onEditImages={() => handlers.setCE(true)} actionContent={<HeroActionButtons isAdmin={isAdmin} onSettings={() => handlers.setS(true)} onReport={() => handlers.onReport()} onUnreport={() => data.handleUnreport(data.society)} hasReported={data.society.has_reported} />} metaContent={<SocietyInfo {...infoProps} showBio={false} showLocation={false} layout="hero" />} />
+        <SocietyHero society={society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })} onUpdateBio={(bio) => data.updateSociety({ bio })} onViewMembers={() => handlers.setM(true)} onEditImages={onEditCover} actionContent={<HeroActionButtons isAdmin={isAdmin} onSettings={() => handlers.setS(true)} onReport={() => handlers.onReport()} onUnreport={() => data.handleUnreport(data.society)} hasReported={data.society.has_reported} />} metaContent={<SocietyInfo {...infoProps} showBio={false} showLocation={false} layout="hero" />} />
     );
 }
 
@@ -111,12 +109,12 @@ function DetailSummary({ data, society }) {
     return <SocietyInfo {...buildInfoProps(data, society)} showBio={false} showMeta={false} />;
 }
 
-const DetailLayout = ({ data, handlers, onBack, isAdmin }) => {
+const DetailLayout = ({ data, handlers, onBack, isAdmin, onEditCover }) => {
     const displaySociety = getDisplaySociety(data.society, data.modals.editMode);
     return (
         <div className={styles.page}>
             <TopBar onBack={onBack} societyName={data.society.name} />
-            <DetailHero data={data} handlers={handlers} isAdmin={isAdmin} society={displaySociety} />
+            <DetailHero data={data} handlers={handlers} isAdmin={isAdmin} society={displaySociety} onEditCover={onEditCover} />
             <DetailSummary data={data} society={displaySociety} />
             <DetailMainContent data={data} isAdmin={isAdmin} society={displaySociety} />
         </div>
@@ -136,12 +134,23 @@ export default function SocietyDetailPage({ societyId, onBack, initialTab, onMem
 
 function SocietyDetailPageView({ data, handlers, onBack, societyId }) {
     const isAdmin = ["admin", "editor"].includes(data.society.role);
+    const coverPicker = useCoverImagePicker((src) => handlers.updateS({ images: src ? [src] : [], image: src || null }));
     return (
         <>
-            <DetailLayout data={data} handlers={handlers} onBack={onBack} isAdmin={isAdmin} />
+            <DetailLayout data={data} handlers={handlers} onBack={onBack} isAdmin={isAdmin} onEditCover={coverPicker.openPicker} />
+            <input {...coverPicker.inputProps} />
             <ModalsContainer state={handlers.state} data={data} handlers={handlers} societyId={societyId} />
         </>
     );
+}
+
+function useCoverImagePicker(onSelect) {
+    const fileRef = useRef(null);
+    const onChange = (event) => readImageFile(event.target.files?.[0], onSelect, () => resetFileInput(fileRef));
+    return {
+        openPicker: () => fileRef.current?.click(),
+        inputProps: { ref: fileRef, type: "file", accept: "image/*", onChange, hidden: true, "data-testid": "cover-image-input" },
+    };
 }
 
 /** Manages the transition between view and edit modes. */

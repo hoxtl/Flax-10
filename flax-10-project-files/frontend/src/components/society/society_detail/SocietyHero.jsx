@@ -32,11 +32,10 @@ export default function SocietyHero(props) {
 }
 
 function HeroFrame(props) {
-    const { media, editMode, onImageClick } = props;
+    const { media, editMode } = props;
     const [hovered, setHovered] = useState(false);
-    const handleClick = () => { if (!editMode) onImageClick?.(0); };
     return (
-        <div className={styles.hero} onClick={handleClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+        <div className={styles.hero} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
             <HeroMedia activeImage={media.activeImage} heroLayoutId={media.heroLayoutId} />
             <HeroOverlay {...props} hovered={hovered} titleLayoutId={media.titleLayoutId} />
         </div>
@@ -78,7 +77,7 @@ function HeroUtilityBar({ hovered, editMode, onEditImages, actionContent }) {
 function EditLayer({ onClick }) {
     return (
         <button type="button" className={styles.editLayer} onClick={onClick}>
-            <span className={styles.editLabel}>Click to Edit Cover Images</span>
+            <span className={styles.editLabel}>Click to Edit Cover Image</span>
         </button>
     );
 }
