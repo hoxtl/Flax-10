@@ -4,7 +4,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, CalendarCheck2, CalendarClock, TimerReset } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import PrimaryButton from "../../common/primary_button/PrimaryButton";
 
 import analyticsApi from "../../../api/analyticsApi";
 import { getEnrollments, getModules } from "../../../api/moduleApi";
@@ -125,10 +126,12 @@ function buildNoEventsInsight() {
 }
 
 function buildDoubleConflictInsight(moduleConflict) {
+  const slot = formatSlot(moduleConflict.event);
   return {
     tone: "warning",
     title: "This society could squeeze your best study window",
-    description: `${moduleConflict.event.title} at ${formatSlot(moduleConflict.event)} overlaps with your ${moduleConflict.module.module_code} lecture and one of the hours you study most.`,
+    description: `${moduleConflict.event.title} at ${slot} overlaps with your ${moduleConflict.module.module_code} lecture and one of the hours you study most.`,
+    highlight: slot,
     primary: { to: `/modules?moduleId=${moduleConflict.module.id}`, label: `Open ${moduleConflict.module.module_code}` },
     secondary: { to: "/analytics", label: "View Analytics" },
     icon: AlertTriangle,
@@ -136,10 +139,12 @@ function buildDoubleConflictInsight(moduleConflict) {
 }
 
 function buildModuleConflictInsight(moduleConflict) {
+  const slot = formatSlot(moduleConflict.event);
   return {
     tone: "warning",
     title: "Timetable clash detected",
-    description: `${moduleConflict.event.title} at ${formatSlot(moduleConflict.event)} overlaps with your ${moduleConflict.module.module_code} lecture.`,
+    description: `${moduleConflict.event.title} at ${slot} overlaps with your ${moduleConflict.module.module_code} lecture.`,
+    highlight: slot,
     primary: { to: `/modules?moduleId=${moduleConflict.module.id}`, label: `Open ${moduleConflict.module.module_code}` },
     secondary: { to: "/calendar", label: "Open Calendar" },
     icon: AlertTriangle,
@@ -147,10 +152,12 @@ function buildModuleConflictInsight(moduleConflict) {
 }
 
 function buildStudyPeakConflictInsight(studyPeakConflict) {
+  const slot = formatSlot(studyPeakConflict.event);
   return {
     tone: "warning",
     title: "This lands in one of your strongest study slots",
-    description: `Based on your analytics, ${studyPeakConflict.event.title} at ${formatSlot(studyPeakConflict.event)} overlaps with a time you usually study most consistently.`,
+    description: `Based on your analytics, ${studyPeakConflict.event.title} at ${slot} overlaps with a time you usually study most consistently.`,
+    highlight: slot,
     primary: { to: "/analytics", label: "View Analytics" },
     secondary: { to: "/calendar", label: "Open Calendar" },
     icon: AlertTriangle,
@@ -210,6 +217,25 @@ function getInsightParams(res, society) {
   };
 }
 
+function InsightText({ insight }) {
+  if (!insight.highlight || !insight.description.includes(insight.highlight)) {
+    return (
+      <>
+        <strong>{insight.title}</strong> — {insight.description}
+      </>
+    );
+  }
+
+  const [before, after] = insight.description.split(insight.highlight, 2);
+  return (
+    <>
+      <strong>{insight.title}</strong> — {before}
+      <span className={styles.highlight}>{insight.highlight}</span>
+      {after}
+    </>
+  );
+}
+
 function useSocietyInsight(society) {
   const [insight, setInsight] = useState(null);
   const sig = useMemo(() => (society?.events || []).map((ev) => `${ev.id}:${ev.start_time}:${ev.end_time}`).join("|"), [society?.events]);
@@ -227,20 +253,24 @@ function useSocietyInsight(society) {
 
 export default function SocietyInsightBanner({ society }) {
   const insight = useSocietyInsight(society);
+  const navigate = useNavigate();
   if (!insight) return null;
 
   const Icon = insight.icon;
   return (
-    <section className={`${styles.banner} ${styles[insight.tone]}`} aria-live="polite">
-      <div className={styles.iconWrap}><Icon size={18} strokeWidth={2.1} /></div>
-      <div className={styles.content}>
-        <p className={styles.title}>{insight.title}</p>
-        <p className={styles.description}>{insight.description}</p>
-        <div className={styles.actions}>
-          <Link to={insight.primary.to} className={styles.primaryLink}>{insight.primary.label}</Link>
-          <Link to={insight.secondary.to} className={styles.secondaryLink}>{insight.secondary.label}</Link>
-        </div>
+    <div className={`${styles.banner} ${styles[insight.tone]}`} aria-live="polite">
+      <Icon className={styles.icon} size={17} strokeWidth={2.1} />
+      <span className={styles.text}>
+        <InsightText insight={insight} />
+      </span>
+      <div className={styles.actions}>
+        <PrimaryButton size="small" pill onClick={() => navigate(insight.primary.to)}>
+          {insight.primary.label}
+        </PrimaryButton>
+        <PrimaryButton size="small" pill variant="secondary" onClick={() => navigate(insight.secondary.to)}>
+          {insight.secondary.label}
+        </PrimaryButton>
       </div>
-    </section>
+    </div>
   );
 }

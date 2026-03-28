@@ -33,15 +33,16 @@
 
 
 .settingsBtn {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
   cursor: pointer;
-  font-size: 1.1rem;
-  color: var(--text);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: rgba(20, 12, 6, 0.82);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -50,12 +51,10 @@
 }
 
 .settingsBtn:hover {
-  background: var(--hover);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .reportBtn {
-  width: 40px;
-  height: 40px;
   color: var(--text);
   opacity: 0.78;
 }
@@ -78,10 +77,20 @@
   border-color: color-mix(in srgb, var(--primary) 24%, var(--border) 76%);
 }
 
+.heroActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.insightBannerWrap {
+  padding: 12px 24px 0;
+}
+
 .mainContent {
   display: flex;
   gap: 24px;
-  padding: 0 24px 24px;
+  padding: 18px 24px 24px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -216,11 +225,4 @@
 
 .skelSidePanel {
   height: 340px;
-}
-
-.topBarActions {
-  display: flex;
-  gap: 0.5rem;
-  margin-left: auto;
-  align-items: center;
 }
