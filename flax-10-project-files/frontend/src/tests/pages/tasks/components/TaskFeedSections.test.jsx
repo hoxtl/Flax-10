@@ -55,6 +55,19 @@ import TaskFeedSections from "../../../../pages/tasks/components/TaskFeedSection
 import { useAuth } from "../../../../context/AuthContext";
 import { getVisibleSections } from "../../../../pages/tasks/components/taskFeedSectionConfigs";
 
+function buildDataProps() {
+  return {
+    search: "",
+    setSearch: vi.fn(),
+    showSearchEmptyState: false,
+    pending: [{ id: 1 }],
+    completed: [{ id: 2 }],
+    filteredCompleted: [{ id: 2 }],
+    sortBy: "priority",
+    listMap: {},
+  };
+}
+
 function buildProps(overrides = {}) {
   return {
     activeFilter: "all",
@@ -67,16 +80,7 @@ function buildProps(overrides = {}) {
     onDeleteTask: vi.fn(),
     onEditTask: vi.fn(),
     sectionPropsWithHandlers: { extra: "value" },
-    data: {
-      search: "",
-      setSearch: vi.fn(),
-      showSearchEmptyState: false,
-      pending: [{ id: 1 }],
-      completed: [{ id: 2 }],
-      filteredCompleted: [{ id: 2 }],
-      sortBy: "priority",
-      listMap: {},
-    },
+    data: buildDataProps(),
     lists: [{ id: 7, name: "CS101 - Systems" }],
     ...overrides,
   };

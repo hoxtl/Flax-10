@@ -104,77 +104,107 @@ vi.mock("../../../pages/homepage/Homepage.module.css", () => ({
 
 import { HomepageDashboard } from "../../../pages/homepage/components/HomepageDashboard";
 
-function buildProps(overrides = {}) {
+function buildBaseProps() {
   return {
-    homeDataLoading: false,
     calendarEvents: [{ id: 1, title: "Lecture" }],
     completedEventIds: new Set(),
     dayTasks: [{ id: 4, title: "Essay plan" }],
     displayName: "Ava",
     getTag: vi.fn(() => ({ label: "Study" })),
-    hasTimerSession: true,
+    homeDataLoading: false,
     now: new Date("2026-03-27T10:00:00.000Z"),
-    openModal: vi.fn(),
-    openTimelinePopup: vi.fn(),
-    refetchTasks: vi.fn(),
     selectedDate: new Date("2026-03-27T10:00:00.000Z"),
-    setCompletedEventIds: vi.fn(),
-    setTaskLists: vi.fn(),
     tags: [{ id: 1, name: "Important" }],
     taskLists: [{ id: 2, name: "Inbox" }],
     taskWidgetRef: { current: null },
-    timeLeft: 1200,
-    timerMode: "work",
-    timerTask: "Essay",
+    toast: { showToast: vi.fn() },
     upcomingDeadlines: [{ id: 9, title: "Essay" }],
-    workTime: 25,
-    breakTime: 5,
+  };
+}
+
+function buildActionProps() {
+  return {
     addEvent: vi.fn(),
     deleteTaskAndRefresh: vi.fn(),
     handleInlineTaskEdit: vi.fn(),
     handleTaskToggle: vi.fn(),
     handleTaskWidgetComplete: vi.fn(),
-    toast: { showToast: vi.fn() },
-    state: {
-      deadlineSuggestions: [{ id: 6 }],
-      enrolledModules: [{ id: 7, code: "CS101" }],
-      homepageRecommendation: "Take a break",
-      navigatorContext: { source: "dashboard" },
-      sortedEvents: [{ id: 8, title: "Lecture" }],
-      suggestableTasks: [{ id: 10, title: "Revise" }],
-      taskWidgetDueTodayCount: 2,
-      taskWidgetItemsOnly: [{ id: 11, title: "Flashcards" }],
-      taskWidgetList: [{ id: 12, title: "Task" }],
-      tasksDueToday: [{ id: 13, title: "Readings" }],
-      tomorrowFirstEvent: { id: 14, title: "Tutorial" },
-    },
-    modals: {
-      lastCreatedListId: null,
-      planTimelineReadItem: null,
-      rescheduleTask: null,
-      selectedDeadline: null,
-      selectedModulePill: null,
-      setLastCreatedListId: vi.fn(),
-      setPlanTimelineReadItem: vi.fn(),
-      setRescheduleTask: vi.fn(),
-      setSelectedDeadline: vi.fn(),
-      setSelectedModulePill: vi.fn(),
-      setShowCreateListFromTask: vi.fn(),
-      setShowCreateTaskModal: vi.fn(),
-      showCreateListFromTask: false,
-      showCreateTaskModal: false,
-    },
-    reschedule: {
-      autoScheduleLoading: false,
-      handleAutoSchedule: vi.fn(),
-      handleConflictAutoMove: vi.fn(),
-      handleConflictPushTomorrow: vi.fn(),
-      handleQuickStartGap: vi.fn(),
-      handleResolveTimelineConflicts: vi.fn(),
-      handleReschedule: vi.fn(),
-      handleTimelineDelete: vi.fn(),
-      resolveConflictsLoading: false,
-    },
+    openModal: vi.fn(),
+    openTimelinePopup: vi.fn(),
+    refetchTasks: vi.fn(),
+    setCompletedEventIds: vi.fn(),
+    setTaskLists: vi.fn(),
+  };
+}
+
+function buildTimerProps() {
+  return {
+    breakTime: 5,
+    hasTimerSession: true,
+    timeLeft: 1200,
+    timerMode: "work",
+    timerTask: "Essay",
+    workTime: 25,
+  };
+}
+
+function buildStateProps() {
+  return {
+    deadlineSuggestions: [{ id: 6 }],
+    enrolledModules: [{ id: 7, code: "CS101" }],
+    homepageRecommendation: "Take a break",
+    navigatorContext: { source: "dashboard" },
+    sortedEvents: [{ id: 8, title: "Lecture" }],
+    suggestableTasks: [{ id: 10, title: "Revise" }],
+    taskWidgetDueTodayCount: 2,
+    taskWidgetItemsOnly: [{ id: 11, title: "Flashcards" }],
+    taskWidgetList: [{ id: 12, title: "Task" }],
+    tasksDueToday: [{ id: 13, title: "Readings" }],
+    tomorrowFirstEvent: { id: 14, title: "Tutorial" },
+  };
+}
+
+function buildModalsProps() {
+  return {
+    lastCreatedListId: null,
+    planTimelineReadItem: null,
+    rescheduleTask: null,
+    selectedDeadline: null,
+    selectedModulePill: null,
+    setLastCreatedListId: vi.fn(),
+    setPlanTimelineReadItem: vi.fn(),
+    setRescheduleTask: vi.fn(),
+    setSelectedDeadline: vi.fn(),
+    setSelectedModulePill: vi.fn(),
+    setShowCreateListFromTask: vi.fn(),
+    setShowCreateTaskModal: vi.fn(),
+    showCreateListFromTask: false,
+    showCreateTaskModal: false,
+  };
+}
+
+function buildRescheduleProps() {
+  return {
+    autoScheduleLoading: false,
+    handleAutoSchedule: vi.fn(),
+    handleConflictAutoMove: vi.fn(),
+    handleConflictPushTomorrow: vi.fn(),
+    handleQuickStartGap: vi.fn(),
+    handleResolveTimelineConflicts: vi.fn(),
+    handleReschedule: vi.fn(),
+    handleTimelineDelete: vi.fn(),
+    resolveConflictsLoading: false,
+  };
+}
+
+function buildProps(overrides = {}) {
+  return {
+    ...buildBaseProps(),
+    ...buildActionProps(),
+    ...buildTimerProps(),
+    state: buildStateProps(),
+    modals: buildModalsProps(),
+    reschedule: buildRescheduleProps(),
     ...overrides,
   };
 }
