@@ -8,7 +8,6 @@ import SocietyHero from "../../../components/society/society_detail/SocietyHero"
 import SocietyInfo from "../../../components/society/society_detail/SocietyInfo";
 import SocietyTabs from "../../../components/society/society_detail/tabs/SocietyTabs";
 import SocietySidebar from "../../../components/society/society_detail/SocietySidebar";
-import ImageGalleryModal from "../../../components/society/society_detail/image_handlers/ImageGalleryModal";
 import SettingsModal from "../../../components/society/society_detail/SettingsModal";
 import AnnouncementModal from "../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal";
 import ReportSocietyModal from "../../../components/society/society_detail/ReportSocietyModal";
@@ -29,7 +28,7 @@ function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;
     return {
         state: modals,
-        setS: modals.setShowSettings, setR: modals.setShowReportModal, setG: modals.setGalleryOpen,
+    setS: modals.setShowSettings, setR: modals.setShowReportModal,
         setM: modals.setShowMembersModal, setEA: modals.setEditingAnnouncement,
         updateS: updateSociety, updateLS: updateLocalSociety, fetchM: fetchMembers, removeM: removeMember,
         onDelete: async () => { await deleteSociety(); onDeleteCallback?.(); onBack(); },
@@ -58,7 +57,6 @@ const ModalsContainer = ({ state, data, handlers, societyId }) => {
         <>
             {state.showSettings && <SettingsModal onClose={() => handlers.setS(false)} onDelete={handlers.onDelete} members={data.members} onFetchMembers={handlers.fetchM} onUpdateRole={data.updateMemberRole} onRemoveMember={handlers.removeM} onAddCollaborator={data.addCollaborator} ratificationStatus={data.society.ratification_status} isRatified={data.society.is_ratified} onRequestRatification={data.requestRatification} />}
             {state.showReportModal && <ReportSocietyModal society={data.society} onClose={() => handlers.setR(false)} onReportSuccess={() => handlers.updateLS({ has_reported: true })} />}
-            {state.galleryOpen && <ImageGalleryModal images={urls} initialIndex={state.galleryOpen?.index} onClose={() => handlers.setG(null)} />}
             {state.showMembersModal && <MemberDirectoryModal societyName={data.society.name} members={data.members} onFetchMembers={handlers.fetchM} onRemoveMember={handlers.removeM} isAdmin={isAdmin} onClose={() => handlers.setM(false)} />}
             {state.editingAnnouncement && <AnnouncementModal announcements={data.society.announcements} announcement={state.editingAnnouncement} societyId={societyId} onClose={() => handlers.setEA(null)} onSubmit={(announcement, conflict) => handlers.onAnnounceSubmit(announcement, conflict)} onDelete={(id) => handlers.onAnnounceDelete(id)} tags={data.society.tags} />}
         </>
@@ -103,7 +101,7 @@ const DetailMainContent = ({ data, isAdmin, society }) => (
 function DetailHero({ data, handlers, isAdmin, society, onEditCover }) {
     const infoProps = buildInfoProps(data, society);
     return (
-        <SocietyHero society={society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })} onUpdateBio={(bio) => data.updateSociety({ bio })} onViewMembers={() => handlers.setM(true)} onImageClick={(index) => handlers.setG({ index })} onEditImages={onEditCover} actionContent={<HeroActionButtons isAdmin={isAdmin} onSettings={() => handlers.setS(true)} onReport={() => handlers.onReport()} onUnreport={() => data.handleUnreport(data.society)} hasReported={data.society.has_reported} />} metaContent={<SocietyInfo {...infoProps} showBio={false} showLocation={false} layout="hero" />} />
+        <SocietyHero society={society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })} onUpdateBio={(bio) => data.updateSociety({ bio })} onViewMembers={() => handlers.setM(true)} onEditImages={onEditCover} actionContent={<HeroActionButtons isAdmin={isAdmin} onSettings={() => handlers.setS(true)} onReport={() => handlers.onReport()} onUnreport={() => data.handleUnreport(data.society)} hasReported={data.society.has_reported} />} metaContent={<SocietyInfo {...infoProps} showBio={false} showLocation={false} layout="hero" />} />
     );
 }
 

@@ -29,9 +29,8 @@ function usePageState(initialTab, location) {
 
 function useModalCoreState() {
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
-  const [galleryOpen, setGalleryOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  return { editingAnnouncement, setEditingAnnouncement, galleryOpen, setGalleryOpen, editMode, setEditMode };
+  return { editingAnnouncement, setEditingAnnouncement, editMode, setEditMode };
 }
 
 function useModalDialogState() {
