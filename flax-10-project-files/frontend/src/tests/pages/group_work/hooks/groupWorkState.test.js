@@ -50,44 +50,53 @@ describe('projectRowUtils – formatProjectHeadlineDate', () => {
 });
 
 describe('projectRowUtils – getDaysLeft', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('returns 0 for today (end of day)', () => {
-    const endOfToday = new Date();
-    endOfToday.setHours(23, 59, 59, 999);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-25T12:00:00Z'));
+    const endOfToday = new Date('2026-03-25T23:59:59.999Z');
     const days = getDaysLeft(endOfToday);
-    expect(days).toBeGreaterThanOrEqual(0);
-    expect(days).toBeLessThanOrEqual(1);
+    expect(days).toBe(0);
   });
 
   it('returns a positive number for a future date', () => {
-    const future = new Date();
-    future.setDate(future.getDate() + 10);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-25T12:00:00Z'));
+    const future = new Date('2026-04-04T12:00:00Z');
     expect(getDaysLeft(future)).toBeGreaterThan(0);
   });
 });
 
 describe('projectRowUtils – formatProjectCountdownText', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('returns "1 day left" when exactly one day remains', () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(23, 59, 59, 999);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-25T12:00:00Z'));
+    const tomorrow = new Date('2026-03-26T12:00:00Z');
     const result = formatProjectCountdownText(tomorrow);
-    expect(['1 day left', '2 days left']).toContain(result);
+    expect(result).toBe('1 day left');
   });
 
   it('returns "1 day overdue" when exactly one day past', () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-25T12:00:00Z'));
+    const yesterday = new Date('2026-03-24T12:00:00Z');
     const result = formatProjectCountdownText(yesterday);
-    expect(result).toMatch(/\d+ day(s)? overdue/);
+    expect(result).toBe('1 day overdue');
   });
 
   it('returns "N days left" for multiple future days', () => {
-    const future = new Date();
-    future.setDate(future.getDate() + 5);
-    future.setHours(23, 59, 59, 999);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-25T12:00:00Z'));
+    const future = new Date('2026-04-01T12:00:00Z');
     const result = formatProjectCountdownText(future);
-    expect(result).toMatch(/\d+ days left/);
+    expect(result).toBe('7 days left');
   });
 });
 
