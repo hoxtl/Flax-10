@@ -196,7 +196,7 @@ describe("ListSidebar coverage", () => {
     expect(screen.getByText('Permanently Delete "this list"')).toBeInTheDocument();
   });
 
-  it("covers society labels, list clicks, context menus, and archive item actions", () => {
+  it("covers society labels, list clicks, and context menus", () => {
     const state = buildState({ showArchived: true });
     const props = buildProps({
       lists: [
@@ -217,10 +217,15 @@ describe("ListSidebar coverage", () => {
 
     fireEvent.contextMenu(screen.getByRole("button", { name: "Inbox" }));
     expect(state.handleCtxMenu).toHaveBeenCalled();
+  });
 
+  it("covers archive item actions", () => {
+    const state = buildState({ showArchived: true });
+    const props = buildProps({ lists: [{ id: 3, name: "Inbox" }], archivedLists: [{ id: 10, name: "Old inbox" }] });
+    sidebarStateMock.mockReturnValue(state);
+    render(<ListSidebar {...props} />);
     fireEvent.click(screen.getByRole("button", { name: "Restore" }));
     fireEvent.click(screen.getByRole("button", { name: "Delete" }));
-
     expect(props.onUnarchiveList).toHaveBeenCalledWith(10);
     expect(state.setPermDeleteId).toHaveBeenCalledWith(10);
   });

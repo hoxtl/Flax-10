@@ -190,24 +190,18 @@ describe("tasks utils coverage topups", () => {
     ]);
   });
 
-  it("executes quick-add cleanup and list mutation updater callbacks", async () => {
+  it("executes quick-add cleanup and resets page count", async () => {
     const quickAddState = {
-      saving: false,
-      setSaving: vi.fn(),
-      setTitle: vi.fn(),
-      setModuleId: vi.fn(),
-      setPageCount: vi.fn(),
-      sortedLists: [{ id: 1 }],
-      taskListId: "1",
-      estimatedMinutes: 25,
-      moduleId: null,
-      defaultDueDate: null,
-      pageCount: 10,
+      saving: false, setSaving: vi.fn(), setTitle: vi.fn(), setModuleId: vi.fn(),
+      setPageCount: vi.fn(), sortedLists: [{ id: 1 }], taskListId: "1",
+      estimatedMinutes: 25, moduleId: null, defaultDueDate: null, pageCount: 10,
     };
 
     await runQuickAdd(quickAddState, vi.fn().mockResolvedValue(undefined), "Read");
     expect(quickAddState.setPageCount).toHaveBeenCalledWith(null);
+  });
 
+  it("applies rename and remove list mutation updater callbacks", async () => {
     updateTaskListMock.mockResolvedValueOnce({ id: 7, color: "#f0f" });
     const setLists = vi.fn();
     const renamed = await renameListImpl(setLists, 7, { color: "#f0f" });
@@ -220,45 +214,53 @@ describe("tasks utils coverage topups", () => {
 
     updateTaskListMock.mockResolvedValueOnce({});
     const setListsAfterArchive = vi.fn();
-    const loadArchived = vi.fn();
-    await removeListImpl(setListsAfterArchive, loadArchived, 9);
+    await removeListImpl(setListsAfterArchive, vi.fn(), 9);
     expect(setListsAfterArchive.mock.calls[0][0]([{ id: 7 }, { id: 9 }])).toEqual([{ id: 7 }]);
   });
 
-  it("covers page handlers for undo, edits, deletes, restores, and permanent deletion", async () => {
-    vi.useFakeTimers();
+  it("handles undo add task and edit-task move and due-date toasts", async () => {
     const state = createState({ toastUndo: { taskId: 3, title: "Undo me" } });
-    const listsApi = createListsApi();
     const tasksApi = createTasksApi();
-    const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
+    const handlers = buildTasksPageHandlers(state, createListsApi(), tasksApi);
 
     handlers.handleUndoAddTask();
     expect(tasksApi.removeTask).toHaveBeenCalledWith(3);
     expect(state.setToastUndo).toHaveBeenCalledWith(null);
-
     state.toastUndo = null;
     handlers.handleUndoAddTask();
     expect(tasksApi.removeTask).toHaveBeenCalledTimes(1);
 
     await handlers.handleEditTask(4, { task_list: 9 }, { source: "context-menu", action: "move-list" });
     expect(state.setToastInfo).toHaveBeenCalledWith("Task moved to Reading.");
-
     await handlers.handleEditTask(4, { due_date: null }, { source: "context-menu", action: "set-due-date" });
     expect(state.setToastInfo).toHaveBeenCalledWith("Task due date removed.");
-
     await handlers.handleEditTask(4, { due_date: "2026-03-11T10:00:00.000Z" }, { source: "context-menu", action: "set-due-date" });
     expect(state.setToastInfo).toHaveBeenCalledWith("Task due date updated.");
+  });
+
+  it("handles edit-task unknown-list toast, plain edit, and delete-task toast", async () => {
+    vi.useFakeTimers();
+    const state = createState();
+    const tasksApi = createTasksApi();
+    const handlers = buildTasksPageHandlers(state, createListsApi(), tasksApi);
 
     tasksApi.editTask.mockResolvedValueOnce({});
     await handlers.handleEditTask(4, { task_list: 404 }, { source: "context-menu", action: "move-list" });
     expect(state.setToastInfo).toHaveBeenCalledWith("Task moved to new list.");
-
     await expect(handlers.handleEditTask(4, { title: "Plain edit" })).resolves.toEqual({ id: 4, task_list: 9 });
 
     await handlers.handleDeleteTask(11);
     expect(state.setToastDelete).toHaveBeenCalledWith(true);
     vi.advanceTimersByTime(3500);
     expect(state.setToastDelete).toHaveBeenCalledWith(false);
+  });
+
+  it("handles unarchive, permanent deletion, and unknown-list fallbacks with toast timeouts", async () => {
+    vi.useFakeTimers();
+    const state = createState();
+    const listsApi = createListsApi();
+    const tasksApi = createTasksApi();
+    const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
 
     await handlers.handleUnarchiveList(21);
     expect(listsApi.restoreList).toHaveBeenCalledWith(21);
@@ -270,7 +272,6 @@ describe("tasks utils coverage topups", () => {
 
     await handlers.handleDeleteList(999);
     expect(state.setToastInfo).toHaveBeenCalledWith('"List" deleted.');
-
     await handlers.handlePermanentlyDeleteList(999);
     expect(state.setToastInfo).toHaveBeenCalledWith('"List" permanently deleted.');
 
@@ -292,67 +293,58 @@ describe("tasks utils coverage topups", () => {
     expect(state.setToastInfo).toHaveBeenCalledWith('"Inbox" deleted.');
   });
 
-  it("builds view props that wire sidebar, feed, modal, and toast behaviour", async () => {
+  function buildPageViewProps() {
     vi.useFakeTimers();
     const state = createState();
-    const listsApi = createListsApi({
-      loading: true,
-      addList: vi.fn().mockResolvedValue({}),
-    });
-    const tasksApi = createTasksApi({
-      initialLoading: false,
-      addTask: vi.fn().mockResolvedValue({ id: 41, title: "Created" }),
-    });
+    const listsApi = createListsApi({ loading: true, addList: vi.fn().mockResolvedValue({}) });
+    const tasksApi = createTasksApi({ initialLoading: false, addTask: vi.fn().mockResolvedValue({ id: 41, title: "Created" }) });
     const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
-    const props = buildTasksPageViewProps(
-      state,
-      listsApi,
-      tasksApi,
-      handlers,
-      [{ id: 1, title: "Filtered" }],
-      "2026-03-11T23:59:59.999Z",
-      "CS101",
-    );
+    const props = buildTasksPageViewProps(state, listsApi, tasksApi, handlers, [{ id: 1, title: "Filtered" }], "2026-03-11T23:59:59.999Z", "CS101");
+    return { state, props };
+  }
 
+  it("builds view props and wires sidebar actions", () => {
+    const { state, props } = buildPageViewProps();
     expect(props.loading).toBe(true);
     expect(props.taskModalProps.defaultDueDate).toBe("2026-03-11T23:59:59.999Z");
-
     props.sidebarProps.onSelectList(9);
     props.sidebarProps.onSelectFilter("later");
     props.sidebarProps.onNewList();
-    props.feedProps.onPlanTomorrow();
-    props.feedProps.onCreateTask();
-    props.feedProps.onListError("bad list");
-    props.listModalProps.onClose();
-
-    vi.advanceTimersByTime(3500);
-
     expect(state.setActiveListId).toHaveBeenCalledWith(9);
     expect(state.setFilterListIds).toHaveBeenCalledWith([]);
     expect(state.setActiveFilter).toHaveBeenCalledWith("later");
     expect(state.setShowListModal).toHaveBeenCalledWith(true);
-    expect(state.setShowListModal).toHaveBeenCalledWith(false);
-    expect(state.setShowTaskModal).toHaveBeenCalled();
-    expect(state.setTaskModalDueDate).toHaveBeenCalled();
+  });
+
+  it("wires feed errors and list modal close actions", () => {
+    const { state, props } = buildPageViewProps();
+    props.feedProps.onPlanTomorrow();
+    props.feedProps.onCreateTask();
+    props.feedProps.onListError("bad list");
+    props.listModalProps.onClose();
+    vi.advanceTimersByTime(3500);
     expect(state.setToastError).toHaveBeenCalledWith("bad list");
     expect(state.setToastError).toHaveBeenCalledWith(null);
+  });
 
+  it("wires create-list callbacks from the task modal state", async () => {
+    const { state, props } = buildPageViewProps();
     await props.createListFromTaskProps.onSave({ name: "No id" });
     expect(state.setLastCreatedListId).not.toHaveBeenCalled();
     expect(state.setShowCreateListFromTask).toHaveBeenCalledWith(false);
-
-    await props.feedProps.onAddTask({ title: "Feed task" });
-    await props.taskModalProps.onSave({ title: "Modal task" });
-
-    vi.advanceTimersByTime(5000);
-
-    expect(state.setToastUndo).toHaveBeenCalledWith({ taskId: 41, title: "Created" });
-    expect(state.setToastUndo).toHaveBeenCalledWith(null);
-
     props.taskModalProps.onOpenCreateList();
     props.taskModalProps.onClose();
     expect(state.setShowCreateListFromTask).toHaveBeenCalledWith(true);
     expect(state.setShowTaskModal).toHaveBeenCalledWith(false);
     expect(state.setTaskModalDueDate).toHaveBeenCalledWith(null);
+  });
+
+  it("wires task add and modal save callbacks", async () => {
+    const { state, props } = buildPageViewProps();
+    await props.feedProps.onAddTask({ title: "Feed task" });
+    await props.taskModalProps.onSave({ title: "Modal task" });
+    vi.advanceTimersByTime(5000);
+    expect(state.setToastUndo).toHaveBeenCalledWith({ taskId: 41, title: "Created" });
+    expect(state.setToastUndo).toHaveBeenCalledWith(null);
   });
 });

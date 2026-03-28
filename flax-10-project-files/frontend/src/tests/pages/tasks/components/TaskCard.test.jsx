@@ -1,4 +1,4 @@
-/**
+/*
  * Covers TaskCard rendering, menu, and modal behaviours.
  */
 
@@ -114,7 +114,6 @@ vi.mock("../../../../pages/tasks/utils/taskCardUtils", async () => {
 });
 
 import { isRoutineTask } from "../../../../lib/completionMessages";
-import { getUserSettings } from "../../../../api/userApi";
 import { formatDueDate } from "../../../../pages/tasks/utils/taskCardUtils";
 
 import { createFnMap } from "../../../utils/testBuilderUtils";
@@ -180,28 +179,26 @@ describe("TaskCard coverage", () => {
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
   });
 
-  it("covers routine and repeated completion flows and the study-now fallback color path", () => {
+  it("clears the completion timeout when the same task is toggled twice", () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
-    const props = buildProps({ listColor: undefined, searchQuery: "zzz" });
-
-    renderWithRouter(<TaskCard {...props} />);
-
+    renderWithRouter(<TaskCard {...buildProps({ listColor: undefined, searchQuery: "zzz" })} />);
     expect(screen.queryByText("zzz", { selector: "mark" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(/Mark complete/i));
+    fireEvent.click(screen.getByLabelText(/Mark complete/i));
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    clearTimeoutSpy.mockRestore();
+  });
 
-    fireEvent.click(screen.getByLabelText(/Mark complete/i));
-    fireEvent.click(screen.getByLabelText(/Mark complete/i));
+  it("uses the study-now fallback colour path", () => {
+    renderWithRouter(<TaskCard {...buildProps({ listColor: undefined, searchQuery: "zzz" })} />);
     fireEvent.click(screen.getByRole("button", { name: /Study now/i }));
     fireEvent.keyDown(screen.getByText("Read book").closest('[role="button"]'), { key: "Enter" });
-
-    expect(clearTimeoutSpy).toHaveBeenCalled();
     expect(timerMock.setActiveTaskId).toHaveBeenCalledWith(
       1,
       expect.objectContaining({ categoryColor: undefined, estimatedBlocks: 2 }),
     );
     expect(navigateMock).toHaveBeenCalledWith("/timer", { state: { fromTaskPlay: true } });
     expect(screen.getByTestId("info-modal")).toBeInTheDocument();
-
-    clearTimeoutSpy.mockRestore();
   });
 
   it("handles completed tasks and routine completions without showing celebration UI", () => {
@@ -306,34 +303,18 @@ describe("TaskCard coverage", () => {
     expect(screen.queryByTestId("info-modal")).not.toBeInTheDocument();
   });
 
-  it("covers routine incomplete tasks plus high and medium accent branches", () => {
+  it("covers routine incomplete tasks and the high accent branch", () => {
     isRoutineTask.mockReturnValue(true);
     formatDueDate.mockReturnValueOnce(null);
-
-    const { rerender } = renderWithRouter(
-      <TaskCard
-        {...buildProps({
-          task: { ...baseTask, id: 50, priority: "high", due_date: null, completed: false },
-          isOverdue: true,
-        })}
-      />,
-    );
-
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...baseTask, id: 50, priority: "high", due_date: null, completed: false }, isOverdue: true })} />);
     fireEvent.click(screen.getByLabelText(/Mark complete/i));
     expect(completionMock.showCompletionToast).toHaveBeenCalledWith("Done", { isRoutine: true });
     expect(screen.getByTitle(/Right-click for more options/i).className).toMatch(/Overdue/);
     expect(screen.queryByText("Today")).not.toBeInTheDocument();
+  });
 
-    rerender(
-      <MemoryRouter>
-        <TaskCard
-          {...buildProps({
-            task: { ...baseTask, id: 51, priority: "medium", completed: false },
-          })}
-        />
-      </MemoryRouter>,
-    );
-
+  it("covers the medium accent branch", () => {
+    renderWithRouter(<TaskCard {...buildProps({ task: { ...baseTask, id: 51, priority: "medium", completed: false } })} />);
     expect(screen.getByTitle(/Right-click for more options/i).className).toMatch(/cardAccent/);
   });
 });
