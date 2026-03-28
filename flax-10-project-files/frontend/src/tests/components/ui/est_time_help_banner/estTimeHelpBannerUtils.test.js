@@ -6,7 +6,7 @@ import {
   openFlaxChat,
   readDismissedState,
   persistDismissedState,
-} from '../../../components/ui/est_time_help_banner/estTimeHelpBannerUtils';
+} from '../../../../components/ui/est_time_help_banner/estTimeHelpBannerUtils';
 
 describe('estTimeHelpBannerUtils', () => {
   beforeEach(() => {

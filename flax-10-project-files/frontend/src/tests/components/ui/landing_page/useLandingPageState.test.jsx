@@ -18,7 +18,7 @@ const getViewportCenterMock = vi.fn(() => 300);
 const lerpMock = vi.fn((start, end, factor) => start + (end - start) * factor);
 const parsePercentMock = vi.fn((value) => Number.parseFloat(value));
 
-vi.mock("../../../components/ui/landing_page/landingPageUtils", () => ({
+vi.mock("../../../../components/ui/landing_page/landingPageUtils", () => ({
   buildTransform: (...args) => buildTransformMock(...args),
   getGlobeOpacity: (...args) => getGlobeOpacityMock(...args),
   getInitialTransform: (...args) => getInitialTransformMock(...args),
@@ -33,7 +33,7 @@ vi.mock("../../../components/ui/landing_page/landingPageUtils", () => ({
   parsePercent: (...args) => parsePercentMock(...args),
 }));
 
-import { useLandingPageState } from "../../../components/ui/landing_page/useLandingPageState";
+import { useLandingPageState } from "../../../../components/ui/landing_page/useLandingPageState";
 
 describe("useLandingPageState", () => {
   let requestAnimationFrameSpy;

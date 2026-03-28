@@ -2,22 +2,22 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import CreateTaskBar from '../../../pages/tasks/components/CreateTaskBar';
+import CreateTaskBar from '../../../../pages/tasks/components/CreateTaskBar';
 
-vi.mock('../../../api/moduleApi', () => ({
+vi.mock('../../../../api/moduleApi', () => ({
     getModules: vi.fn().mockResolvedValue([]),
     getEnrollments: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('../../../components/modules/utils/moduleUtils', () => ({
+vi.mock('../../../../components/modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn().mockReturnValue(false),
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
-vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../../components/settings/hooks/useSleepWarning', () => ({
     useSleepWarning: vi.fn(() => ({
         sleepWarning: false,
         checkSleepAndRun: (_date, fn) => fn(),
@@ -25,11 +25,11 @@ vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
     })),
 }));
 
-vi.mock('../../../components/common/sleep_warning_modal', () => ({
+vi.mock('../../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 
-vi.mock('../../../components/common/animated_dropdown', () => ({
+vi.mock('../../../../components/common/animated_dropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}

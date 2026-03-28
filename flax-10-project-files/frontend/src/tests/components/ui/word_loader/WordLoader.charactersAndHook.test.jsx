@@ -19,8 +19,8 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-import { WordLoaderCharacters } from "../../../components/ui/word_loader/WordLoaderCharacters";
-import { useWordLoader } from "../../../components/ui/word_loader/useWordLoader";
+import { WordLoaderCharacters } from "../../../../components/ui/word_loader/WordLoaderCharacters";
+import { useWordLoader } from "../../../../components/ui/word_loader/useWordLoader";
 
 describe("word loader extra coverage", () => {
   beforeEach(() => {

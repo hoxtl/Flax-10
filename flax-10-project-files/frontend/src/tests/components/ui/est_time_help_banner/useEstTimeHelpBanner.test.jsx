@@ -4,12 +4,12 @@ import { renderHook, act } from "@testing-library/react";
 const readDismissedStateMock = vi.hoisted(() => vi.fn());
 const persistDismissedStateMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../components/ui/est_time_help_banner/estTimeHelpBannerUtils", () => ({
+vi.mock("../../../../components/ui/est_time_help_banner/estTimeHelpBannerUtils", () => ({
   readDismissedState: readDismissedStateMock,
   persistDismissedState: persistDismissedStateMock,
 }));
 
-import { useEstTimeHelpBanner } from "../../../components/ui/est_time_help_banner/useEstTimeHelpBanner";
+import { useEstTimeHelpBanner } from "../../../../components/ui/est_time_help_banner/useEstTimeHelpBanner";
 
 describe("useEstTimeHelpBanner", () => {
   beforeEach(() => {

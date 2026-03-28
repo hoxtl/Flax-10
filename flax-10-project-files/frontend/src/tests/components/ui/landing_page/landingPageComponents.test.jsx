@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import LandingSectionNav from "../../../components/ui/landing_page/LandingSectionNav";
-import LandingTopPills from "../../../components/ui/landing_page/LandingTopPills";
+import LandingSectionNav from "../../../../components/ui/landing_page/LandingSectionNav";
+import LandingTopPills from "../../../../components/ui/landing_page/LandingTopPills";
 
 const styles = new Proxy({}, { get: (_, key) => key });
 

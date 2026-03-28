@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../components/ui/multi_select_dropdown/useDropdownInteractions", () => ({
+vi.mock("../../../../components/ui/multi_select_dropdown/useDropdownInteractions", () => ({
   createHoverHandlers: vi.fn((openOnHover, hoverTimeoutRef, updateOpen) => ({
     onMouseEnter: () => {
       if (openOnHover) updateOpen(true);
@@ -14,7 +14,7 @@ vi.mock("../../../components/ui/multi_select_dropdown/useDropdownInteractions", 
   useDropdownRootRef: vi.fn(() => ({ current: null })),
 }));
 
-vi.mock("../../../components/ui/multi_select_dropdown/useDropdownOpenState", () => ({
+vi.mock("../../../../components/ui/multi_select_dropdown/useDropdownOpenState", () => ({
   useDropdownOpenState: vi.fn((isOpen, onOpenChange) => ({
     isOpen: Boolean(isOpen),
     updateOpen: (next) => {
@@ -25,7 +25,7 @@ vi.mock("../../../components/ui/multi_select_dropdown/useDropdownOpenState", () 
   })),
 }));
 
-import { useMultiSelectDropdown } from "../../../components/ui/multi_select_dropdown/useMultiSelectDropdown";
+import { useMultiSelectDropdown } from "../../../../components/ui/multi_select_dropdown/useMultiSelectDropdown";
 
 describe("useMultiSelectDropdown", () => {
   beforeEach(() => {

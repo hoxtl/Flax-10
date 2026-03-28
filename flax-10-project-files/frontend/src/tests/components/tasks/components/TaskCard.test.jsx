@@ -3,7 +3,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import TaskCard, { EditTaskModal, TaskContextMenu } from '../../../pages/tasks/components/TaskCard';
+import TaskCard, { EditTaskModal, TaskContextMenu } from '../../../../pages/tasks/components/TaskCard';
 const navigateMock = vi.fn();
 const setActiveTaskIdMock = vi.fn();
 const showCompletionToastMock = vi.fn();
@@ -20,35 +20,35 @@ vi.mock('react-router-dom', async (importOriginal) => {
     const actual = await importOriginal();
     return { ...actual, useNavigate: vi.fn(() => navigateMock) };
 });
-vi.mock('../../../context/TimerContext', () => ({
+vi.mock('../../../../context/TimerContext', () => ({
     useTimerContext: vi.fn(() => ({ setActiveTaskId: setActiveTaskIdMock })),
 }));
-vi.mock('../../../context/TaskCompletionContext', () => ({
+vi.mock('../../../../context/TaskCompletionContext', () => ({
     useTaskCompletion: vi.fn(() => ({ showCompletionToast: showCompletionToastMock })),
 }));
-vi.mock('../../../lib/completionMessages', () => ({
+vi.mock('../../../../lib/completionMessages', () => ({
     getCompletionMessage: (...args) => getCompletionMessageMock(...args),
     isRoutineTask: (...args) => isRoutineTaskMock(...args),
 }));
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../../api/userApi', () => ({
     getUserSettings: (...args) => getUserSettingsMock(...args),
 }));
-vi.mock('../../../context/ToastContext', () => ({ useToast: vi.fn(() => vi.fn()) }));
-vi.mock('../../../api/readingApi', () => ({
+vi.mock('../../../../context/ToastContext', () => ({ useToast: vi.fn(() => vi.fn()) }));
+vi.mock('../../../../api/readingApi', () => ({
     getReadingSpeed: (...args) => getReadingSpeedMock(...args),
 }));
-vi.mock('../../../components/common/sleep_warning_modal', () => ({
+vi.mock('../../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
-vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../../components/settings/hooks/useSleepWarning', () => ({
     useSleepWarning: vi.fn(() => sleepWarningState),
 }));
-vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
+vi.mock('../../../../components/common/inputs/DateTimePicker', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input data-testid="date-picker" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
-vi.mock('../../../pages/tasks/components/CreateTaskModal', () => ({
+vi.mock('../../../../pages/tasks/components/CreateTaskModal', () => ({
     default: ({ onClose, onSave, mode }) => (
         <div data-testid="create-task-modal">
             <span>{mode === 'edit' ? 'Edit' : 'Create'} task modal</span>
@@ -57,10 +57,10 @@ vi.mock('../../../pages/tasks/components/CreateTaskModal', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/task_celebration/CheckBurst', () => ({
+vi.mock('../../../../components/task_celebration/CheckBurst', () => ({
     CheckBurst: ({ children }) => <div data-testid="check-burst">{children}</div>,
 }));
-vi.mock('../../../components/common/animated_dropdown/AnimatedDropdown', () => ({
+vi.mock('../../../../components/common/animated_dropdown/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <div data-testid="animated-dropdown">
             {(options || []).map(o => (

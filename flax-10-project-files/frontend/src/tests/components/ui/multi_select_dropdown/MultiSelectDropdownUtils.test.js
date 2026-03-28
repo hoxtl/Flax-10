@@ -9,7 +9,7 @@ import {
   getTriggerLabel,
   normalizeOption,
   toggleSelectedValue,
-} from "../../../components/ui/multi_select_dropdown/multiSelectDropdownUtils";
+} from "../../../../components/ui/multi_select_dropdown/multiSelectDropdownUtils";
 
 describe("multiSelectDropdownUtils", () => {
   it("normalizes string options and preserves object options", () => {
