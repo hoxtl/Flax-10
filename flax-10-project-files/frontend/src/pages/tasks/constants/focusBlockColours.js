@@ -9,9 +9,11 @@ import focusBlockColourValues from './focusBlockColourValues.json';
 const FOCUS_BLOCK_COLOURS = focusBlockColourValues;
 
 /* Hex only, for fallback lookups by index. */
+
 export const FOCUS_BLOCK_COLOURS_HEX = FOCUS_BLOCK_COLOURS;
 
 /* Palette entries with labels for the create modal. */
+
 export const FOCUS_BLOCK_PALETTE = FOCUS_BLOCK_COLOURS.map((hex, i) => ({
   hex,
   label: `Colour ${i + 1}`,

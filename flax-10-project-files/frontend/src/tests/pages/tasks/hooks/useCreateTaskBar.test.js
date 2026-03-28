@@ -1,4 +1,5 @@
 /* Tests for useCreateTaskBar hook quick-add logic and module loading */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 

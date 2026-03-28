@@ -1,4 +1,5 @@
 /* Tests for AllTasksCompleteCard component rendering and interactions */
+
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AllTasksCompleteCard from '../../../../pages/tasks/components/AllTasksCompleteCard';

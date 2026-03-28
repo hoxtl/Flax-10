@@ -104,6 +104,7 @@ function useCreateTaskModalHandlers(props, formState, sleepState) {
 }
 
 /* State and handlers for CreateTaskModal. */
+
 export function useCreateTaskModal(props) {
   const formState = useCreateTaskModalFormState(props);
   const sleepState = useCreateTaskModalSleep();

@@ -119,6 +119,7 @@ export async function savePreferences(data, actions) {
  * @param {string} errorMessage - Shown in the banner if the API call fails.
  * @returns {(data: object, actions: { setBannerMessage: Function, setIsSaving: Function }) => Promise<object|false>}
  */
+
 function createPatchSaveHandler(key, errorMessage) {
   return async (data, actions) => {
     const { setBannerMessage, setIsSaving } = actions;
