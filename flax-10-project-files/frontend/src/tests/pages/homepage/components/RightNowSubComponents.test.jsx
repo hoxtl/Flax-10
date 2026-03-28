@@ -21,7 +21,11 @@ vi.mock("lucide-react", () => ({
   ArrowUpRight: () => <svg aria-hidden="true" />,
 }));
 
+<<<<<<< HEAD
 vi.mock("@/pages/homepage/components/rightNowUtils", () => ({
+=======
+vi.mock("../../../../pages/homepage/components/rightNowUtils", () => ({
+>>>>>>> main
   getJourneySummary: vi.fn((journey) => journey),
   getTimeLeftBand: vi.fn((minutes) => {
     if (minutes == null) return null;
@@ -37,7 +41,11 @@ import {
   ConflictSummary,
   TflDelayCard,
   fadeIn,
+<<<<<<< HEAD
 } from "@/pages/homepage/components/RightNowSubComponents";
+=======
+} from "../../../../pages/homepage/components/RightNowSubComponents";
+>>>>>>> main
 
 describe("RightNowSubComponents", () => {
   beforeEach(() => {

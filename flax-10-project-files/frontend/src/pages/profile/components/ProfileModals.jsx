@@ -68,7 +68,7 @@ const SHARING_TITLES = {
   shared_with: (n) => n === 1 ? "1 person can see my calendar events" : n > 1 ? `${n} people can see my calendar events` : "People who can see my calendar events",
 };
 
-function buildSharingTitle(mode, count) {
+export function buildSharingTitle(mode, count) {
   return (SHARING_TITLES[mode] || SHARING_TITLES.shared_with)(count);
 }
 

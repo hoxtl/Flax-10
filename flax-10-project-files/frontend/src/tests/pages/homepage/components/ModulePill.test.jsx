@@ -11,7 +11,11 @@ vi.mock('framer-motion', () => ({
     }),
 }));
 
+<<<<<<< HEAD
 import { ModulePill, TypePill, getModulePillColors } from '@/pages/homepage/components/ModulePill';
+=======
+import { ModulePill, TypePill, getModulePillColors } from '../../../../pages/homepage/components/ModulePill';
+>>>>>>> main
 
 describe('getModulePillColors', () => {
     it('returns known colors for PS4202', () => {

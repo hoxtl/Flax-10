@@ -16,6 +16,7 @@ import "../../../components/calendar/calendar.css";
 
 function useProfileCalendarMode(dispatch) {
   useEffect(() => {
+    if (!dispatch) return;
     dispatch({ type: "SET_VIEW_MODE", payload: "month" });
     dispatch({ type: "SET_READ_ONLY", payload: true });
   }, [dispatch]);
@@ -25,7 +26,10 @@ function useProfileNavigation() {
   const { selectedDate } = useCalendar();
   const dispatch = useCalendarDispatch();
   useProfileCalendarMode(dispatch);
-  const setDate = (date) => dispatch({ type: "SET_SELECTED_DATE", payload: date });
+  const setDate = (date) => {
+    if (!dispatch) return;
+    dispatch({ type: "SET_SELECTED_DATE", payload: date });
+  };
   return { selectedDate, setDate };
 }
 

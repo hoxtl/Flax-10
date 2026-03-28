@@ -29,7 +29,7 @@ export function useHomeData(selectedDate) {
 
 function getDayEvents(allEvents, events, fallbackDayEvents, selectedDate) {
   const primary = Array.isArray(allEvents) && allEvents.length > 0 ? allEvents : events;
-  const source = Array.isArray(primary) && primary.length > 0 ? primary : fallbackDayEvents || [];
+  const source = Array.isArray(primary) && primary.length > 0 ? primary : fallbackDayEvents;
   return source.filter((event) => overlapsDay(new Date(event.start_time), new Date(event.end_time || event.start_time), selectedDate));
 }
 

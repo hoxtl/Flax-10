@@ -201,7 +201,7 @@ vi.mock("../../../components/tags/components/PillFilters", () => ({
 }));
 
 vi.mock("../../../pages/tasks/components/TaskCard", async () => {
-  const actual = await vi.importActual("../../../pages/Tasks/components/TaskCard");
+  const actual = await vi.importActual("../../../pages/tasks/components/TaskCard");
   return {
     ...actual,
     EditTaskModal: ({ task, onSave, onDelete, onClose }) => (

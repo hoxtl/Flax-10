@@ -79,7 +79,13 @@ vi.mock("../../../../pages/tasks/components/CreateTaskModal", () => ({
 }));
 
 vi.mock("../../../../pages/tasks/components/TaskInfoModal", () => ({
-  TaskInfoModal: () => <div data-testid="info-modal" />,
+  TaskInfoModal: ({ onClose }) => (
+    <div data-testid="info-modal">
+      <button type="button" onClick={onClose}>
+        Close info
+      </button>
+    </div>
+  ),
 }));
 
 vi.mock("../../../../components/common/animated_dropdown", () => ({
@@ -98,7 +104,7 @@ vi.mock("../../../../components/common/animated_dropdown", () => ({
 }));
 
 vi.mock("../../../../pages/tasks/utils/taskCardUtils", async () => {
-  const actual = await vi.importActual("../../../../pages/Tasks/utils/taskCardUtils");
+  const actual = await vi.importActual("../../../../pages/tasks/utils/taskCardUtils");
   return {
     ...actual,
     formatDueDate: vi.fn(() => ({ label: "Today", status: "today" })),
@@ -173,8 +179,6 @@ describe("TaskCard coverage", () => {
 
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
   });
-
-
 
   it("covers routine and repeated completion flows and the study-now fallback color path", () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
@@ -279,8 +283,6 @@ describe("TaskCard coverage", () => {
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
   });
 
-
-
   it("renders the edit modal directly with its default list fallback", () => {
     render(
       <EditTaskModal
@@ -292,5 +294,46 @@ describe("TaskCard coverage", () => {
     );
 
     expect(screen.getByTestId("edit-modal")).toBeInTheDocument();
+  });
+
+  it("opens the info modal when the card body is clicked", () => {
+    renderWithRouter(<TaskCard {...buildProps()} />);
+
+    fireEvent.click(screen.getByText("Read book"));
+
+    expect(screen.getByTestId("info-modal")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close info" }));
+    expect(screen.queryByTestId("info-modal")).not.toBeInTheDocument();
+  });
+
+  it("covers routine incomplete tasks plus high and medium accent branches", () => {
+    isRoutineTask.mockReturnValue(true);
+    formatDueDate.mockReturnValueOnce(null);
+
+    const { rerender } = renderWithRouter(
+      <TaskCard
+        {...buildProps({
+          task: { ...baseTask, id: 50, priority: "high", due_date: null, completed: false },
+          isOverdue: true,
+        })}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText(/Mark complete/i));
+    expect(completionMock.showCompletionToast).toHaveBeenCalledWith("Done", { isRoutine: true });
+    expect(screen.getByTitle(/Right-click for more options/i).className).toMatch(/Overdue/);
+    expect(screen.queryByText("Today")).not.toBeInTheDocument();
+
+    rerender(
+      <MemoryRouter>
+        <TaskCard
+          {...buildProps({
+            task: { ...baseTask, id: 51, priority: "medium", completed: false },
+          })}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTitle(/Right-click for more options/i).className).toMatch(/cardAccent/);
   });
 });

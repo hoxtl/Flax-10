@@ -16,6 +16,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
+<<<<<<< HEAD
 const useCountdownMock = vi.fn(() => ({ text: '5m' }));
 
 vi.mock('@/pages/homepage/hooks/useCountdown', () => ({
@@ -23,21 +24,37 @@ vi.mock('@/pages/homepage/hooks/useCountdown', () => ({
 }));
 
 vi.mock('@/pages/homepage/utils/kclTflMapping', () => ({
+=======
+vi.mock('../../../../pages/homepage/hooks/useCountdown', () => ({
+    useCountdown: vi.fn(() => ({ text: '5m' })),
+}));
+
+vi.mock('../../../../pages/homepage/utils/kclTflMapping', () => ({
+>>>>>>> main
     getRelevantDelays: vi.fn(() => []),
     getTflLinesForLocation: vi.fn(() => []),
     isSevereDisruption: vi.fn(() => false),
 }));
 
+<<<<<<< HEAD
 vi.mock('@/pages/homepage/utils/eventUtils', () => ({
     isNow: vi.fn(() => false),
 }));
 
 vi.mock('@/api/tflApi', () => ({
+=======
+vi.mock('../../../../pages/homepage/utils/eventUtils', () => ({
+    isNow: vi.fn(() => false),
+}));
+
+vi.mock('../../../../api/tflApi', () => ({
+>>>>>>> main
     tflService: {
         journeyPlanner: vi.fn().mockResolvedValue(null),
     },
 }));
 
+<<<<<<< HEAD
 vi.mock('@/api/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue(null),
 }));
@@ -48,6 +65,17 @@ import * as kclTflMapping from '@/pages/homepage/utils/kclTflMapping';
 import * as viewModel from '@/pages/homepage/components/rightNowWidget.viewmodel.js';
 import { getHomeAddress } from '@/api/userApi';
 import { tflService } from '@/api/tflApi';
+=======
+vi.mock('../../../../api/userApi', () => ({
+    getHomeAddress: vi.fn().mockResolvedValue(null),
+}));
+
+import { RightNowWidget } from '../../../../pages/homepage/components/RightNowWidget';
+import * as eventUtils from '../../../../pages/homepage/utils/eventUtils';
+import * as kclTflMapping from '../../../../pages/homepage/utils/kclTflMapping';
+import { getHomeAddress } from '../../../../api/userApi';
+import { tflService } from '../../../../api/tflApi';
+>>>>>>> main
 
 const baseNow = new Date('2024-03-08T14:00:00Z');
 

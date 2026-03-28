@@ -5,7 +5,7 @@
 import ModulesCard from './ModulesCard.jsx';
 import gridStyles from '../../common/card/CardGrid.module.css';
 
-function getModuleCardKey(module, index) {
+export function getModuleCardKey(module, index) {
     return String(module?.id ?? module?.module_code ?? `module-${index}`);
 }
 

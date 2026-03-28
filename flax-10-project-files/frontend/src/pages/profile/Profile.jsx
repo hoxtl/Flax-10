@@ -115,7 +115,7 @@ function CommonGroundInsightsRow({ modules, summary, currentUserModules, current
 
 function OtherProfileColumns(props) {
   const { summary, modules, currentUserModules, currentUserSummary, role, onNavigate, onSuggestStudySession, suggestionState } = props;
-  const sharedModuleCount = (modules || []).filter((mc) => (currentUserModules || []).includes(mc)).length;
+  const sharedModuleCount = (modules || []).filter((mc) => currentUserModules.includes(mc)).length;
   const hasCommonGround = role !== "teacher" && ((modules || []).length > 0 || (summary?.societies || []).length > 0);
   const showTeacherInsights = role === "teacher" && (modules?.length > 0 || (summary && currentUserSummary));
   const compatProps = { summary, currentUserSummary, sharedModuleCount, onSuggestStudySession, suggestionState };

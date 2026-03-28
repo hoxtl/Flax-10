@@ -81,7 +81,7 @@ function buildAutoScheduleContext(props) {
     freeWindows,
     blockNeeds,
     requiredMinutes: sumMinutes(blockNeeds),
-    availableMinutes: sumMinutes(freeWindows.map((win) => win.minutes || 0)),
+    availableMinutes: sumMinutes(freeWindows.map((win) => win.minutes)),
   };
 }
 
@@ -96,7 +96,7 @@ function announceAutoScheduleIssue(props, message) {
 }
 
 function sumMinutes(values) {
-  return values.reduce((sum, value) => sum + (value || 0), 0);
+  return values.reduce((sum, value) => sum + value, 0);
 }
 
 function canFitBlocks(windows, blocks) {
@@ -104,7 +104,7 @@ function canFitBlocks(windows, blocks) {
   return [...blocks].sort((a, b) => b - a).every((block) => assignBlockToWindow(available, block));
 }
 
-function getDayFreeWindows(events = [], selectedDate) {
+function getDayFreeWindows(events, selectedDate) {
   const bounds = buildDayBounds(selectedDate);
   if (bounds.cursorStart >= bounds.dayEndMs) return [];
   return collectFreeWindows(events, bounds.cursorStart, bounds.dayEndMs)

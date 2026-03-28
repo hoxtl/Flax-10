@@ -8,11 +8,19 @@ vi.mock("lucide-react", () => ({
   Upload: () => <svg aria-hidden="true" />,
 }));
 
+<<<<<<< HEAD
 vi.mock("@/components/common/widget_header/WidgetHeader", () => ({
   default: ({ title }) => <div>{title}</div>,
 }));
 
 import PhotoWidget from "@/pages/homepage/components/PhotoWidget";
+=======
+vi.mock("../../../../components/common/widget_header/WidgetHeader", () => ({
+  default: ({ title }) => <div>{title}</div>,
+}));
+
+import PhotoWidget from "../../../../pages/homepage/components/PhotoWidget";
+>>>>>>> main
 
 describe("PhotoWidget", () => {
   beforeEach(() => {

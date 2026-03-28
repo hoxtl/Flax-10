@@ -13,11 +13,11 @@ import { AnimatedList, DecisionListRow } from "./AdminList";
 import AdminPagination from "./AdminPagination";
 import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
 
-function getRatificationMeta(item) {
+export function getRatificationMeta(item) {
   return `${item.member_count ?? 0} members${item.description ? ` · ${item.description.slice(0, 80)}…` : ""}`;
 }
 
-function resolveRatification(id, action) {
+export function resolveRatification(id, action) {
   return action === "approve" ? approveRatification(id) : rejectRatification(id);
 }
 

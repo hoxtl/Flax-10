@@ -17,11 +17,19 @@ vi.mock("framer-motion", () => ({
   }),
 }));
 
+<<<<<<< HEAD
 vi.mock("@/components/welcome/WelcomeBackgroundPaths", () => ({
   default: () => <div data-testid="hero-paths" />,
 }));
 
 vi.mock("@/hooks/useCountUp", () => ({
+=======
+vi.mock("../../../../components/welcome/WelcomeBackgroundPaths", () => ({
+  default: () => <div data-testid="hero-paths" />,
+}));
+
+vi.mock("../../../../hooks/useCountUp", () => ({
+>>>>>>> main
   useCountUp: () => null,
 }));
 
@@ -46,12 +54,20 @@ vi.mock("lucide-react", () => {
   };
 });
 
+<<<<<<< HEAD
 vi.mock("@/pages/homepage/components/IntelligenceUtils", () => ({
+=======
+vi.mock("../../../../pages/homepage/components/IntelligenceUtils", () => ({
+>>>>>>> main
   getGreeting: (name) => `Hello ${name || "there"}`,
   getTodayLabel: () => "MONDAY · 24 MAR",
 }));
 
+<<<<<<< HEAD
 import { IntelligenceHero, StatusBanner } from "@/pages/homepage/components/IntelligenceWidgets";
+=======
+import { IntelligenceHero } from "../../../../pages/homepage/components/IntelligenceWidgets";
+>>>>>>> main
 
 describe("IntelligenceHero", () => {
   it("renders the greeting, live context, and basic stats", () => {
