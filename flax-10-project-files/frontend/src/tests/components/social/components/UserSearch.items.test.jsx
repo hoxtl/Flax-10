@@ -27,6 +27,7 @@ vi.mock('../../../../components/common/search_bar/SearchBar', () => ({
 }));
 
 import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../../components/social/components/UserSearch';
+import { RoleResultItem, YearResultItem } from '../../../../components/social/components/UserSearchItems';
 
 describe('UserResultItem', () => {
     it('renders user name and handle', () => {
@@ -54,6 +55,18 @@ describe('UserResultItem', () => {
         render(<UserResultItem user={user} onSelect={onSelect} />);
         fireEvent.click(screen.getByText('Alice'));
         expect(onSelect).toHaveBeenCalledOnce();
+    });
+
+    it('prefers user.name and renders compact handles without the @ prefix', () => {
+        const user = { id: 4, name: 'Display Alias', username: 'alias' };
+        render(<UserResultItem user={user} onSelect={vi.fn()} compact />);
+        expect(screen.queryByText('Display Alias')).toBeNull();
+        expect(screen.getByText('alias')).toBeTruthy();
+    });
+
+    it('falls back to a generic label when no identifying fields are available', () => {
+        render(<UserResultItem user={{}} onSelect={vi.fn()} />);
+        expect(screen.getByText('User')).toBeTruthy();
     });
 });
 
@@ -113,6 +126,24 @@ describe('SocietyResultItem', () => {
         render(<SocietyResultItem society={society} isChecked={false} onToggle={onToggle} />);
         fireEvent.click(screen.getByText('Drama Club'));
         expect(onToggle).toHaveBeenCalledWith(5);
+    });
+});
+
+describe('YearResultItem', () => {
+    it('renders the year label and toggles it on click', () => {
+        const onToggle = vi.fn();
+        render(<YearResultItem year="Year 3" isChecked={false} onToggle={onToggle} />);
+        fireEvent.click(screen.getByText('Year 3'));
+        expect(onToggle).toHaveBeenCalledWith('Year 3');
+    });
+});
+
+describe('RoleResultItem', () => {
+    it('renders the role label and toggles the role value on click', () => {
+        const onToggle = vi.fn();
+        render(<RoleResultItem role={{ value: 'teacher', label: 'Professor' }} isChecked={false} onToggle={onToggle} />);
+        fireEvent.click(screen.getByText('Professor'));
+        expect(onToggle).toHaveBeenCalledWith('teacher');
     });
 });
 

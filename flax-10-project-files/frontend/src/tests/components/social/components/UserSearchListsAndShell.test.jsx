@@ -137,6 +137,23 @@ describe("UserSearchLists and shell", () => {
     expect(onUserSelect).toHaveBeenCalledWith({ id: 1, username: "ada" });
   });
 
+  it("renders result rows that fall back to the array index when a user id is missing", () => {
+    const onUserSelect = vi.fn();
+    render(
+      <SearchDropdown
+        loading={false}
+        query="anon"
+        setQuery={vi.fn()}
+        userResults={[{ username: "fallback-user" }]}
+        onUserSelect={onUserSelect}
+        compact={false}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("fallback-user"));
+    expect(onUserSelect).toHaveBeenCalledWith({ username: "fallback-user" });
+  });
+
   it("renders the global search bar with dropdown only when requested", () => {
     const setQuery = vi.fn();
     const setFocus = vi.fn();
