@@ -6,6 +6,8 @@ import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-moti
 import { BookOpen, Calendar } from "lucide-react";
 import { createElement } from "react";
 import { useNavigate } from "react-router-dom";
+import LocationLink from "../../../components/common/location_link/LocationLink";
+import scheduleStyles from "../../../components/modules/styles/ModuleSchedule.module.css";
 import StatStrip from "../../../components/common/stat_strip/StatStrip";
 import WelcomeBackgroundPaths from "../../../components/welcome/WelcomeBackgroundPaths";
 import { useCountUp } from "../../../hooks/useCountUp";
@@ -155,9 +157,27 @@ function OnNowCard({ liveContext }) {
         <span className={styles.nextStepLabel}>{liveContext?.label || "On Now"}</span>
         <PulseDot />
       </div>
-      <p className={styles.nextStepText}>{liveContext?.text || "Nothing on right now."}</p>
+      <LiveContextText liveContext={liveContext} />
       {liveContext?.meta && <span className={styles.nextStepMeta}>{liveContext.meta}</span>}
     </Motion.div>
+  );
+}
+
+function LiveContextText({ liveContext }) {
+  const location = String(liveContext?.location || "").trim();
+  if (!location) return <p className={styles.nextStepText}>{liveContext?.text || "Nothing on right now."}</p>;
+
+  return (
+    <p className={`${styles.nextStepText} ${styles.nextStepTextRich}`}>
+      <span>{liveContext?.text}</span>
+      <span className={scheduleStyles.scheduleValueSeparator} aria-hidden="true">·</span>
+      <LocationLink
+        location={location}
+        className={`${scheduleStyles.scheduleLocationLink} ${scheduleStyles.scheduleValue}`}
+        textClassName={scheduleStyles.scheduleInlineLocation}
+        iconClassName={scheduleStyles.scheduleLocationIcon}
+      />
+    </p>
   );
 }
 
