@@ -1,13 +1,10 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import "./__mocks__/motionAndTooltipMocks.jsx";
-import {
-  openMemberProfileMock,
-  resetMemberAvatarHarness,
-} from "./__mocks__/memberAvatarHarness.jsx";
 import {
   getProjectTeacherNameMock,
   openTeacherProfileMock,
+  openMemberProfileMock,
   resetProjectHeaderMetaHarness,
   setAuthProfile,
   getLastMembersSectionProps,
@@ -29,7 +26,6 @@ const renderMeta = (overrides = {}) => render(
 );
 
 beforeEach(() => {
-  resetMemberAvatarHarness();
   resetProjectHeaderMetaHarness();
   setAuthProfile({ id: ownerMember.user });
 });
@@ -77,7 +73,7 @@ it("shows owner removal modal before deleting solo projects", () => {
   renderMeta({ members: [ownerMember], teamMembers: [ownerMember], onDeleteProject });
   fireEvent.click(screen.getByRole("button", { name: "Edit team" }));
   expect(getLastMembersSectionProps().allowOwnerRemove).toBe(true);
-  fireEvent.click(screen.getByText(ownerMember.name));
+  fireEvent.click(within(screen.getByTestId("members-section")).getByText(ownerMember.name));
   fireEvent.click(screen.getByText("Confirm"));
   expect(onDeleteProject).toHaveBeenCalled();
 });
@@ -86,7 +82,7 @@ it("removes collaborators immediately when another owner exists", () => {
   const onMemberRemove = vi.fn();
   renderMeta({ onMemberRemove });
   fireEvent.click(screen.getByRole("button", { name: "Edit team" }));
-  fireEvent.click(screen.getByText(collaboratorMember.name));
+  fireEvent.click(within(screen.getByTestId("members-section")).getByText(collaboratorMember.name));
   expect(onMemberRemove).toHaveBeenCalledWith(collaboratorMember.id);
 });
 

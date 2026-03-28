@@ -81,11 +81,11 @@ vi.mock("react-router-dom", () => ({
   Link: ({ to, children, ...props }) => <a href={to} {...props}>{children}</a>,
 }));
 
-vi.mock("../../../../context/ToastContext", () => ({
+vi.mock("@/context/ToastContext", () => ({
   useToast: () => useToast(),
 }));
 
-vi.mock("../../../../context/AuthContext", () => ({
+vi.mock("@/context/AuthContext", () => ({
   useAuth: () => useAuthMock(),
 }));
 
@@ -100,11 +100,11 @@ vi.mock("../../../../pages/group_work/hooks/useGroupTasksTabState", () => ({
   useGroupTasksTabState: (...args) => useGroupTasksTabState(...args),
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberFilter", () => ({
+vi.mock("@/pages/group_work/components/MemberFilter", () => ({
   default: ({ onToggle }) => <button type="button" onClick={() => onToggle("2")}>toggle-filter</button>,
 }));
 
-vi.mock("../../../../pages/group_work/components/AddTaskModal", () => ({
+vi.mock("@/pages/group_work/components/AddTaskModal", () => ({
   default: ({ onAdd, onClose }) => (
     <div>
       <button type="button" onClick={() => onAdd({ title: "New task", due_date: "2026-03-30", assigned_to: [2] })}>confirm-add-task</button>
@@ -113,7 +113,7 @@ vi.mock("../../../../pages/group_work/components/AddTaskModal", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskListView", () => ({
+vi.mock("@/pages/group_work/components/TaskListView", () => ({
   default: ({ tasks, onToggle, onUpdate, onDelete }) => (
     <div>
       <span>list:{tasks.length}</span>
@@ -124,15 +124,15 @@ vi.mock("../../../../pages/group_work/components/TaskListView", () => ({
   ),
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskTimelineView", () => ({
+vi.mock("@/pages/group_work/components/TaskTimelineView", () => ({
   default: () => <div>timeline-view</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/TaskBoardView", () => ({
+vi.mock("@/pages/group_work/components/TaskBoardView", () => ({
   default: ({ onAdd }) => <button type="button" onClick={() => onAdd("Quick add", "todo")}>board-add</button>,
 }));
 
-vi.mock("../../../../components/common/segmented_control/SegmentedControl.jsx", () => ({
+vi.mock("@/components/common/segmented_control/SegmentedControl.jsx", () => ({
   SegmentedControl: ({ options, onChange }) => (
     <div>
       {options.map((option) => (
@@ -144,7 +144,7 @@ vi.mock("../../../../components/common/segmented_control/SegmentedControl.jsx", 
   ),
 }));
 
-vi.mock("../../../../components/common/primary_button/PrimaryButton", () => ({
+vi.mock("@/components/common/primary_button/PrimaryButton", () => ({
   default: ({ children, onClick, pill, variant, size, ...props }) => <button type="button" onClick={onClick} {...props}>{children}</button>,
 }));
 
@@ -162,27 +162,24 @@ vi.mock("lucide-react", () => ({
   Search: () => <span>search-icon</span>,
 }));
 
-vi.mock("../../../../components/common/app_page/AppPage", () => ({
+vi.mock("@/components/common/app_page/AppPage", () => ({
   default: ({ title, subtitle, children }) => <div><h1>{title}</h1><div>{subtitle}</div>{children}</div>,
 }));
 
-vi.mock("../../../../components/pagination/Pagination", () => ({
+vi.mock("@/components/pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/GroupWorkDetail", () => ({
+vi.mock("@/pages/group_work/components/GroupWorkDetail", () => ({
   default: ({ onBack }) => <button type="button" onClick={onBack}>detail-view</button>,
 }));
 
-vi.mock("../../../../pages/group_work/components/GroupWorkStats", () => ({
-  default: ({ projects }) => <div>stats:{projects.length}</div>,
-}));
 
-vi.mock("../../../../pages/group_work/components/GroupWorkIndexSkeleton", () => ({
+vi.mock("@/pages/group_work/components/GroupWorkIndexSkeleton", () => ({
   default: () => <div>groupwork-skeleton</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/GroupWorkContent", () => ({
+vi.mock("@/pages/group_work/components/GroupWorkContent", () => ({
   default: ({ projects, projectListProps, onProjectCreated, sortBy, setSortBy }) => (
     <div>
       <span>content:{projects.length}</span>
@@ -212,39 +209,39 @@ vi.mock("../../../../pages/group_work/utils/memberAvatarUtils", () => ({
   getMemberKey: vi.fn((member) => String(member?.user || member?.id || "")),
 }));
 
-vi.mock("../../../../components/common/deadline_countdown/DeadlineCountdown", () => ({
+vi.mock("@/components/common/deadline_countdown/DeadlineCountdown", () => ({
   default: ({ dueDate }) => <span>countdown:{String(dueDate)}</span>,
 }));
 
-vi.mock("../../../../components/common/back_button/BackButton.jsx", () => ({
+vi.mock("@/components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label }) => <button type="button" onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../../components/common/badge/Badge", () => ({
+vi.mock("@/components/common/badge/Badge", () => ({
   default: ({ children }) => <span>{children}</span>,
 }));
 
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
-vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () => ({
+vi.mock("@/components/common/hold_confirm_modal/HoldConfirmModal", () => ({
   default: ({ title, onCancel, onConfirm }) => <div><span>{title}</span><button type="button" onClick={onCancel}>cancel-hold</button><button type="button" onClick={onConfirm}>confirm-hold</button></div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/AddMemberForm", () => ({
+vi.mock("@/pages/group_work/components/AddMemberForm", () => ({
   default: ({ onAdded }) => <button type="button" onClick={() => onAdded({ id: 9, user: 9 })}>add-member</button>,
 }));
 
-vi.mock("../../../../pages/group_work/components/MembersSection", () => ({
+vi.mock("@/pages/group_work/components/MembersSection", () => ({
   default: ({ onRemove, members }) => <button type="button" onClick={() => onRemove(members[0].id)}>remove-member</button>,
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberAvatar", () => ({
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username}</span>,
 }));
 
-vi.mock("../../../../hooks/useCountUp", () => ({
+vi.mock("@/hooks/useCountUp", () => ({
   useCountUp: (...args) => useCountUp(...args),
 }));
 
@@ -255,15 +252,15 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../../components/common/stat_strip/StatStrip", () => ({
+vi.mock("@/components/common/stat_strip/StatStrip", () => ({
   default: ({ items }) => <div>{items.map((item) => `${item.label}:${item.value}`).join("|")}</div>,
 }));
 
-import GroupTasksTab from "../../../../pages/group_work/components/GroupTasksTab";
+import GroupTasksTab from "@/pages/group_work/components/GroupTasksTab";
 import GroupWorkIndexPage from "../../../../pages/group_work/GroupWorkIndexPage";
-import ProjectHeader from "../../../../pages/group_work/components/ProjectHeader";
-import ProjectDeleteAction from "../../../../pages/group_work/components/ProjectHeaderSub";
-import ProjectProgress from "../../../../pages/group_work/components/ProjectProgress";
+import ProjectHeader from "@/pages/group_work/components/ProjectHeader";
+import ProjectDeleteAction from "@/pages/group_work/components/ProjectHeaderSub";
+import ProjectProgress from "@/pages/group_work/components/ProjectProgress";
 import { getDaysLeft } from "../../../../pages/group_work/utils/projectRowUtils";
 
 describe("GroupWork pages and header extras", () => {
@@ -337,7 +334,7 @@ describe("GroupWork pages and header extras", () => {
       fireEvent.click(screen.getByText("open-project"));
       fireEvent.click(screen.getByText("prepend-project"));
       fireEvent.click(screen.getByText("set-sort"));
-      expect(screen.getByText("stats:1")).toBeInTheDocument();
+  expect(screen.getByText(/Active projects:1/)).toBeInTheDocument();
       expect(mockNavigate).toHaveBeenCalledWith("/group-work?project=1");
       expect(setProjects).toHaveBeenCalled();
       expect(screen.getAllByText("Back to top").length).toBeGreaterThan(0);

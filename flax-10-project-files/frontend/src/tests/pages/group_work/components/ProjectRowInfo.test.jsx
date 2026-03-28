@@ -1,97 +1,91 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import React from "react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import ProjectRowInfo from "@/pages/group_work/components/ProjectRowInfo";
+import * as rowUtils from "@/pages/group_work/utils/projectRowUtils";
+import * as memberUtils from "@/pages/group_work/utils/memberAvatarUtils";
 
-const openTeacherProfile = vi.fn();
-const openMemberProfile = vi.fn();
-const getProjectTeacherInitials = vi.fn(() => "AB");
-const getProjectTeacherName = vi.fn(() => "Ada Byron");
-const getDisplayName = vi.fn((member) => member.name || member.username || "Unknown");
-
-vi.mock("../../../../components/common/badge/Badge", () => ({
-  default: ({ children, className }) => <span className={className}>{children}</span>,
-}));
-
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberAvatar", () => ({
-  default: ({ member }) => <span>{member.name}</span>,
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
+  default: () => <div data-testid="avatar">Avatar</div>,
 }));
 
-vi.mock("../../../../pages/group_work/utils/projectRowUtils", () => ({
-  getProjectTeacherInitials: (...args) => getProjectTeacherInitials(...args),
-  getProjectTeacherName: (...args) => getProjectTeacherName(...args),
-  openTeacherProfile: (...args) => openTeacherProfile(...args),
+vi.mock("@/pages/group_work/components/ProjectModuleBadge", () => ({
+  default: () => <div data-testid="module-badge">Module</div>,
 }));
 
-vi.mock("../../../../pages/group_work/utils/memberAvatarUtils", () => ({
-  getDisplayName: (...args) => getDisplayName(...args),
-  openMemberProfile: (...args) => openMemberProfile(...args),
-  getMemberKey: vi.fn((member) => String(member?.user || member?.id || "")),
-  getCurrentMember: vi.fn(() => null),
+vi.mock("@/pages/group_work/utils/projectRowUtils", () => ({
+  getProjectTeacherInitials: vi.fn(() => "JD"),
+  getProjectTeacherName: vi.fn(() => "John Doe"),
+  openTeacherProfile: vi.fn(),
 }));
 
-import ProjectRowInfo, { ProjectModuleBadge } from "../../../../pages/group_work/components/ProjectRowInfo";
-
-function renderWithRouter(ui) {
-  return render(<MemoryRouter>{ui}</MemoryRouter>);
-}
+vi.mock("@/pages/group_work/utils/memberAvatarUtils", () => ({
+  getDisplayName: vi.fn((m) => m.name),
+  openMemberProfile: vi.fn(),
+  getMemberKey: vi.fn((m) => m.id),
+}));
 
 describe("ProjectRowInfo", () => {
+  const onProjectNavigate = vi.fn();
+  const project = { id: 1, name: "Test Project", module_tutor_id: 101 };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("handles project and user profile navigation", () => {
-    const onProjectNavigate = vi.fn();
-    renderWithRouter(
-      <ProjectRowInfo
-        project={{ id: 1, name: "Capstone", course_code: "CS101", module_name: "SE", module_tutor_id: 22 }}
-        members={[{ id: 1, name: "Alex" }]}
-        onProjectNavigate={onProjectNavigate}
-      />
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: /details/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Ada Byron's profile/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Alex profile/i }));
-
+  it("renders basic info as owner with action", () => {
+    const action = <button data-testid="test-action">Action</button>;
+    render(<ProjectRowInfo project={project} members={[]} isOwner={true} action={action} onProjectNavigate={onProjectNavigate} />);
+    
+    expect(screen.getByText("Test Project")).toBeTruthy();
+    expect(screen.getByText("PROJECT OWNER")).toBeTruthy();
+    expect(screen.getByTestId("test-action")).toBeTruthy();
+    
+    fireEvent.click(screen.getByText("Test Project"));
     expect(onProjectNavigate).toHaveBeenCalled();
-    expect(openTeacherProfile).toHaveBeenCalled();
-    expect(openMemberProfile).toHaveBeenCalled();
   });
 
-  it("renders owner badge and member counts", () => {
-    renderWithRouter(
-      <ProjectRowInfo project={{ id: 1, name: "P1" }} members={[]} totalMembers={4} isOwner />
-    );
-    expect(screen.getByText("PROJECT OWNER")).toBeInTheDocument();
-    expect(screen.getByText("4 members")).toBeInTheDocument();
+  it("renders teacher avatar button when module_tutor_id is present", () => {
+    render(<ProjectRowInfo project={project} members={[]} />);
+    const teacherBtn = screen.getByLabelText("View John Doe's profile");
+    expect(teacherBtn).toBeTruthy();
+    
+    fireEvent.click(teacherBtn);
+    expect(rowUtils.openTeacherProfile).toHaveBeenCalled();
   });
 
-  it("renders correct module badge link", () => {
-    renderWithRouter(<ProjectModuleBadge project={{ course_code: "CS101", module_name: "SE" }} />);
-    expect(screen.getByRole("link")).toHaveAttribute("href", "/modules?code=CS101");
+  it("renders teacher avatar shell when module_tutor_id is missing", () => {
+    render(<ProjectRowInfo project={{ ...project, module_tutor_id: null }} members={[]} />);
+    expect(screen.queryByLabelText("View John Doe's profile")).toBeNull();
+    expect(screen.getByText("JD")).toBeTruthy();
   });
 
-  it("renders fallback teacher shell and hides module/member extras when data is absent", () => {
-    const { container } = renderWithRouter(
-      <>
-        <ProjectRowInfo
-          project={{ id: 2, name: "Research Sprint" }}
-          members={[]}
-          totalMembers={0}
-          onProjectNavigate={vi.fn()}
-        />
-        <ProjectModuleBadge project={{}} />
-      </>,
-    );
+  it("renders avatar stack with count and handles 'member' vs 'members'", () => {
+    const members = [{ id: 1, name: "Alice" }];
+    const { rerender } = render(<ProjectRowInfo project={project} members={members} />);
+    expect(screen.getByText("1 member")).toBeTruthy();
+    
+    rerender(<ProjectRowInfo project={project} members={[...members, { id: 2, name: "Bob" }]} />);
+    expect(screen.getByText("2 members")).toBeTruthy();
+  });
 
-    expect(screen.queryByText("PROJECT OWNER")).not.toBeInTheDocument();
-    expect(screen.queryByText(/member/)).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /module/i })).not.toBeInTheDocument();
-    expect(container.querySelector("[aria-hidden='true']")).toBeTruthy();
+  it("handles more than 10 members in avatar stack", () => {
+    const members = Array.from({ length: 15 }, (_, i) => ({ id: i, name: `M${i}` }));
+    render(<ProjectRowInfo project={project} members={members} totalMembers={15} />);
+    
+    expect(screen.getByText("+6")).toBeTruthy();
+    expect(screen.queryAllByTestId("avatar").length).toBe(9); // limit 10: 9 + 1 (+6)
+  });
+
+  it("handles clicking member avatar", () => {
+    const members = [{ id: 1, name: "Alice" }];
+    render(<ProjectRowInfo project={project} members={members} />);
+    
+    fireEvent.click(screen.getByLabelText("Open Alice profile"));
+    expect(memberUtils.openMemberProfile).toHaveBeenCalled();
   });
 });

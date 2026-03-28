@@ -10,25 +10,25 @@ vi.mock("../../../../pages/group_work/utils/priorityUtils", () => ({
   getPriorityStyle: vi.fn(() => ({ bg: "#fff", border: "#ddd", color: "#111", backgroundColor: "#eee" })),
 }));
 
-vi.mock("../../../../pages/group_work/components/taskCardEditUtils", () => ({
+vi.mock("@/pages/group_work/components/taskCardEditUtils", () => ({
   useTaskTitleEdit: vi.fn(() => ({ editing: false })),
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberAvatar", () => ({
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,
 }));
 
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
+vi.mock("@/components/common/inputs/DateTimePicker", () => ({
   default: ({ value, onChange }) => (
     <input value={value || ""} onChange={(e) => onChange(e.target.value)} />
   ),
 }));
 
-vi.mock("../../../../components/common/inline_title_field/InlineTitleField", () => ({
+vi.mock("@/components/common/inline_title_field/InlineTitleField", () => ({
   default: ({ value, onStart, onSave, onCancel }) => (
     <div>
       <span>{value}</span>
@@ -40,7 +40,7 @@ vi.mock("../../../../components/common/inline_title_field/InlineTitleField", () 
   useInlineEdit: (...args) => useInlineEdit(...args),
 }));
 
-vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () => ({
+vi.mock("@/components/common/hold_confirm_modal/HoldConfirmModal", () => ({
   default: ({ onCancel, onConfirm, title }) => (
     <div>
       <span>{title}</span>
@@ -62,11 +62,11 @@ vi.mock("framer-motion", () => ({
   motion: { div: ({ children, ...props }) => <div {...props}>{children}</div> },
 }));
 
-import { TimelineCard, UnscheduledCard } from "../../../../pages/group_work/components/TaskTimelineCards";
-import TaskTimelineView from "../../../../pages/group_work/components/TaskTimelineView";
-import TaskListRow from "../../../../pages/group_work/components/TaskListRow";
-import TaskListView from "../../../../pages/group_work/components/TaskListView";
-import { useDragHandlers, useTaskTimelineState } from "../../../../pages/group_work/components/useTaskTimelineState";
+import { TimelineCard, UnscheduledCard } from "@/pages/group_work/components/TaskTimelineCards";
+import TaskTimelineView from "@/pages/group_work/components/TaskTimelineView";
+import TaskListRow from "@/pages/group_work/components/TaskListRow";
+import TaskListView from "@/pages/group_work/components/TaskListView";
+import { useDragHandlers, useTaskTimelineState } from "@/pages/group_work/components/useTaskTimelineState";
 
 vi.mock("../../../../pages/group_work/utils/taskTimelineUtils", () => ({
   DAY_MS: 86400000,

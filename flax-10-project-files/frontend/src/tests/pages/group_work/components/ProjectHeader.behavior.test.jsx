@@ -2,11 +2,12 @@ import { beforeEach, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import "./__mocks__/projectHeaderHarness.jsx";
+import "./__mocks__/projectHeaderMetaHarness.jsx";
 import {
-  getStoredViewerMock,
   getProjectDateMock,
   resetProjectHeaderHarness,
 } from "./__mocks__/projectHeaderHarness.jsx";
+import { getStoredViewerMock } from "./__mocks__/projectHeaderMetaHarness.jsx";
 import ProjectHeader from "@/pages/group_work/components/ProjectHeader";
 
 const makeProps = (overrides = {}) => ({

@@ -11,9 +11,30 @@ vi.mock("@/pages/group_work/components/ProjectHeader", () => ({
   default: ({ project }) => <div data-testid="project-header">{project.name}</div>,
 }));
 
-vi.mock("@/pages/group_work/components/TabsSection", () => ({
-  default: () => <div data-testid="tabs-section" />,
+vi.mock("@/components/common/tabs/Tabs", () => ({
+  default: ({ tabs, activeTab }) => (
+    <div data-testid="tabs-mock">
+      {tabs.map((tab) => (
+        <div key={tab.id} data-testid={`tab-${tab.id}`}>
+          {activeTab === tab.id ? tab.content : null}
+        </div>
+      ))}
+    </div>
+  ),
 }));
+
+vi.mock("@/pages/group_work/components/GroupTasksTab", () => ({
+  default: () => <div data-testid="tasks-tab" />,
+}));
+
+vi.mock("@/pages/group_work/components/AvailabilityTab", () => ({
+  default: () => <div data-testid="availability-tab" />,
+}));
+
+vi.mock("@/pages/group_work/components/ProjectProgress", () => ({
+  default: () => <div data-testid="progress-mock" />,
+}));
+
 
 vi.mock("@/components/common/app_page/AppPage", () => ({
   default: ({ children }) => <div data-testid="app-page">{children}</div>,
@@ -78,7 +99,7 @@ it("renders project header when project is loaded", () => {
 
 it("renders tabs section when project is loaded", () => {
   render(<GroupProjectDetail projectId={1} onBack={vi.fn()} onDelete={vi.fn()} onUpdate={vi.fn()} />);
-  expect(screen.getByTestId("tabs-section")).toBeTruthy();
+  expect(screen.getByTestId("tabs-mock")).toBeTruthy();
 });
 
 it("renders skeleton while loading", () => {

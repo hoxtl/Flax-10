@@ -2,6 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 
+/** Vitest forwards CLI args; bundled config still runs in the main vitest process. */
+const coverageRun = process.argv.some(
+  (arg) => arg === '--coverage' || arg.startsWith('--coverage.') || arg.startsWith('--coverage='),
+)
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -24,12 +29,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',
     css: true,
-    pool: 'threads',
+    pool: 'forks',
+    // Istanbul + all:true + CLI --coverage.include can delete/race on coverage/.tmp (ENOENT). Prefer all:false;
+    // use `npm run coverage -- --coverage.all=true` when you need untested files in the report.
+    ...(coverageRun ? { fileParallelism: false, maxWorkers: 1 } : {}),
     coverage: {
       provider: 'istanbul',
       reporter: ["text", "text-summary", "html", "lcov"],
       reportOnFailure: true,
-      all: true,
+      all: false,
       include: ['src/**/*.{js,jsx}'],
       exclude: [
         'node_modules/',

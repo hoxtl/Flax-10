@@ -43,7 +43,7 @@ vi.mock("../../../../pages/group_work/utils/taskUtils", () => ({
   handleDragStartTask: (...args) => handleDragStartTask(...args),
 }));
 
-vi.mock("../../../../pages/group_work/components/taskCardEditUtils", () => ({
+vi.mock("@/pages/group_work/components/taskCardEditUtils", () => ({
   useTaskTitleEdit: (...args) => useTaskTitleEdit(...args),
   handleTaskTitleKeyDown: (event, saveEdit, setEditing) => {
     if (event.key === "Enter" && !event.shiftKey) saveEdit();
@@ -51,25 +51,25 @@ vi.mock("../../../../pages/group_work/components/taskCardEditUtils", () => ({
   },
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberAvatar", () => ({
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,
 }));
 
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
-vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
+vi.mock("@/components/common/inputs/DateTimePicker", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
   ),
 }));
 
-vi.mock("../../../../components/common/task_priority_pill/TaskPriorityPill", () => ({
+vi.mock("@/components/common/task_priority_pill/TaskPriorityPill", () => ({
   default: ({ priority }) => <span>{priority}</span>,
 }));
 
-vi.mock("../../../../components/common/inline_title_field/InlineTitleField", () => ({
+vi.mock("@/components/common/inline_title_field/InlineTitleField", () => ({
   default: ({ value, onStart, onSave, onCancel }) => (
     <div>
       <span>{value}</span>
@@ -81,7 +81,7 @@ vi.mock("../../../../components/common/inline_title_field/InlineTitleField", () 
   useInlineEdit: (...args) => useInlineEdit(...args),
 }));
 
-vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () => ({
+vi.mock("@/components/common/hold_confirm_modal/HoldConfirmModal", () => ({
   default: ({ onCancel, onConfirm, title }) => (
     <div>
       <span>{title}</span>
@@ -91,7 +91,7 @@ vi.mock("../../../../components/common/hold_confirm_modal/HoldConfirmModal", () 
   ),
 }));
 
-vi.mock("../../../../components/common/search_empty_state/SearchEmptyState", () => ({
+vi.mock("@/components/common/search_empty_state/SearchEmptyState", () => ({
   default: ({ title, hint }) => <div>{title} {hint}</div>,
 }));
 
@@ -123,9 +123,9 @@ vi.mock("../../../../pages/group_work/utils/taskTimelineUtils", () => ({
   )),
 }));
 
-import TaskAvatarStack from "../../../../pages/group_work/components/TaskAvatarStack";
-import TaskAssigneePopup from "../../../../pages/group_work/components/TaskAssigneePopup";
-import TaskContextMenu from "../../../../pages/group_work/components/TaskContextMenu";
+import TaskAvatarStack from "@/pages/group_work/components/TaskAvatarStack";
+import TaskAssigneePopup from "@/pages/group_work/components/TaskAssigneePopup";
+import TaskContextMenu from "@/pages/group_work/components/TaskContextMenu";
 
 describe("GroupWork task component extras", () => {
   beforeEach(() => {

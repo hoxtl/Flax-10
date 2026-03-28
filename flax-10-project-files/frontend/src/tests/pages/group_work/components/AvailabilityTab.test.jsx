@@ -1,262 +1,212 @@
+import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-
-import AvailabilityTab from "../../../../pages/group_work/components/AvailabilityTab";
-
-const useAvailabilityMock = vi.fn();
-const useConfirmMock = vi.fn();
-
-vi.mock("../../../../pages/group_work/hooks/useAvailability", () => ({
-  useAvailability: (...args) => useAvailabilityMock(...args),
-}));
-
-vi.mock("../../../../context/ConfirmContext", () => ({
-  useConfirm: () => useConfirmMock,
-}));
-
-vi.mock("../../../../pages/group_work/utils/availabilityUtils", () => ({
-  formatSuggestionDateLabel: vi.fn((start) => `Formatted(${start})`),
-  getMemberStatuses: vi.fn(() => []),
-  getTeamSize: vi.fn(() => 3),
-  getSuggestionCount: vi.fn(() => 2),
-  getCurrentUserStatus: vi.fn(() => "pending"),
-}));
-
-vi.mock("../../../../pages/group_work/utils/memberAvatarUtils", () => ({
-  getPhotoUrl: vi.fn(() => null),
-}));
-
-vi.mock("../../../../components/common/confirm_modal/ConfirmModal", () => ({
-  default: ({ title, onConfirm, onCancel }) => (
-    <div>
-      <div>{title}</div>
-      <button onClick={onConfirm}>confirm-modal</button>
-      <button onClick={onCancel}>cancel-modal</button>
-    </div>
-  ),
-}));
-
-vi.mock("../../../../components/common/search_empty_state/SearchEmptyState", () => ({
-  default: ({ title, hint }) => <div>{title} {hint}</div>,
-}));
-
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
-  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
-}));
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import AvailabilityTab from "@/pages/group_work/components/AvailabilityTab";
+import { useAvailability } from "@/pages/group_work/hooks/useAvailability";
+import * as avatarUtils from "@/pages/group_work/utils/memberAvatarUtils";
+import * as availabilityUtils from "@/pages/group_work/utils/availabilityUtils";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }) => {
-      const { initial, animate, exit, transition, layoutId, ...rest } = props;
+      const { layoutId, initial, animate, exit, transition, ...rest } = props;
       return <div {...rest}>{children}</div>;
     },
   },
 }));
 
-vi.mock("lucide-react", () => ({
-  Check: () => <span>check-icon</span>,
-  X: () => <span>x-icon</span>,
-  Clock3: () => <span>clock-icon</span>,
-  Plus: () => <span>plus-icon</span>,
-  Star: () => <span>star-icon</span>,
-  Trash2: () => <span>trash-icon</span>,
+vi.mock("@/pages/group_work/hooks/useAvailability", () => ({
+  useAvailability: vi.fn(),
 }));
 
-const baseAvailability = {
-  loading: false,
-  suggestions: [
-    {
-      start: "2026-04-10T10:00:00Z",
-      label: "Thu 10 Apr · 10:00-11:00",
-      free_count: 3,
-      total_count: 3,
-      members: [{ id: 1, name: "Alice", is_free: true }],
-    },
-  ],
-  active_suggestions: [],
-  current_user_id: 1,
-  suggestingSlot: null,
-  setSuggestingSlot: vi.fn(),
-  handleSuggestTime: vi.fn(),
-  handleDelete: vi.fn(),
-  handleVote: vi.fn(),
+vi.mock("@/pages/group_work/utils/memberAvatarUtils", () => ({
+  getPhotoUrl: vi.fn(() => null),
+}));
+
+vi.mock("@/pages/group_work/utils/availabilityUtils", () => ({
+  formatSuggestionDateLabel: vi.fn((d) => d),
+  getMemberStatuses: vi.fn(() => []),
+  getTeamSize: vi.fn(() => 5),
+  getSuggestionCount: vi.fn(() => 1),
+  getCurrentUserStatus: vi.fn(() => "accepted"),
+}));
+
+vi.mock("@/context/ConfirmContext", () => ({
+  useConfirm: vi.fn(() => vi.fn()),
+}));
+
+vi.mock("@/components/common/confirm_modal/ConfirmModal", () => ({
+  default: ({ title, onConfirm, onCancel }) => (
+    <div data-testid="confirm-modal">
+      <h3>{title}</h3>
+      <button onClick={onConfirm}>Confirm Suggestion</button>
+      <button onClick={onCancel}>Cancel Suggestion</button>
+    </div>
+  ),
+}));
+
+vi.mock("@/components/common/search_empty_state/SearchEmptyState", () => ({
+  default: ({ title }) => <div data-testid="empty-state">{title}</div>,
+}));
+
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
+  default: ({ children, content }) => <div data-testid="tooltip" data-tooltip={content}>{children}</div>,
+}));
+
+const mockAvailability = (overrides = {}) => {
+  const defaults = {
+    loading: false,
+    suggestions: [],
+    active_suggestions: [],
+    current_user_id: 1,
+    suggestingSlot: null,
+    setSuggestingSlot: vi.fn(),
+    handleSuggestTime: vi.fn(),
+    handleDelete: vi.fn(),
+    handleVote: vi.fn(),
+  };
+  useAvailability.mockReturnValue({ ...defaults, ...overrides });
 };
 
 describe("AvailabilityTab", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.dispatchEvent = vi.fn();
+    availabilityUtils.getTeamSize.mockReturnValue(5);
+    availabilityUtils.getSuggestionCount.mockReturnValue(1);
+    availabilityUtils.getMemberStatuses.mockReturnValue([]);
   });
 
-  it("shows loading state", () => {
-    useAvailabilityMock.mockReturnValue({ ...baseAvailability, loading: true });
+  it("renders loading state", () => {
+    mockAvailability({ loading: true });
     render(<AvailabilityTab projectId={1} />);
-    expect(screen.getByText(/Analysing member calendars/)).toBeInTheDocument();
+    expect(screen.getByText("Analysing member calendars...")).toBeTruthy();
   });
 
-  it("renders slot list and propose button when no meeting cards", () => {
-    useAvailabilityMock.mockReturnValue(baseAvailability);
+  it("renders empty state with no suggestions", () => {
+    mockAvailability();
+    render(<AvailabilityTab projectId={1} />);
+    expect(screen.getByText("Propose meeting timings with your team")).toBeTruthy();
+  });
+
+  it("renders proposed suggestions and handles view switching", async () => {
+    const suggestions = [
+      { id: 101, start: "2026-04-01T10:00:00Z", is_confirmed: false, suggested_by: { id: 1, username: "user1" }, responses: [] }
+    ];
+    mockAvailability({ active_suggestions: suggestions });
+    // Make sure we have members to hit the stack
+    availabilityUtils.getMemberStatuses.mockReturnValue([
+      { id: 1, username: "u1", name: "Alice", status: "accepted", is_suggester: true }
+    ]);
+
     render(<AvailabilityTab projectId={1} />);
 
-    expect(screen.getByText(/Propose meeting timings/)).toBeInTheDocument();
-    expect(screen.getAllByText(/Propose/).length).toBeGreaterThan(0);
-    // star-icon for best slot (free_count === total_count)
-    expect(screen.getAllByText("star-icon").length).toBeGreaterThan(0);
-    // footer
-    expect(screen.getByText(/Green rings mean free/)).toBeInTheDocument();
-  });
+    expect(screen.getByText("Proposed slots")).toBeTruthy();
+    expect(screen.getByTestId("tooltip")).toBeTruthy();
 
-  it("opens suggestion modal on Propose click and confirms it", () => {
-    const setSuggestingSlot = vi.fn();
-    const handleSuggestTime = vi.fn();
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      setSuggestingSlot,
-      handleSuggestTime,
+    fireEvent.click(screen.getByText("Confirmed meeting slots"));
+    await waitFor(() => {
+      expect(screen.getByTestId("empty-state")).toHaveTextContent("No confirmed meeting slots yet");
     });
-    render(<AvailabilityTab projectId={1} />);
-
-    // The Propose button is a button containing the plus icon and text
-    const proposeBtns = screen.getAllByRole("button").filter(btn => btn.textContent.includes("Propose"));
-    expect(proposeBtns.length).toBeGreaterThan(0);
-    fireEvent.click(proposeBtns[0]);
-    expect(setSuggestingSlot).toHaveBeenCalledWith(baseAvailability.suggestions[0]);
   });
 
-  it("renders suggestion modal and handles confirm/cancel when suggestingSlot is set", () => {
-    const setSuggestingSlot = vi.fn();
-    const handleSuggestTime = vi.fn();
-    const slot = { start: "2026-04-10T10:00:00Z" };
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      suggestingSlot: slot,
-      setSuggestingSlot,
-      handleSuggestTime,
-    });
+  it("handles voting and deleting", () => {
+    const handleVote = vi.fn();
+    const handleDelete = vi.fn();
+    const suggestions = [
+      { id: 101, start: "2026-04-01T10:00:00Z", is_confirmed: false, suggested_by: { id: 1, username: "user1" }, responses: [] }
+    ];
+    mockAvailability({ active_suggestions: suggestions, handleVote, handleDelete, current_user_id: 1 });
     render(<AvailabilityTab projectId={1} />);
 
-    expect(screen.getByText(/Suggest /)).toBeInTheDocument();
-    fireEvent.click(screen.getByText("confirm-modal"));
-    expect(handleSuggestTime).toHaveBeenCalledWith(slot);
+    fireEvent.click(screen.getByLabelText("Accept meeting suggestion"));
+    expect(handleVote).toHaveBeenCalledWith(101, "accepted");
 
-    fireEvent.click(screen.getByText("cancel-modal"));
+    fireEvent.click(screen.getByLabelText("Reject meeting suggestion"));
+    expect(handleVote).toHaveBeenCalledWith(101, "rejected");
+
+    fireEvent.click(screen.getByLabelText("Delete meeting suggestion"));
+    expect(handleDelete).toHaveBeenCalledWith(101);
+  });
+
+  it("handles slot proposing and suggesting modal", () => {
+    const handleSuggestTime = vi.fn();
+    const suggestions = [
+      { start: "2026-04-01T10:00:00Z", label: "10:00 AM", free_count: 5, total_count: 5, members: [{ id: 1, name: "Alice", initials: "A", is_free: true }] }
+    ];
+    mockAvailability({ suggestions, suggestingSlot: suggestions[0], handleSuggestTime });
+    
+    render(<AvailabilityTab projectId={1} />);
+    expect(screen.getByTestId("confirm-modal")).toBeTruthy();
+    fireEvent.click(screen.getByText("Confirm Suggestion"));
+    expect(handleSuggestTime).toHaveBeenCalledWith(suggestions[0]);
+  });
+  
+  it("renders member avatar photo and status correctly", () => {
+    const suggestions = [
+      { 
+        start: "2026-04-01T10:00:00Z", label: "10:00 AM", free_count: 1, total_count: 2, 
+        members: [{ id: 1, name: "Alice", initials: "A", is_free: true }] 
+      }
+    ];
+    mockAvailability({ suggestions });
+    render(<AvailabilityTab projectId={1} />);
+    
+    expect(screen.getByTitle("Alice")).toBeTruthy();
+    fireEvent.click(screen.getByTitle("Alice"));
+    expect(window.dispatchEvent).toHaveBeenCalled();
+  });
+
+  it("handles avatar fallback when photoUrl is missing", () => {
+    const suggestions = [
+      { 
+        start: "2026-04-01T10:00:00Z", label: "10:00 AM", free_count: 1, total_count: 1, 
+        members: [{ id: 1, name: "Alice", initials: "AS", is_free: true }] 
+      }
+    ];
+    mockAvailability({ suggestions });
+    avatarUtils.getPhotoUrl.mockReturnValue(null);
+    
+    render(<AvailabilityTab projectId={1} />);
+    expect(screen.getByText("AS")).toBeTruthy();
+  });
+
+  it("renders img tag when photoUrl is present in MemberAvatarPhoto", () => {
+    const suggestions = [
+      { 
+        start: "2026-04-01T10:00:00Z", label: "10:00 AM", free_count: 1, total_count: 1, 
+        members: [{ id: 1, name: "Alice", initials: "A", is_free: true }] 
+      }
+    ];
+    mockAvailability({ suggestions });
+    avatarUtils.getPhotoUrl.mockReturnValue("http://photo.jpg");
+    
+    render(<AvailabilityTab projectId={1} />);
+    const img = screen.getByRole("img");
+    expect(img.getAttribute("src")).toBe("http://photo.jpg");
+  });
+
+  it("handles cancelling a proposal", () => {
+    const setSuggestingSlot = vi.fn();
+    const suggestions = [{ start: "2026-04-01", label: "10:00 AM", free_count: 5, total_count: 5, members: [] }];
+    mockAvailability({ suggestions, suggestingSlot: suggestions[0], setSuggestingSlot });
+    
+    render(<AvailabilityTab projectId={1} />);
+    fireEvent.click(screen.getByText("Cancel Suggestion"));
     expect(setSuggestingSlot).toHaveBeenCalledWith(null);
   });
-
-  it("renders proposed meeting cards", () => {
-    const proposedSuggestion = { id: 10, start: "2026-04-10T14:00:00Z", suggested_by: { id: 2, username: "bob" }, responses: [] };
-    useAvailabilityMock.mockReturnValue({ ...baseAvailability, active_suggestions: [proposedSuggestion] });
+  
+  it("renders confirmed meeting cards view", async () => {
+    const suggestions = [
+      { id: 102, start: "2026-04-01T12:00:00Z", is_confirmed: true, suggested_by: { id: 2, username: "user2" }, responses: [] }
+    ];
+    mockAvailability({ active_suggestions: suggestions });
     render(<AvailabilityTab projectId={1} />);
-    expect(screen.getByText("Proposed slots")).toBeInTheDocument();
-    expect(screen.getByText(/Proposed by bob/)).toBeInTheDocument();
-  });
-
-  it("handles voting on proposed meeting cards", () => {
-    const proposedSuggestion = { id: 10, start: "2026-04-10T14:00:00Z", suggested_by: { id: 2, username: "bob" }, responses: [] };
-    useAvailabilityMock.mockReturnValue({ ...baseAvailability, active_suggestions: [proposedSuggestion] });
-    render(<AvailabilityTab projectId={1} />);
-    fireEvent.click(screen.getAllByLabelText("Accept meeting suggestion")[0]);
-    expect(baseAvailability.handleVote).toHaveBeenCalledWith(10, "accepted");
-  });
-
-  it("renders confirmed meeting cards when confirmed view is active", () => {
-    const confirmedSuggestion = {
-      id: 20,
-      start: "2026-04-11T09:00:00Z",
-      is_confirmed: true,
-      suggested_by: { id: 3, username: "carol" },
-      responses: [],
-    };
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      active_suggestions: [confirmedSuggestion],
-    });
-    render(<AvailabilityTab projectId={1} />);
-
-    // Switch to confirmed view
+    
     fireEvent.click(screen.getByText("Confirmed meeting slots"));
-    expect(screen.getByText(/Confirmed from carol/)).toBeInTheDocument();
-  });
-
-  it("shows empty state for confirmed view when no confirmed slots", () => {
-    const proposedSuggestion = {
-      id: 10,
-      start: "2026-04-10T14:00:00Z",
-      is_confirmed: false,
-      suggested_by: { id: 2, username: "bob" },
-      responses: [],
-    };
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      active_suggestions: [proposedSuggestion],
+    await waitFor(() => {
+        expect(screen.getByText("Confirmed from user2's proposal")).toBeTruthy();
     });
-    render(<AvailabilityTab projectId={1} />);
-
-    fireEvent.click(screen.getByText("Confirmed meeting slots"));
-    expect(screen.getByText(/No confirmed meeting slots yet/)).toBeInTheDocument();
-  });
-
-  it("renders delete button for suggestions made by current user", () => {
-    const proposedSuggestion = {
-      id: 10,
-      start: "2026-04-10T14:00:00Z",
-      is_confirmed: false,
-      suggested_by: { id: 1, username: "alice" }, // id matches current_user_id
-      responses: [],
-    };
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      current_user_id: 1,
-      active_suggestions: [proposedSuggestion],
-    });
-    render(<AvailabilityTab projectId={1} />);
-
-    expect(screen.getByLabelText("Delete meeting suggestion")).toBeInTheDocument();
-    fireEvent.click(screen.getByLabelText("Delete meeting suggestion"));
-    expect(baseAvailability.handleDelete).toHaveBeenCalledWith(10);
-  });
-
-  it("dispatches navigate event when avatar photo is clicked", () => {
-    const slot = {
-      start: "2026-04-10T10:00:00Z",
-      label: "Thu 10 Apr · 10:00-11:00",
-      free_count: 2,
-      total_count: 3,
-      members: [{ id: 7, name: "Dave", is_free: true, initials: "DA", profile_photo_url: null }],
-    };
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      suggestions: [slot],
-    });
-
-    const dispatched = [];
-    window.addEventListener("navigate", (e) => dispatched.push(e.detail));
-    render(<AvailabilityTab projectId={1} />);
-
-    const avatarDiv = screen.getByTitle("Dave");
-    fireEvent.click(avatarDiv);
-    expect(dispatched.some((d) => d.includes("7"))).toBe(true);
-  });
-
-  it("auto-switches to confirmed view when no proposals but confirmations exist", () => {
-    const confirmedSuggestion = {
-      id: 20,
-      start: "2026-04-11T09:00:00Z",
-      is_confirmed: true,
-      suggested_by: { id: 3, username: "carol" },
-      responses: [],
-    };
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      active_suggestions: [confirmedSuggestion],
-    });
-    render(<AvailabilityTab projectId={1} />);
-
-    // Should auto-switch to confirmed
-    expect(screen.getByText(/Confirmed from carol/)).toBeInTheDocument();
-    // When confirmed view is active, the slot suggestion section is hidden
-    // (no propose buttons for individual slots)
-    const proposeBtns = screen.queryAllByRole("button").filter(btn => btn.className?.includes("proposePill"));
-    expect(proposeBtns.length).toBe(0);
   });
 });

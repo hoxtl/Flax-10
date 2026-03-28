@@ -42,7 +42,7 @@ vi.mock("../../../../pages/group_work/utils/taskUtils", () => ({
   handleDragStartTask: (...args) => handleDragStartTask(...args),
 }));
 
-vi.mock("../../../../pages/group_work/components/taskCardEditUtils", () => ({
+vi.mock("@/pages/group_work/components/taskCardEditUtils", () => ({
   useTaskTitleEdit: (...args) => useTaskTitleEdit(...args),
   handleTaskTitleKeyDown: (event, saveEdit, setEditing) => {
     if (event.key === "Enter" && !event.shiftKey) saveEdit();
@@ -50,21 +50,21 @@ vi.mock("../../../../pages/group_work/components/taskCardEditUtils", () => ({
   },
 }));
 
-vi.mock("../../../../pages/group_work/components/MemberAvatar", () => ({
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
   default: ({ member }) => <span>{member.name || member.username || member.user_name}</span>,
 }));
 
-vi.mock("../../../../components/common/tooltip/Tooltip", () => ({
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
   default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
 }));
 
-vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
+vi.mock("@/components/common/inputs/DateTimePicker", () => ({
   default: ({ value, onChange, placeholder }) => (
     <input aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
   ),
 }));
 
-vi.mock("../../../../components/common/task_priority_pill/TaskPriorityPill", () => ({
+vi.mock("@/components/common/task_priority_pill/TaskPriorityPill", () => ({
   default: ({ priority }) => <span>{priority}</span>,
 }));
 
@@ -82,11 +82,11 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-import TaskAvatarStack from "../../../../pages/group_work/components/TaskAvatarStack";
-import TaskAssigneePopup from "../../../../pages/group_work/components/TaskAssigneePopup";
-import TaskContextMenu from "../../../../pages/group_work/components/TaskContextMenu";
-import TaskBoardCard from "../../../../pages/group_work/components/TaskBoardCard";
-import TaskBoardColumn from "../../../../pages/group_work/components/TaskBoardColumn";
+import TaskAvatarStack from "@/pages/group_work/components/TaskAvatarStack";
+import TaskAssigneePopup from "@/pages/group_work/components/TaskAssigneePopup";
+import TaskContextMenu from "@/pages/group_work/components/TaskContextMenu";
+import TaskBoardCard from "@/pages/group_work/components/TaskBoardCard";
+import TaskBoardColumn from "@/pages/group_work/components/TaskBoardColumn";
 
 const defaultMembers = [
   { id: 1, user: 1, name: "Alex" },

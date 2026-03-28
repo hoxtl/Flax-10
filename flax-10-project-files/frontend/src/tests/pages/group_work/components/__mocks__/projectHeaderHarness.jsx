@@ -27,11 +27,6 @@ vi.mock("@/pages/group_work/components/ProjectHeaderSub", () => ({
   ),
 }));
 
-vi.mock("@/pages/group_work/components/ProjectHeaderMeta", () => ({
-  ProjectHeaderMeta: () => <div data-testid="project-header-meta" />,
-  ProjectTeacherMeta: () => <div data-testid="project-teacher-meta" />,
-}));
-
 vi.mock("@/components/common/deadline_countdown/DeadlineCountdown", () => ({
   default: () => <div data-testid="deadline-countdown" />,
 }));

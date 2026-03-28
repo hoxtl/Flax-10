@@ -21,7 +21,7 @@ vi.mock('../../../../pages/group_work/utils/projectRowUtils', () => ({
   getDaysLeft: vi.fn(() => 5),
 }));
 
-vi.mock('../../../../pages/group_work/components/GroupWorkDetail', () => ({
+vi.mock('@/pages/group_work/components/GroupWorkDetail', () => ({
   default: () => <div data-testid="groupwork-detail" />,
 }));
 

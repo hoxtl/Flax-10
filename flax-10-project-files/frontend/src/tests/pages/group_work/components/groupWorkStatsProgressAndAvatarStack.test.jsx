@@ -5,16 +5,16 @@ import {
   mockGetProgressStats,
   mockGetNextDeadline,
   resetGroupWorkStatsMocks,
-} from "./components/__mocks__/groupWorkStatsMocks.jsx";
-import "./components/__mocks__/motionAndTooltipMocks.jsx";
+} from "./__mocks__/groupWorkStatsMocks.jsx";
+import "./__mocks__/motionAndTooltipMocks.jsx";
 import {
   openMemberProfileMock,
   resetMemberAvatarHarness,
-} from "./components/__mocks__/memberAvatarHarness.jsx";
+} from "./__mocks__/memberAvatarHarness.jsx";
 
-import GroupWorkStats from "../../../pages/group_work/components/GroupWorkStats";
-import ProjectProgress from "../../../pages/group_work/components/ProjectProgress";
-import TaskAvatarStack from "../../../pages/group_work/components/TaskAvatarStack";
+import GroupWorkStats from "@/pages/group_work/components/GroupWorkStats";
+import ProjectProgress from "@/pages/group_work/components/ProjectProgress";
+import TaskAvatarStack from "@/pages/group_work/components/TaskAvatarStack";
 
 describe("GroupWork presentation low-coverage components", () => {
   beforeEach(() => {

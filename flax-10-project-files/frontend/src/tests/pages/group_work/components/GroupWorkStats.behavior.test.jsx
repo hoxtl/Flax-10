@@ -1,7 +1,7 @@
 import { it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-vi.mock("../../../hooks/useCountUp", () => ({
+vi.mock("@/hooks/useCountUp", () => ({
   useCountUp: vi.fn(() => ({ current: null })),
 }));
 

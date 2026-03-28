@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
 
-import GroupProjectDetail from "../../../../pages/group_work/components/GroupWorkDetail";
-import MemberAvatar from "../../../../pages/group_work/components/MemberAvatar";
-import MemberFilter from "../../../../pages/group_work/components/MemberFilter";
-import MembersSection from "../../../../pages/group_work/components/MembersSection";
-import GroupWorkStats from "../../../../pages/group_work/components/GroupWorkStats";
-import TabsSection from "../../../../pages/group_work/components/TabsSection";
+import GroupProjectDetail from "@/pages/group_work/components/GroupWorkDetail";
+import MemberAvatar from "@/pages/group_work/components/MemberAvatar";
+import MemberFilter from "@/pages/group_work/components/MemberFilter";
+import MembersSection from "@/pages/group_work/components/MembersSection";
+import GroupWorkStats from "@/pages/group_work/components/GroupWorkStats";
+import TabsSection from "@/pages/group_work/components/TabsSection";
 
 const useProjectDetailMock = vi.fn();
 const openMemberProfileMock = vi.fn();
@@ -32,7 +32,7 @@ vi.mock("../../../../pages/group_work/utils/priorityUtils", () => ({
   getUserColor: vi.fn(() => "#123456"),
 }));
 
-vi.mock("../../../../hooks/useCountUp", () => ({
+vi.mock("@/hooks/useCountUp", () => ({
   useCountUp: (...args) => useCountUpMock(...args),
 }));
 
@@ -41,39 +41,39 @@ vi.mock("../../../../pages/group_work/utils/projectStatsUtils", () => ({
   getProgressStats: vi.fn(() => ({ percent: 50 })),
 }));
 
-vi.mock("../../../../components/common/app_page/AppPage", () => ({
+vi.mock("@/components/common/app_page/AppPage", () => ({
   default: ({ children }) => <div>{children}</div>,
 }));
 
-vi.mock("../../../../components/common/empty_state/EmptyState", () => ({
+vi.mock("@/components/common/empty_state/EmptyState", () => ({
   default: ({ title, description }) => <div>{title} {description}</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/GroupWorkDetailSkeleton", () => ({
+vi.mock("@/pages/group_work/components/GroupWorkDetailSkeleton", () => ({
   default: ({ onBack }) => <button onClick={onBack}>Skeleton back</button>,
 }));
 
-vi.mock("../../../../pages/group_work/components/ProjectHeader", () => ({
+vi.mock("@/pages/group_work/components/ProjectHeader", () => ({
   default: ({ project }) => <div>Header: {project.name}</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/ProjectProgress", () => ({
+vi.mock("@/pages/group_work/components/ProjectProgress", () => ({
   default: ({ taskStats }) => <div>Progress: {taskStats.percent}</div>,
 }));
 
-vi.mock("../../../../components/common/back_button/BackButton.jsx", () => ({
+vi.mock("@/components/common/back_button/BackButton.jsx", () => ({
   default: ({ onClick, label }) => <button onClick={onClick}>{label}</button>,
 }));
 
-vi.mock("../../../../components/pagination/Pagination", () => ({
+vi.mock("@/components/pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/GroupTasksTab", () => ({
+vi.mock("@/pages/group_work/components/GroupTasksTab", () => ({
   default: ({ projectId }) => <div>Tasks tab {projectId}</div>,
 }));
 
-vi.mock("../../../../pages/group_work/components/AvailabilityTab", () => ({
+vi.mock("@/pages/group_work/components/AvailabilityTab", () => ({
   default: ({ projectId }) => <div>Availability tab {projectId}</div>,
 }));
 

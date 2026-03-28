@@ -3,6 +3,12 @@ import { vi } from "vitest";
 export const getProjectTeacherNameMock = vi.fn();
 export const openTeacherProfileMock = vi.fn();
 export const addMemberFormMock = vi.fn();
+export const getDisplayNameMock = vi.fn((member) => member?.name ?? "");
+export const openMemberProfileMock = vi.fn();
+export const getStoredViewerMock = vi.fn(() => ({ id: 1 }));
+export const getProjectDateMock = vi.fn((d) => (d ? new Date(d) : null));
+export const formatProjectHeadlineDateMock = vi.fn(() => "28 Mar 2026");
+export const getProjectCaptionMock = vi.fn(() => "Project caption");
 const membersSectionCalls = [];
 const authState = { profile: null };
 
@@ -17,6 +23,15 @@ vi.mock("@/context/AuthContext", mockAuthModule);
 vi.mock("@/pages/group_work/utils/projectRowUtils", () => ({
   getProjectTeacherName: (...args) => getProjectTeacherNameMock(...args),
   openTeacherProfile: (...args) => openTeacherProfileMock(...args),
+  getProjectDate: (...args) => getProjectDateMock(...args),
+  formatProjectHeadlineDate: (...args) => formatProjectHeadlineDateMock(...args),
+  getProjectCaption: (...args) => getProjectCaptionMock(...args),
+}));
+
+vi.mock("@/pages/group_work/utils/memberAvatarUtils", () => ({
+  getDisplayName: (...args) => getDisplayNameMock(...args),
+  openMemberProfile: (...args) => openMemberProfileMock(...args),
+  getStoredViewer: (...args) => getStoredViewerMock(...args),
 }));
 
 vi.mock("@/components/common/badge/Badge", () => ({
@@ -45,6 +60,14 @@ vi.mock("@/components/common/hold_confirm_modal/HoldConfirmModal", () => ({
 
 vi.mock("@/pages/group_work/components/ProjectModuleBadge", () => ({
   default: ({ project }) => <div data-testid="module-badge">{project?.code || "MOD"}</div>,
+}));
+
+vi.mock("@/components/common/tooltip/Tooltip", () => ({
+  default: ({ children, content }) => <div data-tooltip={content}>{children}</div>,
+}));
+
+vi.mock("@/pages/group_work/components/MemberAvatar", () => ({
+  default: ({ member }) => <div data-testid="member-avatar">{member?.name}</div>,
 }));
 
 vi.mock("@/pages/group_work/components/AddMemberForm", () => ({
@@ -86,6 +109,16 @@ export function resetProjectHeaderMetaHarness() {
   getProjectTeacherNameMock.mockReset();
   openTeacherProfileMock.mockReset();
   addMemberFormMock.mockReset();
+  getDisplayNameMock.mockReset();
+  openMemberProfileMock.mockReset();
+  getStoredViewerMock.mockReset();
+  getStoredViewerMock.mockImplementation(() => ({ id: 1 }));
+  getProjectDateMock.mockReset();
+  getProjectDateMock.mockImplementation((d) => (d ? new Date(d) : null));
+  formatProjectHeadlineDateMock.mockReset();
+  formatProjectHeadlineDateMock.mockImplementation(() => "28 Mar 2026");
+  getProjectCaptionMock.mockReset();
+  getProjectCaptionMock.mockImplementation(() => "Project caption");
   membersSectionCalls.length = 0;
   authState.profile = null;
 }
