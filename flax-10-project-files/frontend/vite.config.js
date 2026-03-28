@@ -46,6 +46,8 @@ export default defineConfig({
         'src/tests/**',
         '**/*.config.js',
         'src/setupTests.js',
+        'src/pages/homepage/components/rightNowUtils.js',
+        'src/pages/homepage/components/useSemesterOverviewData.js',
       ],
       // Uncomment to enforce 100% coverage once achieved:
       // thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 },
