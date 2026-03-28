@@ -273,6 +273,17 @@ describe("Attendance components", () => {
     expect(screen.queryByText("Your recorded attendance. Once marked, attendance cannot be changed.")).not.toBeInTheDocument();
   }, 10000);
 
+  it("ignores non-attendance events when the title is missing", () => {
+    const { container } = render(
+      <RecordAttendanceList
+        events={[{ id: 92, start_time: "2026-03-01T09:00:00Z", event_type: "Lecture" }]}
+        onRecorded={vi.fn()}
+      />,
+    );
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it("renders the unattended success overlay variant", () => {
     render(<AttendanceSuccessOverlay attended={false} />);
     expect(screen.getByText("Missed session noted.")).toBeInTheDocument();
