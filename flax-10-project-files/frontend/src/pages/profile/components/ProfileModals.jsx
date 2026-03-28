@@ -7,6 +7,7 @@ import GenericSummaryModal from "../../../components/common/generic_summary_moda
 import SummaryItem from "../../../components/common/generic_summary_modal/SummaryItem";
 import { SegmentedControl } from "../../../components/common";
 import UserListModal from "../../../components/social/components/UserListModal";
+import styles from "./ProfileModals.module.css";
 import { DATE_FORMAT, getRangeLabel, RANGE_OPTIONS, TIME_FORMAT } from "../utils/profileHelpers";
 import { socialDataFetchers, useModuleNameMap, useSocialUsers, useTasksModalData } from "../hooks/useProfileModalsData";
 
@@ -34,8 +35,22 @@ function buildSocietyAvatar(society) {
   return imageUrl ? <img src={imageUrl} alt={society.name} style={SOCIETY_AVATAR_STYLE} /> : "🏛️";
 }
 
+function isSocietyManager(society) {
+  const role = String(society?.role || society?.membership_role || "").toLowerCase();
+  return society?.is_admin === true || role === "admin" || role === "editor" || role === "manager";
+}
+
+function SocietyTitle({ society }) {
+  return (
+    <div className={styles.societyTitleRow}>
+      <span>{society.name}</span>
+      {isSocietyManager(society) && <span className={styles.societyManagerPill}>Society Manager</span>}
+    </div>
+  );
+}
+
 export function SocietiesModal({ isOpen, onClose, societies, onNavigate }) {
-  return <GenericSummaryModal isOpen={isOpen} onClose={onClose} title="Societies" emptyMessage="No societies found" items={societies || []} renderItem={(society, index) => <SummaryItem key={society.society_id ?? society.id ?? index} avatar={buildSocietyAvatar(society)} title={society.name} subtitle={society.description || null} onClick={() => navigateToSociety(society, onClose, onNavigate)} />} />;
+  return <GenericSummaryModal isOpen={isOpen} onClose={onClose} title="Societies" emptyMessage="No societies found" items={societies || []} renderItem={(society, index) => <SummaryItem key={`${society.society_id ?? society.id ?? "society"}-${index}`} avatar={buildSocietyAvatar(society)} title={<SocietyTitle society={society} />} subtitle={society.description || null} onClick={() => navigateToSociety(society, onClose, onNavigate)} />} />;
 }
 
 function navigateToSociety(society, onClose, onNavigate) {

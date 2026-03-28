@@ -13,6 +13,7 @@ import ToolbarFilterPanel from '../../../pages/tasks/components/TaskFeedToolbarF
 import taskToolbarStyles from '../../../pages/tasks/components/TaskFeedToolbar.module.css';
 import { SORT_OPTIONS } from './taskInputConstants';
 import { TaskPickItem } from './TaskPickItem';
+import { buildFilterPanelProps, changeSort, closeFilterPanel } from './TaskPickerModal.helpers';
 
 function TaskPickerLoading() {
   return (
@@ -39,23 +40,6 @@ function SmartPickButton({ onPickForMe }) {
   return <PrimaryButton variant="primary" pill className={styles.taskPickSmartBtn} onClick={onPickForMe}>✦ Smart Pick — choose a task for me</PrimaryButton>;
 }
 
-export function buildFilterPanelProps(state) {
-  return {
-    activeFilterTab: state.activeFilterTab,
-    onTabChange: state.setActiveFilterTab,
-    filterQuery: state.filterQuery,
-    onQueryChange: state.setFilterQuery,
-    visibleListItems: state.visibleListItems,
-    filterListIds: state.filterListIds,
-    onToggleList: (listId) => toggleList(listId, state.setFilterListIds),
-    moduleGroupKeys: state.moduleGroupKeys,
-    groupedModuleItems: state.groupedModuleItems,
-    filterModuleCodes: state.filterModuleCodes,
-    onToggleModule: (code) => toggleModule(code, state.setFilterModuleCodes),
-    onClearAll: () => clearAllFilters(state),
-  };
-}
-
 function Toolbar({ state, filterWrapRef, activeFilterCount, onPickForMe }) {
   const filterPanelProps = buildFilterPanelProps(state);
 
@@ -71,32 +55,15 @@ function Toolbar({ state, filterWrapRef, activeFilterCount, onPickForMe }) {
   );
 }
 
-export function changeSort(value, state) {
-  state.setSortBy(value);
-  state.loadTasks(value);
-}
-
-export function toggleList(listId, setFilterListIds) {
-  const stringId = String(listId);
-  setFilterListIds((previous) => previous.includes(stringId) ? previous.filter((id) => id !== stringId) : [...previous, stringId]);
-}
-
-export function toggleModule(code, setFilterModuleCodes) {
-  setFilterModuleCodes((previous) => previous.includes(code) ? previous.filter((item) => item !== code) : [...previous, code]);
-}
-
-export function clearAllFilters(state) {
-  state.setFilterListIds([]);
-  state.setFilterModuleCodes([]);
-  state.setFilterQuery('');
-}
-
 function TaskResults({ state, onSelect }) {
   if (state.loading) return <div className={styles.taskPickResults}><TaskPickerLoading /></div>;
   if (state.filteredTasks.length === 0) return <div className={styles.taskPickResults}><SearchEmptyState query={state.search} itemLabel="tasks" hint={state.search.trim() ? 'Try a different keyword.' : undefined} onClear={state.search.trim() ? () => state.setSearch('') : undefined} /></div>;
   return <div className={styles.taskPickResults}><div className={styles.taskPickList}>{state.filteredTasks.map((task) => <TaskPickItem key={task.id} task={task} selectedTaskId={state.selectedTaskId} recommendedTaskId={state.recommendedTaskId} onSelect={onSelect} />)}</div></div>;
 }
 
+/*
+ * Renders the task picker modal and its task results.
+ */
 export function TaskPickerModal({ state, filterWrapRef, onSelect, onPickForMe }) {
   const activeFilterCount = state.filterListIds.length + state.filterModuleCodes.length;
   const backdropClassName = !state.open ? styles.hidden : styles.taskPickBackdrop;
@@ -107,8 +74,4 @@ export function TaskPickerModal({ state, filterWrapRef, onSelect, onPickForMe })
       {state.open && <div className={styles.taskPickShell} onMouseDown={(event) => closeFilterPanel(event, state, filterWrapRef)}><ModalHeader setOpen={state.setOpen} /><Toolbar state={state} filterWrapRef={filterWrapRef} activeFilterCount={activeFilterCount} onPickForMe={onPickForMe} /><TaskResults state={state} onSelect={onSelect} /></div>}
     </StandardModal>
   );
-}
-
-export function closeFilterPanel(event, state, filterWrapRef) {
-  if (state.isFilterOpen && filterWrapRef.current && !filterWrapRef.current.contains(event.target)) state.setIsFilterOpen(false);
 }

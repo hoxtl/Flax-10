@@ -6,6 +6,7 @@ import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/taskApi";
 import { EventPopups } from "../../../components/calendar/EventPopups";
 import { useAuth } from "../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import BackToTop from "../../../components/common/back_to_top/BackToTop";
 import { TaskWidgetSlot } from "./TaskWidgetSlot";
 import { DeadlinesWidget } from "./DeadlinesWidget";
@@ -51,12 +52,14 @@ function HomepageTaskSlot(props) {
 
 function HomepageDeadlines(props) {
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const isTeacher = profile?.role === "teacher";
+  const handleSelectModule = ({ code }) => navigate(`/modules?code=${encodeURIComponent(code)}`);
   return (
     <DeadlinesWidget
       deadlines={props.upcomingDeadlines || []}
       onSelectDeadline={props.modals.setSelectedDeadline}
-      onSelectModule={props.modals.setSelectedModulePill}
+      onSelectModule={handleSelectModule}
       isTeacher={isTeacher}
     />
   );

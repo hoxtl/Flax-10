@@ -17,6 +17,8 @@ function clearToastTimer(timeoutRef) {
 function buildToastState(message, options) {
   return {
     message,
+    title: options.title || null,
+    description: options.description || null,
     actionLabel: options.actionLabel || null,
     onAction: typeof options.onAction === "function" ? options.onAction : null,
     variant: options.variant || "success",
@@ -45,7 +47,20 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={showToast}>
       {children}
-      <AnimatePresence initial={false}>{toast && <AppToast message={toast.message} actionLabel={toast.actionLabel} onAction={toast.onAction} variant={toast.variant} icon={toast.icon} onClose={closeToast} />}</AnimatePresence>
+      <AnimatePresence initial={false}>
+        {toast && (
+          <AppToast
+            title={toast.title}
+            message={toast.message}
+            description={toast.description}
+            actionLabel={toast.actionLabel}
+            onAction={toast.onAction}
+            variant={toast.variant}
+            icon={toast.icon}
+            onClose={closeToast}
+          />
+        )}
+      </AnimatePresence>
     </ToastContext.Provider>
   );
 }

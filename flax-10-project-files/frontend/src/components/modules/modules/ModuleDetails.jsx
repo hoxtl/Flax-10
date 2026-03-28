@@ -210,7 +210,7 @@ function ProjectRow({ project, index }) {
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
-                    <span className={deadlineStyles.deadlinesType}>🤝 Project</span>
+                    <Badge tone="muted" className={deadlineStyles.deadlinesType}>Project</Badge>
                     <span className={deadlineStyles.deadlineTitle}>{project.name}</span>
                 </div>
                 <div className={deadlineStyles.deadlineMeta}>
