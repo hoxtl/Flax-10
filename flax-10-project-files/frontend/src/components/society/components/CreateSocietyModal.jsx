@@ -3,18 +3,18 @@
  * Collects basic info, categories, admins, and initial collaborators.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "../styles/CreateSocietyModal.module.css";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "../society_detail/RatificationSection";
-import CoverImageModal from "../society_detail/image_handlers/CoverImageModal";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../../pages/societies/utils/societyFilters";
 import { TagsSelector } from "../../common/tags_selector/TagsSelector";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import StandardModal from "../../common/standard_modal/StandardModal";
 import TextInput from "../../common/text_input/TextInput";
 import { useToast } from "../../../context/ToastContext";
+import { readImageFile, resetFileInput } from "../../../utils/imageFile";
 
 const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map((category) => ({ id: category.id, label: category.label }));
 
@@ -34,7 +34,7 @@ function allEmailsValid(emails) {
 
 function useCreateSocietyState() {
     const [form, setForm] = useState(initialForm());
-    const [modals, setModals] = useState({ collab: false, photo: false });
+    const [modals, setModals] = useState({ collab: false });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState("");
     return { form, setForm, modals, setModals, isSubmitting, setIsSubmitting, submitError, setSubmitError };
@@ -62,14 +62,6 @@ function getCollabModalProps(form, setModals, onAdd) {
     };
 }
 
-function getPhotoModalProps(form, setModals, update) {
-    return {
-        images: form.images,
-        onClose: () => setModals((current) => ({ ...current, photo: false })),
-        onUpdate: (images) => update("images", images.slice(0, 1))
-    };
-}
-
 function useCreateSocietyForm(onCreate) {
     const state = useCreateSocietyState();
     const showToast = useToast();
@@ -90,7 +82,6 @@ function buildCreateFormApi(state, update, handleAddCollabs, handleSubmit, isInv
         submitError: state.submitError,
         isCreateDisabled: isInvalid || state.isSubmitting,
         collabModalProps: getCollabModalProps(state.form, state.setModals, handleAddCollabs),
-        photoModalProps: getPhotoModalProps(state.form, state.setModals, update),
         handleSubmit,
     };
 }
@@ -102,7 +93,6 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
         <>
             <CreateSocietyDialog logic={logic} onClose={onClose} />
             {logic.modals.collab && <AddCollaboratorModal {...logic.collabModalProps} />}
-            {logic.modals.photo && <CoverImageModal {...logic.photoModalProps} />}
         </>
     );
 }
@@ -125,7 +115,7 @@ function FormFields({ form, update, setModals }) {
             <NameField value={form.name} onChange={handlers.name} />
             <BioField value={form.bio} onChange={handlers.bio} />
             <CategoriesField value={form.categories} onChange={handlers.categories} />
-            <PhotosField images={form.images} onOpen={() => setModals((current) => ({ ...current, photo: true }))} />
+            <PhotosField images={form.images} onChange={handlers.images} />
             <AdminEmailsField value={form.adminEmails} onChange={handlers.adminEmails} invalid={invalidEmails} />
             <CollaboratorsField collaborators={form.collaborators} onOpen={() => setModals((current) => ({ ...current, collab: true }))} onRoleChange={handlers.role} onRemove={handlers.remove} />
             <RatificationToggle requested={form.requestRatification} onToggle={handlers.ratification} />
@@ -138,6 +128,7 @@ function getFieldHandlers(form, update) {
         name: (value) => update("name", value),
         bio: (value) => update("bio", value),
         categories: (value) => update("categories", value),
+        images: (value) => update("images", value),
         adminEmails: (value) => update("adminEmails", value),
         ratification: (value) => update("requestRatification", value),
         role: (id, role) => update("collaborators", form.collaborators.map((collaborator) => (collaborator.user || collaborator.id) === id ? { ...collaborator, role } : collaborator)),
@@ -184,14 +175,16 @@ function AdminEmailsField({ value, onChange, invalid }) {
     );
 }
 
-function PhotosField({ images, onOpen }) {
-    const hasPhotos = images.length > 0;
-    const coverImage = images[0];
+function PhotosField({ images, onChange }) {
+    const fileRef = useRef(null);
+    const coverImage = images[0] || "";
+    const onFile = (event) => readImageFile(event.target.files?.[0], (src) => onChange([src]), () => resetFileInput(fileRef));
     return (
         <div className={styles.field}>
-            <label className={styles.label}>Cover Image <span className={styles.optional}>({hasPhotos ? 1 : 0}/1)</span></label>
-            {hasPhotos && <div className={styles.photoSummary}><div className={styles.summaryCard} style={{ backgroundImage: `url("${coverImage}")` }} /></div>}
-            <PrimaryButton type="button" className={styles.addCollabBtn} variant="secondary" pill onClick={onOpen}>{hasPhotos ? "Edit Cover Image" : "+ Add Cover Image"}</PrimaryButton>
+            <label className={styles.label}>Cover Image <span className={styles.optional}>({coverImage ? 1 : 0}/1)</span></label>
+            {coverImage && <div className={styles.photoSummary}><div className={styles.summaryCard} style={{ backgroundImage: `url("${coverImage}")` }} /></div>}
+            <PrimaryButton type="button" className={styles.addCollabBtn} variant="secondary" pill onClick={() => fileRef.current?.click()}>{coverImage ? "Replace Cover Image" : "+ Add Cover Image"}</PrimaryButton>
+            <input ref={fileRef} type="file" accept="image/*" onChange={onFile} hidden />
             <p className={styles.hint}>Use one clear image for the society card and banner.</p>
         </div>
     );

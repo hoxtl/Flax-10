@@ -5,7 +5,7 @@
 
 import { useState, useRef } from "react";
 import styles from "./AnnouncementModal.module.css";
-import { handleFileSelect, MAX_IMAGES } from "./announcementModalHelpers";
+import { handleFileSelect } from "./announcementModalHelpers";
 import { TimeRow } from "../../../../calendar/event_modal/components/TimeRow";
 import { RecurrenceField } from "../../../../calendar/event_modal/components/RecurrenceField";
 import { FormField } from "../../../../calendar/event_modal/components/FormField";
@@ -66,43 +66,34 @@ function FormFields({ form, update, setForm, fileRef, tags }) {
 }
 
 function ImagesField({ images, fileRef, onChange }) {
-    const addImage = (src) => onChange([...images, src]);
-    const removeImage = (index) => onChange(images.filter((_, i) => i !== index));
-
+    const image = images[0] || "";
+    const handleFile = (event) => handleFileSelect(event.target.files?.[0], (src) => onChange([src]), fileRef);
     return (
         <div className={styles.field}>
-            <label className={styles.label}>Images ({images.length}/{MAX_IMAGES})</label>
-            <ImagesGrid images={images} onRemove={removeImage}
-                canAdd={images.length < MAX_IMAGES} fileRef={fileRef} onAdd={addImage} />
+            <label className={styles.label}>Image <span className={styles.optional}>({image ? 1 : 0}/1)</span></label>
+            <ImagePreview src={image} onRemove={() => onChange([])} />
+            <ImagePicker fileRef={fileRef} onFile={handleFile} hasImage={!!image} />
         </div>
     );
 }
 
-function ImagesGrid({ images, onRemove, canAdd, fileRef, onAdd }) {
-    const handleFile = (e) => handleFileSelect(e.target.files[0], onAdd, fileRef);
-    return (
-        <div className={styles.imagesGrid}>
-            {images.map((src, i) => <ImageThumb key={i} src={src} onRemove={() => onRemove(i)} />)}
-            {canAdd && <AddImageButton fileRef={fileRef} onFile={handleFile} />}
-        </div>
-    );
-}
-
-function ImageThumb({ src, onRemove }) {
+function ImagePreview({ src, onRemove }) {
+    if (!src) return null;
     return (
         <div className={styles.imageThumb}>
             <img src={src} alt="Preview" />
-            <button className={styles.removeBtn} onClick={onRemove}>&times;</button>
+            <button className={styles.removeBtn} onClick={onRemove} type="button">&times;</button>
         </div>
     );
 }
 
-function AddImageButton({ fileRef, onFile }) {
+function ImagePicker({ fileRef, onFile, hasImage }) {
+    const label = hasImage ? "Replace image" : "+ Add image";
     return (
-        <div className={styles.addImageBtn} onClick={() => fileRef.current?.click()}>
+        <button type="button" className={styles.addImageBtn} onClick={() => fileRef.current?.click()}>
             <input ref={fileRef} type="file" accept="image/*" onChange={onFile} hidden />
-            <span>+</span>
-        </div>
+            <span>{label}</span>
+        </button>
     );
 }
 
