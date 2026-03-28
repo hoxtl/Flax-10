@@ -34,7 +34,7 @@ export function getInitials(member) {
 export function getDisplayName(member) {
   const fullName = [member?.first_name, member?.last_name].filter(Boolean).join(" ").trim();
   const named = String(member?.display_name || member?.full_name || member?.name || "").trim();
-  if (named && shouldPreferNamedValue(named, fullName)) return named;
+  if (shouldPreferNamedValue(named, fullName)) return named;
   if (fullName) return fullName;
   return member?.user_name || member?.username || "";
 }
@@ -125,9 +125,13 @@ export function getCurrentMember(members = []) {
 }
 
 function shouldPreferNamedValue(named, fullName) {
-  if (!named) return false;
-  if (!fullName) return true;
-  return scoreHumanName(named) >= scoreHumanName(fullName);
+  const namedScore = scoreHumanName(named);
+  if (namedScore === Number.NEGATIVE_INFINITY) return false;
+
+  const fullNameScore = scoreHumanName(fullName);
+  if (fullNameScore === Number.NEGATIVE_INFINITY) return true;
+
+  return namedScore >= fullNameScore;
 }
 
 function scoreHumanName(value) {
