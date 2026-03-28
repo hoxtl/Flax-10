@@ -83,6 +83,7 @@ describe("useDateTimePicker", () => {
     expect(setOpen).not.toHaveBeenCalled();
     [ref.current, dRef.current].forEach(el => el.remove());
   });
+
   it("ignores dropdown pointer down", () => {
     const setOpen = vi.fn(), { dropdown, ref, dRef } = setupOutside();
     renderHook(() => useClickOutside(true, ref, dRef, setOpen));
@@ -90,6 +91,7 @@ describe("useDateTimePicker", () => {
     expect(setOpen).not.toHaveBeenCalled();
     [ref.current, dRef.current].forEach(el => el.remove());
   });
+
   it("closes on body pointer down and Escape", () => {
     const setOpen = vi.fn(), { ref, dRef } = setupOutside();
     renderHook(() => useClickOutside(true, ref, dRef, setOpen));
@@ -153,6 +155,7 @@ describe("useDateTimePicker", () => {
     expect(d.isDisabled(10)).toBe(true);
   });
 
+<<<<<<< HEAD
   it("covers today and selection predicates across month and year boundaries", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-10T12:00:00"));
@@ -171,6 +174,8 @@ describe("useDateTimePicker", () => {
     vi.useRealTimers();
   });
 
+=======
+>>>>>>> origin
   it("exposes handlers and updates state", () => {
     const sM = vi.fn(), sY = vi.fn(), sD = vi.fn(), sH = vi.fn(), sMin = vi.fn(), oC = vi.fn();
     const h = useDateTimeHandlers(2026, 0, sM, sY, null, sD, 10, sH, 30, sMin, false, false, oC);

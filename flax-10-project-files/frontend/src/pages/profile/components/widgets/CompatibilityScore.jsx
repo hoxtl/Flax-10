@@ -11,7 +11,7 @@ const PERSONA_TIME_MAP = {
   consistent: "all", sprint: "neutral", marathon: "neutral",
 };
 
-function computeTimeCompat(a, b) {
+export function computeTimeCompat(a, b) {
   if (a === "all" || b === "all") return 80;
   if (a === b) return 100;
   if (a === "neutral" || b === "neutral") return 60;
@@ -20,7 +20,7 @@ function computeTimeCompat(a, b) {
   return 50;
 }
 
-function computeCompatibility(viewedSummary, currentUserSummary, sharedModuleCount, totalModuleCount) {
+export function computeCompatibility(viewedSummary, currentUserSummary, sharedModuleCount, totalModuleCount) {
   const moduleScore = totalModuleCount > 0 ? (sharedModuleCount / totalModuleCount) * 100 : 0;
   const viewedTime = PERSONA_TIME_MAP[viewedSummary?.persona?.id] || "neutral";
   const currentTime = PERSONA_TIME_MAP[currentUserSummary?.persona?.id] || "neutral";
@@ -30,6 +30,10 @@ function computeCompatibility(viewedSummary, currentUserSummary, sharedModuleCou
 }
 
 const MotionCircle = motion.circle;
+
+export function buildSparkPointKey(point, idx) {
+  return `${point.date || "day"}-${idx}`;
+}
 
 function CompatRing({ total }) {
   const radius = 44;
@@ -112,7 +116,7 @@ function ActivitySparklineRow({ activitySparkline }) {
           const level = Math.max(0, Math.min(4, Number(point.level) || 0));
           return (
             <span
-              key={`${point.date || "day"}-${idx}`}
+              key={buildSparkPointKey(point, idx)}
               className={`${compatStyles.sparkDot} ${compatStyles[`sparkDot${level}`] || ""}`}
             />
           );

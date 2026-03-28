@@ -57,6 +57,7 @@ describe("useHomepageReschedule extra branches", () => {
     await act(async () => { await result.current.handleRescheduleTomorrow({ id: "e1", title: "E", start_time: "2026-03-24T13:00:00Z" }); });
     expect(props.showToast).toHaveBeenCalledWith("Couldn't re-schedule. Try again.");
   });
+
   it("uses 25 min fallback for tomorrow reschedule", async () => {
     const props = buildRescheduleProps();
     const { result } = renderHook(() => useHomepageReschedule(props));
@@ -65,6 +66,7 @@ describe("useHomepageReschedule extra branches", () => {
     const diff = new Date(addArgs.end_time).getTime() - new Date(addArgs.start_time).getTime();
     expect(diff).toBe(25 * 60000);
   });
+
   it("handleReschedule moves to same-day slot", async () => {
     getNextFreeSlotTodayMock.mockReturnValue({ start: new Date("2026-03-24T12:00:00Z"), end: new Date("2026-03-24T12:45:00Z") });
     formatTimeMock.mockReturnValue("12:00");
@@ -75,6 +77,7 @@ describe("useHomepageReschedule extra branches", () => {
     expect(props.addEvent).toHaveBeenCalled();
     expect(props.showToast).toHaveBeenCalledWith('"S" → 12:00');
   });
+
   it("handleReschedule falls back to tomorrow", async () => {
     getNextFreeSlotTodayMock.mockReturnValue(null);
     const props = buildRescheduleProps();

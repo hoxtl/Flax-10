@@ -187,4 +187,59 @@ describe("CreateTaskModal coverage", () => {
 
     expect(screen.getByTestId("sleep-warning")).toBeInTheDocument();
   });
+
+  it("falls back to one pomodoro block when no estimate is provided", () => {
+    hookMock.mockReturnValue(
+      buildState({
+        form: {
+          title: "Task",
+          description: "Desc",
+          due_date: "2026-03-09T09:00",
+          estimated_minutes: 0,
+          estimated_blocks: 0,
+          task_list: "1",
+          priority: "",
+          module: "",
+        },
+      }),
+    );
+
+    render(<CreateTaskModal />);
+
+    expect(screen.getByText(/Est\. time/i)).toBeInTheDocument();
+  });
+
+  it("uses explicit minute estimates and module title fallbacks", () => {
+    hookMock.mockReturnValue(
+      buildState({
+        form: {
+          title: "Task",
+          description: "Desc",
+          due_date: "2026-03-09T09:00",
+          estimated_minutes: 50,
+          estimated_blocks: 0,
+          task_list: "1",
+          priority: "",
+          module: "",
+        },
+        sortedModules: [{ id: 11, module_code: "KCL2", title: "Fallback title" }],
+      }),
+    );
+
+    render(<CreateTaskModal />);
+
+    expect(screen.getByRole("button", { name: "KCL2 – Fallback title" })).toBeInTheDocument();
+  });
+
+  it("falls back to an empty module label suffix when names are missing", () => {
+    hookMock.mockReturnValue(
+      buildState({
+        sortedModules: [{ id: 12, module_code: "KCL3" }],
+      }),
+    );
+
+    render(<CreateTaskModal />);
+
+    expect(screen.getByRole("button", { name: "KCL3 –" })).toBeInTheDocument();
+  });
 });

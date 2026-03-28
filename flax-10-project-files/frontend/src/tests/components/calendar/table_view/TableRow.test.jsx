@@ -138,7 +138,6 @@ describe('TableRow', () => {
         expect(onCellClick).toHaveBeenCalledWith(1, 'title', 'Test');
     });
 
-
     it('renders source badge for module events', () => {
         render(<table><tbody><TableRow event={createMockEvent({ module: { id: 1, name: 'CS101' } })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
         expect(screen.getByText('CS101')).toBeInTheDocument();

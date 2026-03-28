@@ -45,6 +45,19 @@ describe("useCreateTaskBar", () => {
     expect(runQuickAdd).toHaveBeenCalled();
   });
 
+  it("submits directly when no default due date is provided", async () => {
+    const onAddTask = vi.fn();
+    const { result } = renderHook(() =>
+      useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], defaultListId: 9, onAddTask }),
+    );
+
+    act(() => result.current.setTitle("Direct add"));
+    await act(async () => result.current.handleSubmit({ preventDefault: vi.fn() }));
+
+    expect(checkSleepAndRunMock).not.toHaveBeenCalled();
+    expect(runQuickAdd).toHaveBeenCalled();
+  });
+
   it("handles escape key to blur input state", () => {
     const { result } = renderHook(() => useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], onAddTask: vi.fn() }));
     const blur = vi.fn();

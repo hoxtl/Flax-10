@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/QuickAddModal.module.css";
 import { useTags } from "../../../context/TagContext";
-import Badge from "../../common/Badge/Badge";
+import Badge from "../../common/badge/Badge";
 import StandardModal from "../../common/standard_modal/StandardModal";
 import { getModules } from "../../../api/moduleApi";
 
@@ -83,7 +83,7 @@ function ModulePickerGrid({ onSelect }) {
   );
 }
 
-function useQuickAddLogic(onSelectType, initialView = 'type') {
+function useQuickAddLogic(onSelectType, initialView) {
   const { tags } = useTags();
   const [view, setView] = useState(normalizeQuickAddView(initialView));
 

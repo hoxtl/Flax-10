@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import styles from '../../../pages/timer/TimerPage.module.css';
-import Tabs from '../../common/Tabs/Tabs';
+import Tabs from '../../common/tabs/Tabs';
 import InlineSoundPanel from '../components/InlineSoundPanel';
 import RightRailHistoryPanel from '../components/RightRailHistoryPanel';
 import { PresetPanel, TimerConfigPanel } from '../components/PresetPanel';

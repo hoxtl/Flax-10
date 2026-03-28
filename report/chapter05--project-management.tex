@@ -8,17 +8,18 @@ transition from a client-led project to an academic one.
 \section{Team Structure and Roles}
 
 To ensure accountability and specialisation, each team member was assigned a specific
-leadership role alongside their development duties:
+leadership role alongside their development duties
+(see team feedback, meeting of 20 January 2026):
 \begin{itemize}
-	\item \textbf{Hamed Latif}: Team Lead, Client Liaison, and Final Submission Manager
-	\item \textbf{Kausar Khan}: Trello Board Manager
-	\item \textbf{Eric Almeida}: User Story and Task Manager
-	\item \textbf{Aishah Ahmed}: LaTeX Report Manager
-	\item \textbf{Cate Tay (Cate) Chew}: GitHub and Version Control Manager
-	\item \textbf{Zerun (Harry) Chen}: Deployment Manager
-	\item \textbf{Dian Mahmood}: Code Quality Manager
-	\item \textbf{Indixora Jozal}: People's Engagement Manager
-	\item \textbf{Binuli Nevanma Markawitage}: Meeting Setup Manager
+    \item \textbf{Hamed Latif}: Client Liaison and Final Submission Manager
+    \item \textbf{Kausar Khan}: Trello Board Manager
+    \item \textbf{Eric Almeida}: User Story and Task Manager
+    \item \textbf{Aishah Ahmed}: LaTeX Report Manager
+    \item \textbf{Cate Tay (Cate) Chew}: GitHub and Version Control Manager
+    \item \textbf{Zerun (Harry) Chen}: Deployment Manager
+    \item \textbf{Dian Mahmood}: Code Quality Manager
+    \item \textbf{Indixora Jozal}: People's Engagement Manager
+    \item \textbf{Binuli Nevanma Markawitage}: Meeting Setup Manager
 \end{itemize}
 
 \section{Project Evolution}
@@ -29,7 +30,7 @@ warehouse focused on analysing mining stocks. At the start of week three, after 
 consideration, the team collectively decided to pivot to an academic project: \textbf{StudyFlax},
 a time management system for King's College London students and teaching staff.
 
-The decision was not taken lightly with the team recognising the value of working with a live
+The decision was not taken lightly. The team recognised the value of working with a live
 production system and appreciated the willingness of MakCorp to collaborate with students.
 However, given the 10-week delivery timeline and the module's emphasis on structured
 development, testing, and version control, the prevailing uncertainty around system access,
@@ -46,40 +47,32 @@ ensure all core features of StudyFlax were delivered on schedule.
 
 The team's communication strategy relied on a combination of synchronous and asynchronous tools:
 \begin{itemize}
-	\item \textbf{Meetings}: The team held two formal meetings per week was
-(Mondays at 3:00PM and Fridays at 2:00PM) to discuss progress and obstacles. This was done for every week except for the one commencing on the 9th due to a variety of reasons: a lot of members had personal commitments during reading week and others caught the flu going around at the time which would have led to very poor attendance. A collective decision to slow down, review and polish our previous work during this week helped improve the code quality and clear up technical debts and missing tests at a critical moment in the project’s development being around the halfway point.
-
-\item \textbf{Instant Messaging}: WhatsApp was used for daily coordination to discuss features within the team, ask for help and or otherwise communicate about the project and its progress. We used a mix of in person and online meetings with meeting notes, feature discussion, role allocation, progress updates and more being communicated regularly on WhatsApp as well as being documented on a shared Google Drive.
-
-\item \textbf{Task Tracking}: A Trello Kanban board was used to plan the project and keep track of various features and their development. The trello board included two lists: a final submission checklist and a todo list for admin as reminders for ourselves. For the features it also included the backlog, in progress, ready for inspection, under review after inspection, ready for integration and completed lists. To expand on their purpose a bit further, the backlog was a way for us to collectively track the best ideas and any prospective features we discussed during meeting or via WhatsApp so that we could be aware of what features needed to be tackled next, who they might be assigned to, how we could label and group them and finally how they fit within the cohesive design of the website as a whole. In progress was a way to catalogue who was working on what, ready for inspection, under ready after inspection, ready for integration and completed to track the progress of the task. Finally labels were used and people assigned to tasks to visually categorise the tasks based on their functionality or design area and track the work of each team member.
-
+    \item \textbf{Meetings}: The team first decided to hold two formal meetings per week
+          (Mondays at 3:00~PM and Fridays at 2:00~PM) to discuss progress and blockers. However, due to unforeseen commitments from team members, we decided to schedule team meetings 2 days before each meeting to accommodate those who had flexible schedules.
+    \item \textbf{Instant Messaging}: WhatsApp was used for daily coordination,
+          with a protocol requiring members to reply within the same day.
+    \item \textbf{Task Tracking}: A Trello Kanban board was used to visualise the backlog,
+          in-progress tasks, and completed features
+          (see team feedback, Trello Kanban board).
 \end{itemize}
 
 \section{Software Quality and Standards}
 
 To maintain a high standard of software engineering, the team enforced strict coding conventions:
 \begin{itemize}
-	\item \textbf{Code Reviews}: All pull requests required approval from at least three team
-      	members before merging into the main branch.
-	\item \textbf{Function Length}: Methods were limited to a maximum of 15 lines to ensure
-      	readability and low coupling.
-	\item \textbf{Testing}: The team aimed for 100\% code coverage, with testing methods
-      	capped at 25 lines.
+    \item \textbf{Code Reviews}: All pull requests required approval from at least three team
+          members before merging into the main branch.
+    \item \textbf{Function Length}: Methods were limited to a maximum of 20-25 lines to ensure
+          readability and low coupling.
+    \item \textbf{Testing}: The team aimed for 100\% code coverage, with testing methods
+          capped at 25 lines.
 \end{itemize}
-
-\section{Workflow and Deployment}
-
-As mentioned previously an agile inspired approach was used to manage the team’s workflow, quickly building up a prototype and expanding it with new ideas leading to a lot more experimentation and trialing for both UI and features early on. This allowed us to iterate and build up a minimum viable product (MVP) quickly to make up for the lost time due to the sudden switch in project type.
-
-Github alongside Git was used to track all the team member’s contributions with each team member working on multiple features that each had their own separate branches. Within each branch we could then prototype the new features or UI to develop something we liked before adding it to the main version of the project. More specifically pull requests were created once we were happy with a feature which would then be reviewed by up to 3 people before being merged into main. Feedback was provided in this way to make the project more robust, ensure any changes were well tested and that they met a high standard of polish. The regular weekly meetings also allowed us to review how each feature progressed as team members discussed pull requests they reviewed or changes they made.
-
-Deployment was also a huge focus for our group reflected by the regular deployment of the website on railway every one to two weeks. This decision was made to review how the site would appear in a deployment environment and catch any issues due to a change from production to deployment early. This proved to be a good decision as solving issues caused by API keys for both the Unimap and AI features took a significant amount of time and benefitted from the longer time allowing us to find the most reliable solution to them.
 
 \section{Reflection and Lessons Learned}
 
 The most significant lesson learnt was the importance of early risk identification.
-Whilst the initial communication issues with Makcorp were a setback, communication within
-the team and a clear division of responsibilities ensured the team remained cohesive during
+Although the initial communication issues with MakCorp were a setback, communication within
+the team and a clear division of responsibilities ensured that the team remained cohesive during
 the transition. The use of a decentralised leadership structure allowed the team to move
-faster than a traditional hierarchy would have permitted. For future projects, the team would
+faster than a traditional hierarchy would have allowed. For future projects, the team would
 establish a more robust contingency plan for client-side delays earlier in the process.

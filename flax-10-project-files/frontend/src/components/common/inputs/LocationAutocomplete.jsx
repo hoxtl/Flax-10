@@ -33,54 +33,43 @@ const KCL_LOCATIONS = [
   'Online (Zoom)',
 ];
 
-export default function LocationAutocomplete({ value, onChange, placeholder, inputClassName }) {
-  const [open, setOpen] = useState(false);
-  const wrapRef = useRef(null);
+function filterLocations(value) {
+  const query = (value || '').toLowerCase();
+  return query.length > 0 ? KCL_LOCATIONS.filter(loc => loc.toLowerCase().includes(query)) : KCL_LOCATIONS;
+}
 
-  const normalizedValue = (value || '').toLowerCase();
-
-  const filtered = normalizedValue.length > 0
-    ? KCL_LOCATIONS.filter(loc => loc.toLowerCase().includes(normalizedValue))
-    : KCL_LOCATIONS;
-
+function useDropdownClose(wrapRef, setOpen) {
   useEffect(() => {
     function onOutsideClick(e) {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
     }
     document.addEventListener('mousedown', onOutsideClick);
     return () => document.removeEventListener('mousedown', onOutsideClick);
-  }, []);
+  }, [wrapRef, setOpen]);
+}
 
-  const handleChange = (e) => {
-    onChange(e.target.value);
-    setOpen(true);
-  };
+function LocationDropdown({ options, onSelect }) {
+  return (
+    <ul className={styles.dropdown}>
+      {options.map(loc => (
+        <li key={loc} className={styles.option} onMouseDown={() => onSelect(loc)}>{loc}</li>
+      ))}
+    </ul>
+  );
+}
 
-  const handleSelect = (loc) => {
-    onChange(loc);
-    setOpen(false);
-  };
-
+/** Autocomplete text input filtered against known KCL campus locations. */
+export default function LocationAutocomplete({ value, onChange, placeholder, inputClassName }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+  useDropdownClose(wrapRef, setOpen);
+  const filtered = filterLocations(value);
+  const handleChange = (e) => { onChange(e.target.value); setOpen(true); };
+  const handleSelect = (loc) => { onChange(loc); setOpen(false); };
   return (
     <div ref={wrapRef} className={styles.wrap}>
-      <input
-        type="text"
-        value={value || ''}
-        onChange={handleChange}
-        onFocus={() => setOpen(true)}
-        placeholder={placeholder || 'e.g., Bush House, 2.09'}
-        className={inputClassName}
-        autoComplete="off"
-      />
-      {open && filtered.length > 0 && (
-        <ul className={styles.dropdown}>
-          {filtered.map(loc => (
-            <li key={loc} className={styles.option} onMouseDown={() => handleSelect(loc)}>
-              {loc}
-            </li>
-          ))}
-        </ul>
-      )}
+      <input type="text" value={value || ''} onChange={handleChange} onFocus={() => setOpen(true)} placeholder={placeholder || 'e.g., Bush House, 2.09'} className={inputClassName} autoComplete="off" />
+      {open && filtered.length > 0 && <LocationDropdown options={filtered} onSelect={handleSelect} />}
     </div>
   );
 }
