@@ -10,7 +10,9 @@ import {
   fetchGroupProjects,
   fetchProjectMembers,
   patchGroupProject,
+  getAuthHeaders,
 } from "../api/groupWorkApi";
+import { calcCompletionSegments } from "../utils/taskStatsUtils";
 
 export { getAuthHeaders } from "../api/groupWorkApi";
 
@@ -124,13 +126,26 @@ function addMemberIfMissing(member, setMembers) {
   setMembers((prev) => (prev.some((item) => item.id === member.id) ? prev : [...prev, member]));
 }
 
+/** Fetches task stats eagerly so they're available regardless of which tab is active. */
+
+function useEagerTaskStats(projectId) {
+  const [taskStats, setTaskStats] = useState(getInitialTaskStats());
+  useEffect(() => {
+    if (!projectId) return;
+    fetch(`/api/tasks/?group_project=${projectId}`, { headers: getAuthHeaders() })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((tasks) => setTaskStats(calcCompletionSegments(tasks, [])));
+  }, [projectId]);
+  return [taskStats, setTaskStats];
+}
+
 /** Aggregates project state, member data, actions, and tab state for the detail page. */
 
 export function useProjectDetail(projectId, onBack, onDelete, onUpdate) {
   const detail = useProjectState(projectId, onBack, onDelete, onUpdate);
   const initialTab = useSelectedTab();
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [taskStats, setTaskStats] = useState(getInitialTaskStats());
+  const [taskStats, setTaskStats] = useEagerTaskStats(projectId);
   return { ...detail, activeTab, setActiveTab, taskStats, setTaskStats };
 }
 

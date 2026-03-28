@@ -11,6 +11,7 @@ SYSTEM_TAG_CONFIG = {
     'Exam': {'color': '#9B59B6', 'duration': 180, 'icon': '📋'},
     'Societies': {'color': '#27AE60', 'duration': 120, 'icon': '👨‍👨‍👧‍👧'},
     'Schedule': {'color': '#F59E0B', 'duration': 60, 'icon': '🗓️'},
+    'Group Study': {'color': '#5A8A6A', 'duration': 60, 'icon': '🤝'},
 }
 
 def get_system_tag(name):
@@ -84,6 +85,9 @@ def get_societies_tag():
 
 def get_schedule_tag():
     return get_system_tag('Schedule')
+
+def get_group_study_tag():
+    return get_system_tag('Group Study')
 
 def fix_untagged_deadline_events():
     deadline_tag = get_deadline_tag()

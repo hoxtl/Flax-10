@@ -47,6 +47,7 @@ function getReadOnlyClassName(event) {
     const type = getEventType(event);
     if (type === 'society') return 'draggable-event society-event';
     if (type === 'module' || type === 'timetable') return 'draggable-event timetable-event';
+    if (type === 'group_meeting') return 'draggable-event group-meeting-event';
     return 'draggable-event';
 }
 

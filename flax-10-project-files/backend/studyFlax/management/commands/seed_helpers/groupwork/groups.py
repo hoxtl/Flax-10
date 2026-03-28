@@ -149,6 +149,15 @@ def _ensure_fixture_users_own_projects(student_modules, rng):
     for student in targets:
         _top_up_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)
 
+def _delete_excess_seeded_projects(allowed_keys):
+    """Delete seeded projects not in the current spec set, leaving user-created projects intact."""
+    GroupProject.objects.filter(is_seeded=True).exclude(
+        id__in=[
+            p.id for p in GroupProject.objects.filter(is_seeded=True)
+            if (p.name, p.course_code) in allowed_keys
+        ]
+    ).delete()
+
 def create_group_projects(stdout):
     now = timezone.now()
     rng = random.Random(PROJECT_OWNER_SEED)
@@ -157,6 +166,8 @@ def create_group_projects(stdout):
     student_modules, module_students = _build_enrollment_maps(students)
     seed_modules = _list_seed_modules(student_modules)
     specs = _build_project_specs(showcase_student, student_modules, seed_modules, now)
+    allowed_keys = {(spec["name"], spec["module"].module_code) for spec in specs}
+    _delete_excess_seeded_projects(allowed_keys)
     for index, spec in enumerate(specs):
         _create_single_project(spec, students, now, rng, index, module_students)
     _ensure_fixture_users_own_projects(student_modules, rng)

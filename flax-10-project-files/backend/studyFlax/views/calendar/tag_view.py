@@ -8,11 +8,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models import Tag, Category, Enrollment
 from studyFlax.models.society import SocietyCalendarSync
+from studyFlax.models.groupwork.groupwork_model import GroupMembership
 from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
 
-PROTECTED_TAGS = {'other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'}
+PROTECTED_TAGS = {'other', 'lecture', 'deadline', 'exam', 'societies', 'schedule', 'group study'}
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -43,9 +44,10 @@ def get_tags(user):
 def ensure_user_system_tags(user):
     from studyFlax.views.calendar.system_tags import get_lecture_tag, get_deadline_tag
     from studyFlax.views.calendar.system_tags import get_exam_tag, get_schedule_tag, get_societies_tag
-    from studyFlax.views.calendar.system_tags import fix_untagged_deadline_events
+    from studyFlax.views.calendar.system_tags import get_group_study_tag, fix_untagged_deadline_events
     _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, fix_untagged_deadline_events)
     _ensure_society_tags(user, get_societies_tag)
+    _ensure_group_study_tag(user, get_group_study_tag)
     get_schedule_tag()
 
 def _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, fix_untagged_deadline_events):
@@ -60,6 +62,10 @@ def _ensure_society_tags(user, get_societies_tag):
     if has_society_syncs(user):
         get_societies_tag()
 
+def _ensure_group_study_tag(user, get_group_study_tag):
+    if has_group_memberships(user):
+        get_group_study_tag()
+
 def has_module_enrollments(user):
     """Return whether has module enrollments."""
     return Enrollment.objects.filter(student=user).exists()
@@ -67,6 +73,10 @@ def has_module_enrollments(user):
 def has_society_syncs(user):
     """Return whether has society syncs."""
     return SocietyCalendarSync.objects.filter(user=user).exists()
+
+def has_group_memberships(user):
+    """Return whether the user is a member of any group project."""
+    return GroupMembership.objects.filter(user=user).exists()
 
 def get_filtered_tags(user):
     tags = Tag.objects.filter(Q(user=user) | Q(is_default=True))
@@ -84,6 +94,8 @@ def get_tags_to_exclude(user):
         excludes.extend(['Lecture', 'Deadline', 'Exam'])
     if not has_society_syncs(user):
         excludes.append('Societies')
+    if not has_group_memberships(user):
+        excludes.append('Group Study')
     return excludes
 
 def get_user_tag(pk, user):

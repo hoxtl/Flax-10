@@ -1,6 +1,5 @@
-/**
- * eventUtils - Event type detection, filtering, and transformation utilities.
- * Handles recurring event IDs, read-only detection, and view-based filtering.
+/*
+ * Event type, visibility, and normalisation helpers for calendar entries.
  */
 
 import { overlapsDay } from './dateUtils';
@@ -31,7 +30,7 @@ export function hasRecurrence(event) {
     return hasDetails || hasRule || hasString;
 }
 
-/** Returns true if the event cannot be edited (module, society, or timetable). */
+/** Returns true if the event cannot be edited (module, society, timetable, or group meeting). */
 
 export function isReadOnlyEvent(event) {
     return getEventType(event) !== 'personal';
@@ -39,10 +38,11 @@ export function isReadOnlyEvent(event) {
 
 const FIXED_TAG_NAMES = new Set(['deadline', 'exam', 'assignment', 'lab', 'practical', 'lecture']);
 
-/** Returns the event source type: 'personal', 'society', 'module', or 'timetable'. */
+/** Returns the event source type: 'personal', 'society', 'module', 'timetable', or 'group_meeting'. */
 
 export function getEventType(event) {
     if (!event) return 'personal';
+    if (event.source === 'group_meeting') return 'group_meeting';
     if (event.source === 'society') return 'society';
     if (typeof event.source === 'string' && event.source.startsWith('module_')) return 'module';
     if (event.source === 'timetable') return 'timetable';
@@ -61,11 +61,37 @@ export function getEventType(event) {
 export function getEffectiveTagName(event) {
     if (!event) return 'other';
     if (event.source === 'society') return 'societies';
+    if (event.source === 'group_meeting') return 'group study';
 
     const tagName = event.tag_name || (typeof event.tag === 'object' ? event.tag?.name : null);
     if (!tagName) return 'other';
 
     return tagName.toLowerCase();
+}
+
+function getEventIdentity(event) {
+    if (event?.id !== undefined && event?.id !== null) return `${event.source || 'personal'}:${event.id}`;
+    if (event?.external_id) return `${event.source || 'external'}:${event.external_id}`;
+    return [event?.source || 'personal', event?.title || '', event?.location || '', event?.description || ''].join(':');
+}
+
+function getEventTimeKey(value) {
+    if (!value) return '';
+    const time = new Date(value);
+    return Number.isNaN(time.getTime()) ? String(value) : time.toISOString();
+}
+
+/** Removes duplicate event payload entries while preserving distinct occurrences. */
+
+export function dedupeEvents(events) {
+    if (!Array.isArray(events) || events.length <= 1) return Array.isArray(events) ? events : [];
+    const seen = new Set();
+    return events.filter((event) => {
+        const key = `${getEventIdentity(event)}:${getEventTimeKey(event?.start_time)}:${getEventTimeKey(event?.end_time)}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
 }
 
 function filterMonthEvents(events, selectedDate) {
