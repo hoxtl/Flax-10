@@ -5,7 +5,14 @@
 
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+
+const { useNotificationsMock } = vi.hoisted(() => ({
+  useNotificationsMock: vi.fn(() => ({
+    togglePanel: vi.fn(),
+    notifications: [],
+  })),
+}));
 
 // ── framer-motion mock ───────────────────────────────────────────────────────
 vi.mock("framer-motion", () => ({
@@ -80,10 +87,7 @@ vi.mock("../../../components/dashboard/components/ProfileDropdown", () => ({
 }));
 
 vi.mock("../../../context/NotificationContext", () => ({
-  useNotifications: () => ({
-    togglePanel: vi.fn(),
-    notifications: [],
-  }),
+  useNotifications: useNotificationsMock,
 }));
 
 vi.mock("../../../components/notifications/components/NotificationPanel", () => ({
@@ -91,7 +95,16 @@ vi.mock("../../../components/notifications/components/NotificationPanel", () => 
 }));
 
 vi.mock("../../../components/dashboard/components/ExpandableTabs", () => ({
-  ExpandableTabs: () => <div data-testid="expandable-tabs" />,
+  ExpandableTabs: ({ tabs = [], onChange }) => (
+    <div data-testid="expandable-tabs">
+      <button data-testid="notif-tab" onClick={() => onChange(0)}>
+        {tabs[0]?.title}:{tabs[0]?.badge ?? 0}
+      </button>
+      <button data-testid="notif-tab-deselect" onClick={() => onChange(null)}>
+        deselect
+      </button>
+    </div>
+  ),
 }));
 
 vi.mock("../../../components/dashboard/components/ThemeToggle", () => ({
@@ -103,9 +116,20 @@ vi.mock("../../../components/timer/components/MiniTimer", () => ({
 }));
 
 vi.mock("../../../components/common/animated_dropdown", () => ({
-  default: ({ customTrigger, options, onChange, value }) => (
+  default: ({ customTrigger, options, onChange, value, isOpen, onOpenChange }) => (
     <div data-testid="animated-dropdown">
-      {customTrigger}
+      {React.isValidElement(customTrigger)
+        ? React.cloneElement(customTrigger, {
+            isOpen,
+            onClick: () => onOpenChange?.(!isOpen),
+          })
+        : customTrigger}
+      <button
+        data-testid={`dropdown-close-${options[0]?.value || value || "menu"}`}
+        onClick={() => onOpenChange?.(false)}
+      >
+        close
+      </button>
       <div data-testid="dropdown-options">
         {options.map((opt, i) => (
           <button
@@ -156,6 +180,13 @@ function renderTopBar(props = {}) {
   return render(<TopBar {...defaults} />);
 }
 
+beforeEach(() => {
+  useNotificationsMock.mockReturnValue({
+    togglePanel: vi.fn(),
+    notifications: [],
+  });
+});
+
 // ── BrandLogo ─────────────────────────────────────────────────────────────────
 
 describe("BrandLogo", () => {
@@ -190,6 +221,54 @@ describe("NavDropdownTrigger via rendered TopBar", () => {
   it("renders Teaching section label for teacher users", () => {
     renderTopBar({ user: { role: "teacher" } });
     expect(screen.getByText("Teaching")).toBeInTheDocument();
+  });
+
+  it("opens on hover and closes when the dropdown requests it", async () => {
+    renderTopBar({ activeNav: "calendar" });
+
+    fireEvent.mouseEnter(screen.getByText("Plan").closest("[data-tour='calendar']"));
+    await waitFor(() => {
+      expect(
+        screen
+          .getAllByTestId("icon-chevron")
+          .some((icon) => icon.className.includes("chevronOpen")),
+      ).toBe(true);
+    });
+
+    fireEvent.click(screen.getByTestId("dropdown-close-calendar"));
+    await waitFor(() => {
+      expect(
+        screen
+          .getAllByTestId("icon-chevron")
+          .some((icon) => icon.className.includes("chevronOpen")),
+      ).toBe(false);
+    });
+  });
+
+  it("ignores direct dropdown open-change events when the menu is not already active", () => {
+    renderTopBar({ activeNav: "calendar" });
+
+    fireEvent.click(screen.getByText("Plan"));
+
+    expect(
+      screen
+        .getAllByTestId("icon-chevron")
+        .some((icon) => icon.className.includes("chevronOpen")),
+    ).toBe(false);
+  });
+
+  it("clears the active hover menu after mouse leave", () => {
+    vi.useFakeTimers();
+
+    renderTopBar({ activeNav: "calendar" });
+    fireEvent.mouseEnter(screen.getByText("Plan").closest("[data-tour='calendar']"));
+    fireEvent.mouseLeave(screen.getByRole("navigation"));
+    act(() => {
+      vi.advanceTimersByTime(151);
+    });
+
+    expect(document.querySelector(".chevronOpen")).not.toBeInTheDocument();
+    vi.useRealTimers();
   });
 });
 
@@ -312,5 +391,36 @@ describe("ToolsPill options", () => {
     renderTopBar({ user: { role: "student" }, onNavChange });
     fireEvent.click(screen.getByTestId("tool-calendar"));
     expect(onNavChange).toHaveBeenCalledWith("calendar");
+  });
+});
+
+describe("ActionPill and notifications", () => {
+  it("dispatches the quick-actions event when the shortcut button is clicked", () => {
+    const handler = vi.fn();
+    window.addEventListener("quick-actions:open", handler);
+
+    renderTopBar();
+    fireEvent.click(screen.getByRole("button", { name: /quick actions/i }));
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    window.removeEventListener("quick-actions:open", handler);
+  });
+
+  it("shows the unread badge and ignores null tab changes", () => {
+    const togglePanel = vi.fn();
+    useNotificationsMock.mockReturnValue({
+      togglePanel,
+      notifications: [{ read: false }, { read: true }],
+    });
+
+    renderTopBar();
+
+    expect(screen.getByTestId("notif-tab")).toHaveTextContent("Notifications:1");
+
+    fireEvent.click(screen.getByTestId("notif-tab-deselect"));
+    expect(togglePanel).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId("notif-tab"));
+    expect(togglePanel).toHaveBeenCalledTimes(1);
   });
 });
