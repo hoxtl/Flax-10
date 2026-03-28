@@ -41,8 +41,7 @@ describe("useOnboarding env fallback", () => {
     vi.unstubAllEnvs();
   });
 
-  it("uses the /api fallback and creates a stored user object when none exists", async () => {
-    const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+  it("constructs the correct fetch request using the /api fallback path", async () => {
     const { default: useOnboarding } = await import("../../../components/onboarding/hooks/useOnboarding");
     const { result } = renderHook(() => useOnboarding());
 
@@ -65,10 +64,27 @@ describe("useOnboarding env fallback", () => {
         }),
       }),
     );
+  });
+
+  it("creates a stored user object and fires completion events when no base user exists", async () => {
+    const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+    const { default: useOnboarding } = await import("../../../components/onboarding/hooks/useOnboarding");
+    const { result } = renderHook(() => useOnboarding());
+
+    act(() => {
+      result.current.setYear("2");
+      result.current.handleMajorChange("Math");
+      result.current.setConfirmed(true);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+
     expect(JSON.parse(localStorage.getItem("user"))).toEqual(
       expect.objectContaining({
-        year: "1",
-        major: "History",
+        year: "2",
+        major: "Math",
         has_completed_onboarding: true,
       }),
     );

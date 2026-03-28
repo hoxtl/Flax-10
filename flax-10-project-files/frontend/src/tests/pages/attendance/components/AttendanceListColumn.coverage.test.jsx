@@ -59,28 +59,30 @@ describe("AttendanceListColumn coverage", () => {
     expect(screen.getByLabelText("Loading attendance events")).toBeInTheDocument();
   });
 
-  it("shows the attended success toast when a segment item is toggled from missed to attended", async () => {
-    const handleToggleStatus = vi.fn().mockResolvedValue(undefined);
-
+  // Helper for setting up segment tests
+  function renderSegmentEvent(label, event, toggleMock) {
     render(
       <AttendanceListColumn
         model={{
-          selectedSegment: { chart: "overall", label: "Missed" },
-          segmentLabel: "Overall: Missed",
-          segmentEvents: [
-            {
-              id: 11,
-              title: "Lecture 11",
-              start_time: "2026-03-18T09:00:00Z",
-              event_type: "Lecture",
-              attended: false,
-            },
-          ],
-          handleToggleStatus,
+          selectedSegment: { chart: "overall", label: label },
+          segmentLabel: `Overall: ${label}`,
+          segmentEvents: [event],
+          handleToggleStatus: toggleMock,
           clearSegment: vi.fn(),
         }}
       />,
     );
+  }
+
+  it("shows the attended success toast when a segment item is toggled to attended", async () => {
+    const handleToggleStatus = vi.fn().mockResolvedValue(undefined);
+    renderSegmentEvent("Missed", {
+      id: 11,
+      title: "Lecture 11",
+      start_time: "2026-03-18T09:00:00Z",
+      event_type: "Lecture",
+       attended: false,
+    }, handleToggleStatus);
 
     fireEvent.click(screen.getByRole("button", { name: "Missed" }));
 
@@ -90,26 +92,13 @@ describe("AttendanceListColumn coverage", () => {
 
   it("shows an error toast when a segment toggle request fails", async () => {
     const handleToggleStatus = vi.fn().mockRejectedValue(new Error("nope"));
-
-    render(
-      <AttendanceListColumn
-        model={{
-          selectedSegment: { chart: "overall", label: "Attended" },
-          segmentLabel: "Overall: Attended",
-          segmentEvents: [
-            {
-              id: 12,
-              title: "Lecture 12",
-              start_time: "2026-03-19T09:00:00Z",
-              event_type: "Lecture",
-              attended: true,
-            },
-          ],
-          handleToggleStatus,
-          clearSegment: vi.fn(),
-        }}
-      />,
-    );
+    renderSegmentEvent("Attended", {
+      id: 12,
+      title: "Lecture 12",
+      start_time: "2026-03-19T09:00:00Z",
+      event_type: "Lecture",
+      attended: true,
+    }, handleToggleStatus);
 
     fireEvent.click(screen.getByRole("button", { name: "Attended" }));
 
