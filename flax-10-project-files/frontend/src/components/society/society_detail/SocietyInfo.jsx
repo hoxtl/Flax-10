@@ -13,13 +13,20 @@ import { SegmentedDivider, SegmentedSlot, SegmentedSlots } from "../../common";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../components/CategorySelector";
 
+function isSectionVisible(flag) {
+    return flag !== false;
+}
+
 function getInfoConfig(society, layout, className, showBio, showLocation, showMeta) {
-    const hasLocation = showLocation && Boolean(society.location);
+    const bioVisible = isSectionVisible(showBio);
+    const metaVisible = isSectionVisible(showMeta);
+    const locationVisible = isSectionVisible(showLocation);
+    const hasLocation = locationVisible && Boolean(society.location);
     return {
-        showBio,
+        showBio: bioVisible,
         hasLocation,
-        showMeta,
-        hasVisibleSections: showBio || hasLocation || showMeta,
+        showMeta: metaVisible,
+        hasVisibleSections: bioVisible || hasLocation || metaVisible,
         className: [styles.info, layout === "hero" ? styles.infoHero : "", className].filter(Boolean).join(" "),
     };
 }

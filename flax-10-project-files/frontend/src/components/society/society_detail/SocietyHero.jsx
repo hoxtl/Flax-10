@@ -78,7 +78,7 @@ function HeroUtilityBar({ hovered, editMode, onEditImages, actionContent }) {
 function EditLayer({ onClick }) {
     return (
         <button type="button" className={styles.editLayer} onClick={onClick}>
-            <span className={styles.editLabel}>Edit Cover Image</span>
+            <span className={styles.editLabel}>Click to Edit Cover Images</span>
         </button>
     );
 }

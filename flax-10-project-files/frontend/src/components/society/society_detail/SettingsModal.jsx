@@ -12,29 +12,27 @@ import StandardModal from "../../common/standard_modal/StandardModal";
 import HoldConfirmModal from "../../common/hold_confirm_modal/HoldConfirmModal";
 import { RatificationSection } from "./RatificationSection";
 
-/** Common logic for collaborator management updates. */
-
 async function syncCollaborator(user, members = [], onUpdate, onAdd) {
-  const existing = members.find(m => m.username?.toLowerCase() === user.username?.toLowerCase());
+  const existing = members.find((member) => member.username?.toLowerCase() === user.username?.toLowerCase());
   if (existing) return onUpdate?.(existing.user, "editor");
   return onAdd?.(user.username, "editor");
 }
 
-/** Hook to handle settings modal internal state. */
+function confirmSocietyDelete(onDelete, onClose, setShowDeleteConfirm) {
+  setShowDeleteConfirm(false);
+  onDelete?.();
+  onClose?.();
+}
 
-function useSettings(props) {
-  const { members, onFetchMembers, onUpdateRole, onAddCollaborator } = props;
+function useSettings({ members, onFetchMembers, onUpdateRole, onAddCollaborator }) {
   const [showAdd, setShowAdd] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   useEffect(() => { onFetchMembers?.(); }, [onFetchMembers]);
-
   const handleAdd = async (users) => {
-    for (const u of users) await syncCollaborator(u, members, onUpdateRole, onAddCollaborator);
+    await Promise.all(users.map((user) => syncCollaborator(user, members, onUpdateRole, onAddCollaborator)));
     await onFetchMembers?.();
   };
-
-  const collabs = (members || []).filter(m => m.role !== 'member');
-  return { showAdd, setShowAdd, showDeleteConfirm, setShowDeleteConfirm, handleAdd, collabs };
+  return { showAdd, setShowAdd, showDeleteConfirm, setShowDeleteConfirm, handleAdd, collabs: (members || []).filter((member) => member.role !== "member") };
 }
 
 function AddCollaboratorSection({ onOpen }) {
@@ -68,35 +66,33 @@ function DangerSection({ onDelete, onDone }) {
   );
 }
 
-export default function SettingsModal(props) {
-  const { onClose, onDelete, onUpdateRole, onRemoveMember, ratificationStatus, isRatified, onRequestRatification } = props;
-  const logic = useSettings(props);
-  const collabs = logic.collabs;
+function SettingsContent({ onClose, ratificationStatus, isRatified, onRequestRatification, collabs, onUpdateRole, onRemoveMember, onConfirmDelete, onShowAdd }) {
+  return (
+    <StandardModal title="Settings" onClose={onClose} size="sm" modalClassName={styles.modal}>
+      <RatificationSection status={ratificationStatus} isRatified={isRatified} onRequest={onRequestRatification} compact />
+      <AddCollaboratorSection onOpen={onShowAdd} />
+      <CollaboratorsSection collabs={collabs} onUpdate={onUpdateRole} onRemove={onRemoveMember} />
+      <DangerSection onDelete={onConfirmDelete} onDone={onClose} />
+    </StandardModal>
+  );
+}
+
+function SettingsOverlays({ collabs, showAdd, setShowAdd, showDeleteConfirm, setShowDeleteConfirm, handleAdd, onDelete, onClose }) {
   return (
     <>
-      <StandardModal title="Settings" onClose={onClose} size="sm" modalClassName={styles.modal}>
-        <RatificationSection status={ratificationStatus} isRatified={isRatified} onRequest={onRequestRatification} compact />
-        <AddCollaboratorSection onOpen={() => logic.setShowAdd(true)} />
-        <CollaboratorsSection collabs={collabs} onUpdate={onUpdateRole} onRemove={onRemoveMember} />
-        <DangerSection onDelete={() => logic.setShowDeleteConfirm(true)} onDone={onClose} />
-      </StandardModal>
-      {logic.showAdd && (
-        <AddCollaboratorModal
-          onClose={() => logic.setShowAdd(false)}
-          onAdd={logic.handleAdd}
-          existingUsernames={collabs.map((member) => member.username)}
-        />
-      )}
-      {logic.showDeleteConfirm && (
-        <HoldConfirmModal
-          title="Delete Society"
-          warningText="This will permanently delete this society and all of its linked content. This cannot be undone."
-          cancelLabel="Keep Society"
-          holdLabel="Hold to Delete"
-          onCancel={() => logic.setShowDeleteConfirm(false)}
-          onConfirm={() => { logic.setShowDeleteConfirm(false); onDelete?.(); onClose?.(); }}
-        />
-      )}
+      {showAdd && <AddCollaboratorModal onClose={() => setShowAdd(false)} onAdd={handleAdd} existingUsernames={(collabs || []).map((member) => member.username)} />}
+      {showDeleteConfirm && <HoldConfirmModal title="Delete Society" warningText="This will permanently delete this society and all of its linked content. This cannot be undone." cancelLabel="Keep Society" holdLabel="Hold to Delete" onCancel={() => setShowDeleteConfirm(false)} onConfirm={() => confirmSocietyDelete(onDelete, onClose, setShowDeleteConfirm)} />}
+    </>
+  );
+}
+
+/** Presents society admin settings for collaborators, ratification, and deletion. */
+export default function SettingsModal(props) {
+  const logic = useSettings(props);
+  return (
+    <>
+      <SettingsContent onClose={props.onClose} ratificationStatus={props.ratificationStatus} isRatified={props.isRatified} onRequestRatification={props.onRequestRatification} collabs={logic.collabs} onUpdateRole={props.onUpdateRole} onRemoveMember={props.onRemoveMember} onConfirmDelete={() => logic.setShowDeleteConfirm(true)} onShowAdd={() => logic.setShowAdd(true)} />
+      <SettingsOverlays collabs={logic.collabs} showAdd={logic.showAdd} setShowAdd={logic.setShowAdd} showDeleteConfirm={logic.showDeleteConfirm} setShowDeleteConfirm={logic.setShowDeleteConfirm} handleAdd={logic.handleAdd} onDelete={props.onDelete} onClose={props.onClose} />
     </>
   );
 }

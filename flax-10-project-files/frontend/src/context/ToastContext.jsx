@@ -42,29 +42,21 @@ function useToastState() {
   return { toast, closeToast, showToast };
 }
 
-export function ToastProvider({ children }) {
-  const { toast, closeToast, showToast } = useToastState();
-  return (
-    <ToastContext.Provider value={showToast}>
-      {children}
-      <AnimatePresence initial={false}>
-        {toast && (
-          <AppToast
-            title={toast.title}
-            message={toast.message}
-            description={toast.description}
-            actionLabel={toast.actionLabel}
-            onAction={toast.onAction}
-            variant={toast.variant}
-            icon={toast.icon}
-            onClose={closeToast}
-          />
-        )}
-      </AnimatePresence>
-    </ToastContext.Provider>
-  );
+function ToastBody({ toast, onClose }) {
+  return <AppToast title={toast.title} message={toast.message} description={toast.description} actionLabel={toast.actionLabel} onAction={toast.onAction} variant={toast.variant} icon={toast.icon} onClose={onClose} />;
 }
 
+function ToastRenderer({ toast, onClose }) {
+  return <AnimatePresence initial={false}>{toast && <ToastBody toast={toast} onClose={onClose} />}</AnimatePresence>;
+}
+
+/** Provides the shared toast dispatcher for the app tree. */
+export function ToastProvider({ children }) {
+  const { toast, closeToast, showToast } = useToastState();
+  return <ToastContext.Provider value={showToast}>{children}<ToastRenderer toast={toast} onClose={closeToast} /></ToastContext.Provider>;
+}
+
+/** Returns the toast dispatcher from the nearest provider. */
 export function useToast() {
   return useContext(ToastContext);
 }

@@ -11,43 +11,23 @@ import { usePagination } from "../../../hooks/usePagination";
 
 const PAGE_SIZE = 15;
 
+/** Renders society browse cards with pagination and empty states. */
 export function SocietyBrowseResults({ items, search, setSearch, onClear, onSelect, onReport, onUnreport }) {
-    if (!items.length) {
-        return <BrowseEmptyState search={search} onClear={onClear || (() => setSearch(""))} />;
-    }
-
-    return (
-        <PaginatedResults
-            items={items}
-            onSelect={onSelect}
-            onReport={onReport}
-            onUnreport={onUnreport}
-        />
-    );
+    if (!items.length) return <BrowseEmptyState search={search} onClear={onClear || (() => setSearch(""))} />;
+    return <PaginatedResults items={items} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />;
 }
 
 function BrowseEmptyState({ search, onClear }) {
     const trimmedSearch = search.trim();
+    return trimmedSearch ? <SearchBrowseEmptyState search={trimmedSearch} onClear={onClear} /> : <DefaultBrowseEmptyState />;
+}
 
-    if (!trimmedSearch) {
-        return (
-            <EmptyState
-                title="No societies found"
-                description="Try adjusting your search or filters."
-            />
-        );
-    }
+function DefaultBrowseEmptyState() {
+    return <EmptyState title="No societies found" description="Try adjusting your search or filters." />;
+}
 
-    return (
-        <SearchEmptyState
-            query={trimmedSearch}
-            itemLabel="societies"
-            hint="Try adjusting your search or filters"
-            alwaysShowClear
-            clearLabel="Clear all"
-            onClear={onClear}
-        />
-    );
+function SearchBrowseEmptyState({ search, onClear }) {
+    return <SearchEmptyState query={search} itemLabel="societies" hint="Try adjusting your search or filters" alwaysShowClear clearLabel="Clear all" onClear={onClear} />;
 }
 
 function PaginatedResults({ items, onSelect, onReport, onUnreport }) {
@@ -62,17 +42,5 @@ function PaginatedResults({ items, onSelect, onReport, onUnreport }) {
 }
 
 function ResultsGrid({ items, onSelect, onReport, onUnreport }) {
-    return (
-        <div className={gridStyles.grid}>
-            {items.map((society) => (
-                <SocietyCard
-                    key={society.id}
-                    society={society}
-                    onClick={onSelect}
-                    onReport={onReport}
-                    onUnreport={onUnreport}
-                />
-            ))}
-        </div>
-    );
+    return <div className={gridStyles.grid}>{items.map((society) => <SocietyCard key={society.id} society={society} onClick={onSelect} onReport={onReport} onUnreport={onUnreport} />)}</div>;
 }

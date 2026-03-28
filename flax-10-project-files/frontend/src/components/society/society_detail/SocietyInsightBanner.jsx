@@ -207,13 +207,13 @@ async function loadSocietyInsightData() {
   return Promise.allSettled([analyticsApi.getSummary(30), getModules(), getEnrollments()]);
 }
 
-function getInsightParams(res, society) {
-  const [a, m, e] = res;
+function getInsightParams(results, society) {
+  const [analyticsResult, modulesResult, enrollmentsResult] = results;
   return {
-    analytics: getFulfilledValue(a, null),
+    analytics: getFulfilledValue(analyticsResult, null),
     events: getUpcomingEvents(society),
-    modules: getEnrolledModules(getFulfilledValue(m, []), getFulfilledValue(e, [])),
-    moduleContextAvailable: m.status === "fulfilled" && e.status === "fulfilled",
+    modules: getEnrolledModules(getFulfilledValue(modulesResult, []), getFulfilledValue(enrollmentsResult, [])),
+    moduleContextAvailable: modulesResult.status === "fulfilled" && enrollmentsResult.status === "fulfilled",
   };
 }
 
@@ -221,7 +221,7 @@ function InsightText({ insight }) {
   if (!insight.highlight || !insight.description.includes(insight.highlight)) {
     return (
       <>
-        <strong>{insight.title}</strong> — {insight.description}
+        <strong>{insight.title}</strong> - {insight.description}
       </>
     );
   }
@@ -229,7 +229,7 @@ function InsightText({ insight }) {
   const [before, after] = insight.description.split(insight.highlight, 2);
   return (
     <>
-      <strong>{insight.title}</strong> — {before}
+      <strong>{insight.title}</strong> - {before}
       <span className={styles.highlight}>{insight.highlight}</span>
       {after}
     </>
@@ -238,39 +238,43 @@ function InsightText({ insight }) {
 
 function useSocietyInsight(society) {
   const [insight, setInsight] = useState(null);
-  const sig = useMemo(() => (society?.events || []).map((ev) => `${ev.id}:${ev.start_time}:${ev.end_time}`).join("|"), [society?.events]);
+  const signature = useMemo(() => (society?.events || []).map((event) => `${event.id}:${event.start_time}:${event.end_time}`).join("|"), [society?.events]);
   useEffect(() => {
     let cancelled = false;
-    loadSocietyInsightData().then((res) => {
-      if (!cancelled) setInsight(buildInsight(getInsightParams(res, society)));
+    loadSocietyInsightData().then((results) => {
+      if (!cancelled) setInsight(buildInsight(getInsightParams(results, society)));
     }).catch(() => {
       if (!cancelled) setInsight(buildInsight({ analytics: null, events: getUpcomingEvents(society), modules: [], moduleContextAvailable: false }));
     });
     return () => { cancelled = true; };
-  }, [society?.id, sig]);
+  }, [society?.id, signature]);
   return insight;
 }
 
-export default function SocietyInsightBanner({ society }) {
-  const insight = useSocietyInsight(society);
-  const navigate = useNavigate();
-  if (!insight) return null;
+function InsightActions({ insight, navigate }) {
+  return (
+    <div className={styles.actions}>
+      <PrimaryButton size="small" pill onClick={() => navigate(insight.primary.to)}>{insight.primary.label}</PrimaryButton>
+      <PrimaryButton size="small" pill variant="secondary" onClick={() => navigate(insight.secondary.to)}>{insight.secondary.label}</PrimaryButton>
+    </div>
+  );
+}
 
+function InsightBannerLayout({ insight, navigate }) {
   const Icon = insight.icon;
   return (
     <div className={`${styles.banner} ${styles[insight.tone]}`} aria-live="polite">
       <Icon className={styles.icon} size={17} strokeWidth={2.1} />
-      <span className={styles.text}>
-        <InsightText insight={insight} />
-      </span>
-      <div className={styles.actions}>
-        <PrimaryButton size="small" pill onClick={() => navigate(insight.primary.to)}>
-          {insight.primary.label}
-        </PrimaryButton>
-        <PrimaryButton size="small" pill variant="secondary" onClick={() => navigate(insight.secondary.to)}>
-          {insight.secondary.label}
-        </PrimaryButton>
-      </div>
+      <span className={styles.text}><InsightText insight={insight} /></span>
+      <InsightActions insight={insight} navigate={navigate} />
     </div>
   );
+}
+
+/** Shows a personalised timing insight for the current society. */
+export default function SocietyInsightBanner({ society }) {
+  const insight = useSocietyInsight(society);
+  const navigate = useNavigate();
+  if (!insight) return null;
+  return <InsightBannerLayout insight={insight} navigate={navigate} />;
 }
