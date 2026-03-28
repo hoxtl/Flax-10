@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for shared animated dropdown support components.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -15,6 +18,14 @@ vi.mock("framer-motion", () => ({
 
 import AnimatedDropdown from "../../../../components/common/animated_dropdown";
 import ScrollToTop from "../../../../components/common/scroll_to_top/ScrollToTop";
+
+function renderScrollToTop(props = {}) {
+  return render(
+    <MemoryRouter initialEntries={["/tasks"]}>
+      <ScrollToTop {...props} />
+    </MemoryRouter>,
+  );
+}
 
 describe("common coverage topups", () => {
   afterEach(() => {
@@ -41,61 +52,37 @@ describe("common coverage topups", () => {
     expect(screen.getAllByText("Beta")[1].closest("button")?.className).toContain("dropdownItemActive");
   });
 
-  it("prefers explicit scroll containers and dashboard-main-content fallbacks", async () => {
+  it("prefers explicit scroll containers", () => {
     const scrollToMock = vi.fn();
     window.scrollTo = scrollToMock;
-
     const selected = document.createElement("div");
     selected.className = "selected-container";
     selected.scrollTop = 45;
     document.body.appendChild(selected);
+    renderScrollToTop({ containerSelector: ".selected-container" });
+    expect(scrollToMock).toHaveBeenCalledWith(0, 0);
+    expect(selected.scrollTop).toBe(0);
+  });
 
+  it("falls back to dashboard-main-content containers", () => {
     const fallback = document.createElement("div");
     fallback.setAttribute("data-dashboard-main-content", "true");
     fallback.scrollTop = 75;
     document.body.appendChild(fallback);
-
-    render(
-      <MemoryRouter initialEntries={["/tasks"]}>
-        <ScrollToTop containerSelector=".selected-container" />
-      </MemoryRouter>,
-    );
-    expect(scrollToMock).toHaveBeenCalledWith(0, 0);
-    expect(selected.scrollTop).toBe(0);
-
-    document.body.removeChild(selected);
-    render(
-      <MemoryRouter initialEntries={["/tasks"]}>
-        <ScrollToTop />
-      </MemoryRouter>,
-    );
+    renderScrollToTop();
     expect(fallback.scrollTop).toBe(0);
   });
 
-  it("falls back to dashboard-main containers and window-only scrolling", () => {
+  it("falls back to dashboard-main containers and window scrolling", () => {
     const scrollToMock = vi.fn();
     window.scrollTo = scrollToMock;
-
-    const dashboardMain = document.createElement("div");
-    dashboardMain.setAttribute("data-dashboard-main", "true");
-    dashboardMain.scrollTop = 32;
-    document.body.appendChild(dashboardMain);
-
-    render(
-      <MemoryRouter initialEntries={["/tasks"]}>
-        <ScrollToTop />
-      </MemoryRouter>,
-    );
-
-    expect(dashboardMain.scrollTop).toBe(0);
-    document.body.removeChild(dashboardMain);
-
-    render(
-      <MemoryRouter initialEntries={["/tasks"]}>
-        <ScrollToTop />
-      </MemoryRouter>,
-    );
-
+    const fallback = document.createElement("div");
+    fallback.setAttribute("data-dashboard-main", "true");
+    fallback.scrollTop = 32;
+    document.body.appendChild(fallback);
+    expect(fallback.scrollTop).toBe(0);
+    document.body.removeChild(fallback);
+    renderScrollToTop();
     expect(scrollToMock).toHaveBeenCalledWith(0, 0);
   });
 });

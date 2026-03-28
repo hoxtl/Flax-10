@@ -25,7 +25,7 @@ describe("module hook extras", () => {
     vi.clearAllMocks();
   });
 
-  it("covers module sorting pagination, toggles, sort changes, and filter clearing", async () => {
+  it("initialises with defaults and paginates correctly", async () => {
     const modules = Array.from({ length: 20 }, (_, index) => ({ id: index + 1, module_code: `CS${index + 1}` }));
     applyFiltersAndSort.mockImplementation((items, selectedCourses, sortBy) =>
       items.map((item) => ({ ...item, selectedCourses, sortBy })),
@@ -38,15 +38,22 @@ describe("module hook extras", () => {
     expect(result.current.totalPages).toBe(2);
     expect(result.current.pageModules).toHaveLength(15);
 
+    result.current.setCurrentPage(2);
+    await waitFor(() => {
+      expect(result.current.pageModules).toHaveLength(5);
+    });
+  });
+
+  it("toggles courses and resets page on sort change", async () => {
+    const modules = Array.from({ length: 20 }, (_, index) => ({ id: index + 1, module_code: `CS${index + 1}` }));
+    applyFiltersAndSort.mockImplementation((items, sc, sb) => items.map((item) => ({ ...item, sc, sb })));
+
+    const { result } = renderHook(() => useModuleSorting(modules));
+
     result.current.toggleCourse("Computer Science");
     await waitFor(() => {
       expect(result.current.selectedCourses).toEqual(["Computer Science"]);
       expect(result.current.currentPage).toBe(1);
-    });
-
-    result.current.setCurrentPage(2);
-    await waitFor(() => {
-      expect(result.current.pageModules).toHaveLength(5);
     });
 
     result.current.toggleCourse("Computer Science");
@@ -56,6 +63,13 @@ describe("module hook extras", () => {
       expect(result.current.sortBy).toBe("recent");
       expect(result.current.currentPage).toBe(1);
     });
+  });
+
+  it("clears filters and resets page", async () => {
+    const modules = Array.from({ length: 20 }, (_, index) => ({ id: index + 1, module_code: `CS${index + 1}` }));
+    applyFiltersAndSort.mockImplementation((items, sc, sb) => items.map((item) => ({ ...item, sc, sb })));
+
+    const { result } = renderHook(() => useModuleSorting(modules));
 
     result.current.toggleCourse("Maths");
     result.current.clearFilters();

@@ -45,32 +45,26 @@ describe("StatStrip", () => {
     expect(screen.getByText("Upcoming project deadline")).toBeInTheDocument();
   });
 
-  it("renders interactive link and button items, forwarded refs, separators, and layout classes", () => {
+  const interactiveItems = (onClick, valueRef = { current: null }) => [
+    { key: "nav", label: "Open", value: 3, to: "/projects", ariaLabel: "Open projects", tone: "accent", valueClassName: "accent-value" },
+    { key: "cta", label: "Refresh", value: "!", onClick, tooltip: "Refresh data", tooltipPosition: "bottom" },
+    { key: "ref", label: "Live", value: 7, valueRef },
+  ];
+
+  it("renders interactive link and layout classes", () => {
+    render(<MemoryRouter><StatStrip compact bare nowrap items={interactiveItems(vi.fn())} /></MemoryRouter>);
+    expect(screen.getByRole("link", { name: "Open projects" })).toHaveAttribute("href", "/projects");
+    expect(screen.getByText("0")).toBeInTheDocument();
+    expect(document.querySelectorAll("[aria-hidden='true']")).toHaveLength(2);
+  });
+
+  it("renders interactive buttons, forwarded refs, and tooltips", () => {
     const onClick = vi.fn();
     const valueRef = { current: null };
-
-    render(
-      <MemoryRouter>
-        <StatStrip
-          compact
-          bare
-          nowrap
-          items={[
-            { key: "nav", label: "Open", value: 3, to: "/projects", ariaLabel: "Open projects", tone: "accent", valueClassName: "accent-value" },
-            { key: "cta", label: "Refresh", value: "!", onClick, tooltip: "Refresh data", tooltipPosition: "bottom" },
-            { key: "ref", label: "Live", value: 7, valueRef },
-          ]}
-        />
-      </MemoryRouter>,
-    );
-
-    expect(screen.getByRole("link", { name: "Open projects" })).toHaveAttribute("href", "/projects");
+    render(<MemoryRouter><StatStrip compact bare nowrap items={interactiveItems(onClick, valueRef)} /></MemoryRouter>);
     expect(screen.getByRole("button", { name: "Refresh data" })).toBeInTheDocument();
-    expect(screen.getByText("0")).toBeInTheDocument();
     expect(valueRef.current).toBeTruthy();
     expect(screen.getAllByText("Refresh data")).toHaveLength(1);
-    expect(document.querySelectorAll("[aria-hidden='true']")).toHaveLength(2);
-
     screen.getByRole("button", { name: "Refresh data" }).click();
     expect(onClick).toHaveBeenCalledTimes(1);
   });

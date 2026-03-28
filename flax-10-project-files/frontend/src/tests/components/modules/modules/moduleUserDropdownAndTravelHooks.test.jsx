@@ -70,7 +70,7 @@ describe("Module extras", () => {
     expect(screen.getByText("Loading modules...")).toBeInTheDocument();
   });
 
-  it("supports none option, custom placeholder, and label fallbacks", () => {
+  it("supports the none option and custom placeholder classes", () => {
     const onChange = vi.fn();
     useModulesMock.mockReturnValueOnce({
       enrollments: [
@@ -90,7 +90,6 @@ describe("Module extras", () => {
         triggerClassName="trigger-shell"
       />,
     );
-
     expect(screen.getByText("None|CS101|History of Art")).toBeInTheDocument();
     expect(screen.getByTestId("placeholder")).toHaveTextContent("Pick one");
     expect(screen.getByTestId("className")).toHaveTextContent("outer-shell");

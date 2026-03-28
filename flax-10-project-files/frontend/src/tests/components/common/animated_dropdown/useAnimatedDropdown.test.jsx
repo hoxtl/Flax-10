@@ -9,6 +9,16 @@ const groupedOptions = [
   { label: "Letters", options: [{ value: "a", label: "Alpha" }, { value: "b", label: "Beta" }] },
   { label: "Numbers", options: [{ value: "1", label: "One" }] },
 ];
+const defaultDirectionProps = {
+  options: [{ value: "a", label: "Alpha" }],
+  grouped: false,
+  placeholder: "Choose",
+  value: "a",
+  onChange: vi.fn(),
+  openOnHover: false,
+  isOpen: false,
+  onOpenChange: vi.fn(),
+};
 
 const renderUncontrolledDropdown = (overrides = {}) => {
   const props = {
@@ -184,29 +194,13 @@ describe("useAnimatedDropdownState", () => {
     });
 
     it("uses default open-direction settings when optional props are omitted", () => {
-      const props = {
-        options: [{ value: "a", label: "Alpha" }],
-        grouped: false,
-        placeholder: "Choose",
-        value: "a",
-        onChange: vi.fn(),
-        openOnHover: false,
-        isOpen: false,
-        onOpenChange: vi.fn(),
-      };
-
-      const { result, rerender } = renderHook((hookProps) => useAnimatedDropdownState(hookProps), {
-        initialProps: props,
-      });
-
+      const { result, rerender } = renderHook((hookProps) => useAnimatedDropdownState(hookProps), { initialProps: defaultDirectionProps });
       act(() => {
         result.current.containerRef.current = {
           getBoundingClientRect: () => ({ top: 120, bottom: 160, left: 40, width: 150 }),
         };
       });
-
-      rerender({ ...props, isOpen: true });
-
+      rerender({ ...defaultDirectionProps, isOpen: true });
       expect(result.current.openUpward).toBe(false);
       expect(result.current.coords).toEqual({ top: 160, left: 40, width: 150 });
     });

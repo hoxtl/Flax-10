@@ -84,6 +84,27 @@ describe('DateTimePicker parts', () => {
     vi.restoreAllMocks();
   });
 
+  const unrestrictedDropdownProps = {
+    ref: null,
+    pos: { top: 4, left: 6 },
+    dateOnly: false,
+    timeOnly: false,
+    setOpen: vi.fn(),
+    selectDay: vi.fn(),
+    viewM: 2,
+    viewY: 2026,
+    prevMonth: vi.fn(),
+    nextMonth: vi.fn(),
+    days: [null, 5],
+    isToday: () => false,
+    isSel: () => false,
+    isDisabled: () => false,
+    hour: 1,
+    minute: 2,
+    changeHour: vi.fn(),
+    changeMinute: vi.fn(),
+  };
+
   it('renders trigger button and handles keyboard events', () => {
     const setOpen = createStateSetter(false), setSelDate = vi.fn(), onChange = vi.fn();
     const props = { open: false, setOpen, selDate: new Date('2026-03-12T09:05:00'), timeOnly: false, dateOnly: false, placeholder: 'Pick', setSelDate, onChange, hideIcon: true };
@@ -212,30 +233,10 @@ describe('DateTimePicker parts', () => {
   });
 
   it('renders calendar and time sections together when not restricted', () => {
-    const props = {
-      ref: null,
-      pos: { top: 4, left: 6 },
-      dateOnly: false,
-      timeOnly: false,
-      setOpen: vi.fn(),
-      selectDay: vi.fn(),
-      viewM: 2,
-      viewY: 2026,
-      prevMonth: vi.fn(),
-      nextMonth: vi.fn(),
-      days: [null, 5],
-      isToday: () => false,
-      isSel: () => false,
-      isDisabled: () => false,
-      hour: 1,
-      minute: 2,
-      changeHour: vi.fn(),
-      changeMinute: vi.fn(),
-    };
-    render(<DropdownPanel {...props} />);
+    render(<DropdownPanel {...unrestrictedDropdownProps} />);
     expect(screen.getByTestId('dd-HH')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: '5' }));
-    expect(props.selectDay).toHaveBeenCalledWith(5);
-    expect(props.setOpen).not.toHaveBeenCalled();
+    expect(unrestrictedDropdownProps.selectDay).toHaveBeenCalledWith(5);
+    expect(unrestrictedDropdownProps.setOpen).not.toHaveBeenCalled();
   });
 });

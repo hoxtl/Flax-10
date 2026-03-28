@@ -1,3 +1,7 @@
+/*
+ * Shared helpers for app tour component tests.
+ */
+
 import { createElement } from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
@@ -40,36 +44,46 @@ export function findClassFragment(fragment) {
     .find((element) => String(element.className || "").includes(fragment));
 }
 
+export async function flushTour(ms = 10) {
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  });
+}
+
+export async function clickTourButton(name) {
+  fireEvent.click(screen.getByRole("button", { name }));
+  await flushTour();
+}
+
+export async function clickTourText(text) {
+  fireEvent.click(screen.getByText(text));
+  await flushTour();
+}
+
+export async function pressTourKey(keyName) {
+  fireEvent.keyDown(window, { key: keyName });
+  await flushTour();
+}
+
+export async function advanceTourSteps(count = TOTAL_STEPS - 1) {
+  for (let index = 0; index < count; index += 1) {
+    await clickTourButton(/next|finish/i);
+  }
+}
+
+export async function completeRenderedTour() {
+  await advanceTourSteps();
+  await clickTourButton(/next|finish/i);
+}
+
 export function renderAppTour(options = {}) {
   const { targets, onDone = vi.fn() } = options;
   if (targets) mockTourTargets(targets);
   const utils = render(createElement(AppTour, { onDone }));
-  const flush = async (ms = 10) => {
-    await act(async () => { await new Promise(r => setTimeout(r, ms)); });
-  };
-  const next = async () => {
-    fireEvent.click(screen.getByRole("button", { name: /next|finish/i }));
-    await flush();
-  };
-  const back = async () => {
-    fireEvent.click(screen.getByText("Back"));
-    await flush();
-  };
-  const jumpTo = async (index) => {
-    fireEvent.click(screen.getByRole("button", { name: new RegExp(`^Go to step ${index + 1}`) }));
-    await flush();
-  };
-  const key = async (keyName) => {
-    fireEvent.keyDown(window, { key: keyName });
-    await flush();
-  };
+  const next = () => clickTourButton(/next|finish/i);
+  const back = () => clickTourText("Back");
+  const jumpTo = (index) => clickTourButton(new RegExp(`^Go to step ${index + 1}`));
+  const key = (keyName) => pressTourKey(keyName);
   const skip = () => fireEvent.click(screen.getByText("Skip tour"));
-  const advanceToFinalStep = async () => {
-    for (let i = 0; i < TOTAL_STEPS - 1; i += 1) await next();
-  };
-  const completeTour = async () => {
-    await advanceToFinalStep();
-    await next();
-  };
-  return { ...utils, onDone, next, back, jumpTo, key, skip, advanceToFinalStep, completeTour, flush };
+  return { ...utils, onDone, next, back, jumpTo, key, skip, advanceToFinalStep: advanceTourSteps, completeTour: completeRenderedTour, flush: flushTour };
 }

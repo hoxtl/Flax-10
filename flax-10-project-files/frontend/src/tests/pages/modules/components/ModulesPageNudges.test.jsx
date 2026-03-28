@@ -53,29 +53,33 @@ describe("ModulesPageNudges", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("uses deadline-title and due-date fallbacks, then hides nudges after they are dismissed", () => {
+  const fallbackNudgeProps = {
+    deadlines: [{ id: 7, title: "Fallback title", start_due_date: "deadline-date" }],
+    readings: [{ id: 9, title: "Reading fallback", due_date: "reading-date" }],
+  };
+
+  it("uses deadline-title and due-date fallbacks", () => {
     getDayCountMock.mockImplementation((value) => {
       if (value === "reading-date") return 0;
       if (value === "deadline-date") return 2;
       return 20;
     });
-
     const onReadingAdded = vi.fn();
-
-    render(
-      <SmartNudge
-        deadlines={[{ id: 7, title: "Fallback title", start_due_date: "deadline-date" }]}
-        readings={[{ id: 9, title: "Reading fallback", due_date: "reading-date" }]}
-        onReadingAdded={onReadingAdded}
-      />
-    );
-
+    render(<SmartNudge {...fallbackNudgeProps} onReadingAdded={onReadingAdded} />);
     expect(screen.getByText(/Reading fallback/)).toBeInTheDocument();
-
     fireEvent.click(screen.getByText("Add reading"));
     expect(onReadingAdded).toHaveBeenCalledWith(9);
     expect(screen.getByText(/Fallback title/)).toBeInTheDocument();
+  });
 
+  it("hides nudges after they are dismissed", () => {
+    getDayCountMock.mockImplementation((value) => {
+      if (value === "reading-date") return 0;
+      if (value === "deadline-date") return 2;
+      return 20;
+    });
+    render(<SmartNudge {...fallbackNudgeProps} onReadingAdded={vi.fn()} />);
+    fireEvent.click(screen.getByText("Add reading"));
     fireEvent.click(screen.getByText("Add deadline"));
     expect(screen.queryByText(/Fallback title/)).not.toBeInTheDocument();
   });

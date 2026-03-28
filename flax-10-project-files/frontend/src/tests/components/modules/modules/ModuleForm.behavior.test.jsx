@@ -85,6 +85,19 @@ vi.mock("../../../../components/modules/modules/ModuleForm.module.css", () => ({
 
 import ModuleForm from "../../../../components/modules/modules/ModuleForm";
 
+async function fillCreateForm() {
+  fireEvent.change(screen.getByLabelText("Select a department..."), { target: { value: "Engineering" } });
+  await waitFor(() => expect(screen.getByLabelText("Select a course...")).toBeInTheDocument());
+  fireEvent.change(screen.getByLabelText("Select a course..."), { target: { value: "Mechanical Engineering" } });
+  fireEvent.change(screen.getByPlaceholderText("e.g., 5CCS2SEG"), { target: { value: "CS101" } });
+  fireEvent.change(screen.getByPlaceholderText("e.g., Software Engineering"), { target: { value: "Software Engineering" } });
+  fireEvent.change(screen.getByPlaceholderText("Brief description of the module..."), { target: { value: "Core systems module" } });
+  fireEvent.change(screen.getByPlaceholderText("e.g., Bush House, 2.09"), { target: { value: "Bush House" } });
+  fireEvent.change(screen.getAllByLabelText("Pick date & time")[0], { target: { value: "2026-04-01T09:00" } });
+  fireEvent.change(screen.getAllByLabelText("Pick date & time")[1], { target: { value: "2026-04-01T11:00" } });
+  fireEvent.click(screen.getByRole("checkbox"));
+}
+
 describe("ModuleForm coverage top-up", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -93,86 +106,40 @@ describe("ModuleForm coverage top-up", () => {
     updateModuleMock.mockResolvedValue({ id: 7, saved: true });
   });
 
-  it("covers the create flow handlers for dropdowns, text inputs, time pickers, and recurring toggle", async () => {
-    const onSuccess = vi.fn();
-
-    render(<ModuleForm onSuccess={onSuccess} onCancel={vi.fn()} />);
+  it("renders create-mode heading, description text, and initial department placeholder", () => {
+    render(<ModuleForm onSuccess={vi.fn()} onCancel={vi.fn()} />);
 
     expect(screen.getByText("Create New Module")).toBeInTheDocument();
     expect(screen.getByText("Fill in the details to create a new module")).toBeInTheDocument();
     expect(screen.getByLabelText("Select a department first")).toBeInTheDocument();
+  });
 
-    fireEvent.change(screen.getByLabelText("Select a department..."), {
-      target: { value: "Engineering" },
-    });
-
-    await waitFor(() => {
-      expect(screen.getByLabelText("Select a course...")).toBeInTheDocument();
-    });
-
-    fireEvent.change(screen.getByLabelText("Select a course..."), {
-      target: { value: "Mechanical Engineering" },
-    });
-
-    fireEvent.change(screen.getByPlaceholderText("e.g., 5CCS2SEG"), {
-      target: { value: "CS101" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("e.g., Software Engineering"), {
-      target: { value: "Software Engineering" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Brief description of the module..."), {
-      target: { value: "Core systems module" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("e.g., Bush House, 2.09"), {
-      target: { value: "Bush House" },
-    });
-    fireEvent.change(screen.getAllByLabelText("Pick date & time")[0], {
-      target: { value: "2026-04-01T09:00" },
-    });
-    fireEvent.change(screen.getAllByLabelText("Pick date & time")[1], {
-      target: { value: "2026-04-01T11:00" },
-    });
-    fireEvent.click(screen.getByRole("checkbox"));
+  it("submits the create form with all fields filled and calls onSuccess", async () => {
+    const onSuccess = vi.fn();
+    render(<ModuleForm onSuccess={onSuccess} onCancel={vi.fn()} />);
+    await fillCreateForm();
     fireEvent.submit(document.querySelector("form"));
-
     await waitFor(() => {
       expect(createModuleMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          department: "Engineering",
-          course: "Mechanical Engineering",
-          module_code: "CS101",
-          module_name: "Software Engineering",
-          description: "Core systems module",
-          location: "Bush House",
-          start_time: "2026-04-01T09:00",
-          end_time: "2026-04-01T11:00",
-          is_recurring: true,
+          department: "Engineering", course: "Mechanical Engineering",
+          module_code: "CS101", module_name: "Software Engineering",
+          description: "Core systems module", location: "Bush House",
+          start_time: "2026-04-01T09:00", end_time: "2026-04-01T11:00", is_recurring: true,
         }),
       );
     });
-
     expect(onSuccess).toHaveBeenCalledWith({ id: 99, saved: true }, true);
   });
 
   it("renders locked department, course, and module code fields while editing", async () => {
-    render(
-      <ModuleForm
-        module={{
-          id: 7,
-          department: "Engineering",
-          course: "Mechanical Engineering",
-          module_code: "CS101",
-          module_name: "Software Engineering",
-          description: "Core systems module",
-          location: "Bush House",
-          start_time: "2026-04-01T09:00",
-          end_time: "2026-04-01T11:00",
-          is_recurring: false,
-        }}
-        onSuccess={vi.fn()}
-        onCancel={vi.fn()}
-      />,
-    );
+    const existingModule = {
+      id: 7, department: "Engineering", course: "Mechanical Engineering",
+      module_code: "CS101", module_name: "Software Engineering",
+      description: "Core systems module", location: "Bush House",
+      start_time: "2026-04-01T09:00", end_time: "2026-04-01T11:00", is_recurring: false,
+    };
+    render(<ModuleForm module={existingModule} onSuccess={vi.fn()} onCancel={vi.fn()} />);
 
     expect(screen.getByText("Edit Module")).toBeInTheDocument();
     expect(screen.getByText("Update the module details below")).toBeInTheDocument();
@@ -183,12 +150,7 @@ describe("ModuleForm coverage top-up", () => {
     fireEvent.submit(document.querySelector("form"));
 
     await waitFor(() => {
-      expect(updateModuleMock).toHaveBeenCalledWith(
-        7,
-        expect.objectContaining({
-          module_name: "Software Engineering",
-        }),
-      );
+      expect(updateModuleMock).toHaveBeenCalledWith(7, expect.objectContaining({ module_name: "Software Engineering" }));
     });
   });
 

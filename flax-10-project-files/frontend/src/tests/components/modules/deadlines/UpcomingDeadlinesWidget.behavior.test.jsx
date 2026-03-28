@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Tests for upcoming deadline widget states and interactions.
+ */
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -114,6 +117,10 @@ vi.mock("../../../../components/modules/deadlines/upcomingDeadlinesUtils", () =>
 
 import { UpcomingDeadlinesWidget } from "../../../../components/modules/deadlines/UpcomingDeadlinesWidget";
 
+function renderDeadlineWidget(props = {}) {
+  return render(<UpcomingDeadlinesWidget {...props} />);
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -160,23 +167,19 @@ describe("UpcomingDeadlinesWidget coverage top-up", () => {
     expect(rows[1]).toContain("Later urgent");
   });
 
-  it("expands extra rows and keeps tier ordering across overdue, critical, urgent, and distant deadlines", () => {
-    const { container } = render(
-      <UpcomingDeadlinesWidget
-        deadlines={[
-          { id: 4, title: "Later urgent", module_code: "BIO2", start_due_date: URGENT_LATER_DATE, deadline_type: "quiz" },
-          { id: 2, assessment_title: "Critical exam", module_code: "ENG1", start_due_date: CRITICAL_DATE, deadline_type: "exam" },
-          { id: 5, start_due_date: DISTANT_DATE, deadline_type: null },
-          { id: 3, title: "Soon urgent", start_due_date: URGENT_SOON_DATE, deadline_type: null },
-          { id: 1, title: "Already overdue", module_code: "LAW1", start_due_date: OVERDUE_DATE, deadline_type: "coursework" },
-        ]}
-        initialShown={2}
-      />,
-    );
-
+  it("expands extra rows and keeps deadline tier ordering", () => {
+    const { container } = renderDeadlineWidget({
+      deadlines: [
+        { id: 4, title: "Later urgent", module_code: "BIO2", start_due_date: URGENT_LATER_DATE, deadline_type: "quiz" },
+        { id: 2, assessment_title: "Critical exam", module_code: "ENG1", start_due_date: CRITICAL_DATE, deadline_type: "exam" },
+        { id: 5, start_due_date: DISTANT_DATE, deadline_type: null },
+        { id: 3, title: "Soon urgent", start_due_date: URGENT_SOON_DATE, deadline_type: null },
+        { id: 1, title: "Already overdue", module_code: "LAW1", start_due_date: OVERDUE_DATE, deadline_type: "coursework" },
+      ],
+      initialShown: 2,
+    });
     expect(screen.getByText("Show 3 more")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Show 3 more"));
-
     const rows = Array.from(container.querySelectorAll(".deadlineRow")).map((row) => row.textContent);
     expect(rows[0]).toContain("Already overdue");
     expect(rows[1]).toContain("Critical exam");
@@ -188,36 +191,36 @@ describe("UpcomingDeadlinesWidget coverage top-up", () => {
     expect(screen.queryByText("Soon urgent")).not.toBeInTheDocument();
   });
 
-  it("handles interactive rows, keyboard selection, and module pill clicks without selecting the row", () => {
+  it("handles interactive row keyboard and click selection", () => {
     const onSelectDeadline = vi.fn();
-    const onModuleCodeClick = vi.fn();
-
-    render(
-      <UpcomingDeadlinesWidget
-        deadlines={[
-          { id: 7, title: "Essay", module_code: "CS101", start_due_date: CRITICAL_DATE, deadline_type: "exam" },
-        ]}
-        interactiveRows
-        onSelectDeadline={onSelectDeadline}
-        onModuleCodeClick={onModuleCodeClick}
-      />,
-    );
-
+    renderDeadlineWidget({
+      deadlines: [{ id: 7, title: "Essay", module_code: "CS101", start_due_date: CRITICAL_DATE, deadline_type: "exam" }],
+      interactiveRows: true,
+      onSelectDeadline,
+      onModuleCodeClick: vi.fn(),
+    });
     const row = screen.getByRole("button", { name: /essay/i });
-
     fireEvent.keyDown(row, { key: "Escape" });
     expect(onSelectDeadline).not.toHaveBeenCalled();
-
     fireEvent.keyDown(row, { key: "Enter" });
     fireEvent.click(row);
     expect(onSelectDeadline).toHaveBeenCalledTimes(2);
+  });
 
+  it("handles module pill clicks without selecting the row", () => {
+    const onSelectDeadline = vi.fn();
+    const onModuleCodeClick = vi.fn();
+    renderDeadlineWidget({
+      deadlines: [{ id: 7, title: "Essay", module_code: "CS101", start_due_date: CRITICAL_DATE, deadline_type: "exam" }],
+      interactiveRows: true,
+      onSelectDeadline,
+      onModuleCodeClick,
+    });
     fireEvent.mouseDown(screen.getByText("EXAM"));
     fireEvent.click(screen.getByText("EXAM"));
     fireEvent.click(screen.getByText("CS101"));
-
     expect(onModuleCodeClick).toHaveBeenCalledWith("CS101");
-    expect(onSelectDeadline).toHaveBeenCalledTimes(2);
+    expect(onSelectDeadline).not.toHaveBeenCalled();
   });
 
   it("falls back to an empty internal list when array detection treats null like an array", () => {

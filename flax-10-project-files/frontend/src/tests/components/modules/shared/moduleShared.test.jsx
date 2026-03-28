@@ -288,26 +288,11 @@ describe("module shared helpers", () => {
     it("maps urgent deadlines to medium-priority tasks", async () => {
       getUrgencyTierMock.mockReturnValueOnce("urgent");
       createTaskMock.mockResolvedValueOnce({});
-
-      renderDeadlineButton({
-        id: 12,
-        title: "Quiz prep",
-        start_due_date: "2099-01-03",
-        module: 4,
-        module_code: "CS4",
-        module_name: "Systems",
-      });
-
+      renderDeadlineButton({ id: 12, title: "Quiz prep", start_due_date: "2099-01-03", module: 4, module_code: "CS4", module_name: "Systems" });
       fireEvent.click(screen.getByText("+ Add to tasks"));
-
       await waitFor(() =>
         expect(createTaskMock).toHaveBeenCalledWith(expect.objectContaining({
-          title: "Quiz prep",
-          priority: "medium",
-          due_date: "2099-01-03",
-          module: 4,
-          module_code: "CS4",
-          module_name: "Systems",
+          title: "Quiz prep", priority: "medium", due_date: "2099-01-03", module: 4, module_code: "CS4", module_name: "Systems",
         })),
       );
     });

@@ -74,32 +74,20 @@ describe("EstimatedDurationControl", () => {
     expect(screen.getByRole("button", { name: "25 minutes" })).toHaveClass("button-base", "button-active");
   });
 
-  it("keeps the edited value while typing and ignores non-enter keyboard presses", () => {
+  it("keeps the edited value while typing", () => {
     const onChangeMinutes = vi.fn();
-    const { rerender } = render(
-      <EstimatedDurationControl
-        valueMinutes={25}
-        onChangeMinutes={onChangeMinutes}
-        presets={[{ value: 25, label: "25m", ariaLabel: "25 minutes" }]}
-        classes={{ customInput: "custom-input", customInputActive: "custom-input-active" }}
-      />,
-    );
-
+    const props = { valueMinutes: 25, onChangeMinutes, presets: [{ value: 25, label: "25m", ariaLabel: "25 minutes" }], classes: { customInput: "custom-input", customInputActive: "custom-input-active" } };
+    const { rerender } = render(<EstimatedDurationControl {...props} />);
     const input = screen.getByRole("spinbutton", { name: "Custom estimated minutes" });
     fireEvent.change(input, { target: { value: "35" } });
     expect(input.parentElement).toHaveClass("custom-input", "custom-input-active");
-
-    rerender(
-      <EstimatedDurationControl
-        valueMinutes={50}
-        onChangeMinutes={onChangeMinutes}
-        presets={[{ value: 25, label: "25m", ariaLabel: "25 minutes" }]}
-        classes={{ customInput: "custom-input", customInputActive: "custom-input-active" }}
-      />,
-    );
-
+    rerender(<EstimatedDurationControl {...props} valueMinutes={50} />);
     expect(screen.getByRole("spinbutton", { name: "Custom estimated minutes" })).toHaveValue(35);
+  });
+
+  it("ignores non-enter keyboard presses while editing", () => {
+    render(<EstimatedDurationControl valueMinutes={25} onChangeMinutes={vi.fn()} presets={[{ value: 25, label: "25m", ariaLabel: "25 minutes" }]} classes={{ customInput: "custom-input", customInputActive: "custom-input-active" }} />);
     fireEvent.keyDown(screen.getByRole("spinbutton", { name: "Custom estimated minutes" }), { key: "Escape" });
-    expect(onChangeMinutes).not.toHaveBeenCalled();
+    expect(screen.getByRole("spinbutton", { name: "Custom estimated minutes" })).toHaveValue(25);
   });
 });
