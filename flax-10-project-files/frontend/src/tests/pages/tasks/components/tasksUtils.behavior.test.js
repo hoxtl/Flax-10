@@ -4,7 +4,7 @@ const createTaskListMock = vi.fn();
 const updateTaskListMock = vi.fn();
 const deleteTaskListMock = vi.fn();
 
-vi.mock("../../../api/taskApi", () => ({
+vi.mock("../../../../api/taskApi", () => ({
   createTaskList: (...args) => createTaskListMock(...args),
   updateTaskList: (...args) => updateTaskListMock(...args),
   deleteTaskList: (...args) => deleteTaskListMock(...args),
@@ -16,27 +16,27 @@ import {
   minutesToEstimateBlocks,
   normalizeEstimateMinutesInput,
   runQuickAdd,
-} from "../../../pages/tasks/utils/createTaskBarUtils";
-import { getListColor } from "../../../pages/tasks/utils/listColorUtils";
+} from "../../../../pages/tasks/utils/createTaskBarUtils";
+import { getListColor } from "../../../../pages/tasks/utils/listColorUtils";
 import {
   getReadingListLabel,
   getSocietyDisplayName,
   isReadingListName,
   matchesReadingList,
-} from "../../../pages/tasks/utils/readingListUtils";
-import { getCompletedDueLabel, splitEstimatedBlocks } from "../../../pages/tasks/utils/taskCardUtils";
-import { getCompletedWeekCount, getThisWeek } from "../../../pages/tasks/utils/taskFeedDataUtils";
-import { sortTasks } from "../../../pages/tasks/utils/taskSortUtils";
+} from "../../../../pages/tasks/utils/readingListUtils";
+import { getCompletedDueLabel, splitEstimatedBlocks } from "../../../../pages/tasks/utils/taskCardUtils";
+import { getCompletedWeekCount, getThisWeek } from "../../../../pages/tasks/utils/taskFeedDataUtils";
+import { sortTasks } from "../../../../pages/tasks/utils/taskSortUtils";
 import {
   buildTasksPageHandlers,
   buildTasksPageViewProps,
-} from "../../../pages/tasks/utils/tasksPageUtils";
+} from "../../../../pages/tasks/utils/tasksPageUtils";
 import {
   addListImpl,
   mergeListColors,
   removeListImpl,
   renameListImpl,
-} from "../../../pages/tasks/utils/useTaskListsUtils";
+} from "../../../../pages/tasks/utils/useTaskListsUtils";
 
 const makeFnMap = (names) => Object.fromEntries(names.map((name) => [name, vi.fn()]));
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { computeListSidebarCounts } from "../../../pages/tasks/utils/listSidebarUtils";
+import { computeListSidebarCounts } from "../../../../pages/tasks/utils/listSidebarUtils";
 
 describe("listSidebarUtils", () => {
   const lists = [{ id: "1", name: "L1" }, { id: "2", name: "L2" }];

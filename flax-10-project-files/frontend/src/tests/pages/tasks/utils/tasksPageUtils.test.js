@@ -3,14 +3,14 @@
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { createFnMap } from "../../utils/testBuilderUtils";
+import { createFnMap } from "../../../utils/testBuilderUtils";
 import {
   getTodayEndISO,
   getTomorrowEndISO,
   filterTasksByListAndFilter,
   buildTasksPageHandlers,
   buildTasksPageViewProps,
-} from "../../../pages/tasks/utils/tasksPageUtils";
+} from "../../../../pages/tasks/utils/tasksPageUtils";
 
 const baseTasks = [
   { id: 1, task_list: "1", completed: false, due_date: "2026-03-15T12:00:00" },

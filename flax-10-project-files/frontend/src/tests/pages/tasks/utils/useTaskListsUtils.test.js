@@ -8,15 +8,15 @@ import {
   removeListImpl,
   restoreListImpl,
   permanentlyDeleteListImpl,
-} from "../../../pages/tasks/utils/useTaskListsUtils";
+} from "../../../../pages/tasks/utils/useTaskListsUtils";
 
-vi.mock("../../../api/taskApi", () => ({
+vi.mock("../../../../api/taskApi", () => ({
   createTaskList: vi.fn(),
   updateTaskList: vi.fn(),
   deleteTaskList: vi.fn(),
 }));
 
-import { createTaskList, updateTaskList, deleteTaskList } from "../../../api/taskApi";
+import { createTaskList, updateTaskList, deleteTaskList } from "../../../../api/taskApi";
 
 describe("useTaskListsUtils", () => {
   beforeEach(() => {

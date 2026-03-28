@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import TasksPage from '../../pages/tasks/TasksPage';
+import TasksPage from '../../../../pages/tasks/TasksPage';
 
-vi.mock('../../pages/tasks/hooks/useTasks', () => ({
+vi.mock('../../../../pages/tasks/hooks/useTasks', () => ({
     default: vi.fn(),
 }));
 
-vi.mock('../../pages/tasks/hooks/useTaskLists', () => ({
+vi.mock('../../../../pages/tasks/hooks/useTaskLists', () => ({
     default: vi.fn(),
 }));
 
-vi.mock('../../pages/tasks/components/TaskFeed', () => ({
+vi.mock('../../../../pages/tasks/components/TaskFeed', () => ({
     default: ({ tasks, onCreateTask, onAddTask, onDeleteTask, onEditTask, onPlanTomorrow, onFilterByList }) => (
         <div data-testid="task-feed">
             <span>Tasks: {tasks.length}</span>
@@ -26,7 +26,7 @@ vi.mock('../../pages/tasks/components/TaskFeed', () => ({
     ),
 }));
 
-vi.mock('../../pages/tasks/components/ListSidebar', () => ({
+vi.mock('../../../../pages/tasks/components/ListSidebar', () => ({
     default: ({ lists, onNewList, onSelectFilter, onSelectList, onUnarchiveList, onPermanentlyDeleteList }) => (
         <div data-testid="list-sidebar">
             <span>Lists: {lists.length}</span>
@@ -39,7 +39,7 @@ vi.mock('../../pages/tasks/components/ListSidebar', () => ({
     ),
 }));
 
-vi.mock('../../pages/tasks/components/CreateTaskModal', () => ({
+vi.mock('../../../../pages/tasks/components/CreateTaskModal', () => ({
     default: ({ onClose, onSave, defaultListId, defaultDueDate }) => (
         <div data-testid="create-task-modal">
             <div>defaultListId:{String(defaultListId ?? '')}</div>
@@ -50,7 +50,7 @@ vi.mock('../../pages/tasks/components/CreateTaskModal', () => ({
     ),
 }));
 
-vi.mock('../../pages/tasks/components/CreateListModal', () => ({
+vi.mock('../../../../pages/tasks/components/CreateListModal', () => ({
     default: ({ onClose, onSave }) => (
         <div data-testid="create-list-modal">
             <button onClick={onClose}>Close List Modal</button>
@@ -58,12 +58,12 @@ vi.mock('../../pages/tasks/components/CreateListModal', () => ({
     ),
 }));
 
-vi.mock('../../components/pagination/Pagination', () => ({
+vi.mock('../../../../components/pagination/Pagination', () => ({
     BackToTop: () => <div data-testid="back-to-top" />,
 }));
 
-import useTasks from '../../pages/tasks/hooks/useTasks';
-import useTaskLists from '../../pages/tasks/hooks/useTaskLists';
+import useTasks from '../../../../pages/tasks/hooks/useTasks';
+import useTaskLists from '../../../../pages/tasks/hooks/useTaskLists';
 
 const mockTasksHook = {
     tasks: [],
