@@ -13,6 +13,10 @@ const coverageRun = process.argv.some(
 
 // https://vite.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
   build: {
     manifest: true,
     emptyOutDir: true,
