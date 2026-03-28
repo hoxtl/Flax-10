@@ -17,7 +17,7 @@ it("renders fallback stats when no projects have deadlines", () => {
   mockGetProgressStats.mockReturnValue({ percent: 0 });
   mockGetNextDeadline.mockReturnValue({ project: null, days: 0 });
   render(<GroupWorkStats projects={null} />);
-  expect(screen.getByTestId("stat-strip")).toHaveTextContent("Upcoming deadlines:--");
+  expect(screen.getByTestId("stat-strip")).toHaveTextContent("Days to next deadline:--");
   expect(mockUseCountUp).toHaveBeenCalledWith(0, 1200);
 });
 
