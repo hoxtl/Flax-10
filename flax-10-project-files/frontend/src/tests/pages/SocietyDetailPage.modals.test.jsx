@@ -88,8 +88,11 @@ describe("SocietyDetailPage Modals", () => {
 
       fireEvent.click(screen.getByText("submit-announcement"));
       fireEvent.click(screen.getByText("submit-new-announcement"));
+      fireEvent.click(screen.getByText("submit-conflict"));
       fireEvent.click(screen.getByText("delete-announcement"));
+      expect(data.updateAnnouncement).toHaveBeenCalledWith(4, { id: 4, pinned: false, title: "Existing pinned" }, false);
       expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Updated announcement" }, false);
+      expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Pinned announcement" }, false);
       expect(data.addAnnouncement).toHaveBeenCalledWith({ title: "Fresh announcement" }, false);
       expect(data.deleteAnnouncement).toHaveBeenCalledWith(7, false);
     });
