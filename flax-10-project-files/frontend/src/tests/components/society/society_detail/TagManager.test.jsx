@@ -173,11 +173,9 @@ describe('TagManager', () => {
         expect(input.value).toBe('Draft Tag');
     });
 
-    it('edits, validates, and resets existing tags', async () => {
+    it('validates existing tag names to prevent duplicates', async () => {
         const onUpdateTag = vi.fn().mockResolvedValue(undefined);
-        const { rerender } = render(
-            <TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} onUpdateTag={onUpdateTag} />,
-        );
+        render(<TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} onUpdateTag={onUpdateTag} />);
 
         fireEvent.click(screen.getByText('Important'));
         const editInput = screen.getByDisplayValue('Important');
@@ -185,32 +183,39 @@ describe('TagManager', () => {
         await act(async () => {
             fireEvent.click(screen.getByText('Save'));
         });
+
         expect(screen.getByText('A tag with this name already exists.')).toBeInTheDocument();
         expect(onUpdateTag).not.toHaveBeenCalled();
+    });
 
+    it('successfully edits and updates an existing tag', async () => {
+        const onUpdateTag = vi.fn().mockResolvedValue(undefined);
+        render(<TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} onUpdateTag={onUpdateTag} />);
+
+        fireEvent.click(screen.getByText('Important'));
+        const editInput = screen.getByDisplayValue('Important');
         fireEvent.change(editInput, { target: { value: 'Updated Important' } });
         const colorButtons = document.querySelectorAll('[class*="colorOption"]');
         fireEvent.click(colorButtons[3]);
         await act(async () => {
             fireEvent.click(screen.getByText('Save'));
         });
+
         expect(onUpdateTag).toHaveBeenCalledWith(1, { label: 'Updated Important', color: '#f59e0b' });
+    });
 
-        rerender(
-            <TagManager
-                tags={[{ id: 1, label: 'Updated Important', color: '#f59e0b' }, mockTags[1]]}
-                onAddTag={vi.fn()}
-                onDeleteTag={vi.fn()}
-                onUpdateTag={onUpdateTag}
-            />,
-        );
+    it('cancels edits and restores the original tag value', () => {
+        const onUpdateTag = vi.fn();
+        render(<TagManager tags={mockTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} onUpdateTag={onUpdateTag} />);
 
-        fireEvent.click(screen.getByText('Updated Important'));
-        const reopenedInput = screen.getByDisplayValue('Updated Important');
+        fireEvent.click(screen.getByText('Important'));
+        const reopenedInput = screen.getByDisplayValue('Important');
         fireEvent.change(reopenedInput, { target: { value: 'Temporary' } });
         fireEvent.click(screen.getByText('Cancel'));
-        fireEvent.click(screen.getByText('Updated Important'));
-        expect(screen.getByDisplayValue('Updated Important')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Important'));
+
+        expect(screen.getByDisplayValue('Important')).toBeInTheDocument();
+        expect(onUpdateTag).not.toHaveBeenCalled();
     });
 
     it('does not save an edited tag when a non-Enter key is pressed', () => {

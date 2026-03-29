@@ -97,6 +97,19 @@ describe('useSocietyMembership', () => {
         expect(mockSoc.member_count).toBe(1);
     });
 
+    it('falls back to "this society" when the previous society name is missing', async () => {
+        mockSoc = { id: 1, member_count: 0, is_member: false, is_subscribed: true };
+        api.joinSociety.mockResolvedValue({});
+        const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
+
+        await act(async () => { await result.current.joinSociety(); });
+
+        expect(mockSoc.is_member).toBe(true);
+        expect(mockSoc.is_subscribed).toBe(true);
+        expect(mockSoc.member_count).toBe(1);
+        expect(showToast).toHaveBeenCalledWith('Joined this society');
+    });
+
     it('requestRatification and publishChanges', async () => {
         api.requestRatification.mockResolvedValue({});
         api.publishChanges.mockResolvedValue({});

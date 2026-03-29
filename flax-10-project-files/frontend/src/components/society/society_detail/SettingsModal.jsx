@@ -80,7 +80,7 @@ function SettingsContent({ onClose, ratificationStatus, isRatified, onRequestRat
 function SettingsOverlays({ collabs, showAdd, setShowAdd, showDeleteConfirm, setShowDeleteConfirm, handleAdd, onDelete, onClose }) {
   return (
     <>
-      {showAdd && <AddCollaboratorModal onClose={() => setShowAdd(false)} onAdd={handleAdd} existingUsernames={(collabs || []).map((member) => member.username)} />}
+      {showAdd && <AddCollaboratorModal onClose={() => setShowAdd(false)} onAdd={handleAdd} existingUsernames={collabs.map((member) => member.username)} />}
       {showDeleteConfirm && <HoldConfirmModal title="Delete Society" warningText="This will permanently delete this society and all of its linked content. This cannot be undone." cancelLabel="Keep Society" holdLabel="Hold to Delete" onCancel={() => setShowDeleteConfirm(false)} onConfirm={() => confirmSocietyDelete(onDelete, onClose, setShowDeleteConfirm)} />}
     </>
   );

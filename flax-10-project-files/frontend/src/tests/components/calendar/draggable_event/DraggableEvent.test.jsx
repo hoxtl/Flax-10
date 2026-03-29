@@ -73,6 +73,14 @@ const timetableEvent = {
     source: 'timetable',
 };
 
+const groupMeetingEvent = {
+    id: 4,
+    title: 'Study Group',
+    start_time: '2025-01-15T12:00:00Z',
+    end_time: '2025-01-15T13:00:00Z',
+    source: 'group_meeting',
+};
+
 import { getEventType } from '../../../../components/calendar/utils/eventUtils';
 
 describe('DraggableEvent', () => {
@@ -158,6 +166,12 @@ describe('DraggableEvent', () => {
         getEventType.mockReturnValue('module');
         const { container } = render(<DraggableEvent event={{ ...timetableEvent, source: 'module' } } style={{ height: '60px', width: '100%' }} />);
         expect(container.querySelector('.timetable-event')).toBeTruthy();
+    });
+
+    it('applies group-meeting-event class for group meetings', () => {
+        getEventType.mockReturnValue('group_meeting');
+        const { container } = render(<DraggableEvent event={groupMeetingEvent} style={{ height: '60px', width: '100%' }} />);
+        expect(container.querySelector('.group-meeting-event')).toBeTruthy();
     });
 
     it('does not call openPopup when isDragging', () => {

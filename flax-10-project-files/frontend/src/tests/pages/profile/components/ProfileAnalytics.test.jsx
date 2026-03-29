@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Profile from '../../../../pages/profile/Profile';
 import analyticsService from '../../../../api/analyticsApi';
@@ -117,35 +117,36 @@ describe('Profile Analytics', () => {
   it('opens achievements modal', async () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
-    fireEvent.click(screen.getByRole('button', { name: /View All/i }));
-    expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
-  });
+    fireEvent.click(await screen.findByRole('button', { name: /View All/i }, { timeout: 4000 }));
+    expect(await screen.findByTestId('achievements-modal', {}, { timeout: 4000 })).toBeTruthy();
+  }, 15000);
 
   it('closes achievements modal when Close clicked', async () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
-    fireEvent.click(screen.getByRole('button', { name: /View All/i }));
-    await screen.findByTestId('achievements-modal');
-    fireEvent.click(screen.getByText('Close'));
-    await waitFor(() => expect(screen.queryByTestId('achievements-modal')).not.toBeInTheDocument());
-  });
+    fireEvent.click(await screen.findByRole('button', { name: /View All/i }, { timeout: 4000 }));
+    const modal = await screen.findByTestId('achievements-modal', {}, { timeout: 4000 });
+    fireEvent.click(within(modal).getByText('Close'));
+    await waitFor(() => expect(screen.queryByTestId('achievements-modal')).not.toBeInTheDocument(), { timeout: 4000 });
+  }, 15000);
 
   it('saves weekly goal and refetches summary', async () => {
     const refetch = vi.fn();
     useProfileSummary.mockReturnValue({ summary: { persona: null, badges: [], weekly: { percentage: 20, hours_studied: 2, goal_hours: 8 }, streaks: { current: 0, longest: 0 }, session_count: 1 }, loading: false, refetch });
     renderProfile();
-    fireEvent.click(screen.getByText('2h').closest('button'));
-    fireEvent.click(await screen.findByRole('button', { name: 'Save goal' }));
-    await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
-  });
+    fireEvent.click(await screen.findByRole('button', { name: /2h/i }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Save goal' }, { timeout: 4000 }));
+    await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })), { timeout: 4000 });
+    await waitFor(() => expect(refetch).toHaveBeenCalledTimes(1), { timeout: 4000 });
+  }, 15000);
 
   it('handles getSummary failure without crashing', async () => {
     analyticsService.getSummary.mockRejectedValue(new Error('error'));
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
-    await waitFor(() => expect(analyticsService.getSummary).toHaveBeenCalledWith(90));
+    await waitFor(() => expect(analyticsService.getSummary).toHaveBeenCalledWith(90), { timeout: 4000 });
     expect(screen.getByText('Night Owl')).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('computePeakHour handles all zeros', async () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });

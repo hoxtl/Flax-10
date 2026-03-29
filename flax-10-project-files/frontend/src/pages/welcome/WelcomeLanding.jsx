@@ -93,7 +93,6 @@ function WelcomeActions({ onExplore, onBackToAuth }) {
     <motion.div className={styles.actions} initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, duration: 0.4 }}>
       <PrimaryButton className={styles.primaryBtn} size="large" pill onClick={onExplore}>Explore StudyFlax</PrimaryButton>
-      <PrimaryButton className={styles.secondaryBtn} variant="secondary" size="large" pill disabled title="Coming soon">Watch tutorial (coming soon)</PrimaryButton>
       <PrimaryButton className={styles.tertiaryBtn} variant="ghost" size="large" pill onClick={onBackToAuth}>Back to sign in</PrimaryButton>
     </motion.div>
   );

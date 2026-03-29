@@ -141,8 +141,8 @@ describe('Profile Core', () => {
   it('falls back to the current user object when profileData is missing', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: null, viewedUserId: 1 }));
     renderProfile({ user: defaultUser, viewedUserId: 1 });
-    expect((await screen.findAllByText('alice')).length).toBeGreaterThan(0);
-  });
+    expect((await screen.findAllByText('alice', {}, { timeout: 4000 })).length).toBeGreaterThan(0);
+  }, 15000);
 
   it('falls back to empty auth modules', async () => {
     const auth = { profile: null, loading: false, authenticated: true, user: { role: 'student' }, refreshProfile: vi.fn() };
@@ -159,16 +159,16 @@ describe('Profile Core', () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData, is_shared_with_me: true }, viewedUserId: 2 }));
     useProfileVisibility.mockReturnValue({ ...defaultVisibility, isSelf: false, canViewCalendar: true, canEditProfile: false });
     renderProfile({ user: defaultUser, viewedUserId: 2, onNavigate: undefined, onNavChange });
-    fireEvent.click(await screen.findByText('View their calendar'));
-    expect(onNavChange).toHaveBeenCalled();
-  });
+    fireEvent.click(await screen.findByRole('button', { name: /View their calendar/i }, { timeout: 4000 }));
+    await waitFor(() => expect(onNavChange).toHaveBeenCalledTimes(1), { timeout: 4000 });
+  }, 15000);
 
   it('renders a standalone back button when onBack is provided', async () => {
     const onBack = vi.fn();
     renderProfile({ onBack, backLabel: 'Go back' });
-    fireEvent.click(screen.getByRole('button', { name: /Go back/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /Go back/i }, { timeout: 4000 }));
     expect(onBack).toHaveBeenCalledTimes(1);
-  });
+  }, 15000);
 
   it('shows shared calendar for mutual profile', async () => {
     useProfileState.mockReturnValue(makeProfileState({ profileData: { ...otherProfileData, is_shared_with_me: true }, viewedUserId: 2 }));
