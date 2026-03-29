@@ -5,6 +5,7 @@
 /*
  * Builds the filter panel configuration from picker state.
  */
+
 export function buildFilterPanelProps(state) {
   return {
     activeFilterTab: state.activeFilterTab,
@@ -25,6 +26,7 @@ export function buildFilterPanelProps(state) {
 /*
  * Applies a new sort selection and reloads the task list.
  */
+
 export function changeSort(value, state) {
   state.setSortBy(value);
   state.loadTasks(value);
@@ -33,6 +35,7 @@ export function changeSort(value, state) {
 /*
  * Toggles a task list filter in the active selection.
  */
+
 export function toggleList(listId, setFilterListIds) {
   const stringId = String(listId);
   setFilterListIds((previous) => previous.includes(stringId) ? previous.filter((id) => id !== stringId) : [...previous, stringId]);
@@ -41,6 +44,7 @@ export function toggleList(listId, setFilterListIds) {
 /*
  * Toggles a module filter in the active selection.
  */
+
 export function toggleModule(code, setFilterModuleCodes) {
   setFilterModuleCodes((previous) => previous.includes(code) ? previous.filter((item) => item !== code) : [...previous, code]);
 }
@@ -48,6 +52,7 @@ export function toggleModule(code, setFilterModuleCodes) {
 /*
  * Clears every active picker filter.
  */
+
 export function clearAllFilters(state) {
   state.setFilterListIds([]);
   state.setFilterModuleCodes([]);
@@ -57,6 +62,7 @@ export function clearAllFilters(state) {
 /*
  * Closes the filter panel when a click lands outside it.
  */
+
 export function closeFilterPanel(event, state, filterWrapRef) {
   if (state.isFilterOpen && filterWrapRef.current && !filterWrapRef.current.contains(event.target)) state.setIsFilterOpen(false);
 }

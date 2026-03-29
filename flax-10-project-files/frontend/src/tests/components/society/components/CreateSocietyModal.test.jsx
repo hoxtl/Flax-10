@@ -42,7 +42,8 @@ vi.mock('../../../../components/common/tags_selector/TagsSelector', () => ({
     TagsSelector: ({ tags, selectedTags, onSelectionChange, emptyHint }) => (
         <div>
             <span>{emptyHint}</span>
-            <button onClick={() => onSelectionChange([{ id: 'Tech', label: 'Tech' }])}>SelectCategory</button>
+            <span data-testid="selected-category-count">{selectedTags.length}</span>
+            <button onClick={() => onSelectionChange([tags[0]])}>SelectCategory</button>
         </div>
     ),
 }));
@@ -258,6 +259,21 @@ describe('CreateSocietyModal', () => {
         expect(bio.value).toBe('A fun photography club');
     });
 
+    it('submits the selected category ids in the payload', async () => {
+        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+        fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
+            target: { value: 'Debate Society' },
+        });
+        fireEvent.click(screen.getByText('SelectCategory'));
+        expect(screen.getByTestId('selected-category-count')).toHaveTextContent('1');
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
+        });
+        expect(onCreate).toHaveBeenCalledWith(
+            expect.objectContaining({ categories: ['sports'] })
+        );
+    });
+
     it('includes bio in onCreate form data', async () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.change(screen.getByPlaceholderText('e.g. Photography Club'), {
@@ -284,16 +300,14 @@ describe('CreateSocietyModal', () => {
             fireEvent.click(screen.getByRole('button', { name: 'Create Society' }));
         });
         expect(onCreate).toHaveBeenCalledWith(
-            expect.objectContaining({ categories: ['Tech'] })
+            expect.objectContaining({ categories: ['sports'] })
         );
     });
 
     it('removes a collaborator via Remove button', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        // Add a collaborator first
         fireEvent.click(screen.getByText('+ Add Collaborators'));
         fireEvent.click(screen.getByText('AddCollab'));
-        // Now remove it
         fireEvent.click(screen.getByText('Remove'));
         expect(screen.queryByText('alice')).not.toBeInTheDocument();
     });

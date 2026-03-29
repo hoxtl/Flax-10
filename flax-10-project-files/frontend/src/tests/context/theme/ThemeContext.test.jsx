@@ -8,6 +8,11 @@ vi.mock('../../../api/client', () => ({
     fetchApi: vi.fn().mockResolvedValue({}),
 }));
 
+function ThemeProbe() {
+    const { mode, theme } = useTheme();
+    return <div data-testid="theme-probe">{`${mode}:${theme}`}</div>;
+}
+
 describe('ThemeContext', () => {
     beforeEach(() => {
         localStorage.clear();
@@ -45,6 +50,24 @@ describe('ThemeContext', () => {
         const wrapper = ({ children }) => <ThemeProvider initialMode="dark">{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
         expect(result.current.mode).toBe('dark');
+    });
+
+    it('syncs mode and theme when the provider receives new initial props', () => {
+        const { rerender } = render(
+            <ThemeProvider initialMode="light" initialTheme="flax">
+                <ThemeProbe />
+            </ThemeProvider>
+        );
+
+        expect(document.querySelector('[data-testid="theme-probe"]').textContent).toBe('light:flax');
+
+        rerender(
+            <ThemeProvider initialMode="dark" initialTheme="ocean">
+                <ThemeProbe />
+            </ThemeProvider>
+        );
+
+        expect(document.querySelector('[data-testid="theme-probe"]').textContent).toBe('dark:ocean');
     });
 
     it('ignores invalid stored mode', () => {

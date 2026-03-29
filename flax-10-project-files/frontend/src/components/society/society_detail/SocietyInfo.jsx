@@ -32,6 +32,7 @@ function getInfoConfig(society, layout, className, showBio, showLocation, showMe
 }
 
 /** Primary metadata and action row for the society detail page. */
+
 export default function SocietyInfo(props) {
     const config = getInfoConfig(props.society, props.layout, props.className, props.showBio, props.showLocation, props.showMeta);
     if (!config.hasVisibleSections) return null;
@@ -53,6 +54,7 @@ function getSocietyCategories(society) {
 }
 
 /** Groups category, notification, and membership actions inside a segmented pill. */
+
 export function SocietyMetaPill(props) {
     const categories = getSocietyCategories(props.society);
     return <MetaPillLayout {...props} categories={categories} />;
@@ -110,6 +112,7 @@ function saveAndClose(value, onSave, setEditing) {
 }
 
 /** Displays or edits the society biography. */
+
 function BioSection({ text, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
     if (editing) return <BioEditor initialValue={text || ""} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;

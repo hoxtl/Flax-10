@@ -122,6 +122,7 @@ const DetailLayout = ({ data, handlers, onBack, isAdmin, onEditCover }) => {
 };
 
 /** Shows the full society detail experience, including tabs, hero actions, and admin modals. */
+
 export default function SocietyDetailPage({ societyId, onBack, initialTab, onMembershipChange, onDelete }) {
     const data = useSocietyPageData(societyId, initialTab, onMembershipChange);
     const handlers = usePageStateHandlers(data, onBack, onDelete);
@@ -154,6 +155,7 @@ function useCoverImagePicker(onSelect) {
 }
 
 /** Manages the transition between view and edit modes. */
+
 async function handleToggleEditMode(modals, tracker, publish) {
     if (modals.editMode && tracker.hasChanges()) {
         await publish(tracker.getChangeSummary());
@@ -163,6 +165,7 @@ async function handleToggleEditMode(modals, tracker, publish) {
 }
 
 /** Toggles the reporting status of the society. */
+
 function ReportButton({ hasReported, onReport, onUnreport }) {
     const title = hasReported ? "You have reported this society. Click to unreport." : "Report Society";
     return (
@@ -194,6 +197,7 @@ function SettingsButton({ onSettings }) {
 }
 
 /** Common header for the detail view including navigation. */
+
 function TopBar({ onBack, societyName }) {
     const crumbs = [
         { label: "Societies", navKey: "societies" },
@@ -210,6 +214,7 @@ function TopBar({ onBack, societyName }) {
 }
 
 /** Simple error display when a society record is missing. */
+
 function NotFound({ onBack }) {
     return (
         <div className={styles.notFound}>

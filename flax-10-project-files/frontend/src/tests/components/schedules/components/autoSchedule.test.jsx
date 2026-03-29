@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { ScheduleAutoForm, ScheduleManualForm } from "../../../../components/schedules/components/ScheduleForms";
+import { ScheduleAutoForm } from "../../../../components/schedules/components/ScheduleForms";
 import { AutoScheduleForm } from "../../../../components/schedules/auto/AutoScheduleForm";
 
 const submitAutoSchedule = vi.fn();
@@ -19,10 +19,6 @@ vi.mock("../../../../components/schedules/auto/AutoScheduleSummary", () => ({
   AutoScheduleSummary: ({ deadlines }) => <div>Summary count: {deadlines.length}</div>,
 }));
 
-vi.mock("../../../../components/schedules/manual/ManualScheduleForm", () => ({
-  ManualScheduleForm: ({ onDone }) => <button onClick={onDone}>manual-proxy</button>,
-}));
-
 describe("Auto schedule form", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -32,17 +28,8 @@ describe("Auto schedule form", () => {
     });
   });
 
-  it("re-exports the manual and auto schedule entry points", () => {
-    const onDone = vi.fn();
-    render(
-      <>
-        <ScheduleManualForm onDone={onDone} />
-        <ScheduleAutoForm onDone={onDone} />
-      </>,
-    );
-
-    fireEvent.click(screen.getByText("manual-proxy"));
-    expect(onDone).toHaveBeenCalled();
+  it("re-exports the auto schedule entry point", () => {
+    render(<ScheduleAutoForm onDone={vi.fn()} />);
     expect(screen.getByText("Generate Auto Schedule")).toBeInTheDocument();
   });
 

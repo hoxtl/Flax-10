@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { validatePasswords, getErrorMessage, saveUserData, clearUserData } from '../../../components/Auth/utils/authHelpers';
 
 const WELCOME_KEY = 'flax_welcome_seen_v1';
+const ACTIVE_NAV_KEY = 'flax_active_nav';
 
 beforeEach(() => {
   localStorage.clear();
@@ -42,25 +43,54 @@ describe('getErrorMessage', () => {
 });
 
 describe('saveUserData', () => {
-  it('saves token and user to localStorage and dispatches event', () => {
+  it('saves token and user, clears cross-session ui state, and dispatches event', () => {
     const user = { username: 'jane' };
+    localStorage.setItem(WELCOME_KEY, '1');
+    localStorage.setItem(ACTIVE_NAV_KEY, 'calendar');
+    localStorage.setItem('colorTheme', 'ocean');
+    localStorage.setItem('theme', 'ocean');
+    localStorage.setItem('mode', 'dark');
+    localStorage.setItem('banned', '1');
+    localStorage.setItem('ban_reason', 'Old');
+
     saveUserData('tok123', user);
+
     expect(localStorage.getItem('token')).toBe('tok123');
     expect(localStorage.getItem('user')).toBe(JSON.stringify(user));
     expect(localStorage.getItem(WELCOME_KEY)).toBeNull();
+    expect(localStorage.getItem(ACTIVE_NAV_KEY)).toBeNull();
+    expect(localStorage.getItem('colorTheme')).toBeNull();
+    expect(localStorage.getItem('theme')).toBeNull();
+    expect(localStorage.getItem('mode')).toBeNull();
+    expect(localStorage.getItem('banned')).toBeNull();
+    expect(localStorage.getItem('ban_reason')).toBeNull();
     expect(window.dispatchEvent).toHaveBeenCalled();
   });
 });
 
 describe('clearUserData', () => {
-  it('removes token, user, and welcome key, then dispatches event', () => {
+  it('removes auth and cross-session ui state, then dispatches event', () => {
     localStorage.setItem('token', 'tok');
     localStorage.setItem('user', '{}');
     localStorage.setItem(WELCOME_KEY, '1');
+    localStorage.setItem(ACTIVE_NAV_KEY, 'calendar');
+    localStorage.setItem('colorTheme', 'ocean');
+    localStorage.setItem('theme', 'ocean');
+    localStorage.setItem('mode', 'dark');
+    localStorage.setItem('banned', '1');
+    localStorage.setItem('ban_reason', 'Old');
+
     clearUserData();
+
     expect(localStorage.getItem('token')).toBeNull();
     expect(localStorage.getItem('user')).toBeNull();
     expect(localStorage.getItem(WELCOME_KEY)).toBeNull();
+    expect(localStorage.getItem(ACTIVE_NAV_KEY)).toBeNull();
+    expect(localStorage.getItem('colorTheme')).toBeNull();
+    expect(localStorage.getItem('theme')).toBeNull();
+    expect(localStorage.getItem('mode')).toBeNull();
+    expect(localStorage.getItem('banned')).toBeNull();
+    expect(localStorage.getItem('ban_reason')).toBeNull();
     expect(window.dispatchEvent).toHaveBeenCalled();
   });
 });

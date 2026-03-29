@@ -16,7 +16,7 @@ import { HomepageOverlays } from "./HomepageOverlays";
 import { HomepageSkeleton } from "./HomepageSkeleton";
 import taskWidgetStyles from "../styles/TaskWidget.module.css";
 import styles from "../Homepage.module.css";
-import { HomepageTimelineSection } from ".";
+import { HomepageTimelineSection } from "./HomepageTimelineSection";
 
 export function HomepageDashboard(props) {
   if (props.homeDataLoading) return <HomepageSkeleton />;

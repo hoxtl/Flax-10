@@ -272,6 +272,7 @@ function InsightBannerLayout({ insight, navigate }) {
 }
 
 /** Shows a personalised timing insight for the current society. */
+
 export default function SocietyInsightBanner({ society }) {
   const insight = useSocietyInsight(society);
   const navigate = useNavigate();

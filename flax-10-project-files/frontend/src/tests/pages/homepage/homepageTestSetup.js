@@ -214,24 +214,7 @@ vi.mock("../../../pages/tasks/components/TaskCard", async () => {
   };
 });
 
-vi.mock("../../../pages/homepage/components", () => ({
-  MiniTimeline: ({ sortedEvents, onQuickStart, onTaskToggle, onCardClick, onEdit, onConflictAutoMove, onPushTomorrow, onDelete, onReschedule, onToggleComplete }) => (
-    <div data-testid="mini-timeline">events:{(sortedEvents || []).length}
-      <button type="button" onClick={() => onQuickStart?.(new Date(), 25, { id: 1, title: "T", estimated_blocks: 1 })}>quick-start</button>
-      <button type="button" onClick={() => onQuickStart?.(new Date(), 25, null)}>quick-start-no-task</button>
-      <button type="button" onClick={() => onTaskToggle?.({ id: 1 }, true)}>task-toggle</button>
-      <button type="button" onClick={() => onCardClick?.({ id: 1, title: "E" })}>card-click</button>
-      <button type="button" onClick={() => onCardClick?.(null)}>card-click-null</button>
-      <button type="button" onClick={() => onEdit?.({ id: 1 })}>timeline-edit</button>
-      <button type="button" onClick={() => onConflictAutoMove?.({ id: 1 }, new Date(), new Date())}>conflict-auto-move</button>
-      <button type="button" onClick={() => onPushTomorrow?.({ id: 1, start_time: new Date().toISOString(), end_time: new Date().toISOString(), title: "E" })}>push-tomorrow</button>
-      <button type="button" onClick={() => onPushTomorrow?.({ id: 1 })}>push-tomorrow-no-time</button>
-      <button type="button" onClick={() => onDelete?.({ id: 1, title: "E" })}>timeline-delete</button>
-      <button type="button" onClick={() => onDelete?.({ id: "ev-1", source: "task", external_id: 99, title: "Task Event" })}>timeline-delete-task</button>
-      <button type="button" onClick={() => onReschedule?.({ id: 1, start_time: new Date().toISOString(), end_time: new Date().toISOString(), title: "E" })}>reschedule</button>
-      <button type="button" onClick={() => onToggleComplete?.(1)}>toggle-complete</button>
-    </div>
-  ),
+vi.mock("../../../pages/homepage/components/HomepageTimelineSection", () => ({
   HomepageTimelineSection: ({ handleResolveTimelineConflicts, onTaskToggle, onQuickStart, onConflictAutoMove, onPushTomorrow, onDelete, onReschedule, sortedEvents }) => (
     <div data-testid="homepage-timeline-section">
       <button type="button" onClick={() => handleResolveTimelineConflicts?.()}>resolve-overlaps</button>

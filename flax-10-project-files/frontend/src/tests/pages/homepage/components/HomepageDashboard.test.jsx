@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { HomepageDashboard } from '../../../../pages/homepage/components/HomepageDashboard';
 import { useAuth } from '../../../../context/AuthContext';
 
@@ -46,7 +47,7 @@ vi.mock('../../../../pages/homepage/components/SleepBanner', () => ({ default: (
 vi.mock('../../../../pages/homepage/components/HomepageModals', () => ({ HomepageModals: () => <div data-testid="HomepageModals">HomepageModals</div> }));
 vi.mock('../../../../pages/homepage/components/HomepageOverlays', () => ({ HomepageOverlays: () => <div data-testid="HomepageOverlays">HomepageOverlays</div> }));
 vi.mock('../../../../pages/homepage/components/HomepageSkeleton', () => ({ HomepageSkeleton: () => <div data-testid="HomepageSkeleton">HomepageSkeleton</div> }));
-vi.mock('../../../../pages/homepage/components', () => ({
+vi.mock('../../../../pages/homepage/components/HomepageTimelineSection', () => ({
   HomepageTimelineSection: () => <div data-testid="HomepageTimelineSection">HomepageTimelineSection</div>,
 }));
 
@@ -117,7 +118,7 @@ describe('HomepageDashboard', () => {
 
   it('renders content when not loading', () => {
     useAuth.mockReturnValue({ profile: { role: 'student' } });
-    render(<HomepageDashboard {...defaultProps} />);
+    render(<MemoryRouter><HomepageDashboard {...defaultProps} /></MemoryRouter>);
     expect(screen.getByTestId('IntelligenceRow')).toBeTruthy();
     expect(screen.getByTestId('SleepBanner')).toBeTruthy();
     expect(screen.getByTestId('HomepageOverlays')).toBeTruthy();
@@ -128,7 +129,7 @@ describe('HomepageDashboard', () => {
 
   it('renders sub-components inIntelligenceRow', () => {
     useAuth.mockReturnValue({ profile: { role: 'student' } });
-    render(<HomepageDashboard {...defaultProps} />);
+    render(<MemoryRouter><HomepageDashboard {...defaultProps} /></MemoryRouter>);
     expect(screen.getByTestId('TaskWidgetSlot')).toBeTruthy();
     expect(screen.getByTestId('DeadlinesWidget')).toBeTruthy();
     expect(screen.getByTestId('HomepageTimelineSection')).toBeTruthy();
@@ -136,30 +137,30 @@ describe('HomepageDashboard', () => {
 
   it('handles role-based logic in HomepageDeadlines', () => {
     useAuth.mockReturnValue({ profile: { role: 'teacher' } });
-    const { rerender } = render(<HomepageDashboard {...defaultProps} />);
+    const { rerender } = render(<MemoryRouter><HomepageDashboard {...defaultProps} /></MemoryRouter>);
     expect(screen.getByTestId('DeadlinesWidget')).toBeTruthy();
     
     useAuth.mockReturnValue({ profile: { role: 'student' } });
-    rerender(<HomepageDashboard {...defaultProps} />);
+    rerender(<MemoryRouter><HomepageDashboard {...defaultProps} /></MemoryRouter>);
     expect(screen.getByTestId('DeadlinesWidget')).toBeTruthy();
   });
 
   it('handles role-based logic fallback in HomepageDeadlines', () => {
     useAuth.mockReturnValue({ profile: null });
-    render(<HomepageDashboard {...defaultProps} />);
+    render(<MemoryRouter><HomepageDashboard {...defaultProps} /></MemoryRouter>);
     expect(screen.getByTestId('DeadlinesWidget')).toBeTruthy();
   });
 
   it('handles missing upcomingDeadlines prop in HomepageDeadlines', () => {
     useAuth.mockReturnValue({ profile: { role: 'student' } });
     const propsWithoutDeadlines = { ...defaultProps, upcomingDeadlines: undefined };
-    render(<HomepageDashboard {...propsWithoutDeadlines} />);
+    render(<MemoryRouter><HomepageDashboard {...propsWithoutDeadlines} /></MemoryRouter>);
     expect(screen.getByTestId('DeadlinesWidget')).toBeTruthy();
   });
 
   it('passes module selections from deadlines into the modal state', () => {
     useAuth.mockReturnValue({ profile: { role: 'student' } });
-    render(<HomepageDashboard {...defaultProps} />);
+    render(<MemoryRouter><HomepageDashboard {...defaultProps} /></MemoryRouter>);
     fireEvent.click(screen.getByRole('button', { name: 'select-module' }));
     expect(defaultProps.modals.setSelectedModulePill).toHaveBeenCalledWith({ id: 'module-1' });
   });

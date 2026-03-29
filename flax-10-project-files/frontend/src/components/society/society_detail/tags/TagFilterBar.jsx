@@ -28,6 +28,7 @@ function FilterSelector({ tags, selectedTags, onSelectionChange }) {
 }
 
 /** Renders the tag filter controls for society events. */
+
 export default function TagFilterBar({ tags, activeFilters = [], onFilterChange }) {
     if (!tags?.length) return null;
     const selectedTags = getSelectedTags(tags, activeFilters);

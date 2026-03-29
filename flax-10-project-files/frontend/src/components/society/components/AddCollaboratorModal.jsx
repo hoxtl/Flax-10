@@ -11,11 +11,21 @@ import StandardModal from "../../common/standard_modal/StandardModal";
 import styles from "../styles/AddCollaboratorModal.module.css";
 
 function buildExistingSet(existingUsernames) {
-  return new Set(existingUsernames.map((username) => username?.toLowerCase()).filter(Boolean));
+  const usernames = new Set();
+  existingUsernames.forEach((username) => {
+    const normalized = username?.toLowerCase();
+    normalized && usernames.add(normalized);
+  });
+  return usernames;
 }
 
 function filterAvailableUsers(users = [], existingSet, selectedIds) {
-  return users.filter((user) => !existingSet.has(user.username?.toLowerCase()) && !selectedIds.has(user.id));
+  const available = [];
+  users.forEach((user) => {
+    const normalizedUsername = user.username?.toLowerCase();
+    !existingSet.has(normalizedUsername) && !selectedIds.has(user.id) && available.push(user);
+  });
+  return available;
 }
 
 function addSelectedUser(user, selectedIds, setSelected) {
@@ -42,11 +52,12 @@ function useCollaboratorSelection(existingUsernames, onAdd, onClose) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const existingSet = buildExistingSet(existingUsernames);
-  const selectedIds = new Set(selected.map((user) => user.id));
+  const selectedIds = buildSelectedIds(selected);
   return { selected, isSubmitting, error, filterUsers: (users) => filterAvailableUsers(users, existingSet, selectedIds), onSelect: (user) => addSelectedUser(user, selectedIds, setSelected), onRemove: (id) => setSelected((current) => current.filter((user) => user.id !== id)), onConfirm: () => confirmCollaborators(selected, onAdd, onClose, setError, setIsSubmitting) };
 }
 
 /** Lets admins search for and add new society collaborators. */
+
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
   const selection = useCollaboratorSelection(existingUsernames, onAdd, onClose);
   return (
@@ -59,6 +70,12 @@ export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames
       <ModalFooter disabled={selection.selected.length === 0 || selection.isSubmitting} isSubmitting={selection.isSubmitting} onCancel={onClose} onConfirm={selection.onConfirm} />
     </StandardModal>
   );
+}
+
+function buildSelectedIds(selected) {
+  const ids = new Set();
+  for (const user of selected) ids.add(user.id);
+  return ids;
 }
 
 function CollaboratorSearch({ filterUsers, onSelect }) {
@@ -75,7 +92,11 @@ function renderEmptyState({ clear, query }) {
 
 function SelectedUsers({ users, onRemove }) {
   if (users.length === 0) return null;
-  return <div className={styles.selected}>{users.map((user) => <UserChip key={user.id} onRemove={onRemove} user={user} />)}</div>;
+  const chips = [];
+  for (const user of users) {
+    chips.push(<UserChip key={user.id} onRemove={onRemove} user={user} />);
+  }
+  return <div className={styles.selected}>{chips}</div>;
 }
 
 function UserChip({ user, onRemove }) {

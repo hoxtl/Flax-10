@@ -168,6 +168,7 @@ function setDefaultSearchAndSortingMocks() {
 /*
  * Returns the hoisted mock functions shared by modules page tests.
  */
+
 export function getModulesPageResultsMocks() {
   return hoistedMocks;
 }
@@ -175,6 +176,7 @@ export function getModulesPageResultsMocks() {
 /*
  * Builds modules page search state for result and main view tests.
  */
+
 export function buildSearchState(overrides = {}) {
   return {
     query: "",
@@ -188,6 +190,7 @@ export function buildSearchState(overrides = {}) {
 /*
  * Builds sorting state used by the modules page result views.
  */
+
 export function buildSorting(overrides = {}) {
   return {
     results: [{ id: 1, module_code: "CS101" }],
@@ -207,6 +210,7 @@ export function buildSorting(overrides = {}) {
 /*
  * Builds the modules page state wrapper with mocked handlers.
  */
+
 export function buildTestState(overrides = {}) {
   return {
     isTeacher: true,
@@ -224,6 +228,7 @@ export function buildTestState(overrides = {}) {
 /*
  * Restores the shared modules page mocks to their default state.
  */
+
 export function resetModulesPageResultsMocks() {
   vi.clearAllMocks();
   setDefaultSearchAndSortingMocks();

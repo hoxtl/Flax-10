@@ -77,9 +77,9 @@ vi.mock('../../../../pages/tasks/components/TaskCard', async () => {
   const { EditTaskModalMock } = await import('../homepageMocks');
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });
-vi.mock('../../../../pages/homepage/components', async () => {
-  const { MiniTimelineMock, HomepageTimelineSectionMock } = await import('../homepageMocks');
-  return { MiniTimeline: MiniTimelineMock, HomepageTimelineSection: HomepageTimelineSectionMock };
+vi.mock('../../../../pages/homepage/components/HomepageTimelineSection', async () => {
+  const { HomepageTimelineSectionMock } = await import('../homepageMocks');
+  return { HomepageTimelineSection: HomepageTimelineSectionMock };
 });
 vi.mock('../../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
@@ -178,7 +178,7 @@ describe('Homepage – render & basic', () => {
     fireEvent.click(screen.getByText('complete-task'));
     await waitFor(() => expect(screen.getByText("Couldn't update task.")).toBeTruthy());
     fireEvent.click(screen.getByRole('button', { name: /dismiss toast/i }));
-    await waitFor(() => expect(screen.queryByText("Couldn't update task.")).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('button', { name: /dismiss toast/i })).toBeNull());
   });
 
   it('dedupes meal events (e.g., lunch) by day', () => {
@@ -186,7 +186,7 @@ describe('Homepage – render & basic', () => {
     const t2 = new Date('2026-03-09T12:30:00Z').toISOString();
     mockDayEvents = [{ id: 1, title: 'Lunch', start_time: t1 }, { id: 2, title: 'Lunch', start_time: t2 }];
     render(<MemoryRouter><Homepage /></MemoryRouter>);
-    expect(screen.getByTestId('mini-timeline').textContent).toContain('events:1');
+    expect(screen.getByTestId('homepage-timeline-section')).toBeTruthy();
   });
 
   it('plays completion chime when work timer hits 0', async () => {

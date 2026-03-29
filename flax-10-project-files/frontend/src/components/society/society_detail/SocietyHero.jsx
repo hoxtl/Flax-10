@@ -26,6 +26,7 @@ function useHeroMedia(society) {
 }
 
 /** Visual header carousel for the society detail page. */
+
 export default function SocietyHero(props) {
     const media = useHeroMedia(props.society);
     return <HeroFrame {...props} media={media} />;
@@ -143,6 +144,7 @@ function handleMemberClick(event, onClick) {
 }
 
 /** Renders a name that becomes an input field in edit mode. */
+
 export function EditableName({ name, editMode, onUpdate, layoutId }) {
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(name);
