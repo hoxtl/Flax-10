@@ -64,6 +64,7 @@ function TaskResults({ state, onSelect }) {
 /*
  * Renders the task picker modal and its task results.
  */
+
 export function TaskPickerModal({ state, filterWrapRef, onSelect, onPickForMe }) {
   const activeFilterCount = state.filterListIds.length + state.filterModuleCodes.length;
   const backdropClassName = !state.open ? styles.hidden : styles.taskPickBackdrop;

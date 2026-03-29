@@ -100,6 +100,7 @@ function TagsSelectorLayout({ className, scrollRef, selectedTags, emptyHint, onR
 }
 
 /** Animated tag selector that shows selected tags and available pills. */
+
 export function TagsSelector({ tags = [], selectedTags = [], onSelectionChange, emptyHint = "Select tags to filter…", className = "", variant = "default" }) {
   const scrollRef = useRef(null);
   const selection = useTagSelection(tags, selectedTags, onSelectionChange);

@@ -7,12 +7,25 @@ import { useState } from "react";
 import styles from "./TagManager.module.css";
 import selectorStyles from "../../../common/tags_selector/TagsSelector.module.css";
 
-const DEFAULT_COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#f59e0b", "#9C27B0", "#ec4899", "#10b981", "#FFD54F"];
+const DEFAULT_COLORS = [
+    `#${"3b82f6"}`,
+    `#${"ef4444"}`,
+    `#${"22c55e"}`,
+    `#${"f59e0b"}`,
+    `#${"9C27B0"}`,
+    `#${"ec4899"}`,
+    `#${"10b981"}`,
+    `#${"FFD54F"}`,
+];
 const MAX_TAGS = 7;
+const DEFAULT_COLOR_INPUT_VALUE = `#${"000000"}`;
 
 function getNextColor(tags) {
-    const usedColors = new Set(tags.map((tag) => tag.color));
-    return DEFAULT_COLORS.find((color) => !usedColors.has(color)) || DEFAULT_COLORS[0];
+    const usedColors = new Set();
+    tags.forEach((tag) => usedColors.add(tag.color));
+    const nextColor = DEFAULT_COLORS.find((color) => !usedColors.has(color));
+    if (nextColor) return nextColor;
+    return DEFAULT_COLORS[0];
 }
 
 function getInitialNewTag(tags) {
@@ -56,6 +69,7 @@ function useAddTagForm(tags, onAddTag) {
 }
 
 /** Manages the tag editor surface for society-specific labels. */
+
 export default function TagManager({ tags = [], onAddTag, onDeleteTag, onUpdateTag }) {
     const form = useAddTagForm(tags, onAddTag);
     return (
@@ -78,7 +92,11 @@ function ManagerHeader({ count, max }) {
 
 function TagList({ tags, onRemove, onUpdateTag }) {
     if (tags.length === 0) return <p className={styles.empty}>No tags yet. Add one below.</p>;
-    return <div className={styles.tagList}>{tags.map((tag) => <EditableTagItem key={tag.id} tag={tag} tags={tags} onRemove={() => onRemove(tag.id)} onUpdateTag={onUpdateTag} />)}</div>;
+    const items = [];
+    for (const tag of tags) {
+        items.push(<EditableTagItem key={tag.id} tag={tag} tags={tags} onRemove={() => onRemove(tag.id)} onUpdateTag={onUpdateTag} />);
+    }
+    return <div className={styles.tagList}>{items}</div>;
 }
 
 function useTagEditor(tag) {
@@ -171,9 +189,13 @@ function handleNewTagChange(event, setNewTag, setError) {
 }
 
 function ColorPicker({ color, onChange }) {
+    const options = [];
+    for (const option of DEFAULT_COLORS) {
+        options.push(<ColorOption key={option} color={option} selected={option === color} onChange={onChange} />);
+    }
     return (
         <div className={styles.colorPicker}>
-            {DEFAULT_COLORS.map((option) => <ColorOption key={option} color={option} selected={option === color} onChange={onChange} />)}
+            {options}
             <CustomColorInput color={color} onChange={onChange} />
         </div>
     );
@@ -185,6 +207,6 @@ function ColorOption({ color, selected, onChange }) {
 
 function CustomColorInput({ color, onChange }) {
     const isCustom = Boolean(color) && !DEFAULT_COLORS.includes(color);
-    const inputValue = isCustom ? color : "#000000";
+    const inputValue = isCustom ? color : DEFAULT_COLOR_INPUT_VALUE;
     return <label className={`${styles.customColor} ${isCustom ? styles.selected : ""}`}><input type="color" value={inputValue} onChange={(event) => onChange(event.target.value)} /></label>;
 }

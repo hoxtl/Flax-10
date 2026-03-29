@@ -31,12 +31,14 @@ function useSocietyCardMotion(society) {
 }
 
 /** Displays a verified icon for officially ratified societies. */
+
 function RatifiedBadge({ isRatified }) {
     if (!isRatified) return null;
     return <BadgeCheck className={styles.verifiedIcon} size={22} title="Official Society" aria-label="Official Society" />;
 }
 
 /** Interactive card component for society directory listings. */
+
 export default function SocietyCard(props) {
     const card = useSocietyCardMotion(props.society);
     return <SocietyCardShell {...props} card={card} />;
@@ -62,6 +64,7 @@ function handleReportAction(event, reported, society, onReport, onUnreport) {
 }
 
 /** Handles the report/unreport button logic and state. */
+
 function ReportAction({ society, onReport, onUnreport }) {
     const reported = society.has_reported;
     const tooltipText = getReportTooltip(reported);

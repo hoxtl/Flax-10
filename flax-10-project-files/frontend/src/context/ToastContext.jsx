@@ -51,12 +51,14 @@ function ToastRenderer({ toast, onClose }) {
 }
 
 /** Provides the shared toast dispatcher for the app tree. */
+
 export function ToastProvider({ children }) {
   const { toast, closeToast, showToast } = useToastState();
   return <ToastContext.Provider value={showToast}>{children}<ToastRenderer toast={toast} onClose={closeToast} /></ToastContext.Provider>;
 }
 
 /** Returns the toast dispatcher from the nearest provider. */
+
 export function useToast() {
   return useContext(ToastContext);
 }

@@ -82,6 +82,7 @@ function removeSocietyFromList(setSocieties, id) {
 }
 
 /** Exposes societies data plus local list mutation helpers for the societies page. */
+
 export function useSocieties() {
     const [societies, setSocieties] = useState([]);
     const [state, setState] = useState({ loading: true, error: null });

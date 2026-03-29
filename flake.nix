@@ -228,6 +228,7 @@ PY
               python312
               nodejs_20
               postgresql
+              xdg-utils
             ];
             text = ''
               ${commonScript}
@@ -266,6 +267,20 @@ PY
               echo "  ./coverage/backend/html/index.html"
               echo "  ./coverage/backend/coverage.xml"
               echo "  ./coverage/frontend/"
+
+              open_report() {
+                target="$1"
+                if command -v open >/dev/null 2>&1; then
+                  open "$target" >/dev/null 2>&1 || true
+                elif command -v xdg-open >/dev/null 2>&1; then
+                  xdg-open "$target" >/dev/null 2>&1 || true
+                fi
+              }
+
+              echo ""
+              echo "Attempting to open coverage reports..."
+              open_report "$WORK_DIR/coverage/backend/html/index.html"
+              open_report "$WORK_DIR/coverage/frontend/index.html"
             '';
           };
 

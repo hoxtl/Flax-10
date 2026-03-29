@@ -12,6 +12,7 @@ import { usePagination } from "../../../hooks/usePagination";
 const PAGE_SIZE = 15;
 
 /** Renders society browse cards with pagination and empty states. */
+
 export function SocietyBrowseResults({ items, search, setSearch, onClear, onSelect, onReport, onUnreport }) {
     if (!items.length) return <BrowseEmptyState search={search} onClear={onClear || (() => setSearch(""))} />;
     return <PaginatedResults items={items} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />;

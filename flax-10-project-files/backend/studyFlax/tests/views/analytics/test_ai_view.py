@@ -264,6 +264,27 @@ class OpenAIImportCoverageTest(TestCase):
             del sys.modules['openai']
             importlib.reload(mod)
 
+    def test_openai_import_branch_without_package(self):
+        import builtins
+        import importlib
+        import sys
+
+        real_import = builtins.__import__
+
+        def raising_import(name, *args, **kwargs):
+            if name == 'openai':
+                raise ImportError('missing openai')
+            return real_import(name, *args, **kwargs)
+
+        import studyFlax.views.analytics.ai_view as mod
+        with patch('builtins.__import__', side_effect=raising_import):
+            sys.modules.pop('openai', None)
+            importlib.reload(mod)
+            self.assertIsNone(mod.OpenAI)
+            self.assertIs(mod.OpenAIError, Exception)
+            self.assertFalse(mod.openai_available)
+        importlib.reload(mod)
+
 class AiScheduleParserTest(TestCase):
     """Tests for AI schedule parsing utilities."""
 

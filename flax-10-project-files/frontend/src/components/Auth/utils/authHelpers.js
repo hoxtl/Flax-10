@@ -1,4 +1,7 @@
 const WELCOME_SEEN_KEY = "flax_welcome_seen_v1";
+const ACTIVE_NAV_KEY = "flax_active_nav";
+const THEME_KEYS = ["colorTheme", "theme", "mode"];
+const SESSION_KEYS = [WELCOME_SEEN_KEY, ACTIVE_NAV_KEY, "banned", "ban_reason"];
 
 const USER_FIELDS = ["first_name", "last_name", "username", "email", "password"];
 
@@ -20,13 +23,13 @@ export const getErrorMessage = (data) => {
 export const saveUserData = (token, user) => {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
-  localStorage.removeItem(WELCOME_SEEN_KEY);
+  [...SESSION_KEYS, ...THEME_KEYS].forEach((key) => localStorage.removeItem(key));
   window.dispatchEvent(new Event("auth-changed"));
 };
 
 export const clearUserData = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  localStorage.removeItem(WELCOME_SEEN_KEY);
+  [...SESSION_KEYS, ...THEME_KEYS].forEach((key) => localStorage.removeItem(key));
   window.dispatchEvent(new Event("auth-changed"));
 };

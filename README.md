@@ -63,7 +63,7 @@ The system consists of two primary components:
 
 The deployed version of the application can be found at: https://flax-10-production.up.railway.app/
 
-The Django admin panel (for local development) is accessible at: http://localhost:8000/admin/
+For local development, the Django admin panel is available at `/admin/` on whichever backend URL you start locally.
 
 ---
 
@@ -78,7 +78,7 @@ The following fixture accounts are available for testing and assessment purposes
 | `amiller` | Teacher         | `1234`   |
 | `charlie` | Student         | `1234`   |
 
-> **Admin Access:** The `johndoe` account holds administrator privileges. In addition to the Django admin panel at http://localhost:8000/admin/, admin features are also accessible directly through the main application by signing in with the username `johndoe` and the password `1234`. Additionally, there is a reference to the Django admin panel inside the `johndoe` admin page.
+> **Admin Access:** The `johndoe` account holds administrator privileges. In addition to the Django admin panel at `/admin/` on your local backend URL, admin features are also accessible directly through the main application by signing in with the username `johndoe` and the password `1234`. Additionally, there is a reference to the Django admin panel inside the `johndoe` admin page.
 
 > **Seeded Users:** Additional user accounts are available, generated using the [Faker](https://faker.readthedocs.io/) library as part of the database seeding process. These accounts can be viewed and managed via the Django admin panel when signed in as `johndoe`.
 
@@ -100,10 +100,10 @@ The following fixture accounts are available for testing and assessment purposes
    cd /path/to/Flax-10
    ```
 
-2. Enter the Nix development environment:
+2. Run the project initialisation command:
 
    ```bash
-   nix --extra-experimental-features 'nix-command flakes' develop -c bash
+   nix --extra-experimental-features 'nix-command flakes' run .#init
    ```
 
    > **Tip:** To enable these experimental features permanently, add the following line to `/etc/nix/nix.conf`:
@@ -111,35 +111,51 @@ The following fixture accounts are available for testing and assessment purposes
    > experimental-features = nix-command flakes
    > ```
 
-3. The Nix flake script will automatically configure the Python virtual environment and npm environment. Once complete, you will be returned to the bash terminal, from which you may activate the virtual environment or run the frontend development server.
+3. This command:
+
+   - creates the Python virtual environment in `flax-10-project-files/venv`
+   - installs Python and frontend dependencies
+   - starts a project-local PostgreSQL instance
+   - runs database migrations
+   - seeds the database with the fixture dataset
+
+4. Start the backend and frontend development servers:
+
+   ```bash
+   nix --extra-experimental-features 'nix-command flakes' run .#run
+   ```
+
+   The command prints the exact local frontend and backend URLs when both servers start.
 
 ---
 
-### Setting Up the Local PostgreSQL Database
+### Local PostgreSQL Database
 
-1. After installing PostgreSQL, open the `psql` terminal.
+When using the Nix workflow above, PostgreSQL is managed automatically for you. The flake starts a project-local database cluster under `.postgres/`, creates the `flax10` database if needed, and sets the backend `POSTGRES_*` environment variables automatically.
 
-2. When prompted for connection details (server, database, username), press **Enter** to accept the defaults until prompted for a password.
+If you run the backend outside the Nix commands, the Django settings fall back to:
 
-3. The Django `settings.py` is pre-configured with default PostgreSQL parameters. The default password is `1234`. Update the password in `settings.py` to match the one set for your local PostgreSQL user if it differs.
-
-4. Once PostgreSQL is running, apply Django database migrations:
-
-   ```bash
-   python manage.py migrate
-   ```
+- host: `localhost`
+- port: `5432`
+- database: `postgres`
+- username: `postgres`
+- password: `1234`
 
 ---
 
 ### Re-entering the Nix Environment
 
-Each time you wish to resume development, re-enter the Nix shell by running the following from the repository root:
+To restart the app later from the repository root, run:
 
 ```bash
-nix --extra-experimental-features 'nix-command flakes' develop -c bash
+nix --extra-experimental-features 'nix-command flakes' run .#run
 ```
 
-Docker users must re-run the full `docker run` command as described above.
+To rerun the automated test suites and generate coverage reports, use:
+
+```bash
+nix --extra-experimental-features 'nix-command flakes' run .#tests
+```
 
 ---
 
@@ -149,10 +165,10 @@ The following third-party packages and tools were used directly in the developme
 
 ### Package Management
 
-| Package | Version | Purpose                              |
-| ------- | ------- | ------------------------------------ |
-| Nix     | 2.33.2  | Reproducible environment management  |
-| npm     | 10.8.2  | JavaScript package management        |
+| Package | Version                         | Purpose                             |
+| ------- | ------------------------------- | ----------------------------------- |
+| Nix     | Managed by the local environment | Reproducible environment management |
+| npm     | Bundled with the Node.js toolchain | JavaScript package management     |
 
 ### Frontend Dependencies
 
@@ -176,8 +192,9 @@ The following third-party packages and tools were used directly in the developme
 | globals                     | 16.5.0  | Shared global variable definitions         |
 | @types/react                | 19.2.5  | TypeScript typings for React               |
 | @types/react-dom            | 19.2.3  | TypeScript typings for React DOM           |
-| canvas-confetti             | 1.9.4   | Confetti animation support                 |
-| framer-motion               | 12.34.0 | Web animation library                      |
+| framer-motion               | 12.34.3 | Web animation library                      |
+| @mui/material               | 7.3.8   | Component library                          |
+| styled-components           | 6.3.9   | CSS-in-JS styling library                  |
 
 ### Backend Dependencies
 
@@ -186,6 +203,7 @@ The following third-party packages and tools were used directly in the developme
 | Django              | 5.2.0   | Web framework                                   |
 | faker               | 40.4.0  | Fake data generation for database seeding       |
 | djangorestframework | 3.16.1  | REST API framework for Django                   |
+| django-cors-headers | 4.9.0   | Cross-origin request handling                   |
 | psycopg             | 3.3.2   | PostgreSQL driver (async-capable core)          |
 | psycopg-binary      | 3.3.2   | Precompiled psycopg binaries for local/dev use  |
 | asgiref             | 3.11.1  | ASGI utilities used by Django                   |
@@ -194,6 +212,9 @@ The following third-party packages and tools were used directly in the developme
 | distlib             | 0.4.0   | Dependency utility library (virtualenv backend) |
 | filelock            | 3.20.1  | Cross-platform file locking                     |
 | platformdirs        | 4.5.0   | OS-specific directory resolution                |
+| Pillow              | 12.1.1  | Image processing support                        |
+| icalendar           | 7.0.0   | Calendar export and iCalendar utilities         |
+| openai              | 2.21.0  | OpenAI API client used by backend features      |
 
 ---
 

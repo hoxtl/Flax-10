@@ -87,6 +87,7 @@ function SettingsOverlays({ collabs, showAdd, setShowAdd, showDeleteConfirm, set
 }
 
 /** Presents society admin settings for collaborators, ratification, and deletion. */
+
 export default function SettingsModal(props) {
   const logic = useSettings(props);
   return (

@@ -17,6 +17,7 @@ import { useToast } from "../../../context/ToastContext";
 import { readImageFile, resetFileInput } from "../../../utils/imageFile";
 
 const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map((category) => ({ id: category.id, label: category.label }));
+const EDITOR_ROLE = "editor";
 
 function isValidEmail(email) {
     const trimmed = email.trim();
@@ -28,8 +29,7 @@ function initialForm() {
 }
 
 function allEmailsValid(emails) {
-    const list = emails.split(",").filter((email) => email.trim());
-    return list.every(isValidEmail);
+    return emails.split(",").every((email) => !email.trim() || isValidEmail(email));
 }
 
 function useCreateSocietyState() {
@@ -58,7 +58,7 @@ function getCollabModalProps(form, setModals, onAdd) {
     return {
         onClose: () => setModals((current) => ({ ...current, collab: false })),
         onAdd,
-        existingUsernames: form.collaborators.map((collaborator) => collaborator.username)
+        existingUsernames: getCollaboratorUsernames(form.collaborators)
     };
 }
 
@@ -66,7 +66,7 @@ function useCreateSocietyForm(onCreate) {
     const state = useCreateSocietyState();
     const showToast = useToast();
     const update = (field, value) => state.setForm((current) => ({ ...current, [field]: value }));
-    const handleAddCollabs = (users) => update("collaborators", [...state.form.collaborators, ...users.map((user) => ({ ...user, role: "editor" }))]);
+    const handleAddCollabs = (users) => update("collaborators", mergeCollaborators(state.form.collaborators, users));
     const isInvalid = !state.form.name.trim() || !allEmailsValid(state.form.adminEmails);
     const handleSubmit = () => !isInvalid && !state.isSubmitting && submitCreateSociety(state.form, onCreate, showToast, state.setIsSubmitting, state.setSubmitError);
     return buildCreateFormApi(state, update, handleAddCollabs, handleSubmit, isInvalid);
@@ -87,6 +87,7 @@ function buildCreateFormApi(state, update, handleAddCollabs, handleSubmit, isInv
 }
 
 /** Presents the society creation flow, including collaborators and the cover image picker. */
+
 export default function CreateSocietyModal({ onClose, onCreate }) {
     const logic = useCreateSocietyForm(onCreate);
     return (
@@ -131,14 +132,14 @@ function getFieldHandlers(form, update) {
         images: (value) => update("images", value),
         adminEmails: (value) => update("adminEmails", value),
         ratification: (value) => update("requestRatification", value),
-        role: (id, role) => update("collaborators", form.collaborators.map((collaborator) => (collaborator.user || collaborator.id) === id ? { ...collaborator, role } : collaborator)),
-        remove: (id) => update("collaborators", form.collaborators.filter((collaborator) => (collaborator.user || collaborator.id) !== id))
+        role: (id, role) => update("collaborators", updateCollaboratorRole(form.collaborators, id, role)),
+        remove: (id) => update("collaborators", removeCollaborator(form.collaborators, id))
     };
 }
 
 function CategoriesField({ value, onChange }) {
-    const selectedTagObjects = CATEGORY_TAGS.filter((tag) => value.includes(tag.id));
-    const handleSelectionChange = (selection) => onChange(selection.map((tag) => tag.id));
+    const selectedTagObjects = getSelectedCategoryTags(value);
+    const handleSelectionChange = (selection) => onChange(getSelectionIds(selection));
     return (
         <div className={styles.field}>
             <label className={styles.label}>Categories</label>
@@ -208,4 +209,42 @@ function ModalFooter({ onClose, onCreate, disabled, isSubmitting }) {
             <PrimaryButton className={styles.createBtn} onClick={onCreate} type="button" disabled={disabled} pill>{isSubmitting ? "Creating..." : "Create Society"}</PrimaryButton>
         </div>
     );
+}
+
+function getCollaboratorUsernames(collaborators) {
+    const usernames = [];
+    for (const collaborator of collaborators) usernames.push(collaborator.username);
+    return usernames;
+}
+
+function mergeCollaborators(currentCollaborators, users) {
+    const merged = [...currentCollaborators];
+    for (const user of users) merged.push({ ...user, role: EDITOR_ROLE });
+    return merged;
+}
+
+function updateCollaboratorRole(collaborators, id, role) {
+    const nextCollaborators = [];
+    for (const collaborator of collaborators) {
+        nextCollaborators.push((collaborator.user || collaborator.id) === id ? { ...collaborator, role } : collaborator);
+    }
+    return nextCollaborators;
+}
+
+function removeCollaborator(collaborators, id) {
+    const nextCollaborators = [];
+    collaborators.forEach((collaborator) => ((collaborator.user || collaborator.id) !== id) && nextCollaborators.push(collaborator));
+    return nextCollaborators;
+}
+
+function getSelectedCategoryTags(selectedIds) {
+    const selected = [];
+    CATEGORY_TAGS.forEach((tag) => selectedIds.includes(tag.id) && selected.push(tag));
+    return selected;
+}
+
+function getSelectionIds(selection) {
+    const ids = [];
+    for (const tag of selection) ids.push(tag.id);
+    return ids;
 }

@@ -2,7 +2,7 @@
  * Root app state wiring for auth, theme, and nav.
  */
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { hasSeenWelcome, isBannedFromStorage, persistActiveNav, readActiveNav } from "../storage";
 import { useThemeState } from "./useThemeState";
@@ -24,8 +24,14 @@ function useAuthSnapshot() {
 export function useAppState() {
   const { activeNav, setActiveNav } = useActiveNavState();
   const { authLoading, authed, profile, user } = useAuthSnapshot();
+  const previousAuthed = useRef(authed);
   const [isBanned] = useState(isBannedFromStorage());
   const [showWelcome, setShowWelcome] = useState(!hasSeenWelcome());
   const { initialMode, initialTheme, isLoadingTheme } = useThemeState(authed);
+  useEffect(() => {
+    if (previousAuthed.current === authed) return;
+    previousAuthed.current = authed;
+    setActiveNav("home");
+  }, [authed, setActiveNav]);
   return { activeNav, setActiveNav, initialTheme, initialMode, isLoadingTheme: isLoadingTheme || authLoading, user, profile, authed, showWelcome, setShowWelcome, isBanned };
 }

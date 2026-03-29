@@ -35,6 +35,7 @@ function getSafeActiveTab(activeTab) {
 }
 
 /** Switches between the calendar and announcements views for a society. */
+
 export default function SocietyTabs(props) {
     return (
         <Tabs tabs={buildTabs(props)} activeTab={getSafeActiveTab(props.activeTab)} onTabChange={props.onTabChange} layoutId="society-tab" className={styles.container} tabClassName={styles.tabButton} />

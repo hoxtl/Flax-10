@@ -93,6 +93,28 @@ describe("app state hooks behavior", () => {
     expect(result.current.isLoadingTheme).toBe(true);
   });
 
+  it("resets active nav to home when the auth state changes", () => {
+    useAuthMock.mockReturnValue({
+      authenticated: false,
+      loading: false,
+      profile: null,
+      user: null,
+    });
+
+    const { rerender } = renderHook(() => useAppState());
+    expect(persistActiveNavMock).not.toHaveBeenCalledWith("home");
+
+    useAuthMock.mockReturnValue({
+      authenticated: true,
+      loading: false,
+      profile: { id: 7, major: "CS" },
+      user: { id: 7, name: "Ava" },
+    });
+
+    rerender();
+    expect(persistActiveNavMock).toHaveBeenCalledWith("home");
+  });
+
   it("reads stored theme prefs immediately and triggers theme loading when auth changes", () => {
     const { result, rerender } = renderHook(({ authed }) => useThemeState(authed), {
       initialProps: { authed: false },

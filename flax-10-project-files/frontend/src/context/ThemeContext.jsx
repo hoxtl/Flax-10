@@ -55,6 +55,12 @@ function applyThemeChange(currentMode, sessionStart, nextMode, setModeState) {
 function useThemePreferences(initialTheme, initialMode) {
   const [mode, setModeState] = useState(() => initialMode || getStored("mode", VALID_MODES, "light"));
   const [theme, setThemeState] = useState(() => initialTheme || getStored("colorTheme", VALID_THEMES, "flax"));
+  useEffect(() => {
+    if (VALID_MODES.includes(initialMode)) setModeState(initialMode);
+  }, [initialMode]);
+  useEffect(() => {
+    if (VALID_THEMES.includes(initialTheme)) setThemeState(initialTheme);
+  }, [initialTheme]);
   return { mode, setModeState, theme, setThemeState };
 }
 

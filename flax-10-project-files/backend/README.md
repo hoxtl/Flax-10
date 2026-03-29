@@ -15,11 +15,12 @@ Activate the virtual environment created by the Nix flake, then from the `backen
 
 ```bash
 python manage.py migrate          # apply database migrations
-python manage.py runserver        # starts API server on http://localhost:8000
-python manage.py seed_db          # seed the database with fixture data
+python manage.py runserver        # starts the API server (defaults to http://127.0.0.1:8000)
+python manage.py seed             # seed the database with fixture data
+python manage.py unseed           # clear seeded data before reseeding
 ```
 
-The Django admin panel is available at http://localhost:8000/admin/ when signed in as `johndoe`.
+The Django admin panel is available at `/admin/` on your local backend URL when signed in as `johndoe`.
 
 ## Testing
 
@@ -41,23 +42,24 @@ backend/
     ├── urls/        # URL routing (grouped by domain)
     ├── tests/       # Backend test suites
     ├── fixtures/    # Seed data
+    ├── management/  # Custom Django management commands
     ├── signals/     # Django signals
+    ├── templates/   # Django-rendered templates used by backend flows
     └── utils/       # Shared utility functions
 ```
 
-## API Domains
+## API Surface
 
-| Domain         | Path prefix              |
-| -------------- | ------------------------ |
-| Authentication | `/api/auth/`             |
-| Calendar       | `/api/calendar/`         |
-| Tasks          | `/api/tasks/`            |
-| Modules        | `/api/modules/`          |
-| Timer          | `/api/timer/`            |
-| Analytics      | `/api/analytics/`        |
-| Social         | `/api/social/`           |
-| Group Work     | `/api/groupwork/`        |
-| Society        | `/api/society/`          |
-| Notifications  | `/api/notifications/`    |
-| Settings       | `/api/settings/`         |
-| Admin          | `/api/admin/`            |
+All application endpoints are mounted under `/api/`.
+
+Common areas include:
+
+- authentication under `/api/auth/`
+- profile, settings, onboarding, and user search endpoints under `/api/`
+- calendar, attendance, tags, categories, and timetable endpoints under `/api/`
+- modules, enrolments, readings, deadlines, and tasks under `/api/`
+- group work endpoints under `/api/group-work/`
+- notifications and schedules under `/api/`
+- societies under `/api/societies/`
+- analytics under `/api/analytics/`
+- admin tools under `/api/admin/`

@@ -101,7 +101,7 @@ function useQuickAddLogic(onSelectType, initialView) {
 }
 
 function normalizeQuickAddView(view) {
-  if (view === 'schedule_manual' || view === 'schedule_auto') return 'type';
+  if (view === 'schedule_auto') return 'type';
   return view || 'type';
 }
 
