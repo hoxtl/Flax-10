@@ -11,6 +11,7 @@ function SuggestionItem({ suggestion, onClick }) {
         </div>
     );
 }
+
 function Dropdown({ suggestions, onSelect, value, isLoading, show }) {
     if (!show || value.length < 3) return null;
     if (isLoading) return <div className={styles.loadingIndicator}><span className={styles.spinner} /></div>;
@@ -25,6 +26,7 @@ function Dropdown({ suggestions, onSelect, value, isLoading, show }) {
         </div>
     );
 }
+
 export function LocationAutocomplete({ value, onChange, placeholder = "Enter location" }) {
     const { wrapperRef, show, suggestions, isLoading, handleSelect, handleInputChange, handleInputFocus } = useLocationAutocomplete(value, onChange);
     return (

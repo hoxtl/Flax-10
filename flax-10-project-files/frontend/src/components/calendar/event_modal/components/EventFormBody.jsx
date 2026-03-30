@@ -16,6 +16,7 @@ function Privacy({ value, onChange }) {
         </div>
     );
 }
+
 export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, showReminder = true, showTagManager = true, tags }) {
     const update = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
     const set = (field, val) => setForm(f => ({ ...f, [field]: val }));

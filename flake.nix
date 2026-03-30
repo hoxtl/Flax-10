@@ -28,30 +28,112 @@
 
           # Initialise and start a project-local PostgreSQL cluster.
           # Exports POSTGRES_* variables so Django connects to it.
-          pgScript = ''
+          pgScript =
+            # Some Linux environments expose UIDs that PostgreSQL cannot resolve
+            # via NSS when launched from Nix. Provide an nss_wrapper mapping
+            # only on Linux (evaluated at Nix build time so the Darwin store
+            # path for nss_wrapper is never referenced on macOS).
+            pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+              UID_VALUE="$(id -u)"
+              GID_VALUE="$(id -g)"
+              mkdir -p "$WORK_DIR/.postgres"
+              NSS_PASSWD_FILE="$WORK_DIR/.postgres/nss-passwd"
+              NSS_GROUP_FILE="$WORK_DIR/.postgres/nss-group"
+              printf 'flax10:x:%s:%s:Flax-10 User:%s:/usr/sbin/nologin\n' "$UID_VALUE" "$GID_VALUE" "$WORK_DIR" > "$NSS_PASSWD_FILE"
+              printf 'flax10:x:%s:\n' "$GID_VALUE" > "$NSS_GROUP_FILE"
+              export NSS_WRAPPER_PASSWD="$NSS_PASSWD_FILE"
+              export NSS_WRAPPER_GROUP="$NSS_GROUP_FILE"
+              export LD_PRELOAD="${pkgs.nss_wrapper}/lib/libnss_wrapper.so:''${LD_PRELOAD:-}"
+              export USER="flax10"
+              export LOGNAME="flax10"
+            ''
+            + ''
+
             PGDATA_DIR="$WORK_DIR/.postgres/data"
+            PGPORT_FILE="$WORK_DIR/.postgres/port"
+            PGSOCKET_DIR="''${TMPDIR:-/tmp}/flax10-pg-$(id -u)"
+            mkdir -p "$PGSOCKET_DIR"
+
+            pick_pg_port() {
+              python - <<'PY'
+import socket
+
+for port in range(5433, 5533):
+    with socket.socket() as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            sock.bind(("127.0.0.1", port))
+        except OSError:
+            continue
+        print(port)
+        break
+else:
+    raise SystemExit("No free PostgreSQL port found in 5433-5532")
+PY
+            }
+
+            set_pg_conf() {
+              key="$1"
+              value="$2"
+              file="$PGDATA_DIR/postgresql.conf"
+              tmp="$PGDATA_DIR/postgresql.conf.tmp"
+              grep -Ev "^[[:space:]]*''${key}[[:space:]]*=" "''${file}" > "''${tmp}"
+              echo "''${key} = ''${value}" >> "''${tmp}"
+              mv "$tmp" "$file"
+            }
 
             if [ ! -f "$PGDATA_DIR/PG_VERSION" ]; then
               echo "Initialising local PostgreSQL cluster..."
               mkdir -p "$PGDATA_DIR"
               initdb -D "$PGDATA_DIR" --no-locale --encoding=UTF8 --auth=trust
-              echo "listen_addresses = '127.0.0.1'" >> "$PGDATA_DIR/postgresql.conf"
-              echo "port = 5433"                    >> "$PGDATA_DIR/postgresql.conf"
             fi
+
+            PGPORT="$(cat "$PGPORT_FILE" 2>/dev/null || true)"
+            if [ -n "$PGPORT" ] && ! [[ "$PGPORT" =~ ^[0-9]+$ ]]; then
+              PGPORT=""
+            fi
+
+            if [ -n "$PGPORT" ] && ! pg_ctl -D "$PGDATA_DIR" status > /dev/null 2>&1; then
+              if ! python - "$PGPORT" <<'PY'
+import socket
+import sys
+
+port = int(sys.argv[1])
+with socket.socket() as sock:
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        sock.bind(("127.0.0.1", port))
+    except OSError:
+        raise SystemExit(1)
+raise SystemExit(0)
+PY
+              then
+                PGPORT=""
+              fi
+            fi
+
+            if [ -z "$PGPORT" ]; then
+              PGPORT="$(pick_pg_port)"
+              printf '%s\n' "$PGPORT" > "$PGPORT_FILE"
+            fi
+
+            set_pg_conf "listen_addresses" "'127.0.0.1'"
+            set_pg_conf "port" "$PGPORT"
+            set_pg_conf "unix_socket_directories" "'$PGSOCKET_DIR'"
 
             if ! pg_ctl -D "$PGDATA_DIR" status > /dev/null 2>&1; then
               echo "Starting local PostgreSQL..."
               pg_ctl -D "$PGDATA_DIR" -l "$PGDATA_DIR/logfile" start
-              until pg_isready -h 127.0.0.1 -p 5433 > /dev/null 2>&1; do
+              until pg_isready -h 127.0.0.1 -p "$PGPORT" > /dev/null 2>&1; do
                 sleep 0.2
               done
             fi
 
             CURRENT_USER="$(id -un)"
-            createdb -h 127.0.0.1 -p 5433 -U "$CURRENT_USER" flax10 2>/dev/null || true
+            createdb -h 127.0.0.1 -p "$PGPORT" -U "$CURRENT_USER" flax10 2>/dev/null || true
 
             export POSTGRES_HOST="127.0.0.1"
-            export POSTGRES_PORT="5433"
+            export POSTGRES_PORT="$PGPORT"
             export POSTGRES_USER="$CURRENT_USER"
             export POSTGRES_PASSWORD=""
             export POSTGRES_DB="flax10"
@@ -82,7 +164,7 @@
               nodejs_20
               git
               postgresql
-            ];
+            ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.nss_wrapper ];
             text = ''
               ${commonScript}
               ${ldLibScript}
@@ -155,7 +237,7 @@ with connection.cursor() as cursor:
               python312
               nodejs_20
               postgresql
-            ];
+            ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.nss_wrapper ];
             text = ''
               ${commonScript}
               ${ldLibScript}
@@ -228,8 +310,7 @@ PY
               python312
               nodejs_20
               postgresql
-              xdg-utils
-            ];
+            ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.nss_wrapper pkgs.xdg-utils ];
             text = ''
               ${commonScript}
               ${ldLibScript}
@@ -288,7 +369,10 @@ PY
           # Removes all seed data and allows immediate re-seeding.
           unseed = pkgs.writeShellApplication {
             name = "unseed";
-            runtimeInputs = with pkgs; [ python312 postgresql ];
+            runtimeInputs = with pkgs; [
+              python312
+              postgresql
+            ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.nss_wrapper ];
             text = ''
               ${commonScript}
               ${ldLibScript}
@@ -307,7 +391,10 @@ PY
           # Seeds the database without full initialisation.
           seed = pkgs.writeShellApplication {
             name = "seed";
-            runtimeInputs = with pkgs; [ python312 postgresql ];
+            runtimeInputs = with pkgs; [
+              python312
+              postgresql
+            ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.nss_wrapper ];
             text = ''
               ${commonScript}
               ${ldLibScript}

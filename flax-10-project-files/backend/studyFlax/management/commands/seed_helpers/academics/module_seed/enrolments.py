@@ -21,13 +21,11 @@ def _coursework_week_key(dt):
     iso = dt.isocalendar()
     return iso.year, iso.week
 
-
 def _shift_deadline_by_weeks(deadline, weeks):
     delta = timedelta(weeks=weeks)
     deadline.start_due_date += delta
     if deadline.end_due_date:
         deadline.end_due_date += delta
-
 
 def _sort_key(deadline):
     return (
@@ -36,12 +34,10 @@ def _sort_key(deadline):
         deadline.title,
     )
 
-
 def _shift_to_free_week(deadline, used_weeks):
     while _coursework_week_key(deadline.start_due_date) in used_weeks:
         _shift_deadline_by_weeks(deadline, 1)
     used_weeks.add(_coursework_week_key(deadline.start_due_date))
-
 
 def _spread_coursework_deadlines(deadlines):
     used_weeks = set()
@@ -49,7 +45,6 @@ def _spread_coursework_deadlines(deadlines):
     for deadline in coursework:
         _shift_to_free_week(deadline, used_weeks)
     return deadlines
-
 
 def create_deadlines(modules, stdout):
     """Build and persist seeded deadlines for all modules, spreading coursework to one per week."""
