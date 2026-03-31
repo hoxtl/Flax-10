@@ -110,7 +110,11 @@ describe("MyModulesDashboard", () => {
   });
 
   it("shows an add-to-tasks button in the smart nudge banner for deadlines", async () => {
-    getUpcomingDeadlines.mockResolvedValue([NUDGE_DEADLINE]);
+    const upcomingDeadline = {
+      ...NUDGE_DEADLINE,
+      start_due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+    getUpcomingDeadlines.mockResolvedValue([upcomingDeadline]);
     getSuggestedReadings.mockResolvedValue([]);
     renderDashboard();
 
@@ -122,7 +126,7 @@ describe("MyModulesDashboard", () => {
         title: "Renal Physiology KEATS Quiz",
         module: 42,
         module_code: "LS4404",
-        due_date: "2026-03-30T10:00:00Z",
+        due_date: upcomingDeadline.start_due_date,
       }));
     });
     expect(toastMock).toHaveBeenCalledWith("Deadline added to tasks!");

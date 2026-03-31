@@ -8,9 +8,18 @@ function resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting) 
   setIsSubmitting(false);
 }
 
+function parseProjectDeadline(value) {
+  if (!value) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(value);
+}
+
 function isPastProjectDeadline(value) {
   if (!value) return false;
-  const deadline = new Date(value);
+  const deadline = parseProjectDeadline(value);
   const now = new Date();
   deadline.setHours(0, 0, 0, 0);
   now.setHours(0, 0, 0, 0);

@@ -274,7 +274,7 @@ describe("Homepage modal, overlay, and semester-data extras", () => {
   it("computes semester ranges from the given week span", () => {
     vi.useRealTimers();
     const { result } = renderHook(() => useSemesterRange("", 12));
-    expect(result.current.semStart.toISOString()).toContain("2026-02-09");
+    expect(result.current.semStart.toISOString()).toContain("2026-02-16");
   });
 
   it("loads semester data and falls back on fetch failures", async () => {

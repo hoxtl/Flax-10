@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.unmock("../../../../components/calendar/utils/dateUtils");
+
 import {
   addDays,
   addHourToTime,
@@ -44,6 +46,7 @@ import {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 describe("dateUtils", () => {
@@ -133,23 +136,10 @@ describe("dateUtils", () => {
   it("formats dates into varying semantic structures", () => {
     const date = new Date("2026-03-18T10:05:00");
 
-    expect(formatDate(date)).toBe(
-      date.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" }),
-    );
-    expect(formatShortDate(date)).toBe(
-      date.toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
-    );
-    expect(formatDateWithYear(date)).toBe(
-      date.toLocaleDateString("en-GB", {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }),
-    );
-    expect(formatMonthYear(date)).toBe(
-      date.toLocaleDateString([], { month: "long", year: "numeric" }),
-    );
+    expect(formatDate(date)).toBe("Wed, 18 Mar");
+    expect(formatShortDate(date)).toBe("18 Mar");
+    expect(formatDateWithYear(date)).toBe("Wed, 18 Mar 2026");
+    expect(formatMonthYear(date)).toBe("March 2026");
   });
 
   it("formats time outputs accurately and combined outputs", () => {

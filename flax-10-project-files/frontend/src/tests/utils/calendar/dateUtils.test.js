@@ -1,4 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
+
+vi.unmock('../../../components/calendar/utils/dateUtils');
 import {
     getWeekDays, getMonthDays, getStartOfWeek, getStartOfMonth, getEndOfMonth,
     getStartOfYear, getEndOfYear,
@@ -7,6 +9,11 @@ import {
     parseDateInput, formatDateTime, formatShortDate, formatDateWithYear,
     formatDateRange, formatTimeRange, addHourToTime, getMonthWeeks
 } from '../../../components/calendar/utils/dateUtils';
+
+afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+});
 
 describe('dateUtils', () => {
     const date = new Date(2026, 1, 15);
@@ -100,6 +107,15 @@ describe('dateUtils', () => {
             expect(d.getMonth()).toBe(2);
         });
 
+        it('addMonths clamps end-of-month navigation instead of overflowing', () => {
+            const endOfMarch = new Date(2026, 2, 31);
+            const april = addMonths(endOfMarch, 1);
+            const backToMarch = addMonths(april, -1);
+            expect(april.getMonth()).toBe(3);
+            expect(april.getDate()).toBe(30);
+            expect(backToMarch.getMonth()).toBe(2);
+        });
+
         it('startOfDay', () => {
             const d = startOfDay(new Date(2026, 1, 15, 12, 30));
             expect(d.getHours()).toBe(0);
@@ -121,7 +137,7 @@ describe('dateUtils', () => {
         });
 
         it('formatDate', () => {
-            expect(formatDate(date)).toMatch(/Sun, Feb 15|Sun, 15 Feb/);
+            expect(formatDate(date)).toBe('Sun, 15 Feb');
         });
 
         it('formatMonthYear', () => {
@@ -139,8 +155,7 @@ describe('dateUtils', () => {
         it('formatDateTime', () => {
             const d = new Date(2026, 1, 15, 10, 30);
             const result = formatDateTime(d);
-            expect(result).toMatch(/Sun, Feb 15|Sun, 15 Feb/);
-            expect(result).toMatch(/10:30/);
+            expect(result).toBe(`Sun, 15 Feb at ${formatTime(d)}`);
         });
 
         it('formatShortDate', () => {

@@ -3,6 +3,9 @@
  * Provides week/month calculations, formatting, and day comparison helpers.
  */
 
+const SHORT_WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 /** Returns array of 7 dates representing the week containing the given date. */
 
 export function getWeekDays(date) {
@@ -75,7 +78,7 @@ export function formatTime(date) {
 }
 
 export function formatDate(date) {
-    return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    return `${SHORT_WEEKDAYS[date.getDay()]}, ${date.getDate()} ${SHORT_MONTHS[date.getMonth()]}`;
 }
 
 export function formatDateTime(date) {
@@ -129,7 +132,11 @@ export function addWeeks(date, weeks) {
 
 export function addMonths(date, months) {
     const result = new Date(date);
+    const originalDay = result.getDate();
+    result.setDate(1);
     result.setMonth(result.getMonth() + months);
+    const daysInTargetMonth = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+    result.setDate(Math.min(originalDay, daysInTargetMonth));
     return result;
 }
 

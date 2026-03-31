@@ -117,6 +117,13 @@ import CreateProjectForm from "../../../../pages/group_work/components/CreatePro
 import { CreateProjectInputs } from "../../../../pages/group_work/components/CreateProjectInputs";
 import { useCreateProjectForm } from "../../../../pages/group_work/components/useCreateProjectForm";
 
+function formatLocalDateInputValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 describe("GroupWork forms extras", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -318,7 +325,7 @@ describe("useCreateProjectForm", () => {
 
   it("accepts today's date as a valid deadline", async () => {
     const { result } = renderHook(() => useCreateProjectForm());
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = formatLocalDateInputValue(new Date());
     
     act(() => {
       result.current.change("deadline", todayStr);
