@@ -1,8 +1,6 @@
-# StudyFlax — Team Flax-10 Major Group Project
+# StudyFlax - Team Flax-10 Major Group Project
 
 **Project Topic:** Academic Time Management System for Students in Higher Education
-
----
 
 ## Table of Contents
 
@@ -15,13 +13,9 @@
 7. [Third-Party Source Code and Libraries](#third-party-source-code-and-libraries)
 8. [Use of AI Assistance](#use-of-ai-assistance)
 
----
-
 ## Project Description
 
 StudyFlax is a web-based academic time management platform built for students and teachers at King's College London. It allows students to organise their schedules, track deadlines, and manage their academic workload in one place. Teachers can create modules, set deadlines, and assign work to their students, whilst the admin oversees and manages the system as a whole.
-
----
 
 ## Authors
 
@@ -37,35 +31,37 @@ The following members contributed to the development of this software:
 - Dian Mahmood
 - Binuli Nevanma Markawitage
 
----
-
 ## Project Structure
 
 The repository is organised as follows:
 
-```
+```text
 Flax-10/
-├── flax-10-project-files/
-│   ├── backend/        # Django REST API backend
-│   └── frontend/       # React + Vite frontend
-├── flake.nix           # Nix development environment configuration
-└── README.md
+├── reports/
+└── source_code/
+    ├── flake.nix                    # Nix development environment configuration
+    ├── flake.lock
+    ├── Dockerfile
+    ├── docker-compose.yml
+    ├── requirements.txt            # Python dependencies used by the Nix workflow
+    ├── README.md
+    └── flax-10-project-files/
+        ├── backend/                # Django REST API backend
+        └── frontend/               # React + Vite frontend
 ```
+
+Important: all `nix` commands in this project must be run from inside the `source_code/` directory, because that is where `flake.nix` now lives.
 
 The system consists of two primary components:
 
 - **Backend:** A Django REST Framework API connected to a PostgreSQL database.
 - **Frontend:** A React application built with Vite, communicating with the backend via REST API.
 
----
-
 ## Deployed Application
 
 The deployed version of the application can be found at: https://flax-10-production.up.railway.app/
 
 For local development, the Django admin panel is available at `/admin/` on whichever backend URL you start locally.
-
----
 
 ## Access Credentials
 
@@ -82,22 +78,18 @@ The following fixture accounts are available for testing and assessment purposes
 
 > **Seeded Users:** Additional user accounts are available, generated using the [Faker](https://faker.readthedocs.io/) library as part of the database seeding process. These accounts can be viewed and managed via the Django admin panel when signed in as `johndoe`.
 
----
-
 ## Installation Instructions
 
 ### Prerequisites
 
 - [Nix Package Manager](https://nixos.org/download/#download-nix) must be installed before proceeding.
 
----
-
 ### Linux / macOS
 
-1. Open a terminal and navigate to the root of the repository:
+1. Open a terminal and navigate into the `source_code` directory:
 
    ```bash
-   cd /path/to/Flax-10
+   cd /path/to/Flax-10/source_code
    ```
 
 2. Run the project initialisation command:
@@ -107,17 +99,17 @@ The following fixture accounts are available for testing and assessment purposes
    ```
 
    > **Tip:** To enable these experimental features permanently, add the following line to `/etc/nix/nix.conf`:
-   > ```
+   > ```text
    > experimental-features = nix-command flakes
    > ```
 
 3. This command:
 
-   - creates the Python virtual environment in `flax-10-project-files/venv`
-   - installs Python and frontend dependencies
-   - starts a project-local PostgreSQL instance
-   - runs database migrations
-   - seeds the database with the fixture dataset
+- creates the Python virtual environment in `source_code/flax-10-project-files/venv`
+- installs Python and frontend dependencies
+- starts a project-local PostgreSQL instance under `source_code/.postgres/`
+- runs database migrations
+- seeds the database with the fixture dataset
 
 4. Start the backend and frontend development servers:
 
@@ -126,8 +118,6 @@ The following fixture accounts are available for testing and assessment purposes
    ```
 
    The command prints the exact local frontend and backend URLs when both servers start.
-
----
 
 ### Local PostgreSQL Database
 
@@ -141,23 +131,31 @@ If you run the backend outside the Nix commands, the Django settings fall back t
 - username: `postgres`
 - password: `1234`
 
----
-
 ### Re-entering the Nix Environment
 
-To restart the app later from the repository root, run:
+Whenever you want to start the app again, first move into `source_code/`:
+
+```bash
+cd /path/to/Flax-10/source_code
+```
+
+Then use any of the following commands:
 
 ```bash
 nix --extra-experimental-features 'nix-command flakes' run .#run
 ```
 
-To rerun the automated test suites and generate coverage reports, use:
-
 ```bash
 nix --extra-experimental-features 'nix-command flakes' run .#tests
 ```
 
----
+```bash
+nix --extra-experimental-features 'nix-command flakes' run .#seed
+```
+
+```bash
+nix --extra-experimental-features 'nix-command flakes' run .#unseed
+```
 
 ## Third-Party Source Code and Libraries
 
@@ -165,8 +163,8 @@ The following third-party packages and tools were used directly in the developme
 
 ### Package Management
 
-| Package | Version                         | Purpose                             |
-| ------- | ------------------------------- | ----------------------------------- |
+| Package | Version                          | Purpose                             |
+| ------- | -------------------------------- | ----------------------------------- |
 | Nix     | Managed by the local environment | Reproducible environment management |
 | npm     | Bundled with the Node.js toolchain | JavaScript package management     |
 
@@ -215,8 +213,6 @@ The following third-party packages and tools were used directly in the developme
 | Pillow              | 12.1.1  | Image processing support                        |
 | icalendar           | 7.0.0   | Calendar export and iCalendar utilities         |
 | openai              | 2.21.0  | OpenAI API client used by backend features      |
-
----
 
 ## Use of AI Assistance
 
