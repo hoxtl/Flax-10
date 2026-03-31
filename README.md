@@ -221,5 +221,6 @@ This project made use of AI tools in the following capacities:
 - **Conceptual understanding:** AI tools were used to help the team understand and explain technical concepts, particularly when learning and navigating the React ecosystem for the first time.
 - **GitHub Copilot (via GitHub Student Developer Pack):** Used throughout development to receive real-time feedback on code quality, suggest new features, and support the team in writing and improving code incrementally.
 - **Testing support:** AI assistance was used to aid in the planning and writing of tests, helping to identify edge cases and improve overall test coverage.
+- **Import error resolution:** During the refactoring process, the codebase grew to a large number of files, which resulted in a significant number of import paths needing to be updated simultaneously. AI tools were used to help locate and correct these broken imports efficiently across the codebase, a task that would have been highly time-consuming to carry out manually at that scale. All suggested changes were reviewed and verified by the team before being merged.
 
 All AI-assisted contributions were reviewed, understood, and integrated by members of the team. No AI-generated code was incorporated without verification.
