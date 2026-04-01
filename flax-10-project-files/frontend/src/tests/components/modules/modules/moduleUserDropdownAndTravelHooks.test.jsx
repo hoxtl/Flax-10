@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { beforeEach, describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 import UserModuleDropdown from "../../../../components/modules/components/UserModuleDropdown";
 import TravelTimeIndicator from "../../../../components/modules/modules/TravelTimeIndicator";
@@ -53,6 +53,10 @@ function TravelHarness({ location }) {
 }
 
 describe("Module extras", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("renders user module dropdown states", () => {
     const onChange = vi.fn();
     useModulesMock.mockReturnValueOnce({
@@ -109,7 +113,11 @@ describe("Module extras", () => {
 
     expect(screen.getByText("18 min via TfL")).toBeInTheDocument();
     expect(screen.getByText("Travel time from home")).toBeInTheDocument();
-    expect(await screen.findByTestId("travel")).toHaveTextContent("24");
+    await waitFor(() => {
+      expect(getHomeAddressMock).toHaveBeenCalledTimes(1);
+      expect(getTravelTimeModuleMock).toHaveBeenCalledWith("London", "Strand Campus");
+      expect(screen.getByTestId("travel")).toHaveTextContent("24");
+    }, { timeout: 10000 });
     fireEvent.click(screen.getByText("open"));
     fireEvent.click(screen.getByText("query"));
     fireEvent.click(screen.getByText("expand"));

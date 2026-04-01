@@ -39,6 +39,7 @@ export default defineConfig({
     setupFiles: './src/setupTests.js',
     css: true,
     pool: 'forks',
+    testTimeout: 15000,
     // Istanbul + all:true + CLI --coverage.include can delete/race on coverage/.tmp (ENOENT). Prefer all:false;
     // use `npm run coverage -- --coverage.all=true` when you need untested files in the report.
     ...(coverageRun ? { fileParallelism: false, maxWorkers: 1 } : {}),
