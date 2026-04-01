@@ -84,7 +84,7 @@ describe("SocietyDetailPage Modals", () => {
       expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith(null);
     });
 
-    it("handles cover uploads and announcement persistence", () => {
+    it("handles cover image uploads and clearing", () => {
       const data = renderInteractivePage();
       imageFileMocks.readImageFile.mockImplementationOnce((file, onSelect, onReset) => {
         onSelect("img-1");
@@ -105,11 +105,16 @@ describe("SocietyDetailPage Modals", () => {
       });
       expect(data.updateSociety).toHaveBeenCalledWith({ images: [], image: null });
       expect(imageFileMocks.resetFileInput).toHaveBeenCalledTimes(2);
+    });
 
+    it("handles announcement edits and persistence", () => {
+      const data = renderInteractivePage();
+      
       fireEvent.click(screen.getByText("submit-announcement"));
       fireEvent.click(screen.getByText("submit-new-announcement"));
       fireEvent.click(screen.getByText("submit-conflict"));
       fireEvent.click(screen.getByText("delete-announcement"));
+      
       expect(data.updateAnnouncement).toHaveBeenCalledWith(4, { id: 4, pinned: false, title: "Existing pinned" }, false);
       expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Updated announcement" }, false);
       expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Pinned announcement" }, false);

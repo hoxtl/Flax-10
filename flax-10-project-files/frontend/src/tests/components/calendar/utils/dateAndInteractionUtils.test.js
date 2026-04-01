@@ -47,12 +47,9 @@ afterEach(() => {
 });
 
 describe("dateUtils", () => {
-  it("builds week, month, and year ranges from a local date", () => {
+  it("builds week ranges from a local date", () => {
     const date = new Date("2026-03-18T15:45:00");
-
     const weekDays = getWeekDays(date);
-    const monthDays = getMonthDays(date);
-    const monthWeeks = getMonthWeeks(date);
 
     expect(weekDays).toHaveLength(7);
     expect(weekDays[0].getDay()).toBe(0);
@@ -62,11 +59,15 @@ describe("dateUtils", () => {
     expect(weekStart.getDay()).toBe(0);
     expect(weekStart.getHours()).toBe(0);
     expect(weekStart.getMinutes()).toBe(0);
+  });
+
+  it("builds month ranges from a local date", () => {
+    const date = new Date("2026-03-18T15:45:00");
+    const monthDays = getMonthDays(date);
+    const monthWeeks = getMonthWeeks(date);
 
     expect(getStartOfMonth(date).getDate()).toBe(1);
     expect(getEndOfMonth(date).getDate()).toBe(31);
-    expect(getStartOfYear(date).toISOString().slice(0, 10)).toBe("2026-01-01");
-    expect(getEndOfYear(date).toISOString().slice(0, 10)).toBe("2026-12-31");
 
     expect(monthDays.length % 7).toBe(0);
     expect(monthDays[0].getDay()).toBe(0);
@@ -77,12 +78,14 @@ describe("dateUtils", () => {
     expect(monthWeeks.at(-1)).toHaveLength(7);
   });
 
-  it("handles day comparisons, parsing, and relative labels", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-03-18T09:00:00"));
+  it("builds year ranges from a local date", () => {
+    const date = new Date("2026-03-18T15:45:00");
+    expect(getStartOfYear(date).toISOString().slice(0, 10)).toBe("2026-01-01");
+    expect(getEndOfYear(date).toISOString().slice(0, 10)).toBe("2026-12-31");
+  });
 
+  it("handles day arithmetic and comparisons", () => {
     const today = new Date("2026-03-18T12:00:00");
-    const tomorrow = new Date("2026-03-19T12:00:00");
 
     expect(addDays(today, 2).toISOString().slice(0, 10)).toBe("2026-03-20");
     expect(addWeeks(today, 2).toISOString().slice(0, 10)).toBe("2026-04-01");
@@ -91,7 +94,9 @@ describe("dateUtils", () => {
     expect(isSameDay(new Date("2026-03-18T01:00:00"), new Date("2026-03-18T23:59:00"))).toBe(true);
     expect(isSameMonth(new Date("2026-03-01T00:00:00"), new Date("2026-03-31T23:59:00"))).toBe(true);
     expect(isSameMonth(new Date("2026-03-31T23:59:00"), new Date("2026-04-01T00:00:00"))).toBe(false);
+  });
 
+  it("handles date parsing and normalization bounds", () => {
     expect(startOfDay(new Date("2026-03-18T18:20:00")).toISOString()).toBe(
       new Date("2026-03-18T00:00:00.000").toISOString(),
     );
@@ -100,6 +105,13 @@ describe("dateUtils", () => {
     expect(parsed.getHours()).toBe(0);
     expect(parsed.getMinutes()).toBe(0);
     expect(parseDateInput("")).toBeNull();
+  });
+
+  it("resolves relative labels and today checks correctly", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-03-18T09:00:00"));
+    const today = new Date("2026-03-18T12:00:00");
+    const tomorrow = new Date("2026-03-19T12:00:00");
 
     expect(isToday(today)).toBe(true);
     expect(isToday(new Date("2026-03-17T23:59:59"))).toBe(false);
@@ -118,16 +130,12 @@ describe("dateUtils", () => {
     );
   });
 
-  it("formats date and time helpers consistently", () => {
+  it("formats dates into varying semantic structures", () => {
     const date = new Date("2026-03-18T10:05:00");
 
-    expect(formatTime(date)).toBe(
-      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    );
     expect(formatDate(date)).toBe(
       date.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" }),
     );
-    expect(formatDateTime(date)).toBe(`${formatDate(date)} at ${formatTime(date)}`);
     expect(formatShortDate(date)).toBe(
       date.toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
     );
@@ -142,6 +150,15 @@ describe("dateUtils", () => {
     expect(formatMonthYear(date)).toBe(
       date.toLocaleDateString([], { month: "long", year: "numeric" }),
     );
+  });
+
+  it("formats time outputs accurately and combined outputs", () => {
+    const date = new Date("2026-03-18T10:05:00");
+
+    expect(formatTime(date)).toBe(
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    );
+    expect(formatDateTime(date)).toBe(`${formatDate(date)} at ${formatTime(date)}`);
     expect(addHourToTime("23:05")).toBe("00:05");
   });
 

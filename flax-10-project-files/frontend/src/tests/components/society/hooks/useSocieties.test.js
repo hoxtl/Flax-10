@@ -55,6 +55,31 @@ describe('useSocieties', () => {
         expect(api.addCollaborator).toHaveBeenCalledWith(3, 'user1', 'editor');
     });
 
+    it('handleCreate stores collaborator failures when addCollaborator fails', async () => {
+        api.createSociety.mockResolvedValue({ id: 7, name: 'WithFailure' });
+        api.addCollaborator.mockRejectedValueOnce(new Error('Collaborator failed'));
+        const { result } = await renderSocietiesHook();
+
+        let createdSociety;
+        await act(async () => {
+            createdSociety = await result.current.handleCreate({
+                name: 'WithFailure',
+                collaborators: [{ username: 'alice', role: 'editor' }]
+            });
+        });
+
+        expect(createdSociety.create_meta.collaboratorFailures).toEqual([
+            { username: 'alice', message: 'Collaborator failed' }
+        ]);
+        expect(createdSociety.create_meta.ratificationError).toBeNull();
+        expect(result.current.societies).toContainEqual({
+            id: 7,
+            name: 'WithFailure',
+            is_admin: true,
+            role: 'admin'
+        });
+    });
+
     it('handleCreate requests ratification when flag is set', async () => {
         api.createSociety.mockResolvedValue({ id: 4, name: 'Ratify' });
         const { result } = await renderSocietiesHook();
@@ -62,6 +87,29 @@ describe('useSocieties', () => {
             await result.current.handleCreate({ name: 'Ratify', requestRatification: true });
         });
         expect(api.requestRatification).toHaveBeenCalledWith(4);
+    });
+
+    it('handleCreate stores ratification error when requestRatification fails', async () => {
+        api.createSociety.mockResolvedValue({ id: 8, name: 'RatifyFail' });
+        api.requestRatification.mockRejectedValueOnce(new Error('Ratification failed'));
+        const { result } = await renderSocietiesHook();
+
+        let createdSociety;
+        await act(async () => {
+            createdSociety = await result.current.handleCreate({
+                name: 'RatifyFail',
+                requestRatification: true
+            });
+        });
+
+        expect(createdSociety.create_meta.collaboratorFailures).toEqual([]);
+        expect(createdSociety.create_meta.ratificationError).toBe('Ratification failed');
+        expect(result.current.societies).toContainEqual({
+            id: 8,
+            name: 'RatifyFail',
+            is_admin: true,
+            role: 'admin'
+        });
     });
 
     it('updateSocietyLocally updates a society in the list', async () => {

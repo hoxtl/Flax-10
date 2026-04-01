@@ -1,5 +1,36 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+
+const {
+    useReducedMotionMock,
+    getPrimarySocietyImageMock,
+    getSocietyHeroLayoutIdMock,
+    getSocietyTitleLayoutIdMock,
+} = vi.hoisted(() => ({
+    useReducedMotionMock: vi.fn(() => false),
+    getPrimarySocietyImageMock: vi.fn(),
+    getSocietyHeroLayoutIdMock: vi.fn(),
+    getSocietyTitleLayoutIdMock: vi.fn(),
+}));
+
+vi.mock('framer-motion', async () => {
+    const actual = await vi.importActual('framer-motion');
+    return {
+        ...actual,
+        useReducedMotion: useReducedMotionMock,
+    };
+});
+
+vi.mock('../../../../components/society/utils/societyMotion', async () => {
+    const actual = await vi.importActual('../../../../components/society/utils/societyMotion');
+    return {
+        ...actual,
+        getPrimarySocietyImage: getPrimarySocietyImageMock,
+        getSocietyHeroLayoutId: getSocietyHeroLayoutIdMock,
+        getSocietyTitleLayoutId: getSocietyTitleLayoutIdMock,
+    };
+});
+
 import SocietyCard from '../../../../components/society/components/SocietyCard';
 
 const society = {
@@ -12,6 +43,20 @@ const society = {
 };
 
 describe('SocietyCard', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useReducedMotionMock.mockReturnValue(false);
+        getPrimarySocietyImageMock.mockImplementation((item) => (
+            item.cover_image
+            || item.image
+            || item.images?.[0]?.url
+            || item.images?.[0]
+            || ''
+        ));
+        getSocietyHeroLayoutIdMock.mockImplementation((id) => `society-hero-${id ?? 'unknown'}`);
+        getSocietyTitleLayoutIdMock.mockImplementation((id) => `society-title-${id ?? 'unknown'}`);
+    });
+
     function getCardMedia(container) {
         return container.querySelector('[class*="cardMedia"]');
     }
@@ -56,6 +101,15 @@ describe('SocietyCard', () => {
     it('uses image when cover_image is not available', () => {
         const { container } = render(<SocietyCard society={{ ...society, image: '/alt.jpg' }} onClick={vi.fn()} />);
         expect(getCardMedia(container)?.style.backgroundImage).toContain('/alt.jpg');
+    });
+
+    it('omits shared layout ids when reduced motion is enabled', () => {
+        useReducedMotionMock.mockReturnValue(true);
+
+        render(<SocietyCard society={society} onClick={vi.fn()} />);
+
+        expect(getSocietyHeroLayoutIdMock).not.toHaveBeenCalled();
+        expect(getSocietyTitleLayoutIdMock).not.toHaveBeenCalled();
     });
 
     it('calls onReport when report button clicked and not reported', () => {

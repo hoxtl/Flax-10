@@ -50,13 +50,21 @@ describe('SocietyHero', () => {
         expect(onImageClick).not.toHaveBeenCalled();
     });
 
-    it('does not call onImageClick in edit mode', () => {
-        const onImageClick = vi.fn();
-        const { container } = render(
-            <SocietyHero society={baseSociety} onImageClick={onImageClick} editMode={true} />
+    it('does not render the utility bar until hovered or action content is provided', () => {
+        const { container, rerender } = render(
+            <SocietyHero society={baseSociety} editMode={true} />
         );
-        fireEvent.click(container.firstChild);
-        expect(onImageClick).not.toHaveBeenCalled();
+        expect(container.querySelector('[class*="utilityBar"]')).toBeNull();
+
+        rerender(
+            <SocietyHero
+                society={baseSociety}
+                editMode={false}
+                actionContent={<button type="button">Quick Action</button>}
+            />
+        );
+
+        expect(screen.getByRole('button', { name: 'Quick Action' })).toBeInTheDocument();
     });
 
     it('uses images from society.images array', () => {
@@ -203,17 +211,18 @@ describe('SocietyHero', () => {
     });
 
     it('renders meta content and prevents hero click propagation from the meta slot', () => {
-        const onImageClick = vi.fn();
+        const onWrapperClick = vi.fn();
         render(
-            <SocietyHero
-                society={baseSociety}
-                onImageClick={onImageClick}
-                editMode={false}
-                metaContent={<button type="button">Open Meta</button>}
-            />
+            <div onClick={onWrapperClick}>
+                <SocietyHero
+                    society={baseSociety}
+                    editMode={false}
+                    metaContent={<button type="button">Open Meta</button>}
+                />
+            </div>
         );
         fireEvent.click(screen.getByRole('button', { name: 'Open Meta' }));
-        expect(onImageClick).not.toHaveBeenCalled();
+        expect(onWrapperClick).not.toHaveBeenCalled();
     });
 
     it('does not render a bio block when there is no bio and edit mode is off', () => {
@@ -228,16 +237,9 @@ describe('SocietyHero', () => {
         expect(document.querySelector('[class*="heroBioButton"]')).toBeNull();
     });
 
-    it('lets editors cancel and save bio updates, including a null bio', () => {
+    it('lets editors cancel bio updates', () => {
         const onUpdateBio = vi.fn();
-        render(
-            <SocietyHero
-                society={{ ...baseSociety, bio: null }}
-                onImageClick={vi.fn()}
-                editMode
-                onUpdateBio={onUpdateBio}
-            />
-        );
+        render(<SocietyHero society={{ ...baseSociety, bio: null }} onImageClick={vi.fn()} editMode onUpdateBio={onUpdateBio} />);
 
         fireEvent.click(screen.getByRole('button', { name: /add a short society bio/i }));
         const textarea = screen.getByRole('textbox');
@@ -245,8 +247,14 @@ describe('SocietyHero', () => {
 
         fireEvent.change(textarea, { target: { value: 'Draft bio' } });
         fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+        
         expect(onUpdateBio).not.toHaveBeenCalled();
         expect(screen.getByRole('button', { name: /add a short society bio/i })).toBeInTheDocument();
+    });
+
+    it('lets editors save bio updates including a null bio', () => {
+        const onUpdateBio = vi.fn();
+        render(<SocietyHero society={{ ...baseSociety, bio: null }} onImageClick={vi.fn()} editMode onUpdateBio={onUpdateBio} />);
 
         fireEvent.click(screen.getByRole('button', { name: /add a short society bio/i }));
         fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Saved bio' } });
@@ -257,17 +265,30 @@ describe('SocietyHero', () => {
         expect(screen.getByRole('button', { name: /add a short society bio/i })).toBeInTheDocument();
     });
 
-    it('stops bio edit clicks from bubbling to the hero image action', () => {
-        const onImageClick = vi.fn();
+    it('renders the saved bio as plain text when edit mode is off', () => {
         render(
             <SocietyHero
-                society={baseSociety}
-                onImageClick={onImageClick}
-                editMode
+                society={{ ...baseSociety, bio: 'Club nights every Thursday.' }}
+                editMode={false}
             />
         );
 
+        expect(screen.getByText('Club nights every Thursday.')).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /club nights every thursday/i })).toBeNull();
+    });
+
+    it('stops bio edit clicks from bubbling to the hero image action', () => {
+        const onWrapperClick = vi.fn();
+        render(
+            <div onClick={onWrapperClick}>
+                <SocietyHero
+                    society={baseSociety}
+                    editMode
+                />
+            </div>
+        );
+
         fireEvent.click(screen.getByRole('button', { name: /a chess society/i }));
-        expect(onImageClick).not.toHaveBeenCalled();
+        expect(onWrapperClick).not.toHaveBeenCalled();
     });
 });

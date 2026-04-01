@@ -191,6 +191,20 @@ describe('projectRowUtils – compareProjectsBySort (advanced)', () => {
     )).toBeGreaterThan(0);
   });
 
+  it('uses completion and final name fallbacks for due-date-desc', () => {
+    expect(compareProjectsBySort(
+      { name: 'Alpha', deadline: '2026-03-01', task_count: 10, completed_task_count: 2 },
+      { name: 'Beta', deadline: '2026-03-01', task_count: 10, completed_task_count: 8 },
+      'due-date-desc',
+    )).toBeGreaterThan(0);
+
+    expect(compareProjectsBySort(
+      { name: 'Match', deadline: '2026-03-01', task_count: 10, completed_task_count: 5 },
+      { name: 'Match', deadline: '2026-03-01', task_count: 10, completed_task_count: 5 },
+      'due-date-desc',
+    )).toBe(0);
+  });
+
   it('hits deep tie-breakers and default sort sequence', () => {
     const a = { name: 'A', task_count: 1, completed_task_count: 1, deadline: '2026-01-01' };
     const b = { name: 'B', task_count: 10, completed_task_count: 10, deadline: '2026-01-01' };

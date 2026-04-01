@@ -117,6 +117,15 @@ describe('SocietyInfo', () => {
         expect(onUpdateSociety).toHaveBeenCalledWith({ categories: ['Tech'] });
     });
 
+    it('CategorySection closes the editor without saving when Cancel is clicked', () => {
+        const onUpdateSociety = vi.fn();
+        renderInfo({}, { showMeta: true, editMode: true, onUpdateSociety });
+        fireEvent.click(screen.getByTestId('edit-category'));
+        fireEvent.click(screen.getByText('Cancel'));
+        expect(screen.queryByText('Edit Categories')).not.toBeInTheDocument();
+        expect(onUpdateSociety).not.toHaveBeenCalled();
+    });
+
     it('shows NotificationBell and calls onToggleSubscription when member', () => {
         const onToggleSubscription = vi.fn();
         renderInfo(

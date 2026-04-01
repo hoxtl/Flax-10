@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { HomepageDashboard } from '../../../../pages/homepage/components/HomepageDashboard';
 import { useAuth } from '../../../../context/AuthContext';
 
@@ -25,7 +25,12 @@ vi.mock('../../../../components/calendar/EventPopups', () => ({ EventPopups: () 
 vi.mock('../../../../components/common/back_to_top/BackToTop', () => ({ default: () => <div data-testid="BackToTop">BackToTop</div> }));
 vi.mock('../../../../pages/homepage/components/TaskWidgetSlot', () => ({ TaskWidgetSlot: () => <div data-testid="TaskWidgetSlot">TaskWidgetSlot</div> }));
 vi.mock('../../../../pages/homepage/components/DeadlinesWidget', () => ({ 
-  DeadlinesWidget: ({ isTeacher }) => <div data-testid="DeadlinesWidget">{isTeacher ? 'teacher' : 'student'}</div> 
+  DeadlinesWidget: ({ isTeacher, onSelectModule }) => (
+    <div data-testid="DeadlinesWidget">
+      {isTeacher ? 'teacher' : 'student'}
+      <button type="button" onClick={() => onSelectModule({ id: 'module-1' })}>select-module</button>
+    </div>
+  )
 }));
 vi.mock('../../../../pages/homepage/components/IntelligenceRow', () => ({ 
   default: ({ slot1TodayTasks, slot3Urgent, slot6Timeline, slot5Data }) => (
@@ -150,5 +155,12 @@ describe('HomepageDashboard', () => {
     const propsWithoutDeadlines = { ...defaultProps, upcomingDeadlines: undefined };
     render(<HomepageDashboard {...propsWithoutDeadlines} />);
     expect(screen.getByTestId('DeadlinesWidget')).toBeTruthy();
+  });
+
+  it('passes module selections from deadlines into the modal state', () => {
+    useAuth.mockReturnValue({ profile: { role: 'student' } });
+    render(<HomepageDashboard {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: 'select-module' }));
+    expect(defaultProps.modals.setSelectedModulePill).toHaveBeenCalledWith({ id: 'module-1' });
   });
 });
