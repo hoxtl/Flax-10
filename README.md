@@ -71,7 +71,7 @@ The following fixture accounts are available for testing and assessment purposes
 | --------- | --------------- | -------- |
 | `janedoe` | Student         | `1234`   |
 | `charlie` | Student         | `1234`   |
-| `johndoe` | Admin / Student | `1234`   |
+| `johndoe` | Admin & Student | `1234`   |
 | `amiller` | Teacher         | `1234`   |
 
 > **Admin Access:** The `johndoe` account holds administrator privileges. In addition to the Django admin panel at `/admin/` on your local backend URL, admin features are also accessible directly through the main application by signing in with the username `johndoe` and the password `1234`. Additionally, there is a reference to the Django admin panel inside the `johndoe` admin page.
