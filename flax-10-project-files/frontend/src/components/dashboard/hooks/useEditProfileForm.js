@@ -7,7 +7,7 @@ import { updateUserProfile } from "../../../api/userApi";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 
 export function getApiBaseUrl(configuredBaseUrl = import.meta.env.VITE_API_BASE_URL) {
-  return configuredBaseUrl || "http://localhost:8000/api";
+  return configuredBaseUrl || "/api";
 }
 
 function resolveProfilePhoto(user) {

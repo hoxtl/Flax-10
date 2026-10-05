@@ -11,7 +11,7 @@ import AppPage from "../../components/common/app_page/AppPage";
 import styles from "./styles/styles";
 import { buildAdminTabs } from "./components/adminTabs.jsx";
 
-const DJANGO_ADMIN_URL = "http://localhost:8000/admin/login/?next=/admin/";
+const DJANGO_ADMIN_URL = import.meta.env.VITE_DJANGO_ADMIN_URL || "/admin/login/?next=/admin/";
 const DJANGO_ADMIN_TOOLTIP = {
   username: "johndoe",
   password: "1234",

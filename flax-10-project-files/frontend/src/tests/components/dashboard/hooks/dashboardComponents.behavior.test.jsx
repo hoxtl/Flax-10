@@ -62,7 +62,7 @@ describe("dashboard coverage topups", () => {
 
   it("uses the configured API base URL helper when one is provided", () => {
     expect(getApiBaseUrl("https://studyflax.test/api")).toBe("https://studyflax.test/api");
-    expect(getApiBaseUrl("")).toBe("http://localhost:8000/api");
+    expect(getApiBaseUrl("")).toBe("/api");
   });
 
   it("uses the configured API base URL for username checks when one is provided", async () => {

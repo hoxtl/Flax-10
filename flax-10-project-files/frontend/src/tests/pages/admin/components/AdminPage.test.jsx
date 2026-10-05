@@ -176,7 +176,7 @@ describe("AdminPage – shell", () => {
   it("renders the detailed reporting link and tooltip credentials", async () => {
     render(<AdminPage />);
     const link = screen.getByRole("link", { name: /Open detailed reporting in Django admin/i });
-    expect(link.getAttribute("href")).toBe("http://localhost:8000/admin/login/?next=/admin/");
+    expect(link.getAttribute("href")).toBe("/admin/login/?next=/admin/");
     fireEvent.mouseEnter(link.parentElement);
     await waitFor(() => expect(screen.getByText(/Quick login/i)).toBeTruthy());
     expect(screen.getByText("johndoe")).toBeTruthy();
