@@ -20,7 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&'
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-CSRF_TRUSTED_ORIGINS = ["https://flax-10-production-c2c7.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://flax-10-production-c2c7.up.railway.app",
+    "https://studyflax.co.uk",
+    "https://www.studyflax.co.uk",
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
