@@ -17,14 +17,13 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&'
+SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&')
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-CSRF_TRUSTED_ORIGINS = [
-    "https://flax-10-production-c2c7.up.railway.app",
-    "https://studyflax.co.uk",
-    "https://www.studyflax.co.uk",
-]
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS",
+    "https://flax-10-production-c2c7.up.railway.app,https://studyflax.co.uk,https://www.studyflax.co.uk",
+).split(",")
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -104,6 +103,7 @@ DATABASES = {
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "1234"),
         "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        "OPTIONS": {"sslmode": os.environ.get("POSTGRES_SSLMODE", "prefer")},
     }
 }
 
